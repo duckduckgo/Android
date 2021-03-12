@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -46,7 +47,7 @@ class WelcomePageViewModel(
             if (intent != null) {
                 emit(WelcomePageView.State.ShowDefaultBrowserDialog(intent))
             } else {
-                pixel.fire(Pixel.AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
                 emit(WelcomePageView.State.Finish)
             }
         } else {
@@ -60,7 +61,7 @@ class WelcomePageViewModel(
         appInstallStore.defaultBrowser = true
 
         pixel.fire(
-            Pixel.AppPixelName.DEFAULT_BROWSER_SET,
+            AppPixelName.DEFAULT_BROWSER_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 
@@ -73,7 +74,7 @@ class WelcomePageViewModel(
         appInstallStore.defaultBrowser = false
 
         pixel.fire(
-            Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET,
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 

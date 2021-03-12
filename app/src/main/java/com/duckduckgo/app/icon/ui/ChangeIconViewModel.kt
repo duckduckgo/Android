@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -63,7 +64,7 @@ class ChangeIconViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun start() {
-        pixel.fire(Pixel.AppPixelName.CHANGE_APP_ICON_OPENED)
+        pixel.fire(AppPixelName.CHANGE_APP_ICON_OPENED)
         val selectedIcon = settingsDataStore.appIcon
         viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, selectedIcon) })
     }

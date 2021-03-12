@@ -27,7 +27,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.NOTIFICATION_SHOWN
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

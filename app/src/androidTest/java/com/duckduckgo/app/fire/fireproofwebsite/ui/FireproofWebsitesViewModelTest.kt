@@ -30,10 +30,11 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
+import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import dagger.Lazy
@@ -140,7 +141,7 @@ class FireproofWebsitesViewModelTest {
 
         viewModel.delete(FireproofWebsiteEntity("domain.com"))
 
-        verify(mockPixel).fire(Pixel.AppPixelName.FIREPROOF_WEBSITE_DELETED)
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_DELETED)
     }
 
     @Test

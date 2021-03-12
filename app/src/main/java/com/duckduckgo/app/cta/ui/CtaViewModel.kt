@@ -33,6 +33,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -115,7 +116,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun hideTipsForever(cta: Cta) {
         settingsDataStore.hideTips = true
-        pixel.fire(Pixel.AppPixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
+        pixel.fire(AppPixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
         userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
     }
 

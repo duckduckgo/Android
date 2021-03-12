@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
 
@@ -45,9 +46,9 @@ class ShortcutReceiver @Inject constructor(
         }
 
         if (useOurAppDetector.isUseOurAppUrl(originUrl)) {
-            pixel.fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
+            pixel.fire(AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
         } else {
-            pixel.fire(Pixel.AppPixelName.SHORTCUT_ADDED)
+            pixel.fire(AppPixelName.SHORTCUT_ADDED)
         }
     }
 

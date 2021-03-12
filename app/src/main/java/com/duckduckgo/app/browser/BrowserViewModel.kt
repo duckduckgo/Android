@@ -39,6 +39,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -232,9 +233,9 @@ class BrowserViewModel(
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
             if (useOurAppDetector.isUseOurAppUrl(url)) {
-                pixel.fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
+                pixel.fire(AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
             } else {
-                pixel.fire(Pixel.AppPixelName.SHORTCUT_OPENED)
+                pixel.fire(AppPixelName.SHORTCUT_OPENED)
             }
         }
     }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import com.duckduckgo.app.pixels.AppPixelName
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -24,7 +25,7 @@ class PixelNameTest {
     @Test
     fun verifyNoDuplicatePixelNames() {
         val existingNames = mutableSetOf<String>()
-        Pixel.AppPixelName.values().forEach {
+        AppPixelName.values().forEach {
             if (!existingNames.add(it.pixelName)) {
                 fail("Duplicate pixel name found: ${it.pixelName}")
             }

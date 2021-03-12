@@ -93,6 +93,7 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -1452,7 +1453,7 @@ class BrowserTabFragment :
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
                 pixel.fire(
-                    Pixel.AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
                     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString())
                 )
             }
@@ -1465,54 +1466,54 @@ class BrowserTabFragment :
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
                 onMenuItemClicked(view.backPopupMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.newTabPopupMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.bookmarksPopupMenuItem) {
                     browserActivity?.launchBookmarks()
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) {
                     launch {
-                        pixel.fire(Pixel.AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                         viewModel.onBookmarkAddRequested()
                     }
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
                 onMenuItemClicked(view.settingsPopupMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
                 onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                     viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_SHARE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
                 onMenuItemClicked(view.addToHome) {
-                    pixel.fire(Pixel.AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
             }
@@ -1524,7 +1525,7 @@ class BrowserTabFragment :
 
         private fun launchTopAnchoredPopupMenu() {
             popupMenu.show(rootView, toolbar)
-            pixel.fire(Pixel.AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
         }
 
         private fun configureShowTabSwitcherListener() {

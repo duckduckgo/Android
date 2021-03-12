@@ -21,6 +21,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 import javax.inject.Inject
@@ -76,7 +77,7 @@ class FilenameExtractor @Inject constructor(
     private fun bestGuess(guesses: Guesses): String {
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
-            pixel.fire(Pixel.AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
+            pixel.fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
             return guess + DEFAULT_FILE_TYPE
         }
         return guess

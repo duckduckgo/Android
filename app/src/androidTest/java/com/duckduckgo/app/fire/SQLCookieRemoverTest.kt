@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.exception.RootExceptionFinder
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -106,7 +107,7 @@ class SQLCookieRemoverTest {
         sqlCookieRemover.removeCookies()
 
         verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
-        verify(mockPixel).fire(eq(Pixel.AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
     }
 
     private fun givenFireproofWebsitesStored() {

@@ -29,6 +29,7 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -223,7 +224,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected("domain.com", LocationPermissionType.DENY_ALWAYS)
 
-        verify(mockPixel).fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
 
@@ -237,7 +238,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
 
-        verify(mockPixel).fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
         verify(mockGeoLocationPermissions).allow(domain)
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
     }

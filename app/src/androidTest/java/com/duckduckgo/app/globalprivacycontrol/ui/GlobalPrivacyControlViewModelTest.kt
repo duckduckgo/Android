@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel.Companion.LEARN_MORE_URL
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -71,7 +72,7 @@ class GlobalPrivacyControlViewModelTest {
 
     @Test
     fun whenViewModelCreateThenPixelSent() {
-        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_SHOWN)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
     @Test
@@ -88,14 +89,14 @@ class GlobalPrivacyControlViewModelTest {
     fun whenOnUserToggleGlobalPrivacyControlThenDoNotSellOnPixelSent() {
         testee.onUserToggleGlobalPrivacyControl(true)
 
-        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_ON)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_DO_NOT_SELL_ON)
     }
 
     @Test
     fun whenOnUserToggleGlobalPrivacyControlThenDoNotSellOffPixelSent() {
         testee.onUserToggleGlobalPrivacyControl(false)
 
-        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_OFF)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_DO_NOT_SELL_OFF)
     }
 
     @Test

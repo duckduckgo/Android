@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -65,7 +66,7 @@ class ChangeIconViewModelTest {
 
         testee.start()
 
-        Mockito.verify(mockPixel).fire(Pixel.AppPixelName.CHANGE_APP_ICON_OPENED)
+        Mockito.verify(mockPixel).fire(AppPixelName.CHANGE_APP_ICON_OPENED)
 
         val viewState = testee.viewState.value!!
         assertTrue(viewState.appIcons.isNotEmpty())

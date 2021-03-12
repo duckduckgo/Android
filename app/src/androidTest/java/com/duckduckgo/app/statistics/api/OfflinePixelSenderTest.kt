@@ -70,6 +70,6 @@ class OfflinePixelSenderTest {
 
         testee.sendOfflinePixels().blockingAwait()
 
-        verify(mockPixel).sendPixel(Pixel.AppPixelName.APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap())
+        verify(mockPixel).sendPixel(Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap())
     }
 }

@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventKey.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -91,7 +92,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onFireproofLoginDialogShown()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -103,7 +104,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onFireproofLoginDialogShown()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DIALOG_SHOWN,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
         )
     }
@@ -113,7 +114,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserConfirmedFireproofDialog("twitter.com")
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
+            pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -125,7 +126,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserConfirmedFireproofDialog("twitter.com")
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
+            pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_ADDED,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
         )
     }
@@ -150,7 +151,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserDismissedFireproofLoginDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
+            pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -161,7 +162,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserDismissedFireproofLoginDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
+            pixel = AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
         )
     }
@@ -215,7 +216,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onDisableLoginDetectionDialogShown()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -225,7 +226,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserConfirmedDisableLoginDetectionDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -237,7 +238,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserConfirmedDisableLoginDetectionDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
         )
     }
@@ -254,7 +255,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserDismissedDisableLoginDetectionDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
         )
     }
@@ -266,7 +267,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserDismissedDisableLoginDetectionDialog()
 
         verify(mockPixel).fire(
-            pixel = Pixel.AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
+            pixel = AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL,
             parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "true")
         )
     }

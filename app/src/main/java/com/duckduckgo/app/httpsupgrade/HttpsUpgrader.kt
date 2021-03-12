@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.*
 import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
 

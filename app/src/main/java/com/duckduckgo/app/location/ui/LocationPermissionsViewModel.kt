@@ -25,6 +25,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -114,7 +115,7 @@ class LocationPermissionsViewModel(
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
-                pixel.fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                 geoLocationPermissions.allow(domain)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
@@ -122,7 +123,7 @@ class LocationPermissionsViewModel(
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 geoLocationPermissions.clear(domain)
-                pixel.fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
                 }

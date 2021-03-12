@@ -20,6 +20,7 @@ import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -62,7 +63,7 @@ class BrokenSiteSubmitter(
                 SURROGATES_KEY to brokenSite.surrogates
             )
             runCatching {
-                pixel.fire(Pixel.AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
+                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
