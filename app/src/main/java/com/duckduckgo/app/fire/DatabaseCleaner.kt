@@ -25,28 +25,25 @@ interface DatabaseCleaner {
     suspend fun cleanDatabase(): Boolean
 }
 
-class AuthDatabaseCleaner(private val databaseLocator: DatabaseLocator) : DatabaseCleaner {
+class AuthDatabaseCleaner(private val databasePath: String) : DatabaseCleaner {
 
     override suspend fun cleanDatabase(): Boolean {
         return withContext(Dispatchers.IO) {
-            val databasePath: String = databaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                return@withContext cleanUpDatabase(databasePath)
+                return@withContext cleanUpDatabase()
             }
             return@withContext false
         }
     }
 
-    private fun cleanUpDatabase(databasePath: String): Boolean {
+    private fun cleanUpDatabase(): Boolean {
         var cleanUpExecuted = false
-        openReadableDatabase(databasePath)?.apply {
+        openReadableDatabase(databasePath)?.use {
             try {
-                execSQL("VACUUM")
+                it.execSQL("VACUUM")
                 cleanUpExecuted = true
             } catch (exception: Exception) {
                 Timber.e(exception)
-            } finally {
-                close()
             }
         }
         return cleanUpExecuted

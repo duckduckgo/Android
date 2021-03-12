@@ -50,6 +50,6 @@ class StubDatabaseModule {
     fun provideWebViewHttpAuthStore(
         context: Context
     ): WebViewHttpAuthStore {
-        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), AuthDatabaseCleaner(AuthDatabaseLocator(context)))
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), AuthDatabaseCleaner(AuthDatabaseLocator(context).getDatabasePath()))
     }
 }

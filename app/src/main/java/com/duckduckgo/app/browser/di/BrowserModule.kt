@@ -211,8 +211,7 @@ class BrowserModule {
     fun authDatabaseLocator(context: Context): DatabaseLocator = AuthDatabaseLocator(context)
 
     @Provides
-    @Named("authDbCleaner")
-    fun authDatabaseCleaner(@Named("authDbLocator") authDatabaseLocator: DatabaseLocator): DatabaseCleaner = AuthDatabaseCleaner(authDatabaseLocator)
+    fun authDatabaseCleaner(@Named("authDbLocator") authDatabaseLocator: DatabaseLocator): DatabaseCleaner = AuthDatabaseCleaner(authDatabaseLocator.getDatabasePath())
 
     @Provides
     fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)

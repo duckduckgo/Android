@@ -31,7 +31,7 @@ class AuthDatabaseCleanerTest {
 
     @Before
     fun before() {
-        testee = AuthDatabaseCleaner(authDatabaseLocator)
+        testee = AuthDatabaseCleaner(authDatabaseLocator.getDatabasePath())
     }
 
     @Test

@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
@@ -38,7 +37,7 @@ class DatabaseModule {
     @Singleton
     fun provideWebViewHttpAuthStore(
         context: Context,
-        @Named("authDbCleaner") databaseCleaner: DatabaseCleaner
+        databaseCleaner: DatabaseCleaner
     ): WebViewHttpAuthStore {
         return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), databaseCleaner)
     }
