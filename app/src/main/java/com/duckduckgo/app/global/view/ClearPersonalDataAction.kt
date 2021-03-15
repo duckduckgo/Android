@@ -32,7 +32,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface ClearDataAction {
 
@@ -45,7 +44,7 @@ interface ClearDataAction {
     fun killAndRestartProcess(notifyDataCleared: Boolean)
 }
 
-class ClearPersonalDataAction @Inject constructor(
+class ClearPersonalDataAction(
     private val context: Context,
     private val dataManager: WebDataManager,
     private val clearingStore: UnsentForgetAllPixelStore,

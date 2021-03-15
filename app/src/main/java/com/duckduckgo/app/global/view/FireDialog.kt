@@ -51,7 +51,7 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
-    private val clearPersonalDataAction: ClearPersonalDataAction,
+    private val clearPersonalDataAction: ClearDataAction,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore

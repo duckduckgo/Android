@@ -66,6 +66,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -192,7 +193,7 @@ class BrowserModule {
 
     @Provides
     fun sqlCookieRemover(
-        webViewDatabaseLocator: WebViewDatabaseLocator,
+        @Named("webViewDbLocator") webViewDatabaseLocator: DatabaseLocator,
         getCookieHostsToPreserve: GetCookieHostsToPreserve,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel,
@@ -202,7 +203,15 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewDatabaseLocator(context: Context): WebViewDatabaseLocator = WebViewDatabaseLocator(context)
+    @Named("webViewDbLocator")
+    fun webViewDatabaseLocator(context: Context): DatabaseLocator = WebViewDatabaseLocator(context)
+
+    @Provides
+    @Named("authDbLocator")
+    fun authDatabaseLocator(context: Context): DatabaseLocator = AuthDatabaseLocator(context)
+
+    @Provides
+    fun databaseCleanerHelper(): DatabaseCleaner = DatabaseCleanerHelper()
 
     @Provides
     fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
