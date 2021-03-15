@@ -17,11 +17,17 @@
 package com.duckduckgo.app.di
 
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Completable
 
 @Module
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [AppConfigurationDownloaderModule::class]
+)
 class StubAppConfigurationDownloadModule {
 
     @Provides

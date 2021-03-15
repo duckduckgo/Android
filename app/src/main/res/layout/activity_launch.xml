@@ -14,12 +14,12 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.launch.LaunchBridgeActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
 

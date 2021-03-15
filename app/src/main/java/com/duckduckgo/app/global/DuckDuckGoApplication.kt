@@ -23,9 +23,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
@@ -44,15 +44,10 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -90,12 +85,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var defaultBrowserObserver: DefaultBrowserObserver
 
     @Inject
-    lateinit var statisticsUpdater: StatisticsUpdater
-
-    @Inject
-    lateinit var statisticsDataStore: StatisticsDataStore
-
-    @Inject
     lateinit var appInstallStore: AppInstallStore
 
     @Inject
@@ -123,16 +112,10 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
-    lateinit var offlinePixelCountDataStore: OfflinePixelCountDataStore
-
-    @Inject
     lateinit var dataClearer: DataClearer
 
     @Inject
     lateinit var workScheduler: WorkScheduler
-
-    @Inject
-    lateinit var workerFactory: WorkerFactory
 
     @Inject
     lateinit var appEnjoymentLifecycleObserver: AppEnjoymentLifecycleObserver
@@ -142,9 +125,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var appDataLoader: AppDataLoader
-
-    @Inject
-    lateinit var offlinePixelSender: OfflinePixelSender
 
     @Inject
     lateinit var pixelSender: PixelSender
@@ -162,9 +142,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var shortcutReceiver: ShortcutReceiver
 
     @Inject
-    lateinit var variantManager: VariantManager
-
-    @Inject
     lateinit var userStageStore: UserStageStore
 
     @Inject
@@ -172,6 +149,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var tabsDbSanitizer: TabsDbSanitizer
+
+    @Inject
+    lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
 
     private var launchedByFireAction: Boolean = false
 
@@ -183,12 +163,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         super.onCreate()
 
         configureLogging()
-        configureDependencyInjection()
-        configureUncaughtExceptionHandler()
+        Timber.i("Application Started")
+        if (appIsRestarting()) return
 
         Timber.i("Creating DuckDuckGoApplication")
-
-        if (appIsRestarting()) return
+        configureDependencyInjection()
+        configureUncaughtExceptionHandler()
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
@@ -201,6 +181,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(pixelSender)
             it.addObserver(fireFireAnimationLoader)
             it.addObserver(tabsDbSanitizer)
+            it.addObserver(webViewHttpAuthStore)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -329,7 +310,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         notificationRegistrar.updateStatus()
         GlobalScope.launch {
             workScheduler.scheduleWork()
-            atbInitializer.initializeAfterReferrerAvailable()
+            atbInitializer.initialize()
         }
     }
 

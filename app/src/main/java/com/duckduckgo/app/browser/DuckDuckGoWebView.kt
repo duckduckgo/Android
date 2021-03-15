@@ -35,9 +35,11 @@ import androidx.core.view.ViewCompat
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
-    private var lastClampedTopY: Boolean = false
+    private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
+    private var hasGestureFinished = true
+    private var canSwipeToRefresh = true
 
     private var lastY: Int = 0
     private var lastDeltaY: Int = 0
@@ -76,12 +78,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         event.offsetLocation(0f, nestedOffsetY.toFloat())
 
         when (action) {
+            MotionEvent.ACTION_UP -> {
+                hasGestureFinished = true
+                returnValue = super.onTouchEvent(event)
+                stopNestedScroll()
+            }
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
 
-                if (deltaY > 0) {
-                    lastClampedTopY = false
-                }
+                lastClampedTopY = deltaY <= 0
 
                 if (dispatchNestedPreScroll(0, deltaY, scrollConsumed, scrollOffset)) {
                     deltaY -= scrollConsumed[1]
@@ -98,8 +103,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
                     lastY -= scrollOffset[1]
                 }
 
-                if (scrollY == 0 && lastClampedTopY && nestedOffsetY == 0) {
-                    // we have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled)
+                if (canSwipeToRefresh && scrollY == 0 && lastClampedTopY && nestedOffsetY == 0) {
+                    // we are on a new gesture, have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled)
                     enableSwipeRefresh(true)
                 }
 
@@ -107,6 +112,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             }
 
             MotionEvent.ACTION_DOWN -> {
+                hasGestureFinished = false
                 // disable swipeRefresh until we can be sure it should be enabled
                 enableSwipeRefresh(false)
 
@@ -153,7 +159,16 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
         // taking into account lastDeltaY since we are only interested whether we clamped at the top
         lastClampedTopY = clampedY && lastDeltaY <= 0
-        enableSwipeRefresh(clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+
+        if (!lastClampedTopY) {
+            canSwipeToRefresh = false // disable because user scrolled down so we need a new gesture
+        }
+
+        if (lastClampedTopY && hasGestureFinished) {
+            canSwipeToRefresh = true // only enable if at the top and gestured finished
+        }
+
+        enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 

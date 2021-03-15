@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.LayoutTransition.CHANGING
-import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -28,10 +26,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -111,7 +106,6 @@ import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -265,7 +259,7 @@ class BrowserTabFragment :
         }
     }
 
-    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
+    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
@@ -304,7 +298,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureKeyboardAwareLogoAnimation()
 
         decorator.decorateWithFeatures()
 
@@ -366,7 +359,6 @@ class BrowserTabFragment :
 
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
-        logoHidingListener.onResume()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
         if (fragmentIsVisible()) {
@@ -377,7 +369,6 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        logoHidingListener.onPause()
         dismissDownloadFragment()
         dismissAuthenticationDialog()
         super.onPause()
@@ -492,7 +483,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        logoHidingListener.onReadyToShowLogo()
+        homeBackgroundLogo.showLogo()
     }
 
     private fun showBrowser() {
@@ -500,6 +491,7 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+        homeBackgroundLogo.hideLogo()
     }
 
     fun submitQuery(query: String) {
@@ -934,16 +926,6 @@ class BrowserTabFragment :
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
-    private fun configureKeyboardAwareLogoAnimation() {
-        newTabLayout.layoutTransition?.apply {
-            // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
-            enableTransitionType(CHANGING)
-            disableTransitionType(DISAPPEARING)
-            setDuration(LAYOUT_TRANSITION_MS)
-        }
-        rootView.addOnLayoutChangeListener(logoHidingListener)
-    }
-
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         GlobalScope.launch {
@@ -1012,6 +994,9 @@ class BrowserTabFragment :
     }
 
     private fun configureSwipeRefresh() {
+        val metrics = resources.displayMetrics
+        val distanceToTrigger = (DEFAULT_CIRCLE_TARGET_TIMES_1_5 * metrics.density).toInt()
+        swipeRefreshContainer.setDistanceToTriggerSync(distanceToTrigger)
         swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
 
         swipeRefreshContainer.setOnRefreshListener {
@@ -1417,6 +1402,8 @@ class BrowserTabFragment :
         private const val TRACKERS_INI_DELAY = 500L
         private const val TRACKERS_SECONDARY_DELAY = 200L
 
+        private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
+
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -1812,8 +1799,6 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-
-                ddgLogo.show()
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
@@ -1821,7 +1806,6 @@ class BrowserTabFragment :
                 } else {
                     hideHomeCta()
                     hideDaxCta()
-                    hideHomeTopCta()
                 }
             }
         }
@@ -1831,7 +1815,6 @@ class BrowserTabFragment :
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
-                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1854,9 +1837,8 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            ddgLogo.hide()
+            homeBackgroundLogo.hideLogo()
             hideHomeCta()
-            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
         }
@@ -1865,29 +1847,14 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
-            hideDaxCta()
-            hideHomeCta()
-
-            logoHidingListener.callToActionView = ctaTopContainer
-
-            configuration.showCta(ctaTopContainer)
-            ctaTopContainer.setOnClickListener {
-                viewModel.onUserClickTopCta(configuration)
-            }
-            ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
-            }
-        }
-
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
-            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
                 configuration.showCta(ctaContainer)
             }
+            homeBackgroundLogo.showLogo()
         }
 
         private fun hideDaxCta() {
@@ -1899,10 +1866,6 @@ class BrowserTabFragment :
             ctaContainer.gone()
         }
 
-        private fun hideHomeTopCta() {
-            ctaTopContainer.gone()
-        }
-
         fun renderHomeCta() {
             val context = context ?: return
             val cta = lastSeenCtaViewState?.cta ?: return
@@ -1911,7 +1874,6 @@ class BrowserTabFragment :
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
@@ -1959,6 +1921,7 @@ class BrowserTabFragment :
             webViewFullScreenContainer.removeAllViews()
             webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
+            focusDummy.requestFocus()
         }
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =

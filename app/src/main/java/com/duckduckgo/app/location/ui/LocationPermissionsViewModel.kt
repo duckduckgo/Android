@@ -20,13 +20,20 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
+import javax.inject.Singleton
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
@@ -125,6 +132,40 @@ class LocationPermissionsViewModel(
                 viewModelScope.launch {
                     locationPermissionsRepository.deletePermission(domain)
                 }
+            }
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class LocationPermissionsViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideLocationPermissionsViewModelFactory(
+        locationPermissionsRepository: LocationPermissionsRepository,
+        geoLocationPermissions: GeoLocationPermissions,
+        dispatcherProvider: DispatcherProvider,
+        settingsDataStore: SettingsDataStore,
+        pixel: Pixel
+    ): ViewModelFactoryPlugin {
+        return LocationPermissionsViewModelFactory(locationPermissionsRepository, geoLocationPermissions, dispatcherProvider, settingsDataStore, pixel)
+    }
+}
+
+private class LocationPermissionsViewModelFactory(
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
+    private val dispatcherProvider: DispatcherProvider,
+    private val settingsDataStore: SettingsDataStore,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository, geoLocationPermissions, dispatcherProvider, settingsDataStore, pixel) as T)
+                else -> null
             }
         }
     }

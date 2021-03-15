@@ -26,12 +26,19 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Singleton
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
@@ -106,5 +113,35 @@ class SurveyViewModel(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SurveyViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSurveyViewModelFactory(
+        surveyDao: SurveyDao,
+        statisticsStore: StatisticsDataStore,
+        appInstallStore: AppInstallStore,
+    ): ViewModelFactoryPlugin {
+        return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
+    }
+}
+
+private class SurveyViewModelFactory(
+    private val surveyDao: SurveyDao,
+    private val statisticsStore: StatisticsDataStore,
+    private val appInstallStore: AppInstallStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao, statisticsStore, appInstallStore) as T)
+                else -> null
+            }
+        }
     }
 }

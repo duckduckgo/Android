@@ -23,6 +23,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -48,8 +49,9 @@ class HttpsUpgraderModule {
     fun bloomFilterFactory(
         specificationDao: HttpsBloomFilterSpecDao,
         binaryDataStore: BinaryDataStore,
-        persister: HttpsDataPersister
+        embeddedDataPersister: HttpsEmbeddedDataPersister,
+        dataPersister: HttpsDataPersister
     ): HttpsBloomFilterFactory {
-        return HttpsBloomFilterFactoryImpl(specificationDao, binaryDataStore, persister)
+        return HttpsBloomFilterFactoryImpl(specificationDao, binaryDataStore, embeddedDataPersister, dataPersister)
     }
 }

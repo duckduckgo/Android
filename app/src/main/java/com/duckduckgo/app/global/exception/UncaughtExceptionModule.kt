@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.exception
 
 import com.duckduckgo.app.global.AlertingUncaughtExceptionHandler
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import dagger.Module
 import dagger.Provides
@@ -30,9 +31,10 @@ class UncaughtExceptionModule {
     @Singleton
     fun uncaughtWebViewExceptionRepository(
         uncaughtExceptionDao: UncaughtExceptionDao,
-        rootExceptionFinder: RootExceptionFinder
+        rootExceptionFinder: RootExceptionFinder,
+        deviceInfo: DeviceInfo
     ): UncaughtExceptionRepository {
-        return UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder)
+        return UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo)
     }
 
     @Provides

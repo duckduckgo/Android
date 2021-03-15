@@ -21,15 +21,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -39,6 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
 
@@ -248,5 +256,37 @@ class SystemSearchViewModel(
     companion object {
         private const val DEBOUNCE_TIME_MS = 200L
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SystemSearchViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSystemSearchViewModelFactory(
+        userStageStore: UserStageStore,
+        autoCompleteApi: AutoCompleteApi,
+        deviceAppLookup: DeviceAppLookup,
+        pixel: Pixel,
+    ): ViewModelFactoryPlugin {
+        return SystemSearchViewModelFactory(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
+    }
+}
+
+private class SystemSearchViewModelFactory(
+    private val userStageStore: UserStageStore,
+    private val autoComplete: AutoComplete,
+    private val deviceAppLookup: DeviceAppLookup,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore, autoComplete, deviceAppLookup, pixel) as T)
+                else -> null
+            }
+        }
     }
 }

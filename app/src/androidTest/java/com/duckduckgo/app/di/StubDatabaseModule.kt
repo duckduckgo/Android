@@ -19,14 +19,23 @@ package com.duckduckgo.app.di
 import android.content.Context
 import android.webkit.WebViewDatabase
 import androidx.room.Room
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.fire.DatabaseCleanerHelper
+import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [DatabaseModule::class]
+)
 class StubDatabaseModule {
 
     @Provides
@@ -40,8 +49,8 @@ class StubDatabaseModule {
     @Provides
     @Singleton
     fun provideWebViewHttpAuthStore(
-        context: Context,
+        context: Context
     ): WebViewHttpAuthStore {
-        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context))
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), DatabaseCleanerHelper(), AuthDatabaseLocator(context), CoroutineTestRule().testDispatcherProvider)
     }
 }

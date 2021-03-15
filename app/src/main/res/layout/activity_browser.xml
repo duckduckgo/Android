@@ -16,13 +16,15 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include layout="@layout/include_omnibar_toolbar_mockup" />
+
+    <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -34,4 +36,4 @@
         android:background="?attr/colorPrimaryDark"
         android:visibility="gone" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
