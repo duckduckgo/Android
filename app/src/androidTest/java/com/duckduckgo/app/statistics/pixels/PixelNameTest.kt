@@ -27,12 +27,12 @@ class PixelNameTest {
         val existingNames = mutableSetOf<String>()
         AppPixelName.values().forEach {
             if (!existingNames.add(it.pixelName)) {
-                fail("Duplicate pixel name found: ${it.pixelName}")
+                fail("Duplicate pixel name in AppPixelName: ${it.pixelName}")
             }
         }
         Pixel.StatisticsPixelName.values().forEach {
             if (!existingNames.add(it.pixelName)) {
-                fail("Duplicate pixel name found: ${it.pixelName}")
+                fail("Duplicate pixel name in StatisticsPixelName: ${it.pixelName}")
             }
         }
     }
