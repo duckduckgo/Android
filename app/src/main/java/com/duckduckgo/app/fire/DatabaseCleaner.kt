@@ -40,12 +40,9 @@ class DatabaseCleanerHelper : DatabaseCleaner {
         return withContext(Dispatchers.IO) {
             if (databasePath.isNotEmpty()) {
                 var commandExecuted = false
-                openReadableDatabase(databasePath)?.use {
+                openReadableDatabase(databasePath)?.use { db ->
                     try {
-                        it.rawQuery(command, null).apply {
-                            moveToFirst()
-                            close()
-                        }
+                        db.rawQuery(command, null).use { cursor -> cursor.moveToFirst() }
                         commandExecuted = true
                     } catch (exception: Exception) {
                         Timber.e(exception)
