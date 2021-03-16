@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -159,7 +160,7 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        verify(mockedPixel).fire(Pixel.PixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
+        verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {

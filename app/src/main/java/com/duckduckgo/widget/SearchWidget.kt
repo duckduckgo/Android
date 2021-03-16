@@ -26,8 +26,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_ADDED
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_DELETED
+import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_ADDED
+import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
