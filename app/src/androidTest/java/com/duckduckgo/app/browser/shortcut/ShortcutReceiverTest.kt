@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.shortcut
 import android.content.Intent
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -43,7 +44,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+        verify(mockPixel).fire(AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
     }
 
     @Test
@@ -53,7 +54,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_ADDED)
+        verify(mockPixel).fire(AppPixelName.SHORTCUT_ADDED)
     }
 
 }

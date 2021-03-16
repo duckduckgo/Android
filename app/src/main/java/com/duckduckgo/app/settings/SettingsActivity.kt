@@ -47,7 +47,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
@@ -179,13 +179,13 @@ class SettingsActivity :
     private fun launchAutomaticallyClearWhatDialog() {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
-        pixel.fire(PixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
+        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
     }
 
     private fun launchAutomaticallyClearWhenDialog() {
         val dialog = SettingsAutomaticallyClearWhenFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhenOption)
         dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)
-        pixel.fire(PixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
+        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
     private fun processCommand(it: Command?) {

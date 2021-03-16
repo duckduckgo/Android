@@ -80,8 +80,9 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
-    private fun clearAuthentication(webView: WebView) {
+    private suspend fun clearAuthentication(webView: WebView) {
         webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
+        webViewHttpAuthStore.cleanHttpAuthDatabase()
     }
 
     private suspend fun clearExternalCookies() {
@@ -95,6 +96,7 @@ class WebViewDataManager @Inject constructor(
     companion object {
         private const val WEBVIEW_DATA_DIRECTORY_NAME = "app_webview"
         private const val WEBVIEW_DEFAULT_DIRECTORY_NAME = "app_webview/Default"
+        private const val DATABASES_DIRECTORY_NAME = "databases"
 
         private val WEBVIEW_FILES_EXCLUDED_FROM_DELETION = listOf(
             "Default",

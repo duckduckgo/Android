@@ -33,8 +33,9 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.ClearPersonalDataAction
+import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -58,7 +59,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         get() = SupervisorJob() + Dispatchers.Main
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearPersonalDataAction
+    lateinit var clearPersonalDataAction: ClearDataAction
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -193,7 +194,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
@@ -53,7 +54,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
@@ -63,7 +64,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test
@@ -73,7 +74,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test
@@ -83,6 +84,6 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_UNSET)
+        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_UNSET)
     }
 }

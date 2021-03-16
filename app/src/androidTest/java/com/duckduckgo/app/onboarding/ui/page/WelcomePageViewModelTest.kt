@@ -22,6 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
@@ -126,7 +127,7 @@ class WelcomePageViewModelTest {
         }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(pixel).fire(Pixel.PixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+        verify(pixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
 
         launch.cancel()
     }
@@ -142,7 +143,7 @@ class WelcomePageViewModelTest {
 
         verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_SET,
+            AppPixelName.DEFAULT_BROWSER_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 
@@ -160,7 +161,7 @@ class WelcomePageViewModelTest {
 
         verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            AppPixelName.DEFAULT_BROWSER_NOT_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 

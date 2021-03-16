@@ -21,21 +21,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
-    android:animateLayoutChanges="true"
     android:foreground="@android:color/transparent"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">
-
-    <include
-        layout="@layout/include_top_cta"
-        android:id="@+id/ctaTopContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <include
         layout="@layout/include_dax_dialog_cta"
@@ -45,7 +33,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"/>
+        app:layout_constraintWidth_max="600dp"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/ctaContainer"

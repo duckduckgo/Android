@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Message
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -44,15 +45,17 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CANCEL
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar_mockup.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
@@ -61,7 +64,7 @@ import javax.inject.Inject
 class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearPersonalDataAction
+    lateinit var clearPersonalDataAction: ClearDataAction
 
     @Inject
     lateinit var dataClearer: DataClearer
@@ -203,14 +206,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                clearPersonalDataAction.killAndRestartProcess()
+                clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
             }
 
             return
         }
 
-        if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
-            Timber.i("Launched from fire")
+        if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
+            Timber.i("Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
@@ -300,7 +303,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     fun launchFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING)
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
@@ -365,24 +368,33 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
+    override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
+        super.onAttachFragment(fragment)
+        hideMockupOmnibar()
+    }
+
+    private fun hideMockupOmnibar() {
+        appBarLayoutMockup.visibility = View.GONE
+    }
+
     companion object {
 
         fun intent(
             context: Context,
             queryExtra: String? = null,
             newSearch: Boolean = false,
-            launchedFromFireAction: Boolean = false
+            notifyDataCleared: Boolean = false
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
-            intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
+            intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             return intent
         }
 
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
-        const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
+        const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"

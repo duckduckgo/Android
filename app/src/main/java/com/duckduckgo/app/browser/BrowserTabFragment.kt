@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.LayoutTransition.CHANGING
-import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -28,10 +26,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -98,6 +93,7 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -111,7 +107,6 @@ import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -302,7 +297,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureKeyboardAwareLogoAnimation()
 
         decorator.decorateWithFeatures()
 
@@ -936,15 +930,6 @@ class BrowserTabFragment :
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
 
-    private fun configureKeyboardAwareLogoAnimation() {
-        newTabLayout.layoutTransition?.apply {
-            // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
-            enableTransitionType(CHANGING)
-            disableTransitionType(DISAPPEARING)
-            setDuration(LAYOUT_TRANSITION_MS)
-        }
-    }
-
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         GlobalScope.launch {
@@ -1466,7 +1451,7 @@ class BrowserTabFragment :
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
                 pixel.fire(
-                    Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
                     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString())
                 )
             }
@@ -1479,54 +1464,54 @@ class BrowserTabFragment :
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
                 onMenuItemClicked(view.backPopupMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.newTabPopupMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.bookmarksPopupMenuItem) {
                     browserActivity?.launchBookmarks()
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+                    pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) {
                     launch {
-                        pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                         viewModel.onBookmarkAddRequested()
                     }
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
                 onMenuItemClicked(view.settingsPopupMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_SETTINGS_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
                 onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
                     viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_SHARE_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
                 onMenuItemClicked(view.addToHome) {
-                    pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                    pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
             }
@@ -1538,7 +1523,7 @@ class BrowserTabFragment :
 
         private fun launchTopAnchoredPopupMenu() {
             popupMenu.show(rootView, toolbar)
-            pixel.fire(Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
         }
 
         private fun configureShowTabSwitcherListener() {
@@ -1821,7 +1806,6 @@ class BrowserTabFragment :
                 } else {
                     hideHomeCta()
                     hideDaxCta()
-                    hideHomeTopCta()
                 }
             }
         }
@@ -1831,7 +1815,6 @@ class BrowserTabFragment :
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
-                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1856,7 +1839,6 @@ class BrowserTabFragment :
         private fun showDaxCta(configuration: DaxBubbleCta) {
             fragment_device_shield_container.hide()
             hideHomeCta()
-            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
         }
@@ -1865,22 +1847,8 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
-            hideDaxCta()
-            hideHomeCta()
-
-            configuration.showCta(ctaTopContainer)
-            ctaTopContainer.setOnClickListener {
-                viewModel.onUserClickTopCta(configuration)
-            }
-            ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
-            }
-        }
-
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
-            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
@@ -1895,10 +1863,6 @@ class BrowserTabFragment :
 
         private fun hideHomeCta() {
             ctaContainer.gone()
-        }
-
-        private fun hideHomeTopCta() {
-            ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {

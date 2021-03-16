@@ -21,9 +21,10 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FEEDBACK_NEGATIVE_SUBMISSION
+import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -151,7 +152,7 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun pixelForPositiveFeedback(): String {
-        return String.format(Locale.US, Pixel.PixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
+        return String.format(Locale.US, AppPixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
     }
 
     private fun version(): String {

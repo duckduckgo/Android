@@ -26,6 +26,7 @@ import android.os.Build.VERSION_CODES.O
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
@@ -105,7 +106,7 @@ class NotificationRegistrar @Inject constructor(
 
     fun updateStatus(enabled: Boolean) {
         if (settingsDataStore.appNotificationsEnabled != enabled) {
-            pixel.fire(if (enabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
+            pixel.fire(if (enabled) AppPixelName.NOTIFICATIONS_ENABLED else AppPixelName.NOTIFICATIONS_DISABLED)
             settingsDataStore.appNotificationsEnabled = enabled
         }
     }

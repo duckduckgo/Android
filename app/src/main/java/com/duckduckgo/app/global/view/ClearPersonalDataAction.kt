@@ -32,7 +32,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface ClearDataAction {
 
@@ -42,10 +41,10 @@ interface ClearDataAction {
     suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess()
+    fun killAndRestartProcess(notifyDataCleared: Boolean)
 }
 
-class ClearPersonalDataAction @Inject constructor(
+class ClearPersonalDataAction(
     private val context: Context,
     private val dataManager: WebDataManager,
     private val clearingStore: UnsentForgetAllPixelStore,
@@ -56,9 +55,9 @@ class ClearPersonalDataAction @Inject constructor(
     private val geoLocationPermissions: GeoLocationPermissions
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess() {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context)
+        FireActivity.triggerRestart(context, notifyDataCleared)
     }
 
     override fun killProcess() {

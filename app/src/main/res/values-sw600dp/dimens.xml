@@ -25,4 +25,5 @@
     <dimen name="feedbackCardVerticalMargin">32dp</dimen>
     <dimen name="feedbackFormFieldsMargin">32dp</dimen>
     <dimen name="feedbackCardHorizontalMargin">48dp</dimen>
+    <dimen name="homeTabDdgLogoTopMargin">200dp</dimen>
 </resources>

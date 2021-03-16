@@ -39,8 +39,8 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_CANCELLED
+import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

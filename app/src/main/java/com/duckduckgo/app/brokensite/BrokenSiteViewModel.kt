@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
@@ -98,7 +99,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     fun onSubmitPressed(webViewVersion: String) {
         val brokenSite = getBrokenSite(url, webViewVersion)
         brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
+        pixel.fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
         command.value = Command.ConfirmAndFinish
     }
 

@@ -34,7 +34,7 @@ import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAl
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -51,7 +51,7 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
-    private val clearPersonalDataAction: ClearPersonalDataAction,
+    private val clearPersonalDataAction: ClearDataAction,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore
@@ -176,7 +176,7 @@ class FireDialog(
                 fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            clearPersonalDataAction.killAndRestartProcess()
+            clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }
 

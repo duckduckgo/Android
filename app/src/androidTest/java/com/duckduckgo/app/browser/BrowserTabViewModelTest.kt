@@ -86,6 +86,7 @@ import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -1095,7 +1096,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -1103,7 +1104,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(false)
-        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -1385,7 +1386,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://www.example.com/home.html")
         testee.onWhitelistSelected()
         verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
-        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
@@ -1395,7 +1396,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://www.example.com/home.html")
         testee.onWhitelistSelected()
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
-        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
@@ -1635,7 +1636,7 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
@@ -1645,7 +1646,7 @@ class BrowserTabViewModelTest {
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
@@ -1654,7 +1655,7 @@ class BrowserTabViewModelTest {
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
     }
 
     @Test
@@ -2061,7 +2062,7 @@ class BrowserTabViewModelTest {
     fun whenFireproofWebsiteAddedThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_ADDED)
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
     }
 
     @Test
@@ -2077,7 +2078,7 @@ class BrowserTabViewModelTest {
         givenFireproofWebsiteDomain("mobile.example.com")
         loadUrl("http://mobile.example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_REMOVE)
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
     }
 
     @Test
@@ -2098,7 +2099,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
     }
 
     @Test
@@ -2313,7 +2314,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
@@ -2323,7 +2324,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
     @Test
@@ -2333,7 +2334,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
     @Test
@@ -2342,7 +2343,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED)
     }
 
     @Test
@@ -2352,7 +2353,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
@@ -2362,7 +2363,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
     @Test
@@ -2372,7 +2373,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
     @Test
@@ -2381,7 +2382,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewReady()
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED)
     }
 
     @Test
@@ -2391,7 +2392,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
@@ -2401,7 +2402,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
     @Test
@@ -2411,7 +2412,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
     @Test
@@ -2420,7 +2421,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+        verify(mockPixel).fire(AppPixelName.UOA_VISITED)
     }
 
     @Test
@@ -2430,7 +2431,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
@@ -2441,7 +2442,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
     @Test
@@ -2451,7 +2452,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
     @Test
@@ -2460,7 +2461,7 @@ class BrowserTabViewModelTest {
 
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
+        verify(mockPixel, never()).fire(AppPixelName.UOA_VISITED)
     }
 
     @Test
@@ -2565,7 +2566,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionDeniedOneTime()
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         verify(geoLocationPermissions).clear(domain)
     }
 
@@ -2592,7 +2593,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionGranted()
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
     }
 
     @Test
@@ -2674,7 +2675,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNotAllowed()
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         verify(geoLocationPermissions).clear(domain)
     }
 
@@ -2688,7 +2689,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNeverAllowed()
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         verify(geoLocationPermissions).clear(domain)
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }

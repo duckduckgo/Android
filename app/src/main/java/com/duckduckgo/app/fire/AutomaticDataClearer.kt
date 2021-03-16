@@ -164,7 +164,7 @@ class AutomaticDataClearer(
                     // need a moment to draw background color (reduces flickering UX)
                     Handler().postDelayed(100) {
                         Timber.i("Will now restart process")
-                        clearDataAction.killAndRestartProcess()
+                        clearDataAction.killAndRestartProcess(notifyDataCleared = true)
                     }
                 } else {
                     Timber.i("Will not restart process")

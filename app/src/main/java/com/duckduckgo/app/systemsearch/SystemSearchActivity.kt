@@ -39,7 +39,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
@@ -94,10 +94,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun sendLaunchPixels(intent: Intent) {
         when {
-            launchedFromAssist(intent) -> pixel.fire(PixelName.APP_ASSIST_LAUNCH)
-            launchedFromWidget(intent) -> pixel.fire(PixelName.APP_WIDGET_LAUNCH)
-            launchedFromNotification(intent) -> pixel.fire(PixelName.APP_NOTIFICATION_LAUNCH)
-            launchedFromSystemSearchBox(intent) -> pixel.fire(PixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
+            launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
+            launchedFromWidget(intent) -> pixel.fire(AppPixelName.APP_WIDGET_LAUNCH)
+            launchedFromNotification(intent) -> pixel.fire(AppPixelName.APP_NOTIFICATION_LAUNCH)
+            launchedFromSystemSearchBox(intent) -> pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
         }
     }
 

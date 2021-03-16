@@ -18,6 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -51,28 +52,28 @@ class HttpsUpgraderTest {
     fun whenHttpUriIsInBloomThenShouldUpgrade() {
         bloomFilter.add("www.local.url")
         assertTrue(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_LOCAL_UPGRADE)
+        mockPixel.fire(AppPixelName.HTTPS_LOCAL_UPGRADE)
     }
 
     @Test
     fun whenHttpUriIsNotInBloomThenShouldNotUpgrade() {
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.differentlocal.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
+        mockPixel.fire(AppPixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpsUriThenShouldNotUpgrade() {
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("https://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
+        mockPixel.fire(AppPixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpUriHasOnlyPartDomainInLocalListThenShouldNotUpgrade() {
         bloomFilter.add("local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
+        mockPixel.fire(AppPixelName.HTTPS_NO_LOOKUP)
     }
 
     @Test
@@ -80,6 +81,6 @@ class HttpsUpgraderTest {
         bloomFilter.add("www.local.url")
         whenever(mockUserAllowlistDao.contains("www.local.url")).thenReturn(true)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
+        mockPixel.fire(AppPixelName.HTTPS_NO_LOOKUP)
     }
 }

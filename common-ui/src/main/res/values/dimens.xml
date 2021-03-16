@@ -35,6 +35,6 @@
     <dimen name="changeAppIconPadding">16dp</dimen>
     <dimen name="changeAppIconListPadding">4dp</dimen>
     <dimen name="changeAppIconSize">75dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
 
 </resources>

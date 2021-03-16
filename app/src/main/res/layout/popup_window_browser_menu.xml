@@ -14,21 +14,18 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:background="@drawable/popup_menu_bg">
 
     <LinearLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/backPopupMenuItem"
@@ -59,18 +56,9 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/whiteTwo"
-        app:layout_constraintBottom_toBottomOf="@+id/header" />
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -97,6 +85,7 @@
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
                 style="@style/BrowserCheckBoxMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
@@ -105,8 +94,7 @@
                 android:drawablePadding="24dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
-                android:text="@string/fireproofWebsiteMenuTitleAdd"
-                android:theme="@style/PopUpMenuSwitchTheme" />
+                android:text="@string/fireproofWebsiteMenuTitleAdd" />
 
             <TextView
                 android:id="@+id/sharePageMenuItem"
@@ -126,6 +114,7 @@
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/BrowserCheckBoxMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
@@ -134,8 +123,7 @@
                 android:drawablePadding="24dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
-                android:text="@string/requestDesktopSiteMenuTitle"
-                android:theme="@style/PopUpMenuSwitchTheme" />
+                android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
                 android:id="@+id/whitelistPopupMenuItem"
@@ -156,5 +144,4 @@
 
     </ScrollView>
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
