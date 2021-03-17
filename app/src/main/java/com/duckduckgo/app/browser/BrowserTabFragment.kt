@@ -482,7 +482,6 @@ class BrowserTabFragment :
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
-        omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
         homeBackgroundLogo.showLogo()
     }
 
@@ -490,7 +489,6 @@ class BrowserTabFragment :
         newTabLayout.gone()
         webView?.show()
         webView?.onResume()
-        omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
         homeBackgroundLogo.hideLogo()
     }
 
@@ -1431,12 +1429,14 @@ class BrowserTabFragment :
             fireMenuButton?.isVisible = viewState.fireButton is FireButton.Visible
             menuButton?.isVisible = viewState.showMenuButton
 
+            // omnibar only scrollable when browser showing and the fire button is not promoted
             if (viewState.fireButton.playPulseAnimation()) {
-                appBarLayout.setExpanded(true, true)
                 omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
                 playPulseAnimation()
             } else {
-                omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+                if (viewState.browserShowing) {
+                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+                }
                 pulseAnimation.stop()
             }
         }
