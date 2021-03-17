@@ -21,8 +21,8 @@ import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -74,7 +74,7 @@ class SQLCookieRemover(
             SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
             offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
-            exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
+            exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
     }
@@ -91,7 +91,7 @@ class SQLCookieRemover(
             } catch (exception: Exception) {
                 Timber.e(exception)
                 offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
-                exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
+                exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()
             }

@@ -20,6 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.nhaarman.mockitokotlin2.mock
@@ -40,7 +41,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
     }
 
     @Test
@@ -51,7 +52,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
     }
 
     @Test
@@ -62,7 +63,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     @Test
@@ -74,7 +75,7 @@ class DataClearerForegroundAppRestartPixelTest {
         testee.firePendingPixels()
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     @Test
@@ -86,7 +87,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     private fun givenEmptyIntent(): Intent = Intent(context, BrowserActivity::class.java)
