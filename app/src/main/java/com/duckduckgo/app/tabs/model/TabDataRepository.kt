@@ -216,9 +216,9 @@ class TabDataRepository @Inject constructor(
         }.join()
     }
 
-    override suspend fun deleteCurrentTabAndSelectSource() {
+    override suspend fun deleteCurrentTabAndSelectSource(tabId: String) {
         databaseExecutor().scheduleDirect {
-            val tabToDelete = tabsDao.selectedTab() ?: return@scheduleDirect
+            val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect
 
             deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId

@@ -331,7 +331,7 @@ class TabDataRepositoryTest {
         var currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, tabToDelete.tabId)
 
-        testee.deleteCurrentTabAndSelectSource()
+        testee.deleteCurrentTabAndSelectSource("tabToDeleteId")
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)

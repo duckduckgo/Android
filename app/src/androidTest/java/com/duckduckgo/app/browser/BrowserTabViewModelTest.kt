@@ -553,7 +553,7 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabsRepository).deleteCurrentTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1218,7 +1218,7 @@ class BrowserTabViewModelTest {
         testee.onRefreshRequested()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabsRepository).deleteCurrentTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1519,7 +1519,7 @@ class BrowserTabViewModelTest {
         showErrorWithAction.action()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabsRepository).deleteCurrentTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1691,7 +1691,7 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
-        verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        verify(mockTabsRepository).deleteCurrentTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
     @Test
@@ -1723,7 +1723,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockTabsRepository).deleteCurrentTabAndSelectSource()
+        verify(mockTabsRepository).deleteCurrentTabAndSelectSource("TAB_ID")
     }
 
     @Test
