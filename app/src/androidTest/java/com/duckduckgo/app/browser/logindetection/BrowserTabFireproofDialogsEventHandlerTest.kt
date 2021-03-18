@@ -168,17 +168,14 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     }
 
     @Test
-    fun whenExpVariantUserDismissedFireproofLoginDialogwThenRegisterEvent() = coroutineRule.runBlocking {
-        givenFireproofLoginExperimentEnabled()
-
+    fun whenUserDismissedFireproofLoginDialogThenRegisterEvent() = coroutineRule.runBlocking {
         testee.onUserDismissedFireproofLoginDialog()
 
         verify(mockUserEventsStore).registerUserEvent(FIREPROOF_LOGIN_DIALOG_DISMISSED)
     }
 
     @Test
-    fun whenExpVariantUserDismissedFireproofLoginDialogTwiceInRowThenAskToDisableLoginDetection() = coroutineRule.runBlocking {
-        givenFireproofLoginExperimentEnabled()
+    fun whenUserDismissedFireproofLoginDialogTwiceInRowThenAskToDisableLoginDetection() = coroutineRule.runBlocking {
         givenUserPreviouslyDismissedDialog()
 
         testee.onUserDismissedFireproofLoginDialog()
@@ -188,8 +185,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     }
 
     @Test
-    fun whenExpVariantUserEnabledFireproofLoginDetectionThenNeverAskToDisableIt() = coroutineRule.runBlocking {
-        givenFireproofLoginExperimentEnabled()
+    fun whenUserEnabledFireproofLoginDetectionThenNeverAskToDisableIt() = coroutineRule.runBlocking {
         givenUserEnabledFireproofLoginDetection()
         givenUserPreviouslyDismissedDialog()
 
@@ -200,8 +196,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     }
 
     @Test
-    fun whenExpVariantUserDidNotDisableLoginDetectionThenNeverAskToDisableItAgain() = coroutineRule.runBlocking {
-        givenFireproofLoginExperimentEnabled()
+    fun whenUserDidNotDisableLoginDetectionThenNeverAskToDisableItAgain() = coroutineRule.runBlocking {
         givenUserDidNotDisableLoginDetection()
         givenUserPreviouslyDismissedDialog()
 
@@ -292,16 +287,6 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     private suspend fun givenUserPreviouslyDismissedDialog() {
         whenever(mockUserEventsStore.getUserEvent(FIREPROOF_LOGIN_DIALOG_DISMISSED))
             .thenReturn(UserEventEntity(FIREPROOF_LOGIN_DIALOG_DISMISSED))
-    }
-
-    private fun givenFireproofLoginExperimentEnabled() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant(
-                key = "",
-                features = listOf(VariantManager.VariantFeature.LoginDetectionEnabled),
-                filterBy = { true }
-            )
-        )
     }
 
     private suspend fun givenUserTriedFireButton() {
