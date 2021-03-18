@@ -20,8 +20,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nhaarman.mockitokotlin2.whenever
-import junit.framework.Assert.assertTrue
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString

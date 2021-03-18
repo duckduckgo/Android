@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dummy.ui.VpnPreferences
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

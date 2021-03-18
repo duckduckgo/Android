@@ -25,10 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CompoundButton
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -41,7 +38,6 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import dummy.VpnViewModelFactory
-import dummy.quietlySetIsChecked
 import nl.dionsegijn.konfetti.KonfettiView
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
@@ -229,8 +225,8 @@ class DeviceShieldFragment : Fragment() {
     private fun renderVpnEnabledState(running: Boolean) {
         deviceShieldDisabledLayout.isVisible = !running
 
-        if (!deviceShieldCtaSubHeaderTextView.isVisible){
-            if (running){
+        if (!deviceShieldCtaSubHeaderTextView.isVisible) {
+            if (running) {
                 deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldEnabledTooltip)
             } else {
                 deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
