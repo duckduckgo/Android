@@ -518,7 +518,7 @@
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
         <![CDATA[DuckDuckGo already blocks many trackers. Now with Global Privacy Control (GPC), you can also invoke your legal privacy rights (e.g., under CCPA, GDPR) by default.<br/><br/>
-        With GPC enabled, DuckDuckGo will automatically tell participating websites not to sell your personal data and to restrict sharing it with other companies. <u><b><a href="">Learn More</a><b><u/>]]>
+        With GPC enabled, DuckDuckGo will automatically tell participating websites not to sell your personal data and to restrict sharing it with other companies. <u><a href="">Learn More</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
