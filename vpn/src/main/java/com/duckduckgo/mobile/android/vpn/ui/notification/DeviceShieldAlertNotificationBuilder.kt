@@ -52,7 +52,7 @@ class DeviceShieldAlertNotificationBuilder {
 
             registerAlertChannel(context)
 
-            val vpnControllerIntent = Intent(context, PrivacyReportActivity::class.java)
+            val vpnControllerIntent = PrivacyReportActivity.intent(context)
             val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(vpnControllerIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -95,7 +95,7 @@ class DeviceShieldAlertNotificationBuilder {
         private fun buildNotification(context: Context, content: RemoteViews, silent: Boolean): Notification {
             registerAlertChannel(context)
 
-            val vpnControllerIntent = Intent(context, PrivacyReportActivity::class.java)
+            val vpnControllerIntent = PrivacyReportActivity.intent(context)
             val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(vpnControllerIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)

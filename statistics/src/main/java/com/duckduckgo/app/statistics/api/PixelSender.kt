@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.RxBasedPixel.Companion.VPN_PREFIX
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
@@ -83,10 +82,6 @@ class RxPixelSender @Inject constructor(
     }
 
     override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        if (!pixelName.startsWith(VPN_PREFIX)) {
-            Timber.w("Pixel $pixelName won't be sent, it doesn't come from the VPN (required prefix: $VPN_PREFIX)")
-            return Completable.complete()
-        }
         return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
     }
 
@@ -103,10 +98,6 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun sendPixel(pixelEntity: PixelEntity): Completable {
-        if (!pixelEntity.pixelName.startsWith(VPN_PREFIX)) {
-            Timber.w("Pixel ${pixelEntity.pixelName} won't be sent, it doesn't come from the VPN")
-            return Completable.complete()
-        }
         with(pixelEntity) {
             return api.fire(
                 this.pixelName,
