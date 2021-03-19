@@ -19,13 +19,13 @@
 <resources>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
-		<item name="android:windowLightStatusBar">false</item>
-		<item name="android:navigationBarColor">@android:color/transparent</item>
+	<item name="android:windowLightStatusBar">false</item>
+	<item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
-		<item name="android:windowLightStatusBar">true</item>
-		<item name="android:navigationBarColor">@android:color/transparent</item>
+	<item name="android:windowLightStatusBar">true</item>
+	<item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 </resources>
