@@ -123,7 +123,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             1 -> createDailyTopTrackerCompanyNotification(trackers)
             2 -> createDailyTopTrackerCompanyNumbersNotification(trackers)
             else -> createDailyLastCompanyAttemptNotification(trackers)
-        }
+        }.copy(notificationVariant = dailyNotificationType)
     }
 
     private fun createDailyTotalTrackersNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
@@ -214,6 +214,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
         val title: SpannableStringBuilder = SpannableStringBuilder(),
         val message: SpannableStringBuilder = SpannableStringBuilder(),
         val silent: Boolean = false,
-        val hidden: Boolean = false
+        val hidden: Boolean = false,
+        val notificationVariant: Int = -1, // default no variant
     )
 }

@@ -21,17 +21,21 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.postDelayed
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -54,6 +58,9 @@ class DeviceShieldFragment : Fragment() {
 
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
+
+    @Inject
+    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
 
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaSubHeaderTextView: TextView
@@ -88,6 +95,20 @@ class DeviceShieldFragment : Fragment() {
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // This logic is to ensure the we send the analytics exactly when the fragment is visible to the user
+        // There are couple nuances/issues
+        // 1. multiple tabs will have this fragment attached and resumed but only one will be shown to the user
+        // 2. in BrowserFragment seems to call fragment_device_shield_container.show()/hide() several times causing
+        //  this fragment to be resumed and visible for a split-second when Dax is shown (aka empty tab)
+        Handler(Looper.getMainLooper()).postDelayed(200) {
+            if (view?.isShown == true) {
+                deviceShieldAnalytics.didShowNewTabSummary()
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -140,9 +161,12 @@ class DeviceShieldFragment : Fragment() {
 
     private fun bindListeners(view: View) {
         deviceShieldInfoLayout.setOnClickListener {
-            startActivity(PrivacyReportActivity.intent(requireActivity()))
+            startActivity(PrivacyReportActivity.intent(requireActivity())).also {
+                deviceShieldAnalytics.didPressNewTabSummary()
+            }
         }
         deviceShieldEnableCTA.setOnClickListener {
+            deviceShieldAnalytics.enableFromNewTab()
             enableDeviceShield()
         }
     }

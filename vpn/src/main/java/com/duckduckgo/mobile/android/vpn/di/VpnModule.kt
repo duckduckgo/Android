@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
@@ -74,11 +75,12 @@ class VpnModule {
     @VpnScope
     @Provides
     fun providesVpnTrackerDetector(
+        deviceShieldAnalytics: DeviceShieldAnalytics,
         hostnameExtractor: HostnameExtractor,
         trackerListProvider: TrackerListProvider,
         vpnDatabase: VpnDatabase
     ): VpnTrackerDetector {
-        return DomainBasedTrackerDetector(hostnameExtractor, trackerListProvider, vpnDatabase)
+        return DomainBasedTrackerDetector(deviceShieldAnalytics, hostnameExtractor, trackerListProvider, vpnDatabase)
     }
 
     @VpnScope

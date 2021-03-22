@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
@@ -32,6 +33,7 @@ interface VpnTrackerDetector {
 }
 
 class DomainBasedTrackerDetector(
+    private val deviceShieldAnalytics: DeviceShieldAnalytics,
     private val hostnameExtractor: HostnameExtractor,
     private val trackerListProvider: TrackerListProvider,
     private val vpnDatabase: VpnDatabase
@@ -59,6 +61,7 @@ class DomainBasedTrackerDetector(
                 tcb.trackerHostName = tracker.hostname
                 Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
                 insertTracker(tracker)
+                deviceShieldAnalytics.trackerBlocked()
                 return Tracker(tracker.hostname)
             }
         }

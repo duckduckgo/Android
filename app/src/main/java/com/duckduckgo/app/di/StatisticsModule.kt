@@ -30,6 +30,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.analytics.VpnStatisticsRequester
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -44,11 +46,16 @@ class StatisticsModule {
 
     @Provides
     fun statisticsUpdater(
+        context: Context,
+        deviceShieldAnalytics: DeviceShieldAnalytics,
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
         variantManager: VariantManager
-    ): StatisticsUpdater =
-        StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
+    ): StatisticsUpdater {
+        // vtodo -> temporary replacement of StatisticsUpdater for appTB F&F release
+        return VpnStatisticsRequester(context, deviceShieldAnalytics)
+//        return StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
+    }
 
     @Provides
     fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {

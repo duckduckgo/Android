@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
@@ -43,6 +44,7 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
+import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -89,6 +91,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
+
+    @Inject
+    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+
+    @Inject
+    lateinit var ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
 
     private val queues = VpnQueues()
 
@@ -160,7 +168,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                stopVpn()
+                stopVpn(VpnStopReason.SelfStop)
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -200,7 +208,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
         if (trackersBlocked.isNotEmpty()) {
             val deviceShieldNotification = deviceShieldNotificationFactory.createTrackersCountDeviceShieldNotification(trackersBlocked)
-            val notification = DeviceShieldEnabledNotificationBuilder.buildTrackersBlockedNotification(this, deviceShieldNotification)
+            val notification = DeviceShieldEnabledNotificationBuilder
+                .buildTrackersBlockedNotification(this, deviceShieldNotification, ongoingNotificationPressedHandler)
             notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
         }
     }
@@ -267,7 +276,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(isError = true)
+            stopVpn(VpnStopReason.Error)
         }
     }
 
@@ -292,7 +301,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun stopVpn(isError: Boolean = false) {
+    private fun stopVpn(reason: VpnStopReason) {
         Timber.i("VPN log: Stopping VPN")
         notifyVpnStopped()
         schedulerReminderAlarm()
@@ -305,12 +314,21 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tunInterface?.close()
         tunInterface = null
 
-        if (!isError) {
+        sendStopPixels(reason)
+        if (reason !is VpnStopReason.Error) {
             vpnServiceHeartbeat.stopHeartbeat()
         }
 
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun sendStopPixels(reason: VpnStopReason) {
+        when (reason) {
+            VpnStopReason.SelfStop -> { /* noop */ }
+            VpnStopReason.Error -> deviceShieldAnalytics.startError()
+            VpnStopReason.Revoked -> deviceShieldAnalytics.suddenKillByVpnRevoked()
+        }
     }
 
     private fun VpnService.Builder.configureMeteredConnection() {
@@ -321,7 +339,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        stopVpn()
+        stopVpn(VpnStopReason.Revoked)
     }
 
     override fun onLowMemory() {
@@ -347,7 +365,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         val deviceShieldNotification = deviceShieldNotificationFactory.createEnabledDeviceShieldNotification()
-        startForeground(VPN_FOREGROUND_SERVICE_ID, DeviceShieldEnabledNotificationBuilder.buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification))
+        startForeground(
+            VPN_FOREGROUND_SERVICE_ID,
+            DeviceShieldEnabledNotificationBuilder
+                .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler)
+        )
 
         newTrackerObserverJob = launch {
             repository.getVpnTrackers({ dateOfLastHour() }).collectLatest {
@@ -467,4 +489,10 @@ class VpnQueues {
         udpDeviceToNetwork.clear()
         networkToDevice.clear()
     }
+}
+
+private sealed class VpnStopReason {
+    object SelfStop : VpnStopReason()
+    object Error : VpnStopReason()
+    object Revoked : VpnStopReason()
 }

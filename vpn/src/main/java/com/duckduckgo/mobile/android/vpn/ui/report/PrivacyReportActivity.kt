@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.os.ResultReceiver
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -37,6 +38,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -66,6 +68,9 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
+    @Inject
+    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+
     private lateinit var reportSummaryTextView: TextView
     private lateinit var reportSummaryEnabledTooltip: TextView
     private lateinit var reportSummaryLink: TextView
@@ -89,6 +94,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         bindViewReferences()
         observeViewModel()
+        deviceShieldAnalytics.didShowPrivacyReport()
     }
 
     @Suppress("DEPRECATION")
@@ -104,6 +110,9 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         super.onPostCreate(savedInstanceState)
 
         val celebrate = intent.getBooleanExtra(CELEBRATION_EXTRA, false)
+        intent.getParcelableExtra<ResultReceiver>(RESULT_RECEIVER_EXTRA)?.let {
+            it.send(ON_LAUNCHED_CALLED_SUCCESS, null)
+        }
 
         if (celebrate) celebrate()
     }
@@ -235,6 +244,8 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     @Suppress("DEPRECATION")
     private fun enableDeviceShield() {
+        deviceShieldAnalytics.enableFromPrivacyReport()
+
         val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(this)
         if (deviceShieldOnboardingIntent == null) {
             startVpnIfAllowed()
@@ -375,12 +386,15 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
         private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 101
+        private const val ON_LAUNCHED_CALLED_SUCCESS = 0
 
         private const val CELEBRATION_EXTRA = "CELEBRATION_EXTRA"
+        private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
 
-        fun intent(context: Context, celebrate: Boolean = false): Intent {
+        fun intent(context: Context, celebrate: Boolean = false, onLaunchCallback: ResultReceiver? = null): Intent {
             return Intent(context, PrivacyReportActivity::class.java).apply {
                 putExtra(CELEBRATION_EXTRA, celebrate)
+                putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
         }
     }

@@ -24,6 +24,7 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -46,11 +47,21 @@ class DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationWorkerInjectorPlugin(
+        dailyNotificationPressedHandler: DailyNotificationPressedHandler,
+        weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
+        deviceShieldAnalytics: DeviceShieldAnalytics,
         repository: AppTrackerBlockingStatsRepository,
         notificationManagerCompat: NotificationManagerCompat,
         deviceShieldNotificationFactory: DeviceShieldNotificationFactory
     ): WorkerInjectorPlugin {
-        return DeviceShieldNotificationWorkerInjectorPlugin(repository, notificationManagerCompat, deviceShieldNotificationFactory)
+        return DeviceShieldNotificationWorkerInjectorPlugin(
+            dailyNotificationPressedHandler,
+            weeklyNotificationPressedHandler,
+            deviceShieldAnalytics,
+            repository,
+            notificationManagerCompat,
+            deviceShieldNotificationFactory
+        )
     }
 }
 
@@ -92,6 +103,8 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
     }
 
     class DeviceShieldDailyNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
+        lateinit var notificationPressedHandler: DailyNotificationPressedHandler
+        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
         lateinit var repository: AppTrackerBlockingStatsRepository
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -99,11 +112,15 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Daily notification worker is now awake")
 
-            val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification()
+            val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification().also {
+                notificationPressedHandler.notificationVariant = it.notificationVariant
+            }
             if (!deviceShieldNotification.hidden) {
-                Timber.v("Vpn Daily notification won't be shown because there is no data to show")
-                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification)
+                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
+                deviceShieldAnalytics.didShowDailyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
+            } else {
+                Timber.v("Vpn Daily notification won't be shown because there is no data to show")
             }
 
             return Result.success()
@@ -111,16 +128,24 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
     }
 
     class DeviceShieldWeeklyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+        lateinit var notificationPressedHandler: WeeklyNotificationPressedHandler
+        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Weekly notification worker is now awake")
 
-            val deviceShieldNotification = deviceShieldNotificationFactory.createWeeklyDeviceShieldNotification()
+            val deviceShieldNotification = deviceShieldNotificationFactory.createWeeklyDeviceShieldNotification().also {
+                notificationPressedHandler.notificationVariant = it.notificationVariant
+            }
+
             if (!deviceShieldNotification.hidden) {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
-                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification)
+                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                    context, deviceShieldNotification, notificationPressedHandler
+                )
+                deviceShieldAnalytics.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_WEEKLY_NOTIFICATION_ID, notification)
             }
 
@@ -143,6 +168,9 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 }
 
 class DeviceShieldNotificationWorkerInjectorPlugin(
+    private var dailyNotificationPressedHandler: DailyNotificationPressedHandler,
+    private var weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
+    private var deviceShieldAnalytics: DeviceShieldAnalytics,
     private val repository: AppTrackerBlockingStatsRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -153,11 +181,15 @@ class DeviceShieldNotificationWorkerInjectorPlugin(
             worker.deviceShieldNotificationFactory = deviceShieldNotificationFactory
             worker.repository = repository
             worker.notificationManager = notificationManagerCompat
+            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.notificationPressedHandler = dailyNotificationPressedHandler
             return true
         }
 
         if (worker is DeviceShieldNotificationScheduler.DeviceShieldWeeklyNotificationWorker) {
             worker.deviceShieldNotificationFactory = deviceShieldNotificationFactory
+            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.notificationPressedHandler = weeklyNotificationPressedHandler
             return true
         }
 

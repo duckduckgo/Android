@@ -23,6 +23,7 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
@@ -47,9 +48,10 @@ class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
     fun provideVpnServiceHeartbeatMonitorWorkerInjectorPlugin(
+        deviceShieldAnalytics: DeviceShieldAnalytics,
         vpnDatabase: VpnDatabase
     ): WorkerInjectorPlugin {
-        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(vpnDatabase)
+        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(deviceShieldAnalytics, vpnDatabase)
     }
 }
 
@@ -73,6 +75,7 @@ class VpnServiceHeartbeatMonitor(
     class VpnServiceHeartbeatMonitorWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var vpnPhoenixDao: VpnPhoenixDao
         lateinit var vpnHeartBeatDao: VpnHeartBeatDao
+        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
 
         override suspend fun doWork(): Result {
             val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
@@ -83,6 +86,9 @@ class VpnServiceHeartbeatMonitor(
                 vpnPhoenixDao.insert(VpnPhoenixEntity(reason = HeartBeatUtils.getAppExitReason(context)))
 
                 TrackerBlockingVpnService.startIntent(context).also {
+                    deviceShieldAnalytics.suddenKillBySystem()
+                    deviceShieldAnalytics.automaticRestart()
+
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         context.startForegroundService(it)
                     } else {
@@ -101,6 +107,7 @@ class VpnServiceHeartbeatMonitor(
 }
 
 class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
+    private val deviceShieldAnalytics: DeviceShieldAnalytics,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {
 
@@ -108,6 +115,7 @@ class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
         if (worker is VpnServiceHeartbeatMonitor.VpnServiceHeartbeatMonitorWorker) {
             worker.vpnHeartBeatDao = vpnDatabase.vpnHeartBeatDao()
             worker.vpnPhoenixDao = vpnDatabase.vpnPhoenixDao()
+            worker.deviceShieldAnalytics = deviceShieldAnalytics
 
             return true
         }

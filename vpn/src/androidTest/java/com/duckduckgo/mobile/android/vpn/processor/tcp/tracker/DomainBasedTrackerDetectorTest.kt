@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.dao.VpnPreferencesDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
@@ -27,6 +28,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -48,6 +50,7 @@ class DomainBasedTrackerDetectorTest {
     private lateinit var preferencesDao: VpnPreferencesDao
     private lateinit var vpnDatabase: VpnDatabase
     private lateinit var trackerDao: VpnTrackerDao
+    private val deviceShieldAnalytics: DeviceShieldAnalytics = mock()
     private val tcb: TCB = mock()
 
     @Before
@@ -65,7 +68,7 @@ class DomainBasedTrackerDetectorTest {
         trackerDao = vpnDatabase.vpnTrackerDao()
         preferencesDao = vpnDatabase.vpnPreferencesDao()
 
-        testee = DomainBasedTrackerDetector(hostnameExtractor, TrackerListProvider(preferencesDao), vpnDatabase)
+        testee = DomainBasedTrackerDetector(deviceShieldAnalytics, hostnameExtractor, TrackerListProvider(preferencesDao), vpnDatabase)
     }
 
     @Test
@@ -87,6 +90,7 @@ class DomainBasedTrackerDetectorTest {
         val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         type.assertIsTracker(trackerDomain)
+        verify(deviceShieldAnalytics).trackerBlocked()
     }
 
     @Test
@@ -94,6 +98,7 @@ class DomainBasedTrackerDetectorTest {
         givenExtractedHostname("foo.bar.doubleclick.net")
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         type.assertIsTracker("doubleclick.net")
+        verify(deviceShieldAnalytics).trackerBlocked()
     }
 
     @Test

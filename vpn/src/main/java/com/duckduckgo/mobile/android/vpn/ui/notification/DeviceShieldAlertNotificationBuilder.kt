@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.ResultReceiver
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -45,16 +46,16 @@ class DeviceShieldAlertNotificationBuilder {
             }
         }
 
-        fun buildReminderNotification(context: Context, silent: Boolean): Notification {
+        fun buildReminderNotification(context: Context, silent: Boolean, onNotificationPressedCallback: ResultReceiver? = null): Notification {
             registerAlertChannel(context)
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
             registerAlertChannel(context)
 
-            val vpnControllerIntent = PrivacyReportActivity.intent(context)
-            val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(vpnControllerIntent)
+            val vpnPrivacyReportIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = onNotificationPressedCallback)
+            val vpnPrivacyReportPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(vpnPrivacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
@@ -66,7 +67,7 @@ class DeviceShieldAlertNotificationBuilder {
             return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(vpnControllerPendingIntent)
+                .setContentIntent(vpnPrivacyReportPendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setSilent(silent)
@@ -83,19 +84,20 @@ class DeviceShieldAlertNotificationBuilder {
 
         fun buildDeviceShieldNotification(
             context: Context,
-            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification
+            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+            onNotificationPressedCallback: ResultReceiver
         ): Notification {
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-            return buildNotification(context, notificationLayout, false)
+            return buildNotification(context, notificationLayout, false, onNotificationPressedCallback)
         }
 
-        private fun buildNotification(context: Context, content: RemoteViews, silent: Boolean): Notification {
+        private fun buildNotification(context: Context, content: RemoteViews, silent: Boolean, resultReceiver: ResultReceiver? = null): Notification {
             registerAlertChannel(context)
 
-            val vpnControllerIntent = PrivacyReportActivity.intent(context)
+            val vpnControllerIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = resultReceiver)
             val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(vpnControllerIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)

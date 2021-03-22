@@ -20,20 +20,31 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
+import android.os.*
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
+import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
+import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 class VpnReminderReceiver : BroadcastReceiver() {
 
+    @Inject
+    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+
+    @Inject
+    lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
+
     override fun onReceive(context: Context, intent: Intent) {
+        AndroidInjection.inject(this, context)
 
         Timber.i("VpnReminderReceiver onReceive ${intent.action}")
         if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == TrackerBlockingVpnService.ACTION_VPN_REMINDER) {
@@ -46,12 +57,13 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")
                     val notification = if (wasReminderNotificationShown(context)) {
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true, notificationPressedHandler)
                     } else {
                         notificationWasShown(context)
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false, notificationPressedHandler)
                     }
 
+                    deviceShieldAnalytics.didShowReminderNotification()
                     manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
                 }
             }
@@ -59,6 +71,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
+            deviceShieldAnalytics.enableFromReminderNotification()
             goAsync {
                 TrackerBlockingVpnService.startIntent(context).also {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

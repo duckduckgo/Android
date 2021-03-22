@@ -43,11 +43,15 @@ class DeviceShieldEnabledNotificationBuilder {
             }
         }
 
-        fun buildDeviceShieldEnabledNotification(context: Context, deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Notification {
+        fun buildDeviceShieldEnabledNotification(
+            context: Context,
+            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+            notificationPressHandler: OngoingNotificationPressedHandler
+        ): Notification {
 
             registerOngoingNotificationChannel(context)
 
-            val privacyReportIntent = PrivacyReportActivity.intent(context)
+            val privacyReportIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -68,12 +72,13 @@ class DeviceShieldEnabledNotificationBuilder {
 
         fun buildTrackersBlockedNotification(
             context: Context,
-            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification
+            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+            notificationPressHandler: OngoingNotificationPressedHandler
         ): Notification {
 
             registerOngoingNotificationChannel(context)
 
-            val privacyReportIntent = PrivacyReportActivity.intent(context)
+            val privacyReportIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
