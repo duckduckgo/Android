@@ -38,7 +38,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldApp
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
-import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
 import org.junit.Before

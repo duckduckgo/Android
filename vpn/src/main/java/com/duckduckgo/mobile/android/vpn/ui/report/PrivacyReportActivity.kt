@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.app.Activity
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
@@ -40,7 +39,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.google.android.material.snackbar.Snackbar
@@ -228,14 +227,9 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         viewKonfetti = findViewById(R.id.deviceShieldKonfetti)
 
         reportSummaryLink.setOnClickListener {
-
-            Intent().apply {
-                val url = "https://spreadprivacy.com/followed-by-ads/"
-                component = ComponentName(applicationContext.packageName, "com.duckduckgo.app.browser.BrowserActivity")
-                putExtra(Intent.EXTRA_TEXT, url)
-            }.also { startActivity(it) }
-
-            finish()
+            TrackerProfilingInfoActivity.intent(this).also {
+                startActivity(it)
+            }
         }
         vpnRunningToggleButton.setOnClickListener {
             enableDeviceShield()

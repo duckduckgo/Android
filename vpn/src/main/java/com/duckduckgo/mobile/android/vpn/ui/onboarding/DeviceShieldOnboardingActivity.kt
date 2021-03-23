@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.onboarding
+package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.Intent
 import android.net.VpnService

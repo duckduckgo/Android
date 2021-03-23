@@ -42,7 +42,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
-import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

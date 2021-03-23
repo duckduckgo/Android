@@ -8,7 +8,7 @@
     <application>
 
         <activity
-            android:name=".ui.report.PrivacyReportActivity"
+            android:name="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity"
             android:label="@string/privacyReportToolbarTitle"
             android:theme="@style/Theme.AndroidVpn"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
@@ -32,9 +32,16 @@
         <activity android:name=".service.VpnPermissionRequesterActivity" />
 
         <activity
-            android:name=".onboarding.DeviceShieldOnboardingActivity"
+            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/privacyReportDeviceShieldEnableLabel"
+            />
+
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.report.TrackerProfilingInfoActivity"
+            android:theme="@style/Theme.AndroidVpn"
+            android:label="@string/trackerProfilingActivityTitle"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity"
             />
 
         <service

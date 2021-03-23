@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:paddingEnd="30dp"
     android:paddingStart="30dp"
-    tools:context="com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboardingActivity">
+    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
     <ScrollView
         android:layout_width="match_parent"

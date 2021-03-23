@@ -48,7 +48,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
 import kotlinx.android.synthetic.main.content_settings_device_shield.*
