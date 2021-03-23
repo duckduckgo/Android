@@ -67,6 +67,7 @@ abstract class VpnDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): VpnDatabase {
             return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
                 .enableMultiInstanceInvalidation()
+                .fallbackToDestructiveMigration()
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
