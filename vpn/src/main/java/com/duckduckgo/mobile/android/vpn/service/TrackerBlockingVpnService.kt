@@ -34,8 +34,9 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
@@ -78,7 +79,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var localAddressDetector: LocalIpAddressDetector
 
     @Inject
-    lateinit var originatingAppResolver: OriginatingAppResolver
+    lateinit var originatingAppPackageIdentifier: OriginatingAppPackageIdentifierStrategy
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -97,6 +98,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
+
+    @Inject
+    lateinit var appNameResolver: AppNameResolver
 
     private val queues = VpnQueues()
 
@@ -135,8 +139,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver, this)
+        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister, originatingAppPackageIdentifier, appNameResolver)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppPackageIdentifier, appNameResolver, this)
 
         Timber.e("VPN log onCreate")
     }

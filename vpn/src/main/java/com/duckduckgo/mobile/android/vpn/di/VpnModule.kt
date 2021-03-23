@@ -16,32 +16,59 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.*
 import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.RoomPacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dummy.ui.VpnPreferences
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Named
 
 @Module
 @ContributesTo(VpnObjectGraph::class)
 class VpnModule {
 
     @Provides
-    fun providesOriginatingAppResolver(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppResolver {
-        return OriginatingAppResolver(connectivityManager, packageManager)
+    @VpnScope
+    @TargetApi(29)
+    @Named("DetectOriginatingAppPackageModern")
+    fun providesOriginatingAppResolverModern(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppPackageIdentifier {
+        return DetectOriginatingAppPackageModern(connectivityManager, packageManager)
     }
+
+    @Provides
+    @VpnScope
+    @Named("DetectOriginatingAppPackageLegacy")
+    fun providesOriginatingAppResolverLegacy(
+        packageManager: PackageManager,
+        networkFileConnectionMatcher: NetworkFileConnectionMatcher,
+        @VpnCoroutineScope vpnCoroutineScope: CoroutineScope
+    ): OriginatingAppPackageIdentifier {
+        return DetectOriginatingAppPackageLegacy(packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
+    }
+
+    @VpnScope
+    @Provides
+    fun providesProcNetFileConnectionMatcher(): NetworkFileConnectionMatcher {
+        return ProcNetFileConnectionMatcher()
+    }
+
+    @Provides
+    @VpnScope
+    fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = AppNameResolver(packageManager)
 
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {

@@ -16,6 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.increaseOrWraparound
@@ -25,8 +28,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
-import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.RequestingApp
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
@@ -56,7 +58,8 @@ class TcpDeviceToNetwork(
     private val trackerDetector: VpnTrackerDetector,
     private val packetPersister: PacketPersister,
     private val localAddressDetector: LocalIpAddressDetector,
-    private val originatingAppResolver: OriginatingAppResolver,
+    private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
+    private val appNameResolver: AppNameResolver,
     private val vpnCoroutineScope: CoroutineScope
 ) {
 
@@ -287,7 +290,7 @@ class TcpDeviceToNetwork(
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestType = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress)
             val requestingApp = determineRequestingApp(tcb, packet)
-            Timber.i("App ${requestingApp.appName} (${requestingApp.packageId}) attempting to send $payloadSize bytes to ${tcb.ipAndPort}. $requestType")
+            Timber.i("App $requestingApp attempting to send $payloadSize bytes to ${tcb.ipAndPort}. $requestType")
 
             if (requestType is RequestTrackerType.Tracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
@@ -342,17 +345,18 @@ class TcpDeviceToNetwork(
         return localAddressDetector.isLocalAddress(packet.ip4Header.destinationAddress)
     }
 
-    private fun determineRequestingApp(tcb: TCB, packet: Packet): RequestingApp {
+    private fun determineRequestingApp(tcb: TCB, packet: Packet): OriginatingApp {
         if (tcb.requestingAppDetermined) {
-            return RequestingApp(tcb.requestingAppPackage ?: "unknown package", tcb.requestingAppName ?: "unknown app")
+            return OriginatingApp(tcb.requestingAppPackage ?: "unknown package", tcb.requestingAppName ?: "unknown app")
         }
 
-        val requestingApp = originatingAppResolver.resolveAppId(packet)
-        tcb.requestingAppDetermined = true
-        tcb.requestingAppName = requestingApp.appName
-        tcb.requestingAppPackage = requestingApp.packageId
+        val packageId = originatingAppPackageResolver.resolvePackageId(packet.connectionInfo())
 
-        return requestingApp
+        tcb.requestingAppDetermined = true
+        tcb.requestingAppPackage = packageId
+        tcb.requestingAppName = appNameResolver.getAppNameForPackageId(packageId).appName
+
+        return OriginatingApp(packageId, tcb.requestingAppName)
     }
 
 }

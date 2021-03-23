@@ -20,6 +20,10 @@ import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
 import android.util.LruCache
+import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
@@ -39,7 +43,9 @@ import java.util.concurrent.TimeUnit
 class UdpPacketProcessor(
     private val queues: VpnQueues,
     private val networkChannelCreator: NetworkChannelCreator,
-    private val packetPersister: PacketPersister
+    private val packetPersister: PacketPersister,
+    private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
+    private val appNameResolver: AppNameResolver
 ) : Runnable {
 
     private var pollJobDeviceToNetwork: Job? = null
@@ -47,11 +53,11 @@ class UdpPacketProcessor(
 
     val selector: Selector = Selector.open()
 
-    private val channelCache = object : LruCache<String, DatagramChannel>(500) {
-        override fun entryRemoved(evicted: Boolean, key: String?, oldValue: DatagramChannel?, newValue: DatagramChannel?) {
+    private val channelCache = object : LruCache<String, ChannelDetails>(500) {
+        override fun entryRemoved(evicted: Boolean, key: String?, oldValue: ChannelDetails?, newValue: ChannelDetails?) {
             Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
             if (evicted) {
-                oldValue?.close()
+                oldValue?.datagramChannel?.close()
             }
         }
     }
@@ -120,25 +126,35 @@ class UdpPacketProcessor(
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.udpHeader.destinationPort
         val cacheKey = generateCacheKey(packet)
+        val connectionInfo = packet.connectionInfo()
 
-        var channel = channelCache[cacheKey]
-        if (channel == null) {
-            channel = createChannel(InetSocketAddress(destinationAddress, destinationPort), cacheKey)
+        var channelDetails = channelCache[cacheKey]
+        if (channelDetails == null) {
+            val channel = createChannel(InetSocketAddress(destinationAddress, destinationPort))
+
             if (channel == null) {
                 ByteBufferPool.release(packet.backingBuffer)
                 return
             }
+
+            val packageId = originatingAppPackageResolver.resolvePackageId(connectionInfo)
+            val appName = appNameResolver.getAppNameForPackageId(packageId).appName
+            channelDetails = ChannelDetails(channel, OriginatingApp(packageId, appName))
+            channelCache.put(cacheKey, channelDetails)
         }
 
         packet.swapSourceAndDestination()
 
         selector.wakeup()
-        channel.register(selector, SelectionKey.OP_READ, packet)
+        channelDetails.datagramChannel.register(selector, SelectionKey.OP_READ, packet)
 
         try {
             val payloadBuffer = packet.backingBuffer ?: return
+
+            Timber.i("App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
+
             while (payloadBuffer.hasRemaining()) {
-                val bytesWritten = channel.write(payloadBuffer)
+                val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
                 Timber.v("UDP packet. Sent $bytesWritten bytes to $cacheKey")
                 packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
             }
@@ -148,7 +164,7 @@ class UdpPacketProcessor(
         }
     }
 
-    private fun createChannel(destination: InetSocketAddress, cacheKey: String): DatagramChannel? {
+    private fun createChannel(destination: InetSocketAddress): DatagramChannel? {
         val channel = networkChannelCreator.createDatagramChannel()
         try {
             channel.connect(destination)
@@ -158,8 +174,6 @@ class UdpPacketProcessor(
             return null
         }
 
-        channelCache.put(cacheKey, channel)
-        Timber.v("UDP cache size now ${channelCache.size()}")
         return channel
     }
 
@@ -210,6 +224,8 @@ class UdpPacketProcessor(
     private fun generateCacheKey(packet: Packet): String {
         return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
+
+    private data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE

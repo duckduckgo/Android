@@ -18,11 +18,12 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
@@ -49,7 +50,8 @@ class TcpPacketProcessor(
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
     localAddressDetector: LocalIpAddressDetector,
-    originatingAppResolver: OriginatingAppResolver,
+    originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
+    appNameResolver: AppNameResolver,
     private val vpnCoroutineScope: CoroutineScope
 ) : Runnable {
 
@@ -75,7 +77,8 @@ class TcpPacketProcessor(
             trackerDetector = trackerDetector,
             packetPersister = packetPersister,
             localAddressDetector = localAddressDetector,
-            originatingAppResolver = originatingAppResolver,
+            originatingAppPackageResolver = originatingAppPackageResolver,
+            appNameResolver = appNameResolver,
             vpnCoroutineScope = vpnCoroutineScope
         )
 
