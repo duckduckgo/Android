@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -231,6 +215,7 @@
     <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
     <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %1$s</string>
     <string name="bookmarkEdited">Knjižna je oznaka dodana</string>
+    <string name="bookmarkDeleteConfirmationMessage">Izbrisano &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdi</string>
@@ -496,6 +481,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>
     <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
     <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
+    <string name="disableLoginDetectionDialogTitle">Onemogućiti podsjetnik za označavanje sigurnog web-mjesta prilikom prijave?</string>
+    <string name="disableLoginDetectionDialogDescription">Ovu postavku možete promijeniti bilo kada u Postavkama.</string>
+    <string name="disableLoginDetectionDialogPositive">ONEMOGUĆI</string>
+    <string name="disableLoginDetectionDialogNegative">ODUSTANI</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Oznaka sigurnog web-mjesta uklonjena je za &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija gumba Vatre</string>

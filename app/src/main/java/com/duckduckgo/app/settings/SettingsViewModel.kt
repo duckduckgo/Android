@@ -49,6 +49,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class SettingsViewModel(
@@ -328,35 +329,35 @@ class SettingsViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideSettingsViewModelFactory(
-        deviceShieldAnalytics: DeviceShieldAnalytics,
-        appContext: Context,
-        settingsDataStore: SettingsDataStore,
-        defaultWebBrowserCapability: DefaultBrowserDetector,
-        variantManager: VariantManager,
-        fireAnimationLoader: FireAnimationLoader,
-        pixel: Pixel,
-        deviceShieldExcludedApps: DeviceShieldExcludedApps,
-        deviceShieldOnboarding: DeviceShieldOnboarding
+        deviceShieldAnalytics: Provider<DeviceShieldAnalytics>,
+        appContext: Provider<Context>,
+        settingsDataStore: Provider<SettingsDataStore>,
+        defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
+        variantManager: Provider<VariantManager>,
+        fireAnimationLoader: Provider<FireAnimationLoader>,
+        pixel: Provider<Pixel>,
+        deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
+        deviceShieldOnboarding: Provider<DeviceShieldOnboarding>
     ): ViewModelFactoryPlugin {
         return SettingsViewModelFactory(deviceShieldAnalytics, appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding)
     }
 }
 
 private class SettingsViewModelFactory(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
-    private val appContext: Context,
-    private val settingsDataStore: SettingsDataStore,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager,
-    private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel,
-    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
-    private val deviceShieldOnboarding: DeviceShieldOnboarding
+    private val deviceShieldAnalytics: Provider<DeviceShieldAnalytics>,
+    private val appContext: Provider<Context>,
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
+    private val variantManager: Provider<VariantManager>,
+    private val fireAnimationLoader: Provider<FireAnimationLoader>,
+    private val pixel: Provider<Pixel>,
+    private val deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
+    private val deviceShieldOnboarding: Provider<DeviceShieldOnboarding>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldAnalytics, appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldAnalytics.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
                 else -> null
             }
         }

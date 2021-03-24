@@ -36,6 +36,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class WhitelistViewModel(
@@ -133,19 +134,19 @@ class WhitelistViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideWhitelistViewModelFactory(
-        dao: UserWhitelistDao
+        dao: Provider<UserWhitelistDao>
     ): ViewModelFactoryPlugin {
         return WhitelistViewModelFactory(dao)
     }
 }
 
 private class WhitelistViewModelFactory(
-    private val dao: UserWhitelistDao
+    private val dao: Provider<UserWhitelistDao>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao) as T)
+                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get()) as T)
                 else -> null
             }
         }

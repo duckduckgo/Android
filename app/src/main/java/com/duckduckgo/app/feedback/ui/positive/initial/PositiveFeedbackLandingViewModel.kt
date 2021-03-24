@@ -62,7 +62,7 @@ class PositiveFeedbackLandingViewModelFactoryModule {
     }
 }
 
-private class PositiveFeedbackLandingViewModelFactory() : ViewModelFactoryPlugin {
+private class PositiveFeedbackLandingViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

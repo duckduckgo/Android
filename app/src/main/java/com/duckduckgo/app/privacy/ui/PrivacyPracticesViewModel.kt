@@ -79,7 +79,7 @@ class PrivacyPracticesViewModelFactoryModule {
     }
 }
 
-private class PrivacyPracticesViewModelFactory() : ViewModelFactoryPlugin {
+private class PrivacyPracticesViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

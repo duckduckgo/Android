@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Inga bokmärken har lagts till ännu</string>
     <string name="bookmarkOverflowContentDescription">Fler alternativ för bokmärke %1$s</string>
     <string name="bookmarkEdited">Bokmärke sparat</string>
+    <string name="bookmarkDeleteConfirmationMessage">Borttagen &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekräfta</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Inte nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webbplatser</string>
     <string name="fireproofWebsiteToogleText">Fråga när du loggar in</string>
+    <string name="disableLoginDetectionDialogTitle">Vill du inaktivera påminnelse om brandsäkring när du loggar in på webbplatser?</string>
+    <string name="disableLoginDetectionDialogDescription">Du kan när som helst ändra denna inställning i Inställningar.</string>
+    <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>
+    <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation för brännarknapp</string>
