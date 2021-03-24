@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Ainda não foram adicionados marcadores</string>
     <string name="bookmarkOverflowContentDescription">Mais opções para o marcador %1$s</string>
     <string name="bookmarkEdited">Favorito adicionado</string>
+    <string name="bookmarkDeleteConfirmationMessage">Eliminado: &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
+    <string name="disableLoginDetectionDialogTitle">Desativar lembrete de barreira de segurança ao iniciar sessão em sites?</string>
+    <string name="disableLoginDetectionDialogDescription">Pode alterar esta preferência nas definições em qualquer altura.</string>
+    <string name="disableLoginDetectionDialogPositive">DESATIVAR</string>
+    <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Barreira de segurança removida para &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animação do Botão de Fogo</string>

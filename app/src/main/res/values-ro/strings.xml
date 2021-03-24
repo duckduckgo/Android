@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -227,6 +211,7 @@
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %1$s</string>
     <string name="bookmarkEdited">Semn de carte adăugat</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
@@ -490,6 +475,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
     <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
+    <string name="disableLoginDetectionDialogTitle">Dezactivezi memento pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
+    <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
+    <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>
+    <string name="disableLoginDetectionDialogNegative">ANULARE</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animație buton Foc</string>

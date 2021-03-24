@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
     <string name="bookmarkOverflowContentDescription">%1$s yer imi için diğer seçenekler</string>
     <string name="bookmarkEdited">Yer imi eklendi</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; silindi</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
     <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+    <string name="disableLoginDetectionDialogTitle">Sitelerde oturum açılırken Koruma hatırlatıcısı devre dışı bırakılsın mı?</string>
+    <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>
+    <string name="disableLoginDetectionDialogNegative">İPTAL</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; için Koruma kaldırıldı</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
