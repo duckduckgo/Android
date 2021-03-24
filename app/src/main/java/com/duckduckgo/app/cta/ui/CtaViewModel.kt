@@ -216,6 +216,9 @@ class CtaViewModel @Inject constructor(
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
+            canShowDeviceShieldCta() -> {
+                DeviceShieldCta
+            }
             else -> null
         }
     }
@@ -270,6 +273,11 @@ class CtaViewModel @Inject constructor(
         //     !widgetCapabilities.hasInstalledWidgets &&
         //     !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
         return false
+    }
+
+    @WorkerThread
+    private fun canShowDeviceShieldCta(): Boolean {
+        return daxDialogEndShown()
     }
 
     @WorkerThread

@@ -1798,7 +1798,6 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-                fragment_device_shield_container.show()
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
@@ -1812,8 +1811,11 @@ class BrowserTabFragment :
 
         private fun showCta(configuration: Cta) {
             when (configuration) {
+                is HomePanelCta.DeviceShieldCta -> fragment_device_shield_container.show()
                 is HomePanelCta -> showHomeCta(configuration)
-                is DaxBubbleCta -> showDaxCta(configuration)
+                is DaxBubbleCta -> {
+                    showDaxCta(configuration)
+                }
                 is DialogCta -> showDaxDialogCta(configuration)
             }
 
@@ -1837,7 +1839,6 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            fragment_device_shield_container.hide()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }

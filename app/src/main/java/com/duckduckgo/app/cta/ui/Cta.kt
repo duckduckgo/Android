@@ -384,6 +384,18 @@ sealed class HomePanelCta(
         AppPixelName.SURVEY_CTA_DISMISSED
     )
 
+    object DeviceShieldCta : HomePanelCta(
+        CtaId.DEVICE_SHIELD_CTA,
+        R.drawable.add_widget_cta_icon,
+        R.string.addWidgetCtaTitle,
+        R.string.addWidgetCtaDescription,
+        R.string.addWidgetCtaAutoLaunchButton,
+        R.string.addWidgetCtaDismissButton,
+        null,
+        null,
+        null
+    )
+
     object AddWidgetAuto : HomePanelCta(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,

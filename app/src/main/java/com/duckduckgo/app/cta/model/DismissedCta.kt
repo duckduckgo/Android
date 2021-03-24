@@ -33,6 +33,7 @@ enum class CtaId {
     USE_OUR_APP,
     USE_OUR_APP_DELETION,
     DAX_FIRE_BUTTON_PULSE,
+    DEVICE_SHIELD_CTA,
     UNKNOWN
 }
 
