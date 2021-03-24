@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.content.Context
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
@@ -63,7 +64,8 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
-        geoLocationPermissions: GeoLocationPermissions
+        geoLocationPermissions: GeoLocationPermissions,
+        thirdPartyCookieManager: ThirdPartyCookieManager
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -73,7 +75,8 @@ class PrivacyModule {
             settingsDataStore,
             cookieManager,
             appCacheClearer,
-            geoLocationPermissions
+            geoLocationPermissions,
+            thirdPartyCookieManager
         )
     }
 

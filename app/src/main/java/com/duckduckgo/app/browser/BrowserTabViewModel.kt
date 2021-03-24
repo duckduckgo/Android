@@ -113,6 +113,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -283,6 +284,7 @@ class BrowserTabViewModel(
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
         class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
         class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
+        object ChildTabClosed : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -394,6 +396,13 @@ class BrowserTabViewModel(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
+        viewModelScope.launch(dispatchers.main()) {
+            tabRepository.childClosedTabs.collect { closedTab ->
+                if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
+                    command.value = ChildTabClosed
+                }
+            }
+        }
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -401,7 +410,6 @@ class BrowserTabViewModel(
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
-
         initialUrl?.let { buildSiteFactory(it) }
     }
 

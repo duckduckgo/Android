@@ -24,6 +24,9 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -94,7 +97,8 @@ class BrowserModule {
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        globalPrivacyControl: GlobalPrivacyControl
+        globalPrivacyControl: GlobalPrivacyControl,
+        thirdPartyCookieManager: ThirdPartyCookieManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -107,7 +111,8 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl
+            globalPrivacyControl,
+            thirdPartyCookieManager
         )
     }
 
@@ -287,5 +292,10 @@ class BrowserModule {
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+    }
+
+    @Provides
+    fun thirdPartyCookieManager(cookieManager: CookieManager, allowedDomainsRepository: AllowedDomainsRepository): ThirdPartyCookieManager {
+        return AppThirdPartyCookieManager(cookieManager, allowedDomainsRepository)
     }
 }
