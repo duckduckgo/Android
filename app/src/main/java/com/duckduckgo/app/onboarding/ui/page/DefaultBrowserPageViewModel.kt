@@ -29,6 +29,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class DefaultBrowserPageViewModel(
@@ -209,23 +210,23 @@ class DefaultBrowserPageViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideDefaultBrowserPageViewModelFactory(
-        defaultBrowserDetector: DefaultBrowserDetector,
-        pixel: Pixel,
-        installStore: AppInstallStore
+        defaultBrowserDetector: Provider<DefaultBrowserDetector>,
+        pixel: Provider<Pixel>,
+        installStore: Provider<AppInstallStore>
     ): ViewModelFactoryPlugin {
         return DefaultBrowserPageViewModelFactory(defaultBrowserDetector, pixel, installStore)
     }
 }
 
 private class DefaultBrowserPageViewModelFactory(
-    private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val pixel: Pixel,
-    private val installStore: AppInstallStore
+    private val defaultBrowserDetector: Provider<DefaultBrowserDetector>,
+    private val pixel: Provider<Pixel>,
+    private val installStore: Provider<AppInstallStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, installStore) as T)
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector.get(), pixel.get(), installStore.get()) as T)
                 else -> null
             }
         }

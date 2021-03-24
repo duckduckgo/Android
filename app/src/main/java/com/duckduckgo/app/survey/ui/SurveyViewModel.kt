@@ -38,6 +38,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class SurveyViewModel(
@@ -123,23 +124,23 @@ class SurveyViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideSurveyViewModelFactory(
-        surveyDao: SurveyDao,
-        statisticsStore: StatisticsDataStore,
-        appInstallStore: AppInstallStore,
+        surveyDao: Provider<SurveyDao>,
+        statisticsStore: Provider<StatisticsDataStore>,
+        appInstallStore: Provider<AppInstallStore>
     ): ViewModelFactoryPlugin {
         return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
     }
 }
 
 private class SurveyViewModelFactory(
-    private val surveyDao: SurveyDao,
-    private val statisticsStore: StatisticsDataStore,
-    private val appInstallStore: AppInstallStore
+    private val surveyDao: Provider<SurveyDao>,
+    private val statisticsStore: Provider<StatisticsDataStore>,
+    private val appInstallStore: Provider<AppInstallStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao, statisticsStore, appInstallStore) as T)
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao.get(), statisticsStore.get(), appInstallStore.get()) as T)
                 else -> null
             }
         }

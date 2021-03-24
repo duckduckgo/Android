@@ -29,6 +29,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class OnboardingViewModel(
@@ -64,23 +65,23 @@ class OnboardingViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideOnboardingViewModelFactory(
-        userStageStore: UserStageStore,
-        pageLayoutManager: OnboardingPageManager,
-        dispatchers: DispatcherProvider
+        userStageStore: Provider<UserStageStore>,
+        pageLayoutManager: Provider<OnboardingPageManager>,
+        dispatchers: Provider<DispatcherProvider>
     ): ViewModelFactoryPlugin {
         return OnboardingViewModelFactory(userStageStore, pageLayoutManager, dispatchers)
     }
 }
 
 private class OnboardingViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val pageLayoutManager: OnboardingPageManager,
-    private val dispatchers: DispatcherProvider
+    private val userStageStore: Provider<UserStageStore>,
+    private val pageLayoutManager: Provider<OnboardingPageManager>,
+    private val dispatchers: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore, pageLayoutManager, dispatchers) as T)
+                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore.get(), pageLayoutManager.get(), dispatchers.get()) as T)
                 else -> null
             }
         }

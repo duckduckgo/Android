@@ -27,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class GlobalPrivacyControlViewModel(
@@ -76,21 +77,21 @@ class GlobalPrivacyControlViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideGlobalPrivacyControlViewModelFactory(
-        pixel: Pixel,
-        settingsDataStore: SettingsDataStore
+        pixel: Provider<Pixel>,
+        settingsDataStore: Provider<SettingsDataStore>
     ): ViewModelFactoryPlugin {
         return GlobalPrivacyControlViewModelFactory(pixel, settingsDataStore)
     }
 }
 
 private class GlobalPrivacyControlViewModelFactory(
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore
+    private val pixel: Provider<Pixel>,
+    private val settingsDataStore: Provider<SettingsDataStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel, settingsDataStore) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), settingsDataStore.get()) as T)
                 else -> null
             }
         }
