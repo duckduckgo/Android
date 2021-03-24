@@ -70,10 +70,10 @@ class AppThirdPartyCookieManager(
     }
 
     private suspend fun addHostToList(uri: Uri) {
-        val ssDomain = uri.getQueryParameter("ss_domain")
-        val accessType = uri.getQueryParameter("response_type")
+        val ssDomain = uri.getQueryParameter(SS_DOMAIN)
+        val accessType = uri.getQueryParameter(RESPONSE_TYPE)
         ssDomain?.let {
-            if (accessType?.contains("id_token") == true) {
+            if (accessType?.contains(ID_TOKEN) == true) {
                 ssDomain.toUri().host?.let {
                     allowedDomainsRepository.addDomain(it)
                 }
@@ -83,13 +83,17 @@ class AppThirdPartyCookieManager(
 
     private fun hasUserIdCookie(): Boolean {
         return cookieManager.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
-            it.contains("user_id")
+            it.contains(USER_ID_COOKIE)
         } != null
     }
 
     companion object {
-        val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com")
+        private const val SS_DOMAIN = "ss_domain"
+        private const val RESPONSE_TYPE = "response_type"
+        private const val ID_TOKEN = "id_token"
+        const val USER_ID_COOKIE = "user_id"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"
+        val hostsThatAlwaysRequireThirdPartyCookies = listOf("home.nest.com")
     }
 }

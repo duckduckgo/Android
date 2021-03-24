@@ -396,7 +396,7 @@ class BrowserTabViewModel(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch {
             tabRepository.childClosedTabs.collect { closedTab ->
                 if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
                     command.value = ChildTabClosed

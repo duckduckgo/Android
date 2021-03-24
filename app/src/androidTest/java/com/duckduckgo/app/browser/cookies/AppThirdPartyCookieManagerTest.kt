@@ -24,6 +24,7 @@ import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager.Companion.USER_ID_COOKIE
 import com.duckduckgo.app.browser.cookies.db.AllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
@@ -168,7 +169,7 @@ class AppThirdPartyCookieManagerTest {
 
     private suspend fun givenUserIdCookieIsSet() {
         withContext(coroutinesTestRule.testDispatcherProvider.main()) {
-            cookieManager.setCookie("https://accounts.google.com", "user_id=test")
+            cookieManager.setCookie("https://accounts.google.com", "$USER_ID_COOKIE=test")
         }
     }
 
