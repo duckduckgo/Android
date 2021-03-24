@@ -117,6 +117,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class BrowserTabViewModel(
@@ -1843,36 +1844,36 @@ class BrowserTabViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideBrowserTabViewModelFactory(
-        statisticsUpdater: StatisticsUpdater,
-        queryUrlConverter: QueryUrlConverter,
-        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        siteFactory: SiteFactory,
-        tabRepository: TabRepository,
-        userWhitelistDao: UserWhitelistDao,
-        networkLeaderboardDao: NetworkLeaderboardDao,
-        bookmarksDao: BookmarksDao,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        locationPermissionsRepository: LocationPermissionsRepository,
-        geoLocationPermissions: GeoLocationPermissions,
-        navigationAwareLoginDetector: NavigationAwareLoginDetector,
-        autoCompleteApi: AutoCompleteApi,
-        appSettingsPreferencesStore: SettingsDataStore,
-        longPressHandler: LongPressHandler,
-        webViewSessionStorage: WebViewSessionStorage,
-        specialUrlDetector: SpecialUrlDetector,
-        faviconManager: FaviconManager,
-        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-        ctaViewModel: CtaViewModel,
-        searchCountDao: SearchCountDao,
-        pixel: Pixel,
+        statisticsUpdater: Provider<StatisticsUpdater>,
+        queryUrlConverter: Provider<QueryUrlConverter>,
+        duckDuckGoUrlDetector: Provider<DuckDuckGoUrlDetector>,
+        siteFactory: Provider<SiteFactory>,
+        tabRepository: Provider<TabRepository>,
+        userWhitelistDao: Provider<UserWhitelistDao>,
+        networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
+        bookmarksDao: Provider<BookmarksDao>,
+        fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
+        locationPermissionsRepository: Provider<LocationPermissionsRepository>,
+        geoLocationPermissions: Provider<GeoLocationPermissions>,
+        navigationAwareLoginDetector: Provider<NavigationAwareLoginDetector>,
+        autoCompleteApi: Provider<AutoCompleteApi>,
+        appSettingsPreferencesStore: Provider<SettingsDataStore>,
+        longPressHandler: Provider<LongPressHandler>,
+        webViewSessionStorage: Provider<WebViewSessionStorage>,
+        specialUrlDetector: Provider<SpecialUrlDetector>,
+        faviconManager: Provider<FaviconManager>,
+        addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
+        ctaViewModel: Provider<CtaViewModel>,
+        searchCountDao: Provider<SearchCountDao>,
+        pixel: Provider<Pixel>,
         dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-        userEventsStore: UserEventsStore,
-        notificationDao: NotificationDao,
-        useOurAppDetector: UseOurAppDetector,
-        variantManager: VariantManager,
-        fileDownloader: FileDownloader,
-        globalPrivacyControl: GlobalPrivacyControl,
-        fireproofDialogsEventHandler: FireproofDialogsEventHandler
+        userEventsStore: Provider<UserEventsStore>,
+        notificationDao: Provider<NotificationDao>,
+        useOurAppDetector: Provider<UseOurAppDetector>,
+        variantManager: Provider<VariantManager>,
+        fileDownloader: Provider<FileDownloader>,
+        globalPrivacyControl: Provider<GlobalPrivacyControl>,
+        fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>
     ): ViewModelFactoryPlugin {
         return BrowserTabViewModelFactory(
             statisticsUpdater,
@@ -1910,41 +1911,41 @@ class BrowserTabViewModelFactoryModule {
 }
 
 private class BrowserTabViewModelFactory(
-    private val statisticsUpdater: StatisticsUpdater,
-    private val queryUrlConverter: OmnibarEntryConverter,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val siteFactory: SiteFactory,
-    private val tabRepository: TabRepository,
-    private val userWhitelistDao: UserWhitelistDao,
-    private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geoLocationPermissions: GeoLocationPermissions,
-    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
-    private val autoComplete: AutoComplete,
-    private val appSettingsPreferencesStore: SettingsDataStore,
-    private val longPressHandler: LongPressHandler,
-    private val webViewSessionStorage: WebViewSessionStorage,
-    private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconManager: FaviconManager,
-    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val ctaViewModel: CtaViewModel,
-    private val searchCountDao: SearchCountDao,
-    private val pixel: Pixel,
+    private val statisticsUpdater: Provider<StatisticsUpdater>,
+    private val queryUrlConverter: Provider<QueryUrlConverter>,
+    private val duckDuckGoUrlDetector: Provider<DuckDuckGoUrlDetector>,
+    private val siteFactory: Provider<SiteFactory>,
+    private val tabRepository: Provider<TabRepository>,
+    private val userWhitelistDao: Provider<UserWhitelistDao>,
+    private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
+    private val bookmarksDao: Provider<BookmarksDao>,
+    private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
+    private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
+    private val geoLocationPermissions: Provider<GeoLocationPermissions>,
+    private val navigationAwareLoginDetector: Provider<NavigationAwareLoginDetector>,
+    private val autoComplete: Provider<AutoCompleteApi>,
+    private val appSettingsPreferencesStore: Provider<SettingsDataStore>,
+    private val longPressHandler: Provider<LongPressHandler>,
+    private val webViewSessionStorage: Provider<WebViewSessionStorage>,
+    private val specialUrlDetector: Provider<SpecialUrlDetector>,
+    private val faviconManager: Provider<FaviconManager>,
+    private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
+    private val ctaViewModel: Provider<CtaViewModel>,
+    private val searchCountDao: Provider<SearchCountDao>,
+    private val pixel: Provider<Pixel>,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val userEventsStore: UserEventsStore,
-    private val notificationDao: NotificationDao,
-    private val useOurAppDetector: UseOurAppDetector,
-    private val variantManager: VariantManager,
-    private val fileDownloader: FileDownloader,
-    private val globalPrivacyControl: GlobalPrivacyControl,
-    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
+    private val userEventsStore: Provider<UserEventsStore>,
+    private val notificationDao: Provider<NotificationDao>,
+    private val useOurAppDetector: Provider<UseOurAppDetector>,
+    private val variantManager: Provider<VariantManager>,
+    private val fileDownloader: Provider<FileDownloader>,
+    private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
+    private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater, queryUrlConverter, duckDuckGoUrlDetector, siteFactory, tabRepository, userWhitelistDao, networkLeaderboardDao, bookmarksDao, fireproofWebsiteRepository, locationPermissionsRepository, geoLocationPermissions, navigationAwareLoginDetector, autoComplete, appSettingsPreferencesStore, longPressHandler, webViewSessionStorage, specialUrlDetector, faviconManager, addToHomeCapabilityDetector, ctaViewModel, searchCountDao, pixel, dispatchers, userEventsStore, notificationDao, useOurAppDetector, variantManager, fileDownloader, globalPrivacyControl, fireproofDialogsEventHandler) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get()) as T
                 else -> null
             }
         }

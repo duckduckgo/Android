@@ -46,6 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Provider
 import javax.inject.Singleton
 
 data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
@@ -266,25 +267,25 @@ class SystemSearchViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideSystemSearchViewModelFactory(
-        userStageStore: UserStageStore,
-        autoCompleteApi: AutoCompleteApi,
-        deviceAppLookup: DeviceAppLookup,
-        pixel: Pixel,
+        userStageStore: Provider<UserStageStore>,
+        autoCompleteApi: Provider<AutoCompleteApi>,
+        deviceAppLookup: Provider<DeviceAppLookup>,
+        pixel: Provider<Pixel>
     ): ViewModelFactoryPlugin {
         return SystemSearchViewModelFactory(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
     }
 }
 
 private class SystemSearchViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val autoComplete: AutoComplete,
-    private val deviceAppLookup: DeviceAppLookup,
-    private val pixel: Pixel
+    private val userStageStore: Provider<UserStageStore>,
+    private val autoComplete: Provider<AutoCompleteApi>,
+    private val deviceAppLookup: Provider<DeviceAppLookup>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore, autoComplete, deviceAppLookup, pixel) as T)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore.get(), autoComplete.get(), deviceAppLookup.get(), pixel.get()) as T)
                 else -> null
             }
         }

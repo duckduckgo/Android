@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
@@ -87,21 +88,21 @@ class TabSwitcherViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideTabSwitcherViewModelFactory(
-        tabRepository: TabRepository,
-        webViewSessionStorage: WebViewSessionStorage
+        tabRepository: Provider<TabRepository>,
+        webViewSessionStorage: Provider<WebViewSessionStorage>
     ): ViewModelFactoryPlugin {
         return TabSwitcherViewModelFactory(tabRepository, webViewSessionStorage)
     }
 }
 
 private class TabSwitcherViewModelFactory(
-    private val tabRepository: TabRepository,
-    private val webViewSessionStorage: WebViewSessionStorage
+    private val tabRepository: Provider<TabRepository>,
+    private val webViewSessionStorage: Provider<WebViewSessionStorage>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage) as T
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
                 else -> null
             }
         }

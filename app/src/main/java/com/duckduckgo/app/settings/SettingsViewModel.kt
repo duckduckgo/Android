@@ -42,6 +42,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class SettingsViewModel @Inject constructor(
@@ -251,27 +252,27 @@ class SettingsViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideSettingsViewModelFactory(
-        settingsDataStore: SettingsDataStore,
-        defaultWebBrowserCapability: DefaultBrowserDetector,
-        variantManager: VariantManager,
-        fireAnimationLoader: FireAnimationLoader,
-        pixel: Pixel
+        settingsDataStore: Provider<SettingsDataStore>,
+        defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
+        variantManager: Provider<VariantManager>,
+        fireAnimationLoader: Provider<FireAnimationLoader>,
+        pixel: Provider<Pixel>
     ): ViewModelFactoryPlugin {
         return SettingsViewModelFactory(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel)
     }
 }
 
 private class SettingsViewModelFactory(
-    private val settingsDataStore: SettingsDataStore,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager,
-    private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
+    private val variantManager: Provider<VariantManager>,
+    private val fireAnimationLoader: Provider<FireAnimationLoader>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
                 else -> null
             }
         }

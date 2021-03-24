@@ -31,6 +31,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class ChangeIconViewModel @Inject constructor(
@@ -89,23 +90,23 @@ class ChangeIconViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideChangeIconViewModelFactory(
-        settingsDataStore: SettingsDataStore,
-        appIconModifier: IconModifier,
-        pixel: Pixel
+        settingsDataStore: Provider<SettingsDataStore>,
+        appIconModifier: Provider<IconModifier>,
+        pixel: Provider<Pixel>
     ): ViewModelFactoryPlugin {
         return ChangeIconViewModelFactory(settingsDataStore, appIconModifier, pixel)
     }
 }
 
 private class ChangeIconViewModelFactory(
-    private val settingsDataStore: SettingsDataStore,
-    private val appIconModifier: IconModifier,
-    private val pixel: Pixel
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val appIconModifier: Provider<IconModifier>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore, appIconModifier, pixel) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
                 else -> null
             }
         }

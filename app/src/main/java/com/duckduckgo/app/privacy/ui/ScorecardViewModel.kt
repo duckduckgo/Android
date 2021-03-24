@@ -36,6 +36,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class ScorecardViewModel(
@@ -121,18 +122,18 @@ class ScorecardViewModelFactoryModule {
     @Provides
     @Singleton
     @IntoSet
-    fun provideScorecardViewModelFactory(userWhitelistDao: UserWhitelistDao): ViewModelFactoryPlugin {
+    fun provideScorecardViewModelFactory(userWhitelistDao: Provider<UserWhitelistDao>): ViewModelFactoryPlugin {
         return ScorecardViewModelFactory(userWhitelistDao)
     }
 }
 
 private class ScorecardViewModelFactory(
-    private val userWhitelistDao: UserWhitelistDao,
+    private val userWhitelistDao: Provider<UserWhitelistDao>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao) as T
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get()) as T
                 else -> null
             }
         }

@@ -58,7 +58,7 @@ class ShareOpenEndedNegativeFeedbackViewModelFactoryModule {
     }
 }
 
-private class ShareOpenEndedNegativeFeedbackViewModelFactory() : ViewModelFactoryPlugin {
+private class ShareOpenEndedNegativeFeedbackViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

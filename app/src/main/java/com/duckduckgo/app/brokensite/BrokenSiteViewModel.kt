@@ -35,6 +35,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
@@ -134,21 +135,21 @@ class BrokenSiteViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideBrokenSiteViewModelFactory(
-        pixel: Pixel,
-        brokenSiteSender: BrokenSiteSender
+        pixel: Provider<Pixel>,
+        brokenSiteSender: Provider<BrokenSiteSender>
     ): ViewModelFactoryPlugin {
         return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
     }
 }
 
 private class BrokenSiteViewModelFactory(
-    private val pixel: Pixel,
-    private val brokenSiteSender: BrokenSiteSender
+    private val pixel: Provider<Pixel>,
+    private val brokenSiteSender: Provider<BrokenSiteSender>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel, brokenSiteSender) as T)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
                 else -> null
             }
         }
