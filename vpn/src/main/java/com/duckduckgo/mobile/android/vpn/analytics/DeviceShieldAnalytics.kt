@@ -26,7 +26,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -335,7 +334,6 @@ class RealDeviceShieldAnalytics @Inject constructor(
     }
 
     private fun firePixel(p: DeviceShieldPixels) {
-        Timber.v("Device shield pixel ${p.pixelName} fired")
         pixel.fire(p)
     }
 
@@ -349,7 +347,6 @@ class RealDeviceShieldAnalytics @Inject constructor(
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            Timber.v("Device shield daily pixel $pixelName fired")
             this.pixel.fire(pixelName).also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
         }
     }
@@ -359,7 +356,6 @@ class RealDeviceShieldAnalytics @Inject constructor(
 
         if (didExecuteAlready) return
 
-        Timber.v("Device shield unique pixel ${pixel.pixelName} fired")
         this.pixel.fire(pixel).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
     }
 
