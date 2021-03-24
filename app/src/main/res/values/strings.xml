@@ -208,6 +208,7 @@
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="bookmarkEdited">Bookmark added</string>
+    <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
@@ -469,6 +470,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+    <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
+    <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
+    <string name="disableLoginDetectionDialogPositive">DISABLE</string>
+    <string name="disableLoginDetectionDialogNegative">CANCEL</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Fire Button Animation</string>

@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Järjehoidjaid pole veel lisatud</string>
     <string name="bookmarkOverflowContentDescription">Veel järjehoidja %1$s valikuid</string>
     <string name="bookmarkEdited">Järjehoidja lisatud</string>
+    <string name="bookmarkDeleteConfirmationMessage">Kustutatud &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Kinnita</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
     <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
+    <string name="disableLoginDetectionDialogTitle">Kas keelata tulekindel meeldetuletus saitidele sisselogimisel?</string>
+    <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
+    <string name="disableLoginDetectionDialogPositive">KEELA</string>
+    <string name="disableLoginDetectionDialogNegative">TÜHISTA</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tulekindlus on eemaldatud</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tulenupu animatsioon</string>

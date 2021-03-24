@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Non è ancora stato aggiunto nessun segnalibro</string>
     <string name="bookmarkOverflowContentDescription">Ulteriori opzioni per il segnalibro %1$s</string>
     <string name="bookmarkEdited">Segnalibro aggiunto</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; eliminato</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Conferma</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti web</string>
     <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
+    <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
+    <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
+    <string name="disableLoginDetectionDialogPositive">DISABILITA</string>
+    <string name="disableLoginDetectionDialogNegative">ANNULLA</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Protezione rimossa per &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animazione pulsante fuoco</string>
