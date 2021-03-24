@@ -51,7 +51,7 @@ class BrokenSiteNegativeFeedbackViewModelFactoryModule {
     }
 }
 
-private class BrokenSiteNegativeFeedbackViewModelFactory() : ViewModelFactoryPlugin {
+private class BrokenSiteNegativeFeedbackViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

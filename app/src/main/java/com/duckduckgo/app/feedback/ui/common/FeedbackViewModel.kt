@@ -37,6 +37,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
@@ -297,21 +298,21 @@ class FeedbackViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideFeedbackViewModelFactory(
-        playStoreUtils: PlayStoreUtils,
-        feedbackSubmitter: FeedbackSubmitter
+        playStoreUtils: Provider<PlayStoreUtils>,
+        feedbackSubmitter: Provider<FeedbackSubmitter>
     ): ViewModelFactoryPlugin {
         return FeedbackViewModelFactory(playStoreUtils, feedbackSubmitter)
     }
 }
 
 private class FeedbackViewModelFactory(
-    private val playStoreUtils: PlayStoreUtils,
-    private val feedbackSubmitter: FeedbackSubmitter
+    private val playStoreUtils: Provider<PlayStoreUtils>,
+    private val feedbackSubmitter: Provider<FeedbackSubmitter>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils, feedbackSubmitter) as T)
+                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils.get(), feedbackSubmitter.get()) as T)
                 else -> null
             }
         }
