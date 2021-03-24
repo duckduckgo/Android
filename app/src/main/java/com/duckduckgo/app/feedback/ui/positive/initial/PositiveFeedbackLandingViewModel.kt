@@ -20,11 +20,8 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class PositiveFeedbackLandingViewModel : ViewModel() {
 
@@ -51,18 +48,8 @@ sealed class Command {
     object LaunchShareFeedbackPage : Command()
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class PositiveFeedbackLandingViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun providePositiveFeedbackLandingViewModelFactory(): ViewModelFactoryPlugin {
-        return PositiveFeedbackLandingViewModelFactory()
-    }
-}
-
-private class PositiveFeedbackLandingViewModelFactory : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class PositiveFeedbackLandingViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

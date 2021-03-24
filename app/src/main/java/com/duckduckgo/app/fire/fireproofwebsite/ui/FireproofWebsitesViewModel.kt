@@ -17,7 +17,6 @@
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
@@ -26,17 +25,14 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
@@ -112,24 +108,8 @@ class FireproofWebsitesViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class FireproofWebsitesViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFireproofWebsitesViewModelFactory(
-        fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
-        dispatcherProvider: Provider<DispatcherProvider>,
-        pixel: Provider<Pixel>,
-        settingsDataStore: Provider<SettingsDataStore>,
-        userEventsStore: Provider<UserEventsStore>
-    ): ViewModelFactoryPlugin {
-        return FireproofWebsitesViewModelFactory(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore)
-    }
-}
-
-private class FireproofWebsitesViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class FireproofWebsitesViewModelFactory @Inject constructor(
     private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>,
     private val pixel: Provider<Pixel>,

@@ -22,11 +22,8 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class AddWidgetInstructionsViewModel : ViewModel() {
 
@@ -46,18 +43,8 @@ class AddWidgetInstructionsViewModel : ViewModel() {
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class AddWidgetInstructionsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideAddWidgetInstructionsViewModelFactory(): ViewModelFactoryPlugin {
-        return AddWidgetInstructionsViewModelFactory()
-    }
-}
-
-private class AddWidgetInstructionsViewModelFactory() : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class AddWidgetInstructionsViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

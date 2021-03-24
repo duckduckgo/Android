@@ -31,12 +31,9 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
@@ -128,21 +125,8 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrokenSiteViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrokenSiteViewModelFactory(
-        pixel: Provider<Pixel>,
-        brokenSiteSender: Provider<BrokenSiteSender>
-    ): ViewModelFactoryPlugin {
-        return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
-    }
-}
-
-private class BrokenSiteViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class BrokenSiteViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val brokenSiteSender: Provider<BrokenSiteSender>
 ) : ViewModelFactoryPlugin {
