@@ -320,7 +320,7 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenDeleteCurrentTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runBlocking<Unit> {
+    fun whenDeleteTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
         val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
@@ -331,7 +331,7 @@ class TabDataRepositoryTest {
         var currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, tabToDelete.tabId)
 
-        testee.deleteCurrentTabAndSelectSource("tabToDeleteId")
+        testee.deleteTabAndSelectSource("tabToDeleteId")
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
