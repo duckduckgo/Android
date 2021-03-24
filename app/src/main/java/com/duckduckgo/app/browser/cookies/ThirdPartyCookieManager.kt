@@ -73,7 +73,7 @@ class AppThirdPartyCookieManager(
         val ssDomain = uri.getQueryParameter(SS_DOMAIN)
         val accessType = uri.getQueryParameter(RESPONSE_TYPE)
         ssDomain?.let {
-            if (accessType?.contains(ID_TOKEN) == true) {
+            if (accessType?.contains(CODE) == false) {
                 ssDomain.toUri().host?.let {
                     allowedDomainsRepository.addDomain(it)
                 }
@@ -90,7 +90,7 @@ class AppThirdPartyCookieManager(
     companion object {
         private const val SS_DOMAIN = "ss_domain"
         private const val RESPONSE_TYPE = "response_type"
-        private const val ID_TOKEN = "id_token"
+        private const val CODE = "code"
         const val USER_ID_COOKIE = "user_id"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"
         const val GOOGLE_ACCOUNTS_HOST = "accounts.google.com"

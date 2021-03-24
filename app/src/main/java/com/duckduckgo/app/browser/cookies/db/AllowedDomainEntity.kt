@@ -21,6 +21,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "allowed_domains")
 data class AllowedDomainEntity(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    @PrimaryKey
     var domain: String
 )

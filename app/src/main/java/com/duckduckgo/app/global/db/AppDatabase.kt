@@ -393,7 +393,7 @@ class MigrationsProvider(
 
     val MIGRATION_30_TO_31: Migration = object : Migration(26, 27) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `allowed_domains` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `domain` TEXT NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
         }
     }
 
