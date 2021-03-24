@@ -410,6 +410,7 @@ class BrowserTabViewModel(
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
+
         initialUrl?.let { buildSiteFactory(it) }
     }
 

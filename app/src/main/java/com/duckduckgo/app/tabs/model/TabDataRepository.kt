@@ -235,7 +235,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
 
-            if (tabToSelect != null) {
+            tabToSelect?.let {
                 appCoroutineScope.launch {
                     childTabClosedSharedFlow.emit(tabToSelect.tabId)
                 }
