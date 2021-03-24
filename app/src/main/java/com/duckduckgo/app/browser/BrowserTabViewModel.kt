@@ -586,7 +586,7 @@ class BrowserTabViewModel(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
-            tabRepository.delete(currentTab)
+            tabRepository.deleteTabAndSelectSource(it.tabId)
         }
     }
 
@@ -636,7 +636,7 @@ class BrowserTabViewModel(
     }
 
     private suspend fun removeAndSelectTabFromRepository() {
-        tabRepository.deleteCurrentTabAndSelectSource()
+        removeCurrentTabFromRepository()
     }
 
     fun onUserPressedForward() {
@@ -688,7 +688,7 @@ class BrowserTabViewModel(
             return true
         } else if (hasSourceTab) {
             viewModelScope.launch {
-                tabRepository.deleteCurrentTabAndSelectSource()
+                removeCurrentTabFromRepository()
             }
             return true
         } else if (!skipHome) {
