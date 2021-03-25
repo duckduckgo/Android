@@ -20,32 +20,32 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ResultReceiver
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import timber.log.Timber
 import javax.inject.Inject
 
 private const val INVALID_NOTIFICATION_VARIANT = -1
 
 class ReminderNotificationPressedHandler @Inject constructor(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
         Timber.v("Reminder notification pressed")
-        deviceShieldAnalytics.didPressReminderNotification()
+        deviceShieldPixels.didPressReminderNotification()
     }
 }
 
 class OngoingNotificationPressedHandler @Inject constructor(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
         Timber.v("Ongoing notification pressed")
-        deviceShieldAnalytics.didPressOngoingNotification()
+        deviceShieldPixels.didPressOngoingNotification()
     }
 }
 
 class WeeklyNotificationPressedHandler @Inject constructor(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
@@ -55,13 +55,13 @@ class WeeklyNotificationPressedHandler @Inject constructor(
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
             Timber.e("Weekly notification pressed reported with uninitialized notification variant")
         } else {
-            deviceShieldAnalytics.didPressOnWeeklyNotification(notificationVariant)
+            deviceShieldPixels.didPressOnWeeklyNotification(notificationVariant)
         }
     }
 }
 
 class DailyNotificationPressedHandler @Inject constructor(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
@@ -71,7 +71,7 @@ class DailyNotificationPressedHandler @Inject constructor(
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
             Timber.e("Daily notification pressed reported with uninitialized notification variant")
         } else {
-            deviceShieldAnalytics.didPressOnDailyNotification(notificationVariant)
+            deviceShieldPixels.didPressOnDailyNotification(notificationVariant)
         }
     }
 }

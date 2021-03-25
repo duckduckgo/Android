@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.analytics
+package com.duckduckgo.mobile.android.vpn.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 
-enum class DeviceShieldPixels(override val pixelName: String) : Pixel.PixelName {
+enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelName {
     DS_INSTALLED_UNIQUE("m_apptb_i"),
 
     DS_ENABLE_UPON_SEARCH_DAILY("m_apptb_e_sd"),

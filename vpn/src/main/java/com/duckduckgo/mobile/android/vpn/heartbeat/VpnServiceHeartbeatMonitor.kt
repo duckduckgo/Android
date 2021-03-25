@@ -23,7 +23,7 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
@@ -48,10 +48,10 @@ class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
     fun provideVpnServiceHeartbeatMonitorWorkerInjectorPlugin(
-        deviceShieldAnalytics: DeviceShieldAnalytics,
+        deviceShieldPixels: DeviceShieldPixels,
         vpnDatabase: VpnDatabase
     ): WorkerInjectorPlugin {
-        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(deviceShieldAnalytics, vpnDatabase)
+        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(deviceShieldPixels, vpnDatabase)
     }
 }
 
@@ -75,7 +75,7 @@ class VpnServiceHeartbeatMonitor(
     class VpnServiceHeartbeatMonitorWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var vpnPhoenixDao: VpnPhoenixDao
         lateinit var vpnHeartBeatDao: VpnHeartBeatDao
-        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+        lateinit var deviceShieldPixels: DeviceShieldPixels
 
         override suspend fun doWork(): Result {
             val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
@@ -86,8 +86,8 @@ class VpnServiceHeartbeatMonitor(
                 vpnPhoenixDao.insert(VpnPhoenixEntity(reason = HeartBeatUtils.getAppExitReason(context)))
 
                 TrackerBlockingVpnService.startIntent(context).also {
-                    deviceShieldAnalytics.suddenKillBySystem()
-                    deviceShieldAnalytics.automaticRestart()
+                    deviceShieldPixels.suddenKillBySystem()
+                    deviceShieldPixels.automaticRestart()
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         context.startForegroundService(it)
@@ -107,7 +107,7 @@ class VpnServiceHeartbeatMonitor(
 }
 
 class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {
 
@@ -115,7 +115,7 @@ class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
         if (worker is VpnServiceHeartbeatMonitor.VpnServiceHeartbeatMonitorWorker) {
             worker.vpnHeartBeatDao = vpnDatabase.vpnHeartBeatDao()
             worker.vpnPhoenixDao = vpnDatabase.vpnPhoenixDao()
-            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.deviceShieldPixels = deviceShieldPixels
 
             return true
         }

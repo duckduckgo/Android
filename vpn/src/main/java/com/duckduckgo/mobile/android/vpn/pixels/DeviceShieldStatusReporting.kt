@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.analytics
+package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
@@ -43,9 +43,9 @@ class DeviceShieldStatusReportingModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldStatusReportingWorkerInjectorPlugin(
-        deviceShieldAnalytics: DeviceShieldAnalytics
+        deviceShieldPixels: DeviceShieldPixels
     ): WorkerInjectorPlugin {
-        return DeviceShieldStatusReportingWorkerInjectorPlugin(deviceShieldAnalytics)
+        return DeviceShieldStatusReportingWorkerInjectorPlugin(deviceShieldPixels)
     }
 }
 
@@ -65,13 +65,13 @@ class DeviceShieldStatusReporting(
     }
 
     class DeviceShieldStatusReportingWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+        lateinit var deviceShieldPixels: DeviceShieldPixels
 
         override suspend fun doWork(): Result {
             if (TrackerBlockingVpnService.isServiceRunning(context)) {
-                deviceShieldAnalytics.reportEnabled()
+                deviceShieldPixels.reportEnabled()
             } else {
-                deviceShieldAnalytics.reportDisabled()
+                deviceShieldPixels.reportDisabled()
             }
 
             return Result.success()
@@ -83,10 +83,10 @@ class DeviceShieldStatusReporting(
     }
 }
 
-class DeviceShieldStatusReportingWorkerInjectorPlugin(private val deviceShieldAnalytics: DeviceShieldAnalytics) : WorkerInjectorPlugin {
+class DeviceShieldStatusReportingWorkerInjectorPlugin(private val deviceShieldPixels: DeviceShieldPixels) : WorkerInjectorPlugin {
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is DeviceShieldStatusReporting.DeviceShieldStatusReportingWorker) {
-            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.deviceShieldPixels = deviceShieldPixels
             return true
         }
         return false

@@ -35,7 +35,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -60,7 +60,7 @@ class DeviceShieldFragment : Fragment() {
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     @Inject
-    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaSubHeaderTextView: TextView
@@ -106,7 +106,7 @@ class DeviceShieldFragment : Fragment() {
         //  this fragment to be resumed and visible for a split-second when Dax is shown (aka empty tab)
         Handler(Looper.getMainLooper()).postDelayed(200) {
             if (view?.isShown == true) {
-                deviceShieldAnalytics.didShowNewTabSummary()
+                deviceShieldPixels.didShowNewTabSummary()
             }
         }
     }
@@ -162,11 +162,11 @@ class DeviceShieldFragment : Fragment() {
     private fun bindListeners(view: View) {
         deviceShieldInfoLayout.setOnClickListener {
             startActivity(PrivacyReportActivity.intent(requireActivity())).also {
-                deviceShieldAnalytics.didPressNewTabSummary()
+                deviceShieldPixels.didPressNewTabSummary()
             }
         }
         deviceShieldEnableCTA.setOnClickListener {
-            deviceShieldAnalytics.enableFromNewTab()
+            deviceShieldPixels.enableFromNewTab()
             enableDeviceShield()
         }
     }

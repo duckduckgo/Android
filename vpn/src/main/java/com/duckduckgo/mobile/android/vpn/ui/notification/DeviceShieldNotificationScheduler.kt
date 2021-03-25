@@ -24,7 +24,7 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -49,7 +49,7 @@ class DeviceShieldNotificationSchedulerModule {
     fun provideDeviceShieldNotificationWorkerInjectorPlugin(
         dailyNotificationPressedHandler: DailyNotificationPressedHandler,
         weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
-        deviceShieldAnalytics: DeviceShieldAnalytics,
+        deviceShieldPixels: DeviceShieldPixels,
         repository: AppTrackerBlockingStatsRepository,
         notificationManagerCompat: NotificationManagerCompat,
         deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -57,7 +57,7 @@ class DeviceShieldNotificationSchedulerModule {
         return DeviceShieldNotificationWorkerInjectorPlugin(
             dailyNotificationPressedHandler,
             weeklyNotificationPressedHandler,
-            deviceShieldAnalytics,
+            deviceShieldPixels,
             repository,
             notificationManagerCompat,
             deviceShieldNotificationFactory
@@ -104,7 +104,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 
     class DeviceShieldDailyNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var notificationPressedHandler: DailyNotificationPressedHandler
-        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+        lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var repository: AppTrackerBlockingStatsRepository
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -117,7 +117,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
             }
             if (!deviceShieldNotification.hidden) {
                 val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
-                deviceShieldAnalytics.didShowDailyNotification(deviceShieldNotification.notificationVariant)
+                deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
             } else {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
@@ -129,7 +129,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 
     class DeviceShieldWeeklyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var notificationPressedHandler: WeeklyNotificationPressedHandler
-        lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+        lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
@@ -145,7 +145,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
                 val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
                     context, deviceShieldNotification, notificationPressedHandler
                 )
-                deviceShieldAnalytics.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
+                deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_WEEKLY_NOTIFICATION_ID, notification)
             }
 
@@ -170,7 +170,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 class DeviceShieldNotificationWorkerInjectorPlugin(
     private var dailyNotificationPressedHandler: DailyNotificationPressedHandler,
     private var weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
-    private var deviceShieldAnalytics: DeviceShieldAnalytics,
+    private var deviceShieldPixels: DeviceShieldPixels,
     private val repository: AppTrackerBlockingStatsRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -181,14 +181,14 @@ class DeviceShieldNotificationWorkerInjectorPlugin(
             worker.deviceShieldNotificationFactory = deviceShieldNotificationFactory
             worker.repository = repository
             worker.notificationManager = notificationManagerCompat
-            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.deviceShieldPixels = deviceShieldPixels
             worker.notificationPressedHandler = dailyNotificationPressedHandler
             return true
         }
 
         if (worker is DeviceShieldNotificationScheduler.DeviceShieldWeeklyNotificationWorker) {
             worker.deviceShieldNotificationFactory = deviceShieldNotificationFactory
-            worker.deviceShieldAnalytics = deviceShieldAnalytics
+            worker.deviceShieldPixels = deviceShieldPixels
             worker.notificationPressedHandler = weeklyNotificationPressedHandler
             return true
         }

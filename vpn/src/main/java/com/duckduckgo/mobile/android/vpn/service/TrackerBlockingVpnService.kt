@@ -27,7 +27,7 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
@@ -94,7 +94,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
     @Inject
-    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject
     lateinit var ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
@@ -330,8 +330,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
             VpnStopReason.SelfStop -> { /* noop */ }
-            VpnStopReason.Error -> deviceShieldAnalytics.startError()
-            VpnStopReason.Revoked -> deviceShieldAnalytics.suddenKillByVpnRevoked()
+            VpnStopReason.Error -> deviceShieldPixels.startError()
+            VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
     }
 

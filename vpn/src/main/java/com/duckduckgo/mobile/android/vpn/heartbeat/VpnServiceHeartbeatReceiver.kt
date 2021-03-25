@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Process
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -38,7 +38,7 @@ class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProc
 
     @Inject lateinit var vpnDatabase: VpnDatabase
 
-    @Inject lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     override fun onReceive(context: Context, intent: Intent) {
         AndroidInjection.inject(this, context)
@@ -73,8 +73,8 @@ class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProc
     override fun onAliveMissed() {
         if (!TrackerBlockingVpnService.isServiceRunning(appContext)) {
             Timber.e("(${Process.myPid()}) heartbeat ALIVE missed - re-launcing VPN")
-            deviceShieldAnalytics.suddenKillBySystem()
-            deviceShieldAnalytics.automaticRestart()
+            deviceShieldPixels.suddenKillBySystem()
+            deviceShieldPixels.automaticRestart()
             goAsync {
                 heartbeatProcessor.restartVpnService()
             }

@@ -36,7 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -53,7 +53,7 @@ import javax.inject.Provider
 import javax.inject.Singleton
 
 class SettingsViewModel(
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val appContext: Context,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -220,9 +220,9 @@ class SettingsViewModel(
         Timber.i("Device Shield, is now enabled: $enabled")
 
         if (enabled) {
-            deviceShieldAnalytics.enableFromSettings()
+            deviceShieldPixels.enableFromSettings()
         } else {
-            deviceShieldAnalytics.disableFromSettings()
+            deviceShieldPixels.disableFromSettings()
         }
 
         val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(appContext)
@@ -329,7 +329,7 @@ class SettingsViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideSettingsViewModelFactory(
-        deviceShieldAnalytics: Provider<DeviceShieldAnalytics>,
+        deviceShieldPixels: Provider<DeviceShieldPixels>,
         appContext: Provider<Context>,
         settingsDataStore: Provider<SettingsDataStore>,
         defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
@@ -339,12 +339,12 @@ class SettingsViewModelFactoryModule {
         deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
         deviceShieldOnboarding: Provider<DeviceShieldOnboarding>
     ): ViewModelFactoryPlugin {
-        return SettingsViewModelFactory(deviceShieldAnalytics, appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding)
+        return SettingsViewModelFactory(deviceShieldPixels, appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding)
     }
 }
 
 private class SettingsViewModelFactory(
-    private val deviceShieldAnalytics: Provider<DeviceShieldAnalytics>,
+    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
     private val appContext: Provider<Context>,
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
@@ -357,7 +357,7 @@ private class SettingsViewModelFactory(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldAnalytics.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldPixels.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
                 else -> null
             }
         }

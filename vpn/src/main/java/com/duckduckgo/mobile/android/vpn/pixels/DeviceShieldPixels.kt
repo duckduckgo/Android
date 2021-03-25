@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.analytics
+package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -30,7 +30,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-interface DeviceShieldAnalytics {
+interface DeviceShieldPixels {
     /** This pixel is fired only once, no matter how many times we call this fun */
     fun deviceShieldInstalled()
 
@@ -178,166 +178,166 @@ interface DeviceShieldAnalytics {
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealDeviceShieldAnalytics @Inject constructor(
+class RealDeviceShieldPixels @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
-) : DeviceShieldAnalytics {
+) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(DS_ANALYTICS_PREF_FILE, Context.MODE_PRIVATE)
+        get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_PRIVATE)
 
     override fun deviceShieldInstalled() {
-        tryToFireUniquePixel(DeviceShieldPixels.DS_INSTALLED_UNIQUE)
+        tryToFireUniquePixel(DeviceShieldPixelNames.DS_INSTALLED_UNIQUE)
     }
 
     override fun deviceShieldEnabledOnSearch() {
-        tryToFireDailyPixel(DeviceShieldPixels.DS_ENABLE_UPON_SEARCH_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_UPON_SEARCH_DAILY)
     }
 
     override fun deviceShieldDisabledOnSearch() {
-        tryToFireDailyPixel(DeviceShieldPixels.DS_DISABLE_UPON_SEARCH_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_UPON_SEARCH_DAILY)
     }
 
     override fun reportEnabled() {
-        tryToFireUniquePixel(DeviceShieldPixels.DS_ENABLE_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixels.DS_ENABLE_DAILY)
+        tryToFireUniquePixel(DeviceShieldPixelNames.DS_ENABLE_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_DAILY)
     }
 
     override fun reportDisabled() {
-        tryToFireDailyPixel(DeviceShieldPixels.DS_DISABLE_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_DAILY)
     }
 
     override fun enableFromNewTab() {
-        tryToFireUniquePixel(DeviceShieldPixels.ENABLE_DS_FROM_NEW_TAB_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixels.ENABLE_DS_FROM_NEW_TAB_DAILY)
-        firePixel(DeviceShieldPixels.ENABLE_DS_FROM_NEW_TAB)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB)
     }
 
     override fun enableFromReminderNotification() {
-        tryToFireUniquePixel(DeviceShieldPixels.ENABLE_DS_FROM_REMINDER_NOTIFICATION_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixels.ENABLE_DS_FROM_REMINDER_NOTIFICATION_DAILY)
-        firePixel(DeviceShieldPixels.ENABLE_DS_FROM_REMINDER_NOTIFICATION)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION)
     }
 
     override fun enableFromSettings() {
-        tryToFireUniquePixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS_DAILY)
-        firePixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS)
     }
 
     override fun enableFromQuickSettingsTile() {
-        tryToFireUniquePixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS_TILE_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS_TILE_DAILY)
-        firePixel(DeviceShieldPixels.ENABLE_DS_FROM_SETTINGS_TILE)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE)
     }
 
     override fun enableFromPrivacyReport() {
-        tryToFireUniquePixel(DeviceShieldPixels.ENABLE_DS_FROM_PRIVACY_REPORT_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixels.ENABLE_DS_FROM_PRIVACY_REPORT_DAILY)
-        firePixel(DeviceShieldPixels.ENABLE_DS_FROM_PRIVACY_REPORT)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT)
     }
 
     override fun disableFromSettings() {
-        tryToFireDailyPixel(DeviceShieldPixels.DISABLE_DS_FROM_SETTINGS_DAILY)
-        firePixel(DeviceShieldPixels.DISABLE_DS_FROM_SETTINGS)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_DAILY)
+        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS)
     }
 
     override fun disableFromQuickSettingsTile() {
-        tryToFireDailyPixel(DeviceShieldPixels.DISABLE_DS_FROM_SETTINGS_TILE_DAILY)
-        firePixel(DeviceShieldPixels.DISABLE_DS_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE_DAILY)
+        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE)
     }
 
     override fun didShowDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixels.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant)
         )
     }
 
     override fun didPressOnDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixels.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant)
         )
     }
 
     override fun didShowWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixels.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant)
         )
     }
 
     override fun didPressOnWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixels.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant)
+            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant)
         )
     }
 
     override fun didPressOngoingNotification() {
-        tryToFireDailyPixel(DeviceShieldPixels.DID_PRESS_ONGOING_NOTIFICATION_DAILY)
-        firePixel(DeviceShieldPixels.DID_PRESS_ONGOING_NOTIFICATION)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_PRESS_ONGOING_NOTIFICATION_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_PRESS_ONGOING_NOTIFICATION)
     }
 
     override fun didShowReminderNotification() {
-        tryToFireDailyPixel(DeviceShieldPixels.DID_SHOW_REMINDER_NOTIFICATION_DAILY)
-        firePixel(DeviceShieldPixels.DID_SHOW_REMINDER_NOTIFICATION)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REMINDER_NOTIFICATION_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_SHOW_REMINDER_NOTIFICATION)
     }
 
     override fun didPressReminderNotification() {
-        tryToFireDailyPixel(DeviceShieldPixels.DID_PRESS_REMINDER_NOTIFICATION_DAILY)
-        firePixel(DeviceShieldPixels.DID_PRESS_REMINDER_NOTIFICATION)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_PRESS_REMINDER_NOTIFICATION_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_PRESS_REMINDER_NOTIFICATION)
     }
 
     override fun didShowNewTabSummary() {
-        tryToFireUniquePixel(DeviceShieldPixels.DID_SHOW_NEW_TAB_SUMMARY_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixels.DID_SHOW_NEW_TAB_SUMMARY_DAILY)
-        firePixel(DeviceShieldPixels.DID_SHOW_NEW_TAB_SUMMARY)
+        tryToFireUniquePixel(DeviceShieldPixelNames.DID_SHOW_NEW_TAB_SUMMARY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_NEW_TAB_SUMMARY_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_SHOW_NEW_TAB_SUMMARY)
     }
 
     override fun didPressNewTabSummary() {
-        tryToFireDailyPixel(DeviceShieldPixels.DID_PRESS_NEW_TAB_SUMMARY_DAILY)
-        firePixel(DeviceShieldPixels.DID_PRESS_NEW_TAB_SUMMARY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_PRESS_NEW_TAB_SUMMARY_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_PRESS_NEW_TAB_SUMMARY)
     }
 
     override fun didShowPrivacyReport() {
-        tryToFireUniquePixel(DeviceShieldPixels.DID_SHOW_PRIVACY_REPORT_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixels.DID_SHOW_PRIVACY_REPORT_DAILY)
-        firePixel(DeviceShieldPixels.DID_SHOW_PRIVACY_REPORT)
+        tryToFireUniquePixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT)
     }
 
     override fun startError() {
-        tryToFireDailyPixel(DeviceShieldPixels.DS_START_ERROR_DAILY)
-        firePixel(DeviceShieldPixels.DS_START_ERROR)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_START_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_START_ERROR)
     }
 
     override fun automaticRestart() {
-        tryToFireDailyPixel(DeviceShieldPixels.DS_AUTOMATIC_RESTART_DAILY)
-        firePixel(DeviceShieldPixels.DS_AUTOMATIC_RESTART)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART)
     }
 
     override fun suddenKillBySystem() {
         suddenKill()
-        tryToFireDailyPixel(DeviceShieldPixels.DS_KILLED_BY_SYSTEM_DAILY)
-        firePixel(DeviceShieldPixels.DS_KILLED_BY_SYSTEM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM)
     }
 
     override fun suddenKillByVpnRevoked() {
         suddenKill()
-        tryToFireDailyPixel(DeviceShieldPixels.DS_KILLED_VPN_REVOKED_DAILY)
-        firePixel(DeviceShieldPixels.DS_KILLED_VPN_REVOKED)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED)
     }
 
     override fun trackerBlocked() {
-        firePixel(DeviceShieldPixels.DS_TRACKER_BLOCKED)
+        firePixel(DeviceShieldPixelNames.DS_TRACKER_BLOCKED)
     }
 
     private fun suddenKill() {
-        firePixel(DeviceShieldPixels.DS_KILLED)
+        firePixel(DeviceShieldPixelNames.DS_KILLED)
     }
 
-    private fun firePixel(p: DeviceShieldPixels) {
+    private fun firePixel(p: DeviceShieldPixelNames) {
         pixel.fire(p)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixels) {
+    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames) {
         tryToFireDailyPixel(pixel.pixelName)
     }
 
@@ -351,7 +351,7 @@ class RealDeviceShieldAnalytics @Inject constructor(
         }
     }
 
-    private fun tryToFireUniquePixel(pixel: DeviceShieldPixels, tag: String? = null) {
+    private fun tryToFireUniquePixel(pixel: DeviceShieldPixelNames, tag: String? = null) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return
@@ -371,6 +371,6 @@ class RealDeviceShieldAnalytics @Inject constructor(
     companion object {
         private const val FIRST_ENABLE_ENTRY_POINT_TAG = "FIRST_ENABLE_ENTRY_POINT_TAG"
         @VisibleForTesting
-        const val DS_ANALYTICS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.analytics"
+        const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
     }
 }

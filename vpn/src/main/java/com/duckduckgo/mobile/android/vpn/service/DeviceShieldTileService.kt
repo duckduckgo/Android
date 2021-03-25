@@ -24,7 +24,7 @@ import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @RequiresApi(Build.VERSION_CODES.N)
 class DeviceShieldTileService : TileService() {
 
-    @Inject lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private var deviceShieldStatePollingJob: Job? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -45,10 +45,10 @@ class DeviceShieldTileService : TileService() {
 
     override fun onClick() {
         if (TrackerBlockingVpnService.isServiceRunning(this)) {
-            deviceShieldAnalytics.disableFromQuickSettingsTile()
+            deviceShieldPixels.disableFromQuickSettingsTile()
             startService(TrackerBlockingVpnService.stopIntent(this))
         } else {
-            deviceShieldAnalytics.enableFromQuickSettingsTile()
+            deviceShieldPixels.enableFromQuickSettingsTile()
             if (hasVpnPermission()) {
                 startDeviceShield()
             } else {

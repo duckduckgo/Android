@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.analytics
+package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
 import com.duckduckgo.app.statistics.api.StatisticsRequester
@@ -33,18 +33,18 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
  */
 class VpnStatisticsRequester(
     private val context: Context,
-    private val deviceShieldAnalytics: DeviceShieldAnalytics,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : StatisticsUpdater {
 
     override fun initializeAtb() {
-        deviceShieldAnalytics.deviceShieldInstalled()
+        deviceShieldPixels.deviceShieldInstalled()
     }
 
     override fun refreshSearchRetentionAtb() {
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
-            deviceShieldAnalytics.deviceShieldEnabledOnSearch()
+            deviceShieldPixels.deviceShieldEnabledOnSearch()
         } else {
-            deviceShieldAnalytics.deviceShieldDisabledOnSearch()
+            deviceShieldPixels.deviceShieldDisabledOnSearch()
         }
     }
 

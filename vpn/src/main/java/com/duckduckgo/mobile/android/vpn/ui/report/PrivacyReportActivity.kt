@@ -37,7 +37,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -68,7 +68,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     @Inject
-    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private lateinit var reportSummaryTextView: TextView
     private lateinit var reportSummaryEnabledTooltip: TextView
@@ -93,7 +93,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         bindViewReferences()
         observeViewModel()
-        deviceShieldAnalytics.didShowPrivacyReport()
+        deviceShieldPixels.didShowPrivacyReport()
     }
 
     @Suppress("DEPRECATION")
@@ -238,7 +238,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     @Suppress("DEPRECATION")
     private fun enableDeviceShield() {
-        deviceShieldAnalytics.enableFromPrivacyReport()
+        deviceShieldPixels.enableFromPrivacyReport()
 
         val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(this)
         if (deviceShieldOnboardingIntent == null) {

@@ -30,8 +30,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
-import com.duckduckgo.mobile.android.vpn.analytics.VpnStatisticsRequester
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.pixels.VpnStatisticsRequester
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -47,13 +47,13 @@ class StatisticsModule {
     @Provides
     fun statisticsUpdater(
         context: Context,
-        deviceShieldAnalytics: DeviceShieldAnalytics,
+        deviceShieldPixels: DeviceShieldPixels,
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
         variantManager: VariantManager
     ): StatisticsUpdater {
         // vtodo -> temporary replacement of StatisticsUpdater for appTB F&F release
-        return VpnStatisticsRequester(context, deviceShieldAnalytics)
+        return VpnStatisticsRequester(context, deviceShieldPixels)
 //        return StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
     }
 

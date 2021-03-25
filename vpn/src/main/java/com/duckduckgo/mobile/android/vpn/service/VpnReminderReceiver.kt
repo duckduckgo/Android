@@ -23,7 +23,7 @@ import android.content.SharedPreferences
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class VpnReminderReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var deviceShieldAnalytics: DeviceShieldAnalytics
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject
     lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
@@ -63,7 +63,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
                         DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false, notificationPressedHandler)
                     }
 
-                    deviceShieldAnalytics.didShowReminderNotification()
+                    deviceShieldPixels.didShowReminderNotification()
                     manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
                 }
             }
@@ -71,7 +71,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
-            deviceShieldAnalytics.enableFromReminderNotification()
+            deviceShieldPixels.enableFromReminderNotification()
             goAsync {
                 TrackerBlockingVpnService.startIntent(context).also {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

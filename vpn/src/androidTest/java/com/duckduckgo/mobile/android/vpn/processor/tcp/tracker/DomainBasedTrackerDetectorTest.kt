@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.analytics.DeviceShieldAnalytics
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnPreferencesDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
@@ -50,7 +50,7 @@ class DomainBasedTrackerDetectorTest {
     private lateinit var preferencesDao: VpnPreferencesDao
     private lateinit var vpnDatabase: VpnDatabase
     private lateinit var trackerDao: VpnTrackerDao
-    private val deviceShieldAnalytics: DeviceShieldAnalytics = mock()
+    private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val tcb: TCB = mock()
 
     @Before
@@ -68,7 +68,7 @@ class DomainBasedTrackerDetectorTest {
         trackerDao = vpnDatabase.vpnTrackerDao()
         preferencesDao = vpnDatabase.vpnPreferencesDao()
 
-        testee = DomainBasedTrackerDetector(deviceShieldAnalytics, hostnameExtractor, TrackerListProvider(preferencesDao), vpnDatabase)
+        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, TrackerListProvider(preferencesDao), vpnDatabase)
     }
 
     @Test
@@ -90,7 +90,7 @@ class DomainBasedTrackerDetectorTest {
         val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         type.assertIsTracker(trackerDomain)
-        verify(deviceShieldAnalytics).trackerBlocked()
+        verify(deviceShieldPixels).trackerBlocked()
     }
 
     @Test
@@ -98,7 +98,7 @@ class DomainBasedTrackerDetectorTest {
         givenExtractedHostname("foo.bar.doubleclick.net")
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         type.assertIsTracker("doubleclick.net")
-        verify(deviceShieldAnalytics).trackerBlocked()
+        verify(deviceShieldPixels).trackerBlocked()
     }
 
     @Test
