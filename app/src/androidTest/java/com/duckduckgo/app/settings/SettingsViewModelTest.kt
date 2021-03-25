@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldApp
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
@@ -81,6 +82,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboarding
 
+    @Mock
+    private lateinit var deviceShieldPixels: DeviceShieldPixels
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -91,6 +95,7 @@ class SettingsViewModelTest {
         commandCaptor = argumentCaptor()
 
         testee = SettingsViewModel(
+            deviceShieldPixels,
             context,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
@@ -299,6 +304,18 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchDeviceShieldOnboarding, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenDeviceShieldIsOnThenSendPixel() {
+        testee.onDeviceShieldSettingChanged(true)
+        verify(deviceShieldPixels).enableFromSettings()
+    }
+
+    @Test
+    fun whenDeviceShieldIsOffThenSendPixel() {
+        testee.onDeviceShieldSettingChanged(false)
+        verify(deviceShieldPixels).disableFromSettings()
     }
 
     @Test
