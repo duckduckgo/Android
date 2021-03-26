@@ -25,8 +25,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager.Companion.USER_ID_COOKIE
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainsDao
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,8 +45,8 @@ class AppThirdPartyCookieManagerTest {
 
     private val cookieManager = CookieManager.getInstance()
     private lateinit var db: AppDatabase
-    private lateinit var allowedDomainsDao: AllowedDomainsDao
-    private lateinit var allowedDomainsRepository: AllowedDomainsRepository
+    private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
+    private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
     private lateinit var testee: AppThirdPartyCookieManager
     private lateinit var webView: WebView
 
@@ -56,11 +56,11 @@ class AppThirdPartyCookieManagerTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        allowedDomainsDao = db.allowedDomainsDao()
-        allowedDomainsRepository = AllowedDomainsRepository(allowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
+        authCookiesAllowedDomainsDao = db.authCookiesAllowedDomainsDao()
+        authCookiesAllowedDomainsRepository = AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        testee = AppThirdPartyCookieManager(cookieManager, allowedDomainsRepository)
+        testee = AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @UiThreadTest
@@ -106,7 +106,7 @@ class AppThirdPartyCookieManagerTest {
 
         testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
 
-        assertNull(allowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
     @UiThreadTest
@@ -116,7 +116,7 @@ class AppThirdPartyCookieManagerTest {
 
         testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
 
-        assertNull(allowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
     @UiThreadTest
@@ -126,7 +126,7 @@ class AppThirdPartyCookieManagerTest {
 
         testee.processUriForThirdPartyCookies(webView, EXCLUDED_DOMAIN_URI)
 
-        assertNotNull(allowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
     }
 
     @UiThreadTest
@@ -134,7 +134,7 @@ class AppThirdPartyCookieManagerTest {
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthAndIsTokenTypeThenDomainAddedToTheList() = coroutinesTestRule.runBlocking {
         testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_URI)
 
-        assertNotNull(allowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
     @UiThreadTest
@@ -142,7 +142,7 @@ class AppThirdPartyCookieManagerTest {
     fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthAndIsNotTokenTypeThenDomainNotAddedToTheList() = coroutinesTestRule.runBlocking {
         testee.processUriForThirdPartyCookies(webView, NON_THIRD_PARTY_AUTH_URI)
 
-        assertNull(allowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
     @Test
@@ -151,7 +151,7 @@ class AppThirdPartyCookieManagerTest {
 
         testee.clearAllData()
 
-        assertNull(allowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
     @Test
@@ -160,12 +160,12 @@ class AppThirdPartyCookieManagerTest {
 
         testee.clearAllData()
 
-        assertNotNull(allowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXCLUDED_DOMAIN_URI.host!!))
     }
 
     private suspend fun givenDomainIsInTheThirdPartyCookieList(domain: String) = coroutinesTestRule.runBlocking {
         withContext(coroutinesTestRule.testDispatcherProvider.io()) {
-            allowedDomainsRepository.addDomain(domain)
+            authCookiesAllowedDomainsRepository.addDomain(domain)
         }
     }
 

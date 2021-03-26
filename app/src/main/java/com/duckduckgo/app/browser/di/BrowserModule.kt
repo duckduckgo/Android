@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -296,7 +296,7 @@ class BrowserModule {
 
     @Singleton
     @Provides
-    fun thirdPartyCookieManager(cookieManager: CookieManager, allowedDomainsRepository: AllowedDomainsRepository): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManager, allowedDomainsRepository)
+    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
+        return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 }

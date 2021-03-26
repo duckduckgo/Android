@@ -23,17 +23,17 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface AllowedDomainsDao {
+interface AuthCookiesAllowedDomainsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(allowedDomainEntity: AllowedDomainEntity): Long
+    fun insert(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity): Long
 
     @Delete
-    fun delete(allowedDomainEntity: AllowedDomainEntity)
+    fun delete(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity)
 
-    @Query("SELECT * FROM allowed_domains WHERE domain = :host limit 1")
-    fun getDomain(host: String): AllowedDomainEntity?
+    @Query("SELECT * FROM auth_cookies_allowed_domains WHERE domain = :host limit 1")
+    fun getDomain(host: String): AuthCookieAllowedDomainEntity?
 
-    @Query("DELETE FROM allowed_domains WHERE domain NOT IN (:exceptionList)")
+    @Query("DELETE FROM auth_cookies_allowed_domains WHERE domain NOT IN (:exceptionList)")
     fun deleteAll(exceptionList: String)
 }

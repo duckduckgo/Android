@@ -25,8 +25,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainsDao
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainEntity
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -95,7 +95,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UserEventEntity::class,
         LocationPermissionEntity::class,
         PixelEntity::class,
-        AllowedDomainEntity::class
+        AuthCookieAllowedDomainEntity::class
     ]
 )
 
@@ -139,7 +139,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
-    abstract fun allowedDomainsDao(): AllowedDomainsDao
+    abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
 }
 
 @Suppress("PropertyName")
@@ -393,7 +393,7 @@ class MigrationsProvider(
 
     val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
         }
     }
 

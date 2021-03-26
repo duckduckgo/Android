@@ -90,5 +90,5 @@ class DaoModule {
     fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
 
     @Provides
-    fun allowedDomainsDao(database: AppDatabase) = database.allowedDomainsDao()
+    fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
 }

@@ -21,18 +21,18 @@ import com.duckduckgo.app.global.UriString
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class AllowedDomainsRepository @Inject constructor(
-    private val allowedDomainsDao: AllowedDomainsDao,
+class AuthCookiesAllowedDomainsRepository @Inject constructor(
+    private val authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao,
     private val dispatcherProvider: DispatcherProvider
 ) {
 
     suspend fun addDomain(domain: String): Long? {
         if (!UriString.isValidDomain(domain)) return null
 
-        val allowedDomainEntity = AllowedDomainEntity(domain = domain)
+        val authCookieAllowedDomainEntity = AuthCookieAllowedDomainEntity(domain = domain)
 
         val id = withContext(dispatcherProvider.io()) {
-            allowedDomainsDao.insert(allowedDomainEntity)
+            authCookiesAllowedDomainsDao.insert(authCookieAllowedDomainEntity)
         }
 
         return if (id >= 0) {
@@ -42,21 +42,21 @@ class AllowedDomainsRepository @Inject constructor(
         }
     }
 
-    suspend fun getDomain(domain: String): AllowedDomainEntity? {
+    suspend fun getDomain(domain: String): AuthCookieAllowedDomainEntity? {
         return withContext(dispatcherProvider.io()) {
-            allowedDomainsDao.getDomain(domain)
+            authCookiesAllowedDomainsDao.getDomain(domain)
         }
     }
 
-    suspend fun removeDomain(allowedDomainEntity: AllowedDomainEntity) {
+    suspend fun removeDomain(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity) {
         withContext(dispatcherProvider.io()) {
-            allowedDomainsDao.delete(allowedDomainEntity)
+            authCookiesAllowedDomainsDao.delete(authCookieAllowedDomainEntity)
         }
     }
 
     suspend fun deleteAll(exceptionList: List<String> = emptyList()) {
         withContext(dispatcherProvider.io()) {
-            allowedDomainsDao.deleteAll(exceptionList.joinToString(","))
+            authCookiesAllowedDomainsDao.deleteAll(exceptionList.joinToString(","))
         }
     }
 }

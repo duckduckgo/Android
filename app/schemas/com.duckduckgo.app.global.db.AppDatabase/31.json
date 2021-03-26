@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 31,
-    "identityHash": "09d3ee04622c2e686f2030e14c18eb4e",
+    "identityHash": "be6380785dcbf8f6793f852097f0d224",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -837,7 +837,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "allowed_domains",
+        "tableName": "auth_cookies_allowed_domains",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
@@ -860,7 +860,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '09d3ee04622c2e686f2030e14c18eb4e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be6380785dcbf8f6793f852097f0d224')"
     ]
   }
 }

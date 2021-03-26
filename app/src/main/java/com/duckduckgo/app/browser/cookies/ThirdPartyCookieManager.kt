@@ -20,8 +20,8 @@ import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainEntity
-import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
+import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -33,7 +33,7 @@ interface ThirdPartyCookieManager {
 
 class AppThirdPartyCookieManager(
     private val cookieManager: CookieManager,
-    private val allowedDomainsRepository: AllowedDomainsRepository
+    private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
 ) : ThirdPartyCookieManager {
 
     override suspend fun processUriForThirdPartyCookies(webView: WebView, uri: Uri) {
@@ -45,27 +45,27 @@ class AppThirdPartyCookieManager(
     }
 
     override suspend fun clearAllData() {
-        allowedDomainsRepository.deleteAll(hostsThatAlwaysRequireThirdPartyCookies)
+        authCookiesAllowedDomainsRepository.deleteAll(hostsThatAlwaysRequireThirdPartyCookies)
     }
 
     private suspend fun processThirdPartyCookiesSetting(webView: WebView, uri: Uri) {
         val host = uri.host ?: return
-        val allowedDomain = allowedDomainsRepository.getDomain(host)
+        val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(Dispatchers.Main) {
-            if (allowedDomain != null && hasUserIdCookie()) {
+            if (domain != null && hasUserIdCookie()) {
                 Timber.d("Cookies enabled for $uri")
                 cookieManager.setAcceptThirdPartyCookies(webView, true)
             } else {
                 Timber.d("Cookies disabled for $uri")
                 cookieManager.setAcceptThirdPartyCookies(webView, false)
             }
-            allowedDomain?.let { deleteHost(it) }
+            domain?.let { deleteHost(it) }
         }
     }
 
-    private suspend fun deleteHost(allowedDomainEntity: AllowedDomainEntity) {
-        if (hostsThatAlwaysRequireThirdPartyCookies.contains(allowedDomainEntity.domain)) return
-        allowedDomainsRepository.removeDomain(allowedDomainEntity)
+    private suspend fun deleteHost(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity) {
+        if (hostsThatAlwaysRequireThirdPartyCookies.contains(authCookieAllowedDomainEntity.domain)) return
+        authCookiesAllowedDomainsRepository.removeDomain(authCookieAllowedDomainEntity)
     }
 
     private suspend fun addHostToList(uri: Uri) {
@@ -74,7 +74,7 @@ class AppThirdPartyCookieManager(
         ssDomain?.let {
             if (accessType?.contains(CODE) == false) {
                 ssDomain.toUri().host?.let {
-                    allowedDomainsRepository.addDomain(it)
+                    authCookiesAllowedDomainsRepository.addDomain(it)
                 }
             }
         }

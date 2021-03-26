@@ -30,7 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class AllowedDomainsRepositoryTest {
+class AuthCookiesAllowedDomainsRepositoryTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
@@ -40,16 +40,16 @@ class AllowedDomainsRepositoryTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var allowedDomainsDao: AllowedDomainsDao
-    private lateinit var allowedDomainsRepository: AllowedDomainsRepository
+    private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
+    private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        allowedDomainsDao = db.allowedDomainsDao()
-        allowedDomainsRepository = AllowedDomainsRepository(allowedDomainsDao, coroutineRule.testDispatcherProvider)
+        authCookiesAllowedDomainsDao = db.authCookiesAllowedDomainsDao()
+        authCookiesAllowedDomainsRepository = AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -59,57 +59,57 @@ class AllowedDomainsRepositoryTest {
 
     @Test
     fun whenAddDomainIfIsEmptyThenReturnNull() = coroutineRule.runBlocking {
-        assertNull(allowedDomainsRepository.addDomain(""))
+        assertNull(authCookiesAllowedDomainsRepository.addDomain(""))
     }
 
     @Test
     fun whenAddDomainAndDomainNotValidThenReturnNull() = coroutineRule.runBlocking {
-        assertNull(allowedDomainsRepository.addDomain("https://example.com"))
+        assertNull(authCookiesAllowedDomainsRepository.addDomain("https://example.com"))
     }
 
     @Test
     fun whenAddValidDomainThenReturnNonNull() = coroutineRule.runBlocking {
-        assertNotNull(allowedDomainsRepository.addDomain("example.com"))
+        assertNotNull(authCookiesAllowedDomainsRepository.addDomain("example.com"))
     }
 
     @Test
     fun whenGetDomainIfDomainExistsThenReturnAllowedDomainEntity() = coroutineRule.runBlocking {
-        givenAllowedDomain("example.com")
+        givenAuthCookieAllowedDomain("example.com")
 
-        val allowedDomainEntity = allowedDomainsRepository.getDomain("example.com")
-        assertEquals("example.com", allowedDomainEntity?.domain)
+        val authCookieAllowedDomainEntity = authCookiesAllowedDomainsRepository.getDomain("example.com")
+        assertEquals("example.com", authCookieAllowedDomainEntity?.domain)
     }
 
     @Test
     fun whenGetDomainIfDomainDoesNotExistThenReturnNull() = coroutineRule.runBlocking {
-        val allowedDomainEntity = allowedDomainsRepository.getDomain("example.com")
-        assertNull(allowedDomainEntity)
+        val authCookieAllowedDomainEntity = authCookiesAllowedDomainsRepository.getDomain("example.com")
+        assertNull(authCookieAllowedDomainEntity)
     }
 
     @Test
     fun whenRemoveDomainThenDomainDeletedFromDatabase() = coroutineRule.runBlocking {
-        givenAllowedDomain("example.com")
-        val allowedDomainEntity = allowedDomainsRepository.getDomain("example.com")
+        givenAuthCookieAllowedDomain("example.com")
+        val authCookieAllowedDomainEntity = authCookiesAllowedDomainsRepository.getDomain("example.com")
 
-        allowedDomainsRepository.removeDomain(allowedDomainEntity!!)
+        authCookiesAllowedDomainsRepository.removeDomain(authCookieAllowedDomainEntity!!)
 
-        val deletedEntity = allowedDomainsRepository.getDomain("example.com")
+        val deletedEntity = authCookiesAllowedDomainsRepository.getDomain("example.com")
         assertNull(deletedEntity)
     }
 
     @Test
     fun whenDeleteAllThenAllDomainsDeletedExceptFromTheExceptionList() = coroutineRule.runBlocking {
-        givenAllowedDomain("example.com", "example2.com")
+        givenAuthCookieAllowedDomain("example.com", "example2.com")
 
-        allowedDomainsRepository.deleteAll(listOf("example.com"))
+        authCookiesAllowedDomainsRepository.deleteAll(listOf("example.com"))
 
-        assertNull(allowedDomainsRepository.getDomain("example2.com"))
-        assertNotNull(allowedDomainsRepository.getDomain("example.com"))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain("example2.com"))
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain("example.com"))
     }
 
-    private fun givenAllowedDomain(vararg allowedDomain: String) {
+    private fun givenAuthCookieAllowedDomain(vararg allowedDomain: String) {
         allowedDomain.forEach {
-            allowedDomainsDao.insert(AllowedDomainEntity(domain = it))
+            authCookiesAllowedDomainsDao.insert(AuthCookieAllowedDomainEntity(domain = it))
         }
     }
 }
