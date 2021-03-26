@@ -19,11 +19,13 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.os.Build
 import android.webkit.*
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
@@ -34,6 +36,7 @@ import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,6 +62,7 @@ class BrowserWebViewClientTest {
     private val globalPrivacyControl: GlobalPrivacyControl = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
+    private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
 
     @UiThreadTest
     @Before
@@ -75,7 +79,9 @@ class BrowserWebViewClientTest {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl
+            globalPrivacyControl,
+            thirdPartyCookieManager,
+            GlobalScope
         )
         testee.webViewClientListener = listener
     }
@@ -115,6 +121,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectDoNotSellToDom() = coroutinesTestRule.runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(globalPrivacyControl).injectDoNotSellToDom(webView)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = coroutinesTestRule.runBlocking {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
     }
 
     @UiThreadTest
