@@ -40,7 +40,7 @@ class DeviceShieldAlertNotificationBuilder {
 
         private fun registerAlertChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_HIGH)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -70,6 +70,7 @@ class DeviceShieldAlertNotificationBuilder {
                 .setContentIntent(vpnPrivacyReportPendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSilent(silent)
                 .addAction(
                     NotificationCompat.Action(

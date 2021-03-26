@@ -29,7 +29,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 1,
+    exportSchema = true, version = 2,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -38,7 +38,8 @@ import java.util.concurrent.Executors
         VpnDataStats::class,
         VpnPreferences::class,
         HeartBeatEntity::class,
-        VpnPhoenixEntity::class
+        VpnPhoenixEntity::class,
+        VpnNotification::class
     ]
 )
 
@@ -53,6 +54,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnPreferencesDao(): VpnPreferencesDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
+    abstract fun vpnNotificationsDao(): VpnNotificationsDao
 
     companion object {
 
