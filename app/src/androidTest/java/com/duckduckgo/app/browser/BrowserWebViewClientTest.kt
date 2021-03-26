@@ -36,6 +36,7 @@ import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -79,7 +80,8 @@ class BrowserWebViewClientTest {
             loginDetector,
             dosDetector,
             globalPrivacyControl,
-            thirdPartyCookieManager
+            thirdPartyCookieManager,
+            GlobalScope
         )
         testee.webViewClientListener = listener
     }

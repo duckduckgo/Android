@@ -42,6 +42,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -69,6 +70,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -98,7 +100,8 @@ class BrowserModule {
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
         globalPrivacyControl: GlobalPrivacyControl,
-        thirdPartyCookieManager: ThirdPartyCookieManager
+        thirdPartyCookieManager: ThirdPartyCookieManager,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -112,7 +115,8 @@ class BrowserModule {
             loginDetector,
             dosDetector,
             globalPrivacyControl,
-            thirdPartyCookieManager
+            thirdPartyCookieManager,
+            appCoroutineScope
         )
     }
 

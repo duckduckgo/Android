@@ -86,6 +86,7 @@ class AppThirdPartyCookieManager(
         } != null
     }
 
+    // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below values
     companion object {
         private const val SS_DOMAIN = "ss_domain"
         private const val RESPONSE_TYPE = "response_type"
