@@ -33,9 +33,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ENABLE_DS_FROM_REMINDER_NOTIFICATION_UNIQUE("m_apptb_e_rnu"),
     ENABLE_DS_FROM_REMINDER_NOTIFICATION_DAILY("m_apptb_e_rnd"),
     ENABLE_DS_FROM_REMINDER_NOTIFICATION("m_apptb_e_rn"),
-    ENABLE_DS_FROM_SETTINGS_UNIQUE("m_apptb_e_su"),
-    ENABLE_DS_FROM_SETTINGS_DAILY("m_apptb_e_sd"),
-    ENABLE_DS_FROM_SETTINGS("m_apptb_e_s"),
+    ENABLE_DS_FROM_SETTINGS_UNIQUE("m_apptb_e_stu"),
+    ENABLE_DS_FROM_SETTINGS_DAILY("m_apptb_e_std"),
+    ENABLE_DS_FROM_SETTINGS("m_apptb_e_st"),
     ENABLE_DS_FROM_SETTINGS_TILE_UNIQUE("m_apptb_e_tu"),
     ENABLE_DS_FROM_SETTINGS_TILE_DAILY("m_apptb_e_td"),
     ENABLE_DS_FROM_SETTINGS_TILE("m_apptb_e_t"),
@@ -43,8 +43,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ENABLE_DS_FROM_PRIVACY_REPORT_DAILY("m_apptb_e_prd"),
     ENABLE_DS_FROM_PRIVACY_REPORT("m_apptb_e_pr"),
 
-    DISABLE_DS_FROM_SETTINGS_DAILY("m_apptb_d_sd"),
-    DISABLE_DS_FROM_SETTINGS("m_apptb_d_s"),
+    DISABLE_DS_FROM_SETTINGS_DAILY("m_apptb_d_std"),
+    DISABLE_DS_FROM_SETTINGS("m_apptb_d_st"),
     DISABLE_DS_FROM_SETTINGS_TILE_DAILY("m_apptb_d_td"),
     DISABLE_DS_FROM_SETTINGS_TILE("m_apptb_d_t"),
 

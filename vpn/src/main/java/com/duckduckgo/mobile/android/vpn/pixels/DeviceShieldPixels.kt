@@ -184,7 +184,7 @@ class RealDeviceShieldPixels @Inject constructor(
 ) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_PRIVATE)
+        get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
 
     override fun deviceShieldInstalled() {
         tryToFireUniquePixel(DeviceShieldPixelNames.DS_INSTALLED_UNIQUE)
