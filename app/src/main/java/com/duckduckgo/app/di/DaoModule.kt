@@ -88,4 +88,7 @@ class DaoModule {
 
     @Provides
     fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
+
+    @Provides
+    fun webTrackersBlockedDao(database: AppDatabase) = database.webTrackersBlockedDao()
 }

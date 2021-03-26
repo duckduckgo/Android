@@ -30,12 +30,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
+import org.threeten.bp.LocalDateTime
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -49,13 +52,17 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
     private lateinit var vpnActiveText: TextView
     private lateinit var networkAvailable: TextView
     private lateinit var runningTime: TextView
-    private lateinit var trackersTextView: TextView
+    private lateinit var appTrackersTextView: TextView
+    private lateinit var webTrackersTextView: TextView
     private lateinit var dnsServersText: TextView
 
     private lateinit var connectivityManager: ConnectivityManager
 
     @Inject
     lateinit var repository: AppTrackerBlockingStatsRepository
+
+    @Inject
+    lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
 
     private var timerUpdateJob: Job? = null
 
@@ -76,9 +83,11 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
             val networkInfo = retrieveNetworkStatusInfo()
             val dnsInfo = retrieveDnsInfo()
             val addresses = retrieveIpAddressesInfo(networkInfo)
-            val totalTrackers = retrieveTrackersBlockedInfo()
+            val totalAppTrackers = retrieveAppTrackersBlockedInfo()
+            val totalWebTrackers = retrieveWebTrackersBlockedInfo()
             val runningTimeFormatted = retrieveRunningTimeInfo()
-            val trackersBlockedFormatted = generateTrackersBlocked(totalTrackers)
+            val appTrackersBlockedFormatted = generateTrackersBlocked(totalAppTrackers)
+            val webTrackersBlockedFormatted = generateTrackersBlocked(totalWebTrackers)
 
             withContext(Dispatchers.Main) {
                 networkAddresses.text = addresses
@@ -86,7 +95,8 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                 vpnActiveText.text = getString(R.string.vpnConnectionStatus, networkInfo.vpn.toString())
                 networkAvailable.text = getString(R.string.networkAvailable, networkInfo.connectedToInternet.toString())
                 runningTime.text = runningTimeFormatted
-                trackersTextView.text = trackersBlockedFormatted
+                appTrackersTextView.text = "App $appTrackersBlockedFormatted"
+                webTrackersTextView.text = "Web $webTrackersBlockedFormatted"
                 dnsServersText.text = getString(R.string.dnsServers, dnsInfo)
             }
         }
@@ -122,7 +132,13 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
     private suspend fun retrieveRunningTimeInfo() =
         generateTimeRunningMessage(repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L)
 
-    private suspend fun retrieveTrackersBlockedInfo() = (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
+    private suspend fun retrieveAppTrackersBlockedInfo() = (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
+
+    private suspend fun retrieveWebTrackersBlockedInfo() = (webTrackersBlockedRepository.get({ noStartDate() }).firstOrNull() ?: emptyList()).size
+
+    private fun noStartDate(): String {
+        return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
+    }
 
     private fun retrieveIpAddressesInfo(networkInfo: NetworkInfo): String {
         return if (networkInfo.networks.isEmpty()) {
@@ -144,7 +160,7 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         return if (totalTrackers == 0) {
             applicationContext.getString(R.string.vpnTrackersNone)
         } else {
-            return applicationContext.getString(R.string.vpnTrackersBlocked, totalTrackers)
+            return applicationContext.getString(R.string.vpnTrackersBlockedToday, totalTrackers)
         }
     }
 
@@ -257,7 +273,8 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         vpnActiveText = findViewById(R.id.vpnStatus)
         networkAvailable = findViewById(R.id.networkAvailable)
         runningTime = findViewById(R.id.runningTime)
-        trackersTextView = findViewById(R.id.trackersBlockedText)
+        appTrackersTextView = findViewById(R.id.appTrackersBlockedText)
+        webTrackersTextView = findViewById(R.id.webTrackersBlockedText)
         dnsServersText = findViewById(R.id.dnsServersText)
     }
 

@@ -29,7 +29,6 @@ import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
-import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.SearchWidget
@@ -64,7 +63,6 @@ import javax.inject.Singleton
         BrowserAutoCompleteModule::class,
         HttpsUpgraderModule::class,
         ResourceSurrogateModule::class,
-        TrackerDetectionModule::class,
         NotificationModule::class,
         OnboardingModule::class,
         VariantModule::class,

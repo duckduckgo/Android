@@ -90,13 +90,13 @@
             tools:text="1 GB received from the network" />
 
         <TextView
-            android:id="@+id/vpnTrackersLabel"
+            android:id="@+id/vpnAppTrackersLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
-            android:text="Trackers:"
+            android:text="App Trackers:"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@
 
 
         <TextView
-            android:id="@+id/vpnTrackerCompaniesBlocked"
+            android:id="@+id/vpnAppTrackerCompaniesBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -113,11 +113,11 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vpnTrackersLabel"
+            app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersLabel"
             tools:text="26 tracker companies blocked last 24 hours" />
 
         <TextView
-            android:id="@+id/vpnTrackersBlocked"
+            android:id="@+id/vpnAppTrackersBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -126,11 +126,11 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vpnTrackerCompaniesBlocked"
+            app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedToday"
             tools:text="26 trackers blocked last 24 hours" />
 
         <TextView
-            android:id="@+id/vpnLastTrackerDomain"
+            android:id="@+id/vpnAppTrackerCompaniesBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -139,21 +139,113 @@
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vpnTrackersBlocked"
-            tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
+            app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedToday"
+            tools:text="150 tracker companies blocked last week" />
 
-        <ToggleButton
-            android:id="@+id/vpnRunningButton"
+        <TextView
+            android:id="@+id/vpnAppTrackersBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@id/vpnUUID"
-            app:layout_constraintEnd_toEndOf="@id/vpnUUID"
-            app:layout_constraintStart_toStartOf="@id/vpnUUID"
-            app:layout_constraintTop_toBottomOf="@id/vpnLastTrackerDomain"
-            app:layout_constraintVertical_bias="1"
-            app:layout_constraintWidth_min="40dp" />
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedWeek"
+            tools:text="457 trackers blocked last week" />
+
+        <TextView
+            android:id="@+id/vpnAppLastTrackerDomain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedWeek"
+            tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
+
+        <TextView
+            android:id="@+id/vpnWebTrackersLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="32dp"
+            android:text="Web Trackers:"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnAppLastTrackerDomain" />
+
+        <TextView
+            android:id="@+id/vpnWebTrackerCompaniesBlockedToday"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersLabel"
+            tools:text="150 tracker companies blocked last week" />
+
+        <TextView
+            android:id="@+id/vpnWebTrackersBlockedToday"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebTrackerCompaniesBlockedToday"
+            tools:text="26 trackers blocked last 24 hours" />
+
+
+        <TextView
+            android:id="@+id/vpnWebTrackersCompaniesBlockedWeek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedToday"
+            tools:text="457 trackers blocked last week" />
+
+        <TextView
+            android:id="@+id/vpnWebTrackersBlockedWeek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersCompaniesBlockedWeek"
+            tools:text="457 trackers blocked last week" />
+
+        <TextView
+            android:id="@+id/vpnWebLastTrackerDomain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="32dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedWeek"
+            tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
         <TextView
             android:id="@+id/vpnUUID"
@@ -168,7 +260,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vpnRunningButton"
+            app:layout_constraintTop_toBottomOf="@id/vpnWebLastTrackerDomain"
             tools:text="UUID is: XXXXXXXXXXXXXXXXXXX" />
 
         <TextView

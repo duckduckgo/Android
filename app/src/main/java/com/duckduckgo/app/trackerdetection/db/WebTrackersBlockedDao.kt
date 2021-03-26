@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.dao
+package com.duckduckgo.app.trackerdetection.db
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface VpnTrackerDao {
+interface WebTrackersBlockedDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: VpnTracker)
+    fun insert(tracker: WebTrackerBlocked)
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
-    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTrackerAndCompany>>
-
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
-    fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTrackerAndCompany>
-
-    @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
+    @Query("DELETE FROM web_trackers_blocked WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
+
+    @Query("SELECT * FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
+    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<WebTrackerBlocked>>
 
 }

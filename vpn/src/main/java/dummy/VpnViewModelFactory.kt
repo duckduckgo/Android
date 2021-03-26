@@ -19,6 +19,7 @@ package dummy
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import dummy.ui.VpnControllerViewModel
@@ -35,6 +36,9 @@ class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceF
     lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     @Inject
+    lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
+
+    @Inject
     lateinit var vpnPreferences: VpnPreferences
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -49,7 +53,8 @@ class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceF
     private fun vpnControllerViewModel(): VpnControllerViewModel {
         return VpnControllerViewModel(
             applicationContext = applicationContext,
-            repository = appTrackerBlockingStatsRepository,
+            appTrackerBlockedRepository = appTrackerBlockingStatsRepository,
+            webTrackersBlockedRepository = webTrackersBlockedRepository,
             vpnPreferences = vpnPreferences
         )
     }

@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -28,44 +30,55 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import kotlinx.coroutines.flow.map
 
 class VpnControllerViewModel(
-    private val repository: AppTrackerBlockingStatsRepository,
+    private val appTrackerBlockedRepository: AppTrackerBlockingStatsRepository,
+    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
     private val applicationContext: Context,
     private val vpnPreferences: VpnPreferences
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
-        return repository.getRunningTimeMillis(startTime)
+        return appTrackerBlockedRepository.getRunningTimeMillis(startTime)
             .map { timeRunning -> VpnRunningStatus(timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext)) }
             .asLiveData()
     }
 
     fun getDataTransferredUpdates(startTime: () -> String): LiveData<DataStats> {
-        return repository.getVpnDataStats(startTime).asLiveData()
+        return appTrackerBlockedRepository.getVpnDataStats(startTime).asLiveData()
     }
 
-    fun getTrackerBlockedUpdates(startTime: () -> String): LiveData<TrackersBlocked> {
-        return repository.getVpnTrackers(startTime).map {
-            TrackersBlocked(it)
+    fun getAppTrackerBlockedUpdates(startTime: () -> String): LiveData<AppTrackersBlocked> {
+        return appTrackerBlockedRepository.getVpnTrackers(startTime).map {
+            AppTrackersBlocked(it)
+        }.asLiveData()
+    }
+
+    fun getWebTrackerBlockedUpdates(startTime: () -> String): LiveData<WebTrackersBlocked> {
+        return webTrackersBlockedRepository.get(startTime).map {
+            WebTrackersBlocked(it)
         }.asLiveData()
     }
 
     fun getVpnState(): LiveData<VpnState> {
-        return repository.getVpnState().asLiveData()
+        return appTrackerBlockedRepository.getVpnState().asLiveData()
     }
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
-    fun getBlockFacebookDomainsPreference(): Boolean = vpnPreferences.getBlockFacebookDomainsPreference()
-    fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
-    fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
-    fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
-    fun blockFacebookDomains(enabled: Boolean) = vpnPreferences.blockFacebookDomains(enabled)
 
     data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
 
-    data class TrackersBlocked(val trackerList: List<VpnTrackerAndCompany>) {
+    data class AppTrackersBlocked(val trackerList: List<VpnTrackerAndCompany>) {
 
         fun byCompany(): Map<Int, List<VpnTrackerAndCompany>> {
             return trackerList.groupBy { it.trackerCompany.trackerCompanyId }
+        }
+
+    }
+
+    data class WebTrackersBlocked(val trackerList: List<WebTrackerBlocked>) {
+
+        fun byCompany(): Map<String, List<WebTrackerBlocked>> {
+            return trackerList.groupBy { it.trackerCompany }
+
         }
 
     }

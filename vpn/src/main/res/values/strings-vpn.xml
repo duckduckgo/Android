@@ -16,16 +16,18 @@
 
 <resources>
     <string name="deviceShieldAppName">Device Shield</string>
-    <string name="title_activity_vpn_controller">DDG Vpn - Today\'s Stats</string>
+    <string name="title_activity_vpn_controller">Device Shield - Stats</string>
     <string name="device_shield_tile_label">Device Shield</string>
     <string name="vpnNotificationTitle">App Tracker Protection Active</string>
     <string name="vpnReminderNotificationTitle">App Tracker Protection is not enabled</string>
     <string name="vpnReminderNotificationText">Please, tap on this notification and enable it now</string>
     <string name="refresh">Refresh</string>
     <string name="vpnTimeRunning">Time running: %s</string>
-    <string name="vpnTrackerCompaniesBlocked">Tracker companies blocked: %d</string>
+    <string name="vpnTrackerCompaniesBlockedToday">Tracker companies blocked today: %d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek">Tracker companies blocked this week: %d</string>
     <string name="vpnTrackerCompaniesNone">"No tracker companies blocked yet"</string>
-    <string name="vpnTrackersBlocked">Trackers blocked: %d</string>
+    <string name="vpnTrackersBlockedToday">Trackers blocked today: %d</string>
+    <string name="vpnTrackersBlockedThisWeek">Trackers blocked this week: %d</string>
     <string name="vpnTrackersNone">"No trackers blocked yet"</string>
     <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
     <string name="vpnDataTransferred">"%s\n%s packets"</string>

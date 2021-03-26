@@ -65,7 +65,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 30,
+    exportSchema = true, version = 31,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -92,7 +92,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         FireproofWebsiteEntity::class,
         UserEventEntity::class,
         LocationPermissionEntity::class,
-        PixelEntity::class
+        PixelEntity::class,
+        WebTrackerBlocked::class
     ]
 )
 
@@ -136,6 +137,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
+    abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 }
 
 @Suppress("PropertyName")
@@ -387,6 +389,13 @@ class MigrationsProvider(
         }
     }
 
+    // todo: make sure this is not an issue when migrating to main repo
+    val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
@@ -423,7 +432,8 @@ class MigrationsProvider(
             MIGRATION_26_TO_27,
             MIGRATION_27_TO_28,
             MIGRATION_28_TO_29,
-            MIGRATION_29_TO_30
+            MIGRATION_29_TO_30,
+            MIGRATION_30_TO_31
         )
 
     @Deprecated(

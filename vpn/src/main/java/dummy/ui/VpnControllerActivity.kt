@@ -16,35 +16,26 @@
 
 package dummy.ui
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.net.VpnService
 import android.os.Bundle
-import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.DataSizeFormatter
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.VpnViewModelFactory
-import dummy.quietlySetIsChecked
-import dummy.ui.VpnControllerViewModel.TrackersBlocked
+import dummy.ui.VpnControllerViewModel.AppTrackersBlocked
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
@@ -55,14 +46,22 @@ import javax.inject.Inject
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
-    private lateinit var lastTrackerDomainTextView: TextView
-    private lateinit var timeRunningTodayTextView: TextView
+    private lateinit var lastAppTrackerDomainTextView: TextView
+    private lateinit var appTrackerCompaniesBlockedTodayTextView: TextView
+    private lateinit var appTrackersBlockedTodayTextView: TextView
+    private lateinit var appTrackerCompaniesBlockedWeekTextView: TextView
+    private lateinit var appTrackersBlockedWeekTextView: TextView
+
+    private lateinit var lastWebTrackerDomainTextView: TextView
+    private lateinit var webTrackerCompaniesBlockedTodayTextView: TextView
+    private lateinit var webTrackersBlockedTodayTextView: TextView
+    private lateinit var webTrackerCompaniesBlockedWeekTextView: TextView
+    private lateinit var webTrackersBlockedWeekTextView: TextView
+
     private lateinit var appVersionText: TextView
-    private lateinit var trackerCompaniesBlockedTextView: TextView
-    private lateinit var trackersBlockedTextView: TextView
+    private lateinit var timeRunningTodayTextView: TextView
     private lateinit var dataSentTextView: TextView
     private lateinit var dataReceivedTextView: TextView
-    private lateinit var vpnRunningToggleButton: ToggleButton
     private lateinit var uuidTextView: TextView
 
     @Inject
@@ -79,7 +78,9 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private val viewModel: VpnControllerViewModel by bindViewModel()
     private val packetsFormatter = NumberFormat.getInstance()
 
-    private var lastTrackerBlocked: VpnTrackerAndCompany? = null
+    private var lastAppTrackerBlocked: VpnTrackerAndCompany? = null
+    private var lastWebTrackerBlocked: WebTrackerBlocked? = null
+
     private var timerUpdateJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,15 +101,26 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
         viewModel.getRunningTimeUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderTimeRunning(it.runningTimeMillis)
-            renderVpnEnabledState(it.isRunning)
         }
 
         viewModel.getDataTransferredUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderDataStats(dataSent = it.sent, dataReceived = it.received)
         }
 
-        viewModel.getTrackerBlockedUpdates { dateOfPreviousMidnight() }.observe(this) {
-            renderTrackerData(it)
+        viewModel.getAppTrackerBlockedUpdates { dateOfPreviousMidnight() }.observe(this) {
+            renderTodayAppTrackerData(it)
+        }
+
+        viewModel.getAppTrackerBlockedUpdates { dateOfLastWeek() }.observe(this) {
+            renderLastWeekAppTrackerData(it)
+        }
+
+        viewModel.getWebTrackerBlockedUpdates { dateOfPreviousMidnight() }.observe(this) {
+            renderTodayWebTrackerData(it)
+        }
+
+        viewModel.getWebTrackerBlockedUpdates { dateOfLastWeek() }.observe(this) {
+            renderLastWeekWebTrackerData(it)
         }
 
         viewModel.getVpnState().observe(this) {
@@ -134,23 +146,30 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun updateRelativeTimes() {
-        lastTrackerDomainTextView.text = generateLastTrackerBlocked(lastTrackerBlocked)
+        lastAppTrackerDomainTextView.text = generateLastAppTrackerBlocked(lastAppTrackerBlocked)
     }
 
     private fun setViewReferences() {
-        trackerCompaniesBlockedTextView = findViewById(R.id.vpnTrackerCompaniesBlocked)
-        trackersBlockedTextView = findViewById(R.id.vpnTrackersBlocked)
-        lastTrackerDomainTextView = findViewById(R.id.vpnLastTrackerDomain)
+        appTrackerCompaniesBlockedTodayTextView = findViewById(R.id.vpnAppTrackerCompaniesBlockedToday)
+        appTrackersBlockedTodayTextView = findViewById(R.id.vpnAppTrackersBlockedToday)
+        appTrackerCompaniesBlockedWeekTextView = findViewById(R.id.vpnAppTrackerCompaniesBlockedWeek)
+        appTrackersBlockedWeekTextView = findViewById(R.id.vpnAppTrackersBlockedWeek)
+        lastAppTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
+
+        webTrackerCompaniesBlockedTodayTextView = findViewById(R.id.vpnWebTrackerCompaniesBlockedToday)
+        webTrackersBlockedTodayTextView = findViewById(R.id.vpnWebTrackersBlockedToday)
+        webTrackerCompaniesBlockedWeekTextView = findViewById(R.id.vpnWebTrackersCompaniesBlockedWeek)
+        webTrackersBlockedWeekTextView = findViewById(R.id.vpnWebTrackersBlockedWeek)
+        lastWebTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
+
         timeRunningTodayTextView = findViewById(R.id.vpnTodayRunningTime)
         dataSentTextView = findViewById(R.id.vpnSentStats)
         dataReceivedTextView = findViewById(R.id.vpnReceivedStats)
-        vpnRunningToggleButton = findViewById(R.id.vpnRunningButton)
         uuidTextView = findViewById(R.id.vpnUUID)
         appVersionText = findViewById<TextView>(R.id.appVersionText).also { it.text = packageManager.getPackageInfo(packageName, 0).versionName }
     }
 
     private fun configureUiHandlers() {
-        vpnRunningToggleButton.setOnCheckedChangeListener(runningButtonChangeListener)
         uuidTextView.setOnClickListener {
             val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
@@ -170,10 +189,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
     }
 
-    private fun launchFeedback() {
-        startActivity(Intent(ACTION_VIEW, FEEDBACK_URL))
-    }
-
     private fun renderTimeRunning(timeRunningMillis: Long) {
         timeRunningTodayTextView.text = generateTimeRunningMessage(timeRunningMillis)
     }
@@ -191,78 +206,32 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         )
     }
 
-    private fun renderVpnEnabledState(running: Boolean) {
-        vpnRunningToggleButton.quietlySetIsChecked(running, runningButtonChangeListener)
-    }
-
     private fun renderUuid(uuid: String) {
         uuidTextView.text = uuid
     }
 
-    private fun renderTrackerData(trackerData: TrackersBlocked) {
-        trackerCompaniesBlockedTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size)
-        trackersBlockedTextView.text = generateTrackersBlocked(trackerData.trackerList.size)
-        lastTrackerBlocked = trackerData.trackerList.firstOrNull()
+    private fun renderTodayAppTrackerData(trackerData: AppTrackersBlocked) {
+        appTrackerCompaniesBlockedTodayTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
+        appTrackersBlockedTodayTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
+        lastAppTrackerBlocked = trackerData.trackerList.firstOrNull()
         updateRelativeTimes()
     }
 
-    private fun startVpnIfAllowed() {
-        when (val permissionStatus = checkVpnPermission()) {
-            is VpnPermissionStatus.Granted -> startVpn()
-            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
-        }
+    private fun renderLastWeekAppTrackerData(trackerData: AppTrackersBlocked) {
+        appTrackerCompaniesBlockedWeekTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
+        appTrackersBlockedWeekTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 
-    @Suppress("DEPRECATION")
-    private fun obtainVpnRequestPermission(intent: Intent) {
-        startActivityForResult(intent, RC_REQUEST_VPN_PERMISSION)
+    private fun renderTodayWebTrackerData(trackerData: VpnControllerViewModel.WebTrackersBlocked) {
+        webTrackerCompaniesBlockedTodayTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
+        webTrackersBlockedTodayTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
+        lastWebTrackerBlocked = trackerData.trackerList.firstOrNull()
+        lastWebTrackerDomainTextView.text = generateLastWebTrackerBlocked(lastWebTrackerBlocked)
     }
 
-    private fun checkVpnPermission(): VpnPermissionStatus {
-        val intent = VpnService.prepare(this)
-        return if (intent == null) {
-            VpnPermissionStatus.Granted
-        } else {
-            VpnPermissionStatus.Denied(intent)
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun handleVpnPermissionResult(resultCode: Int) {
-        when (resultCode) {
-            Activity.RESULT_CANCELED -> {
-                Timber.i("User cancelled and refused VPN permission")
-                vpnRunningToggleButton.quietlySetIsChecked(false, runningButtonChangeListener)
-            }
-            Activity.RESULT_OK -> {
-                Timber.i("User granted VPN permission")
-                startVpn()
-            }
-        }
-    }
-
-    private fun startVpn() {
-        startService(TrackerBlockingVpnService.startIntent(this))
-    }
-
-    private fun stopVpn() {
-        startService(TrackerBlockingVpnService.stopIntent(this))
-    }
-
-    private val runningButtonChangeListener = CompoundButton.OnCheckedChangeListener { _, checked ->
-        Timber.i("Toggle changed. enabled=$checked")
-        if (checked) {
-            startVpnIfAllowed()
-        } else {
-            stopVpn()
-        }
+    private fun renderLastWeekWebTrackerData(trackerData: VpnControllerViewModel.WebTrackersBlocked) {
+        webTrackerCompaniesBlockedWeekTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
+        webTrackersBlockedWeekTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 
     private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
@@ -273,7 +242,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
     }
 
-    private fun generateLastTrackerBlocked(lastTracker: VpnTrackerAndCompany?): String {
+    private fun generateLastAppTrackerBlocked(lastTracker: VpnTrackerAndCompany?): String {
         if (lastTracker == null) return ""
 
         val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
@@ -282,19 +251,36 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.tracker.domain}\n(owned by ${lastTracker.trackerCompany.company})"
     }
 
-    private fun generateTrackerCompaniesBlocked(totalTrackerCompanies: Int): String {
+    private fun generateLastWebTrackerBlocked(lastTracker: WebTrackerBlocked?): String {
+        if (lastTracker == null) return ""
+
+        val timestamp = LocalDateTime.parse(lastTracker.timestamp)
+        val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
+        val timeRunning = TimePassed.fromMilliseconds(timeDifference)
+        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.trackerUrl}\n(owned by ${lastTracker.trackerCompany})"
+    }
+
+    private fun generateTrackerCompaniesBlocked(totalTrackerCompanies: Int, displayWeek: Boolean): String {
         return if (totalTrackerCompanies == 0) {
             applicationContext.getString(R.string.vpnTrackerCompaniesNone)
         } else {
-            return applicationContext.getString(R.string.vpnTrackerCompaniesBlocked, totalTrackerCompanies)
+            return if (displayWeek) {
+                applicationContext.getString(R.string.vpnTrackerCompaniesBlockedThisWeek, totalTrackerCompanies)
+            } else {
+                applicationContext.getString(R.string.vpnTrackerCompaniesBlockedToday, totalTrackerCompanies)
+            }
         }
     }
 
-    private fun generateTrackersBlocked(totalTrackers: Int): String {
+    private fun generateTrackersBlocked(totalTrackers: Int, displayWeek: Boolean): String {
         return if (totalTrackers == 0) {
             applicationContext.getString(R.string.vpnTrackersNone)
         } else {
-            return applicationContext.getString(R.string.vpnTrackersBlocked, totalTrackers)
+            return if (displayWeek) {
+                applicationContext.getString(R.string.vpnTrackersBlockedThisWeek, totalTrackers)
+            } else {
+                applicationContext.getString(R.string.vpnTrackersBlockedToday, totalTrackers)
+            }
         }
     }
 

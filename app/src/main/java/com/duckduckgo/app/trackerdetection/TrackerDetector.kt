@@ -19,18 +19,27 @@ package com.duckduckgo.app.trackerdetection
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface TrackerDetector {
     fun addClient(client: Client)
     fun evaluate(url: String, documentUrl: String): TrackingEvent?
 }
 
-class TrackerDetectorImpl(
+@ContributesBinding(AppObjectGraph::class)
+@Singleton
+class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
-    private val userWhitelistDao: UserWhitelistDao
+    private val userWhitelistDao: UserWhitelistDao,
+    private val webTrackersBlockedDao: WebTrackersBlockedDao
 ) : TrackerDetector {
 
     private val clients = CopyOnWriteArrayList<Client>()
@@ -63,6 +72,9 @@ class TrackerDetectorImpl(
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
+
+            val trackerCompany = entity?.displayName ?: "Undefined"
+            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
             return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl))
         }
 
