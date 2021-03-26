@@ -104,7 +104,7 @@ class TrackerNetworksViewModelFactoryModule {
     }
 }
 
-private class TrackerNetworksViewModelFactory() : ViewModelFactoryPlugin {
+private class TrackerNetworksViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

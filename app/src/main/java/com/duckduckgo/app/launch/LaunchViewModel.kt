@@ -30,6 +30,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class LaunchViewModel(
@@ -74,21 +75,21 @@ class LaunchViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideLaunchViewModelFactory(
-        userStageStore: UserStageStore,
-        appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+        userStageStore: Provider<UserStageStore>,
+        appInstallationReferrerStateListener: Provider<AppInstallationReferrerStateListener>
     ): ViewModelFactoryPlugin {
         return LaunchViewModelFactory(userStageStore, appInstallationReferrerStateListener)
     }
 }
 
 private class LaunchViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+    private val userStageStore: Provider<UserStageStore>,
+    private val appInstallationReferrerStateListener: Provider<AppInstallationReferrerStateListener>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore, appInstallationReferrerStateListener) as T)
+                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore.get(), appInstallationReferrerStateListener.get()) as T)
                 else -> null
             }
         }

@@ -58,7 +58,7 @@ class InitialFeedbackFragmentViewModelFactoryModule {
     }
 }
 
-private class InitialFeedbackFragmentViewModelFactory() : ViewModelFactoryPlugin {
+private class InitialFeedbackFragmentViewModelFactory : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

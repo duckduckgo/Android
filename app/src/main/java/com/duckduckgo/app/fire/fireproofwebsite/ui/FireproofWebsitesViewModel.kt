@@ -35,6 +35,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class FireproofWebsitesViewModel(
@@ -118,27 +119,27 @@ class FireproofWebsitesViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideFireproofWebsitesViewModelFactory(
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider,
-        pixel: Pixel,
-        settingsDataStore: SettingsDataStore,
-        userEventsStore: UserEventsStore
+        fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
+        dispatcherProvider: Provider<DispatcherProvider>,
+        pixel: Provider<Pixel>,
+        settingsDataStore: Provider<SettingsDataStore>,
+        userEventsStore: Provider<UserEventsStore>
     ): ViewModelFactoryPlugin {
         return FireproofWebsitesViewModelFactory(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore)
     }
 }
 
 private class FireproofWebsitesViewModelFactory(
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore
+    private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
+    private val dispatcherProvider: Provider<DispatcherProvider>,
+    private val pixel: Provider<Pixel>,
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val userEventsStore: Provider<UserEventsStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore) as T)
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository.get(), dispatcherProvider.get(), pixel.get(), settingsDataStore.get(), userEventsStore.get()) as T)
                 else -> null
             }
         }

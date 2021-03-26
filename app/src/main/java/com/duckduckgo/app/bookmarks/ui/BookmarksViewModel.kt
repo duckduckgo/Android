@@ -37,6 +37,7 @@ import dagger.multibindings.IntoSet
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class BookmarksViewModel(
@@ -127,23 +128,23 @@ class BookmarksViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun provideBookmarksViewModelFactory(
-        dao: BookmarksDao,
-        faviconManager: FaviconManager,
-        dispatcherProvider: DispatcherProvider
+        dao: Provider<BookmarksDao>,
+        faviconManager: Provider<FaviconManager>,
+        dispatcherProvider: Provider<DispatcherProvider>
     ): ViewModelFactoryPlugin {
         return BookmarksViewModelFactory(dao, faviconManager, dispatcherProvider)
     }
 }
 
 private class BookmarksViewModelFactory(
-    private val dao: BookmarksDao,
-    private val faviconManager: FaviconManager,
-    private val dispatcherProvider: DispatcherProvider
+    private val dao: Provider<BookmarksDao>,
+    private val faviconManager: Provider<FaviconManager>,
+    private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao, faviconManager, dispatcherProvider) as T)
+                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao.get(), faviconManager.get(), dispatcherProvider.get()) as T)
                 else -> null
             }
         }

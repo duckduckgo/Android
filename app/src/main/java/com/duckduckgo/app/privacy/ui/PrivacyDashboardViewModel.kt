@@ -44,6 +44,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class PrivacyDashboardViewModel(
@@ -212,23 +213,23 @@ class PrivacyDashboardViewModelFactoryModule {
     @Singleton
     @IntoSet
     fun providePrivacyDashboardViewModelFactory(
-        userWhitelistDao: UserWhitelistDao,
-        networkLeaderboardDao: NetworkLeaderboardDao,
-        pixel: Pixel
+        userWhitelistDao: Provider<UserWhitelistDao>,
+        networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
+        pixel: Provider<Pixel>
     ): ViewModelFactoryPlugin {
         return PrivacyDashboardViewModelFactory(userWhitelistDao, networkLeaderboardDao, pixel)
     }
 }
 
 private class PrivacyDashboardViewModelFactory(
-    private val userWhitelistDao: UserWhitelistDao,
-    private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val pixel: Pixel
+    private val userWhitelistDao: Provider<UserWhitelistDao>,
+    private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao, networkLeaderboardDao, pixel) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), networkLeaderboardDao.get(), pixel.get()) as T
                 else -> null
             }
         }
