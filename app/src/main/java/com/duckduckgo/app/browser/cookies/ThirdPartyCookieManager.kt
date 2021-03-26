@@ -40,7 +40,7 @@ class AppThirdPartyCookieManager(
         if (uri.host == GOOGLE_ACCOUNTS_HOST) {
             addHostToList(uri)
         } else {
-            enableThirdPartyCookies(webView, uri)
+            processThirdPartyCookiesSetting(webView, uri)
         }
     }
 
@@ -48,19 +48,18 @@ class AppThirdPartyCookieManager(
         allowedDomainsRepository.deleteAll(hostsThatAlwaysRequireThirdPartyCookies)
     }
 
-    private suspend fun enableThirdPartyCookies(webView: WebView, uri: Uri) {
+    private suspend fun processThirdPartyCookiesSetting(webView: WebView, uri: Uri) {
         val host = uri.host ?: return
         val allowedDomain = allowedDomainsRepository.getDomain(host)
         withContext(Dispatchers.Main) {
             if (allowedDomain != null && hasUserIdCookie()) {
                 Timber.d("Cookies enabled for $uri")
                 cookieManager.setAcceptThirdPartyCookies(webView, true)
-                deleteHost(allowedDomain)
             } else {
                 Timber.d("Cookies disabled for $uri")
-                allowedDomain?.let { deleteHost(it) }
                 cookieManager.setAcceptThirdPartyCookies(webView, false)
             }
+            allowedDomain?.let { deleteHost(it) }
         }
     }
 

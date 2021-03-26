@@ -54,7 +54,7 @@ class AllowedDomainsRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteAll(exceptionList: List<String>) {
+    suspend fun deleteAll(exceptionList: List<String> = emptyList()) {
         withContext(dispatcherProvider.io()) {
             allowedDomainsDao.deleteAll(exceptionList.joinToString(","))
         }

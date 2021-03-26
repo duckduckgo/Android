@@ -294,6 +294,7 @@ class BrowserModule {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 
+    @Singleton
     @Provides
     fun thirdPartyCookieManager(cookieManager: CookieManager, allowedDomainsRepository: AllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, allowedDomainsRepository)

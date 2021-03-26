@@ -22,12 +22,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AllowedDomainsRepositoryTest {
     @get:Rule
     @Suppress("unused")
@@ -66,12 +68,7 @@ class AllowedDomainsRepositoryTest {
     }
 
     @Test
-    fun whenAddDomainWithSubDomainThenReturnNonNull() = coroutineRule.runBlocking {
-        assertNotNull(allowedDomainsRepository.addDomain("test.example.com"))
-    }
-
-    @Test
-    fun whenAddDomainThenReturnNonNull() = coroutineRule.runBlocking {
+    fun whenAddValidDomainThenReturnNonNull() = coroutineRule.runBlocking {
         assertNotNull(allowedDomainsRepository.addDomain("example.com"))
     }
 

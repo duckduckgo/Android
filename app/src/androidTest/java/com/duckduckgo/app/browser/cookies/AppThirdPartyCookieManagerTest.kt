@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.cookies.db.AllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.*
@@ -36,6 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AppThirdPartyCookieManagerTest {
 
     @get:Rule
@@ -69,7 +71,7 @@ class AppThirdPartyCookieManagerTest {
 
     @UiThreadTest
     @Test
-    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAndIsNotInTheListThenThirdPartyCookiesDisabled() = coroutinesTestRule.runBlocking {
+    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAuthAndIsNotInTheListThenThirdPartyCookiesDisabled() = coroutinesTestRule.runBlocking {
         testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
 
         assertFalse(cookieManager.acceptThirdPartyCookies(webView))
@@ -77,7 +79,7 @@ class AppThirdPartyCookieManagerTest {
 
     @UiThreadTest
     @Test
-    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAndIsInTheListAndHasCookieThenThirdPartyCookiesEnabled() = coroutinesTestRule.runBlocking {
+    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAuthAndIsInTheListAndHasCookieThenThirdPartyCookiesEnabled() = coroutinesTestRule.runBlocking {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
         givenUserIdCookieIsSet()
 
@@ -88,7 +90,7 @@ class AppThirdPartyCookieManagerTest {
 
     @UiThreadTest
     @Test
-    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAndIsInTheListAndDoesNotHaveCookieThenThirdPartyCookiesDisabled() = coroutinesTestRule.runBlocking {
+    fun whenProcessUriForThirdPartyCookiesIfDomainIsNotGoogleAuthAndIsInTheListAndDoesNotHaveCookieThenThirdPartyCookiesDisabled() = coroutinesTestRule.runBlocking {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
 
         testee.processUriForThirdPartyCookies(webView, EXAMPLE_URI)
