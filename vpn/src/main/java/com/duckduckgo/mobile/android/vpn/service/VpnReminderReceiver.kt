@@ -47,10 +47,11 @@ class VpnReminderReceiver : BroadcastReceiver() {
         AndroidInjection.inject(this, context)
 
         Timber.i("VpnReminderReceiver onReceive ${intent.action}")
+        val pendingResult = goAsync()
         if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == TrackerBlockingVpnService.ACTION_VPN_REMINDER) {
             Timber.v("Checking if VPN is running")
 
-            goAsync {
+            goAsync(pendingResult) {
                 val manager = NotificationManagerCompat.from(context)
                 if (TrackerBlockingVpnService.isServiceRunning(context)) {
                     Timber.v("Vpn is already running, nothing to show")
@@ -72,7 +73,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
             deviceShieldPixels.enableFromReminderNotification()
-            goAsync {
+            goAsync(pendingResult) {
                 TrackerBlockingVpnService.startIntent(context).also {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(it)
@@ -98,17 +99,17 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
 }
 
-fun BroadcastReceiver.goAsync(
+fun goAsync(
+    pendingResult: BroadcastReceiver.PendingResult,
     coroutineScope: CoroutineScope = GlobalScope,
     block: suspend () -> Unit
 ) {
-    val result = goAsync()
     coroutineScope.launch {
         try {
             block()
         } finally {
             // Always call finish(), even if the coroutineScope was cancelled
-            result.finish()
+            pendingResult.finish()
         }
     }
 }
