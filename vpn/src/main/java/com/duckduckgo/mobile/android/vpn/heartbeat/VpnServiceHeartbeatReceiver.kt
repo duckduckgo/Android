@@ -47,12 +47,14 @@ class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProc
 
         when (val action = intent.action) {
             "android.intent.action.BOOT_COMPLETED" -> {
-                goAsync {
+                val pendingResult = goAsync()
+                goAsync(pendingResult) {
                     heartbeatProcessor.checkLastHeartBeat(this@VpnServiceHeartbeatReceiver)
                 }
             }
             ACTION_VPN_HEART_BEAT -> {
-                goAsync {
+                val pendingResult = goAsync()
+                goAsync(pendingResult) {
                     heartbeatProcessor.processHeartBeat(intent, this)
                 }
             }
@@ -75,7 +77,8 @@ class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProc
             Timber.e("(${Process.myPid()}) heartbeat ALIVE missed - re-launcing VPN")
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
-            goAsync {
+            val pendingResult = goAsync()
+            goAsync(pendingResult) {
                 heartbeatProcessor.restartVpnService()
             }
         } else {
