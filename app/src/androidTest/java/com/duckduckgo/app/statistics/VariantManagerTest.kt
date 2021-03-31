@@ -46,14 +46,14 @@ class VariantManagerTest {
     // Use our app experiment
     @Test
     fun inBrowserControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zj" }
+        val variant = variants.first { it.key == "ma" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun inBrowserSecondControlVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingFeatures() {
-        val variant = variants.first { it.key == "zk" }
+        val variant = variants.first { it.key == "mb" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(KillOnboarding))
@@ -62,7 +62,7 @@ class VariantManagerTest {
 
     @Test
     fun inBrowserInAppUsageVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingAndInAppUsageFeatures() {
-        val variant = variants.first { it.key == "zl" }
+        val variant = variants.first { it.key == "mc" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(KillOnboarding))
