@@ -231,7 +231,15 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                val sourceTabId =
+                    if (intent.action == null && currentTab?.tabUrl != null)
+                        currentTab?.tabId
+                    else
+                    // Do not set sourceTabId for external intents which usually has
+                    // non-null action, or for empty current tab which will be removed
+                    // before the new tab is added.
+                        null
+                launch { viewModel.onOpenInNewTabRequested(query = sharedText, sourceTabId = sourceTabId, skipHome = true) }
                 return
             }
         }

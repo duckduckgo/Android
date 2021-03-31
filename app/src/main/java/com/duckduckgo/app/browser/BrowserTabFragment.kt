@@ -192,6 +192,8 @@ class BrowserTabFragment :
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
+    val tabUrl get() = viewModel.url
+
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
