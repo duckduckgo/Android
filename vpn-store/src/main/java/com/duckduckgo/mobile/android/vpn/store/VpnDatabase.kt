@@ -29,7 +29,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 2,
+    exportSchema = true, version = 3,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -73,6 +73,13 @@ abstract class VpnDatabase : RoomDatabase() {
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
+                        ioThread {
+                            prepopulateTrackerCompanies(context)
+                            prepopulateUUID(context)
+                        }
+                    }
+
+                    override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
                         ioThread {
                             prepopulateTrackerCompanies(context)
                             prepopulateUUID(context)
