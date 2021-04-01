@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Single
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -61,7 +63,8 @@ class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
     }
 }
 
-class AppConfigurationWorkerInjectorPlugin(
+@ContributesMultibinding(AppObjectGraph::class)
+class AppConfigurationWorkerInjectorPlugin @Inject constructor(
     private val configurationDownloader: ConfigurationDownloader
 ) : WorkerInjectorPlugin {
 

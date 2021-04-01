@@ -30,14 +30,11 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -116,18 +113,8 @@ class ScorecardViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ScorecardViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideScorecardViewModelFactory(userWhitelistDao: Provider<UserWhitelistDao>): ViewModelFactoryPlugin {
-        return ScorecardViewModelFactory(userWhitelistDao)
-    }
-}
-
-private class ScorecardViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class ScorecardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
