@@ -403,6 +403,12 @@ class MigrationsProvider(
         }
     }
 
+    val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
