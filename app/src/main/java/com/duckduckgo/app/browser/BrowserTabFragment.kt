@@ -494,9 +494,9 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         focusDummy.show()
+        focusDummy.requestFocus()
         newTabLayout.gone()
         browserLayout.show()
-
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
     }
