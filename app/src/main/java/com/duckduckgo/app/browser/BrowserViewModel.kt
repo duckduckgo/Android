@@ -45,16 +45,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
@@ -242,27 +239,8 @@ class BrowserViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrowserViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrowserViewModelFactory(
-        tabRepository: Provider<TabRepository>,
-        queryUrlConverter: Provider<QueryUrlConverter>,
-        dataClearer: Provider<DataClearer>,
-        appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
-        appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
-        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-        pixel: Provider<Pixel>,
-        useOurAppDetector: Provider<UseOurAppDetector>
-    ): ViewModelFactoryPlugin {
-        return BrowserViewModelFactory(tabRepository, queryUrlConverter, dataClearer, appEnjoymentPromptEmitter, appEnjoymentUserEventRecorder, dispatchers, pixel, useOurAppDetector)
-    }
-}
-
-private class BrowserViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class BrowserViewModelFactory @Inject constructor(
     val tabRepository: Provider<TabRepository>,
     val queryUrlConverter: Provider<QueryUrlConverter>,
     val dataClearer: Provider<DataClearer>,

@@ -28,8 +28,11 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_SHOWN
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 // Please don't rename any Worker class name or class path
 // More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
@@ -111,7 +114,8 @@ class NotificationScheduler(
     }
 }
 
-class ClearDataNotificationWorkerInjectorPlugin(
+@ContributesMultibinding(AppObjectGraph::class)
+class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationDao: NotificationDao,
     private val notificationFactory: NotificationFactory,
@@ -132,7 +136,8 @@ class ClearDataNotificationWorkerInjectorPlugin(
     }
 }
 
-class PrivacyNotificationWorkerInjectorPlugin(
+@ContributesMultibinding(AppObjectGraph::class)
+class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationDao: NotificationDao,
     private val notificationFactory: NotificationFactory,

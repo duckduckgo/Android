@@ -19,6 +19,9 @@ package com.duckduckgo.app.statistics.api
 import android.content.Context
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -68,7 +71,8 @@ class OfflinePixelScheduler @Inject constructor(private val workManager: WorkMan
     }
 }
 
-class OfflinePixelWorkerInjectorPlugin(
+@ContributesMultibinding(AppObjectGraph::class)
+class OfflinePixelWorkerInjectorPlugin @Inject constructor(
     private val offlinePixelSender: OfflinePixelSender
 ) : WorkerInjectorPlugin {
 

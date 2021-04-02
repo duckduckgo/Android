@@ -29,14 +29,11 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -46,8 +43,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
 
@@ -260,23 +257,8 @@ class SystemSearchViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SystemSearchViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSystemSearchViewModelFactory(
-        userStageStore: Provider<UserStageStore>,
-        autoCompleteApi: Provider<AutoCompleteApi>,
-        deviceAppLookup: Provider<DeviceAppLookup>,
-        pixel: Provider<Pixel>
-    ): ViewModelFactoryPlugin {
-        return SystemSearchViewModelFactory(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
-    }
-}
-
-private class SystemSearchViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class SystemSearchViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val autoComplete: Provider<AutoCompleteApi>,
     private val deviceAppLookup: Provider<DeviceAppLookup>,

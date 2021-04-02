@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
@@ -30,15 +26,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class BookmarksViewModel(
     val dao: BookmarksDao,
@@ -121,22 +114,8 @@ class BookmarksViewModel(
 
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BookmarksViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBookmarksViewModelFactory(
-        dao: Provider<BookmarksDao>,
-        faviconManager: Provider<FaviconManager>,
-        dispatcherProvider: Provider<DispatcherProvider>
-    ): ViewModelFactoryPlugin {
-        return BookmarksViewModelFactory(dao, faviconManager, dispatcherProvider)
-    }
-}
-
-private class BookmarksViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class BookmarksViewModelFactory @Inject constructor(
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>

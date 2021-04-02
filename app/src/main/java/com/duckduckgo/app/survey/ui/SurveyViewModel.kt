@@ -31,15 +31,12 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
@@ -117,22 +114,8 @@ class SurveyViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SurveyViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSurveyViewModelFactory(
-        surveyDao: Provider<SurveyDao>,
-        statisticsStore: Provider<StatisticsDataStore>,
-        appInstallStore: Provider<AppInstallStore>
-    ): ViewModelFactoryPlugin {
-        return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
-    }
-}
-
-private class SurveyViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class SurveyViewModelFactory @Inject constructor(
     private val surveyDao: Provider<SurveyDao>,
     private val statisticsStore: Provider<StatisticsDataStore>,
     private val appInstallStore: Provider<AppInstallStore>

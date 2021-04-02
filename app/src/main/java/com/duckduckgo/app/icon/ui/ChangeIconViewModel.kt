@@ -26,13 +26,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class ChangeIconViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
@@ -83,22 +79,8 @@ class ChangeIconViewModel @Inject constructor(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ChangeIconViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideChangeIconViewModelFactory(
-        settingsDataStore: Provider<SettingsDataStore>,
-        appIconModifier: Provider<IconModifier>,
-        pixel: Provider<Pixel>
-    ): ViewModelFactoryPlugin {
-        return ChangeIconViewModelFactory(settingsDataStore, appIconModifier, pixel)
-    }
-}
-
-private class ChangeIconViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class ChangeIconViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val appIconModifier: Provider<IconModifier>,
     private val pixel: Provider<Pixel>
