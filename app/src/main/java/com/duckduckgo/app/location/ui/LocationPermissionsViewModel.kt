@@ -17,7 +17,6 @@
 package com.duckduckgo.app.location.ui
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -29,13 +28,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
@@ -139,24 +135,8 @@ class LocationPermissionsViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class LocationPermissionsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideLocationPermissionsViewModelFactory(
-        locationPermissionsRepository: Provider<LocationPermissionsRepository>,
-        geoLocationPermissions: Provider<GeoLocationPermissions>,
-        dispatcherProvider: Provider<DispatcherProvider>,
-        settingsDataStore: Provider<SettingsDataStore>,
-        pixel: Provider<Pixel>
-    ): ViewModelFactoryPlugin {
-        return LocationPermissionsViewModelFactory(locationPermissionsRepository, geoLocationPermissions, dispatcherProvider, settingsDataStore, pixel)
-    }
-}
-
-private class LocationPermissionsViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class LocationPermissionsViewModelFactory @Inject constructor(
     private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
     private val geoLocationPermissions: Provider<GeoLocationPermissions>,
     private val dispatcherProvider: Provider<DispatcherProvider>,

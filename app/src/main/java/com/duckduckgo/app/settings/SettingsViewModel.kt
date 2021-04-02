@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -33,14 +34,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -49,8 +46,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class SettingsViewModel(
     private val deviceShieldPixels: DeviceShieldPixels,
@@ -322,28 +319,8 @@ class SettingsViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SettingsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSettingsViewModelFactory(
-        deviceShieldPixels: Provider<DeviceShieldPixels>,
-        appContext: Provider<Context>,
-        settingsDataStore: Provider<SettingsDataStore>,
-        defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
-        variantManager: Provider<VariantManager>,
-        fireAnimationLoader: Provider<FireAnimationLoader>,
-        pixel: Provider<Pixel>,
-        deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
-        deviceShieldOnboarding: Provider<DeviceShieldOnboarding>
-    ): ViewModelFactoryPlugin {
-        return SettingsViewModelFactory(deviceShieldPixels, appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding)
-    }
-}
-
-private class SettingsViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class SettingsViewModelFactory @Inject constructor(
     private val deviceShieldPixels: Provider<DeviceShieldPixels>,
     private val appContext: Provider<Context>,
     private val settingsDataStore: Provider<SettingsDataStore>,

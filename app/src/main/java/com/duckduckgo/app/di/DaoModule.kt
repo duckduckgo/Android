@@ -91,4 +91,7 @@ class DaoModule {
 
     @Provides
     fun webTrackersBlockedDao(database: AppDatabase) = database.webTrackersBlockedDao()
+
+    @Provides
+    fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
 }

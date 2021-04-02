@@ -25,6 +25,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -65,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 31,
+    exportSchema = true, version = 32,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -93,7 +95,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UserEventEntity::class,
         LocationPermissionEntity::class,
         PixelEntity::class,
-        WebTrackerBlocked::class
+        WebTrackerBlocked::class,
+        AuthCookieAllowedDomainEntity::class
     ]
 )
 
@@ -138,6 +141,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
+    abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
 }
 
 @Suppress("PropertyName")
@@ -389,8 +393,14 @@ class MigrationsProvider(
         }
     }
 
-    // todo: make sure this is not an issue when migrating to main repo
     val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
+        }
+    }
+
+    // todo: make sure this is not an issue when migrating to main repo
+    val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
         }
@@ -433,7 +443,8 @@ class MigrationsProvider(
             MIGRATION_27_TO_28,
             MIGRATION_28_TO_29,
             MIGRATION_29_TO_30,
-            MIGRATION_30_TO_31
+            MIGRATION_30_TO_31,
+            MIGRATION_31_TO_32
         )
 
     @Deprecated(

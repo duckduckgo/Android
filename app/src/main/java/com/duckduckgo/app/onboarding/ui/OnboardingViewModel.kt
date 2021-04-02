@@ -24,13 +24,10 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,
@@ -58,22 +55,8 @@ class OnboardingViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class OnboardingViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideOnboardingViewModelFactory(
-        userStageStore: Provider<UserStageStore>,
-        pageLayoutManager: Provider<OnboardingPageManager>,
-        dispatchers: Provider<DispatcherProvider>
-    ): ViewModelFactoryPlugin {
-        return OnboardingViewModelFactory(userStageStore, pageLayoutManager, dispatchers)
-    }
-}
-
-private class OnboardingViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class OnboardingViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val pageLayoutManager: Provider<OnboardingPageManager>,
     private val dispatchers: Provider<DispatcherProvider>

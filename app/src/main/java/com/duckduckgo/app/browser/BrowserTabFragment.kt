@@ -65,6 +65,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -196,6 +197,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
+
+    @Inject
+    lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
 
     var messageFromPreviousTab: Message? = null
 
@@ -616,6 +620,16 @@ class BrowserTabFragment :
             is DownloadCommand -> processDownloadCommand(it)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
+            is Command.ChildTabClosed -> processUriForThirdPartyCookies()
+        }
+    }
+
+    private fun processUriForThirdPartyCookies() {
+        webView?.let {
+            val url = it.url ?: return
+            launch {
+                thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
+            }
         }
     }
 
