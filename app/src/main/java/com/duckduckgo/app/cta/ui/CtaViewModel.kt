@@ -226,9 +226,7 @@ class CtaViewModel @Inject constructor(
                 getDaxDialogCta(site)
             }
             canShowUseOurAppDeletionDialog(site) -> {
-                val cta = UseOurAppDeletionCta()
-                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-                cta
+                UseOurAppDeletionCta()
             }
             else -> null
         }
@@ -260,8 +258,8 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {
         val timestampKey = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
-        val days = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - timestampKey.timestamp)
-        return (days >= 2)
+        val days = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timestampKey.timestamp)
+        return (days >= 30)
     }
 
     @WorkerThread
