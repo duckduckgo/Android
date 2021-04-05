@@ -258,8 +258,8 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {
         val timestampKey = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
-        val days = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timestampKey.timestamp)
-        return (days >= 30)
+        val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - timestampKey.timestamp)
+        return (days >= 2)
     }
 
     @WorkerThread
