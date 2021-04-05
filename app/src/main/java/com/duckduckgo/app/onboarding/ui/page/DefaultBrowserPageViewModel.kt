@@ -25,12 +25,9 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
@@ -203,22 +200,8 @@ class DefaultBrowserPageViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class DefaultBrowserPageViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideDefaultBrowserPageViewModelFactory(
-        defaultBrowserDetector: Provider<DefaultBrowserDetector>,
-        pixel: Provider<Pixel>,
-        installStore: Provider<AppInstallStore>
-    ): ViewModelFactoryPlugin {
-        return DefaultBrowserPageViewModelFactory(defaultBrowserDetector, pixel, installStore)
-    }
-}
-
-private class DefaultBrowserPageViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class DefaultBrowserPageViewModelFactory @Inject constructor(
     private val defaultBrowserDetector: Provider<DefaultBrowserDetector>,
     private val pixel: Provider<Pixel>,
     private val installStore: Provider<AppInstallStore>

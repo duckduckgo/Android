@@ -22,11 +22,8 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
 
@@ -47,18 +44,8 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ShareOpenEndedNegativeFeedbackViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideShareOpenEndedNegativeFeedbackViewModelFactory(): ViewModelFactoryPlugin {
-        return ShareOpenEndedNegativeFeedbackViewModelFactory()
-    }
-}
-
-private class ShareOpenEndedNegativeFeedbackViewModelFactory : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class ShareOpenEndedNegativeFeedbackViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

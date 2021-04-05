@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -33,17 +34,12 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
@@ -245,24 +241,8 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SettingsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSettingsViewModelFactory(
-        settingsDataStore: Provider<SettingsDataStore>,
-        defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
-        variantManager: Provider<VariantManager>,
-        fireAnimationLoader: Provider<FireAnimationLoader>,
-        pixel: Provider<Pixel>
-    ): ViewModelFactoryPlugin {
-        return SettingsViewModelFactory(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel)
-    }
-}
-
-private class SettingsViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class SettingsViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,

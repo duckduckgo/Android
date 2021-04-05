@@ -21,11 +21,8 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.common.ViewState
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class InitialFeedbackFragmentViewModel : ViewModel() {
 
@@ -47,18 +44,8 @@ class InitialFeedbackFragmentViewModel : ViewModel() {
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class InitialFeedbackFragmentViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideInitialFeedbackFragmentViewModelFactory(): ViewModelFactoryPlugin {
-        return InitialFeedbackFragmentViewModelFactory()
-    }
-}
-
-private class InitialFeedbackFragmentViewModelFactory : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class InitialFeedbackFragmentViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

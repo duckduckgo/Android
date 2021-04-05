@@ -89,6 +89,7 @@ import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -96,7 +97,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
@@ -106,10 +106,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -119,8 +116,8 @@ import timber.log.Timber
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -1847,80 +1844,8 @@ class BrowserTabViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrowserTabViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrowserTabViewModelFactory(
-        statisticsUpdater: Provider<StatisticsUpdater>,
-        queryUrlConverter: Provider<QueryUrlConverter>,
-        duckDuckGoUrlDetector: Provider<DuckDuckGoUrlDetector>,
-        siteFactory: Provider<SiteFactory>,
-        tabRepository: Provider<TabRepository>,
-        userWhitelistDao: Provider<UserWhitelistDao>,
-        networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
-        bookmarksDao: Provider<BookmarksDao>,
-        fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
-        locationPermissionsRepository: Provider<LocationPermissionsRepository>,
-        geoLocationPermissions: Provider<GeoLocationPermissions>,
-        navigationAwareLoginDetector: Provider<NavigationAwareLoginDetector>,
-        autoCompleteApi: Provider<AutoCompleteApi>,
-        appSettingsPreferencesStore: Provider<SettingsDataStore>,
-        longPressHandler: Provider<LongPressHandler>,
-        webViewSessionStorage: Provider<WebViewSessionStorage>,
-        specialUrlDetector: Provider<SpecialUrlDetector>,
-        faviconManager: Provider<FaviconManager>,
-        addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
-        ctaViewModel: Provider<CtaViewModel>,
-        searchCountDao: Provider<SearchCountDao>,
-        pixel: Provider<Pixel>,
-        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-        userEventsStore: Provider<UserEventsStore>,
-        notificationDao: Provider<NotificationDao>,
-        useOurAppDetector: Provider<UseOurAppDetector>,
-        variantManager: Provider<VariantManager>,
-        fileDownloader: Provider<FileDownloader>,
-        globalPrivacyControl: Provider<GlobalPrivacyControl>,
-        fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>
-    ): ViewModelFactoryPlugin {
-        return BrowserTabViewModelFactory(
-            statisticsUpdater,
-            queryUrlConverter,
-            duckDuckGoUrlDetector,
-            siteFactory,
-            tabRepository,
-            userWhitelistDao,
-            networkLeaderboardDao,
-            bookmarksDao,
-            fireproofWebsiteRepository,
-            locationPermissionsRepository,
-            geoLocationPermissions,
-            navigationAwareLoginDetector,
-            autoCompleteApi,
-            appSettingsPreferencesStore,
-            longPressHandler,
-            webViewSessionStorage,
-            specialUrlDetector,
-            faviconManager,
-            addToHomeCapabilityDetector,
-            ctaViewModel,
-            searchCountDao,
-            pixel,
-            dispatchers,
-            userEventsStore,
-            notificationDao,
-            useOurAppDetector,
-            variantManager,
-            fileDownloader,
-            globalPrivacyControl,
-            fireproofDialogsEventHandler
-        )
-    }
-}
-
-private class BrowserTabViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class BrowserTabViewModelFactory @Inject constructor(
     private val statisticsUpdater: Provider<StatisticsUpdater>,
     private val queryUrlConverter: Provider<QueryUrlConverter>,
     private val duckDuckGoUrlDetector: Provider<DuckDuckGoUrlDetector>,

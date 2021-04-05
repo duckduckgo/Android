@@ -3,7 +3,7 @@
 buildscript {
     ext.kotlin_version = '1.4.21'
     ext.spotless = "5.7.0"
-    ext.anvil_version = "2.1.0"
+    ext.anvil_version = "2.2.0"
 
     ext.min_sdk = 21
     ext.target_sdk = 29

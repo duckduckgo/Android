@@ -16,19 +16,18 @@
 
 package com.duckduckgo.app.globalprivacycontrol.ui
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class GlobalPrivacyControlViewModel(
     private val pixel: Pixel,
@@ -70,21 +69,8 @@ class GlobalPrivacyControlViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class GlobalPrivacyControlViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideGlobalPrivacyControlViewModelFactory(
-        pixel: Provider<Pixel>,
-        settingsDataStore: Provider<SettingsDataStore>
-    ): ViewModelFactoryPlugin {
-        return GlobalPrivacyControlViewModelFactory(pixel, settingsDataStore)
-    }
-}
-
-private class GlobalPrivacyControlViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class GlobalPrivacyControlViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val settingsDataStore: Provider<SettingsDataStore>
 ) : ViewModelFactoryPlugin {

@@ -28,12 +28,9 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
@@ -81,21 +78,8 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class TabSwitcherViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideTabSwitcherViewModelFactory(
-        tabRepository: Provider<TabRepository>,
-        webViewSessionStorage: Provider<WebViewSessionStorage>
-    ): ViewModelFactoryPlugin {
-        return TabSwitcherViewModelFactory(tabRepository, webViewSessionStorage)
-    }
-}
-
-private class TabSwitcherViewModelFactory(
+@ContributesMultibinding(AppObjectGraph::class)
+class TabSwitcherViewModelFactory @Inject constructor(
     private val tabRepository: Provider<TabRepository>,
     private val webViewSessionStorage: Provider<WebViewSessionStorage>
 ) : ViewModelFactoryPlugin {
