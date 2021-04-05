@@ -197,7 +197,7 @@ class UseOurAppNotificationWorkerInjectorPlugin(
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is NotificationScheduler.PrivacyNotificationWorker) {
+        if (worker is NotificationScheduler.UseOurAppNotificationWorker) {
             worker.manager = notificationManagerCompat
             worker.notificationDao = notificationDao
             worker.factory = notificationFactory
