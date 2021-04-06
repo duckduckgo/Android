@@ -37,6 +37,7 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -125,7 +126,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = coroutinesTestRule.runBlocking {
+    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
     }
