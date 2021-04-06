@@ -101,7 +101,8 @@ class BrowserModule {
         dosDetector: DosDetector,
         globalPrivacyControl: GlobalPrivacyControl,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -116,7 +117,8 @@ class BrowserModule {
             dosDetector,
             globalPrivacyControl,
             thirdPartyCookieManager,
-            appCoroutineScope
+            appCoroutineScope,
+            dispatcherProvider
         )
     }
 

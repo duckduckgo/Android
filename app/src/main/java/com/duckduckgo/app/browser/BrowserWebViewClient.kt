@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
@@ -56,7 +56,8 @@ class BrowserWebViewClient(
     private val dosDetector: DosDetector,
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -146,7 +147,7 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
             url?.let {
-                appCoroutineScope.launch {
+                appCoroutineScope.launch(dispatcherProvider.io()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
                 }
             }

@@ -82,7 +82,8 @@ class BrowserWebViewClientTest {
             dosDetector,
             globalPrivacyControl,
             thirdPartyCookieManager,
-            GlobalScope
+            GlobalScope,
+            coroutinesTestRule.testDispatcherProvider
         )
         testee.webViewClientListener = listener
     }
@@ -126,7 +127,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runBlocking {
+    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = coroutinesTestRule.runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
     }
