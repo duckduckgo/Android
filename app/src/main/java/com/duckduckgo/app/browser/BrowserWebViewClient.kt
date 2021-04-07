@@ -147,7 +147,7 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
             url?.let {
-                appCoroutineScope.launch(dispatcherProvider.io()) {
+                appCoroutineScope.launch(dispatcherProvider.default()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
                 }
             }
