@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -68,7 +69,7 @@ class UriUtilsFilenameExtractorTest {
     fun whenUrlContainsFilenameButContentDispositionSaysOtherwiseThenExtractFromContentDisposition() {
         val url = "https://example.com/filename.jpg"
         val mimeType: String? = null
-        val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.jpg"
+        val contentDisposition: String = "Content-Disposition: attachment; filename=fromDisposition.jpg"
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("fromDisposition.jpg", extracted)
     }
@@ -119,9 +120,20 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 21)
+    fun whenUrlIsEmptyStringAndMimeTypeProvidedThenDefaultNameAndFiletypeFromMimeReturnedLollipop() {
+        val url = ""
+        val mimeType = "image/jpeg"
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertEquals("downloadfile.jpeg", extracted)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlIsEmptyStringAndMimeTypeProvidedThenDefaultNameAndFiletypeFromMimeReturned() {
         val url = ""
-        val mimeType: String? = "image/jpeg"
+        val mimeType = "image/jpeg"
         val contentDisposition: String? = null
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("downloadfile.jpg", extracted)
@@ -131,7 +143,7 @@ class UriUtilsFilenameExtractorTest {
     fun whenUrlIsEmptyStringAndContentDispositionProvidedThenExtractFromContentDisposition() {
         val url = ""
         val mimeType: String? = null
-        val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.jpg"
+        val contentDisposition = "Content-Disposition: attachment; filename=fromDisposition.jpg"
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("fromDisposition.jpg", extracted)
     }
@@ -159,7 +171,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "http://example.com/cat/600/400"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 

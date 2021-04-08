@@ -25,7 +25,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 import java.util.*
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MINUTES
+import java.util.concurrent.TimeUnit.SECONDS
 
 @RunWith(Parameterized::class)
 class DataClearerTimeKeeperTest(private val testCase: TestCase) {
@@ -38,44 +39,49 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         @Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
 
-            val timeNow = SystemClock.elapsedRealtime()
+            fun timeNow(): () -> Long = { SystemClock.elapsedRealtime() }
 
             return arrayOf(
                 // APP_EXIT_ONLY shouldn't be passed to this method - always expected to return false regardless of other configuration/inputs
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(5), timeNow),
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(0), timeNow),
-                TestCase(false, APP_EXIT_ONLY, TimeUnit.MINUTES.toMillis(-5), timeNow),
+                TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(5), timeNow()),
+                TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(0), timeNow()),
+                TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(-5), timeNow()),
+
+                // will return true when duration is >= 5 secs
+                TestCase(false, APP_EXIT_OR_5_SECONDS, SECONDS.toMillis(4), timeNow()),
+                TestCase(true, APP_EXIT_OR_5_SECONDS, SECONDS.toMillis(5), timeNow()),
+                TestCase(true, APP_EXIT_OR_5_SECONDS, SECONDS.toMillis(6), timeNow()),
 
                 // will return true when duration is >= 5 mins
-                TestCase(false, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(4), timeNow),
-                TestCase(true, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(5), timeNow),
-                TestCase(true, APP_EXIT_OR_5_MINS, TimeUnit.MINUTES.toMillis(6), timeNow),
+                TestCase(false, APP_EXIT_OR_5_MINS, MINUTES.toMillis(4), timeNow()),
+                TestCase(true, APP_EXIT_OR_5_MINS, MINUTES.toMillis(5), timeNow()),
+                TestCase(true, APP_EXIT_OR_5_MINS, MINUTES.toMillis(6), timeNow()),
 
                 // will return true when duration is >= 15 mins
-                TestCase(false, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(14), timeNow),
-                TestCase(true, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(15), timeNow),
-                TestCase(true, APP_EXIT_OR_15_MINS, TimeUnit.MINUTES.toMillis(16), timeNow),
+                TestCase(false, APP_EXIT_OR_15_MINS, MINUTES.toMillis(14), timeNow()),
+                TestCase(true, APP_EXIT_OR_15_MINS, MINUTES.toMillis(15), timeNow()),
+                TestCase(true, APP_EXIT_OR_15_MINS, MINUTES.toMillis(16), timeNow()),
 
                 // will return true when duration is >= 30 mins
-                TestCase(false, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(29), timeNow),
-                TestCase(true, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(30), timeNow),
-                TestCase(true, APP_EXIT_OR_30_MINS, TimeUnit.MINUTES.toMillis(31), timeNow),
+                TestCase(false, APP_EXIT_OR_30_MINS, MINUTES.toMillis(29), timeNow()),
+                TestCase(true, APP_EXIT_OR_30_MINS, MINUTES.toMillis(30), timeNow()),
+                TestCase(true, APP_EXIT_OR_30_MINS, MINUTES.toMillis(31), timeNow()),
 
                 // will return true when duration is >= 60 mins
-                TestCase(false, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(59), timeNow),
-                TestCase(true, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(60), timeNow),
-                TestCase(true, APP_EXIT_OR_60_MINS, TimeUnit.MINUTES.toMillis(61), timeNow)
+                TestCase(false, APP_EXIT_OR_60_MINS, MINUTES.toMillis(59), timeNow()),
+                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(60), timeNow()),
+                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow())
             )
         }
     }
 
     @Test
     fun enoughTimePassed() {
-        val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow)
+        val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow.invoke())
         assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
     }
 
-    private fun getPastTimestamp(millisPreviously: Long, timeNow: Long = SystemClock.elapsedRealtime()): Long {
+    private fun getPastTimestamp(millisPreviously: Long, timeNow: Long): Long {
         return Calendar.getInstance().also {
             it.timeInMillis = timeNow
             it.add(Calendar.MILLISECOND, (-millisPreviously).toInt())
@@ -86,6 +92,6 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         val expected: Boolean,
         val clearWhenOption: ClearWhenOption,
         val durationBackgrounded: Long,
-        val timeNow: Long
+        val timeNow: () -> Long
     )
 }
