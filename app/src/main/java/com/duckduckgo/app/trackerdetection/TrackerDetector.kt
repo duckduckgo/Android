@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -95,6 +96,7 @@ class TrackerDetectorImpl @Inject constructor(
         return firstNetwork.name == secondNetwork.name
     }
 
+    @VisibleForTesting
     val clientCount get() = clients.count()
 }
 

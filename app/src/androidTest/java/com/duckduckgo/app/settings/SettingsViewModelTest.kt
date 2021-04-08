@@ -36,11 +36,12 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldApp
-import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -113,6 +114,7 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        runBlocking { whenever(mockDeviceShieldExcludedApps.getExclusionAppList()).thenReturn(listOf()) }
     }
 
     @Test
@@ -150,17 +152,17 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartCalledAndZeroExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExcludedApps()).thenReturn(listOf())
+        whenever(mockDeviceShieldExcludedApps.getExclusionAppList()).thenReturn(listOf())
         testee.start()
         assertEquals("None", latestViewState().excludedAppsInfo)
     }
 
     @Test
     fun whenStartCalledAndOneExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
             .thenReturn(
                 listOf(
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "foo",
                         packageName = "foo.com",
                         type = null
@@ -173,15 +175,15 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartCalledAndTwoExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
             .thenReturn(
                 listOf(
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "foo",
                         packageName = "foo.com",
                         type = null
                     ),
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "bar",
                         packageName = "bar.com",
                         type = null
@@ -194,20 +196,20 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartCalledAndThreeOrMoreExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
             .thenReturn(
                 listOf(
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "foo",
                         packageName = "foo.com",
                         type = null
                     ),
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "bar",
                         packageName = "bar.com",
                         type = null
                     ),
-                    DeviceShieldApp(
+                    VpnExcludedInstalledAppInfo(
                         name = "baz",
                         packageName = "baz.com",
                         type = null

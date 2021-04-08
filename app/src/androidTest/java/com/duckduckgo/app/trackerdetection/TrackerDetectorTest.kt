@@ -20,6 +20,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -31,7 +32,8 @@ class TrackerDetectorTest {
 
     private val mockEntityLookup: EntityLookup = mock()
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
-    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao)
+    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockWebTrackersBlockedDao)
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {

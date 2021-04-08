@@ -27,8 +27,9 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
@@ -102,6 +103,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var appNameResolver: AppNameResolver
 
+    @Inject
+    lateinit var newAppBroadcastReceiver: NewAppBroadcastReceiver
+
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -141,6 +145,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister, originatingAppPackageIdentifier, appNameResolver)
         tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppPackageIdentifier, appNameResolver, this)
+
+        newAppBroadcastReceiver.register()
 
         Timber.e("VPN log onCreate")
     }
@@ -269,7 +275,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
                 Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
             } else {
-                safelyAddDisallowedApps(deviceShieldExcludedApps.getExclusionList())
+                safelyAddDisallowedApps(
+                    deviceShieldExcludedApps.getExclusionAppList()
+                        .filter { it.isExcludedFromVpn }
+                        .map { it.packageName }
+                )
             }
 
             // Apparently we always need to call prepare, even tho not clear in docs

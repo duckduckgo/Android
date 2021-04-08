@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -33,8 +34,9 @@ class TrackerDetectorClientTypeTest {
     private var mockBlockingClient: Client = mock()
     private var mockWhitelistClient: Client = mock()
     private var mockUserWhitelistDao: UserWhitelistDao = mock()
+    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
 
-    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao)
+    private var testee: TrackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockWebTrackersBlockedDao)
 
     @Before
     fun before() {

@@ -38,13 +38,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -155,10 +152,10 @@ class SettingsViewModel(
     }
 
     private fun getExcludedAppsInfo(): String {
-        val apps = deviceShieldExcludedApps.getExcludedApps()
+        val apps = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }
         return when (apps.size) {
             0 -> "None"
-            1 -> apps.first().name
+            1 -> "${apps.first().name}"
             2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
             else -> "${apps.first().name}, ${apps.take(2)[1].name} and more"
         }
