@@ -62,28 +62,10 @@ android {
 }
 
 ext {
-    androidX = "1.3.0-alpha02"
-    androidKtxCore = "1.3.2"
-    coroutines = "1.4.0"
-    materialDesign = "1.2.0-alpha05"
-    constraintLayout = "2.0.0-beta4"
-    lifecycle = "2.2.0"
-    androidXTest = "1.3.0"
-    room = "2.2.5"
-    dagger = "2.27"
     workManager = "2.5.0-beta01"
-    coreTesting = "2.1.0"
-
     threetenabp = "1.3.0"
     threetenbp = "1.4.5"
-
     firebase = "26.0.0"
-
-    junit = "4.12"
-    mockitoAndroid = "3.4.6"
-    mockito = "2.18.3"
-    mockitoKotlin = "2.2.0"
-
 }
 
 dependencies {
@@ -94,63 +76,64 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':statistics')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation Kotlin.stdlib.jdk7
 
-    implementation "androidx.core:core-ktx:$androidKtxCore"
+    implementation AndroidX.core.ktx
 
-    implementation "androidx.appcompat:appcompat:$androidX"
-    implementation "androidx.core:core-ktx:$androidKtxCore"
-    implementation "com.google.android.material:material:$materialDesign"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
 
     implementation platform("com.google.firebase:firebase-bom:$firebase")
     implementation "com.google.firebase:firebase-crashlytics-ktx"
 
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+    implementation AndroidX.lifecycle.extensions
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtimeKtx
+    implementation  AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.liveDataKtx
 
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation "com.google.dagger:dagger-android:$dagger"
-    implementation "com.google.dagger:dagger-android-support:$dagger"
+    implementation Google.dagger.android
+    implementation Google.dagger.android.support
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+    implementation KotlinX.coroutines.core
+    androidTestImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
     implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
     testImplementation "org.threeten:threetenbp:$threetenabp"
 
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation JakeWharton.timber
 
     implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     // Room
-    implementation "androidx.room:room-runtime:$room"
-    implementation "androidx.room:room-rxjava2:$room"
-    implementation "androidx.room:room-ktx:$room"
-    testImplementation "androidx.room:room-testing:$room"
-    androidTestImplementation "androidx.room:room-testing:$room"
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    testImplementation AndroidX.room.testing
+    androidTestImplementation AndroidX.room.testing
 
     // WorkManager
-    implementation "androidx.work:work-runtime-ktx:$workManager"
+    implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:$workManager"
-    androidTestImplementation "androidx.work:work-testing:$workManager"
-    implementation "androidx.work:work-rxjava2:$workManager"
+    androidTestImplementation AndroidX.work.testing
+    implementation AndroidX.work.rxJava2
 
     // Testing dependencies
-    testImplementation "org.mockito:mockito-core:$mockito"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-    testImplementation 'junit:junit:4.13'
-    testImplementation "androidx.arch.core:core-testing:$coreTesting"
-    androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
+    testImplementation Testing.mockito.kotlin
+    testImplementation "junit:junit:_"
+    testImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.archCore.testing
 
-    androidTestImplementation "androidx.test:runner:$androidXTest"
-    androidTestImplementation "androidx.test:rules:$androidXTest"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
 
-    androidTestImplementation "org.mockito:mockito-android:$mockitoAndroid"
-    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
+    androidTestImplementation Testing.mockito.android
+    androidTestImplementation Testing.mockito.kotlin
 }
