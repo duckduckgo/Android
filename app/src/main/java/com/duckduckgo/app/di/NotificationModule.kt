@@ -31,6 +31,7 @@ import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -89,12 +90,16 @@ class NotificationModule {
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification
+        privacyProtectionNotification: PrivacyProtectionNotification,
+        useOurAppNotification: UseOurAppNotification,
+        variantManager: VariantManager
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
-            privacyProtectionNotification
+            privacyProtectionNotification,
+            useOurAppNotification,
+            variantManager
         )
     }
 

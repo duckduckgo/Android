@@ -1611,10 +1611,6 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    fun onManualCtaShown(cta: Cta) {
-        ctaViewModel.onCtaShown(cta)
-    }
-
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {

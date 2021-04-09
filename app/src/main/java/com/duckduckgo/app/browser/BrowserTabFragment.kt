@@ -1831,8 +1831,6 @@ class BrowserTabFragment :
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
-
-            viewModel.onCtaShown()
         }
 
         private fun showDaxDialogCta(configuration: DialogCta) {
@@ -1848,6 +1846,7 @@ class BrowserTabFragment :
                     setDaxDialogListener(this@BrowserTabFragment)
                     getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
+                viewModel.onCtaShown()
             }
         }
 
@@ -1856,6 +1855,7 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            viewModel.onCtaShown()
         }
 
         private fun removeNewTabLayoutClickListener() {
@@ -1870,6 +1870,7 @@ class BrowserTabFragment :
                 configuration.showCta(ctaContainer)
             }
             homeBackgroundLogo.showLogo()
+            viewModel.onCtaShown()
         }
 
         private fun hideDaxCta() {

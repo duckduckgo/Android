@@ -43,28 +43,31 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    // Single Search Bar Experiments
+    // Use our app experiment
     @Test
-    fun serpHeaderControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(0.0, variant.weight)
+    fun inBrowserControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "ma" }
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpHeaderVariantHasExpectedWeightAndSERPHeaderRemovalFeature() {
-        val variant = variants.first { it.key == "zi" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertEquals(SerpHeaderRemoval, variant.features[0])
+    fun inBrowserSecondControlVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingFeatures() {
+        val variant = variants.first { it.key == "mb" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(2, variant.features.size)
+        assertTrue(variant.hasFeature(KillOnboarding))
+        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
     }
 
     @Test
-    fun serpHeaderVariantHasExpectedWeightAndSERPHeaderQueryReplacementFeature() {
-        val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertEquals(SerpHeaderQueryReplacement, variant.features[0])
+    fun inBrowserInAppUsageVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingAndInAppUsageFeatures() {
+        val variant = variants.first { it.key == "mc" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(3, variant.features.size)
+        assertTrue(variant.hasFeature(KillOnboarding))
+        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
+        assertTrue(variant.hasFeature(InAppUsage))
     }
 
     @Test

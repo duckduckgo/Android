@@ -281,7 +281,7 @@ class SystemSearchViewModelTest {
             override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
             override fun insert(userStage: UserStage) {}
         }
-        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider)
+        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider, mock(), mock())
     }
 
     companion object {
