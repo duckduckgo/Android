@@ -26,10 +26,12 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_SHOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -44,25 +46,56 @@ interface AndroidNotificationScheduler {
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
+    private val privacyNotification: SchedulableNotification,
+    private val useOurAppNotification: SchedulableNotification,
+    private val variantManager: VariantManager
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
+        scheduleUseOurAppNotification()
         scheduleInactiveUserNotifications()
+    }
+
+    private suspend fun scheduleUseOurAppNotification() {
+        if (variant().hasFeature(VariantManager.VariantFeature.InAppUsage) && useOurAppNotification.canShow()) {
+            val operation = scheduleUniqueNotification(
+                OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
+                3,
+                TimeUnit.DAYS,
+                USE_OUR_APP_WORK_REQUEST_TAG
+            )
+            try {
+                operation.await()
+            } catch (e: Exception) {
+                Timber.v("Notification could not be scheduled: $e")
+            }
+        }
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
-            privacyNotification.canShow() -> {
+            (!variant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications) && privacyNotification.canShow()) -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            clearDataNotification.canShow() -> {
+            (!variant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications) && clearDataNotification.canShow()) -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
+    }
+
+    private fun variant() = variantManager.getVariant()
+
+    private fun scheduleUniqueNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String): Operation {
+        Timber.v("Scheduling unique notification")
+        val request = builder
+            .addTag(tag)
+            .setInitialDelay(duration, unit)
+            .build()
+
+        return workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.KEEP, request)
     }
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
@@ -81,6 +114,7 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class UseOurAppNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -111,6 +145,7 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
     }
 }
 
@@ -152,6 +187,27 @@ class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
             worker.factory = notificationFactory
             worker.pixel = pixel
             worker.notification = privacyProtectionNotification
+            return true
+        }
+        return false
+    }
+}
+@ContributesMultibinding(AppObjectGraph::class)
+class UseOurAppNotificationWorkerInjectorPlugin @Inject constructor(
+    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationDao: NotificationDao,
+    private val notificationFactory: NotificationFactory,
+    private val pixel: Pixel,
+    private val useOurAppNotification: UseOurAppNotification
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is NotificationScheduler.UseOurAppNotificationWorker) {
+            worker.manager = notificationManagerCompat
+            worker.notificationDao = notificationDao
+            worker.factory = notificationFactory
+            worker.pixel = pixel
+            worker.notification = useOurAppNotification
             return true
         }
         return false

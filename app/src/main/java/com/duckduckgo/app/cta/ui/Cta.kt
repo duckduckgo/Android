@@ -73,7 +73,7 @@ class UseOurAppCta(
     @StringRes val okButton: Int = R.string.useOurAppDialogButtonText,
     @StringRes val cancelButton: Int = R.string.useOurAppDialogCancelButtonText,
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
-    override val shownPixel: Pixel.PixelName? = AppPixelName.USE_OUR_APP_DIALOG_SHOWN,
+    override val shownPixel: Pixel.PixelName? = null,
     override val okPixel: Pixel.PixelName? = AppPixelName.USE_OUR_APP_DIALOG_OK,
     override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {

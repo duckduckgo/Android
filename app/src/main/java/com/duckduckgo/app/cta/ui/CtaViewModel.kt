@@ -228,7 +228,9 @@ class CtaViewModel @Inject constructor(
             canShowDaxDialogCta() -> {
                 getDaxDialogCta(site)
             }
-            canShowUseOurAppDeletionDialog(site) -> UseOurAppDeletionCta()
+            canShowUseOurAppDeletionDialog(site) -> {
+                UseOurAppDeletionCta()
+            }
             else -> null
         }
     }
