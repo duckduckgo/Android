@@ -114,6 +114,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -173,7 +175,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
-    private lateinit var mockTabsRepository: TabRepository
+    private lateinit var mockTabRepository: TabRepository
 
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
@@ -230,9 +232,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockFileDownloader: FileDownloader
 
     @Mock
-    private lateinit var mockTabRepository: TabRepository
-
-    @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
     @Mock
@@ -262,6 +261,10 @@ class BrowserTabViewModelTest {
     private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
 
     private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
+    private val childClosedTabsSharedFlow = MutableSharedFlow<String>()
+
+    private val childClosedTabsFlow = childClosedTabsSharedFlow.asSharedFlow()
 
     @Before
     fun before() {
@@ -299,9 +302,10 @@ class BrowserTabViewModelTest {
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
-        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
@@ -312,7 +316,7 @@ class BrowserTabViewModelTest {
             queryUrlConverter = mockOmnibarConverter,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
-            tabRepository = mockTabsRepository,
+            tabRepository = mockTabRepository,
             userWhitelistDao = mockUserWhitelistDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
@@ -389,7 +393,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
 
-        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
+        verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
     }
 
     @Test
@@ -553,7 +557,7 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1218,7 +1222,7 @@ class BrowserTabViewModelTest {
         testee.onRefreshRequested()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1519,7 +1523,7 @@ class BrowserTabViewModelTest {
         showErrorWithAction.action()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1691,7 +1695,7 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
-        verify(mockTabsRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
     @Test
@@ -1723,7 +1727,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockTabsRepository).deleteTabAndSelectSource("TAB_ID")
+        verify(mockTabRepository).deleteTabAndSelectSource("TAB_ID")
     }
 
     @Test
@@ -1812,14 +1816,6 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.onCtaShown()
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenManualCtaShownThenFirePixel() {
-        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-
-        testee.onManualCtaShown(cta)
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
     }
 
@@ -2870,7 +2866,7 @@ class BrowserTabViewModelTest {
 
         testee.prefetchFavicon(url)
 
-        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test
@@ -2879,7 +2875,7 @@ class BrowserTabViewModelTest {
 
         testee.prefetchFavicon("url")
 
-        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
     }
 
     @Test
@@ -2901,7 +2897,7 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived(bitmap)
 
-        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test
@@ -2912,7 +2908,7 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived(bitmap)
 
-        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
     }
 
     @Test
@@ -3136,6 +3132,24 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsParentThenChildTabClosedCommandSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("TAB_ID")
+
+        assertCommandIssued<Command.ChildTabClosed>()
+    }
+
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsNotParentThenChildTabClosedCommandNotSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("other_tab")
+
+        assertCommandNotIssued<Command.ChildTabClosed>()
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
@@ -3222,7 +3236,7 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn(USE_OUR_APP_DOMAIN)
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", USE_OUR_APP_DOMAIN, false)
     }
 
@@ -3232,7 +3246,7 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn("example.com")
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", "example.com", false)
     }
 
@@ -3250,7 +3264,7 @@ class BrowserTabViewModelTest {
         whenever(site.uri).thenReturn(Uri.parse(domain))
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false)
     }
 

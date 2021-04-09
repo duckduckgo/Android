@@ -29,6 +29,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +50,8 @@ class AndroidNotificationSchedulerTest {
 
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
+    private val useOurAppNotification: SchedulableNotification = mock()
+    private val variantManager: VariantManager = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -59,7 +64,9 @@ class AndroidNotificationSchedulerTest {
         testee = NotificationScheduler(
             workManager,
             clearNotification,
-            privacyNotification
+            privacyNotification,
+            useOurAppNotification,
+            variantManager
         )
     }
 
@@ -76,6 +83,7 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+        setDefaultVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -85,6 +93,7 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+        setDefaultVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
@@ -94,6 +103,7 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runBlocking<Unit> {
+        setDefaultVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -103,11 +113,135 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runBlocking<Unit> {
+        setDefaultVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
         assertNoNotificationScheduled()
+    }
+
+    @Test
+    fun whenInAppUsageVariantAndUseOurAppNotificationCanShowThenNotificationScheduled() = runBlocking {
+        givenNoInactiveUserNotifications()
+        setInAppUsageVariant()
+        whenever(useOurAppNotification.canShow()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(NotificationScheduler.UseOurAppNotificationWorker::class.jvmName, NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenInAppUsageVariantUseOurAppNotificationCannotShowThenNoNotificationScheduled() = runBlocking {
+        givenNoInactiveUserNotifications()
+        setInAppUsageVariant()
+        whenever(useOurAppNotification.canShow()).thenReturn(false)
+
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled(NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenInAppUsageSecondControlVariantThenNoNotificationScheduled() = runBlocking<Unit> {
+        setInAppUsageSecondControlVariant()
+        whenever(useOurAppNotification.canShow()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled(NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenInAppUsageControlVariantThenNoNotificationScheduled() = runBlocking<Unit> {
+        givenNoInactiveUserNotifications()
+        setInAppUsageControlVariant()
+        whenever(useOurAppNotification.canShow()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled(NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenInAppUsageControlVariantAndPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+        setInAppUsageControlVariant()
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenInAppUsageControlVariantAndPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+        setInAppUsageControlVariant()
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenInAppUsageControlVariantAndPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationScheduled() = runBlocking<Unit> {
+        setInAppUsageControlVariant()
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenInAppUsageControlVariantAndPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runBlocking<Unit> {
+        setDefaultVariant()
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled()
+    }
+
+    private suspend fun givenNoInactiveUserNotifications() {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+    }
+
+    private fun setInAppUsageVariant() {
+        whenever(variantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(
+                    VariantManager.VariantFeature.InAppUsage,
+                    VariantManager.VariantFeature.RemoveDay1AndDay3Notifications,
+                    VariantManager.VariantFeature.KillOnboarding
+                ),
+                filterBy = { true }
+            )
+        )
+    }
+
+    private fun setInAppUsageSecondControlVariant() {
+        whenever(variantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(
+                    VariantManager.VariantFeature.RemoveDay1AndDay3Notifications,
+                    VariantManager.VariantFeature.KillOnboarding
+                ),
+                filterBy = { true }
+            )
+        )
+    }
+
+    private fun setInAppUsageControlVariant() {
+        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
+    }
+
+    private fun setDefaultVariant() {
+        whenever(variantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     private fun assertNotificationScheduled(workerName: String, tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {

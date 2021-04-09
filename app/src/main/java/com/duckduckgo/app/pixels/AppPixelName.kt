@@ -53,10 +53,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROWSER_MENU_WHITELIST_ADD("mb_wla"),
     BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
 
-    HTTPS_NO_LOOKUP("m_https_nl"),
-    HTTPS_LOCAL_UPGRADE("m_https_lu"),
-    HTTPS_NO_UPGRADE("m_https_nu"),
-
     DEFAULT_BROWSER_SET("m_db_s"),
     DEFAULT_BROWSER_NOT_SET("m_db_ns"),
     DEFAULT_BROWSER_UNSET("m_db_u"),

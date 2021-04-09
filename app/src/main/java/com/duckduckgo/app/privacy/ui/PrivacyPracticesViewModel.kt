@@ -24,11 +24,8 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class PrivacyPracticesViewModel : ViewModel() {
 
@@ -68,18 +65,8 @@ class PrivacyPracticesViewModel : ViewModel() {
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class PrivacyPracticesViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun providePrivacyPracticesViewModelFactory(): ViewModelFactoryPlugin {
-        return PrivacyPracticesViewModelFactory()
-    }
-}
-
-private class PrivacyPracticesViewModelFactory : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class PrivacyPracticesViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

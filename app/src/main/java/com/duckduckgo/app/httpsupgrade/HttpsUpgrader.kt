@@ -54,31 +54,23 @@ class HttpsUpgraderImpl(
     override fun shouldUpgrade(uri: Uri): Boolean {
 
         if (uri.isHttps) {
-            pixel.fire(HTTPS_NO_LOOKUP)
             return false
         }
 
-        val host = uri.host
-        if (host == null) {
-            pixel.fire(HTTPS_NO_LOOKUP)
-            return false
-        }
+        val host = uri.host ?: return false
 
         if (userAllowListDao.contains(host)) {
-            pixel.fire(HTTPS_NO_LOOKUP)
             Timber.d("$host is in user allowlist and so not upgradable")
             return false
         }
 
         if (bloomFalsePositiveDao.contains(host)) {
-            pixel.fire(HTTPS_NO_LOOKUP)
             Timber.d("$host is in https whitelist and so not upgradable")
             return false
         }
 
         val isUpgradable = isInUpgradeList(host)
         Timber.d("$host ${if (isUpgradable) "is" else "is not"} upgradable")
-        pixel.fire(if (isUpgradable) HTTPS_LOCAL_UPGRADE else HTTPS_NO_UPGRADE)
         return isUpgradable
     }
 

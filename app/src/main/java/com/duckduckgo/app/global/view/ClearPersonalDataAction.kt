@@ -22,6 +22,7 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
@@ -52,7 +53,8 @@ class ClearPersonalDataAction(
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer,
-    private val geoLocationPermissions: GeoLocationPermissions
+    private val geoLocationPermissions: GeoLocationPermissions,
+    private val thirdPartyCookieManager: ThirdPartyCookieManager
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean) {
@@ -69,6 +71,7 @@ class ClearPersonalDataAction(
         withContext(Dispatchers.IO) {
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
+            thirdPartyCookieManager.clearAllData()
             clearTabsAsync(appInForeground)
         }
 

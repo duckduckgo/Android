@@ -24,6 +24,9 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -39,6 +42,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -66,6 +70,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -94,7 +99,10 @@ class BrowserModule {
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        globalPrivacyControl: GlobalPrivacyControl
+        globalPrivacyControl: GlobalPrivacyControl,
+        thirdPartyCookieManager: ThirdPartyCookieManager,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -107,7 +115,10 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl
+            globalPrivacyControl,
+            thirdPartyCookieManager,
+            appCoroutineScope,
+            dispatcherProvider
         )
     }
 
@@ -287,5 +298,11 @@ class BrowserModule {
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+    }
+
+    @Singleton
+    @Provides
+    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
+        return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 }
