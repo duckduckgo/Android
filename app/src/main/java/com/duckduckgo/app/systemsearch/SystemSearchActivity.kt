@@ -52,7 +52,6 @@ import kotlinx.android.synthetic.main.activity_system_search.logo
 import kotlinx.android.synthetic.main.activity_system_search.omnibarTextInput
 import kotlinx.android.synthetic.main.activity_system_search.results
 import kotlinx.android.synthetic.main.activity_system_search.resultsContent
-import kotlinx.android.synthetic.main.activity_system_search_update.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
 import javax.inject.Inject
 
