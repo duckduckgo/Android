@@ -533,6 +533,7 @@ class BrowserTabFragment :
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
+            is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favoriteId, it.title, it.url)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
                 navigate(it.url, it.headers)
@@ -1097,6 +1098,16 @@ class BrowserTabFragment :
             .show()
     }
 
+    private fun favoriteAdded(favoriteId: Long, title: String, url: String) {
+        Snackbar.make(browserLayout, R.string.favoriteAddedMessage, Snackbar.LENGTH_LONG)
+            .setAction(R.string.edit) {
+                val addBookmarkDialog = EditBookmarkDialogFragment.instance(favoriteId, title, url)
+                addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
+                addBookmarkDialog.listener = viewModel
+            }
+            .show()
+    }
+
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
         Snackbar.make(
             rootView,
@@ -1398,6 +1409,7 @@ class BrowserTabFragment :
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
 
         private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
+        private const val ADD_FAVORITE_FRAGMENT_TAG = "ADD_FAVORITE"
         private const val KEYBOARD_DELAY = 200L
         private const val LAYOUT_TRANSITION_MS = 200L
 
@@ -1504,6 +1516,13 @@ class BrowserTabFragment :
                     launch {
                         pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                         viewModel.onBookmarkAddRequested()
+                    }
+                }
+                onMenuItemClicked(view.addFavoritePopupMenuItem) {
+                    launch {
+                        //TODO: do we need a pixel here?
+                        //pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        viewModel.onAddFavoriteMenuClicked()
                     }
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {

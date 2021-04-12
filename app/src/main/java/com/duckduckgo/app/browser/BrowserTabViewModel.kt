@@ -41,6 +41,10 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.db.FavoriteEntity
+import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.model.Favorite
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
@@ -127,6 +131,7 @@ class BrowserTabViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val favoritesRepository: FavoritesRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geoLocationPermissions: GeoLocationPermissions,
@@ -255,6 +260,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
+        class ShowFavoriteAddedConfirmation(val favoriteId: Long, val title: String, val url: String) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
@@ -1303,6 +1309,20 @@ class BrowserTabViewModel(
         }
     }
 
+    suspend fun onAddFavoriteMenuClicked() {
+        val url = url ?: ""
+        val title = title ?: ""
+        val id = withContext(dispatchers.io()) {
+            if (url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, url)
+            }
+            favoritesRepository.insert(Favorite(title = title, url = url))
+        }
+        withContext(dispatchers.main()) {
+            command.value = ShowBookmarkAddedConfirmation(id, title, url)
+        }
+    }
+
     fun onFireproofWebsiteMenuClicked() {
         val domain = site?.domain ?: return
         viewModelScope.launch {
@@ -1852,6 +1872,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
     private val bookmarksDao: Provider<BookmarksDao>,
+    private val favoritesRepository: Provider<FavoritesRepository>,
     private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
     private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
     private val geoLocationPermissions: Provider<GeoLocationPermissions>,
@@ -1878,7 +1899,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get()) as T
                 else -> null
             }
         }

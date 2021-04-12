@@ -43,4 +43,7 @@ interface FavoritesDao {
 
     @Query("select CAST(COUNT(*) AS BIT) from favorites")
     suspend fun hasBookmarks(): Boolean
+
+    @Query("select position from favorites where id = ( select MAX(id) from favorites)")
+    suspend fun getLastPosition(): Int?
 }
