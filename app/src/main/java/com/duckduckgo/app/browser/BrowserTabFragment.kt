@@ -1088,7 +1088,7 @@ class BrowserTabFragment :
     }
 
     private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
-        Snackbar.make(browserLayout, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
+        Snackbar.make(browserLayout, R.string.bookmarkAddedMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
