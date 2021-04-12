@@ -1319,7 +1319,7 @@ class BrowserTabViewModel(
             favoritesRepository.insert(Favorite(title = title, url = url))
         }
         withContext(dispatchers.main()) {
-            command.value = ShowBookmarkAddedConfirmation(id, title, url)
+            command.value = ShowFavoriteAddedConfirmation(id, title, url)
         }
     }
 
