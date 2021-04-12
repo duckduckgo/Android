@@ -82,6 +82,11 @@
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/addBookmarkMenuTitle" />
 
+            <TextView
+                android:id="@+id/addFavoritePopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/addFavoriteMenuTitle" />
+
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
                 style="@style/BrowserCheckBoxMenuItem"

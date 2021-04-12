@@ -30,6 +30,7 @@ class BrowserStateModifier {
             canReportSite = true,
             canSharePage = true,
             canAddBookmarks = true,
+            canAddFavorite = true,
             addToHomeEnabled = true
         )
     }
@@ -43,6 +44,7 @@ class BrowserStateModifier {
             canReportSite = false,
             canSharePage = false,
             canAddBookmarks = false,
+            canAddFavorite = false,
             addToHomeEnabled = false,
             canGoBack = false
         )
