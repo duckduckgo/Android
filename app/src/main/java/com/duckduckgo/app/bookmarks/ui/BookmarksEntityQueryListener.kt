@@ -26,7 +26,7 @@ class BookmarksEntityQueryListener(
 
     override fun onQueryTextChange(newText: String): Boolean {
         if (bookmarks != null) {
-            adapter.bookmarks = filter(newText, bookmarks)
+            //adapter.bookmarks = filter(newText, bookmarks)
             adapter.notifyDataSetChanged()
         }
         return true

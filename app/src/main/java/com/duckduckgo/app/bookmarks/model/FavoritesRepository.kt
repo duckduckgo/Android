@@ -18,9 +18,12 @@ package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.tabs.model.TabEntity
+import kotlinx.coroutines.flow.Flow
 
 interface FavoritesRepository {
     suspend fun insert(favorite: Favorite): Long
+    suspend fun favorites(): Flow<List<FavoriteEntity>>
 }
 
 data class Favorite(
@@ -33,5 +36,9 @@ class FavoritesDataRepository (private val favoritesDao: FavoritesDao) : Favorit
     override suspend fun insert(favorite: Favorite): Long {
         val lastPosition = favoritesDao.getLastPosition() ?: 0
         return favoritesDao.insert(FavoriteEntity(title = favorite.title, url = favorite.url, position = lastPosition + 1))
+    }
+
+    override suspend fun favorites(): Flow<List<FavoriteEntity>> {
+        return favoritesDao.favorites()
     }
 }

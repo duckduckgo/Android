@@ -19,6 +19,9 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.db.FavoriteEntity
+import com.duckduckgo.app.bookmarks.model.Favorite
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -29,11 +32,14 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
 class BookmarksViewModel(
+    private val favoritesRepository: FavoritesRepository,
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
     private val dispatcherProvider: DispatcherProvider
@@ -41,16 +47,16 @@ class BookmarksViewModel(
 
     data class ViewState(
         val showBookmarks: Boolean = false,
+        val showFavorites: Boolean = false,
         val enableSearch: Boolean = false,
-        val bookmarks: List<BookmarkEntity> = emptyList()
+        val bookmarks: List<BookmarkEntity> = emptyList(),
+        val favorites: List<Favorite> = emptyList()
     )
 
     sealed class Command {
-
         class OpenBookmark(val bookmark: BookmarkEntity) : Command()
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
         class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
-
     }
 
     companion object {
@@ -66,6 +72,11 @@ class BookmarksViewModel(
     init {
         viewState.value = ViewState()
         bookmarks.observeForever(bookmarksObserver)
+        viewModelScope.launch {
+            favoritesRepository.favorites().collect {
+                onFavoritesChanged(it)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -84,6 +95,13 @@ class BookmarksViewModel(
             showBookmarks = bookmarks.isNotEmpty(),
             bookmarks = bookmarks,
             enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
+        )
+    }
+
+    private fun onFavoritesChanged(favorites: List<FavoriteEntity>) {
+        viewState.value = viewState.value?.copy(
+            showFavorites = favorites.isNotEmpty(),
+            favorites = favorites.map { Favorite(it.title, it.url) }
         )
     }
 
@@ -116,6 +134,7 @@ class BookmarksViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarksViewModelFactory @Inject constructor(
+    private val favoritesRepository: Provider<FavoritesRepository>,
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>
@@ -123,7 +142,7 @@ class BookmarksViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao.get(), faviconManager.get(), dispatcherProvider.get()) as T)
+                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(favoritesRepository.get(), dao.get(), faviconManager.get(), dispatcherProvider.get()) as T)
                 else -> null
             }
         }

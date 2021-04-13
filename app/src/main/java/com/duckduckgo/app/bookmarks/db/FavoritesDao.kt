@@ -18,7 +18,9 @@ package com.duckduckgo.app.bookmarks.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.duckduckgo.app.tabs.model.TabEntity
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoritesDao {
@@ -27,7 +29,7 @@ interface FavoritesDao {
     fun insert(favorite: FavoriteEntity): Long
 
     @Query("select * from favorites")
-    fun favorites(): LiveData<List<FavoriteEntity>>
+    fun favorites(): Flow<List<FavoriteEntity>>
 
     @Query("select count(*) from favorites WHERE url LIKE :url")
     fun favoritesCountByUrl(url: String): Int
