@@ -24,7 +24,7 @@ import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
@@ -51,7 +51,7 @@ class BookmarksAdapter(
         const val BOOKMARK_EMPTY_HINT_SIZE = 1
     }
 
-    var bookmarkItems: List<BookmarkEntity> = emptyList()
+    var bookmarkItems: List<SavedSite.Bookmark> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -137,7 +137,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val faviconManager: FaviconManager
     ) : BookmarkScreenViewHolders(itemView) {
 
-        fun update(bookmark: BookmarkEntity) {
+        fun update(bookmark: SavedSite.Bookmark) {
             itemView.overflowMenu.contentDescription = itemView.context.getString(
                 R.string.bookmarkOverflowContentDescription,
                 bookmark.title
@@ -167,7 +167,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(anchor: ImageView, bookmark: BookmarkEntity) {
+        private fun showOverFlowMenu(anchor: ImageView, bookmark: SavedSite.Bookmark) {
             val popupMenu = BookmarksPopupMenu(layoutInflater)
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -177,12 +177,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             popupMenu.show(itemView, anchor)
         }
 
-        private fun editBookmark(bookmark: BookmarkEntity) {
+        private fun editBookmark(bookmark: SavedSite.Bookmark) {
             Timber.i("Editing bookmark ${bookmark.title}")
             viewModel.onEditBookmarkRequested(bookmark)
         }
 
-        private fun deleteBookmark(bookmark: BookmarkEntity) {
+        private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
             Timber.i("Deleting bookmark ${bookmark.title}")
             viewModel.onDeleteRequested(bookmark)
         }

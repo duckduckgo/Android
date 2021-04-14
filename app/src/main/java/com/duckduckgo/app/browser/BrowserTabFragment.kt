@@ -58,6 +58,7 @@ import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
@@ -532,8 +533,8 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
-            is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
-            is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favoriteId, it.title, it.url)
+            is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmark)
+            is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favorite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
                 navigate(it.url, it.headers)
@@ -1088,20 +1089,20 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
+    private fun bookmarkAdded(bookmark: SavedSite.Bookmark) {
         Snackbar.make(browserLayout, R.string.bookmarkAddedMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
+                val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmark)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
             }
             .show()
     }
 
-    private fun favoriteAdded(favoriteId: Long, title: String, url: String) {
+    private fun favoriteAdded(favorite: SavedSite.Favorite) {
         Snackbar.make(browserLayout, R.string.favoriteAddedMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditBookmarkDialogFragment.instance(favoriteId, title, url)
+                val addBookmarkDialog = EditBookmarkDialogFragment.instance(favorite)
                 addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
             }

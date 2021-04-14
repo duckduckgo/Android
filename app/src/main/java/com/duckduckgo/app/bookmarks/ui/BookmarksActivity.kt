@@ -24,7 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
@@ -79,9 +79,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
             Observer {
                 when (it) {
-                    is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
-                    is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
-                    is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
+                    is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
+                    is BookmarksViewModel.Command.OpenSavedsite -> openBookmark(it.savedSite)
+                    is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                 }
             }
         )
@@ -100,32 +100,27 @@ class BookmarksActivity : DuckDuckGoActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
-        val dialog = EditBookmarkDialogFragment.instance(bookmark.id, bookmark.title, bookmark.url)
+    private fun showEditSavedSiteDialog(savedSite: SavedSite) {
+        val dialog = EditBookmarkDialogFragment.instance(savedSite)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
 
-    private fun openBookmark(bookmark: BookmarkEntity) {
-        startActivity(BrowserActivity.intent(this, bookmark.url))
+    private fun openBookmark(savedSite: SavedSite) {
+        startActivity(BrowserActivity.intent(this, savedSite.url))
         finish()
     }
 
-    private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmark.title).html(this)
-        viewModel.delete(bookmark)
+    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        viewModel.delete(savedSite)
         Snackbar.make(
             bookmarkRootView,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insert(bookmark)
+            viewModel.insert(savedSite)
         }.show()
-
-    }
-
-    private fun delete(bookmark: BookmarkEntity) {
-        viewModel.delete(bookmark)
     }
 
     override fun onDestroy() {

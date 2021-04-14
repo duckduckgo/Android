@@ -41,10 +41,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
-import com.duckduckgo.app.bookmarks.model.Favorite
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSite.UnsavedSite
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
@@ -259,8 +258,8 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
-        class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
-        class ShowFavoriteAddedConfirmation(val favoriteId: Long, val title: String, val url: String) : Command()
+        class ShowBookmarkAddedConfirmation(val bookmark: SavedSite.Bookmark) : Command()
+        class ShowFavoriteAddedConfirmation(val favorite: SavedSite.Favorite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
@@ -1296,31 +1295,37 @@ class BrowserTabViewModel(
     }
 
     suspend fun onBookmarkAddRequested() {
-        val url = url ?: ""
-        val title = title ?: ""
-        val id = withContext(dispatchers.io()) {
-            if (url.isNotBlank()) {
-                faviconManager.persistFavicon(tabId, url)
+        val unsavedSite = createSiteToSave()
+        val savedBookmark = withContext(dispatchers.io()) {
+            if (unsavedSite.url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, unsavedSite.url)
             }
-            bookmarksDao.insert(BookmarkEntity(title = title, url = url))
+            val bookmarkEntity = BookmarkEntity(title = unsavedSite.title, url = unsavedSite.url)
+            val id = bookmarksDao.insert(bookmarkEntity)
+            SavedSite.Bookmark(id, unsavedSite.title, unsavedSite.url)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowBookmarkAddedConfirmation(id, title, url)
+            command.value = ShowBookmarkAddedConfirmation(savedBookmark)
         }
     }
 
     suspend fun onAddFavoriteMenuClicked() {
-        val url = url ?: ""
-        val title = title ?: ""
-        val id = withContext(dispatchers.io()) {
-            if (url.isNotBlank()) {
-                faviconManager.persistFavicon(tabId, url)
+        val unsavedSite = createSiteToSave()
+        val savedFavorite = withContext(dispatchers.io()) {
+            if (unsavedSite.url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, unsavedSite.url)
             }
-            favoritesRepository.insert(Favorite(title = title, url = url))
+            favoritesRepository.insert(unsavedSite)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowFavoriteAddedConfirmation(id, title, url)
+            command.value = ShowFavoriteAddedConfirmation(savedFavorite)
         }
+    }
+
+    private fun createSiteToSave(): UnsavedSite {
+        val url = url ?: ""
+        val title = title ?: ""
+        return UnsavedSite(title, url)
     }
 
     fun onFireproofWebsiteMenuClicked() {
@@ -1382,15 +1387,31 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onBookmarkEdited(id: Long, title: String, url: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            editBookmark(id, title, url)
+    override fun onSavedSiteEdited(savedSite: SavedSite) {
+        when(savedSite) {
+            is SavedSite.Bookmark -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    editBookmark(savedSite)
+                }
+            }
+            is SavedSite.Favorite -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    editFavorite(savedSite)
+                }
+            }
+            is UnsavedSite -> throw IllegalArgumentException("Illegal SavedSite to edit received")
         }
     }
 
-    suspend fun editBookmark(id: Long, title: String, url: String) {
+    private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
-            bookmarksDao.update(BookmarkEntity(id, title, url))
+            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+        }
+    }
+
+    private suspend fun editFavorite(favorite: SavedSite.Favorite) {
+        withContext(dispatchers.io()) {
+            favoritesRepository.update(favorite)
         }
     }
 

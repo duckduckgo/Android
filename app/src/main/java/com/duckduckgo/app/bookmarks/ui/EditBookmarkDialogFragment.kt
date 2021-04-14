@@ -23,6 +23,7 @@ import android.view.WindowManager
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
@@ -31,7 +32,7 @@ import org.jetbrains.anko.find
 class EditBookmarkDialogFragment : DialogFragment() {
 
     interface EditBookmarkListener {
-        fun onBookmarkEdited(id: Long, title: String, url: String)
+        fun onSavedSiteEdited(savedSite: SavedSite)
     }
 
     var listener: EditBookmarkListener? = null
@@ -59,12 +60,18 @@ class EditBookmarkDialogFragment : DialogFragment() {
     }
 
     private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
-        listener?.onBookmarkEdited(
-            getExistingId(),
-            titleInput.text.toString(),
-            urlInput.text.toString()
-        )
-
+        when (val savedSite = getSavedSite()) {
+            is SavedSite.Bookmark -> {
+                listener?.onSavedSiteEdited(
+                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
+                )
+            }
+            is SavedSite.Favorite -> {
+                listener?.onSavedSiteEdited(
+                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
+                )
+            }
+        }
         titleInput.hideKeyboard()
     }
 
@@ -79,34 +86,28 @@ class EditBookmarkDialogFragment : DialogFragment() {
         urlInput.setText(getExistingUrl())
     }
 
-    private fun getExistingId(): Long = requireArguments().getLong(KEY_BOOKMARK_ID)
-    private fun getExistingTitle(): String? = requireArguments().getString(KEY_PREEXISTING_TITLE)
-    private fun getExistingUrl(): String? = requireArguments().getString(KEY_PREEXISTING_URL)
+    private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
+    private fun getExistingId(): Long = getSavedSite().id
+    private fun getExistingTitle(): String = getSavedSite().title
+    private fun getExistingUrl(): String = getSavedSite().url
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
         val args = requireArguments()
-        if (!args.containsKey(KEY_PREEXISTING_TITLE) ||
-            !args.containsKey(KEY_PREEXISTING_URL)
-        ) {
+        if (!args.containsKey(KEY_SAVED_SITE)) {
             throw IllegalArgumentException("Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
     }
 
     companion object {
-        private const val KEY_BOOKMARK_ID = "KEY_BOOKMARK_ID"
-        private const val KEY_PREEXISTING_TITLE = "KEY_PREEXISTING_TITLE"
-        private const val KEY_PREEXISTING_URL = "KEY_PREEXISTING_URL"
+        private const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(bookmarkId: Long, title: String?, url: String?): EditBookmarkDialogFragment {
+        fun instance(savedSite: SavedSite): EditBookmarkDialogFragment {
 
             val dialog = EditBookmarkDialogFragment()
             val bundle = Bundle()
 
-            bundle.putLong(KEY_BOOKMARK_ID, bookmarkId)
-            bundle.putString(KEY_PREEXISTING_TITLE, title)
-            bundle.putString(KEY_PREEXISTING_URL, url)
-
+            bundle.putSerializable(KEY_SAVED_SITE, savedSite)
             dialog.arguments = bundle
             return dialog
         }

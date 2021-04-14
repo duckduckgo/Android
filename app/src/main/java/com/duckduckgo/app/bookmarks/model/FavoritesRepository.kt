@@ -18,27 +18,66 @@ package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
-import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
+import java.io.Serializable
 
 interface FavoritesRepository {
-    suspend fun insert(favorite: Favorite): Long
-    suspend fun favorites(): Flow<List<FavoriteEntity>>
+    suspend fun insert(unsavedSite: SavedSite.UnsavedSite): SavedSite.Favorite
+    suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite
+    suspend fun update(favorite: SavedSite.Favorite)
+    suspend fun favorites(): Flow<List<SavedSite.Favorite>>
+    suspend fun delete(favorite: SavedSite.Favorite)
 }
 
-data class Favorite(
-    var title: String,
-    var url: String
-)
+sealed class SavedSite(open val id: Long,
+                       open val title: String,
+                       open val url: String) : Serializable {
+    data class Favorite(
+        override val id: Long,
+        override val title: String,
+        override val url: String,
+        val position: Int
+    ) : SavedSite(id, title, url)
 
-class FavoritesDataRepository (private val favoritesDao: FavoritesDao) : FavoritesRepository {
+    data class Bookmark(
+        override val id: Long,
+        override val title: String,
+        override val url: String
+    ) : SavedSite(id, title, url)
 
-    override suspend fun insert(favorite: Favorite): Long {
+    data class UnsavedSite(
+        override val title: String,
+        override val url: String): SavedSite(0, title, url)
+}
+
+
+class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
+
+    override suspend fun insert(favorite: SavedSite.UnsavedSite): SavedSite.Favorite {
         val lastPosition = favoritesDao.getLastPosition() ?: 0
-        return favoritesDao.insert(FavoriteEntity(title = favorite.title, url = favorite.url, position = lastPosition + 1))
+        val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = lastPosition + 1)
+        val id = favoritesDao.insert(favoriteEntity)
+        return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
     }
 
-    override suspend fun favorites(): Flow<List<FavoriteEntity>> {
-        return favoritesDao.favorites()
+    override suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite {
+        val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = favorite.position)
+        val id = favoritesDao.insert(favoriteEntity)
+        return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
+    }
+
+    override suspend fun update(favorite: SavedSite.Favorite) {
+        favoritesDao.update(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
+    }
+
+    override suspend fun favorites(): Flow<List<SavedSite.Favorite>> {
+        return favoritesDao.favorites().map { favorites -> favorites.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) } }
+    }
+
+    override suspend fun delete(favorite: SavedSite.Favorite) {
+        favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 }
