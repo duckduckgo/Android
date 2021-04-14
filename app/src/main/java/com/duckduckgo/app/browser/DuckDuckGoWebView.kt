@@ -105,7 +105,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 if (canSwipeToRefresh && scrollY == 0 && lastClampedTopY && nestedOffsetY == 0) {
                     // we are on a new gesture, have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled)
-                    enableSwipeRefresh(true)
+                    //enableSwipeRefresh(true)
                 }
 
                 lastDeltaY = deltaY
