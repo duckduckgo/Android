@@ -212,6 +212,7 @@
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
+    <string name="bookmarksSectionTitle">Bookmarks</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>

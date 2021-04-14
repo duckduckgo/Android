@@ -30,9 +30,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.Favorite
 import com.duckduckgo.app.browser.BrowserActivity
@@ -51,6 +50,7 @@ import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
+import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,7 +60,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    lateinit var adapter: BookmarksAdapter
+    lateinit var bookmarksAdapter: BookmarksAdapter
+    lateinit var favoritesAdapter: FavoritesAdapter
     private var deleteDialog: AlertDialog? = null
 
     private val viewModel: BookmarksViewModel by bindViewModel()
@@ -74,8 +75,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun setupBookmarksRecycler() {
-        adapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
-        recycler.adapter = adapter
+        bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
+        favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager)
+        recycler.adapter = ConcatAdapter(favoritesAdapter, bookmarksAdapter)
     }
 
     private fun observeViewModel() {
@@ -84,7 +86,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
             Observer { viewState ->
                 viewState?.let {
                     if (it.showBookmarks) showBookmarks() else hideBookmarks()
-                    adapter.bookmarkItems = it.favorites.map { BookmarksAdapter.BookmarkItems.Favorite(it) } + it.bookmarks.map { BookmarksAdapter.BookmarkItems.Bookmark(it) }
+                    favoritesAdapter.bookmarkItems = it.favorites.map { FavoritesAdapter.Favorite(it) }
+                    bookmarksAdapter.bookmarkItems = it.bookmarks
                     invalidateOptionsMenu()
                 }
             }
@@ -106,7 +109,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         menuInflater.inflate(bookmark_activity_menu, menu)
         val searchItem = menu?.findItem(action_search)
         val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
+        //searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -175,19 +178,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
     ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
         companion object {
-            const val FAVORITE_SECTION_TITLE_TYPE = 0
-            const val BOOKMARK_SECTION_TITLE_TYPE = 1
-            const val EMPTY_STATE_TYPE = 2
-            const val BOOKMARK_TYPE = 3
-            const val FAVORITE_TYPE = 4
+            const val BOOKMARK_SECTION_TITLE_TYPE = 0
+            const val EMPTY_STATE_TYPE = 1
+            const val BOOKMARK_TYPE = 2
+
+            const val BOOKMARK_SECTION_TITLE_SIZE = 1
         }
 
-        sealed class BookmarkItems {
-            data class Bookmark(val bookmark: BookmarkEntity): BookmarkItems()
-            data class Favorite(val favorite: com.duckduckgo.app.bookmarks.model.Favorite): BookmarkItems()
-        }
-
-        var bookmarkItems: List<BookmarkItems> = emptyList()
+        var bookmarkItems: List<BookmarkEntity> = emptyList()
             set(value) {
                 field = value
                 notifyDataSetChanged()
@@ -200,38 +198,49 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
                     return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
                 }
-                FAVORITE_TYPE -> {
-                    val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
-                    return BookmarkScreenViewHolders.FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
+                BOOKMARK_SECTION_TITLE_TYPE -> {
+                    val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
+                    return BookmarkScreenViewHolders.SectionTitle(view)
                 }
                 else -> throw IllegalArgumentException("viewType not found")
             }
         }
 
         override fun getItemCount(): Int {
-            return bookmarkItems.size
+            return headerItemsSize() + bookmarkItems.size
         }
 
         override fun onBindViewHolder(holder: BookmarkScreenViewHolders, position: Int) {
             when (holder) {
                 is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                    holder.update((bookmarkItems[position] as BookmarkItems.Bookmark).bookmark)
+                    holder.update(bookmarkItems[position - headerItemsSize()])
                 }
-                is BookmarkScreenViewHolders.FavoriteViewHolder -> {
-                    holder.update((bookmarkItems[position] as BookmarkItems.Favorite).favorite)
+                is BookmarkScreenViewHolders.SectionTitle -> {
+                    holder.bind()
                 }
             }
         }
 
         override fun getItemViewType(position: Int): Int {
-            return when(bookmarkItems.get(position)){
-                is BookmarkItems.Bookmark -> BOOKMARK_TYPE
-                is BookmarkItems.Favorite -> FAVORITE_TYPE
+            return if (position == 0 ) {
+                BOOKMARK_SECTION_TITLE_TYPE
+            } else {
+                BOOKMARK_TYPE
             }
+        }
+
+        private fun headerItemsSize(): Int {
+            return BOOKMARK_SECTION_TITLE_SIZE
         }
     }
 
     sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        class SectionTitle(itemView: View) : BookmarkScreenViewHolders(itemView) {
+            fun bind() {
+                itemView.locationPermissionsSectionTitle.setText(R.string.bookmarksSectionTitle)
+            }
+        }
 
         class BookmarksViewHolder(
             private val layoutInflater: LayoutInflater,
@@ -295,68 +304,100 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 viewModel.onDeleteRequested(bookmark)
             }
         }
+    }
 
-        class FavoriteViewHolder(
-            private val layoutInflater: LayoutInflater,
-            itemView: View,
-            private val viewModel: BookmarksViewModel,
-            private val lifecycleOwner: LifecycleOwner,
-            private val faviconManager: FaviconManager
-        ) : BookmarkScreenViewHolders(itemView) {
+    class FavoritesAdapter(
+        private val layoutInflater: LayoutInflater,
+        private val viewModel: BookmarksViewModel,
+        private val lifecycleOwner: LifecycleOwner,
+        private val faviconManager: FaviconManager
+    ) : RecyclerView.Adapter<FavoriteViewHolder>() {
 
-            lateinit var favorite: Favorite
+        companion object {
+            const val FAVORITE_SECTION_TITLE_TYPE = 0
+            const val BOOKMARK_SECTION_TITLE_TYPE = 1
+            const val EMPTY_STATE_TYPE = 2
+            const val BOOKMARK_TYPE = 3
+            const val FAVORITE_TYPE = 4
+        }
 
-            fun update(favorite: Favorite) {
-                this.favorite = favorite
+        data class Favorite(val favorite: com.duckduckgo.app.bookmarks.model.Favorite)
 
-                itemView.overflowMenu.contentDescription = itemView.context.getString(
-                    R.string.bookmarkOverflowContentDescription,
-                    favorite.title
-                )
+        var bookmarkItems: List<Favorite> = emptyList()
+            set(value) {
+                field = value
+                notifyDataSetChanged()
+            }
 
-                itemView.title.text = favorite.title
-                itemView.url.text = parseDisplayUrl(favorite.url)
-                loadFavicon(favorite.url)
-
-                itemView.overflowMenu.setOnClickListener {
-                    showOverFlowMenu(itemView.overflowMenu, favorite)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            return when (viewType) {
+                FAVORITE_TYPE -> {
+                    val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
+                    return FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
                 }
+                else -> throw IllegalArgumentException("viewType not found")
+            }
+        }
 
-                itemView.setOnClickListener {
-                    //viewModel.onSelected(favorite)
+        override fun getItemCount(): Int {
+            return bookmarkItems.size
+        }
+
+        override fun onBindViewHolder(holder: FavoriteViewHolder, position: Int) {
+            when (holder) {
+                is FavoriteViewHolder -> {
+                    holder.update(bookmarkItems[position].favorite)
                 }
             }
+        }
 
-            private fun loadFavicon(url: String) {
-                lifecycleOwner.lifecycleScope.launch {
-                    faviconManager.loadToViewFromPersisted(url, itemView.favicon)
-                }
+        override fun getItemViewType(position: Int): Int {
+            return FAVORITE_TYPE
+        }
+    }
+
+
+    class FavoriteViewHolder(
+        private val layoutInflater: LayoutInflater,
+        itemView: View,
+        private val viewModel: BookmarksViewModel,
+        private val lifecycleOwner: LifecycleOwner,
+        private val faviconManager: FaviconManager
+    ) : RecyclerView.ViewHolder(itemView) {
+
+        lateinit var favorite: Favorite
+
+        fun update(favorite: Favorite) {
+            this.favorite = favorite
+
+            itemView.overflowMenu.contentDescription = itemView.context.getString(
+                R.string.bookmarkOverflowContentDescription,
+                favorite.title
+            )
+
+            itemView.title.text = favorite.title
+            itemView.url.text = parseDisplayUrl(favorite.url)
+            loadFavicon(favorite.url)
+
+            itemView.overflowMenu.setOnClickListener {
+                //showOverFlowMenu(itemView.overflowMenu, favorite)
             }
 
-            private fun parseDisplayUrl(urlString: String): String {
-                val uri = Uri.parse(urlString)
-                return uri.baseHost ?: return urlString
+            itemView.setOnClickListener {
+                //viewModel.onSelected(favorite)
             }
+        }
 
-            private fun showOverFlowMenu(anchor: ImageView, favorite: Favorite) {
-                val popupMenu = BookmarksPopupMenu(layoutInflater)
-                val view = popupMenu.contentView
-                popupMenu.apply {
-                    onMenuItemClicked(view.editBookmark) { editBookmark(favorite) }
-                    onMenuItemClicked(view.deleteBookmark) { deleteBookmark(favorite) }
-                }
-                popupMenu.show(itemView, anchor)
+        private fun loadFavicon(url: String) {
+            lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromPersisted(url, itemView.favicon)
             }
+        }
 
-            private fun editBookmark(favorite: Favorite) {
-                Timber.i("Editing favorite ${favorite.title}")
-                //viewModel.onEditBookmarkRequested(favorite)
-            }
-
-            private fun deleteBookmark(favorite: Favorite) {
-                Timber.i("Deleting favorite ${favorite.title}")
-                //viewModel.onDeleteRequested(favorite)
-            }
+        private fun parseDisplayUrl(urlString: String): String {
+            val uri = Uri.parse(urlString)
+            return uri.baseHost ?: return urlString
         }
     }
 }
