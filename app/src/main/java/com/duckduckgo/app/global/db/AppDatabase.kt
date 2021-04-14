@@ -401,7 +401,7 @@ class MigrationsProvider(
         }
     }
 
-    val MIGRATION_31_TO_32: Migration = object : Migration(30, 31) {
+    val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `favorites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `position` INTEGER NOT NULL)")
         }
