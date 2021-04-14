@@ -50,6 +50,7 @@ import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_empty_hint.view.*
 import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -85,7 +86,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
             Observer { viewState ->
                 viewState?.let {
-                    if (it.showBookmarks) showBookmarks() else hideBookmarks()
                     favoritesAdapter.bookmarkItems = it.favorites.map { FavoritesAdapter.Favorite(it) }
                     bookmarksAdapter.bookmarkItems = it.bookmarks
                     invalidateOptionsMenu()
@@ -122,16 +122,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val dialog = EditBookmarkDialogFragment.instance(bookmark.id, bookmark.title, bookmark.url)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
-    }
-
-    private fun showBookmarks() {
-        recycler.show()
-        emptyBookmarks.gone()
-    }
-
-    private fun hideBookmarks() {
-        recycler.gone()
-        emptyBookmarks.show()
     }
 
     private fun openBookmark(bookmark: BookmarkEntity) {
@@ -183,6 +173,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             const val BOOKMARK_TYPE = 2
 
             const val BOOKMARK_SECTION_TITLE_SIZE = 1
+            const val BOOKMARK_EMPTY_HINT_SIZE = 1
         }
 
         var bookmarkItems: List<BookmarkEntity> = emptyList()
@@ -202,12 +193,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
                     return BookmarkScreenViewHolders.SectionTitle(view)
                 }
+                EMPTY_STATE_TYPE -> {
+                    val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
+                    BookmarkScreenViewHolders.EmptyHint(view)
+                }
                 else -> throw IllegalArgumentException("viewType not found")
             }
         }
 
         override fun getItemCount(): Int {
-            return headerItemsSize() + bookmarkItems.size
+            return headerItemsSize() + listSize()
         }
 
         override fun onBindViewHolder(holder: BookmarkScreenViewHolders, position: Int) {
@@ -218,20 +213,32 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarkScreenViewHolders.SectionTitle -> {
                     holder.bind()
                 }
+                is BookmarkScreenViewHolders.EmptyHint -> {
+                    holder.bind()
+                }
             }
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position == 0 ) {
-                BOOKMARK_SECTION_TITLE_TYPE
-            } else {
-                BOOKMARK_TYPE
+            return when {
+                position == 0 -> {
+                    BOOKMARK_SECTION_TITLE_TYPE
+                }
+                bookmarkItems.isEmpty() -> {
+                    EMPTY_STATE_TYPE
+                }
+                else -> {
+                    BOOKMARK_TYPE
+                }
             }
         }
 
         private fun headerItemsSize(): Int {
             return BOOKMARK_SECTION_TITLE_SIZE
         }
+
+        private fun listSize() = if (bookmarkItems.isEmpty()) BOOKMARK_EMPTY_HINT_SIZE else bookmarkItems.size
+
     }
 
     sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -239,6 +246,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
         class SectionTitle(itemView: View) : BookmarkScreenViewHolders(itemView) {
             fun bind() {
                 itemView.locationPermissionsSectionTitle.setText(R.string.bookmarksSectionTitle)
+            }
+        }
+
+        class EmptyHint(itemView: View) : BookmarkScreenViewHolders(itemView) {
+            fun bind() {
+                itemView.fireproofWebsiteEmptyHint.setText(R.string.bookmarksEmptyHint)
             }
         }
 

@@ -213,6 +213,7 @@
     <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
     <string name="bookmarksSectionTitle">Bookmarks</string>
+    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
