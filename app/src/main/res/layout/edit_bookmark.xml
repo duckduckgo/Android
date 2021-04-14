@@ -35,7 +35,7 @@
             android:id="@+id/titleInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bookmarkTitleHint"
+            android:hint="@string/bookmarkDialogTitleHint"
             android:inputType="text|textCapWords" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -53,7 +53,7 @@
             android:id="@+id/urlInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bookmarkUrlHint"
+            android:hint="@string/bookmarkDialogUrlHint"
             android:inputType="textUri" />
 
     </com.google.android.material.textfield.TextInputLayout>
