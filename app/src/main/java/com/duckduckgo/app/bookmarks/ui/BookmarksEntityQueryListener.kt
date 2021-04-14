@@ -21,7 +21,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 
 class BookmarksEntityQueryListener(
     val bookmarks: List<BookmarkEntity>?,
-    val adapter: BookmarksActivity.BookmarksAdapter
+    val adapter: BookmarksAdapter
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {

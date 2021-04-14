@@ -115,6 +115,18 @@ class BookmarksViewModel(
         command.value = ShowEditBookmark(bookmark)
     }
 
+    fun onSelected(favorite: Favorite) {
+        //command.value = OpenBookmark(favorite)
+    }
+
+    fun onDeleteRequested(favorite: Favorite) {
+        //command.value = ConfirmDeleteBookmark(favorite)
+    }
+
+    fun onEditFavoriteRequested(favorite: Favorite) {
+        //command.value = ShowEditBookmark(favorite)
+    }
+
     fun delete(bookmark: BookmarkEntity) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             faviconManager.deletePersistedFavicon(bookmark.url)
