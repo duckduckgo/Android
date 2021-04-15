@@ -1388,7 +1388,7 @@ class BrowserTabViewModel(
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when(savedSite) {
+        when (savedSite) {
             is SavedSite.Bookmark -> {
                 viewModelScope.launch(dispatchers.io()) {
                     editBookmark(savedSite)

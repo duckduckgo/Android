@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.tabs.model.TabEntity
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 

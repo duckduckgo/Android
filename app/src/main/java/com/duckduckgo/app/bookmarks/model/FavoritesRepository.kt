@@ -19,8 +19,6 @@ package com.duckduckgo.app.bookmarks.model
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMap
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
 
@@ -32,9 +30,11 @@ interface FavoritesRepository {
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
-sealed class SavedSite(open val id: Long,
-                       open val title: String,
-                       open val url: String) : Serializable {
+sealed class SavedSite(
+    open val id: Long,
+    open val title: String,
+    open val url: String
+) : Serializable {
     data class Favorite(
         override val id: Long,
         override val title: String,
@@ -50,9 +50,9 @@ sealed class SavedSite(open val id: Long,
 
     data class UnsavedSite(
         override val title: String,
-        override val url: String): SavedSite(0, title, url)
+        override val url: String
+    ) : SavedSite(0, title, url)
 }
-
 
 class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
 

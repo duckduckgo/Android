@@ -1521,8 +1521,8 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
                     launch {
-                        //TODO: do we need a pixel here?
-                        //pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        // TODO: do we need a pixel here?
+                        // pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                         viewModel.onAddFavoriteMenuClicked()
                     }
                 }
