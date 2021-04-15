@@ -47,9 +47,9 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/blockFacebookDomains"
+        android:id="@+id/useFullBlockList"
         android:checkable="true"
-        android:title="Block Facebook domains"
+        android:title="Use full blocklist"
         app:actionViewClass="android.widget.CheckBox"
         app:showAsAction="never" />
 

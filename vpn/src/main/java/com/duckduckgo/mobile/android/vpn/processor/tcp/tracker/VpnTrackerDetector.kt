@@ -21,6 +21,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
@@ -55,15 +56,13 @@ class DomainBasedTrackerDetector(
 
         tcb.trackerTypeDetermined = true
 
-        trackerListProvider.trackerList().forEach { tracker ->
-            if (hostname.endsWith(tracker.hostname)) {
-                tcb.isTracker = true
-                tcb.trackerHostName = tracker.hostname
-                Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
-                insertTracker(tracker)
-                deviceShieldPixels.trackerBlocked()
-                return Tracker(tracker.hostname)
-            }
+        trackerListProvider.findTracker(hostname)?.let { tracker ->
+            tcb.isTracker = true
+            tcb.trackerHostName = tracker.hostname
+            Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
+            insertTracker(tracker)
+            deviceShieldPixels.trackerBlocked()
+            return Tracker(tracker.hostname)
         }
 
         tcb.isTracker = false
@@ -72,10 +71,11 @@ class DomainBasedTrackerDetector(
         return RequestTrackerType.NotTracker(hostname)
     }
 
-    private fun insertTracker(tracker: TrackerListProvider.Tracker) {
-        val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId }
-            ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
-        val vpnTracker = VpnTracker(trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname)
+    private fun insertTracker(tracker: AppTracker) {
+        val vpnTracker = VpnTracker(
+            trackerCompanyId = tracker.trackerCompanyId,
+            company = tracker.owner.displayName,
+            domain = tracker.hostname)
         Timber.i("Inserting $vpnTracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }

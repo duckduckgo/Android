@@ -125,6 +125,8 @@ dependencies {
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
+    implementation Square.retrofit2.converter.moshi
+
     // Testing dependencies
     testImplementation Testing.mockito.kotlin
     testImplementation "junit:junit:_"

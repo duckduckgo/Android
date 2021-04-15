@@ -31,7 +31,7 @@ import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -215,7 +215,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
+    private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTracker>) {
         if (trackersBlocked.isNotEmpty()) {
             val deviceShieldNotification = deviceShieldNotificationFactory.createTrackersCountDeviceShieldNotification(trackersBlocked)
             val notification = DeviceShieldEnabledNotificationBuilder

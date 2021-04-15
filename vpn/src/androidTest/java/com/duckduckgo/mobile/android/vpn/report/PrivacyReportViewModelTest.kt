@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerCompanyDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -31,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nhaarman.mockitokotlin2.mock
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -55,9 +55,9 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private lateinit var vpnTrackerCompanyDao: VpnTrackerCompanyDao
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val trackerListProvider : TrackerListProvider = mock()
 
     private lateinit var testee: PrivacyReportViewModel
 
@@ -71,7 +71,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, vpnPreferences, context)
+        testee = PrivacyReportViewModel(repository, vpnPreferences, context, trackerListProvider)
     }
 
     private fun prepareDb() {
@@ -80,14 +80,6 @@ class PrivacyReportViewModelTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        vpnTrackerCompanyDao = db.vpnTrackerCompanyDao()
-        prepopulateTrackerCompanies()
-    }
-
-    private fun prepopulateTrackerCompanies() {
-        for (trackerGroupCompany in TrackerListProvider.TRACKER_GROUP_COMPANIES) {
-            vpnTrackerCompanyDao.insert(trackerGroupCompany)
-        }
     }
 
     @After
@@ -108,7 +100,6 @@ class PrivacyReportViewModelTest {
             val companiesBlockedObserved = it.companiesBlocked
             assertEquals(3, trackersBlockedObserved)
             assertEquals(1, totalCompaniesObserved)
-            assertEquals(TrackerListProvider.UNDEFINED_TRACKER_COMPANY.company, companiesBlockedObserved[0].companyName)
         }
 
     }
@@ -133,10 +124,10 @@ class PrivacyReportViewModelTest {
 
     private fun trackerFound(
         domain: String = "example.com",
-        trackerCompanyId: Int = TrackerListProvider.UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
+        trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "")
         vpnTrackerDao.insert(tracker)
     }
 

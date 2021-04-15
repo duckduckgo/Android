@@ -34,10 +34,10 @@ class VpnPreferences(private val applicationContext: Context) {
         prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
     }
 
-    fun getBlockFacebookDomainsPreference(): Boolean = prefs().getBoolean(PREFS_KEY_BLOCK_FACEBOOK_DOMAINS, true)
+    fun getUseFullBlockListPreference(): Boolean = prefs().getBoolean(PREFS_KEY_USE_FULL_BLOCK_LIST, true)
 
-    fun blockFacebookDomains(enabled: Boolean) {
-        prefs().edit { putBoolean(PREFS_KEY_BLOCK_FACEBOOK_DOMAINS, enabled) }
+    fun useFullBlockList(useFullList: Boolean) {
+        prefs().edit { putBoolean(PREFS_KEY_USE_FULL_BLOCK_LIST, useFullList) }
     }
 
     fun isCustomDnsServerSet(): Boolean = prefs().getBoolean(PREFS_KEY_DNS_SERVER, false)
@@ -52,7 +52,7 @@ class VpnPreferences(private val applicationContext: Context) {
         const val PREFS_FILENAME = "VpnDummySettings"
 
         private const val PREFS_KEY_DEBUG_LOGGING = "PREFS_KEY_DEBUG_LOGGING"
-        private const val PREFS_KEY_BLOCK_FACEBOOK_DOMAINS = "PREFS_KEY_BLOCK_FACEBOOK_DOMAINS"
+        private const val PREFS_KEY_USE_FULL_BLOCK_LIST = "PREFS_KEY_USE_FULL_BLOCK_LIST"
         private const val PREFS_KEY_DNS_SERVER = "PREFS_KEY_DNS_SERVER"
         const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"
     }

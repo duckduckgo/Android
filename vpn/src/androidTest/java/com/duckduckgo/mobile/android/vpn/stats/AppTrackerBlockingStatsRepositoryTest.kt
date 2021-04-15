@@ -21,9 +21,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider.Companion.UNDEFINED_TRACKER_COMPANY
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -48,7 +45,6 @@ class AppTrackerBlockingStatsRepositoryTest {
     private lateinit var db: VpnDatabase
     private lateinit var vpnRunningStatsDao: VpnRunningStatsDao
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private lateinit var vpnTrackerCompanyDao: VpnTrackerCompanyDao
     private lateinit var vpnPhoenixDao: VpnPhoenixDao
     private lateinit var repository: AppTrackerBlockingStatsRepository
 
@@ -60,11 +56,8 @@ class AppTrackerBlockingStatsRepositoryTest {
             .build()
         vpnRunningStatsDao = db.vpnRunningStatsDao()
         vpnTrackerDao = db.vpnTrackerDao()
-        vpnTrackerCompanyDao = db.vpnTrackerCompanyDao()
         vpnPhoenixDao = db.vpnPhoenixDao()
         repository = AppTrackerBlockingStatsRepository(db)
-
-        vpnTrackerCompanyDao.insert(VpnTrackerCompany(UNDEFINED_TRACKER_COMPANY.trackerCompanyId, UNDEFINED_TRACKER_COMPANY.company))
     }
 
     @After
@@ -162,14 +155,14 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     private fun trackerFound(
         domain: String = "example.com",
-        trackerCompanyId: Int = UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
+        trackerCompanyId: Int = -1,
         timestamp: String = bucketByHour()
     ) {
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "")
         vpnTrackerDao.insert(tracker)
     }
 
-    private fun assertNoTrackers(vpnTrackers: List<VpnTrackerAndCompany>?) {
+    private fun assertNoTrackers(vpnTrackers: List<VpnTracker>?) {
         assertNotNull(vpnTrackers)
         assertTrue(vpnTrackers!!.isEmpty())
     }
@@ -180,14 +173,14 @@ class AppTrackerBlockingStatsRepositoryTest {
         return bucketByHour(yesterday)
     }
 
-    private fun assertTrackerFound(vpnTrackers: List<VpnTrackerAndCompany>?, trackerDomain: String) {
+    private fun assertTrackerFound(vpnTrackers: List<VpnTracker>?, trackerDomain: String) {
         assertFalse(vpnTrackers.isNullOrEmpty())
         assertTrue(isTrackerInList(vpnTrackers, trackerDomain))
     }
 
-    private fun isTrackerInList(vpnTrackers: List<VpnTrackerAndCompany>?, trackerDomain: String): Boolean {
+    private fun isTrackerInList(vpnTrackers: List<VpnTracker>?, trackerDomain: String): Boolean {
         vpnTrackers!!.forEach {
-            if (it.tracker.domain == trackerDomain) {
+            if (it.domain == trackerDomain) {
                 return true
             }
         }

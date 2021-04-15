@@ -18,10 +18,11 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.content.Context
 import androidx.lifecycle.*
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -32,7 +33,8 @@ import kotlinx.coroutines.launch
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnPreferences: VpnPreferences,
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val trackerListProvider: TrackerListProvider
 ) : ViewModel(), LifecycleObserver {
 
     private var vpnUpdateJob: Job? = null
@@ -60,7 +62,7 @@ class PrivacyReportViewModel(
     fun getReport(): LiveData<PrivacyReportView.State.TrackersBlocked> {
         return repository.getVpnTrackers({ dateOfLastWeek() }).map { trackers ->
             val trackerCompanies: MutableList<PrivacyReportView.CompanyTrackers> = mutableListOf()
-            val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+            val perCompany = trackers.groupBy { it.trackerCompanyId }
             val totalCompanies = perCompany.size
             perCompany.values.forEach {
                 trackerCompanies.add(PrivacyReportView.CompanyTrackers.group(it))
@@ -70,21 +72,21 @@ class PrivacyReportViewModel(
     }
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
-    fun getBlockFacebookDomainsPreference(): Boolean = vpnPreferences.getBlockFacebookDomainsPreference()
+    fun getUseFullBlockListPreference(): Boolean = vpnPreferences.getUseFullBlockListPreference().also { trackerListProvider.setUseFullTrackerList(it) }
     fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
     fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
     fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
-    fun blockFacebookDomains(enabled: Boolean) = vpnPreferences.blockFacebookDomains(enabled)
+    fun useFullBlockList(useFullBLocklist: Boolean) = vpnPreferences.useFullBlockList(useFullBLocklist).also { trackerListProvider.setUseFullTrackerList(useFullBLocklist) }
 
     object PrivacyReportView {
         sealed class State {
             data class TrackersBlocked(val totalCompanies: Int, val totalTrackers: Int, val companiesBlocked: List<CompanyTrackers>) : State()
         }
-        data class CompanyTrackers(val companyName: String, val totalTrackers: Int, val lastTracker: VpnTrackerAndCompany) {
+        data class CompanyTrackers(val companyName: String, val totalTrackers: Int, val lastTracker: VpnTracker) {
             companion object {
-                fun group(trackers: List<VpnTrackerAndCompany>): CompanyTrackers {
+                fun group(trackers: List<VpnTracker>): CompanyTrackers {
                     val lastTracker = trackers.first()
-                    return CompanyTrackers(lastTracker.trackerCompany.company, trackers.size, lastTracker)
+                    return CompanyTrackers(lastTracker.company, trackers.size, lastTracker)
                 }
             }
         }

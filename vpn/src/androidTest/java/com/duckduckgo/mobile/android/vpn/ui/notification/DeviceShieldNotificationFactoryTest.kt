@@ -20,11 +20,8 @@ import android.graphics.Typeface
 import android.text.style.StyleSpan
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerCompanyDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -39,7 +36,6 @@ class DeviceShieldNotificationFactoryTest {
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private lateinit var vpnTrackerCompanyDao: VpnTrackerCompanyDao
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     private lateinit var factory: DeviceShieldNotificationFactory
@@ -51,15 +47,8 @@ class DeviceShieldNotificationFactoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        vpnTrackerCompanyDao = db.vpnTrackerCompanyDao()
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
 
-        vpnTrackerCompanyDao.insert(
-            VpnTrackerCompany(
-                TrackerListProvider.UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
-                TrackerListProvider.UNDEFINED_TRACKER_COMPANY.company
-            )
-        )
         factory = DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
     }
 
@@ -363,22 +352,20 @@ class DeviceShieldNotificationFactoryTest {
 
     private fun trackerFound(
         domain: String = "example.com",
-        trackerCompanyId: Int = TrackerListProvider.UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
+        trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC")
         vpnTrackerDao.insert(tracker)
     }
 
     private fun aTrackerAndCompany(
         domain: String = "example.com",
-        trackerCompanyName: String = TrackerListProvider.UNDEFINED_TRACKER_COMPANY.company,
-        trackerCompanyId: Int = TrackerListProvider.UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
+        trackerCompanyName: String = "Tracking LLC",
+        trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
-    ): VpnTrackerAndCompany {
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp)
-        val trackerCompany = VpnTrackerCompany(trackerCompanyId = trackerCompanyId, company = trackerCompanyName)
-        return VpnTrackerAndCompany(tracker, trackerCompany)
+    ): VpnTracker {
+        return VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = trackerCompanyName)
     }
 
 }

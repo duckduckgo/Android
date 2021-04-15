@@ -39,6 +39,8 @@ dependencies {
 
     implementation JakeWharton.timber
 
+    implementation Square.retrofit2.converter.moshi
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2

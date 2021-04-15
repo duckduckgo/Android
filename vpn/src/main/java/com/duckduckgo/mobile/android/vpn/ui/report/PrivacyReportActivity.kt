@@ -41,7 +41,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.VpnViewModelFactory
@@ -60,9 +59,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     @Inject
     lateinit var viewModelFactory: VpnViewModelFactory
-
-    @Inject
-    lateinit var trackerListProvider: TrackerListProvider
 
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
@@ -128,9 +124,8 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             it.isChecked = viewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
-        menu.findItem(R.id.blockFacebookDomains)?.let {
-            it.isChecked = viewModel.getBlockFacebookDomainsPreference()
-            trackerListProvider.setIncludeFacebookDomains(it.isChecked)
+        menu.findItem(R.id.useFullBlockList)?.let {
+            it.isChecked = viewModel.getUseFullBlockListPreference()
         }
         return true
     }
@@ -157,10 +152,9 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
                 viewModel.useCustomDnsServer(enabled)
                 true
             }
-            R.id.blockFacebookDomains -> {
+            R.id.useFullBlockList -> {
                 val enabled = !item.isChecked
-                viewModel.blockFacebookDomains(enabled)
-                trackerListProvider.setIncludeFacebookDomains(enabled)
+                viewModel.useFullBlockList(enabled)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -348,7 +342,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             trackerAndCompany.totalTrackers
         )
 
-        val timestamp = LocalDateTime.parse(trackerAndCompany.lastTracker.tracker.timestamp)
+        val timestamp = LocalDateTime.parse(trackerAndCompany.lastTracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
         timeTextView.text = getString(R.string.privacyReportAppTrackerTime, timeRunning.shortFormat()).capitalize()

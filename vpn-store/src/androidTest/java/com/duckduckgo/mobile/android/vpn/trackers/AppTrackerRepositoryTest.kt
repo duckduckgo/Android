@@ -20,13 +20,13 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class TrackerListProviderTest {
-    private lateinit var trackerListProvider: TrackerListProvider
+class AppTrackerRepositoryTest {
+
+    private lateinit var appTrackerRepository : RealAppTrackerRepository
     private lateinit var vpnDatabase: VpnDatabase
 
     @Before
@@ -39,44 +39,36 @@ class TrackerListProviderTest {
             VpnDatabase.prepopulateAppTrackerBlockingList(context, this)
         }
 
-        val appTrackerRepository = RealAppTrackerRepository(context, Moshi.Builder().build(), vpnDatabase.vpnAppTrackerBlockingDao())
-        trackerListProvider = RealTrackerListProvider(vpnDatabase.vpnPreferencesDao(), appTrackerRepository)
+        appTrackerRepository = RealAppTrackerRepository(context, Moshi.Builder().build(), vpnDatabase.vpnAppTrackerBlockingDao())
     }
 
     @Test
-    fun whenFindTrackerInFullListMatchesThenReturnTracker() {
-        trackerListProvider.setUseFullTrackerList(true)
-
-        val tracker = trackerListProvider.findTracker("fls.doubleclick.net")
-
-        assertNotNull(tracker)
+    fun whenMatchTrackerInFullListAndHostnameIsTrackerThenReturnTracker() {
+        assertNotNull(appTrackerRepository.matchTrackerInFullList("g.doubleclick.net"))
     }
 
     @Test
-    fun whenFindTrackerInLegacyListMatchesThenReturnTracker() = runBlocking {
-        trackerListProvider.setUseFullTrackerList(false)
-
-        val tracker = trackerListProvider.findTracker("fls.doubleclick.net")
-
-        assertEquals("doubleclick.net", tracker?.hostname)
-        assertEquals("Google", tracker?.owner?.displayName)
+    fun whenMatchTrackerInLegacyListAndHostnameIsTrackerThenReturnTracker() {
+        assertNotNull(appTrackerRepository.matchTrackerInLegacyList("g.doubleclick.net"))
     }
 
     @Test
-    fun whenFindTrackerInFullListDoesNotMatchThenReturnNull() {
-        trackerListProvider.setUseFullTrackerList(true)
-
-        val tracker = trackerListProvider.findTracker("tracker.llc")
-
-        assertNull(tracker)
+    fun whenMatchTrackerInFullListAndSubdomainIsTrackerThenReturnTracker() {
+        assertNotNull(appTrackerRepository.matchTrackerInFullList("foo.g.doubleclick.net"))
     }
 
     @Test
-    fun whenFindTrackerInLegacyListDoesNotMatchThenReturnNull() {
-        trackerListProvider.setUseFullTrackerList(false)
+    fun whenMatchTrackerInLegacyListAndSubdomainIsTrackerThenReturnTracker() {
+        assertNotNull(appTrackerRepository.matchTrackerInLegacyList("foo.g.doubleclick.net"))
+    }
 
-        val tracker = trackerListProvider.findTracker("tracker.llc")
+    @Test
+    fun whenMatchTrackerInFullListAndHostnameIsNotTrackerThenReturnNull() {
+        assertNull(appTrackerRepository.matchTrackerInFullList("not.tracker.net"))
+    }
 
-        assertNull(tracker)
+    @Test
+    fun whenMatchTrackerInLegacyListAndHostnameIsNotTrackerThenReturnNull() {
+        assertNull(appTrackerRepository.matchTrackerInLegacyList("not.tracker.net"))
     }
 }

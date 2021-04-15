@@ -19,12 +19,15 @@ package com.duckduckgo.mobile.android.vpn.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
+import androidx.room.Query
+import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 
 @Dao
-interface VpnTrackerCompanyDao {
+interface VpnAppTrackerBlockingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(trackerCompany: VpnTrackerCompany)
+    fun insertAll(tracker: List<AppTracker>)
 
+    @Query("SELECT * FROM vpn_app_tracker_bocking WHERE :subdomain LIKE '%' || hostname LIMIT 1")
+    fun getTrackerBySubdomain(subdomain: String): AppTracker?
 }

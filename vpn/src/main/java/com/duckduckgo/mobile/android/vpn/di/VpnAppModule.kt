@@ -21,8 +21,12 @@ import android.content.res.Resources
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
+import com.duckduckgo.mobile.android.vpn.trackers.RealTrackerListProvider
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.squareup.anvil.annotations.ContributesTo
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -49,9 +53,16 @@ class VpnAppModule {
 
     @Provides
     @Singleton
+    fun provideAppTrackerLoader(context: Context, moshi: Moshi, vpnDatabase: VpnDatabase) : AppTrackerRepository {
+        return RealAppTrackerRepository(context, moshi, vpnDatabase.vpnAppTrackerBlockingDao())
+    }
+
+    @Provides
+    @Singleton
     fun provideTrackerListProvider(
-        vpnDatabase: VpnDatabase
-    ): TrackerListProvider = TrackerListProvider(vpnDatabase.vpnPreferencesDao())
+        vpnDatabase: VpnDatabase,
+        appTrackerRepository: AppTrackerRepository
+    ): TrackerListProvider = RealTrackerListProvider(vpnDatabase.vpnPreferencesDao(), appTrackerRepository)
 
     @Provides
     @Singleton

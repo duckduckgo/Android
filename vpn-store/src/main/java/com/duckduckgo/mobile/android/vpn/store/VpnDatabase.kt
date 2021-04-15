@@ -17,11 +17,16 @@
 package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTracker
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
@@ -29,17 +34,17 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 3,
+    exportSchema = true, version = 4,
     entities = [
         VpnState::class,
         VpnTracker::class,
-        VpnTrackerCompany::class,
         VpnRunningStats::class,
         VpnDataStats::class,
         VpnPreferences::class,
         HeartBeatEntity::class,
         VpnPhoenixEntity::class,
-        VpnNotification::class
+        VpnNotification::class,
+        AppTracker::class
     ]
 )
 
@@ -48,13 +53,13 @@ abstract class VpnDatabase : RoomDatabase() {
 
     abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
-    abstract fun vpnTrackerCompanyDao(): VpnTrackerCompanyDao
     abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
     abstract fun vpnDataStatsDao(): VpnDataStatsDao
     abstract fun vpnPreferencesDao(): VpnPreferencesDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
+    abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
 
     companion object {
 
@@ -74,25 +79,19 @@ abstract class VpnDatabase : RoomDatabase() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         ioThread {
-                            prepopulateTrackerCompanies(context)
                             prepopulateUUID(context)
+                            prepopulateAppTrackerBlockingList(context, getInstance(context))
                         }
                     }
 
                     override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
                         ioThread {
-                            prepopulateTrackerCompanies(context)
                             prepopulateUUID(context)
+                            prepopulateAppTrackerBlockingList(context, getInstance(context))
                         }
                     }
                 })
                 .build()
-        }
-
-        private fun prepopulateTrackerCompanies(context: Context) {
-            for (trackerGroupCompany in TrackerListProvider.TRACKER_GROUP_COMPANIES) {
-                getInstance(context).vpnTrackerCompanyDao().insert(trackerGroupCompany)
-            }
         }
 
         private fun prepopulateUUID(context: Context) {
@@ -100,6 +99,34 @@ abstract class VpnDatabase : RoomDatabase() {
             getInstance(context).vpnStateDao().insert(VpnState(uuid = uuid))
             Timber.w("VPNDatabase: UUID pre-populated as $uuid")
         }
+
+        @VisibleForTesting
+        internal fun prepopulateAppTrackerBlockingList(context: Context, vpnDatabase: VpnDatabase) {
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+                .use { it.readText() }
+                .also {
+                    val trackers = getFullAppTrackerBlockingList(it)
+                    vpnDatabase.vpnAppTrackerBlockingDao().insertAll(trackers)
+                }
+        }
+
+        private fun getFullAppTrackerBlockingList(json: String): List<AppTracker> {
+            val moshi = Moshi.Builder().build()
+            val type = Types.newParameterizedType(Map::class.java, String::class.java, JsonAppTracker::class.java)
+            val adapter : JsonAdapter<Map<String, JsonAppTracker>> = moshi.adapter(type)
+            return adapter.fromJson(json).orEmpty()
+                .filter { !it.value.isCdn }
+                .mapValues {
+                    AppTracker(
+                        hostname = it.key,
+                        trackerCompanyId = it.value.owner.displayName.hashCode(),
+                        owner = it.value.owner,
+                        app = it.value.app,
+                        isCdn = it.value.isCdn
+                    )
+                }.map { it.value }
+        }
+
     }
 }
 

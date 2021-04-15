@@ -237,12 +237,12 @@ class DeviceShieldFragment : Fragment() {
         } else {
             deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, totalTrackers, totalTrackers)
             val lastTracker = companiesBlocked.first().lastTracker
-            val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
+            val timestamp = LocalDateTime.parse(lastTracker.timestamp)
             val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
             val timeRunning = TimePassed.fromMilliseconds(timeDifference)
             deviceShieldCtaSubHeaderTextView.isVisible = true
             deviceShieldCtaSubHeaderTextView.text =
-                getString(R.string.deviceShieldLastTrackerBlocked, lastTracker.trackerCompany.company, timeRunning.shortFormat())
+                getString(R.string.deviceShieldLastTrackerBlocked, lastTracker.company, timeRunning.shortFormat())
         }
     }
 

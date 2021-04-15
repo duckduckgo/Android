@@ -20,7 +20,7 @@ import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastDay
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -36,9 +36,9 @@ class DeviceShieldNotificationFactory @Inject constructor(
         return DeviceShieldNotification(title)
     }
 
-    fun createTrackersCountDeviceShieldNotification(trackersBlocked: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
-        val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompany.trackerCompanyId }
+    fun createTrackersCountDeviceShieldNotification(trackersBlocked: List<VpnTracker>): DeviceShieldNotification {
+        val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompanyId }.size
+        val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompanyId }
 
         val title = when {
             trackersBlocked.isEmpty() -> SpannableStringBuilder(resources.getString(R.string.deviceShieldOnNoTrackersNotificationHeader))
@@ -54,48 +54,48 @@ class DeviceShieldNotificationFactory @Inject constructor(
         } else {
             when (trackerCompaniesTotal) {
                 1 -> {
-                    val nonStyledText = resources.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().trackerCompany.company)
-                    nonStyledText.applyBoldSpanTo(listOf(trackerCompanies.first().trackerCompany.company))
+                    val nonStyledText = resources.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().company)
+                    nonStyledText.applyBoldSpanTo(listOf(trackerCompanies.first().company))
                 }
                 2 -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationTwoCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company
+                        trackerCompanies.first().company,
+                        trackerCompanies[1].company
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().trackerCompany.company,
-                            trackerCompanies[1].trackerCompany.company
+                            trackerCompanies.first().company,
+                            trackerCompanies[1].company
                         )
                     )
                 }
                 3 -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationThreeCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company,
-                        trackerCompanies[2].trackerCompany.company
+                        trackerCompanies.first().company,
+                        trackerCompanies[1].company,
+                        trackerCompanies[2].company
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().trackerCompany.company,
-                            trackerCompanies[1].trackerCompany.company,
-                            trackerCompanies[2].trackerCompany.company
+                            trackerCompanies.first().company,
+                            trackerCompanies[1].company,
+                            trackerCompanies[2].company
                         )
                     )
                 }
                 else -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationFourCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company,
+                        trackerCompanies.first().company,
+                        trackerCompanies[1].company,
                         trackerCompaniesTotal - 2
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().trackerCompany.company,
-                            trackerCompanies[1].trackerCompany.company
+                            trackerCompanies.first().company,
+                            trackerCompanies[1].company
                         )
                     )
                 }
@@ -126,14 +126,14 @@ class DeviceShieldNotificationFactory @Inject constructor(
         }.copy(notificationVariant = dailyNotificationType)
     }
 
-    private fun createDailyTotalTrackersNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
+    private fun createDailyTotalTrackersNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
         val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
         val textToStyle = resources.getString(R.string.deviceShieldDailyTrackersNotification, totalTrackers)
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers)))
     }
 
-    private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+    private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+        val perCompany = trackers.groupBy { it.trackerCompanyId }
         var topOffender = perCompany.values.first()
         perCompany.values.forEach {
             if (it.size > topOffender.size) {
@@ -141,15 +141,15 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
         }
 
-        val company = topOffender.first().trackerCompany.company
+        val company = topOffender.first().company
         val textToStyle = resources.getString(R.string.deviceShieldDailyTopCompanyNotification, company)
 
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))
 
     }
 
-    private fun createDailyTopTrackerCompanyNumbersNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+    private fun createDailyTopTrackerCompanyNumbersNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+        val perCompany = trackers.groupBy { it.trackerCompanyId }
         var topOffender = perCompany.values.first()
         perCompany.values.forEach {
             if (it.size > topOffender.size) {
@@ -157,14 +157,14 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
         }
         val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldDailyCompanyBlocked, topOffender.size, topOffender.size)
-        val company = topOffender.first().trackerCompany.company
+        val company = topOffender.first().company
         val textToStyle =
             resources.getString(R.string.deviceShieldDailyCompanyBlockedNotification, company, totalTrackers)
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company, totalTrackers)))
     }
 
-    private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val lastCompany = trackers.first().trackerCompany.company
+    private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+        val lastCompany = trackers.first().company
         val textToStyle = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany)
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany)))
     }
@@ -187,8 +187,8 @@ class DeviceShieldNotificationFactory @Inject constructor(
         }
     }
 
-    private fun createWeeklyReportNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+    private fun createWeeklyReportNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+        val perCompany = trackers.groupBy { it.trackerCompanyId }
         val totalCompanies = resources.getQuantityString(R.plurals.deviceShieldDailyCompany, perCompany.keys.size, perCompany.keys.size)
         val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
         val textToStyle = resources.getString(R.string.deviceShieldWeeklyCompanyTrackersBlockedNotification, totalCompanies, totalTrackers)
@@ -196,15 +196,15 @@ class DeviceShieldNotificationFactory @Inject constructor(
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers, totalCompanies)))
     }
 
-    private fun createWeeklyTopTrackerCompanyNotification(trackers: List<VpnTrackerAndCompany>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+    private fun createWeeklyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+        val perCompany = trackers.groupBy { it.trackerCompanyId }
         var topOffender = perCompany.values.first()
         perCompany.values.forEach {
             if (it.size > topOffender.size) {
                 topOffender = it
             }
         }
-        val company = topOffender.first().trackerCompany.company
+        val company = topOffender.first().company
         val textToStyle = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotification, company)
 
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))

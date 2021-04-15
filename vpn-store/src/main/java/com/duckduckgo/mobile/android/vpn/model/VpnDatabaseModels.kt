@@ -18,10 +18,8 @@
 
 package com.duckduckgo.mobile.android.vpn.model
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
 @Entity(tableName = "vpn_tracker")
@@ -29,22 +27,8 @@ data class VpnTracker(
     @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
     val domain: String,
+    val company: String,
     val timestamp: String = DatabaseDateFormatter.timestamp()
-)
-
-@Entity(tableName = "vpn_tracker_company")
-data class VpnTrackerCompany(
-    @PrimaryKey val trackerCompanyId: Int,
-    val company: String
-)
-
-data class VpnTrackerAndCompany(
-    @Embedded val tracker: VpnTracker,
-    @Relation(
-        parentColumn = "trackerCompanyId",
-        entityColumn = "trackerCompanyId"
-    )
-    val trackerCompany: VpnTrackerCompany
 )
 
 @Entity(tableName = "vpn_state")

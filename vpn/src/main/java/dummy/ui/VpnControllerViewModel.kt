@@ -23,7 +23,7 @@ import androidx.lifecycle.asLiveData
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.mobile.android.vpn.model.VpnState
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
@@ -66,10 +66,10 @@ class VpnControllerViewModel(
 
     data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
 
-    data class AppTrackersBlocked(val trackerList: List<VpnTrackerAndCompany>) {
+    data class AppTrackersBlocked(val trackerList: List<VpnTracker>) {
 
-        fun byCompany(): Map<Int, List<VpnTrackerAndCompany>> {
-            return trackerList.groupBy { it.trackerCompany.trackerCompanyId }
+        fun byCompany(): Map<Int, List<VpnTracker>> {
+            return trackerList.groupBy { it.trackerCompanyId }
         }
 
     }

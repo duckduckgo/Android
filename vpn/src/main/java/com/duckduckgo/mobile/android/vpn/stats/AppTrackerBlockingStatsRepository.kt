@@ -20,7 +20,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
 import com.duckduckgo.mobile.android.vpn.model.VpnState
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import kotlinx.coroutines.Dispatchers
@@ -41,15 +41,15 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         return stateDao.get().distinctUntilChanged()
     }
 
-    fun getVpnTrackers(startTime: () -> String, endTime: String = noEndDate()): Flow<List<VpnTrackerAndCompany>> {
+    fun getVpnTrackers(startTime: () -> String, endTime: String = noEndDate()): Flow<List<VpnTracker>> {
         return trackerDao.getTrackersBetween(startTime(), endTime)
             .distinctUntilChanged()
-            .map { it.filter { tracker -> tracker.tracker.timestamp >= startTime() } }
+            .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
     }
 
     @WorkerThread
-    fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTrackerAndCompany> {
-        return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker -> tracker.tracker.timestamp >= startTime() }
+    fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTracker> {
+        return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker -> tracker.timestamp >= startTime() }
     }
 
     fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {

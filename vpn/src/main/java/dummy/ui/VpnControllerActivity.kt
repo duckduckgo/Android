@@ -78,7 +78,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private val viewModel: VpnControllerViewModel by bindViewModel()
     private val packetsFormatter = NumberFormat.getInstance()
 
-    private var lastAppTrackerBlocked: VpnTrackerAndCompany? = null
+    private var lastAppTrackerBlocked: VpnTracker? = null
     private var lastWebTrackerBlocked: WebTrackerBlocked? = null
 
     private var timerUpdateJob: Job? = null
@@ -242,13 +242,13 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
     }
 
-    private fun generateLastAppTrackerBlocked(lastTracker: VpnTrackerAndCompany?): String {
+    private fun generateLastAppTrackerBlocked(lastTracker: VpnTracker?): String {
         if (lastTracker == null) return ""
 
-        val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
+        val timestamp = LocalDateTime.parse(lastTracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.tracker.domain}\n(owned by ${lastTracker.trackerCompany.company})"
+        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.domain}\n(owned by ${lastTracker.company})"
     }
 
     private fun generateLastWebTrackerBlocked(lastTracker: WebTrackerBlocked?): String {

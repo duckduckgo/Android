@@ -21,7 +21,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,10 +30,10 @@ interface VpnTrackerDao {
     fun insert(tracker: VpnTracker)
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
-    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTrackerAndCompany>>
+    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
-    fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTrackerAndCompany>
+    fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
