@@ -21,13 +21,12 @@ import android.os.Process
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 interface VpnServiceHeartbeat {
     suspend fun startHeartbeat()
@@ -35,19 +34,9 @@ interface VpnServiceHeartbeat {
     fun stopHeartbeat()
 }
 
-@Module
-@ContributesTo(VpnObjectGraph::class)
-class VpnServiceHeartbeatModule {
-    @Provides
-    @VpnScope
-    fun provideVpnServiceHeartbeat(
-        context: Context
-    ): VpnServiceHeartbeat {
-        return VpnServiceHeartbeatImpl(context)
-    }
-}
-
-private class VpnServiceHeartbeatImpl(private val context: Context) : VpnServiceHeartbeat {
+@ContributesBinding(VpnObjectGraph::class)
+@VpnScope
+class VpnServiceHeartbeatImpl @Inject constructor(private val context: Context) : VpnServiceHeartbeat {
     private val isActive = AtomicBoolean(false)
 
     override suspend fun startHeartbeat() {
@@ -55,7 +44,7 @@ private class VpnServiceHeartbeatImpl(private val context: Context) : VpnService
             isActive.set(TrackerBlockingVpnService.isServiceRunning(context))
             while (isActive.get()) {
                 Timber.d("(${Process.myPid()}) - Sending heartbeat")
-                context.sendBroadcast(VpnServiceHeartbeatReceiver.aliveBroadcastIntent(context, HEART_BEAT_PERIOD_SECONDS, TimeUnit.SECONDS))
+                context.startService(VpnHeartbeatReceiverService.aliveServiceIntent(context, HEART_BEAT_PERIOD_SECONDS, TimeUnit.SECONDS))
                 delay(TimeUnit.SECONDS.toMillis(HEART_BEAT_PERIOD_SECONDS))
             }
         }
@@ -63,7 +52,7 @@ private class VpnServiceHeartbeatImpl(private val context: Context) : VpnService
 
     override fun stopHeartbeat() {
         isActive.set(false)
-        context.sendBroadcast(VpnServiceHeartbeatReceiver.stoppedBroadcastIntent(context))
+        context.startService(VpnHeartbeatReceiverService.stoppedServiceIntent(context))
     }
 
     companion object {

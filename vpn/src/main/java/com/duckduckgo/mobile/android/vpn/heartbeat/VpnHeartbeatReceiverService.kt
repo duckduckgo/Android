@@ -16,52 +16,53 @@
 
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
-import android.content.BroadcastReceiver
+import android.app.IntentService
 import android.content.Context
 import android.content.Intent
 import android.os.Process
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.android.AndroidInjection
 import timber.log.Timber
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProcessor.Listener {
+@Suppress("DEPRECATION")
+class VpnHeartbeatReceiverService : IntentService("VpnHeartbeatReceiverService"), VpnServiceHeartbeatProcessor.Listener {
 
-    @Inject lateinit var heartbeatProcessor: VpnServiceHeartbeatProcessor
+    @Inject
+    lateinit var vpnDatabase: VpnDatabase
 
-    @Inject lateinit var appContext: Context
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject lateinit var vpnDatabase: VpnDatabase
+    @Inject
+    lateinit var heartbeatProcessor: VpnServiceHeartbeatProcessor
 
-    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+    override fun onCreate() {
+        super.onCreate()
+        AndroidInjection.inject(this)
+    }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        AndroidInjection.inject(this, context)
-
-        Timber.d("VPN receiver handling intent ${intent.action}")
-
-        when (val action = intent.action) {
-            "android.intent.action.BOOT_COMPLETED" -> {
-                val pendingResult = goAsync()
-                goAsync(pendingResult) {
-                    heartbeatProcessor.checkLastHeartBeat(this@VpnServiceHeartbeatReceiver)
-                }
-            }
-            ACTION_VPN_HEART_BEAT -> {
-                val pendingResult = goAsync()
-                goAsync(pendingResult) {
-                    heartbeatProcessor.processHeartBeat(intent, this)
-                }
-            }
-            else -> {
-                Timber.w("(${Process.myPid()}) VPN heartbeat received wrong action = $action")
-            }
+    override fun onHandleIntent(intent: Intent?) {
+        if (intent == null) {
+            Timber.e("Heartbeat service received null intent")
+            return
         }
+        when {
+            intent.isActionBootCompleted() -> heartbeatProcessor.checkLastHeartBeat(this)
+            intent.isActionHeartbeatReceived() -> heartbeatProcessor.processHeartBeat(intent, this)
+            else -> Timber.w("(${Process.myPid()}) VPN heartbeat received wrong action = ${intent.action}")
+        }
+    }
+
+    private fun Intent.isActionBootCompleted() : Boolean {
+        return action == "android.intent.action.BOOT_COMPLETED"
+    }
+
+    private fun Intent.isActionHeartbeatReceived() : Boolean {
+        return action == ACTION_VPN_HEART_BEAT
     }
 
     override fun onStopReceived() {
@@ -73,44 +74,42 @@ class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProc
     }
 
     override fun onAliveMissed() {
-        if (!TrackerBlockingVpnService.isServiceRunning(appContext)) {
+        if (!TrackerBlockingVpnService.isServiceRunning(this)) {
             Timber.e("(${Process.myPid()}) heartbeat ALIVE missed - re-launcing VPN")
             deviceShieldPixels.suddenKillBySystem()
             deviceShieldPixels.automaticRestart()
-            val pendingResult = goAsync()
-            goAsync(pendingResult) {
-                heartbeatProcessor.restartVpnService()
-            }
+            heartbeatProcessor.restartVpnService()
         } else {
             Timber.d("(${Process.myPid()}) heartbeat ALIVE missed, VPN still up - false positive️")
         }
     }
 
     companion object {
+
         const val ACTION_VPN_HEART_BEAT = "com.duckduckgo.mobile.android.vpn.heartbeat"
         const val EXTRA_VALID_PERIOD_SEC = "com.duckduckgo.mobile.android.vpn.heartbeat.VALID_PERIOD_SECONDS"
         const val EXTRA_HEART_BEAT_TYPE = "com.duckduckgo.mobile.android.vpn.heartbeat.TYPE"
         const val EXTRA_HEART_BEAT_TYPE_ALIVE = "ALIVE"
         const val EXTRA_HEART_BEAT_TYPE_STOPPED = "STOPPED"
 
-        private fun broadcastIntent(context: Context): Intent {
-            return Intent(context, VpnServiceHeartbeatReceiver::class.java).apply {
-                action = ACTION_VPN_HEART_BEAT
-            }
-        }
-
-        fun aliveBroadcastIntent(context: Context, validityWindow: Long, unit: TimeUnit): Intent {
+        fun aliveServiceIntent(context: Context, validityWindow: Long, unit: TimeUnit): Intent {
             require(validityWindow > 0) { "validityWindow < 0: $validityWindow" }
 
-            return broadcastIntent(context).apply {
+            return serviceIntent(context).apply {
                 putExtra(EXTRA_HEART_BEAT_TYPE, EXTRA_HEART_BEAT_TYPE_ALIVE)
                 putExtra(EXTRA_VALID_PERIOD_SEC, unit.toSeconds(validityWindow))
             }
         }
 
-        fun stoppedBroadcastIntent(context: Context): Intent {
-            return broadcastIntent(context).apply {
+        fun stoppedServiceIntent(context: Context): Intent {
+            return serviceIntent(context).apply {
                 putExtra(EXTRA_HEART_BEAT_TYPE, EXTRA_HEART_BEAT_TYPE_STOPPED)
+            }
+        }
+
+        private fun serviceIntent(context: Context): Intent {
+            return Intent(context, VpnHeartbeatReceiverService::class.java).apply {
+                action = ACTION_VPN_HEART_BEAT
             }
         }
     }

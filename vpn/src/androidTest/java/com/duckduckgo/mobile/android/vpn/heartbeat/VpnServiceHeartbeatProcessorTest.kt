@@ -17,17 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.*
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
@@ -40,16 +36,7 @@ class VpnServiceHeartbeatProcessorTest {
     private val heartBeatDao: VpnHeartBeatDao = mock()
     private val listener: VpnServiceHeartbeatProcessor.Listener = mock()
 
-    private val testDispatcher = TestCoroutineDispatcher()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun default(): CoroutineDispatcher = testDispatcher
-        override fun io(): CoroutineDispatcher = testDispatcher
-        override fun main(): CoroutineDispatcher = testDispatcher
-        override fun unconfined(): CoroutineDispatcher = testDispatcher
-
-    }
 
     private val aliveEntity = HeartBeatEntity("ALIVE")
     private val stopEntity = HeartBeatEntity("STOPPED")
@@ -65,12 +52,12 @@ class VpnServiceHeartbeatProcessorTest {
         whenever(heartBeatDao.insertType(eq("ALIVE"))).thenReturn(aliveEntity)
         whenever(heartBeatDao.insertType(eq("STOPPED"))).thenReturn(stopEntity)
 
-        processor = VpnServiceHeartbeatProcessor(context, vpnDatabase, testDispatcherProvider)
+        processor = VpnServiceHeartbeatProcessor(context, vpnDatabase)
     }
 
     @Test
-    fun whenAliveThenInsertInHeartBeatDatabase() = runBlockingTest {
-        VpnServiceHeartbeatReceiver.aliveBroadcastIntent(context, 1, TimeUnit.SECONDS).also {
+    fun whenAliveThenInsertInHeartBeatDatabase() {
+        VpnHeartbeatReceiverService.aliveServiceIntent(context, 1, TimeUnit.SECONDS).also {
             processor.processHeartBeat(it, listener)
         }
 
@@ -78,8 +65,8 @@ class VpnServiceHeartbeatProcessorTest {
     }
 
     @Test
-    fun whenAliveThenCallOnAliveReceived() = runBlockingTest {
-        VpnServiceHeartbeatReceiver.aliveBroadcastIntent(context, 1, TimeUnit.SECONDS).also {
+    fun whenAliveThenCallOnAliveReceived() {
+        VpnHeartbeatReceiverService.aliveServiceIntent(context, 1, TimeUnit.SECONDS).also {
             processor.processHeartBeat(it, listener)
         }
 
@@ -88,8 +75,8 @@ class VpnServiceHeartbeatProcessorTest {
     }
 
     @Test
-    fun whenStoppedThenCallOnStopReceived() = runBlockingTest {
-        VpnServiceHeartbeatReceiver.stoppedBroadcastIntent(context).also {
+    fun whenStoppedThenCallOnStopReceived() {
+        VpnHeartbeatReceiverService.stoppedServiceIntent(context).also {
             processor.processHeartBeat(it, listener)
         }
 
@@ -98,14 +85,14 @@ class VpnServiceHeartbeatProcessorTest {
     }
 
     @Test
-    fun whenCheckLastHeartBeatAndNoDbEntryThenNoop() = runBlockingTest {
+    fun whenCheckLastHeartBeatAndNoDbEntryThenNoop() {
         processor.checkLastHeartBeat(listener)
 
         verifyZeroInteractions(listener)
     }
 
     @Test
-    fun whenCheckLastHeartBeatAndLastIsStoppedEntryThenNoop() = runBlockingTest {
+    fun whenCheckLastHeartBeatAndLastIsStoppedEntryThenNoop() {
         whenever(heartBeatDao.hearBeats()).thenReturn(listOf(stopEntity))
 
         processor.checkLastHeartBeat(listener)
@@ -114,7 +101,7 @@ class VpnServiceHeartbeatProcessorTest {
     }
 
     @Test
-    fun whenCheckLastHeartBeatAndLastIsAliveEntryThenOnAliveMissed() = runBlockingTest {
+    fun whenCheckLastHeartBeatAndLastIsAliveEntryThenOnAliveMissed() {
         whenever(heartBeatDao.hearBeats()).thenReturn(listOf(aliveEntity))
 
         processor.checkLastHeartBeat(listener)

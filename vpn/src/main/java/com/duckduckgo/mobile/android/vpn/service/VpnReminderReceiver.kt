@@ -100,7 +100,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 }
 
 fun goAsync(
-    pendingResult: BroadcastReceiver.PendingResult,
+    pendingResult: BroadcastReceiver.PendingResult?,
     coroutineScope: CoroutineScope = GlobalScope,
     block: suspend () -> Unit
 ) {
@@ -109,7 +109,7 @@ fun goAsync(
             block()
         } finally {
             // Always call finish(), even if the coroutineScope was cancelled
-            pendingResult.finish()
+            pendingResult?.finish()
         }
     }
 }
