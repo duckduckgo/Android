@@ -393,16 +393,16 @@ class MigrationsProvider(
         }
     }
 
+    // todo: make sure this is not an issue when migrating to main repo
     val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
         }
     }
 
-    // todo: make sure this is not an issue when migrating to main repo
     val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
         }
     }
 
