@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.After
 import org.junit.Assert

@@ -22,7 +22,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AppCategoryDetector {
-    fun getAppCategory(packageName: String) : AppCategory
+    fun getAppCategory(packageName: String): AppCategory
 }
 
 @ContributesBinding(AppObjectGraph::class)

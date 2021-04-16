@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfo.CATEGORY_UNDEFINED
 
-private fun parseAppCategory(category: Int) : AppCategory {
-    return when(category) {
+private fun parseAppCategory(category: Int): AppCategory {
+    return when (category) {
         ApplicationInfo.CATEGORY_AUDIO -> AppCategory.Audio
         ApplicationInfo.CATEGORY_VIDEO -> AppCategory.Video
         ApplicationInfo.CATEGORY_GAME -> AppCategory.Game
@@ -33,7 +33,7 @@ private fun parseAppCategory(category: Int) : AppCategory {
     }
 }
 
-fun ApplicationInfo.parseAppCategory() : AppCategory {
+fun ApplicationInfo.parseAppCategory(): AppCategory {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         parseAppCategory(category)
     } else {
@@ -41,11 +41,11 @@ fun ApplicationInfo.parseAppCategory() : AppCategory {
     }
 }
 
-fun ApplicationInfo.shouldBeInExclusionList() : Boolean {
+fun ApplicationInfo.shouldBeInExclusionList(): Boolean {
     return VpnExclusionList.isDdgApp(packageName) || VpnExclusionList.EXCLUDED_APPS.contains(packageName) || isGame()
 }
 
-fun ApplicationInfo.getAppCategoryCompat() : Int {
+fun ApplicationInfo.getAppCategoryCompat(): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         category
     } else {
@@ -53,7 +53,7 @@ fun ApplicationInfo.getAppCategoryCompat() : Int {
     }
 }
 
-fun ApplicationInfo.isGame() : Boolean {
+fun ApplicationInfo.isGame(): Boolean {
     return getAppCategoryCompat() == ApplicationInfo.CATEGORY_GAME
 }
 

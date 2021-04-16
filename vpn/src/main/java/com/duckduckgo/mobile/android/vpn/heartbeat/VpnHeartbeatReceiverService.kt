@@ -57,11 +57,11 @@ class VpnHeartbeatReceiverService : IntentService("VpnHeartbeatReceiverService")
         }
     }
 
-    private fun Intent.isActionBootCompleted() : Boolean {
+    private fun Intent.isActionBootCompleted(): Boolean {
         return action == "android.intent.action.BOOT_COMPLETED"
     }
 
-    private fun Intent.isActionHeartbeatReceived() : Boolean {
+    private fun Intent.isActionHeartbeatReceived(): Boolean {
         return action == ACTION_VPN_HEART_BEAT
     }
 

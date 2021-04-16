@@ -57,7 +57,7 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnTrackerDao: VpnTrackerDao
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val trackerListProvider : TrackerListProvider = mock()
+    private val trackerListProvider: TrackerListProvider = mock()
 
     private lateinit var testee: PrivacyReportViewModel
 

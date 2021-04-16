@@ -31,7 +31,7 @@ class NewAppBroadcastReceiver @Inject constructor(
     private val appCategoryDetector: AppCategoryDetector
 ) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        when(intent.action) {
+        when (intent.action) {
             Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
         }
     }
@@ -42,7 +42,6 @@ class NewAppBroadcastReceiver @Inject constructor(
             Timber.i("Newly installed package $packageName is not a game")
             return
         }
-
 
         val pendingResult = goAsync()
         goAsync(pendingResult) {

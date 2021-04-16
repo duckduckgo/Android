@@ -51,7 +51,6 @@ class VpnServiceHeartbeatProcessor @Inject constructor(
         return getLongExtra(VpnHeartbeatReceiverService.EXTRA_VALID_PERIOD_SEC, -1)
     }
 
-
     @WorkerThread
     fun checkLastHeartBeat(listener: Listener) {
         val lastHeartBeat = vpnDatabase.vpnHeartBeatDao().hearBeats().maxByOrNull { it.timestamp }

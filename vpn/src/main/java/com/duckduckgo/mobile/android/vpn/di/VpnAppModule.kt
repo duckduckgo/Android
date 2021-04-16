@@ -53,7 +53,7 @@ class VpnAppModule {
 
     @Provides
     @Singleton
-    fun provideAppTrackerLoader(context: Context, moshi: Moshi, vpnDatabase: VpnDatabase) : AppTrackerRepository {
+    fun provideAppTrackerLoader(context: Context, moshi: Moshi, vpnDatabase: VpnDatabase): AppTrackerRepository {
         return RealAppTrackerRepository(context, moshi, vpnDatabase.vpnAppTrackerBlockingDao())
     }
 

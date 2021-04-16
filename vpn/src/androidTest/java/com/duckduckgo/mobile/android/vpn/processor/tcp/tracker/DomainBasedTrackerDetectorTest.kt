@@ -74,7 +74,8 @@ class DomainBasedTrackerDetectorTest {
         val appTrackerRepository = RealAppTrackerRepository(
             appContext,
             Moshi.Builder().build(),
-            vpnAppTrackerBlockingDao)
+            vpnAppTrackerBlockingDao
+        )
         val trackerListProvider = RealTrackerListProvider(preferencesDao, appTrackerRepository).apply { setUseFullTrackerList(false) }
 
         testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, trackerListProvider, vpnDatabase)

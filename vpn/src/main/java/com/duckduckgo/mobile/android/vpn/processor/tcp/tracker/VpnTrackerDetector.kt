@@ -75,7 +75,8 @@ class DomainBasedTrackerDetector(
         val vpnTracker = VpnTracker(
             trackerCompanyId = tracker.trackerCompanyId,
             company = tracker.owner.displayName,
-            domain = tracker.hostname)
+            domain = tracker.hostname
+        )
         Timber.i("Inserting $vpnTracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }
