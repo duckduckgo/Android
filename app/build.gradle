@@ -131,6 +131,8 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    implementation 'org.jsoup:jsoup:1.13.1'
+
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

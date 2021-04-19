@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarksDao {
@@ -28,6 +29,9 @@ interface BookmarksDao {
 
     @Query("select * from bookmarks")
     fun bookmarks(): LiveData<List<BookmarkEntity>>
+
+    @Query("select * from bookmarks")
+    fun bookmarksSync(): List<BookmarkEntity>
 
     @Query("select count(*) from bookmarks WHERE url LIKE :url")
     fun bookmarksCountByUrl(url: String): Int

@@ -22,4 +22,10 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/bookmark_import"
+        android:title="Import bookmarks" />
+    <item
+        android:id="@+id/bookmark_export"
+        android:title="Export bookmarks" />
 </menu>

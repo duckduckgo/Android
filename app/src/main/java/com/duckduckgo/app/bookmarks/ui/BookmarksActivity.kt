@@ -22,6 +22,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -76,6 +77,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 111 && resultCode == RESULT_OK) {
+            val selectedFile = data?.data //The uri with the location of the file
+
+        }
+    }
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
         recycler.adapter = adapter
@@ -106,11 +115,27 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(bookmark_activity_menu, menu)
         val searchItem = menu?.findItem(action_search)
         val searchView = searchItem?.actionView as SearchView
         searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.bookmark_import -> {
+
+                val intent = Intent()
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT)
+
+                startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
+            }
+            R.id.bookmark_export -> {
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
