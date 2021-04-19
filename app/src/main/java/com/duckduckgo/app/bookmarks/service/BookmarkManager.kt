@@ -38,16 +38,14 @@ class BookmarkManager(
                     appendLine("<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">")
                     appendLine("<Title>Bookmarks</Title>")
                     appendLine("<H1>Bookmarks</H1>")
-                    appendLine()
                     appendLine("<DL><p>")
-                    appendLine("<DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo</H3>")
-
+                    appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo</H3>")
+                    appendLine("    <DL><p>")
                     dao.bookmarksSync().forEach { entity ->
-                        appendLine("<DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
+                        appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
                     }
-
-                    appendLine("</DL>")
-                    appendLine()
+                    appendLine("    </DL><p>")
+                    appendLine("</DL><p>")
                 }
             } else {
                 ""
@@ -55,11 +53,19 @@ class BookmarkManager(
         }
     }
 
-    fun import(html: String): Int {
+    data class Bookmark(val title: String, val url: String)
+
+    fun import(html: String): List<Bookmark> {
         val document = Jsoup.parse(html)
-        val bookmarkLinks = document.select("DL")
-        val bookmarkFolder = document.select("DT")
-        val title = document.title()
-        return 0
+        val validBookmarks = mutableListOf<Bookmark>()
+        val bookmarkLinks = document.select("a")
+        bookmarkLinks.forEach { possibleBookmark ->
+            val link = possibleBookmark.attr("href")
+            val title = possibleBookmark.text()
+            val bookmark = Bookmark(title, link)
+            validBookmarks.add(bookmark)
+
+        }
+        return validBookmarks
     }
 }
