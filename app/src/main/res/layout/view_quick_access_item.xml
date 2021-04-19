@@ -16,7 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
@@ -27,7 +27,7 @@
         android:id="@+id/quickAccessFavicon"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_globe_gray_16dp" />
 
@@ -35,6 +35,8 @@
         android:id="@+id/quickAccessTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
         android:ellipsize="end"
         android:maxLines="1"
         tools:text="Super long favorite title" />

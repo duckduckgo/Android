@@ -32,5 +32,8 @@
         android:paddingBottom="8dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listItem="@layout/view_quickAccessRecyclerView" />
+        tools:itemCount="8"
+        tools:listItem="@layout/view_quick_access_item"
+        tools:showIn="@layout/activity_system_search"
+        tools:spanCount="4" />
 </merge>
