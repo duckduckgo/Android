@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
@@ -40,22 +41,28 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
+) : ListAdapter<BookmarksAdapter.BookmarksItemTypes, BookmarkScreenViewHolders>(BookmarksDiffCallback()) {
 
     companion object {
         const val BOOKMARK_SECTION_TITLE_TYPE = 0
         const val EMPTY_STATE_TYPE = 1
         const val BOOKMARK_TYPE = 2
-
-        const val BOOKMARK_SECTION_TITLE_SIZE = 1
-        const val BOOKMARK_EMPTY_HINT_SIZE = 1
     }
 
-    var bookmarkItems: List<SavedSite.Bookmark> = emptyList()
+    interface BookmarksItemTypes
+    object Header : BookmarksItemTypes
+    object EmptyHint : BookmarksItemTypes
+    data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
+
+    var bookmarkItems: List<BookmarksItemTypes> = emptyList()
         set(value) {
-            field = value
-            notifyDataSetChanged()
+            field = generateNewList(value)
+            submitList(field)
         }
+
+    private fun generateNewList(value: List<BookmarksItemTypes>): List<BookmarksItemTypes> {
+        return listOf(Header) + (if (value.isEmpty()) listOf(EmptyHint) else value)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
@@ -76,14 +83,12 @@ class BookmarksAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return headerItemsSize() + listSize()
-    }
+    override fun getItemCount(): Int = bookmarkItems.size
 
     override fun onBindViewHolder(holder: BookmarkScreenViewHolders, position: Int) {
         when (holder) {
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                holder.update(bookmarkItems[position - headerItemsSize()])
+                holder.update((bookmarkItems[position] as BookmarkItem).bookmark)
             }
             is BookmarkScreenViewHolders.SectionTitle -> {
                 holder.bind()
@@ -95,24 +100,13 @@ class BookmarksAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when {
-            position == 0 -> {
-                BOOKMARK_SECTION_TITLE_TYPE
-            }
-            bookmarkItems.isEmpty() -> {
-                EMPTY_STATE_TYPE
-            }
-            else -> {
-                BOOKMARK_TYPE
-            }
+        return when(bookmarkItems[position]) {
+            is Header -> BOOKMARK_SECTION_TITLE_TYPE
+            is EmptyHint -> EMPTY_STATE_TYPE
+            else -> BOOKMARK_TYPE
+
         }
     }
-
-    private fun headerItemsSize(): Int {
-        return BOOKMARK_SECTION_TITLE_SIZE
-    }
-
-    private fun listSize() = if (bookmarkItems.isEmpty()) BOOKMARK_EMPTY_HINT_SIZE else bookmarkItems.size
 }
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -68,8 +68,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
             Observer { viewState ->
                 viewState?.let {
-                    favoritesAdapter.favoriteItems = it.favorites
-                    bookmarksAdapter.bookmarkItems = it.bookmarks
+                    favoritesAdapter.favoriteItems = it.favorites.map { FavoritesAdapter.FavoriteItem(it) }
+                    bookmarksAdapter.bookmarkItems = it.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }
                     invalidateOptionsMenu()
                 }
             }
@@ -91,7 +91,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         menuInflater.inflate(bookmark_activity_menu, menu)
         val searchItem = menu?.findItem(action_search)
         val searchView = searchItem?.actionView as SearchView
-        //searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, bookmarksAdapter))
         return super.onCreateOptionsMenu(menu)
     }
 

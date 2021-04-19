@@ -23,8 +23,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -41,35 +41,41 @@ class FavoritesAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : RecyclerView.Adapter<FavoritesScreenViewHolders>() {
+) : ListAdapter<FavoritesAdapter.FavoriteItemTypes, FavoritesScreenViewHolders>(FavoritesDiffCallback()) {
 
     companion object {
         const val FAVORITE_SECTION_TITLE_TYPE = 0
         const val EMPTY_STATE_TYPE = 1
         const val FAVORITE_TYPE = 2
-
-        const val FAVORITE_SECTION_TITLE_SIZE = 1
-        const val FAVORITE_EMPTY_HINT_SIZE = 1
     }
 
-    var favoriteItems: List<Favorite> = emptyList()
+    interface FavoriteItemTypes
+    object Header: FavoriteItemTypes
+    object EmptyHint: FavoriteItemTypes
+    data class FavoriteItem(val favorite: Favorite): FavoriteItemTypes
+
+    var favoriteItems: List<FavoriteItemTypes> = emptyList()
         set(value) {
-            field = value
-            notifyDataSetChanged()
+            field = generateNewList(value)
+            submitList(field)
         }
+
+    private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
+        return listOf(Header) + (if (value.isEmpty()) listOf(EmptyHint) else value)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritesScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            BookmarksAdapter.BOOKMARK_TYPE -> {
+            FAVORITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
                 return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
             }
-            BookmarksAdapter.BOOKMARK_SECTION_TITLE_TYPE -> {
+            FAVORITE_SECTION_TITLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
                 return FavoritesScreenViewHolders.SectionTitle(view)
             }
-            BookmarksAdapter.EMPTY_STATE_TYPE -> {
+            EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_boomark_empty_hint, parent, false)
                 FavoritesScreenViewHolders.EmptyHint(view)
             }
@@ -78,13 +84,13 @@ class FavoritesAdapter(
     }
 
     override fun getItemCount(): Int {
-        return headerItemsSize() + listSize()
+        return favoriteItems.size
     }
 
     override fun onBindViewHolder(holder: FavoritesScreenViewHolders, position: Int) {
         when (holder) {
             is FavoritesScreenViewHolders.FavoriteViewHolder -> {
-                holder.update(favoriteItems[position - headerItemsSize()])
+                holder.update((favoriteItems[position] as FavoriteItem).favorite)
             }
             is FavoritesScreenViewHolders.SectionTitle -> {
                 holder.bind()
@@ -96,11 +102,11 @@ class FavoritesAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when {
-            position == 0 -> {
+        return when(favoriteItems[position]) {
+            is Header -> {
                 FAVORITE_SECTION_TITLE_TYPE
             }
-            favoriteItems.isEmpty() -> {
+            is EmptyHint -> {
                 EMPTY_STATE_TYPE
             }
             else -> {
@@ -108,12 +114,6 @@ class FavoritesAdapter(
             }
         }
     }
-
-    private fun headerItemsSize(): Int {
-        return FAVORITE_SECTION_TITLE_SIZE
-    }
-
-    private fun listSize() = if (favoriteItems.isEmpty()) FAVORITE_EMPTY_HINT_SIZE else favoriteItems.size
 }
 
 sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {

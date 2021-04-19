@@ -35,6 +35,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -112,6 +113,7 @@ class BookmarksViewModel(
     }
 
     private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
+        Timber.i("Bookmark received: $bookmarks")
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
@@ -119,6 +121,7 @@ class BookmarksViewModel(
     }
 
     private fun onFavoritesChanged(favorites: List<Favorite>) {
+        Timber.i("Favorites received: $favorites")
         viewState.value = viewState.value?.copy(
             showFavorites = favorites.isNotEmpty(),
             favorites = favorites
@@ -194,13 +197,13 @@ class BookmarksViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(BookmarksViewModel::class.java) -> (
-                    BookmarksViewModel(
-                        favoritesRepository.get(),
-                        dao.get(),
-                        faviconManager.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
+                        BookmarksViewModel(
+                            favoritesRepository.get(),
+                            dao.get(),
+                            faviconManager.get(),
+                            dispatcherProvider.get()
+                        ) as T
+                        )
                 else -> null
             }
         }
