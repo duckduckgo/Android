@@ -29,10 +29,13 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -41,7 +44,6 @@ import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.activity_system_search.appBarLayout
 import kotlinx.android.synthetic.main.activity_system_search.autocompleteSuggestions
@@ -52,6 +54,7 @@ import kotlinx.android.synthetic.main.activity_system_search.logo
 import kotlinx.android.synthetic.main.activity_system_search.omnibarTextInput
 import kotlinx.android.synthetic.main.activity_system_search.results
 import kotlinx.android.synthetic.main.activity_system_search.resultsContent
+import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
 import javax.inject.Inject
 
@@ -66,9 +69,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
+    private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
 
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -88,6 +95,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureDaxButton()
         configureOmnibar()
         configureTextInput()
+        configureQuickAccessGrid()
 
         if (savedInstanceState == null) {
             intent?.let { sendLaunchPixels(it) }
@@ -118,9 +126,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
         )
         viewModel.resultsViewState.observe(
-            this,
-            Observer<SystemSearchResultsViewState> {
-                it?.let { renderResultsViewState(it) }
+            this, {
+                when(it) {
+                    is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
+                        renderResultsViewState(it)
+                    }
+                    is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
+                        renderQuickAccessItems(it)
+                    }
+                }
             }
         )
         viewModel.command.observe(
@@ -159,6 +173,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             viewModel.userSelectedApp(it)
         }
         deviceAppSuggestions.adapter = deviceAppSuggestionsAdapter
+    }
+
+    private fun configureQuickAccessGrid() {
+        val layoutManager = GridLayoutManager(this, 4)
+        quickAccessRecyclerView.layoutManager = layoutManager
+        quickAccessAdapter = FavoritesQuickAccessAdapter(this, faviconManager)
+        quickAccessRecyclerView.adapter = quickAccessAdapter
     }
 
     private fun configureDaxButton() {
@@ -214,10 +235,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         toggleButton.text = getString(toggleText)
     }
 
-    private fun renderResultsViewState(viewState: SystemSearchResultsViewState) {
+    private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
         deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
+        quickAccessRecyclerView.visibility = View.GONE
+    }
+
+    private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
+        quickAccessAdapter.submitList(it.favorites)
+        quickAccessRecyclerView.visibility = View.VISIBLE
     }
 
     private fun processCommand(command: SystemSearchViewModel.Command) {

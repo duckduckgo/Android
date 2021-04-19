@@ -22,6 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -40,6 +42,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -53,6 +56,7 @@ class SystemSearchViewModel(
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
+    private val favoritesRepository: FavoritesRepository,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -61,10 +65,14 @@ class SystemSearchViewModel(
         val expanded: Boolean = false
     )
 
-    data class SystemSearchResultsViewState(
-        val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
-        val appResults: List<DeviceApp> = emptyList()
-    )
+    sealed class Suggestions {
+        data class SystemSearchResultsViewState(
+            val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
+            val appResults: List<DeviceApp> = emptyList()
+        ) : Suggestions()
+
+        data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) : Suggestions()
+    }
 
     sealed class Command {
         object ClearInputText : Command()
@@ -77,7 +85,7 @@ class SystemSearchViewModel(
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
-    val resultsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
+    val resultsViewState: MutableLiveData<Suggestions> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val resultsPublishSubject = PublishRelay.create<String>()
@@ -90,10 +98,15 @@ class SystemSearchViewModel(
         resetViewState()
         configureResults()
         refreshAppList()
+        viewModelScope.launch {
+            favoritesRepository.favorites().collect { favorite ->
+                resultsViewState.postValue(Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }))
+            }
+        }
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
-    private fun currentResultsState(): SystemSearchResultsViewState = resultsViewState.value!!
+    private fun currentResultsState(): Suggestions = resultsViewState.value!!
 
     fun resetViewState() {
         command.value = Command.ClearInputText
@@ -114,7 +127,7 @@ class SystemSearchViewModel(
     private fun resetResultsState() {
         results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
         appsJob?.cancel()
-        resultsViewState.value = SystemSearchResultsViewState()
+        resultsViewState.value = Suggestions.QuickAccessItems(emptyList())
     }
 
     private fun configureResults() {
@@ -186,10 +199,18 @@ class SystemSearchViewModel(
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
         resultsViewState.postValue(
-            currentResultsState().copy(
-                autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                appResults = updatedApps
-            )
+            when (val currentResultsState = currentResultsState()) {
+                is Suggestions.SystemSearchResultsViewState -> {
+                    currentResultsState.copy(
+                        autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+                        appResults = updatedApps
+                    )
+                }
+                is Suggestions.QuickAccessItems -> Suggestions.SystemSearchResultsViewState(
+                    autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+                    appResults = updatedApps
+                )
+            }
         )
     }
 
@@ -262,12 +283,19 @@ class SystemSearchViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val autoComplete: Provider<AutoCompleteApi>,
     private val deviceAppLookup: Provider<DeviceAppLookup>,
+    private val favoritesRepository: Provider<FavoritesRepository>,
     private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore.get(), autoComplete.get(), deviceAppLookup.get(), pixel.get()) as T)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(
+                    userStageStore.get(),
+                    autoComplete.get(),
+                    deviceAppLookup.get(),
+                    pixel.get(),
+                    favoritesRepository.get()
+                ) as T)
                 else -> null
             }
         }
