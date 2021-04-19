@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
+import dagger.binding.TileServiceBingingKey
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class DeviceShieldTileService : TileService() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidInjection.inject(this)
+        AndroidInjection.inject(this, TileServiceBingingKey::class.java)
     }
 
     override fun onClick() {

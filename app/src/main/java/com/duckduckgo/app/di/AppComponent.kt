@@ -35,7 +35,6 @@ import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
@@ -48,7 +47,6 @@ import javax.inject.Singleton
         ApplicationModule::class,
         JobsModule::class,
         WorkerModule::class,
-        AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,
         StatisticsModule::class,

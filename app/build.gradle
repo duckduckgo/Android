@@ -167,8 +167,6 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
-    implementation Google.dagger.android
-    implementation Google.dagger.android.support
 
     // ThreeTenABP
     implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"

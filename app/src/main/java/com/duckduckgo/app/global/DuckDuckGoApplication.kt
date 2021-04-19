@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
@@ -57,12 +58,11 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
+import dagger.android.AndroidInjector
+import dagger.android.HasDaggerInjector
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.threetenabp.AndroidThreeTen
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
@@ -71,13 +71,11 @@ import org.jetbrains.anko.doAsync
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 import java.io.File
+import java.lang.RuntimeException
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleObserver {
-
-    @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleObserver {
 
     @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
@@ -162,6 +160,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
+
+    @Inject
+    lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
 
     private var launchedByFireAction: Boolean = false
 
@@ -380,10 +381,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         }
     }
 
-    override fun androidInjector(): AndroidInjector<Any> {
-        return androidInjector
-    }
-
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
         if (launchedByFireAction) {
@@ -407,4 +404,21 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
 
+    /**
+     * Implementation of [HasDaggerInjector.daggerFactoryFor].
+     * Similar to what dagger-android does, The [DuckDuckGoApplication] gets the [DuckDuckGoApplication.injectorFactoryMap]
+     * from DI. This holds all the Dagger factories for Android types, like Activities that we create. See [BookmarksActivityComponent.Factory]
+     * as an example.
+     *
+     * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
+     */
+    override fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*> {
+        return injectorFactoryMap[key]
+            ?: throw RuntimeException(
+                """
+                Could not find the dagger component for ${key::class.simpleName}.
+                You probably forgot to create the ${key::class.simpleName}Component
+                """.trimIndent()
+            )
+    }
 }

@@ -37,8 +37,7 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     // Dagger
-    implementation Google.dagger.android
-    implementation Google.dagger.android.support
+    implementation Google.dagger
     // fixme: for whatever reason moving to AndroidX.room.compiler breaks room kapt and vpn database is not generated
     // the problem is not with refreshVersions but with the dagger version. AndroidX.room.compiler uses 2.32
     // I don't understand yet what happens tho so I will leave it as is for now

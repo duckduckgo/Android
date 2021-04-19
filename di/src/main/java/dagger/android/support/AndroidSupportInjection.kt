@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package dagger.android.support
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.app.Application
+import androidx.fragment.app.Fragment
+import dagger.android.AndroidInjector
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.fragmentKtx
-    implementation Google.dagger
+class AndroidSupportInjection {
+    companion object {
+        inline fun <reified T : Fragment> inject(instance: T) {
+            AndroidInjector.inject(instance.context?.applicationContext as Application, instance)
+        }
+    }
 }
