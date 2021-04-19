@@ -61,6 +61,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
         favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager)
         recycler.adapter = ConcatAdapter(favoritesAdapter, bookmarksAdapter)
+        recycler.setItemAnimator(null);
     }
 
     private fun observeViewModel() {
