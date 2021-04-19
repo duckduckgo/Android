@@ -16,13 +16,19 @@
 
 package com.duckduckgo.app.bookmarks.service
 
+import android.content.ContentResolver
+import android.net.Uri
+import android.os.Environment
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import java.io.File
 
 class BookmarkManager(
+    private val contentResolver: ContentResolver,
     private val dao: BookmarksDao,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) {
@@ -55,8 +61,19 @@ class BookmarkManager(
 
     data class Bookmark(val title: String, val url: String)
 
+    fun importUri(uri: Uri): List<Bookmark> {
+        contentResolver.openInputStream(uri).use { stream ->
+            val document = Jsoup.parse(stream, "", "duckduckgo.com")
+            return parseDocument(document)
+        }
+    }
+
     fun import(html: String): List<Bookmark> {
         val document = Jsoup.parse(html)
+        return parseDocument(document)
+    }
+
+    private fun parseDocument(document: Document): List<Bookmark> {
         val validBookmarks = mutableListOf<Bookmark>()
         val bookmarkLinks = document.select("a")
         bookmarkLinks.forEach { possibleBookmark ->
@@ -64,7 +81,6 @@ class BookmarkManager(
             val title = possibleBookmark.text()
             val bookmark = Bookmark(title, link)
             validBookmarks.add(bookmark)
-
         }
         return validBookmarks
     }

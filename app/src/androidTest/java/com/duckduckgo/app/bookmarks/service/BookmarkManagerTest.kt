@@ -47,11 +47,12 @@ class BookmarkManagerTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         dao = db.bookmarksDao()
-        bookmarkManager = BookmarkManager(dao)
+        bookmarkManager = BookmarkManager(context.contentResolver, dao)
     }
 
     @After
