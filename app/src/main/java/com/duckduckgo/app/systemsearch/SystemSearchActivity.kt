@@ -30,12 +30,14 @@ import android.widget.Toast.LENGTH_SHORT
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -126,8 +128,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
         )
         viewModel.resultsViewState.observe(
-            this, {
-                when(it) {
+            this,
+            {
+                when (it) {
                     is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
                         renderResultsViewState(it)
                     }
@@ -179,6 +182,17 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         val layoutManager = GridLayoutManager(this, 4)
         quickAccessRecyclerView.layoutManager = layoutManager
         quickAccessAdapter = FavoritesQuickAccessAdapter(this, faviconManager)
+        val itemTouchHelper = ItemTouchHelper(
+            QuickAccessDragTouchItemListener(
+                quickAccessAdapter,
+                object : QuickAccessDragTouchItemListener.DragDropListener {
+                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+                        viewModel.onQuickAccessListChanged(listElements)
+                    }
+                }
+            )
+        )
+        itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
         quickAccessRecyclerView.adapter = quickAccessAdapter
     }
 

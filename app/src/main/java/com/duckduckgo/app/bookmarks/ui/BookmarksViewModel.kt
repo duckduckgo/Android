@@ -197,13 +197,13 @@ class BookmarksViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(BookmarksViewModel::class.java) -> (
-                        BookmarksViewModel(
-                            favoritesRepository.get(),
-                            dao.get(),
-                            faviconManager.get(),
-                            dispatcherProvider.get()
-                        ) as T
-                        )
+                    BookmarksViewModel(
+                        favoritesRepository.get(),
+                        dao.get(),
+                        faviconManager.get(),
+                        dispatcherProvider.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

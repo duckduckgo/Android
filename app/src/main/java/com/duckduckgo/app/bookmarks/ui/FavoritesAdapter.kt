@@ -50,9 +50,9 @@ class FavoritesAdapter(
     }
 
     interface FavoriteItemTypes
-    object Header: FavoriteItemTypes
-    object EmptyHint: FavoriteItemTypes
-    data class FavoriteItem(val favorite: Favorite): FavoriteItemTypes
+    object Header : FavoriteItemTypes
+    object EmptyHint : FavoriteItemTypes
+    data class FavoriteItem(val favorite: Favorite) : FavoriteItemTypes
 
     var favoriteItems: List<FavoriteItemTypes> = emptyList()
         set(value) {
@@ -102,7 +102,7 @@ class FavoritesAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(favoriteItems[position]) {
+        return when (favoriteItems[position]) {
             is Header -> {
                 FAVORITE_SECTION_TITLE_TYPE
             }

@@ -74,7 +74,7 @@ class FavoritesQuickAccessAdapter(
 
 class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite>() {
     override fun areItemsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
-        return oldItem == newItem
+        return oldItem.favorite.id == newItem.favorite.id
     }
 
     override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {

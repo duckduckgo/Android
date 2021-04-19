@@ -100,7 +100,7 @@ class BookmarksAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(bookmarkItems[position]) {
+        return when (bookmarkItems[position]) {
             is Header -> BOOKMARK_SECTION_TITLE_TYPE
             is EmptyHint -> EMPTY_STATE_TYPE
             else -> BOOKMARK_TYPE

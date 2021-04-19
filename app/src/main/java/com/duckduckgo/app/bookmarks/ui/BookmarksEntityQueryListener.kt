@@ -17,7 +17,6 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.appcompat.widget.SearchView
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.SavedSite
 
 class BookmarksEntityQueryListener(

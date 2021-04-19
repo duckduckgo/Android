@@ -17,8 +17,11 @@
 package com.duckduckgo.app.bookmarks.db
 
 import androidx.room.*
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.anko.collections.forEachWithIndex
+import java.util.*
 
 @Dao
 interface FavoritesDao {
@@ -26,7 +29,7 @@ interface FavoritesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(favorite: FavoriteEntity): Long
 
-    @Query("select * from favorites")
+    @Query("select * from favorites order by position")
     fun favorites(): Flow<List<FavoriteEntity>>
 
     @Query("select count(*) from favorites WHERE url LIKE :url")
@@ -46,4 +49,16 @@ interface FavoritesDao {
 
     @Query("select position from favorites where id = ( select MAX(id) from favorites)")
     suspend fun getLastPosition(): Int?
+
+    @Query("select * from favorites where id = :id")
+    fun favorite(id: Long): FavoriteEntity?
+
+    @Transaction
+    suspend fun persistChanges(favorites: List<SavedSite.Favorite>) {
+        favorites.forEachWithIndex { index, favorite ->
+            val favoriteEntity = favorite(favorite.id) ?: return
+            favoriteEntity.position = index
+            update(favoriteEntity)
+        }
+    }
 }

@@ -272,6 +272,13 @@ class SystemSearchViewModel(
         super.onCleared()
     }
 
+    fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        viewModelScope.launch(dispatchers.io()) {
+            Timber.i("Persist favorites $newList")
+            favoritesRepository.persistChanges(newList.map { it.favorite })
+        }
+    }
+
     companion object {
         private const val DEBOUNCE_TIME_MS = 200L
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
@@ -289,13 +296,15 @@ class SystemSearchViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(
-                    userStageStore.get(),
-                    autoComplete.get(),
-                    deviceAppLookup.get(),
-                    pixel.get(),
-                    favoritesRepository.get()
-                ) as T)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> (
+                    SystemSearchViewModel(
+                        userStageStore.get(),
+                        autoComplete.get(),
+                        deviceAppLookup.get(),
+                        pixel.get(),
+                        favoritesRepository.get()
+                    ) as T
+                    )
                 else -> null
             }
         }
