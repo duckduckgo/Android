@@ -27,17 +27,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.service.Bookmark
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
-import com.duckduckgo.app.browser.R.menu.bookmark_activity_menu
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
@@ -82,9 +81,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         if (requestCode == 111 && resultCode == RESULT_OK) {
             val selectedFile = data?.data //The uri with the location of the file
-
+            viewModel.importBookmarks(selectedFile!!)
         }
     }
+
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
         recycler.adapter = adapter
@@ -109,17 +109,31 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
                     is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
                     is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
+                    is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.bookmarks)
                 }
             }
         )
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val searchItem = menu?.findItem(action_search)
-        val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
-        return super.onCreateOptionsMenu(menu)
+    private fun showImportedBookmarks(bookmarks: List<Bookmark>) {
+        Snackbar.make(
+            bookmarkRootView,
+            "Imported ${bookmarks.size} bookmarks",
+            Snackbar.LENGTH_LONG
+        ).show()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
+        return true
+    }
+
+    // override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    //     val searchItem = menu?.findItem(action_search)
+    //     val searchView = searchItem?.actionView as SearchView
+    //     searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
+    //     return super.onCreateOptionsMenu(menu)
+    // }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -174,7 +188,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insert(bookmark)
         }.show()
-
     }
 
     private fun delete(bookmark: BookmarkEntity) {

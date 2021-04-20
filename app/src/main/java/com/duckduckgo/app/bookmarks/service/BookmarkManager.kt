@@ -18,22 +18,28 @@ package com.duckduckgo.app.bookmarks.service
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.os.Environment
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.io.File
 
-class BookmarkManager(
+data class Bookmark(val title: String, val url: String)
+
+interface BookmarkManager {
+    suspend fun export(): String
+    suspend fun importUri(uri: Uri): List<Bookmark>
+}
+
+class DuckDuckGoBookmarkManager constructor(
     private val contentResolver: ContentResolver,
     private val dao: BookmarksDao,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
-) {
+) : BookmarkManager {
 
-    suspend fun export(): String {
+    override suspend fun export(): String {
         return withContext(dispatcher.io()) {
             if (dao.hasBookmarks()) {
                 buildString {
@@ -59,13 +65,16 @@ class BookmarkManager(
         }
     }
 
-    data class Bookmark(val title: String, val url: String)
-
-    fun importUri(uri: Uri): List<Bookmark> {
-        contentResolver.openInputStream(uri).use { stream ->
-            val document = Jsoup.parse(stream, "", "duckduckgo.com")
-            return parseDocument(document)
+    override suspend fun importUri(uri: Uri): List<Bookmark> {
+        val bookmarks = contentResolver.openInputStream(uri).use { stream ->
+            val document = Jsoup.parse(stream, "UTF-8", "duckduckgo.com")
+            parseDocument(document)
         }
+        bookmarks.forEach {
+            dao.insert(BookmarkEntity(title = it.title, url = it.url))
+        }
+
+        return bookmarks
     }
 
     fun import(html: String): List<Bookmark> {
