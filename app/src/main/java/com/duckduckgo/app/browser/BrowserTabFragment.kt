@@ -487,6 +487,7 @@ class BrowserTabFragment :
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
+        swipeRefreshContainer.isEnabled = false
         homeBackgroundLogo.showLogo()
     }
 
