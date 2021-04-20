@@ -1674,7 +1674,6 @@ class BrowserTabFragment :
 
                 if (!viewState.isLoading && lastSeenBrowserViewState?.browserShowing == true) {
                     swipeRefreshContainer.isRefreshing = false
-                    webView?.detectOverscrollBehavior()
                 }
             }
         }
