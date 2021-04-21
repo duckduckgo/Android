@@ -20,6 +20,8 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
+import android.provider.Settings
+import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
@@ -140,7 +142,12 @@ class FireDialog(
         }
     }
 
-    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled
+    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled && animatorDurationEnabled()
+
+    private fun animatorDurationEnabled(): Boolean {
+        val animatorScale = Settings.Global.getFloat(context.contentResolver, ANIMATOR_DURATION_SCALE, 1.0f)
+        return animatorScale != 0.0f
+    }
 
     private fun playAnimation() {
         window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)
