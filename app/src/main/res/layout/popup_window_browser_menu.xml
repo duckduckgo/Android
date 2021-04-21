@@ -102,6 +102,11 @@
                 android:text="@string/shareMenuTitle" />
 
             <TextView
+                android:id="@+id/newEmailAliasMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/newEmailAliasMenuTitle" />
+
+            <TextView
                 android:id="@+id/findInPageMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/findInPageMenuTitle" />
