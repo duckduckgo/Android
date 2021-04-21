@@ -80,7 +80,7 @@ class AppEmailManager(
     override fun getAlias(): String? = consumeAlias()
 
     override fun isSignedIn(): Boolean {
-        return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank() && !emailDataStore.nextAlias.isNullOrBlank()
+        return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
     }
 
     override fun storeCredentials(token: String, username: String) {

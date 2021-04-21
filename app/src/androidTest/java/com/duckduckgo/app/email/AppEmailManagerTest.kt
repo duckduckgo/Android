@@ -134,18 +134,9 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenIsSignedInAndNextAliasDoesNotExistThenReturnFalse() {
+    fun whenIsSignedInAndTokenAndUsernameExistThenReturnTrue() {
         whenever(mockEmailDataStore.emailToken).thenReturn("token")
         whenever(mockEmailDataStore.emailUsername).thenReturn("username")
-
-        assertFalse(testee.isSignedIn())
-    }
-
-    @Test
-    fun whenIsSignedInAndTokenAndUsernameExistAndNextAliasExistThenReturnTrue() {
-        whenever(mockEmailDataStore.emailToken).thenReturn("token")
-        whenever(mockEmailDataStore.emailUsername).thenReturn("username")
-        whenever(mockEmailDataStore.nextAlias).thenReturn("alias")
 
         assertTrue(testee.isSignedIn())
     }
