@@ -25,11 +25,21 @@ import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
 
 data class Bookmark(val title: String, val url: String)
 
+sealed class ExportBookmarksResult {
+    object Success : ExportBookmarksResult()
+    data class Error(val exception: Exception) : ExportBookmarksResult()
+    object NoBookmarksAvailable : ExportBookmarksResult()
+}
+
+
 interface BookmarkManager {
-    suspend fun export(): String
+    suspend fun export(uri: Uri): ExportBookmarksResult
     suspend fun importUri(uri: Uri): List<Bookmark>
 }
 
@@ -39,10 +49,11 @@ class DuckDuckGoBookmarkManager constructor(
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : BookmarkManager {
 
-    override suspend fun export(): String {
+
+    override suspend fun export(uri: Uri): ExportBookmarksResult {
         return withContext(dispatcher.io()) {
             if (dao.hasBookmarks()) {
-                buildString {
+               val bookmarks =  buildString {
                     appendLine("<!DOCTYPE NETSCAPE-Bookmark-file-1>")
                     appendLine("<!--This is an automatically generated file.")
                     appendLine("It will be read and overwritten.")
@@ -51,7 +62,7 @@ class DuckDuckGoBookmarkManager constructor(
                     appendLine("<Title>Bookmarks</Title>")
                     appendLine("<H1>Bookmarks</H1>")
                     appendLine("<DL><p>")
-                    appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo</H3>")
+                    appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo</H3>")
                     appendLine("    <DL><p>")
                     dao.bookmarksSync().forEach { entity ->
                         appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
@@ -59,9 +70,29 @@ class DuckDuckGoBookmarkManager constructor(
                     appendLine("    </DL><p>")
                     appendLine("</DL><p>")
                 }
+                writeFileContent(uri, bookmarks)
             } else {
-                ""
+                ExportBookmarksResult.NoBookmarksAvailable
             }
+        }
+    }
+
+    private fun writeFileContent(uri: Uri, content: String): ExportBookmarksResult {
+        return try {
+            val file = contentResolver.openFileDescriptor(uri, "w")
+            if (file != null) {
+                val fileOutputStream = FileOutputStream(file.fileDescriptor)
+                fileOutputStream.write(content.toByteArray())
+                fileOutputStream.close()
+                file.close()
+                ExportBookmarksResult.Success
+            } else {
+                ExportBookmarksResult.NoBookmarksAvailable
+            }
+        } catch (e: FileNotFoundException) {
+            ExportBookmarksResult.Error(e)
+        } catch (e: IOException) {
+            ExportBookmarksResult.Error(e)
         }
     }
 

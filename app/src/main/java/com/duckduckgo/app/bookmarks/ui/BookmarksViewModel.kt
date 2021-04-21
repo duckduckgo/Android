@@ -17,11 +17,14 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.net.Uri
+import android.os.FileUtils
 import androidx.lifecycle.*
+import androidx.room.util.FileUtil
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.service.Bookmark
 import com.duckduckgo.app.bookmarks.service.BookmarkManager
+import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -56,6 +59,7 @@ class BookmarksViewModel(
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
         class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
         class ImportedBookmarks(val bookmarks: List<Bookmark>) : Command()
+        data class ExportedBookmarks(val exportBookmarksResult: ExportBookmarksResult) : Command()
 
     }
 
@@ -119,10 +123,19 @@ class BookmarksViewModel(
     }
 
     fun importBookmarks(uri: Uri) {
-        viewModelScope.launch(dispatcherProvider.io()){
+        viewModelScope.launch(dispatcherProvider.io()) {
             val bookmarks = bookmarksManager.importUri(uri)
-            withContext(dispatcherProvider.main()){
+            withContext(dispatcherProvider.main()) {
                 command.value = ImportedBookmarks(bookmarks)
+            }
+        }
+    }
+
+    fun exportBookmarks(selectedFile: Uri) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val result = bookmarksManager.export(selectedFile)
+            withContext(dispatcherProvider.main()) {
+                command.value = ExportedBookmarks(result)
             }
         }
     }
@@ -138,7 +151,12 @@ class BookmarksViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao.get(), faviconManager.get(), bookmarksManager.get(), dispatcherProvider.get()) as T)
+                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(
+                    dao.get(),
+                    faviconManager.get(),
+                    bookmarksManager.get(),
+                    dispatcherProvider.get()
+                ) as T)
                 else -> null
             }
         }

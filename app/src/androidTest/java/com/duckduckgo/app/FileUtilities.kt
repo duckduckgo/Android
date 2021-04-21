@@ -16,7 +16,11 @@
 
 package com.duckduckgo.app
 
+import android.content.ContentResolver
+import android.net.Uri
 import java.io.BufferedReader
+import java.io.File
+import java.io.FileOutputStream
 
 object FileUtilities {
 
@@ -26,4 +30,15 @@ object FileUtilities {
         return javaClass.classLoader!!.getResource(resourceName).openStream().bufferedReader()
     }
 
+    private fun writeFileContent(contentResolver: ContentResolver, uri: Uri, content: String) {
+        val file = contentResolver.openFileDescriptor(uri, "w")
+
+        file?.let {
+            val fileOutputStream = FileOutputStream(file.fileDescriptor)
+            fileOutputStream.write(content.toByteArray())
+            fileOutputStream.close()
+            it.close()
+        }
+
+    }
 }

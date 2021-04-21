@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.service.Bookmark
+import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
@@ -79,9 +80,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 111 && resultCode == RESULT_OK) {
+        if (requestCode == IMPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
             val selectedFile = data?.data //The uri with the location of the file
             viewModel.importBookmarks(selectedFile!!)
+        }
+
+        if (requestCode == EXPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
+            val selectedFile = data?.data //The uri with the location of the file
+            viewModel.exportBookmarks(selectedFile!!)
         }
     }
 
@@ -110,15 +116,34 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
                     is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
                     is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.bookmarks)
+                    is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
                 }
             }
         )
     }
 
     private fun showImportedBookmarks(bookmarks: List<Bookmark>) {
+        showMessage("Imported ${bookmarks.size} bookmarks")
+    }
+
+    private fun showExportedBookmarks(it: ExportBookmarksResult) {
+        when (it) {
+            is ExportBookmarksResult.Error -> {
+                showMessage("Error exporting bookmarks ${it.exception}")
+            }
+            ExportBookmarksResult.NoBookmarksAvailable -> {
+                showMessage("No Bookmarks available")
+            }
+            ExportBookmarksResult.Success -> {
+                showMessage("Successfully exported bookmarks")
+            }
+        }
+    }
+
+    private fun showMessage(message: String) {
         Snackbar.make(
             bookmarkRootView,
-            "Imported ${bookmarks.size} bookmarks",
+            message,
             Snackbar.LENGTH_LONG
         ).show()
     }
@@ -143,10 +168,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
 
-                startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
+                startActivityForResult(Intent.createChooser(intent, "Select a file"), IMPORT_BOOKMARKS_REQUEST_CODE)
             }
             R.id.bookmark_export -> {
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
 
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "text/html"
+                intent.putExtra(Intent.EXTRA_TITLE, "bookmarks_ddg.html")
+
+                startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -206,6 +237,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+        private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
+        private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
     }
 
     class BookmarksAdapter(
