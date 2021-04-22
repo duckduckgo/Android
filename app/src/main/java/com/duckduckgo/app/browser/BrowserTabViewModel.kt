@@ -66,6 +66,7 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
@@ -110,7 +111,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -148,7 +151,8 @@ class BrowserTabViewModel(
     private val variantManager: VariantManager,
     private val fileDownloader: FileDownloader,
     private val globalPrivacyControl: GlobalPrivacyControl,
-    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
+    private val emailManager: EmailManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -185,7 +189,8 @@ class BrowserTabViewModel(
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
-        val showDaxIcon: Boolean = false
+        val showDaxIcon: Boolean = false,
+        val isEmailSignedIn: Boolean = false
     )
 
     sealed class FireButton {
@@ -283,6 +288,9 @@ class BrowserTabViewModel(
         class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
         class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         object ChildTabClosed : Command()
+        class CopyAliasToClipboard(val alias: String) : Command()
+        class InjectEmailAddress(val address: String) : Command()
+        class ShowEmailTooltip(val address: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -350,6 +358,7 @@ class BrowserTabViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
@@ -394,13 +403,16 @@ class BrowserTabViewModel(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
-        viewModelScope.launch {
-            tabRepository.childClosedTabs.collect { closedTab ->
-                if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
-                    command.value = ChildTabClosed
-                }
+
+        tabRepository.childClosedTabs.onEach { closedTab ->
+            if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
+                command.value = ChildTabClosed
             }
-        }
+        }.launchIn(viewModelScope)
+
+        emailManager.signedInFlow().onEach { isSignedIn ->
+            browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
+        }.launchIn(viewModelScope)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -1789,6 +1801,36 @@ class BrowserTabViewModel(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
+    fun showEmailTooltip() {
+        emailManager.getEmailAddress()?.let {
+            command.postValue(ShowEmailTooltip(it))
+        }
+    }
+
+    fun consumeAliasAndCopyToClipboard() {
+        emailManager.getAlias()?.let {
+            command.value = CopyAliasToClipboard(it)
+        }
+    }
+
+    fun consumeAlias() {
+        emailManager.getAlias()?.let {
+            command.postValue(InjectEmailAddress(it))
+            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS)
+        }
+    }
+
+    fun useAddress() {
+        emailManager.getEmailAddress()?.let {
+            command.postValue(InjectEmailAddress(it))
+            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS)
+        }
+    }
+
+    fun cancelAutofillTooltip() {
+        pixel.enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED)
+    }
+
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
             fileDownloader.download(
@@ -1876,12 +1918,13 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val variantManager: Provider<VariantManager>,
     private val fileDownloader: Provider<FileDownloader>,
     private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
-    private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>
+    private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
+    private val emailManager: Provider<EmailManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get()) as T
                 else -> null
             }
         }

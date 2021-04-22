@@ -24,9 +24,11 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.SettingsViewModel.EmailSetting
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
@@ -41,6 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 
 class SettingsViewModelTest {
@@ -71,16 +74,19 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockEmailManager, mockFireAnimationLoader, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -302,7 +308,74 @@ class SettingsViewModelTest {
         assertEquals(Command.LaunchGlobalPrivacyControl, commandCaptor.firstValue)
     }
 
+    @Test
+    fun whenUserNotSignedInOnEmailThenEmailSettingIsOff() {
+        givenUserIsNotSignedIn()
+
+        testee.start()
+
+        assert(latestViewState().emailSetting is EmailSetting.EmailSettingOff)
+    }
+
+    @Test
+    fun whenUserSignedInOnEmailAndEmailAddressIsNotNullThenEmailSettingIsOn() {
+        givenUserIsSignedInAndHasAliasAvailable()
+
+        testee.start()
+
+        assertTrue(latestViewState().emailSetting is EmailSetting.EmailSettingOn)
+    }
+
+    @Test
+    fun whenUserSignedInOnEmailAndEmailAddressIsNullThenEmailSettingIsOff() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+
+        testee.start()
+
+        assert(latestViewState().emailSetting is EmailSetting.EmailSettingOff)
+    }
+
+    @Test
+    fun whenOnEmailLogoutThenSignOutIsCalled() {
+        testee.onEmailLogout()
+
+        verify(mockEmailManager).signOut()
+    }
+
+    @Test
+    fun whenOnEmailLogoutThenEmailSettingIsOff() {
+        testee.onEmailLogout()
+
+        assert(latestViewState().emailSetting is EmailSetting.EmailSettingOff)
+    }
+
+    @Test
+    fun whenOnEmailSettingClickedAndUserIsSignedInThenLaunchEmailDialogCommandSent() {
+        givenUserIsSignedInAndHasAliasAvailable()
+
+        testee.onEmailSettingClicked()
+
+        assertCommandIssued<Command.LaunchEmailDialog>()
+    }
+
     private fun latestViewState() = testee.viewState.value!!
+
+    private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
+        Mockito.verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is T }
+        assertNotNull(issuedCommand)
+        (issuedCommand as T).apply { instanceAssertions() }
+    }
+
+    private fun givenUserIsSignedInAndHasAliasAvailable() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+    }
+
+    private fun givenUserIsNotSignedIn() {
+        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
+    }
 
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)

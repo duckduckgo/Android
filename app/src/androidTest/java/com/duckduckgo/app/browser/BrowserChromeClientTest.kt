@@ -125,5 +125,9 @@ class BrowserChromeClientTest {
         obj = mock<WebView.WebViewTransport>()
     }
 
-    private class TestWebView(context: Context) : WebView(context)
+    private class TestWebView(context: Context) : WebView(context){
+        override fun getUrl(): String {
+            return "https://example.com"
+        }
+    }
 }

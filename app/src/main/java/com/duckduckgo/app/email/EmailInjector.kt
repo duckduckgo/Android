@@ -1,0 +1,78 @@
+/*
+ * Copyright (c) 2020 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.email
+
+import android.content.Context
+import android.webkit.WebView
+import androidx.annotation.UiThread
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+
+interface EmailInjector {
+    fun injectEmailAutofillJs(webView: WebView, url: String?)
+    fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit)
+    fun injectAddressInEmailField(webView: WebView, alias: String?)
+    fun resetInjectedJsFlag()
+}
+
+class EmailInjectorJs(private val emailManager: EmailManager, private val urlDetector: DuckDuckGoUrlDetector) : EmailInjector {
+    private val javaScriptInjector = JavaScriptInjector()
+    private var hasJsBeenInjected = false
+
+    override fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit) {
+        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
+    }
+
+    @UiThread
+    override fun injectEmailAutofillJs(webView: WebView, url: String?) {
+        if (!hasJsBeenInjected && (isDuckDuckGoUrl(url) || emailManager.isSignedIn())) {
+            hasJsBeenInjected = true
+            webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context)}", null)
+        }
+    }
+
+    @UiThread
+    override fun injectAddressInEmailField(webView: WebView, alias: String?) {
+        webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+    }
+
+    override fun resetInjectedJsFlag() {
+        hasJsBeenInjected = false
+    }
+
+    private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoDomain(url))
+
+    private class JavaScriptInjector {
+        private lateinit var functions: String
+        private lateinit var aliasFunctions: String
+
+        fun getFunctionsJS(context: Context): String {
+            if (!this::functions.isInitialized) {
+                functions = context.resources.openRawResource(R.raw.autofill).bufferedReader().use { it.readText() }
+            }
+            return functions
+        }
+
+        fun getAliasFunctions(context: Context, alias: String?): String {
+            if (!this::aliasFunctions.isInitialized) {
+                aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
+            }
+            return aliasFunctions.replace("%s", alias.orEmpty())
+        }
+    }
+}
