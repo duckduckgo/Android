@@ -19,9 +19,14 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.global.baseHost
 import javax.inject.Inject
 
 class DuckDuckGoUrlDetector @Inject constructor() {
+
+    fun isDuckDuckGoDomain(uri: String): Boolean {
+        return uri.toUri().baseHost?.contains(AppUrl.Url.HOST) ?: false
+    }
 
     fun isDuckDuckGoUrl(uri: String): Boolean {
         return AppUrl.Url.HOST == uri.toUri().host
