@@ -21,24 +21,37 @@
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_margin="15dp">
 
-    <ImageView
-        android:id="@+id/quickAccessFavicon"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+    <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_gray_16dp" />
+        app:cardCornerRadius="6dp"
+        app:cardElevation="4dp">
+
+        <ImageView
+            android:id="@+id/quickAccessFavicon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_globe_gray_16dp" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/quickAccessTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:gravity="center"
         android:ellipsize="end"
+        android:gravity="center"
         android:maxLines="1"
+        android:paddingTop="8dp"
+        android:textColor="?normalTextColor"
+        android:textSize="12sp"
         tools:text="Super long favorite title" />
 
 </LinearLayout>
