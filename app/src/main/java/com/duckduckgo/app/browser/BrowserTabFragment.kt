@@ -501,7 +501,8 @@ class BrowserTabFragment :
         newTabLayout.show()
         appBarLayout.setExpanded(true)
         webView?.onPause()
-        webView?.gone()
+        webView?.hide()
+        swipeRefreshContainer.isEnabled = false
     }
 
     private fun showBrowser() {
@@ -1740,7 +1741,6 @@ class BrowserTabFragment :
 
                 if (!viewState.isLoading && lastSeenBrowserViewState?.browserShowing == true) {
                     swipeRefreshContainer.isRefreshing = false
-                    webView?.detectOverscrollBehavior()
                 }
             }
         }
