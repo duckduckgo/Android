@@ -32,6 +32,10 @@ class QuickAccessDragTouchItemListener(
         fun onListChanged(listElements: List<QuickAccessFavorite>)
     }
 
+    override fun isLongPressDragEnabled(): Boolean {
+        return false
+    }
+
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         Timber.i("QuickAccessDragTouchItemListener onMove ${viewHolder.bindingAdapterPosition} to ${target.bindingAdapterPosition}")
         val items = favoritesQuickAccessAdapter.currentList.toMutableList()

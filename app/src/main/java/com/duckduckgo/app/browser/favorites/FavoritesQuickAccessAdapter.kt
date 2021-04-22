@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.browser.favorites
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.os.Handler
+import android.view.*
+import androidx.constraintlayout.motion.widget.MotionController
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -32,10 +32,12 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
+    private val onMoveListener: (RecyclerView.ViewHolder) -> Unit
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
@@ -44,13 +46,38 @@ class FavoritesQuickAccessAdapter(
         private val layoutInflater: LayoutInflater,
         itemView: View,
         private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager
+        private val faviconManager: FaviconManager,
+        private val onMoveListener: (RecyclerView.ViewHolder) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
+
+        private var menu: Menu? = null
 
         fun bind(item: QuickAccessFavorite) {
             with(item.favorite) {
                 itemView.quickAccessTitle.text = title
                 loadFavicon(url)
+                itemView.quickAccessFaviconCard.setOnLongClickListener {
+                    Timber.i("QuickAccessFav: longPress")
+                    false
+                }
+
+                itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
+                    if(event.actionMasked == MotionEvent.ACTION_MOVE) {
+                        Timber.i("QuickAccessFav: move")
+                        onMoveListener(this@QuickAccessViewHolder)
+                        Handler().post {
+                            menu?.close()
+                        }
+                    }
+                    false
+                }
+
+                itemView.quickAccessFaviconCard.setOnCreateContextMenuListener { menu, v, menuInfo ->
+                    this@QuickAccessViewHolder.menu = menu
+                    Timber.i("QuickAccessFav: setOnCreateContextMenuListener")
+                    val Edit: MenuItem = menu.add(Menu.NONE, 1, 1, "Edit")
+                    val Delete: MenuItem = menu.add(Menu.NONE, 2, 2, "Delete")
+                }
             }
         }
 
@@ -64,7 +91,7 @@ class FavoritesQuickAccessAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_quick_access_item, parent, false)
-        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager)
+        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager, onMoveListener)
     }
 
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {

@@ -78,6 +78,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -181,8 +182,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureQuickAccessGrid() {
         val layoutManager = GridLayoutManager(this, 4)
         quickAccessRecyclerView.layoutManager = layoutManager
-        quickAccessAdapter = FavoritesQuickAccessAdapter(this, faviconManager)
-        val itemTouchHelper = ItemTouchHelper(
+        quickAccessAdapter = FavoritesQuickAccessAdapter(this, faviconManager, { viewHolder ->
+            itemTouchHelper.startDrag(viewHolder)
+        })
+        itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
                 quickAccessAdapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
@@ -192,6 +195,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 }
             )
         )
+
         itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
         quickAccessRecyclerView.adapter = quickAccessAdapter
     }
