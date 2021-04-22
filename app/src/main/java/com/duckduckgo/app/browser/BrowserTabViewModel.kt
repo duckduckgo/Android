@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -102,6 +103,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -164,7 +166,8 @@ class BrowserTabViewModel(
     }
 
     data class CtaViewState(
-        val cta: Cta? = null
+        val cta: Cta? = null,
+        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
     data class BrowserViewState(
@@ -405,6 +408,12 @@ class BrowserTabViewModel(
                 if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
                     command.value = ChildTabClosed
                 }
+            }
+        }
+        viewModelScope.launch {
+            favoritesRepository.favorites().collect { favorite ->
+                Timber.i("BrowserTab favs: collect $favorite")
+                ctaViewState.postValue(currentCtaViewState().copy(favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }))
             }
         }
     }
@@ -1920,7 +1929,39 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(
+                    statisticsUpdater.get(),
+                    queryUrlConverter.get(),
+                    duckDuckGoUrlDetector.get(),
+                    siteFactory.get(),
+                    tabRepository.get(),
+                    userWhitelistDao.get(),
+                    networkLeaderboardDao.get(),
+                    bookmarksDao.get(),
+                    favoritesRepository.get(),
+                    fireproofWebsiteRepository.get(),
+                    locationPermissionsRepository.get(),
+                    geoLocationPermissions.get(),
+                    navigationAwareLoginDetector.get(),
+                    autoComplete.get(),
+                    appSettingsPreferencesStore.get(),
+                    longPressHandler.get(),
+                    webViewSessionStorage.get(),
+                    specialUrlDetector.get(),
+                    faviconManager.get(),
+                    addToHomeCapabilityDetector.get(),
+                    ctaViewModel.get(),
+                    searchCountDao.get(),
+                    pixel.get(),
+                    dispatchers,
+                    userEventsStore.get(),
+                    notificationDao.get(),
+                    useOurAppDetector.get(),
+                    variantManager.get(),
+                    fileDownloader.get(),
+                    globalPrivacyControl.get(),
+                    fireproofDialogsEventHandler.get()
+                ) as T
                 else -> null
             }
         }

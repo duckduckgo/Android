@@ -56,6 +56,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -72,6 +74,9 @@ import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -116,6 +121,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -202,6 +208,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -220,6 +229,10 @@ class BrowserTabFragment :
     private lateinit var renderer: BrowserTabFragmentRenderer
 
     private lateinit var decorator: BrowserTabFragmentDecorator
+
+    private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
+
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -304,6 +317,7 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
+        configureQuickAccessGrid()
 
         decorator.decorateWithFeatures()
 
@@ -487,15 +501,13 @@ class BrowserTabFragment :
         newTabLayout.show()
         appBarLayout.setExpanded(true)
         webView?.onPause()
-        webView?.hide()
-        homeBackgroundLogo.showLogo()
+        webView?.gone()
     }
 
     private fun showBrowser() {
         newTabLayout.gone()
         webView?.show()
         webView?.onResume()
-        homeBackgroundLogo.hideLogo()
     }
 
     fun submitQuery(query: String) {
@@ -889,6 +901,40 @@ class BrowserTabFragment :
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
+
+    private fun configureQuickAccessGrid() {
+        val layoutManager = GridLayoutManager(requireContext(), 4)
+        quickAccessRecyclerView.layoutManager = layoutManager
+        quickAccessAdapter = FavoritesQuickAccessAdapter(
+            this, faviconManager,
+            { viewHolder ->
+                itemTouchHelper.startDrag(viewHolder)
+            },
+            {
+                //viewModel.onQuickAccesItemClicked(it)
+            },
+            {
+                //viewModel.onEditQuickAccessItemRequested(it)
+            },
+            {
+                //confirmDeleteSavedSite(it.favorite)
+            }
+        )
+        itemTouchHelper = ItemTouchHelper(
+            QuickAccessDragTouchItemListener(
+                quickAccessAdapter,
+                object : QuickAccessDragTouchItemListener.DragDropListener {
+                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+                        //viewModel.onQuickAccessListChanged(listElements)
+                    }
+                }
+            )
+        )
+
+        itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
+        quickAccessRecyclerView.adapter = quickAccessAdapter
+    }
+
 
     private fun configurePrivacyGrade() {
         toolbar.privacyGradeButton.setOnClickListener {
@@ -1838,17 +1884,18 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
-                    showCta(viewState.cta)
+                    showCta(viewState.cta, viewState.favorites)
                 } else {
                     hideHomeCta()
                     hideDaxCta()
+                    showHomeBackground(viewState.favorites)
                 }
             }
         }
 
-        private fun showCta(configuration: Cta) {
+        private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration)
+                is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
@@ -1872,7 +1919,7 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            homeBackgroundLogo.hideLogo()
+            hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
@@ -1883,15 +1930,33 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeCta(configuration: HomePanelCta) {
+        private fun showHomeCta(configuration: HomePanelCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
                 configuration.showCta(ctaContainer)
             }
-            homeBackgroundLogo.showLogo()
+            showHomeBackground(favorites)
             viewModel.onCtaShown()
+        }
+
+        private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+            Timber.i("BrowserTab favs: showHomeBackground $favorites")
+            if (favorites.isEmpty()) {
+                homeBackgroundLogo.showLogo()
+                quickAccessRecyclerView.visibility = GONE
+            } else {
+                homeBackgroundLogo.hideLogo()
+                quickAccessAdapter.submitList(favorites)
+                quickAccessRecyclerView.visibility = VISIBLE
+            }
+        }
+
+        private fun hideHomeBackground() {
+            Timber.i("BrowserTab favs: hideHomeBackground")
+            homeBackgroundLogo.hideLogo()
+            quickAccessRecyclerView.visibility = GONE
         }
 
         private fun hideDaxCta() {
