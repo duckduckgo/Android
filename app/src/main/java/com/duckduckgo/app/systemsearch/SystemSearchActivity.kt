@@ -32,6 +32,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -43,9 +45,12 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_bookmarks.*
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.activity_system_search.appBarLayout
 import kotlinx.android.synthetic.main.activity_system_search.autocompleteSuggestions
@@ -58,6 +63,7 @@ import kotlinx.android.synthetic.main.activity_system_search.results
 import kotlinx.android.synthetic.main.activity_system_search.resultsContent
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -131,6 +137,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         viewModel.resultsViewState.observe(
             this,
             {
+                Timber.i("SystemSearchActivity d: $it")
                 when (it) {
                     is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
                         renderResultsViewState(it)
@@ -182,9 +189,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureQuickAccessGrid() {
         val layoutManager = GridLayoutManager(this, 4)
         quickAccessRecyclerView.layoutManager = layoutManager
-        quickAccessAdapter = FavoritesQuickAccessAdapter(this, faviconManager, { viewHolder ->
-            itemTouchHelper.startDrag(viewHolder)
-        })
+        quickAccessAdapter = FavoritesQuickAccessAdapter(
+            this, faviconManager,
+            { viewHolder ->
+                itemTouchHelper.startDrag(viewHolder)
+            },
+            {
+                viewModel.onQuickAccesItemClicked(it)
+            },
+            {
+                viewModel.onEditQuickAccessItemRequested(it)
+            },
+            {
+                confirmDeleteSavedSite(it.favorite)
+            }
+        )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
                 quickAccessAdapter,
@@ -208,6 +227,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOmnibar() {
         resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateScroll() }
+    }
+
+    private fun showEditSavedSiteDialog(savedSite: SavedSite) {
+        val dialog = EditBookmarkDialogFragment.instance(savedSite)
+        dialog.show(supportFragmentManager, "EDIT_BOOKMARK")
+        dialog.listener = viewModel
     }
 
     private fun updateScroll() {
@@ -289,12 +314,27 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             is EditQuery -> {
                 editQuery(command.query)
             }
+            is LaunchEditDialog -> {
+                showEditSavedSiteDialog(command.savedSite)
+            }
         }
     }
 
     private fun editQuery(query: String) {
         omnibarTextInput.setText(query)
         omnibarTextInput.setSelection(query.length)
+    }
+
+    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        viewModel.deleteQuickAccessItem(savedSite)
+        Snackbar.make(
+            rootView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.insertQuickAccessItem(savedSite)
+        }.show()
     }
 
     private fun launchDuckDuckGo() {

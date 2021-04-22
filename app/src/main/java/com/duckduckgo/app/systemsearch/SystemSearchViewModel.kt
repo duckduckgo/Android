@@ -23,6 +23,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -42,6 +45,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -57,8 +61,9 @@ class SystemSearchViewModel(
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
     private val favoritesRepository: FavoritesRepository,
+    private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
-) : ViewModel() {
+) : ViewModel(), EditBookmarkDialogFragment.EditBookmarkListener {
 
     data class OnboardingViewState(
         val visible: Boolean,
@@ -78,6 +83,7 @@ class SystemSearchViewModel(
         object ClearInputText : Command()
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
+        data class LaunchEditDialog(val savedSite: SavedSite) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         object DismissKeyboard : Command()
@@ -281,9 +287,43 @@ class SystemSearchViewModel(
         }
     }
 
+    fun onQuickAccesItemClicked(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        command.value = Command.LaunchBrowser(it.favorite.url)
+    }
+
+    fun onEditQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        command.value = Command.LaunchEditDialog(it.favorite)
+    }
+
     companion object {
         private const val DEBOUNCE_TIME_MS = 200L
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
+    }
+
+    override fun onSavedSiteEdited(savedSite: SavedSite) {
+        when (savedSite) {
+            is SavedSite.Favorite -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    favoritesRepository.update(savedSite)
+                }
+            }
+            else -> throw IllegalArgumentException("Illegal SavedSite to edit received")
+        }
+    }
+
+    fun deleteQuickAccessItem(savedSite: SavedSite) {
+        val favorite = savedSite as? SavedSite.Favorite ?: return
+        viewModelScope.launch(dispatchers.io() + NonCancellable) {
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            favoritesRepository.delete(favorite)
+        }
+    }
+
+    fun insertQuickAccessItem(savedSite: SavedSite) {
+        val favorite = savedSite as? SavedSite.Favorite ?: return
+        viewModelScope.launch(dispatchers.io()) {
+            favoritesRepository.insert(favorite)
+        }
     }
 }
 
@@ -293,6 +333,7 @@ class SystemSearchViewModelFactory @Inject constructor(
     private val autoComplete: Provider<AutoCompleteApi>,
     private val deviceAppLookup: Provider<DeviceAppLookup>,
     private val favoritesRepository: Provider<FavoritesRepository>,
+    private val faviconManager: Provider<FaviconManager>,
     private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -304,7 +345,8 @@ class SystemSearchViewModelFactory @Inject constructor(
                         autoComplete.get(),
                         deviceAppLookup.get(),
                         pixel.get(),
-                        favoritesRepository.get()
+                        favoritesRepository.get(),
+                        faviconManager.get()
                     ) as T
                     )
                 else -> null

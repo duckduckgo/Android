@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.favorites
 
 import android.os.Handler
 import android.view.*
-import androidx.constraintlayout.motion.widget.MotionController
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -37,7 +36,10 @@ import timber.log.Timber
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val onMoveListener: (RecyclerView.ViewHolder) -> Unit
+    private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
+    private val onItemSelected: (QuickAccessFavorite) -> Unit,
+    private val onEditClicked: (QuickAccessFavorite) -> Unit,
+    private val onDeleteClicked: (QuickAccessFavorite) -> Unit
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
@@ -47,7 +49,10 @@ class FavoritesQuickAccessAdapter(
         itemView: View,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
-        private val onMoveListener: (RecyclerView.ViewHolder) -> Unit
+        private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
+        private val onItemSelected: (QuickAccessFavorite) -> Unit,
+        private val onEditClicked: (QuickAccessFavorite) -> Unit,
+        private val onDeleteClicked: (QuickAccessFavorite) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
         private var menu: Menu? = null
@@ -62,7 +67,7 @@ class FavoritesQuickAccessAdapter(
                 }
 
                 itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
-                    if(event.actionMasked == MotionEvent.ACTION_MOVE) {
+                    if (event.actionMasked == MotionEvent.ACTION_MOVE) {
                         Timber.i("QuickAccessFav: move")
                         onMoveListener(this@QuickAccessViewHolder)
                         Handler().post { menu?.close() }
@@ -73,9 +78,20 @@ class FavoritesQuickAccessAdapter(
                 itemView.quickAccessFaviconCard.setOnCreateContextMenuListener { menu, v, menuInfo ->
                     this@QuickAccessViewHolder.menu = menu
                     Timber.i("QuickAccessFav: setOnCreateContextMenuListener")
-                    val Edit: MenuItem = menu.add(Menu.NONE, 1, 1, "Edit")
-                    val Delete: MenuItem = menu.add(Menu.NONE, 2, 2, "Delete")
+                    val editMenuItem: MenuItem = menu.add(Menu.NONE, 1, 1, "Edit")
+                    val deleteMenuItem: MenuItem = menu.add(Menu.NONE, 2, 2, "Delete")
+                    editMenuItem.setOnMenuItemClickListener {
+                        onEditClicked(item)
+                        true
+                    }
+
+                    deleteMenuItem.setOnMenuItemClickListener {
+                        onDeleteClicked(item)
+                        true
+                    }
                 }
+
+                itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
             }
         }
 
@@ -89,7 +105,7 @@ class FavoritesQuickAccessAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_quick_access_item, parent, false)
-        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager, onMoveListener)
+        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
     }
 
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
