@@ -993,7 +993,7 @@ module.exports = "\n.wrapper *, .wrapper *::before, .wrapper *::after {\n    box
 
 },{}],3:[function(require,module,exports){
 const {daxSvg} = require('./logo-svg')
-const { isMacOSApp, getDaxBoundingBox, safeExecute } = require('./autofill-utils')
+const { isApp, getDaxBoundingBox, safeExecute } = require('./autofill-utils')
 
 class DDGAutofill {
     constructor (input, associatedForm, getAlias, refreshAlias) {
@@ -1003,7 +1003,7 @@ class DDGAutofill {
         this.associatedForm = associatedForm
         this.animationFrame = null
 
-        const includeStyles = isMacOSApp
+        const includeStyles = isApp
             ? `<style>${require('./DDGAutofill-styles.js')}</style>`
             : `<link rel="stylesheet" href="${chrome.runtime.getURL('public/css/email-autofill.css')}">`
 
@@ -1159,7 +1159,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var DDGAutofill = require('./DDGAutofill');
 
 var _require = require('./autofill-utils'),
-    isMacOSApp = _require.isMacOSApp,
+    isApp = _require.isApp,
     notifyWebApp = _require.notifyWebApp,
     isDDGApp = _require.isDDGApp,
     isAndroid = _require.isAndroid,
@@ -1175,7 +1175,7 @@ var SIGN_IN_MSG = {
 
 var createAttachTooltip = function createAttachTooltip(getAlias, refreshAlias) {
   return function (form, input) {
-    if (isDDGApp && !isMacOSApp) {
+    if (isDDGApp && !isApp) {
       form.activeInput = input;
       getAlias().then(function (alias) {
         if (alias) form.autofill(alias);else form.activeInput.focus();
@@ -1328,17 +1328,17 @@ var AppleDeviceInterface = function AppleDeviceInterface() {
   _classCallCheck(this, AppleDeviceInterface);
 
   if (isDDGDomain()) {
-    // Tell the web app whether we're in the macOS app
+    // Tell the web app whether we're in the app
     notifyWebApp({
-      isMacOSApp: isMacOSApp
+      isApp: isApp
     });
   }
 
   this.getAlias = function () {
     return sendAndWaitForAnswer(function () {
       return window.webkit.messageHandlers['emailHandlerGetAlias'].postMessage({
-        requiresUserPermission: !isMacOSApp,
-        shouldConsumeAliasIfProvided: !isMacOSApp
+        requiresUserPermission: !isApp,
+        shouldConsumeAliasIfProvided: !isApp
       });
     }, 'getAliasResponse').then(function (_ref4) {
       var alias = _ref4.alias;
@@ -1871,10 +1871,10 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-var isMacOSApp = false; // Do not modify or remove the next line -- the macOS app code will replace it with `isMacOSApp = true;`
-// INJECT isMacOSApp HERE
+var isApp = false; // Do not modify or remove the next line -- the app code will replace it with `isApp = true;`
+// INJECT isApp HERE
 
-var isDDGApp = /(iPhone|iPad|Android|Mac).*DuckDuckGo\/[0-9]/i.test(window.navigator.userAgent) || isMacOSApp;
+var isDDGApp = /(iPhone|iPad|Android).*DuckDuckGo\/[0-9]/i.test(window.navigator.userAgent) || isApp;
 var isAndroid = isDDGApp && /Android/i.test(window.navigator.userAgent);
 var DDG_DOMAIN_REGEX = new RegExp(/^https:\/\/(([a-z0-9-_]+?)\.)?duckduckgo\.com/);
 
@@ -2024,7 +2024,7 @@ var removeInlineStyles = function removeInlineStyles(el, styles) {
 };
 
 module.exports = {
-  isMacOSApp: isMacOSApp,
+  isApp: isApp,
   isDDGApp: isDDGApp,
   isAndroid: isAndroid,
   DDG_DOMAIN_REGEX: DDG_DOMAIN_REGEX,
