@@ -65,9 +65,7 @@ class FavoritesQuickAccessAdapter(
                     if(event.actionMasked == MotionEvent.ACTION_MOVE) {
                         Timber.i("QuickAccessFav: move")
                         onMoveListener(this@QuickAccessViewHolder)
-                        Handler().post {
-                            menu?.close()
-                        }
+                        Handler().post { menu?.close() }
                     }
                     false
                 }
