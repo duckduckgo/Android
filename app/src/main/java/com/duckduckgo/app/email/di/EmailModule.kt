@@ -18,6 +18,7 @@ package com.duckduckgo.app.email.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.email.EmailInjectorJs
@@ -28,6 +29,7 @@ import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.global.DispatcherProvider
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -35,8 +37,8 @@ class EmailModule {
 
     @Singleton
     @Provides
-    fun providesEmailManager(emailService: EmailService, emailDataStore: EmailDataStore, dispatcherProvider: DispatcherProvider): EmailManager {
-        return AppEmailManager(emailService, emailDataStore, dispatcherProvider)
+    fun providesEmailManager(emailService: EmailService, emailDataStore: EmailDataStore, dispatcherProvider: DispatcherProvider, @AppCoroutineScope appCoroutineScope: CoroutineScope): EmailManager {
+        return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope)
     }
 
     @Provides

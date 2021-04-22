@@ -26,10 +26,10 @@ import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import org.junit.After
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -47,22 +47,13 @@ class AppEmailManagerTest {
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = mock()
-    private val aliasChannel = Channel<String?>()
+    private val aliasSharedFlow = MutableStateFlow<String?>(null)
     lateinit var testee: AppEmailManager
 
     @Before
     fun setup() {
-        whenever(mockEmailDataStore.nextAliasFlow()).thenReturn(aliasChannel.consumeAsFlow())
-        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider)
-
-        coroutineRule.runBlocking {
-            testee.onAppForegrounded()
-        }
-    }
-
-    @After
-    fun after() {
-        aliasChannel.close()
+        whenever(mockEmailDataStore.nextAliasFlow()).thenReturn(aliasSharedFlow.asStateFlow())
+        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test
@@ -89,13 +80,6 @@ class AppEmailManagerTest {
         testee.getAlias()
 
         verify(mockEmailDataStore, times(2)).nextAlias = null
-    }
-
-    @Test
-    fun whenNewAliasReceivedThenNextAliasUpdated() = coroutineRule.runBlocking {
-        aliasChannel.send("newAlias")
-
-        assertEquals("newAlias", testee.nextAlias)
     }
 
     @Test
@@ -167,13 +151,13 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenSignedOutThenClearEmailDataAndNextAliasIsNull() {
+    fun whenSignedOutThenClearEmailDataAndAliasIsNull() {
         testee.signOut()
 
         verify(mockEmailDataStore).emailUsername = null
         verify(mockEmailDataStore).emailToken = null
         verify(mockEmailDataStore).nextAlias = null
-        assertNull(testee.nextAlias)
+        assertNull(testee.getAlias())
     }
 
     @Test
@@ -191,6 +175,6 @@ class AppEmailManagerTest {
     }
 
     private suspend fun givenNextAliasExists() {
-        aliasChannel.send("alias")
+        aliasSharedFlow.emit("alias")
     }
 }

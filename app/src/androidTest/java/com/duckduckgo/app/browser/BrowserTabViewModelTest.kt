@@ -117,7 +117,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -272,7 +274,7 @@ class BrowserTabViewModelTest {
 
     private val childClosedTabsFlow = childClosedTabsSharedFlow.asSharedFlow()
 
-    private val emailChannel = Channel<Boolean>()
+    private val emailStateFlow = MutableStateFlow(false)
 
     @Before
     fun before() {
@@ -288,7 +290,7 @@ class BrowserTabViewModelTest {
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
-        whenever(mockEmailManager.signedInFlow()).thenReturn(emailChannel.consumeAsFlow())
+        whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -367,7 +369,6 @@ class BrowserTabViewModelTest {
     fun after() {
         ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
-        emailChannel.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -3172,14 +3173,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEmailIsSignedOutThenIsEmailSignedInReturnsFalse() = coroutineRule.runBlocking {
-        emailChannel.send(false)
+        emailStateFlow.emit(false)
 
         assertFalse(browserViewState().isEmailSignedIn)
     }
 
     @Test
     fun whenEmailIsSignedInThenIsEmailSignedInReturnsTrue() = coroutineRule.runBlocking {
-        emailChannel.send(true)
+        emailStateFlow.emit(true)
 
         assertTrue(browserViewState().isEmailSignedIn)
     }

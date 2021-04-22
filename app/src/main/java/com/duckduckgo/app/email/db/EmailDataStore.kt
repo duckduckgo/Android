@@ -24,24 +24,24 @@ import androidx.security.crypto.MasterKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 interface EmailDataStore {
     var emailToken: String?
     var nextAlias: String?
     var emailUsername: String?
-    fun nextAliasFlow(): Flow<String?>
+    fun nextAliasFlow(): StateFlow<String?>
 }
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataStore {
 
-    private val nextAliasChannel: ConflatedBroadcastChannel<String?> = ConflatedBroadcastChannel(nextAlias)
-    override fun nextAliasFlow(): Flow<String?> = nextAliasChannel.asFlow()
+    private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
+    override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow.asStateFlow()
 
     private val encryptedPreferences: SharedPreferences
         get() = EncryptedSharedPreferences.create(
@@ -70,7 +70,7 @@ class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataS
                 if (value == null) remove(KEY_NEXT_ALIAS)
                 else putString(KEY_NEXT_ALIAS, value)
                 GlobalScope.launch {
-                    nextAliasChannel.send(value)
+                    nextAliasSharedFlow.emit(value)
                 }
             }
         }

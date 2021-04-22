@@ -111,7 +111,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -337,10 +338,6 @@ class BrowserTabViewModel(
         context = viewModelScope.coroutineContext
     )
 
-    private val isEmailSignedIn: LiveData<Boolean> = emailManager.signedInFlow().asLiveData(
-        context = viewModelScope.coroutineContext
-    )
-
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
@@ -359,11 +356,6 @@ class BrowserTabViewModel(
             is Event.AskToDisableLoginDetection -> AskToDisableLoginDetection
             is Event.FireproofWebSiteSuccess -> ShowFireproofWebSiteConfirmation(event.fireproofWebsiteEntity)
         }
-    }
-
-    private val emailSignIn = Observer<Boolean> { isSignedIn ->
-        Timber.i("Is email signed in $isSignedIn")
-        browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
     }
 
     @ExperimentalCoroutinesApi
@@ -411,14 +403,16 @@ class BrowserTabViewModel(
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
-        viewModelScope.launch {
-            tabRepository.childClosedTabs.collect { closedTab ->
-                if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
-                    command.value = ChildTabClosed
-                }
+
+        tabRepository.childClosedTabs.onEach { closedTab ->
+            if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
+                command.value = ChildTabClosed
             }
-        }
-        isEmailSignedIn.observeForever(emailSignIn)
+        }.launchIn(viewModelScope)
+
+        emailManager.signedInFlow().onEach { isSignedIn ->
+            browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
+        }.launchIn(viewModelScope)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -489,7 +483,6 @@ class BrowserTabViewModel(
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
-        isEmailSignedIn.removeObserver(emailSignIn)
         super.onCleared()
     }
 

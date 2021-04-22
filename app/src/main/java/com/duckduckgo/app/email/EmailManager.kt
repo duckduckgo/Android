@@ -16,33 +16,26 @@
 
 package com.duckduckgo.app.email
 
-import androidx.annotation.UiThread
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.asLiveData
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface EmailManager : LifecycleObserver {
-    fun signedInFlow(): Flow<Boolean>
+    fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
     fun storeCredentials(token: String, username: String)
     fun signOut()
     fun getEmailAddress(): String?
-    var nextAlias: String?
 }
 
 @FlowPreview
@@ -50,32 +43,14 @@ interface EmailManager : LifecycleObserver {
 class AppEmailManager(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
-    private val dispatcherProvider: DispatcherProvider
-) : EmailManager, LifecycleObserver {
+    private val dispatcherProvider: DispatcherProvider,
+    private val appCoroutineScope: CoroutineScope
+) : EmailManager {
 
-    override var nextAlias: String? = null
+    private val nextAliasFlow = emailDataStore.nextAliasFlow()
 
-    private val nextAliasLiveData: LiveData<String?> = emailDataStore.nextAliasFlow().asLiveData()
-
-    private val alias = Observer<String?> { alias ->
-        nextAlias = alias
-    }
-
-    private val isSignedInChannel = ConflatedBroadcastChannel(isSignedIn())
-
-    override fun signedInFlow(): Flow<Boolean> = isSignedInChannel.asFlow()
-
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
-        nextAliasLiveData.observeForever(alias)
-    }
-
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
-        nextAliasLiveData.removeObserver(alias)
-    }
+    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+    override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
 
     override fun getAlias(): String? = consumeAlias()
 
@@ -86,16 +61,16 @@ class AppEmailManager(
     override fun storeCredentials(token: String, username: String) {
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
-        GlobalScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             generateNewAlias()
-            isSignedInChannel.send(true)
+            isSignedInStateFlow.emit(true)
         }
     }
 
     override fun signOut() {
-        GlobalScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             emailDataStore.clearEmailData()
-            isSignedInChannel.send(false)
+            isSignedInStateFlow.emit(false)
         }
     }
 
@@ -106,9 +81,9 @@ class AppEmailManager(
     }
 
     private fun consumeAlias(): String? {
-        val alias = nextAlias
+        val alias = nextAliasFlow.value
         emailDataStore.clearNextAlias()
-        GlobalScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             generateNewAlias()
         }
         return alias
