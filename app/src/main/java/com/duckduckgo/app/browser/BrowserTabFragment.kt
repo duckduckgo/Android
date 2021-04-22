@@ -499,14 +499,15 @@ class BrowserTabFragment :
     private fun showHome() {
         errorSnackbar.dismiss()
         newTabLayout.show()
+        browserLayout.gone()
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
-        swipeRefreshContainer.isEnabled = false
     }
 
     private fun showBrowser() {
         newTabLayout.gone()
+        browserLayout.show()
         webView?.show()
         webView?.onResume()
     }
