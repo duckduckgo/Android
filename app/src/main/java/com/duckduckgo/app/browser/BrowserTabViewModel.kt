@@ -615,14 +615,18 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun iconReceived(icon: Bitmap) {
+    override fun iconReceived(url:String, icon: Bitmap) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
-        val url = currentTab.url ?: return
-        viewModelScope.launch {
-            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
-            faviconFile?.let {
-                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+        val currentUrl = currentTab.url ?: return
+        if (currentUrl == url){
+            viewModelScope.launch {
+                val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+                faviconFile?.let {
+                    tabRepository.updateTabFavicon(tabId, faviconFile.name)
+                }
             }
+        } else {
+            Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
         }
     }
 

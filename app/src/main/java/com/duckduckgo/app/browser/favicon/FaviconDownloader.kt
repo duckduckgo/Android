@@ -33,7 +33,6 @@ interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
     suspend fun loadFaviconToView(file: File, view: ImageView)
-    suspend fun loadDefaultFaviconToView(view: ImageView)
 }
 
 class GlideFaviconDownloader @Inject constructor(
@@ -79,9 +78,4 @@ class GlideFaviconDownloader @Inject constructor(
         }
     }
 
-    override suspend fun loadDefaultFaviconToView(view: ImageView) {
-        withContext(dispatcherProvider.main()) {
-            view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
-        }
-    }
 }
