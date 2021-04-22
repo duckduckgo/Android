@@ -91,6 +91,7 @@ class SystemSearchViewModel(
     private val resultsPublishSubject = PublishRelay.create<String>()
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsDisposable: Disposable? = null
+    private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
 
     private var appsJob: Job? = null
 
@@ -100,7 +101,8 @@ class SystemSearchViewModel(
         refreshAppList()
         viewModelScope.launch {
             favoritesRepository.favorites().collect { favorite ->
-                resultsViewState.postValue(Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }))
+                latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                resultsViewState.postValue(latestQuickAccessItems)
             }
         }
     }
@@ -127,7 +129,7 @@ class SystemSearchViewModel(
     private fun resetResultsState() {
         results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
         appsJob?.cancel()
-        resultsViewState.value = Suggestions.QuickAccessItems(emptyList())
+        resultsViewState.value = latestQuickAccessItems
     }
 
     private fun configureResults() {

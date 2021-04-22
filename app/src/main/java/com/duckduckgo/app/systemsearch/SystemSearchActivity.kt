@@ -257,7 +257,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
-        quickAccessRecyclerView.visibility = View.GONE
     }
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
