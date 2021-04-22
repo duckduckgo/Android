@@ -618,15 +618,17 @@ class BrowserTabViewModel(
     override fun iconReceived(url:String, icon: Bitmap) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
-        if (currentUrl == url){
-            viewModelScope.launch {
-                val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
-                faviconFile?.let {
-                    tabRepository.updateTabFavicon(tabId, faviconFile.name)
-                }
-            }
-        } else {
+        if (currentUrl != url){
+            pixel.enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
             Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
+            return
+        }
+
+        viewModelScope.launch {
+            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+            faviconFile?.let {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
         }
     }
 

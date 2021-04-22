@@ -108,16 +108,6 @@ class DuckDuckGoFaviconManagerTest {
     }
 
     @Test
-    fun whenLoadToViewFromPersistedIfCannotFindFaviconThenLoadDefaultFaviconIntoView() = coroutineRule.runBlocking {
-        val view: ImageView = mock()
-        val url = "https://example.com"
-
-        testee.loadToViewFromPersisted(url, view)
-
-        verify(mockFaviconDownloader).loadDefaultFaviconToView(view)
-    }
-
-    @Test
     fun whenLoadToViewFromTempThenLoadView() = coroutineRule.runBlocking {
         givenFaviconExistsInDirectory(FAVICON_TEMP_DIR)
         val view: ImageView = mock()
@@ -135,15 +125,6 @@ class DuckDuckGoFaviconManagerTest {
         testee.loadToViewFromTemp("subFolder", url, view)
 
         verify(mockFaviconDownloader).getFaviconFromUrl(url.toUri().faviconLocation()!!)
-    }
-
-    @Test
-    fun whenLoadToViewFromTempIfCannotFindFaviconThenLoadDefaultFaviconIntoView() = coroutineRule.runBlocking {
-        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
-
-        testee.loadToViewFromTemp("subFolder", "example.com", view)
-
-        verify(mockFaviconDownloader).loadDefaultFaviconToView(view)
     }
 
     @Test
