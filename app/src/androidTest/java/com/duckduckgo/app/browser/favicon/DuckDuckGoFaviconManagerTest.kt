@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.favicon
 import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.core.net.toUri
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
