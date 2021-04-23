@@ -85,7 +85,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     }
 
     override fun onReceivedIcon(webView: WebView, icon: Bitmap) {
-        webViewClientListener?.iconReceived(icon)
+        webViewClientListener?.iconReceived(webView.url, icon)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

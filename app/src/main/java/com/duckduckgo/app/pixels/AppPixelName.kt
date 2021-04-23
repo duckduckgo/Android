@@ -212,5 +212,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     EMAIL_TOOLTIP_DISMISSED("m_e_t_d"),
     EMAIL_USE_ALIAS("m_e_ua"),
-    EMAIL_USE_ADDRESS("m_e_uad")
+    EMAIL_USE_ADDRESS("m_e_uad"),
+
+    FAVICON_WRONG_URL_ERROR("m_fwu_r")
+
 }
