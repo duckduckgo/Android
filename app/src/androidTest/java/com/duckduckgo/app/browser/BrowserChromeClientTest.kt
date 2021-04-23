@@ -117,7 +117,7 @@ class BrowserChromeClientTest {
     fun whenOnReceivedIconThenIconReceived() {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         testee.onReceivedIcon(webView, bitmap)
-        verify(mockWebViewClientListener).iconReceived("", bitmap)
+        verify(mockWebViewClientListener).iconReceived(bitmap)
     }
 
     private val mockMsg = Message().apply {
@@ -125,5 +125,9 @@ class BrowserChromeClientTest {
         obj = mock<WebView.WebViewTransport>()
     }
 
-    private class TestWebView(context: Context) : WebView(context)
+    private class TestWebView(context: Context) : WebView(context) {
+        override fun getUrl(): String {
+            return "https://example.com"
+        }
+    }
 }
