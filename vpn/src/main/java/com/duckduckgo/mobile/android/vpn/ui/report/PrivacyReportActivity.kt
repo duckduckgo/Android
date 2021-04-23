@@ -19,7 +19,9 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.view.LayoutInflater
@@ -84,6 +86,10 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            window.statusBarColor = Color.BLACK
+        }
 
         AndroidInjection.inject(this)
 
