@@ -352,7 +352,7 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion31To32ThenValidationSucceeds() {
-        createDatabaseAndMigrate(30, 31, migrationsProvider.MIGRATION_31_TO_32)
+        createDatabaseAndMigrate(31, 32, migrationsProvider.MIGRATION_31_TO_32)
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {

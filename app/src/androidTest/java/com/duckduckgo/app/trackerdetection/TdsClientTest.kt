@@ -207,13 +207,11 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
-        val exceptions = RuleExceptions(null, listOf("something"))
-
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, "testId")
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, "script.js")
 
         val testee = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule))))
 
-        assertEquals("testId", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).surrogate)
+        assertEquals("script.js", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).surrogate)
     }
 
     companion object {
