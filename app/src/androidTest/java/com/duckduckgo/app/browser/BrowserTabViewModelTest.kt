@@ -2883,7 +2883,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
     }
@@ -2895,7 +2895,7 @@ class BrowserTabViewModelTest {
         val file = File("test")
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
@@ -2906,7 +2906,7 @@ class BrowserTabViewModelTest {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockTabRepository, never()).updateTabFavicon(any(), any())
     }
