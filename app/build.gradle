@@ -194,6 +194,9 @@ dependencies {
     // Lottie
     implementation "com.airbnb.android:lottie:_"
 
+    // Security crypto
+    implementation AndroidX.security.crypto
+
     // Play Store referrer library
     playImplementation("com.android.installreferrer:installreferrer:_")
 

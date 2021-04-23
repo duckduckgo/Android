@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
@@ -64,6 +65,7 @@ class BrowserWebViewClientTest {
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
+    private val emailInjector: EmailInjector = mock()
 
     @UiThreadTest
     @Before
@@ -83,7 +85,8 @@ class BrowserWebViewClientTest {
             globalPrivacyControl,
             thirdPartyCookieManager,
             GlobalScope,
-            coroutinesTestRule.testDispatcherProvider
+            coroutinesTestRule.testDispatcherProvider,
+            emailInjector
         )
         testee.webViewClientListener = listener
     }
@@ -195,6 +198,20 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledIfUrlIsNullThenDoNotCallPrefetchIcon() {
         testee.onPageFinished(webView, null)
         verify(listener, never()).prefetchFavicon(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenInjectEmailAutofillJsCalled() {
+        testee.onPageFinished(webView, null)
+        verify(emailInjector).injectEmailAutofillJs(webView, null)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenResetInjectedJsFlagCalled() {
+        testee.onPageStarted(webView, null, null)
+        verify(emailInjector).resetInjectedJsFlag()
     }
 
     private class TestWebView(context: Context) : WebView(context)

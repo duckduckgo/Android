@@ -86,6 +86,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.email.EmailInjector
+import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
@@ -201,6 +203,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
 
+    @Inject
+    lateinit var emailInjector: EmailInjector
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -273,6 +278,8 @@ class BrowserTabFragment :
     private var alertDialog: AlertDialog? = null
 
     private var loginDetectionDialog: AlertDialog? = null
+
+    private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
@@ -487,6 +494,7 @@ class BrowserTabFragment :
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
+        swipeRefreshContainer.isEnabled = false
         homeBackgroundLogo.showLogo()
     }
 
@@ -617,6 +625,24 @@ class BrowserTabFragment :
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
+            is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
+            is Command.InjectEmailAddress -> injectEmailAddress(it.address)
+            is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
+        }
+    }
+
+    private fun injectEmailAddress(alias: String) {
+        webView?.let {
+            emailInjector.injectAddressInEmailField(it, alias)
+        }
+    }
+
+    private fun copyAliasToClipboard(alias: String) {
+        context?.let {
+            val clipboard: ClipboardManager? = ContextCompat.getSystemService(it, ClipboardManager::class.java)
+            val clip: ClipData = ClipData.newPlainText("Alias", alias)
+            clipboard?.setPrimaryClip(clip)
+            showToast(R.string.aliasToClipboardMessage)
         }
     }
 
@@ -999,6 +1025,7 @@ class BrowserTabFragment :
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
+            emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
         }
 
         if (BuildConfig.DEBUG) {
@@ -1215,6 +1242,7 @@ class BrowserTabFragment :
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
+        emailAutofillTooltipDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
     }
@@ -1392,6 +1420,19 @@ class BrowserTabFragment :
         viewModel.stopShowingEmptyGrade()
     }
 
+    private fun showEmailTooltip(address: String) {
+        context?.let {
+            val isShowing: Boolean? = emailAutofillTooltipDialog?.isShowing
+            if (isShowing != true) {
+                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(it, address)
+                emailAutofillTooltipDialog?.show()
+                emailAutofillTooltipDialog?.setOnCancelListener { viewModel.cancelAutofillTooltip() }
+                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress() }
+                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias() }
+            }
+        }
+    }
+
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
@@ -1530,6 +1571,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
+                onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
             }
             browserMenu.setOnClickListener {
                 hideKeyboardImmediately()
@@ -1674,7 +1716,6 @@ class BrowserTabFragment :
 
                 if (!viewState.isLoading && lastSeenBrowserViewState?.browserShowing == true) {
                     swipeRefreshContainer.isRefreshing = false
-                    webView?.detectOverscrollBehavior()
                 }
             }
         }
@@ -1768,6 +1809,10 @@ class BrowserTabFragment :
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
+
+                newEmailAliasMenuItem?.let {
+                    it.visibility = if (viewState.isEmailSignedIn) VISIBLE else GONE
+                }
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

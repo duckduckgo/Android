@@ -21,6 +21,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
+import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
@@ -130,6 +131,10 @@ class NetworkModule {
     @Provides
     fun autoCompleteService(@Named("nonCaching") retrofit: Retrofit): AutoCompleteService =
         retrofit.create(AutoCompleteService::class.java)
+
+    @Provides
+    fun emailService(@Named("nonCaching") retrofit: Retrofit): EmailService =
+        retrofit.create(EmailService::class.java)
 
     @Provides
     fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
