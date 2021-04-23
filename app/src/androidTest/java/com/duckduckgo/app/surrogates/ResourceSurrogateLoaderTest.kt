@@ -105,6 +105,17 @@ class ResourceSurrogateLoaderTest {
         assertEquals(6, surrogates.size)
     }
 
+    @Test
+    fun whenLoadingSurrogatesThenCorrectScriptIdStored() {
+        val surrogates = initialiseFile("surrogates_6")
+        assertEquals("ga.js", surrogates[0].scriptId)
+        assertEquals("analytics.js", surrogates[1].scriptId)
+        assertEquals("inpage_linkid.js", surrogates[2].scriptId)
+        assertEquals("api.js", surrogates[3].scriptId)
+        assertEquals("gpt.js", surrogates[4].scriptId)
+        assertEquals("gtm.js", surrogates[5].scriptId)
+    }
+
     private fun initialiseFile(filename: String): List<SurrogateResponse> {
         return testee.convertBytes(readFile(filename))
     }

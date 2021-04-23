@@ -22,6 +22,7 @@ import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -78,7 +79,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionBlockThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL)
@@ -87,7 +88,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionIgnoreThenMatchesIsFalse() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", IGNORE, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", IGNORE, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL)
@@ -96,7 +97,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesDomainWithDefaultBlockAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null)
         val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL)
@@ -105,7 +106,7 @@ class TdsClientTest {
 
     @Test
     fun whenUrlMatchesDomainWithDefaultIgnoreAndRuleWithNoExceptionsAndNoActionThenMatchesIsTrue() {
-        val rule = Rule("api\\.tracker\\.com\\/auth", null, null)
+        val rule = Rule("api\\.tracker\\.com\\/auth", null, null, null)
         val data = listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(rule)))
         val testee = TdsClient(TDS, data)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL)
@@ -116,9 +117,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithExceptionsAndExceptionDomainMatchesDocumentThenMatchesIsFalseIrrespectiveOfAction() {
         val exceptions = RuleExceptions(listOf("example.com"), null)
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
 
         val testeeBlockRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleBlock))))
         val testeeIgnoreRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleBlock))))
@@ -139,9 +140,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithExceptionsAndExceptionDomainDoesNotMatchDocumentThenMatchesBehaviorIsStandard() {
         val exceptions = RuleExceptions(listOf("nonmatching.com"), null)
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
 
         val testeeBlockRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleBlock))))
         val testeeIgnoreRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleBlock))))
@@ -162,9 +163,9 @@ class TdsClientTest {
     fun whenUrlMatchesRuleWithExceptionsWithNoDomainsAndTypesIsNotNullThenMatchesIsFalseIrrespectiveOfAction() {
         val exceptions = RuleExceptions(null, listOf("something"))
 
-        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions)
-        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions)
-        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions)
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, null)
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, null)
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, null)
 
         val testeeBlockRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleBlock))))
         val testeeIgnoreRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleBlock))))
@@ -179,6 +180,40 @@ class TdsClientTest {
         assertFalse(testeeIgnoreRuleIgnore.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
         assertFalse(testeeBlockRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
         assertFalse(testeeIgnoreRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleWithSurrogateThenMatchesIsTrueIrrespectiveOfAction() {
+        val exceptions = RuleExceptions(null, listOf("something"))
+
+        val ruleBlock = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, "testId")
+        val ruleIgnore = Rule("api\\.tracker\\.com\\/auth", IGNORE, exceptions, "testId")
+        val ruleNone = Rule("api\\.tracker\\.com\\/auth", null, exceptions, "testId")
+
+        val testeeBlockRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleBlock))))
+        val testeeIgnoreRuleBlock = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleBlock))))
+        val testeeBlockRuleIgnore = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleIgnore))))
+        val testeeIgnoreRuleIgnore = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleIgnore))))
+        val testeeBlockRuleNone = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(ruleNone))))
+        val testeeIgnoreRuleNone = TdsClient(TDS, listOf(TdsTracker("tracker.com", IGNORE, OWNER, CATEGORY, listOf(ruleNone))))
+
+        assertFalse(testeeBlockRuleBlock.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+        assertFalse(testeeIgnoreRuleBlock.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+        assertFalse(testeeBlockRuleIgnore.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+        assertFalse(testeeIgnoreRuleIgnore.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+        assertFalse(testeeBlockRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+        assertFalse(testeeIgnoreRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleWithSurrogateThenSurrogateScriptIdReturned() {
+        val exceptions = RuleExceptions(null, listOf("something"))
+
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK, exceptions, "testId")
+
+        val testee = TdsClient(TDS, listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule))))
+
+        assertEquals("testId", testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL).surrogate)
     }
 
     companion object {

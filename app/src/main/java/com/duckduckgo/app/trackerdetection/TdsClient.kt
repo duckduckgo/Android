@@ -27,24 +27,27 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
     override fun matches(url: String, documentUrl: String): Client.Result {
         val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
-        return Client.Result(matches, tracker.ownerName, tracker.categories)
+        return Client.Result(matches = matches.first, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.second)
     }
 
-    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): Boolean {
+    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): Pair<Boolean, String?> {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
                 if (matchedException(rule.exceptions, documentUrl)) {
-                    return false
+                    return false to null
                 }
                 if (rule.action == IGNORE) {
-                    return false
+                    return false to null
                 }
-                return true
+                if (rule.surrogate != null) {
+                    return true to rule.surrogate
+                }
+                return true to null
             }
         }
 
-        return tracker.defaultAction == BLOCK
+        return (tracker.defaultAction == BLOCK) to null
     }
 
     private fun matchedException(exceptions: RuleExceptions?, documentUrl: String): Boolean {

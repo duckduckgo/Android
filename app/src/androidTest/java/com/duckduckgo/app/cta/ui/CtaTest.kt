@@ -297,8 +297,8 @@ class CtaTest {
     @Test
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
 
@@ -312,8 +312,8 @@ class CtaTest {
     @Test
     fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null)
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
 
