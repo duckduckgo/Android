@@ -40,7 +40,7 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
                 if (rule.action == IGNORE) {
                     return false to null
                 }
-                if (rule.surrogate != null) {
+                if (rule.surrogate?.isNotEmpty() == true) {
                     return true to rule.surrogate
                 }
                 return true to null
