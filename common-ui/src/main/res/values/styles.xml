@@ -361,6 +361,16 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="EmailTooltip" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/EmailTooltipStyle</item>
+    </style>
+
+    <style name="EmailTooltipStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
     <style name="LocationPermissionDialogTitle">
         <item name="android:textAlignment">center</item>
         <item name="android:fontFamily">sans-serif</item>

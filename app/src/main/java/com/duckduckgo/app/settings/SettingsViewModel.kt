@@ -21,6 +21,7 @@ import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -52,6 +53,7 @@ class SettingsViewModel(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
+    private val emailManager: EmailManager,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
     private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
@@ -71,9 +73,15 @@ class SettingsViewModel(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
+        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
         val deviceShieldEnabled: Boolean = false,
         val excludedAppsInfo: String = ""
     )
+
+    sealed class EmailSetting {
+        object EmailSettingOff : EmailSetting()
+        data class EmailSettingOn(val emailAddress: String) : EmailSetting()
+    }
 
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
@@ -92,6 +100,7 @@ class SettingsViewModel(
         object LaunchExcludedAppList : Command()
         object LaunchDeviceShieldPrivacyReport : Command()
         object UpdateTheme : Command()
+        object LaunchEmailDialog : Command()
         object LaunchDeviceShieldOnboarding : Command()
         object StartDeviceShield : Command()
         object StopDeviceShield : Command()
@@ -126,6 +135,7 @@ class SettingsViewModel(
             appIcon = settingsDataStore.appIcon,
             selectedFireAnimation = settingsDataStore.selectedFireAnimation,
             globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
+            emailSetting = getEmailSetting(),
             deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
             excludedAppsInfo = getExcludedAppsInfo()
         )
@@ -161,6 +171,25 @@ class SettingsViewModel(
         }
     }
 
+    private fun getEmailSetting(): EmailSetting {
+        val emailAddress = emailManager.getEmailAddress()
+
+        return if (emailManager.isSignedIn()) {
+            when (emailAddress) {
+                null -> EmailSetting.EmailSettingOff
+                else -> EmailSetting.EmailSettingOn(emailAddress)
+            }
+        } else {
+            EmailSetting.EmailSettingOff
+        }
+    }
+
+    fun onEmailSettingClicked() {
+        if (getEmailSetting() is EmailSetting.EmailSettingOn) {
+            command.value = Command.LaunchEmailDialog
+        }
+    }
+
     fun userRequestedToSendFeedback() {
         command.value = Command.LaunchFeedback
     }
@@ -192,6 +221,11 @@ class SettingsViewModel(
 
     fun onGlobalPrivacyControlClicked() {
         command.value = Command.LaunchGlobalPrivacyControl
+    }
+
+    fun onEmailLogout() {
+        emailManager.signOut()
+        viewState.value = currentViewState().copy(emailSetting = EmailSetting.EmailSettingOff)
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
@@ -323,6 +357,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
+    private val emailManager: Provider<EmailManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
     private val pixel: Provider<Pixel>,
     private val deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
@@ -331,7 +366,7 @@ class SettingsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldPixels.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldPixels.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
                 else -> null
             }
         }

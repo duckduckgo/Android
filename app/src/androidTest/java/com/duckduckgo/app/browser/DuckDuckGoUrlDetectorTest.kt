@@ -118,4 +118,23 @@ class DuckDuckGoUrlDetectorTest {
         assertFalse(testee.isDuckDuckGoStaticUrl("https://example.com/settings"))
     }
 
+    @Test
+    fun whenDomainIsNotDuckDuckGoThenReturnFalse() {
+        assertFalse(testee.isDuckDuckGoDomain("https://example.com"))
+    }
+
+    @Test
+    fun whenDomainIsDuckDuckGoThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoDomain("https://duckduckgo.com"))
+    }
+
+    @Test
+    fun whenUrlContainsSubdomainAndIsFromDuckDuckGoDomainThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoDomain("https://test.duckduckgo.com"))
+    }
+
+    @Test
+    fun whenUrlHasNoSchemeAndIsFromDuckDuckGoDomainThenReturnsTrue() {
+        assertTrue(testee.isDuckDuckGoDomain("duckduckgo.com"))
+    }
 }
