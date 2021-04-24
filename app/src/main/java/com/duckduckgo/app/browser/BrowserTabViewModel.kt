@@ -413,7 +413,7 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             favoritesRepository.favorites().collect { favorite ->
                 Timber.i("BrowserTab favs: collect $favorite")
-                ctaViewState.postValue(currentCtaViewState().copy(favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }))
+                ctaViewState.value = currentCtaViewState().copy(favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
             }
         }
     }
