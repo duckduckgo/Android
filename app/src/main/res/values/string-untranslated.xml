@@ -36,4 +36,8 @@
     <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
+
+    <!-- Import / Export Bookmarks -->
+    <string name="importBookmarksMenu">Import Bookmarks</string>
+    <string name="exportBookmarksMenu">Export Bookmarks</string>
 </resources>

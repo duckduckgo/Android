@@ -27,6 +27,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -153,13 +155,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         return true
     }
 
-    // override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    //     val searchItem = menu?.findItem(action_search)
-    //     val searchView = searchItem?.actionView as SearchView
-    //     searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
-    //     return super.onCreateOptionsMenu(menu)
-    // }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.bookmark_import -> {
@@ -184,7 +179,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.findItem(action_search)?.isVisible = viewModel.viewState.value?.enableSearch == true
+        val searchView = menu?.findItem(action_search)?.actionView as SearchView
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
+        searchView.isVisible = viewModel.viewState.value?.enableSearch == true
         return super.onPrepareOptionsMenu(menu)
     }
 

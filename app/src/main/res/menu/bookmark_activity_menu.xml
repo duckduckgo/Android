@@ -17,15 +17,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/bookmark_import"
+        android:title="@string/importBookmarksMenu" />
+    <item
+        android:id="@+id/bookmark_export"
+        android:title="@string/exportBookmarksMenu" />
+    <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_bookmark"
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
-    <item
-        android:id="@+id/bookmark_import"
-        android:title="Import bookmarks" />
-    <item
-        android:id="@+id/bookmark_export"
-        android:title="Export bookmarks" />
 </menu>
