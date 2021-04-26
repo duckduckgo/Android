@@ -21,16 +21,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingEnd="30dp"
     android:paddingStart="30dp"
+    android:paddingEnd="30dp"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/askVpnPermissionButton"
         android:paddingBottom="16dp"
         android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@+id/askVpnPermissionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -73,13 +73,13 @@
                 android:layout_marginTop="32dp"
                 android:fontFamily="sans-serif"
                 android:lineSpacingExtra="6sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:text="@string/deviceShieldOnboardingDescription"
                 android:textAlignment="center"
                 android:textColor="@color/brownishGrayTwo"
                 android:textSize="14sp"
                 android:textStyle="normal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -91,13 +91,15 @@
     <Button
         android:id="@+id/askVpnPermissionButton"
         style="@style/OnboardingButtonPrimaryRoundedCta"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="32dp"
         android:text="@string/deviceShieldOnboardingCta"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="1000dp"
+        app:layout_constraintWidth_percent="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
