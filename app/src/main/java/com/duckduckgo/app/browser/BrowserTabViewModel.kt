@@ -643,6 +643,10 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun iconReceived(visitedUrl: String, iconUrl: String) {
+        //noop
+    }
+
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {

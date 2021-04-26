@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
@@ -109,6 +110,7 @@ class FileBasedFaviconPersister(
             val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
             existingFavicon?.let {
+                Timber.i("Favicon favicon size: ${it.width} x ${it.height}")
                 if (it.width > bitmap.width) {
                     return null // Stored file has better quality
                 }
