@@ -27,27 +27,27 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
     override fun matches(url: String, documentUrl: String): Client.Result {
         val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
-        return Client.Result(matches = matches.first, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.second)
+        return Client.Result(matches = matches.shouldBlock, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.surrogate)
     }
 
-    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): Pair<Boolean, String?> {
+    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
                 if (matchedException(rule.exceptions, documentUrl)) {
-                    return false to null
+                    return MatchedResult(shouldBlock = false)
                 }
                 if (rule.action == IGNORE) {
-                    return false to null
+                    return MatchedResult(shouldBlock = false)
                 }
                 if (rule.surrogate?.isNotEmpty() == true) {
-                    return true to rule.surrogate
+                    return MatchedResult(shouldBlock = true, surrogate = rule.surrogate)
                 }
-                return true to null
+                return MatchedResult(shouldBlock = true)
             }
         }
 
-        return (tracker.defaultAction == BLOCK) to null
+        return MatchedResult(shouldBlock = (tracker.defaultAction == BLOCK))
     }
 
     private fun matchedException(exceptions: RuleExceptions?, documentUrl: String): Boolean {
@@ -70,4 +70,6 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
         }
         return false
     }
+
+    private data class MatchedResult(val shouldBlock: Boolean, val surrogate: String? = null)
 }
