@@ -174,6 +174,9 @@ interface DeviceShieldPixels {
 
     /** This fun will fire a pixel on every call */
     fun trackerBlocked()
+
+    /** Will fire a pixel on every call */
+    fun privacyReportArticleDisplayed()
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -327,6 +330,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun trackerBlocked() {
         firePixel(DeviceShieldPixelNames.DS_TRACKER_BLOCKED)
+    }
+
+    override fun privacyReportArticleDisplayed() {
+        firePixel(DeviceShieldPixelNames.DS_PRIVACY_REPORT_ARTICLE_SHOWED)
     }
 
     private fun suddenKill() {

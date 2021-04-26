@@ -82,5 +82,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     DS_KILLED_VPN_REVOKED("m_apptb_k_v"),
 
     DS_TRACKER_BLOCKED("m_apptb_tb"),
+
+    DS_PRIVACY_REPORT_ARTICLE_SHOWED("m_apptb_pra_s"),
     ;
 }

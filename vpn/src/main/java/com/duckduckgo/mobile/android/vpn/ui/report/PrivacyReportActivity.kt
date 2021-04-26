@@ -228,6 +228,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         reportSummaryLink.setOnClickListener {
             TrackerProfilingInfoActivity.intent(this).also {
+                deviceShieldPixels.privacyReportArticleDisplayed()
                 startActivity(it)
             }
         }

@@ -314,6 +314,15 @@ class RealDeviceShieldPixelsTest {
         verifyNoMoreInteractions(pixel)
     }
 
+    @Test
+    fun whenPrivacyReportArticleDisplayedThenFireCountPixel() {
+        deviceShieldPixels.privacyReportArticleDisplayed()
+        deviceShieldPixels.privacyReportArticleDisplayed()
+
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_PRIVACY_REPORT_ARTICLE_SHOWED)
+        verifyNoMoreInteractions(pixel)
+    }
+
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {
         return String.format(Locale.US, pixelName, variant)
     }
