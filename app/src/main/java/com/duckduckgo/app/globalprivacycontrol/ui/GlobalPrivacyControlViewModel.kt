@@ -65,7 +65,7 @@ class GlobalPrivacyControlViewModel(
     }
 
     companion object {
-        const val LEARN_MORE_URL = "https://duckduckgo.com/global-privacy-control-learn-more"
+        const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/"
     }
 }
 
