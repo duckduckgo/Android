@@ -30,15 +30,6 @@ import javax.inject.Singleton
 @Module
 class FaviconModule {
 
-    @Provides
-    @Singleton
-    fun bookmarkManager(
-        context: Context,
-        bookmarksDao: BookmarksDao,
-        dispatcherProvider: DispatcherProvider
-    ): BookmarkManager {
-        return DuckDuckGoBookmarkManager(context.contentResolver, bookmarksDao, dispatcherProvider)
-    }
 
     @Provides
     @Singleton

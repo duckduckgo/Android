@@ -118,10 +118,15 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
                     is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
                     is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.bookmarks)
+                    is BookmarksViewModel.Command.ImportBookmarksError -> showImportedBookmarksError()
                     is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
                 }
             }
         )
+    }
+
+    private fun showImportedBookmarksError(){
+        showMessage("Error importing bookmarks, nothing has been imported")
     }
 
     private fun showImportedBookmarks(bookmarks: List<Bookmark>) {
@@ -133,7 +138,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             is ExportBookmarksResult.Error -> {
                 showMessage("Error exporting bookmarks ${it.exception}")
             }
-            ExportBookmarksResult.NoBookmarksAvailable -> {
+            ExportBookmarksResult.NoBookmarksExported -> {
                 showMessage("No Bookmarks available")
             }
             ExportBookmarksResult.Success -> {

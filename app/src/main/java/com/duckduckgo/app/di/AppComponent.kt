@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
+import com.duckduckgo.app.bookmarks.di.BookmarksModule
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
@@ -79,7 +80,8 @@ import javax.inject.Singleton
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
         HttpsPersisterModule::class,
-        EmailModule::class
+        EmailModule::class,
+        BookmarksModule::class,
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

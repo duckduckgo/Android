@@ -25,6 +25,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.service.Bookmark
 import com.duckduckgo.app.bookmarks.service.BookmarkManager
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -58,7 +59,8 @@ class BookmarksViewModel(
         class OpenBookmark(val bookmark: BookmarkEntity) : Command()
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
         class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
-        class ImportedBookmarks(val bookmarks: List<Bookmark>) : Command()
+        data class ImportedBookmarks(val bookmarks: List<Bookmark>) : Command()
+        object ImportBookmarksError : Command()
         data class ExportedBookmarks(val exportBookmarksResult: ExportBookmarksResult) : Command()
 
     }
@@ -124,9 +126,13 @@ class BookmarksViewModel(
 
     fun importBookmarks(uri: Uri) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val bookmarks = bookmarksManager.importUri(uri)
+            val result = bookmarksManager.import(uri)
             withContext(dispatcherProvider.main()) {
-                command.value = ImportedBookmarks(bookmarks)
+                when (result) {
+                    is ImportBookmarksResult.Error -> command.value = ImportBookmarksError
+                    is ImportBookmarksResult.Success -> command.value = ImportedBookmarks(result.bookmarks)
+                }
+
             }
         }
     }
