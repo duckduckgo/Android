@@ -63,7 +63,7 @@ class TrackerDetectorImpl(
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
-            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl))
+            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl), result.surrogate)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
