@@ -45,15 +45,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
@@ -241,40 +239,21 @@ class BrowserViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrowserViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrowserViewModelFactory(
-        tabRepository: TabRepository,
-        queryUrlConverter: QueryUrlConverter,
-        dataClearer: DataClearer,
-        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
-        appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
-        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-        pixel: Pixel,
-        useOurAppDetector: UseOurAppDetector
-    ): ViewModelFactoryPlugin {
-        return BrowserViewModelFactory(tabRepository, queryUrlConverter, dataClearer, appEnjoymentPromptEmitter, appEnjoymentUserEventRecorder, dispatchers, pixel, useOurAppDetector)
-    }
-}
-
-private class BrowserViewModelFactory(
-    val tabRepository: TabRepository,
-    val queryUrlConverter: OmnibarEntryConverter,
-    val dataClearer: DataClearer,
-    val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
-    val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+@ContributesMultibinding(AppObjectGraph::class)
+class BrowserViewModelFactory @Inject constructor(
+    val tabRepository: Provider<TabRepository>,
+    val queryUrlConverter: Provider<QueryUrlConverter>,
+    val dataClearer: Provider<DataClearer>,
+    val appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
+    val appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
     val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    val pixel: Pixel,
-    val useOurAppDetector: UseOurAppDetector
+    val pixel: Provider<Pixel>,
+    val useOurAppDetector: Provider<UseOurAppDetector>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer, appEnjoymentPromptEmitter, appEnjoymentUserEventRecorder, dispatchers, pixel, useOurAppDetector) as T
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), useOurAppDetector.get()) as T
                 else -> null
             }
         }

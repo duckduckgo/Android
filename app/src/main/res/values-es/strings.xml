@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -223,6 +207,7 @@
     <string name="noBookmarks">Aún no se han añadido marcadores</string>
     <string name="bookmarkOverflowContentDescription">Más opciones para el marcador %1$s</string>
     <string name="bookmarkEdited">Marcador añadido</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; eliminado</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
@@ -484,6 +469,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web</string>
     <string name="fireproofWebsiteToogleText">Preguntar al iniciar sesión</string>
+    <string name="disableLoginDetectionDialogTitle">¿Deshabilitar recordatorio de a prueba de fuego al iniciar sesión en los sitios?</string>
+    <string name="disableLoginDetectionDialogDescription">Puedes cambiar esta preferencia en cualquier momento en Ajustes.</string>
+    <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>
+    <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
+    <string name="fireproofWebsiteRemovalConfirmation">A prueba de fuego desactivado para &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animación del botón Fuego</string>

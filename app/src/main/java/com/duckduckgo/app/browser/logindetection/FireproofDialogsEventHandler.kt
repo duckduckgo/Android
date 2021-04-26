@@ -27,7 +27,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.loginDetectionExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.withContext
 
@@ -111,8 +110,6 @@ class BrowserTabFireproofDialogsEventHandler constructor(
 
     @Suppress("UnnecessaryVariable")
     private suspend fun allowUserToDisableFireproofLoginActive(): Boolean {
-        if (!variantManager.loginDetectionExperimentEnabled()) return false
-
         val userEnabledLoginDetection = userEventsStore.getUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN) != null
         val userDismissedDisableFireproofLoginDialog = userEventsStore.getUserEvent(UserEventKey.FIREPROOF_DISABLE_DIALOG_DISMISSED) != null
         if (userEnabledLoginDetection || userDismissedDisableFireproofLoginDialog) return false

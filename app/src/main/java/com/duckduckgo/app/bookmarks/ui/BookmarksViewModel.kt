@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
@@ -30,14 +26,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class BookmarksViewModel(
     val dao: BookmarksDao,
@@ -120,30 +114,16 @@ class BookmarksViewModel(
 
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BookmarksViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBookmarksViewModelFactory(
-        dao: BookmarksDao,
-        faviconManager: FaviconManager,
-        dispatcherProvider: DispatcherProvider
-    ): ViewModelFactoryPlugin {
-        return BookmarksViewModelFactory(dao, faviconManager, dispatcherProvider)
-    }
-}
-
-private class BookmarksViewModelFactory(
-    private val dao: BookmarksDao,
-    private val faviconManager: FaviconManager,
-    private val dispatcherProvider: DispatcherProvider
+@ContributesMultibinding(AppObjectGraph::class)
+class BookmarksViewModelFactory @Inject constructor(
+    private val dao: Provider<BookmarksDao>,
+    private val faviconManager: Provider<FaviconManager>,
+    private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao, faviconManager, dispatcherProvider) as T)
+                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao.get(), faviconManager.get(), dispatcherProvider.get()) as T)
                 else -> null
             }
         }

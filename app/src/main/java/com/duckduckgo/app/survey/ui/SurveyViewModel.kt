@@ -31,14 +31,12 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
@@ -116,30 +114,16 @@ class SurveyViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SurveyViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSurveyViewModelFactory(
-        surveyDao: SurveyDao,
-        statisticsStore: StatisticsDataStore,
-        appInstallStore: AppInstallStore,
-    ): ViewModelFactoryPlugin {
-        return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
-    }
-}
-
-private class SurveyViewModelFactory(
-    private val surveyDao: SurveyDao,
-    private val statisticsStore: StatisticsDataStore,
-    private val appInstallStore: AppInstallStore
+@ContributesMultibinding(AppObjectGraph::class)
+class SurveyViewModelFactory @Inject constructor(
+    private val surveyDao: Provider<SurveyDao>,
+    private val statisticsStore: Provider<StatisticsDataStore>,
+    private val appInstallStore: Provider<AppInstallStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao, statisticsStore, appInstallStore) as T)
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao.get(), statisticsStore.get(), appInstallStore.get()) as T)
                 else -> null
             }
         }

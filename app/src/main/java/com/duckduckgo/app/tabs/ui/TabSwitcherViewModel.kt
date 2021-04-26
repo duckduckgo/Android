@@ -28,11 +28,9 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
@@ -80,28 +78,15 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class TabSwitcherViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideTabSwitcherViewModelFactory(
-        tabRepository: TabRepository,
-        webViewSessionStorage: WebViewSessionStorage
-    ): ViewModelFactoryPlugin {
-        return TabSwitcherViewModelFactory(tabRepository, webViewSessionStorage)
-    }
-}
-
-private class TabSwitcherViewModelFactory(
-    private val tabRepository: TabRepository,
-    private val webViewSessionStorage: WebViewSessionStorage
+@ContributesMultibinding(AppObjectGraph::class)
+class TabSwitcherViewModelFactory @Inject constructor(
+    private val tabRepository: Provider<TabRepository>,
+    private val webViewSessionStorage: Provider<WebViewSessionStorage>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage) as T
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
                 else -> null
             }
         }

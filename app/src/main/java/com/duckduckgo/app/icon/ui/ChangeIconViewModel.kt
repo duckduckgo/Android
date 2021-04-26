@@ -26,12 +26,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import javax.inject.Provider
 
 class ChangeIconViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
@@ -82,30 +79,16 @@ class ChangeIconViewModel @Inject constructor(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ChangeIconViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideChangeIconViewModelFactory(
-        settingsDataStore: SettingsDataStore,
-        appIconModifier: IconModifier,
-        pixel: Pixel
-    ): ViewModelFactoryPlugin {
-        return ChangeIconViewModelFactory(settingsDataStore, appIconModifier, pixel)
-    }
-}
-
-private class ChangeIconViewModelFactory(
-    private val settingsDataStore: SettingsDataStore,
-    private val appIconModifier: IconModifier,
-    private val pixel: Pixel
+@ContributesMultibinding(AppObjectGraph::class)
+class ChangeIconViewModelFactory @Inject constructor(
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val appIconModifier: Provider<IconModifier>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore, appIconModifier, pixel) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
                 else -> null
             }
         }

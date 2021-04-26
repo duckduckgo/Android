@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface TabRepository {
 
@@ -29,6 +30,8 @@ interface TabRepository {
     val liveTabs: LiveData<List<TabEntity>>
 
     val flowTabs: Flow<List<TabEntity>>
+
+    val childClosedTabs: SharedFlow<String>
 
     /**
      * @return the tabs that are marked as "deletable" in the DB
@@ -66,7 +69,7 @@ interface TabRepository {
      */
     suspend fun purgeDeletableTabs()
 
-    suspend fun deleteCurrentTabAndSelectSource()
+    suspend fun deleteTabAndSelectSource(tabId: String)
 
     suspend fun deleteAll()
 

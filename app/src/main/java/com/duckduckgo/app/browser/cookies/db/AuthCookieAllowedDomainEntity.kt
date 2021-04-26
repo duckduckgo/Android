@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics
+package com.duckduckgo.app.browser.cookies.db
 
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-class DummyTestForCI {
-
-    @Test
-    fun dummyAlwaysPasses() {
-        assertTrue(true)
-    }
-}
+@Entity(tableName = "auth_cookies_allowed_domains")
+data class AuthCookieAllowedDomainEntity(
+    @PrimaryKey
+    var domain: String
+)

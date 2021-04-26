@@ -59,7 +59,13 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -108,12 +114,26 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.firstValue
+import com.nhaarman.mockitokotlin2.lastValue
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -123,15 +143,20 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.*
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Captor
+import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class BrowserTabViewModelTest {
 
@@ -173,7 +198,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
-    private lateinit var mockTabsRepository: TabRepository
+    private lateinit var mockTabRepository: TabRepository
 
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
@@ -230,13 +255,13 @@ class BrowserTabViewModelTest {
     private lateinit var mockFileDownloader: FileDownloader
 
     @Mock
-    private lateinit var mockTabRepository: TabRepository
-
-    @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
     @Mock
     private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -263,6 +288,12 @@ class BrowserTabViewModelTest {
 
     private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
 
+    private val childClosedTabsSharedFlow = MutableSharedFlow<String>()
+
+    private val childClosedTabsFlow = childClosedTabsSharedFlow.asSharedFlow()
+
+    private val emailStateFlow = MutableStateFlow(false)
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -277,6 +308,7 @@ class BrowserTabViewModelTest {
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -299,9 +331,10 @@ class BrowserTabViewModelTest {
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
-        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
@@ -312,7 +345,7 @@ class BrowserTabViewModelTest {
             queryUrlConverter = mockOmnibarConverter,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
-            tabRepository = mockTabsRepository,
+            tabRepository = mockTabRepository,
             userWhitelistDao = mockUserWhitelistDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
@@ -341,7 +374,8 @@ class BrowserTabViewModelTest {
             variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
-            fireproofDialogsEventHandler = fireproofDialogsEventHandler
+            fireproofDialogsEventHandler = fireproofDialogsEventHandler,
+            emailManager = mockEmailManager
         )
 
         testee.loadData("abc", null, false)
@@ -389,7 +423,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
 
-        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
+        verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
     }
 
     @Test
@@ -553,7 +587,7 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1218,7 +1252,7 @@ class BrowserTabViewModelTest {
         testee.onRefreshRequested()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1519,7 +1553,7 @@ class BrowserTabViewModelTest {
         showErrorWithAction.action()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1691,7 +1725,7 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
-        verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
     @Test
@@ -1723,7 +1757,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        verify(mockTabsRepository).deleteCurrentTabAndSelectSource()
+        verify(mockTabRepository).deleteTabAndSelectSource("TAB_ID")
     }
 
     @Test
@@ -1812,14 +1846,6 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.onCtaShown()
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenManualCtaShownThenFirePixel() {
-        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-
-        testee.onManualCtaShown(cta)
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
     }
 
@@ -2870,7 +2896,7 @@ class BrowserTabViewModelTest {
 
         testee.prefetchFavicon(url)
 
-        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test
@@ -2879,7 +2905,7 @@ class BrowserTabViewModelTest {
 
         testee.prefetchFavicon("url")
 
-        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
     }
 
     @Test
@@ -2887,7 +2913,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
     }
@@ -2899,9 +2925,9 @@ class BrowserTabViewModelTest {
         val file = File("test")
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
-        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test
@@ -2910,9 +2936,22 @@ class BrowserTabViewModelTest {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
-        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedFromPreviousUrkThenDontUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://notexample.com", bitmap)
+
+        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
+        verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test
@@ -3136,6 +3175,116 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsParentThenChildTabClosedCommandSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("TAB_ID")
+
+        assertCommandIssued<Command.ChildTabClosed>()
+    }
+
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsNotParentThenChildTabClosedCommandNotSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("other_tab")
+
+        assertCommandNotIssued<Command.ChildTabClosed>()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenCopyAliasToClipboardCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAliasAndCopyToClipboard()
+
+        assertCommandIssued<Command.CopyAliasToClipboard>()
+    }
+
+    @Test
+    fun whenEmailIsSignedOutThenIsEmailSignedInReturnsFalse() = coroutineRule.runBlocking {
+        emailStateFlow.emit(false)
+
+        assertFalse(browserViewState().isEmailSignedIn)
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenIsEmailSignedInReturnsTrue() = coroutineRule.runBlocking {
+        emailStateFlow.emit(true)
+
+        assertTrue(browserViewState().isEmailSignedIn)
+    }
+
+    @Test
+    fun whenConsumeAliasThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("alias", this.address)
+        }
+    }
+
+    @Test
+    fun whenConsumeAliasThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS)
+    }
+
+    @Test
+    fun whenCancelAutofillTooltipThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.cancelAutofillTooltip()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED)
+    }
+
+    @Test
+    fun whenUseAddressThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("address", this.address)
+        }
+    }
+
+    @Test
+    fun whenUseAddressThenPixelSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS)
+    }
+
+    @Test
+    fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.showEmailTooltip()
+
+        assertCommandIssued<Command.ShowEmailTooltip> {
+            assertEquals("address", this.address)
+        }
+    }
+
+    @Test
+    fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
+
+        testee.showEmailTooltip()
+
+        assertCommandNotIssued<Command.ShowEmailTooltip>()
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
@@ -3222,7 +3371,7 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn(USE_OUR_APP_DOMAIN)
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", USE_OUR_APP_DOMAIN, false)
     }
 
@@ -3232,7 +3381,7 @@ class BrowserTabViewModelTest {
         whenever(site.url).thenReturn("example.com")
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", "example.com", false)
     }
 
@@ -3250,7 +3399,7 @@ class BrowserTabViewModelTest {
         whenever(site.uri).thenReturn(Uri.parse(domain))
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
-        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false)
     }
 

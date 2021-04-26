@@ -59,6 +59,6 @@ interface WebViewClientListener {
 
     fun loginDetected()
     fun dosAttackDetected()
-    fun iconReceived(icon: Bitmap)
+    fun iconReceived(url: String, icon: Bitmap)
     fun prefetchFavicon(url: String)
 }

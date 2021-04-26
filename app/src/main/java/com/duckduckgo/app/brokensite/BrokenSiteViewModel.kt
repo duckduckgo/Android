@@ -31,11 +31,9 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
@@ -127,28 +125,15 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrokenSiteViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrokenSiteViewModelFactory(
-        pixel: Pixel,
-        brokenSiteSender: BrokenSiteSender
-    ): ViewModelFactoryPlugin {
-        return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
-    }
-}
-
-private class BrokenSiteViewModelFactory(
-    private val pixel: Pixel,
-    private val brokenSiteSender: BrokenSiteSender
+@ContributesMultibinding(AppObjectGraph::class)
+class BrokenSiteViewModelFactory @Inject constructor(
+    private val pixel: Provider<Pixel>,
+    private val brokenSiteSender: Provider<BrokenSiteSender>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel, brokenSiteSender) as T)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
                 else -> null
             }
         }

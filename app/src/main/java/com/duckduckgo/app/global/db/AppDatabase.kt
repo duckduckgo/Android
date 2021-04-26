@@ -25,6 +25,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
+import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -65,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 30,
+    exportSchema = true, version = 31,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -92,7 +94,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         FireproofWebsiteEntity::class,
         UserEventEntity::class,
         LocationPermissionEntity::class,
-        PixelEntity::class
+        PixelEntity::class,
+        AuthCookieAllowedDomainEntity::class
     ]
 )
 
@@ -136,6 +139,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
+    abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
 }
 
 @Suppress("PropertyName")
@@ -387,9 +391,21 @@ class MigrationsProvider(
         }
     }
 
+    val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
+        }
+    }
+
+    val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
         }
     }
 
@@ -423,7 +439,8 @@ class MigrationsProvider(
             MIGRATION_26_TO_27,
             MIGRATION_27_TO_28,
             MIGRATION_28_TO_29,
-            MIGRATION_29_TO_30
+            MIGRATION_29_TO_30,
+            MIGRATION_30_TO_31
         )
 
     @Deprecated(

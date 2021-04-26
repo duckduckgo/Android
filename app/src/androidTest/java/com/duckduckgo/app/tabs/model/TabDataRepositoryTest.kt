@@ -320,7 +320,7 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenDeleteCurrentTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runBlocking<Unit> {
+    fun whenDeleteTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
         val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
@@ -331,7 +331,7 @@ class TabDataRepositoryTest {
         var currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, tabToDelete.tabId)
 
-        testee.deleteCurrentTabAndSelectSource()
+        testee.deleteTabAndSelectSource("tabToDeleteId")
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
@@ -420,6 +420,27 @@ class TabDataRepositoryTest {
         daoDeletableTabs.send(listOf(tab, tab, tab))
         daoDeletableTabs.send(listOf(tab, tab, tab))
         daoDeletableTabs.send(listOf(tab, tab, tab))
+        job.cancel()
+    }
+
+    @Test
+    fun whenDeleteTabAndSelectSourceIfTabHadAParentThenEmitParentTabId() = runBlocking {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
+        val tabToDelete = TabEntity(tabId = "tabToDeleteId", url = "http://www.example.com", position = 1, sourceTabId = "sourceId")
+        dao.addAndSelectTab(sourceTab)
+        dao.addAndSelectTab(tabToDelete)
+        testee = tabDataRepository(dao)
+
+        testee.deleteTabAndSelectSource("tabToDeleteId")
+
+        val job = launch {
+            testee.childClosedTabs.collect {
+                assertEquals("sourceId", it)
+            }
+        }
+
         job.cancel()
     }
 

@@ -24,12 +24,10 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,
@@ -57,30 +55,16 @@ class OnboardingViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class OnboardingViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideOnboardingViewModelFactory(
-        userStageStore: UserStageStore,
-        pageLayoutManager: OnboardingPageManager,
-        dispatchers: DispatcherProvider
-    ): ViewModelFactoryPlugin {
-        return OnboardingViewModelFactory(userStageStore, pageLayoutManager, dispatchers)
-    }
-}
-
-private class OnboardingViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val pageLayoutManager: OnboardingPageManager,
-    private val dispatchers: DispatcherProvider
+@ContributesMultibinding(AppObjectGraph::class)
+class OnboardingViewModelFactory @Inject constructor(
+    private val userStageStore: Provider<UserStageStore>,
+    private val pageLayoutManager: Provider<OnboardingPageManager>,
+    private val dispatchers: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore, pageLayoutManager, dispatchers) as T)
+                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore.get(), pageLayoutManager.get(), dispatchers.get()) as T)
                 else -> null
             }
         }

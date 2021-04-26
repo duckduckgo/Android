@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.app.email.api
 
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import retrofit2.http.Header
+import retrofit2.http.POST
 
-class DummyTestForCI {
-
-    @Test
-    fun dummyAlwaysPasses() {
-        assertTrue(true)
-    }
+interface EmailService {
+    @POST("https://quack.duckduckgo.com/api/email/addresses")
+    suspend fun newAlias(@Header("Authorization") authorization: String): EmailAlias
 }
+
+data class EmailAlias(val address: String)

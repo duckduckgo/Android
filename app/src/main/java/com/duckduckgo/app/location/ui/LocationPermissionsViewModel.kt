@@ -17,7 +17,6 @@
 package com.duckduckgo.app.location.ui
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -29,12 +28,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
@@ -138,34 +135,18 @@ class LocationPermissionsViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class LocationPermissionsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideLocationPermissionsViewModelFactory(
-        locationPermissionsRepository: LocationPermissionsRepository,
-        geoLocationPermissions: GeoLocationPermissions,
-        dispatcherProvider: DispatcherProvider,
-        settingsDataStore: SettingsDataStore,
-        pixel: Pixel
-    ): ViewModelFactoryPlugin {
-        return LocationPermissionsViewModelFactory(locationPermissionsRepository, geoLocationPermissions, dispatcherProvider, settingsDataStore, pixel)
-    }
-}
-
-private class LocationPermissionsViewModelFactory(
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geoLocationPermissions: GeoLocationPermissions,
-    private val dispatcherProvider: DispatcherProvider,
-    private val settingsDataStore: SettingsDataStore,
-    private val pixel: Pixel
+@ContributesMultibinding(AppObjectGraph::class)
+class LocationPermissionsViewModelFactory @Inject constructor(
+    private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
+    private val geoLocationPermissions: Provider<GeoLocationPermissions>,
+    private val dispatcherProvider: Provider<DispatcherProvider>,
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository, geoLocationPermissions, dispatcherProvider, settingsDataStore, pixel) as T)
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository.get(), geoLocationPermissions.get(), dispatcherProvider.get(), settingsDataStore.get(), pixel.get()) as T)
                 else -> null
             }
         }

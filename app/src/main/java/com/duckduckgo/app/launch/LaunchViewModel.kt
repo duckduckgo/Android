@@ -24,13 +24,11 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class LaunchViewModel(
     private val userStageStore: UserStageStore,
@@ -67,28 +65,15 @@ class LaunchViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class LaunchViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideLaunchViewModelFactory(
-        userStageStore: UserStageStore,
-        appInstallationReferrerStateListener: AppInstallationReferrerStateListener
-    ): ViewModelFactoryPlugin {
-        return LaunchViewModelFactory(userStageStore, appInstallationReferrerStateListener)
-    }
-}
-
-private class LaunchViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+@ContributesMultibinding(AppObjectGraph::class)
+class LaunchViewModelFactory @Inject constructor(
+    private val userStageStore: Provider<UserStageStore>,
+    private val appInstallationReferrerStateListener: Provider<AppInstallationReferrerStateListener>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore, appInstallationReferrerStateListener) as T)
+                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore.get(), appInstallationReferrerStateListener.get()) as T)
                 else -> null
             }
         }

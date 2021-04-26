@@ -30,13 +30,11 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -115,24 +113,14 @@ class ScorecardViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ScorecardViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideScorecardViewModelFactory(userWhitelistDao: UserWhitelistDao): ViewModelFactoryPlugin {
-        return ScorecardViewModelFactory(userWhitelistDao)
-    }
-}
-
-private class ScorecardViewModelFactory(
-    private val userWhitelistDao: UserWhitelistDao,
+@ContributesMultibinding(AppObjectGraph::class)
+class ScorecardViewModelFactory @Inject constructor(
+    private val userWhitelistDao: Provider<UserWhitelistDao>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao) as T
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get()) as T
                 else -> null
             }
         }

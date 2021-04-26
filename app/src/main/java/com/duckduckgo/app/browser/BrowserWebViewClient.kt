@@ -25,13 +25,17 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.email.EmailInjector
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
@@ -51,7 +55,11 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val thirdPartyCookieManager: ThirdPartyCookieManager,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val emailInjector: EmailInjector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -140,12 +148,18 @@ class BrowserWebViewClient(
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+            url?.let {
+                appCoroutineScope.launch(dispatcherProvider.default()) {
+                    thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
+                }
+            }
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             if (url != null && url == lastPageStarted) {
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
+            emailInjector.resetInjectedJsFlag()
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
@@ -161,6 +175,7 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
+            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageFinished
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))
                 url?.let { prefetchFavicon(url) }

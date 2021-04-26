@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -171,7 +155,7 @@
     <string name="settingsHeadingGeneral">Obecné</string>
     <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsLightTheme">Lehký motiv</string>
+    <string name="settingsLightTheme">Světlý motiv</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
@@ -231,6 +215,7 @@
     <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
     <string name="bookmarkOverflowContentDescription">Další možnosti záložky %1$s</string>
     <string name="bookmarkEdited">Záložka přidána</string>
+    <string name="bookmarkDeleteConfirmationMessage">Odstraněno &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdit</string>
@@ -496,6 +481,11 @@
     <string name="fireproofWebsiteLoginDialogNegative">Teď ne</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
     <string name="fireproofWebsiteToogleText">Zeptat se při přihlašování</string>
+    <string name="disableLoginDetectionDialogTitle">Zakázat připomenutí ochrany při přihlašování k webovým stránkám?</string>
+    <string name="disableLoginDetectionDialogDescription">Tuto předvolbu můžete v Nastavení kdykoli změnit.</string>
+    <string name="disableLoginDetectionDialogPositive">VYPNOUT</string>
+    <string name="disableLoginDetectionDialogNegative">ZRUŠIT</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Ochrana odstraněna pro &lt;b&gt;%1$s&lt;/b&gt;</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animace tlačítka pro mazání</string>

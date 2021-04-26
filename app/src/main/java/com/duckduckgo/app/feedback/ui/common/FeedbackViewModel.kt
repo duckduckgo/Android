@@ -28,16 +28,14 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
@@ -290,28 +288,15 @@ data class UpdateViewCommand(
     val subReason: SubReason? = null
 )
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class FeedbackViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFeedbackViewModelFactory(
-        playStoreUtils: PlayStoreUtils,
-        feedbackSubmitter: FeedbackSubmitter
-    ): ViewModelFactoryPlugin {
-        return FeedbackViewModelFactory(playStoreUtils, feedbackSubmitter)
-    }
-}
-
-private class FeedbackViewModelFactory(
-    private val playStoreUtils: PlayStoreUtils,
-    private val feedbackSubmitter: FeedbackSubmitter
+@ContributesMultibinding(AppObjectGraph::class)
+class FeedbackViewModelFactory @Inject constructor(
+    private val playStoreUtils: Provider<PlayStoreUtils>,
+    private val feedbackSubmitter: Provider<FeedbackSubmitter>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils, feedbackSubmitter) as T)
+                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils.get(), feedbackSubmitter.get()) as T)
                 else -> null
             }
         }

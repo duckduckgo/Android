@@ -20,11 +20,8 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
@@ -40,18 +37,8 @@ class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrokenSiteNegativeFeedbackViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrokenSiteNegativeFeedbackViewModelFactory(): ViewModelFactoryPlugin {
-        return BrokenSiteNegativeFeedbackViewModelFactory()
-    }
-}
-
-private class BrokenSiteNegativeFeedbackViewModelFactory() : ViewModelFactoryPlugin {
+@ContributesMultibinding(AppObjectGraph::class)
+class BrokenSiteNegativeFeedbackViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

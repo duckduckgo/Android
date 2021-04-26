@@ -25,15 +25,15 @@
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
 
-    <!-- Fireproof Websites snackbar -->
-    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
-
-    <!-- Bookmark Websites snackbar -->
-    <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
-
-    <!-- Login detection enabled experiment -->
-    <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
-    <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
-    <string name="disableLoginDetectionDialogPositive">DISABLE</string>
-    <string name="disableLoginDetectionDialogNegative">CANCEL</string>
+    <!-- Email Autofill -->
+    <string name="settingsEmailAutofill">Email Autofill</string>
+    <string name="settingsEmailAutofillEnabledFor">Enabled for %1$s</string>
+    <string name="autofillSettingCancel">Cancel</string>
+    <string name="autofillSettingDisable">Disable</string>
+    <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
+    <string name="autofillTooltipUseYourAlias">Use %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
+    <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
+    <string name="newEmailAliasMenuTitle">Create Duck Address</string>
 </resources>

@@ -30,6 +30,8 @@ import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import timber.log.Timber
@@ -50,6 +52,10 @@ class TabDataRepository @Inject constructor(
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
     override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
+
+    private val childTabClosedSharedFlow = MutableSharedFlow<String>()
+
+    override val childClosedTabs = childTabClosedSharedFlow.asSharedFlow()
 
     // We only want the new emissions when subscribing, however Room does not honour that contract so we
     // need to drop the first emission always (this is equivalent to the Observable semantics)
@@ -216,9 +222,9 @@ class TabDataRepository @Inject constructor(
         }.join()
     }
 
-    override suspend fun deleteCurrentTabAndSelectSource() {
+    override suspend fun deleteTabAndSelectSource(tabId: String) {
         databaseExecutor().scheduleDirect {
-            val tabToDelete = tabsDao.selectedTab() ?: return@scheduleDirect
+            val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect
 
             deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId
@@ -228,6 +234,12 @@ class TabDataRepository @Inject constructor(
                 }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
+
+            tabToSelect?.let {
+                appCoroutineScope.launch {
+                    childTabClosedSharedFlow.emit(tabToSelect.tabId)
+                }
+            }
         }
     }
 

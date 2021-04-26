@@ -29,14 +29,12 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Provider
 
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
@@ -126,26 +124,14 @@ class WhitelistViewModel(
     }
 }
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class WhitelistViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideWhitelistViewModelFactory(
-        dao: UserWhitelistDao
-    ): ViewModelFactoryPlugin {
-        return WhitelistViewModelFactory(dao)
-    }
-}
-
-private class WhitelistViewModelFactory(
-    private val dao: UserWhitelistDao
+@ContributesMultibinding(AppObjectGraph::class)
+class WhitelistViewModelFactory @Inject constructor(
+    private val dao: Provider<UserWhitelistDao>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao) as T)
+                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get()) as T)
                 else -> null
             }
         }
