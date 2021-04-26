@@ -263,11 +263,13 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmark: SavedSite.Bookmark) : Command()
         class ShowFavoriteAddedConfirmation(val favorite: SavedSite.Favorite) : Command()
+        class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
+        class SubmitQuery(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
@@ -1412,6 +1414,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
+        command.value = DeleteSavedSiteConfirmation(savedSite)
+    }
+
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
             bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
@@ -1878,6 +1884,25 @@ class BrowserTabViewModel(
                     }
                 }
             )
+        }
+    }
+
+    fun onQuickAccesItemClicked(it: SavedSite) {
+        command.value = SubmitQuery(it.url)
+    }
+
+    fun deleteQuickAccessItem(savedSite: SavedSite) {
+        val favorite = savedSite as? SavedSite.Favorite ?: return
+        viewModelScope.launch(dispatchers.io() + NonCancellable) {
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            favoritesRepository.delete(favorite)
+        }
+    }
+
+    fun insertQuickAccessItem(savedSite: SavedSite) {
+        val favorite = savedSite as? SavedSite.Favorite ?: return
+        viewModelScope.launch(dispatchers.io()) {
+            favoritesRepository.insert(favorite)
         }
     }
 

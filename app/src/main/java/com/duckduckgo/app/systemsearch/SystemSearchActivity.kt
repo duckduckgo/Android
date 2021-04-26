@@ -201,7 +201,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 viewModel.onEditQuickAccessItemRequested(it)
             },
             {
-                confirmDeleteSavedSite(it.favorite)
+                viewModel.onDeleteQuickAccessItemRequested(it)
             }
         )
         itemTouchHelper = ItemTouchHelper(
@@ -316,6 +316,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
             is LaunchEditDialog -> {
                 showEditSavedSiteDialog(command.savedSite)
+            }
+            is DeleteSavedSiteConfirmation -> {
+                confirmDeleteSavedSite(command.savedSite)
             }
         }
     }

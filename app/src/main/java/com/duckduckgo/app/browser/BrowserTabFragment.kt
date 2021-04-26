@@ -113,13 +113,20 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
@@ -549,6 +556,7 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmark)
             is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favorite)
+            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
                 navigate(it.url, it.headers)
@@ -633,6 +641,7 @@ class BrowserTabFragment :
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
+            is Command.SubmitQuery -> submitQuery(it.url)
         }
     }
 
@@ -913,13 +922,13 @@ class BrowserTabFragment :
                 itemTouchHelper.startDrag(viewHolder)
             },
             {
-                //viewModel.onQuickAccesItemClicked(it)
+                viewModel.onQuickAccesItemClicked(it.favorite)
             },
             {
-                //viewModel.onEditQuickAccessItemRequested(it)
+                viewModel.onSavedSiteEdited(it.favorite)
             },
             {
-                //confirmDeleteSavedSite(it.favorite)
+                viewModel.onDeleteQuickAccessItemRequested(it.favorite)
             }
         )
         itemTouchHelper = ItemTouchHelper(
@@ -936,7 +945,6 @@ class BrowserTabFragment :
         itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
         quickAccessRecyclerView.adapter = quickAccessAdapter
     }
-
 
     private fun configurePrivacyGrade() {
         toolbar.privacyGradeButton.setOnClickListener {
@@ -1155,6 +1163,18 @@ class BrowserTabFragment :
                 addBookmarkDialog.listener = viewModel
             }
             .show()
+    }
+
+    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
+        viewModel.deleteQuickAccessItem(savedSite)
+        Snackbar.make(
+            rootView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.insertQuickAccessItem(savedSite)
+        }.show()
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
@@ -1882,6 +1902,7 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                Timber.i("BrowserTab favs: renderIfChanged $viewState")
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
