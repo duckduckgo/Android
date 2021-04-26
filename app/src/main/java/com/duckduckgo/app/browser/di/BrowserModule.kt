@@ -43,6 +43,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -102,7 +103,8 @@ class BrowserModule {
         globalPrivacyControl: GlobalPrivacyControl,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
+        emailInjector: EmailInjector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -118,7 +120,8 @@ class BrowserModule {
             globalPrivacyControl,
             thirdPartyCookieManager,
             appCoroutineScope,
-            dispatcherProvider
+            dispatcherProvider,
+            emailInjector
         )
     }
 
