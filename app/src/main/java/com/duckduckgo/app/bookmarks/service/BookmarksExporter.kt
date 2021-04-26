@@ -27,7 +27,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 interface BookmarksExporter {
-    suspend fun export(uri: Uri): ExportBookmarksResult
+    suspend fun export(): String
 }
 
 sealed class ExportBookmarksResult {
@@ -37,21 +37,20 @@ sealed class ExportBookmarksResult {
 }
 
 class DuckDuckGoBookmarksExporter(
-    private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : BookmarksExporter {
 
-    override suspend fun export(uri: Uri): ExportBookmarksResult {
+    override suspend fun export(): String {
         val bookmarks = withContext(dispatcher.io()){
             bookmarksDao.bookmarksSync()
         }
 
         if (bookmarks.isEmpty()) {
-            return ExportBookmarksResult.NoBookmarksExported
+            return ""
         }
 
-        val bookmarksHtml = buildString {
+        return buildString {
             appendLine("<!DOCTYPE NETSCAPE-Bookmark-file-1>")
             appendLine("<!--This is an automatically generated file.")
             appendLine("It will be read and overwritten.")
@@ -67,26 +66,6 @@ class DuckDuckGoBookmarksExporter(
             }
             appendLine("    </DL><p>")
             appendLine("</DL><p>")
-        }
-        return writeFileContent(uri, bookmarksHtml)
-    }
-
-    private fun writeFileContent(uri: Uri, content: String): ExportBookmarksResult {
-        return try {
-            val file = contentResolver.openFileDescriptor(uri, "w")
-            if (file != null) {
-                val fileOutputStream = FileOutputStream(file.fileDescriptor)
-                fileOutputStream.write(content.toByteArray())
-                fileOutputStream.close()
-                file.close()
-                ExportBookmarksResult.Success
-            } else {
-                ExportBookmarksResult.NoBookmarksExported
-            }
-        } catch (e: FileNotFoundException) {
-            ExportBookmarksResult.Error(e)
-        } catch (e: IOException) {
-            ExportBookmarksResult.Error(e)
         }
     }
 

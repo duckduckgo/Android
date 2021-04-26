@@ -18,7 +18,12 @@ package com.duckduckgo.app.bookmarks.di
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.*
+import com.duckduckgo.app.bookmarks.service.BookmarkManager
+import com.duckduckgo.app.bookmarks.service.BookmarksExporter
+import com.duckduckgo.app.bookmarks.service.BookmarksImporter
+import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarkManager
+import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksExporter
+import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksImporter
 import com.duckduckgo.app.global.DispatcherProvider
 import dagger.Module
 import dagger.Provides
@@ -39,20 +44,19 @@ class BookmarksModule {
     @Provides
     @Singleton
     fun bookmarksExporter(
-        context: Context,
         bookmarksDao: BookmarksDao,
         dispatcherProvider: DispatcherProvider
     ): BookmarksExporter {
-        return DuckDuckGoBookmarksExporter(context.contentResolver, bookmarksDao, dispatcherProvider)
+        return DuckDuckGoBookmarksExporter(bookmarksDao, dispatcherProvider)
     }
 
     @Provides
     @Singleton
     fun bookmarkManager(
+        context: Context,
         bookmarksImporter: BookmarksImporter,
         bookmarksExporter: BookmarksExporter
     ): BookmarkManager {
-        return DuckDuckGoBookmarkManager(bookmarksImporter, bookmarksExporter)
+        return DuckDuckGoBookmarkManager(context.contentResolver, bookmarksImporter, bookmarksExporter)
     }
-
 }

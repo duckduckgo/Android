@@ -16,24 +16,21 @@
 
 package com.duckduckgo.app.bookmarks.service
 
-import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.global.db.AppDatabase
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class BookmarkExporterTest {
+class BookmarkManagerTest {
 
     @get:Rule
     @Suppress("unused")
@@ -43,9 +40,11 @@ class BookmarkExporterTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
+    private lateinit var importer: BookmarksImporter
+    private lateinit var exporter: BookmarksExporter
     private lateinit var db: AppDatabase
     private lateinit var dao: BookmarksDao
-    private lateinit var exporter: BookmarksExporter
+    private lateinit var bookmarkManager: BookmarkManager
 
     @Before
     fun before() {
@@ -54,43 +53,11 @@ class BookmarkExporterTest {
             .allowMainThreadQueries()
             .build()
         dao = db.bookmarksDao()
+
+        importer = DuckDuckGoBookmarksImporter(context.contentResolver, dao)
         exporter = DuckDuckGoBookmarksExporter(dao)
-    }
 
-    @After
-    fun after() {
-        db.close()
-    }
-
-    @Test
-    fun whenSomeBookmarksExistThenHtmlIsGenerated() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
-        dao.insert(bookmark)
-
-        val result = exporter.export()
-        val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-            "<!--This is an automatically generated file.\n" +
-            "It will be read and overwritten.\n" +
-            "Do Not Edit! -->\n" +
-            "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-            "<Title>Bookmarks</Title>\n" +
-            "<H1>Bookmarks</H1>\n" +
-            "<DL><p>\n" +
-            "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo</H3>\n" +
-            "    <DL><p>\n" +
-            "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
-            "    </DL><p>\n" +
-            "</DL><p>\n"
-
-        assertEquals(expectedHtml, result)
-    }
-
-    @Test
-    fun whenNoBookmarksExistThenNothingIsGenerated() = runBlocking {
-        val result = exporter.export()
-        val expectedHtml = ""
-
-        assertEquals(expectedHtml, result)
+        bookmarkManager = DuckDuckGoBookmarkManager(context.contentResolver, importer, exporter)
     }
 
 }
