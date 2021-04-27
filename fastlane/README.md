@@ -31,6 +31,11 @@ Upload APK to ad-hoc internal app sharing
 fastlane android deploy_github
 ```
 Deploy APK to GitHub
+### android update_fastlane_release_notes
+```
+fastlane android update_fastlane_release_notes
+```
+Update local changelist metadata
 ### android release
 ```
 fastlane android release
