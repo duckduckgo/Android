@@ -25,6 +25,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.view.FaviconImageView
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
@@ -32,8 +33,8 @@ import javax.inject.Inject
 interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
-    suspend fun loadFaviconToView(file: File, view: ImageView)
-    suspend fun loadDefaultFaviconToView(view: ImageView)
+    suspend fun loadFaviconToView(file: File, view: ImageView, domain: String = "")
+    suspend fun loadDefaultFaviconToView(view: ImageView, domain: String = "")
 }
 
 class GlideFaviconDownloader @Inject constructor(
@@ -67,22 +68,22 @@ class GlideFaviconDownloader @Inject constructor(
         }
     }
 
-    override suspend fun loadFaviconToView(file: File, view: ImageView) {
+    override suspend fun loadFaviconToView(file: File, view: ImageView, domain: String) {
         withContext(dispatcherProvider.main()) {
             Glide.with(context)
                 .load(file)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
-                .placeholder(R.drawable.ic_globe_gray_16dp)
-                .error(R.drawable.ic_globe_gray_16dp)
+                .placeholder(FaviconImageView.getDrawableForDomain(view.context, domain))
+                .error(FaviconImageView.getDrawableForDomain(view.context, domain))
                 .into(view)
         }
     }
 
-    override suspend fun loadDefaultFaviconToView(view: ImageView) {
+    override suspend fun loadDefaultFaviconToView(view: ImageView, domain: String) {
         withContext(dispatcherProvider.main()) {
-            view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
+            //view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
+            view.setImageDrawable(FaviconImageView.getDrawableForDomain(view.context, domain))
         }
     }
-
 }
