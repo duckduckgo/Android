@@ -57,8 +57,7 @@ class BookmarksViewModel(
         class OpenBookmark(val bookmark: BookmarkEntity) : Command()
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
         class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
-        data class ImportedBookmarks(val bookmarks: List<Bookmark>) : Command()
-        object ImportBookmarksError : Command()
+        data class ImportedBookmarks(val importBookmarksResult: ImportBookmarksResult) : Command()
         data class ExportedBookmarks(val exportBookmarksResult: ExportBookmarksResult) : Command()
 
     }
@@ -126,11 +125,7 @@ class BookmarksViewModel(
         viewModelScope.launch(dispatcherProvider.io()) {
             val result = bookmarksManager.import(uri)
             withContext(dispatcherProvider.main()) {
-                when (result) {
-                    is ImportBookmarksResult.Error -> command.value = ImportBookmarksError
-                    is ImportBookmarksResult.Success -> command.value = ImportedBookmarks(result.bookmarks)
-                }
-
+                command.value = ImportedBookmarks(result)
             }
         }
     }

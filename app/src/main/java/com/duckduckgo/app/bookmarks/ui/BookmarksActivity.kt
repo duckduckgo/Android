@@ -35,8 +35,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.service.Bookmark
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
@@ -47,7 +47,7 @@ import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bookmarks.*
+import kotlinx.android.synthetic.main.activity_bookmarks.bookmarkRootView
 import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
 import kotlinx.android.synthetic.main.content_bookmarks.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
@@ -83,13 +83,17 @@ class BookmarksActivity : DuckDuckGoActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == IMPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data // The uri with the location of the file
-            viewModel.importBookmarks(selectedFile!!)
+            val selectedFile = data?.data
+            if (selectedFile != null) {
+                viewModel.importBookmarks(selectedFile)
+            }
         }
 
         if (requestCode == EXPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data // The uri with the location of the file
-            viewModel.exportBookmarks(selectedFile!!)
+            val selectedFile = data?.data
+            if (selectedFile != null) {
+                viewModel.exportBookmarks(selectedFile)
+            }
         }
     }
 
@@ -117,8 +121,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
                     is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
                     is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
-                    is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.bookmarks)
-                    is BookmarksViewModel.Command.ImportBookmarksError -> showImportedBookmarksError()
+                    is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.importBookmarksResult)
                     is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
                 }
             }
@@ -129,20 +132,31 @@ class BookmarksActivity : DuckDuckGoActivity() {
         showMessage("Error importing bookmarks, nothing has been imported")
     }
 
-    private fun showImportedBookmarks(bookmarks: List<Bookmark>) {
-        showMessage("Imported ${bookmarks.size} bookmarks")
+    private fun showImportedBookmarks(result: ImportBookmarksResult) {
+        when (result) {
+            is ImportBookmarksResult.Error -> {
+                showMessage(getString(R.string.importBookmarksError))
+            }
+            is ImportBookmarksResult.Success -> {
+                if (result.bookmarks.isEmpty()) {
+                    showMessage(getString(R.string.importBookmarksEmpty))
+                } else {
+                    showMessage(getString(R.string.importBookmarksSuccess, result.bookmarks.size))
+                }
+            }
+        }
     }
 
-    private fun showExportedBookmarks(it: ExportBookmarksResult) {
-        when (it) {
+    private fun showExportedBookmarks(result: ExportBookmarksResult) {
+        when (result) {
             is ExportBookmarksResult.Error -> {
-                showMessage("Error exporting bookmarks ${it.exception}")
+                showMessage(getString(R.string.exportBookmarksError))
             }
             ExportBookmarksResult.NoBookmarksExported -> {
-                showMessage("No Bookmarks available")
+                showMessage(getString(R.string.exportBookmarksEmpty))
             }
             ExportBookmarksResult.Success -> {
-                showMessage("Successfully exported bookmarks")
+                showMessage(getString(R.string.exportBookmarksSuccess))
             }
         }
     }
