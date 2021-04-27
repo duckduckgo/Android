@@ -30,6 +30,19 @@ platform :android do
     )
   end
 
+  desc "Upload APK to ad-hoc internal app sharing"
+  lane :deploy_adhoc do
+
+      props = property_file_read(file: "app/version/version.properties")
+      version = props["VERSION"]
+      apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+      upload_to_play_store_internal_app_sharing(
+        apk: apkPath
+      )
+
+ end
+
   desc "Deploy APK to GitHub"
   lane :deploy_github do
 
