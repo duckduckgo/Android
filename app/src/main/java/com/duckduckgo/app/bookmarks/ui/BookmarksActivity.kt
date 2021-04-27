@@ -177,19 +177,24 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.bookmark_import -> {
-
                 val intent = Intent()
-                    .setType("*/*")
+                    .setType("text/html")
                     .setAction(Intent.ACTION_GET_CONTENT)
 
-                startActivityForResult(Intent.createChooser(intent, "Select a file"), IMPORT_BOOKMARKS_REQUEST_CODE)
+                startActivityForResult(
+                    Intent.createChooser(
+                        intent,
+                        getString(R.string.importBookmarksFileTitle)
+                    ),
+                    IMPORT_BOOKMARKS_REQUEST_CODE
+                )
             }
             R.id.bookmark_export -> {
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "text/html"
-                intent.putExtra(Intent.EXTRA_TITLE, "bookmarks_ddg.html")
+                val intent = Intent()
+                    .setType("text/html")
+                    .setAction(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
 
                 startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
             }
@@ -253,8 +258,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
+        private const val EXPORT_BOOKMARKS_FILE_NAME = "bookmarks_ddg.html"
     }
 
     class BookmarksAdapter(
