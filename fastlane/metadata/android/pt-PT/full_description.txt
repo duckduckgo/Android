@@ -1,0 +1,23 @@
+Privacidade, simplificada.
+
+No DuckDuckGo, acreditamos que a Internet não deveria parecer tão assustadora, e ter a privacidade que merece online deveria ser tão simples como fechar as cortinas. 
+
+Oferecemos os fundamentos de privacidade necessários para controlar facilmente os seus dados pessoais quando pesquisar e navegar na Web, onde quer que a Internet o leve: 
+• Evite as redes de localizadores de publicidade – A nossa proteção de privacidade bloqueará todos os localizadores ocultos que conseguirmos encontrar, revelando as principais redes de publicidade que o seguem ao longo do tempo, para que possa seguir quem está a tentar segui-lo. 
+• Aumente a proteção de encriptação – Obrigamos os sites a utilizarem uma ligação encriptada sempre que disponível, para proteger os seus dados de olhares curiosos, como os fornecedores de serviços Internet. 
+• Pesquise de forma privada – Partilha os seus dados mais pessoais com o seu motor de busca, como questões financeiras, médicas e políticas. O que pesquisa só a si lhe diz respeito, e é por isso que o DuckDuckGo não o segue. Nunca. 
+• Descodifique as políticas de privacidade – Estabelecemos uma parceria com o Terms of Service Didn't Read para incluir os respetivos resultados e etiquetas das políticas de privacidade e termos de serviço do website, sempre que disponíveis. 
+
+Quando estiver a pesquisar e a navegar, o DuckDuckGo mostra-lhe a sua classificação de nível de privacidade quando visitar um website (A-F). Essa classificação permite-lhe ver \"num piscar de olhos" o seu nível de proteção, pesquisar os detalhes para verificar quem apanhámos a tentar segui-lo e ficar a saber como reforçámos as medidas de privacidade do site subjacente. O nível de privacidade é classificado imediatamente com base na prevalência das redes de localizadores ocultos, disponibilidade de encriptação e práticas de privacidade de website. 
+
+A nossa aplicação oferece uma funcionalidade de navegação padrão incluindo separadores, favoritos e autocomplemento. Além disso, para reforçar a proteção de privacidade conforme descrito abaixo, também incluímos mais algumas funcionalidades de privacidade no navegador: 
+• Botão Fire – Elimine todos os seus separadores e dados com um toque. 
+
+Muitas pessoas acreditam que não é possível ter privacidade na Internet. Estamos a lutar para mudar isso e decidimos que a nossa missão é definir um novo padrão de confiança online. Instale o DuckDuckGo e recupere a sua privacidade!
+
+Sobre nós: https://duckduckgo.com/about/
+Dicas de privacidade para o dispositivo: https://spreadprivacy.com/tag/device-privacy-tips/
+Mais informação sobre a privacidade: https://spreadprivacy.com/tag/privacy-newsletter/
+A nossa política de privacidade: https://duckduckgo.com/privacy/
+
+Código-fonte aberto em https://github.com/duckduckgo/android

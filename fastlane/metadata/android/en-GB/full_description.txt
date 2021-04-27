@@ -1,0 +1,23 @@
+Tired of being tracked online? We can help. At DuckDuckGo, we believe online privacy should be simple.
+
+DuckDuckGo Privacy Browser has the speed you need, the browsing features you expect (like tabs & bookmarks), and comes packed with best-in-class privacy essentials:
+
+<b>Tap Fire Button, Burn Data</b> — clear all your tabs and browsing data with one tap. 
+
+<b>Escape Online Tracking</b> — automatically block hidden third-party trackers we can find lurking on websites you visit, which stops the companies behind those trackers from collecting and selling your data. 
+
+<b>Search Privately</b> — our private search engine comes built-in so you can search the Internet without being tracked.
+
+<b>Enforce Encryption</b> — force sites to use an encrypted (HTTPS) connection where available, protecting your data from prying eyes, like from unwanted snoopers and Internet service providers.
+
+<b>Decode Privacy</b> — each site you visit gets a Privacy Grade (A-F) so you can see how protected you are at a glance, and you can even dig into the details to see who we caught trying to track you. 
+
+<b>Signal Your Privacy Preference with GPC</b> — built into the browser, Global Privacy Control (GPC) intends to help you express your legal opt-out rights automatically. This will tell websites not to sell or share your personal information under future legal frameworks (e.g., CCPA, GDPR) in various states or countries.
+
+Privacy, simplified.
+
+About Us: https://duckduckgo.com/about/
+Device Privacy: https://spreadprivacy.com/tag/device-privacy-tips/ 
+Privacy Newsletter: https://duckduckgo.com/newsletter 
+Privacy Policy: https://duckduckgo.com/privacy/
+Open Source: https://github.com/duckduckgo/Android

@@ -1,0 +1,23 @@
+Privacitat sense complicacions.
+
+A DuckDuckGo creiem que internet no hauria de fer por i que garantir la privacitat que toca quan hom és en línia hauria de ser tan senzill com abaixar la persiana. 
+
+Proporcionem les eines essencials de privacitat necessàries per poder donar-vos el control de la vostra informació personal de manera eficaç quan cerqueu i navegueu pel web, independentment d’on aneu a parar a internet:
+• Escapeu de les xarxes de seguiment publicitari: la nostra protecció de la privacitat bloqueja totes les eines de seguiment que trobem. Desemmascaren les principals xarxes publicitàries que us rastregen, així que podreu rastrejar els que proven de rastrejar-vos.
+• Protecció encriptada reforçada: forcem als web que facin servir una connexió encriptada sempre que sigui possible. Les vostres dades estaran protegides de les mirades indiscretes, com ara les dels proveïdors de serveis d’internet.
+• Cerques privades: quan feu servir el motor de cerca, esteu compartint la vostra informació més personal, incloses dades financeres, mèdiques o polítiques. El que cerqueu és cosa vostra. Per aquest motiu, la cerca de DuckDuckGo no us rastreja. Mai de la vida.
+• Identificació de les condicions de privacitat: col•laborem amb Terms of Service; Didn’t Read per incloure les seves puntuacions i etiquetes de les condicions del servei i de privacitat dels webs, sempre que sigui possible. 
+
+A mesura que cerqueu i navegueu, DuckDuckGo us mostrarà una nota (d’A a F) de privacitat quan visiteu un web. Aquesta puntuació permet saber en un vist i no vist quin grau de protecció teniu, conèixer en profunditat a qui hem enxampat provant de rastrejar-vos i saber com reforcem les mesures de privacitat subjacents del web. La nota de privacitat s’obté automàticament en funció del predomini de xarxes de rastreig amagades, de la disponibilitat d’encriptació i de les pràctiques de privacitat del web.
+
+La nostra aplicació proporciona una funcionalitat de navegació estàndard, amb pestanyes, marcadors i emplenament automàtic. A més de la protecció de la privacitat potent descrita, hem afegit algunes funcionalitats addicionals de privacitat en el propi navegador:
+• Botó disparador: totes les pestanyes i les dades es volatilitzen amb un toc.
+
+Massa gent dona per fet que la privacitat a internet no és possible. Ens revoltem contra aquesta concepció fins al punt que hem adoptat com a missió establir un nou estàndard de confiança en línia. Instal•leu DuckDuckGo i recupereu la vostra privacitat!
+
+Qui som: https://duckduckgo.com/about/
+Consells de privacitat per a dispositius: https://spreadprivacy.com/tag/device-privacy-tips/
+Més informació sobre privacitat: https://spreadprivacy.com/tag/privacy-newsletter/
+Les nostres condicions de privacitat: https://duckduckgo.com/privacy/
+
+Codi obert disponible a https://github.com/duckduckgo/android
