@@ -119,6 +119,7 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
     }
 
     override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
-        return oldItem == newItem
+        return oldItem.favorite.title == newItem.favorite.title &&
+                oldItem.favorite.url == newItem.favorite.url
     }
 }

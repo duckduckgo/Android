@@ -563,6 +563,7 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmark)
             is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favorite)
+            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
@@ -950,7 +951,7 @@ class BrowserTabFragment :
                 viewModel.onQuickAccesItemClicked(it.favorite)
             },
             {
-                viewModel.onSavedSiteEdited(it.favorite)
+                viewModel.onEditSavedSiteRequested(it.favorite)
             },
             {
                 viewModel.onDeleteQuickAccessItemRequested(it.favorite)
@@ -961,7 +962,7 @@ class BrowserTabFragment :
                 quickAccessAdapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
                     override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-                        // viewModel.onQuickAccessListChanged(listElements)
+                        viewModel.onQuickAccessListChanged(listElements)
                     }
                 }
             )
@@ -1189,6 +1190,12 @@ class BrowserTabFragment :
                 addBookmarkDialog.listener = viewModel
             }
             .show()
+    }
+
+    private fun editSavedSite(savedSite: SavedSite) {
+        val addBookmarkDialog = EditBookmarkDialogFragment.instance(savedSite)
+        addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
+        addBookmarkDialog.listener = viewModel
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {

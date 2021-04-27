@@ -267,6 +267,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmark: SavedSite.Bookmark) : Command()
         class ShowFavoriteAddedConfirmation(val favorite: SavedSite.Favorite) : Command()
+        class ShowEditSavedSiteDialog(val savedSite: SavedSite) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
@@ -1452,6 +1453,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onEditSavedSiteRequested(savedSite: SavedSite) {
+        command.value = ShowEditSavedSiteDialog(savedSite)
+    }
+
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
         command.value = DeleteSavedSiteConfirmation(savedSite)
     }
@@ -1971,6 +1976,13 @@ class BrowserTabViewModel(
         val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io()) {
             favoritesRepository.insert(favorite)
+        }
+    }
+
+    fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        viewModelScope.launch(dispatchers.io()) {
+            Timber.i("Persist favorites $newList")
+            favoritesRepository.persistChanges(newList.map { it.favorite })
         }
     }
 
