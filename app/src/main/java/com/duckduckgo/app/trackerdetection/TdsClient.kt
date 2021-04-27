@@ -27,24 +27,27 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
     override fun matches(url: String, documentUrl: String): Client.Result {
         val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
-        return Client.Result(matches, tracker.ownerName, tracker.categories)
+        return Client.Result(matches = matches.shouldBlock, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.surrogate)
     }
 
-    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): Boolean {
+    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
                 if (matchedException(rule.exceptions, documentUrl)) {
-                    return false
+                    return MatchedResult(shouldBlock = false)
                 }
                 if (rule.action == IGNORE) {
-                    return false
+                    return MatchedResult(shouldBlock = false)
                 }
-                return true
+                if (rule.surrogate?.isNotEmpty() == true) {
+                    return MatchedResult(shouldBlock = true, surrogate = rule.surrogate)
+                }
+                return MatchedResult(shouldBlock = true)
             }
         }
 
-        return tracker.defaultAction == BLOCK
+        return MatchedResult(shouldBlock = (tracker.defaultAction == BLOCK))
     }
 
     private fun matchedException(exceptions: RuleExceptions?, documentUrl: String): Boolean {
@@ -67,4 +70,6 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
         }
         return false
     }
+
+    private data class MatchedResult(val shouldBlock: Boolean, val surrogate: String? = null)
 }
