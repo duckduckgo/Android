@@ -31,6 +31,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 
 class BookmarkExporterTest {
 
@@ -46,6 +47,8 @@ class BookmarkExporterTest {
     private lateinit var dao: BookmarksDao
     private lateinit var exporter: BookmarksExporter
 
+    private lateinit var filesDir: File
+
     @Before
     fun before() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -53,6 +56,7 @@ class BookmarkExporterTest {
             .allowMainThreadQueries()
             .build()
         dao = db.bookmarksDao()
+        filesDir = context.filesDir
         exporter = DuckDuckGoBookmarksExporter(context.contentResolver, dao, DuckDuckGoBookmarksParser())
     }
 
@@ -66,10 +70,25 @@ class BookmarkExporterTest {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
         dao.insert(bookmark)
 
-        val localUri = Uri.parse("whatever")
+        val testFile = File(filesDir, "test_bookmarks.html")
+        val localUri = Uri.fromFile(testFile)
 
         val result = exporter.export(localUri)
+        testFile.delete()
+
         assertTrue(result is ExportBookmarksResult.Success)
+    }
+
+    @Test
+    fun whenFileDSomeBookmarksExistThenExportingSucceeds() = runBlocking {
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
+        dao.insert(bookmark)
+
+        val localUri = Uri.parse("uridoesnotexist")
+
+        val result = exporter.export(localUri)
+
+        assertTrue(result is ExportBookmarksResult.Error)
     }
 
     @Test
