@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.service
 
-import android.content.ContentResolver
 import android.net.Uri
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
 
 data class Bookmark(val title: String, val url: String)
 
@@ -30,36 +26,12 @@ interface BookmarkManager {
 }
 
 class DuckDuckGoBookmarkManager constructor(
-    private val contentResolver: ContentResolver,
     private val bookmarksImporter: BookmarksImporter,
     private val bookmarksExporter: BookmarksExporter,
 ) : BookmarkManager {
 
     override suspend fun export(uri: Uri): ExportBookmarksResult {
-        val bookmarksHtml = bookmarksExporter.export()
-        return storeHtml(uri, bookmarksHtml)
-    }
-
-    private fun storeHtml(uri: Uri, content: String): ExportBookmarksResult {
-        return try {
-            if (content.isEmpty()){
-                return ExportBookmarksResult.NoBookmarksExported
-            }
-            val file = contentResolver.openFileDescriptor(uri, "w")
-            if (file != null) {
-                val fileOutputStream = FileOutputStream(file.fileDescriptor)
-                fileOutputStream.write(content.toByteArray())
-                fileOutputStream.close()
-                file.close()
-                ExportBookmarksResult.Success
-            } else {
-                ExportBookmarksResult.NoBookmarksExported
-            }
-        } catch (e: FileNotFoundException) {
-            ExportBookmarksResult.Error(e)
-        } catch (e: IOException) {
-            ExportBookmarksResult.Error(e)
-        }
+        return bookmarksExporter.export(uri)
     }
 
     override suspend fun import(uri: Uri): ImportBookmarksResult {

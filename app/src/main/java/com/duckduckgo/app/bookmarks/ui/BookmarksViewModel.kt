@@ -17,9 +17,7 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.net.Uri
-import android.os.FileUtils
 import androidx.lifecycle.*
-import androidx.room.util.FileUtil
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.service.Bookmark
@@ -157,12 +155,14 @@ class BookmarksViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(
-                    dao.get(),
-                    faviconManager.get(),
-                    bookmarksManager.get(),
-                    dispatcherProvider.get()
-                ) as T)
+                isAssignableFrom(BookmarksViewModel::class.java) -> (
+                    BookmarksViewModel(
+                        dao.get(),
+                        faviconManager.get(),
+                        bookmarksManager.get(),
+                        dispatcherProvider.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

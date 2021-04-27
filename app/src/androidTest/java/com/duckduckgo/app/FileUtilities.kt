@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app
 
-import android.content.ContentResolver
-import android.net.Uri
 import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
 
 object FileUtilities {
 

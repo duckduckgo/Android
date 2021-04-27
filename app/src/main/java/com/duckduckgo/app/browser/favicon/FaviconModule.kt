@@ -18,8 +18,6 @@ package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.BookmarkManager
-import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarkManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -29,7 +27,6 @@ import javax.inject.Singleton
 
 @Module
 class FaviconModule {
-
 
     @Provides
     @Singleton

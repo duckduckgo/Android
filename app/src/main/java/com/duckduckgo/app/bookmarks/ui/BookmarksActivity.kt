@@ -83,12 +83,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == IMPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data //The uri with the location of the file
+            val selectedFile = data?.data // The uri with the location of the file
             viewModel.importBookmarks(selectedFile!!)
         }
 
         if (requestCode == EXPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data //The uri with the location of the file
+            val selectedFile = data?.data // The uri with the location of the file
             viewModel.exportBookmarks(selectedFile!!)
         }
     }
@@ -125,7 +125,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         )
     }
 
-    private fun showImportedBookmarksError(){
+    private fun showImportedBookmarksError() {
         showMessage("Error importing bookmarks, nothing has been imported")
     }
 

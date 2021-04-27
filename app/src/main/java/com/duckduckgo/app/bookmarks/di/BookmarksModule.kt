@@ -21,9 +21,11 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.service.BookmarkManager
 import com.duckduckgo.app.bookmarks.service.BookmarksExporter
 import com.duckduckgo.app.bookmarks.service.BookmarksImporter
+import com.duckduckgo.app.bookmarks.service.BookmarksParser
 import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarkManager
 import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksExporter
 import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksImporter
+import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksParser
 import com.duckduckgo.app.global.DispatcherProvider
 import dagger.Module
 import dagger.Provides
@@ -43,20 +45,27 @@ class BookmarksModule {
 
     @Provides
     @Singleton
+    fun bookmarksParser(): BookmarksParser {
+        return DuckDuckGoBookmarksParser()
+    }
+
+    @Provides
+    @Singleton
     fun bookmarksExporter(
+        context: Context,
+        bookmarksParser: BookmarksParser,
         bookmarksDao: BookmarksDao,
         dispatcherProvider: DispatcherProvider
     ): BookmarksExporter {
-        return DuckDuckGoBookmarksExporter(bookmarksDao, dispatcherProvider)
+        return DuckDuckGoBookmarksExporter(context.contentResolver, bookmarksDao, bookmarksParser, dispatcherProvider)
     }
 
     @Provides
     @Singleton
     fun bookmarkManager(
-        context: Context,
         bookmarksImporter: BookmarksImporter,
         bookmarksExporter: BookmarksExporter
     ): BookmarkManager {
-        return DuckDuckGoBookmarkManager(context.contentResolver, bookmarksImporter, bookmarksExporter)
+        return DuckDuckGoBookmarkManager(bookmarksImporter, bookmarksExporter)
     }
 }

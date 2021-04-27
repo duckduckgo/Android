@@ -27,7 +27,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 interface BookmarksExporter {
-    suspend fun export(): String
+    suspend fun export(uri: Uri): ExportBookmarksResult
 }
 
 sealed class ExportBookmarksResult {
@@ -37,37 +37,41 @@ sealed class ExportBookmarksResult {
 }
 
 class DuckDuckGoBookmarksExporter(
+    private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
+    private val bookmarksParser: BookmarksParser,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : BookmarksExporter {
 
-    override suspend fun export(): String {
-        val bookmarks = withContext(dispatcher.io()){
+    override suspend fun export(uri: Uri): ExportBookmarksResult {
+        val bookmarks = withContext(dispatcher.io()) {
             bookmarksDao.bookmarksSync()
         }
 
-        if (bookmarks.isEmpty()) {
-            return ""
-        }
-
-        return buildString {
-            appendLine("<!DOCTYPE NETSCAPE-Bookmark-file-1>")
-            appendLine("<!--This is an automatically generated file.")
-            appendLine("It will be read and overwritten.")
-            appendLine("Do Not Edit! -->")
-            appendLine("<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">")
-            appendLine("<Title>Bookmarks</Title>")
-            appendLine("<H1>Bookmarks</H1>")
-            appendLine("<DL><p>")
-            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo</H3>")
-            appendLine("    <DL><p>")
-            bookmarks.forEach { entity ->
-                appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
-            }
-            appendLine("    </DL><p>")
-            appendLine("</DL><p>")
-        }
+        val html = bookmarksParser.generateHtml(bookmarks)
+        return storeHtml(uri, html)
     }
 
+    private fun storeHtml(uri: Uri, content: String): ExportBookmarksResult {
+        return try {
+            if (content.isEmpty()) {
+                return ExportBookmarksResult.NoBookmarksExported
+            }
+            val file = contentResolver.openFileDescriptor(uri, "w")
+            if (file != null) {
+                val fileOutputStream = FileOutputStream(file.fileDescriptor)
+                fileOutputStream.write(content.toByteArray())
+                fileOutputStream.close()
+                file.close()
+                ExportBookmarksResult.Success
+            } else {
+                ExportBookmarksResult.NoBookmarksExported
+            }
+        } catch (e: FileNotFoundException) {
+            ExportBookmarksResult.Error(e)
+        } catch (e: IOException) {
+            ExportBookmarksResult.Error(e)
+        }
+    }
 
 }

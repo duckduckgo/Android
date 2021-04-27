@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarksDao {
