@@ -90,6 +90,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     }
 
     override fun onReceivedTouchIconUrl(view: WebView?, url: String?, precomposed: Boolean) {
+        Timber.i("Favicon touch icon: ${view?.url}, $url")
         val visitedUrl = view?.url ?: return
         val iconUrl = url ?: return
         webViewClientListener?.iconReceived(visitedUrl, iconUrl)

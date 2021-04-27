@@ -634,10 +634,11 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun prefetchFavicon(url: String) {
-        faviconPrefetchJob?.cancel()
+    override fun prefetchFavicon(faviconUrl: String) {
+        //faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
-            val faviconFile = faviconManager.prefetchToTemp(tabId, url)
+            Timber.i("Favicon prefetch $faviconUrl")
+            val faviconFile = faviconManager.prefetchToTemp(tabId, faviconUrl)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
@@ -662,7 +663,22 @@ class BrowserTabViewModel(
     }
 
     override fun iconReceived(visitedUrl: String, iconUrl: String) {
-        // noop
+        val currentTab = tabRepository.liveSelectedTab.value ?: return
+        val currentUrl = currentTab.url ?: return
+        if (currentUrl.toUri().host != visitedUrl.toUri().host) {
+            pixel.enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
+            Timber.d("Favicon received for a url $visitedUrl, different than the current one $currentUrl")
+            return
+        }
+
+        //faviconPrefetchJob?.cancel()
+        faviconPrefetchJob = viewModelScope.launch {
+            Timber.i("Favicon prefetch $iconUrl")
+            val faviconFile = faviconManager.prefetchToTemp(tabId, iconUrl, visitedUrl)
+            if (faviconFile != null) {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
+        }
     }
 
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode

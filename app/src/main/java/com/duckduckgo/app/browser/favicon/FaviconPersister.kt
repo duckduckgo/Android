@@ -106,7 +106,7 @@ class FileBasedFaviconPersister(
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
         if (existingFile.exists()) {
-
+            Timber.i("Favicon favicon exists for $domain")
             val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
             existingFavicon?.let {
@@ -119,6 +119,7 @@ class FileBasedFaviconPersister(
 
         val faviconFile = prepareDestinationFile(directory, subFolder, domain)
         writeBytesToFile(faviconFile, bitmap)
+        Timber.i("Favicon favicon stored")
 
         return if (faviconFile.exists()) {
             faviconFile

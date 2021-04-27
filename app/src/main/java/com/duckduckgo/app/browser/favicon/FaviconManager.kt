@@ -28,13 +28,15 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 interface FaviconManager {
     suspend fun saveToTemp(subFolder: String, icon: Bitmap, url: String): File?
-    suspend fun prefetchToTemp(subFolder: String, url: String): File?
+    suspend fun prefetchToTemp(subFolder: String, faviconUrl: String, origin: String = faviconUrl): File?
     suspend fun persistFavicon(subFolder: String, url: String)
     suspend fun loadFromTemp(subFolder: String, url: String): Bitmap?
     suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView)
@@ -75,12 +77,21 @@ class DuckDuckGoFaviconManager constructor(
         loadToViewFromDirectory(url, FAVICON_TEMP_DIR, subFolder, view)
     }
 
-    override suspend fun prefetchToTemp(subFolder: String, url: String): File? {
-        val domain = url.toUri().domain() ?: return null
-        val favicon = downloadFromUrl(url)
+    override suspend fun prefetchToTemp(subFolder: String, faviconUrl: String, origin: String): File? {
+        val domain = origin.toUri().domain() ?: return null
+
+        val favicon = if(faviconUrl == origin) {
+             downloadFromUrl(faviconUrl)
+        } else {
+            Timber.i("Favicon downloaded from $faviconUrl")
+            faviconDownloader.getFaviconFromUrl(faviconUrl.toUri())
+        }
+
         return if (favicon != null) {
+            Timber.i("Favicon downloaded for $domain")
             saveToFile(FAVICON_TEMP_DIR, subFolder, favicon, domain)
         } else {
+            Timber.i("Favicon downloaded null for $domain")
             null
         }
     }
@@ -128,7 +139,14 @@ class DuckDuckGoFaviconManager constructor(
 
     private suspend fun downloadFromUrl(url: String): Bitmap? {
         val faviconUrl = getFaviconUrl(url) ?: return null
-        return faviconDownloader.getFaviconFromUrl(faviconUrl)
+        val touchFaviconUrl = getTouchFaviconUrl(url) ?: return null
+        faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
+            Timber.i("Favicon downloaded from $touchFaviconUrl")
+            return it
+        } ?: faviconDownloader.getFaviconFromUrl(faviconUrl).let {
+            Timber.i("Favicon downloaded from $faviconUrl")
+            return it
+        }
     }
 
     private fun getFaviconUrl(url: String): Uri? {
@@ -136,6 +154,14 @@ class DuckDuckGoFaviconManager constructor(
             "https://$url".toUri().faviconLocation()
         } else {
             url.toUri().faviconLocation()
+        }
+    }
+
+    private fun getTouchFaviconUrl(url: String): Uri? {
+        return if (url.toUri().host.isNullOrBlank()) {
+            "https://$url".toUri().touchFaviconLocation()
+        } else {
+            url.toUri().touchFaviconLocation()
         }
     }
 
