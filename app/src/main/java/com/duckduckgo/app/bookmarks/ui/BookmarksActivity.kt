@@ -43,6 +43,7 @@ import com.duckduckgo.app.browser.R.id.action_search
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
@@ -59,6 +60,10 @@ import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class BookmarksActivity : DuckDuckGoActivity() {
@@ -261,7 +266,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
-        private const val EXPORT_BOOKMARKS_FILE_NAME = "bookmarks_ddg.html"
+
+        private val EXPORT_BOOKMARKS_FILE_NAME: String
+            get() = "bookmarks_ddg_${formattedTimestamp()}.html"
+
+        private fun formattedTimestamp(): String = formatter.format(Date())
+        private val formatter: SimpleDateFormat = SimpleDateFormat("MMddYY", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
     }
 
     class BookmarksAdapter(
