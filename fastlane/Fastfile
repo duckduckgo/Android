@@ -72,6 +72,7 @@ platform :android do
  desc "Update local changelist metadata"
       lane :update_fastlane_release_notes do
 
+      flversion=gradle(task: '-q fastlaneVersionCode')
       UI.message("Fastlane version is #{flversion}.")
 
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
