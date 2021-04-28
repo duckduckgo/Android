@@ -1,0 +1,23 @@
+La privacidad simplificada.
+
+En DuckDuckGo creemos que internet no debería dar tanto miedo, y obtener la privacidad en línea que se merece debería ser tan sencillo como cerrar las persianas. 
+
+Le ofrecemos los elementos esenciales de privacidad necesarios para controlar su información personal mientras busca y navega por internet, sin importar adónde le lleve:
+• Evite las redes de seguimiento publicitario: nuestra Protección de Privacidad bloqueará todos los rastreadores ocultos que detectemos, lo que identificará las principales redes de publicidad que le vienen siguiendo a lo largo del tiempo para que pueda controlar quién está tratando de rastrear sus actividades.
+• Aumente la protección de cifrado: obligamos a los sitios a utilizar una conexión cifrada siempre que sea posible, protegiendo sus datos de miradas indiscretas, como los Proveedores de Servicios de Internet (ISP).
+• Realice búsquedas privadas: recuerde que comparte su información más personal con su motor de búsqueda, como sus asuntos financieros, médicos y políticos. Las búsquedas que realiza son solo asunto suyo, razón por la cual la búsqueda de DuckDuckGo no las rastrea. Nunca.
+• Conozca las políticas de privacidad: nos hemos asociado con Terms of Service; Didn't Read para incluir sus calificaciones y etiquetas de las condiciones de servicio y las políticas de privacidad de los sitios web, siempre que se encuentren disponibles. 
+
+Mientras busca y navega, DuckDuckGo le muestra una valoración del Grado de Privacidad cuando visita un sitio web (A-F). Esta calificación le permite saber su grado de protección de un vistazo, conocer los detalles acerca de quién cazamos tratando de rastrear sus actividades y descubrir cómo optimizamos las medidas de privacidad del sitio. El Grado de Privacidad se calculará automáticamente en función de la prevalencia de las redes de seguimiento ocultas, la disponibilidad del cifrado y las prácticas de privacidad del sitio web.
+
+Nuestra aplicación pone a su disposición funciones de navegación estándar, incluyendo pestañas, marcadores y la opción de autocompletar. Además de una sólida Protección de Privacidad, como se ha descrito anteriormente, también hemos incluido algunas funciones de privacidad adicionales en el navegador:
+• Botón de disparo: borra todas las pestañas y los datos de un solo toque.
+
+Muchas personas creenque la privacidad en internet simplemente no existe. Estamos luchando para cambiarlo y nos hemos propuesto establecer un nuevo nivel de confianza en línea. ¡Instale DuckDuckGo y recupere su privacidad!
+
+Sobre nosotros: https://duckduckgo.com/about/
+Consejos de privacidad sobre el dispositivo: https://spreadprivacy.com/tag/device-privacy-tips/
+Más información sobre privacidad: https://spreadprivacy.com/tag/privacy-newsletter/
+Nuestra política de privacidad: https://duckduckgo.com/privacy/
+
+Código abierto en https://github.com/duckduckgo/android

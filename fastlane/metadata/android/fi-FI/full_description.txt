@@ -1,0 +1,23 @@
+Yksityisyyttä yksinkertaisesti.
+
+Me DuckDuckGo’lla uskomme, että internetin ei pitäisi tuntua ahdistavalta, vaan yksityisyyden pitäisi olla jokaisen perusoikeus. 
+
+Tarjoamme yksityisyystyökalut, joiden avulla voit helposti pitää henkilökohtaiset tietosi omissa käsissäsi tehdessäsi hakuja ja käyttäessäsi internetiä:
+• Välty mainosverkostojen seurannalta – Yksityisyystyökalumme estävät havaitsemansa piilotetut seurantaominaisuudet. Ne paljastavat sinua seuraavat keskeiset mainosverkostot, joten tiedät, kuka yrittää seurata toimiasi.
+• Paranna salauksen kattavuutta – Pakotamme sivustot käyttämään salattua yhteyttä, jos sellainen on saatavilla. Näin tietosi ovat turvassa urkkijoilta, kuten internetpalveluntarjoajilta.
+• Tee hakuja yksityisesti – Käyttäessäsi hakukonetta saatat jakaa esimerkiksi raha-asioihin, terveyteen tai poliittisiin näkemyksiin liittyviä henkilökohtaisia tietoja. On oma asiasi, mitä etsit internetistä – ja siksi DuckDuckGo ei tallenna hakujasi. Ikinä.
+• Tulkitse tietosuojakäytäntöjä – Näytämme Terms of Service; Didn't Read -palvelun antamat verkkosivustojen käyttöehtoja ja tietosuojakäytäntöjä koskevat luokitukset ja merkinnät, kun sellaisia on saatavilla. 
+
+Kun teet hakuja ja käytät internetiä, DuckDuckGo näyttää sivuston yksityisyysarvosanan asteikolla A–F. Siitä näet yhdellä silmäyksellä, miten hyvin tietosi ovat turvassa. Lisäksi voit selvittää, kuka yritti seurata toimiasi sekä miten paransimme sivuston yksityisyyttä. Yksityisyysarvosana annetaan automaattisesti sen perusteella, kuinka paljon sivusto hyödyntää piilotettuja seurantaverkostoja, onko salattua yhteyttä saatavilla ja mitkä sivuston tietosuojakäytännöt ovat.
+
+Sovelluksessamme on tutut selaustoiminnot, kuten välilehdet, kirjanmerkit ja automaattinen täydennys. Selaimessa on myös lisää yksityisyyttä parantavia ominaisuuksia edellä kuvattujen erinomaisten yksityisyystyökalujen lisäksi:
+• Hätäpainike – Tyhjennä kaikki välilehdet ja tiedot yhdellä napautuksella.
+
+Liian moni kuvittelee, että yksityisyyden säilyttäminen internetissä ei yksinkertaisesti ole mahdollista. Haluamme saada asiaan muutoksen, ja tavoitteemme onkin tehdä internetistä entistä turvallisempi paikka. Asenna DuckDuckGo ja palauta yksityisyytesi!
+
+Tietoa meistä: https://duckduckgo.com/about/
+Vinkkejä yksityisyyden parantamiseen laitteita käytettäessä: https://spreadprivacy.com/tag/device-privacy-tips/
+Lisätietoa yksityisyydestä: https://spreadprivacy.com/tag/privacy-newsletter/
+Tietosuojakäytäntömme: https://duckduckgo.com/privacy/
+
+Avoin lähdekoodi: https://github.com/duckduckgo/Android

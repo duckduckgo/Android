@@ -1,0 +1,23 @@
+Confidențialitate simplificată.
+
+La DuckDuckGo, noi credem că internetul nu trebuie să fie deloc dubios, iar garantarea confidențialității pe care o meritați în spațiul online nu trebuie să fie deloc complicată. 
+
+Noi vă oferim elementele esențiale asociate confidențialității de care aveți nevoie pentru a prelua controlul fără probleme asupra informațiilor dvs. personale, în timp ce dvs. căutați și navigați pe web, indiferent unde vă aflați pe internet:
+• Scăpați de rețelele de urmărire în scop publicitar — Funcția noastră de protejare a confidențialității va bloca toate modulele de urmărire ascunse pe care le putem găsi, expunând rețelele majore de publicitate care vă urmăresc în timp, astfel încât să îi puteți urmări pe cei care doresc să vă urmărească.
+• Sporiți protecția criptării — Noi forțăm site-urile să folosească o conexiune criptată dacă este disponibilă, protejându-vă datele de privirile indiscrete, cum ar fi furnizorii de servicii de internet.
+• Căutați în mod privat — Vă împărtășiți cele mai personale informații cu motorul de căutare. Cum ar fi întrebările de natură financiară, medicală și politică. Nu este treaba nimănui ce căutați dvs. și, de aceea, căutarea DuckDuckGo nu vă urmărește. Niciodată.
+• Decodificați politicile de confidențialitate — Am încheiat un parteneriat cu Terms of Service Didn't Read, pentru a include scorurile și etichetele lor cu privire la termenii de servicii și politicile de confidențialitate ale site-urilor web, dacă sunt disponibile. 
+
+În timp ce căutați și navigați, DuckDuckGo vă prezintă o evaluare a Nivelului de confidențialitate atunci când vizitați un site web (A-F). Această evaluare vă permite să vedeți rapid cât de protejat(ă) sunteți, să intrați în detalii, pentru a vedea pe cine am prins că încerca să vă urmărească și să aflați cum am îmbunătățit măsurile care stau la baza confidențialității site-ului. Scorul Nivelului de confidențialitate se calculează automat, în funcție de prevalența rețelelor de urmărire ascunsă, de disponibilitatea criptării și de practicile de confidențialitate ale site-ului web.
+
+Aplicația noastră oferă funcționalitate standard de navigare, inclusiv file, marcaje și completare automată. În plus față de funcția puternică de Protejare a confidențialității descrisă mai sus, am adăugat și câteva alte caracteristici de confidențialitate în plus, direct în browser:
+• Buton declanșator — Ștergeți toate filele și datele cu o singură atingere.
+
+Sunt prea mulți cei care cred că pur și simplu nu te poți aștepta la confidențialitate pe internet. Noi ne luptăm să schimbăm această credință și avem drept misiune stabilirea unui nou standard de încredere online. Instalați DuckDuckGo și redobândiți-vă confidențialitatea!
+
+Despre noi: https://duckduckgo.com/about/
+Sfaturi despre confidențialitatea dispozitivelor: https://spreadprivacy.com/tag/device-privacy-tips/
+Educație suplimentară privind confidențialitatea: https://spreadprivacy.com/tag/privacy-newsletter/
+Politica noastră de confidențialitate: https://duckduckgo.com/privacy/
+
+Open source la https://github.com/duckduckgo/android

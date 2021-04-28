@@ -16,11 +16,26 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
+### android deploy_playstore
+```
+fastlane android deploy_playstore
+```
+Upload APK to Play Store
+### android deploy_adhoc
+```
+fastlane android deploy_adhoc
+```
+Upload APK to ad-hoc internal app sharing
 ### android deploy_github
 ```
 fastlane android deploy_github
 ```
 Deploy APK to GitHub
+### android update_fastlane_release_notes
+```
+fastlane android update_fastlane_release_notes
+```
+Update local changelist metadata
 ### android release
 ```
 fastlane android release
