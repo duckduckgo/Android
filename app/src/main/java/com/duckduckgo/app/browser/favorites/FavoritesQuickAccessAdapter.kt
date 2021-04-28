@@ -44,6 +44,10 @@ class FavoritesQuickAccessAdapter(
     private val onDeleteClicked: (QuickAccessFavorite) -> Unit
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
+    companion object {
+        const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 100
+    }
+
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
 
     class QuickAccessViewHolder(
