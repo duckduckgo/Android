@@ -91,6 +91,10 @@ platform :android do
 
         ensure_git_status_clean
 
+        ensure_git_branch(
+          branch: 'develop'
+        )
+
         newVersion = prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
         releaseNotes = prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
         commits = changelog_from_git_commits(
