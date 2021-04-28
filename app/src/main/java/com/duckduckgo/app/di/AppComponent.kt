@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
+import com.duckduckgo.app.email.di.EmailModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionModule
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
@@ -77,7 +78,8 @@ import javax.inject.Singleton
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
-        HttpsPersisterModule::class
+        HttpsPersisterModule::class,
+        EmailModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

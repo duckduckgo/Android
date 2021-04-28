@@ -50,7 +50,7 @@ class TrackerNetworksAdapterTest {
     }
 
     private fun data(): SortedMap<Entity, List<TrackingEvent>> {
-        val trackingEvent = TrackingEvent("", "", null, null, true)
+        val trackingEvent = TrackingEvent("", "", null, null, true, null)
         val minorNetworkList = arrayListOf(trackingEvent, trackingEvent)
         val majorNetworkList = arrayListOf(trackingEvent, trackingEvent)
         return mapOf(

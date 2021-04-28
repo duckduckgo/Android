@@ -285,8 +285,9 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThen() = runBlocking<Unit> {
+    fun whenRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
         val availableSurrogate = SurrogateResponse(
+            scriptId = "testId",
             responseAvailable = true,
             mimeType = "application/javascript",
             jsFunction = "javascript replacement function goes here"
@@ -308,6 +309,7 @@ class WebViewRequestInterceptorTest {
     @Test
     fun whenRequestShouldBlockButThereIsASurrogateThenCallSurrogateDetected() = runBlocking<Unit> {
         val availableSurrogate = SurrogateResponse(
+            scriptId = "testId",
             responseAvailable = true,
             mimeType = "application/javascript",
             jsFunction = "javascript replacement function goes here"
@@ -499,7 +501,8 @@ class WebViewRequestInterceptorTest {
             documentUrl = "",
             trackerUrl = "",
             entity = null,
-            categories = null
+            categories = null,
+            surrogateId = "testId"
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
