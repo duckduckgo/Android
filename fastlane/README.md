@@ -36,6 +36,11 @@ Deploy APK to GitHub
 fastlane android update_fastlane_release_notes
 ```
 Update local changelist metadata
+### android cleanup_fastlane_release_notes
+```
+fastlane android cleanup_fastlane_release_notes
+```
+Clean up local changelist metadata
 ### android release
 ```
 fastlane android release
