@@ -132,10 +132,10 @@ platform :android do
           end
 
           File.open('../app/version/release-notes', 'w') do |file|
-            file.write("""## What's new in this release?
+            file.write("""What's new in this release?
 #{releaseNotes}
 
-## Have feedback?
+Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
 
