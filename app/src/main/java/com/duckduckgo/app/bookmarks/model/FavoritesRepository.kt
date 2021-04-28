@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -25,6 +26,7 @@ import java.io.Serializable
 
 interface FavoritesRepository {
     suspend fun favoritesCountByDomain(domain: String): Int
+    fun favoritesObservable(): Single<List<SavedSite.Favorite>>
     suspend fun insert(unsavedSite: SavedSite.UnsavedSite): SavedSite.Favorite
     suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite
     suspend fun update(favorite: SavedSite.Favorite)
@@ -62,6 +64,9 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         return favoritesDao.favoritesCountByUrl(domain)
     }
 
+    override fun favoritesObservable() =
+        favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
+
     override suspend fun insert(favorite: SavedSite.UnsavedSite): SavedSite.Favorite {
         val lastPosition = favoritesDao.getLastPosition() ?: 0
         val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = lastPosition + 1)
@@ -84,10 +89,12 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
     }
 
     override suspend fun favorites(): Flow<List<SavedSite.Favorite>> {
-        return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) } }
+        return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
     }
 
     override suspend fun delete(favorite: SavedSite.Favorite) {
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
+
+    private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> = this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
 }
