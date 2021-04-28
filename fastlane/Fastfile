@@ -69,8 +69,8 @@ platform :android do
 
     end
 
- desc "Update local changelist metadata"
-      lane :update_fastlane_release_notes do
+    desc "Update local changelist metadata"
+    lane :update_fastlane_release_notes do
 
       flversion=gradle(task: '-q fastlaneVersionCode')
       UI.message("Fastlane version is #{flversion}.")
@@ -78,7 +78,7 @@ platform :android do
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
 
- end
+    end
 
     # Note, this currently relies on having `git flow` tools installed.
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
@@ -123,7 +123,7 @@ platform :android do
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
 
-          lane("update_fastlane_release_notes")
+          update_fastlane_release_notes()
 
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
 
