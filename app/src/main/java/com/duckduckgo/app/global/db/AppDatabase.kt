@@ -67,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 31,
+    exportSchema = true, version = 32,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -397,6 +397,14 @@ class MigrationsProvider(
         }
     }
 
+    val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM tds_domain_entity")
+            database.execSQL("DELETE FROM tds_entity")
+            database.execSQL("DELETE FROM tds_tracker")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
@@ -440,7 +448,8 @@ class MigrationsProvider(
             MIGRATION_27_TO_28,
             MIGRATION_28_TO_29,
             MIGRATION_29_TO_30,
-            MIGRATION_30_TO_31
+            MIGRATION_30_TO_31,
+            MIGRATION_31_TO_32
         )
 
     @Deprecated(

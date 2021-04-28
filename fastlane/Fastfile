@@ -26,9 +26,24 @@ platform :android do
 
     upload_to_play_store(
       apk: apkPath,
-      track: 'internal'
+      track: 'internal',
+      skip_upload_screenshots: true,
+      skip_upload_images: true
     )
   end
+
+  desc "Upload APK to ad-hoc internal app sharing"
+  lane :deploy_adhoc do
+
+      props = property_file_read(file: "app/version/version.properties")
+      version = props["VERSION"]
+      apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+      upload_to_play_store_internal_app_sharing(
+        apk: apkPath
+      )
+
+ end
 
   desc "Deploy APK to GitHub"
   lane :deploy_github do
@@ -50,6 +65,17 @@ platform :android do
         upload_assets: [apkPath],
         is_draft: false,
         is_prerelease: false)
+
+    end
+
+    desc "Update local changelist metadata"
+    lane :update_fastlane_release_notes do
+
+      flversion=gradle(task: '-q fastlaneVersionCode')
+      UI.message("Fastlane version is #{flversion}.")
+
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
 
     end
 
@@ -95,6 +121,8 @@ platform :android do
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
+
+          update_fastlane_release_notes()
 
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
 

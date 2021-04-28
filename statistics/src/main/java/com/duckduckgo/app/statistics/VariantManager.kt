@@ -43,13 +43,16 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // InAppUsage Experiments
-            Variant(key = "ma", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mb", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
-            Variant(key = "mc", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() })
+            Variant(key = "ma", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mb", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
+            Variant(key = "mc", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
+
+            Variant(key = "zx", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zy", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage), filterBy = { isEnglishLocale() })
         )
 
         val REFERRER_VARIANTS = listOf(
