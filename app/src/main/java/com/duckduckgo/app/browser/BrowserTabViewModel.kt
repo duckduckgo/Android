@@ -636,7 +636,7 @@ class BrowserTabViewModel(
     }
 
     override fun prefetchFavicon(url: String) {
-        //faviconPrefetchJob?.cancel()
+        // faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
             Timber.i("Favicon prefetch for $url")
             val faviconFile = faviconManager.prefetchToTemp(subFolder = tabId, faviconUrl = url)
@@ -672,7 +672,7 @@ class BrowserTabViewModel(
             return
         }
 
-        //faviconPrefetchJob?.cancel()
+        // faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
             Timber.i("Favicon prefetch touch $iconUrl")
             val faviconFile = faviconManager.prefetchToTemp(tabId, iconUrl, visitedUrl)

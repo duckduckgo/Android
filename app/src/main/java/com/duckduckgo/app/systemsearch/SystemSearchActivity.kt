@@ -19,7 +19,6 @@ package com.duckduckgo.app.systemsearch
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent
@@ -33,7 +32,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
@@ -67,7 +65,6 @@ import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.math.min
 
 class SystemSearchActivity : DuckDuckGoActivity() {
 

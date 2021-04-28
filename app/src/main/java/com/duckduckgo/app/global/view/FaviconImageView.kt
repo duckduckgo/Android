@@ -87,7 +87,7 @@ private fun generateDefaultDrawable(context: Context, domain: String): Drawable 
             val centerY = bounds.height() * 0.5f
             textPaint.textSize = (bounds.width() / 2).toFloat()
             val textWidth: Float = textPaint.measureText(letter) * 0.5f
-            val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f;
+            val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
             canvas.drawRoundRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), 10f, 10f, backgroundPaint)
             canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
         }

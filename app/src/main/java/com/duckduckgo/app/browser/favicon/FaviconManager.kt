@@ -198,9 +198,9 @@ class DuckDuckGoFaviconManager constructor(
         val query = "%$domain%"
         return withContext(dispatcherProvider.io()) {
             bookmarksDao.bookmarksCountByUrl(query) +
-                    locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
-                    fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                    favoritesRepository.favoritesCountByDomain(query)
+                locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
+                fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
+                favoritesRepository.favoritesCountByDomain(query)
         }
     }
 

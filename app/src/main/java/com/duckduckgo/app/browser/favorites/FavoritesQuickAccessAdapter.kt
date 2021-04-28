@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.favorites
 
 import android.os.Handler
 import android.view.*
-import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -30,7 +29,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
-import com.duckduckgo.app.global.baseHost
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -72,7 +70,7 @@ class FavoritesQuickAccessAdapter(
                     false
                 }
 
-                //itemView.quickAccessFaviconImage.name = item.favorite.url.toUri().baseHost ?: ""
+                // itemView.quickAccessFaviconImage.name = item.favorite.url.toUri().baseHost ?: ""
 
                 itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
                     if (event.actionMasked == MotionEvent.ACTION_MOVE) {
@@ -128,6 +126,6 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
 
     override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
         return oldItem.favorite.title == newItem.favorite.title &&
-                oldItem.favorite.url == newItem.favorite.url
+            oldItem.favorite.url == newItem.favorite.url
     }
 }
