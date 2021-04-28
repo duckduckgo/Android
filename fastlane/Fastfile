@@ -28,8 +28,7 @@ platform :android do
       apk: apkPath,
       track: 'internal',
       skip_upload_screenshots: true,
-      skip_upload_images: true,
-      validate_only: true
+      skip_upload_images: true
     )
   end
 
