@@ -30,6 +30,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
+import com.duckduckgo.app.global.view.loadDefaultFavicon
+import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -69,21 +71,21 @@ class DuckDuckGoFaviconManager constructor(
 
     override suspend fun loadToViewFromPersisted(url: String, view: ImageView) {
         // avoid displaying the previous favicon when the holder is recycled
-        faviconDownloader.loadDefaultFaviconToView(view, url)
+        view.loadDefaultFavicon(url)
         loadToViewFromDirectory(url, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, view)
     }
 
     override suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView) {
         // avoid displaying the previous favicon when the holder is recycled
-        faviconDownloader.loadDefaultFaviconToView(view, url)
+        view.loadDefaultFavicon(url)
         loadToViewFromDirectory(url, FAVICON_TEMP_DIR, subFolder, view)
     }
 
     override suspend fun prefetchToTemp(subFolder: String, faviconUrl: String, origin: String): File? {
         val domain = origin.toUri().domain() ?: return null
 
-        val favicon = if(faviconUrl == origin) {
-             downloadFromUrl(faviconUrl)
+        val favicon = if (faviconUrl == origin) {
+            downloadFromUrl(faviconUrl)
         } else {
             Timber.i("Favicon downloaded from $faviconUrl")
             faviconDownloader.getFaviconFromUrl(faviconUrl.toUri())
@@ -135,7 +137,7 @@ class DuckDuckGoFaviconManager constructor(
         val domain = extractDomain(url)
         val cachedFavicon = getFaviconForDomainOrFallback(directory, subFolder, domain)
         cachedFavicon?.let {
-            loadFaviconToView(cachedFavicon, view)
+            view.loadFavicon(cachedFavicon, url)
         }
     }
 
@@ -167,10 +169,6 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    private suspend fun loadFaviconToView(file: File, view: ImageView) {
-        faviconDownloader.loadFaviconToView(file, view)
-    }
-
     private suspend fun replacePersistedFavicons(icon: Bitmap, domain: String) {
         if (persistedFaviconsForDomain(domain) > 0) {
             saveToFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
@@ -200,9 +198,9 @@ class DuckDuckGoFaviconManager constructor(
         val query = "%$domain%"
         return withContext(dispatcherProvider.io()) {
             bookmarksDao.bookmarksCountByUrl(query) +
-                locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
-                fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                favoritesRepository.favoritesCountByDomain(query)
+                    locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
+                    fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
+                    favoritesRepository.favoritesCountByDomain(query)
         }
     }
 
