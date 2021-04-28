@@ -123,6 +123,8 @@ platform :android do
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
 
+          lane("update_fastlane_release_notes")
+
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
 
             git_commit(path: "*", message: "Updated release notes and version number for new release - #{newVersion}")
