@@ -64,7 +64,7 @@ class NotificationScheduler(
         if (variant().hasFeature(VariantManager.VariantFeature.InAppUsage) && useOurAppNotification.canShow()) {
             val operation = scheduleUniqueNotification(
                 OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
-                UOA_DURATION,
+                UOA_DELAY_DURATION_IN_DAYS,
                 TimeUnit.DAYS,
                 USE_OUR_APP_WORK_REQUEST_TAG
             )
@@ -81,11 +81,11 @@ class NotificationScheduler(
 
         when {
             (!variant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications) && privacyNotification.canShow()) -> {
-                val duration = getDurationForInactiveNotification(PRIVACY_DURATION)
+                val duration = getDurationForInactiveNotification(PRIVACY_DELAY_DURATION_IN_DAYS)
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), duration, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             (!variant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications) && clearDataNotification.canShow()) -> {
-                val duration = getDurationForInactiveNotification(CLEAR_DATA_DURATION)
+                val duration = getDurationForInactiveNotification(CLEAR_DATA_DELAY_DURATION_IN_DAYS)
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), duration, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
@@ -96,7 +96,7 @@ class NotificationScheduler(
     fun getDurationForInactiveNotification(day: Long): Long {
         Timber.d("Inactive notification days installed is ${appInstallStore.daysInstalled()} day is $day")
         var duration = day
-        if (variantHasInAppUsage() && (appInstallStore.daysInstalled() + day) == UOA_DURATION) {
+        if (variantHasInAppUsage() && (appInstallStore.daysInstalled() + day) == UOA_DELAY_DURATION_IN_DAYS) {
             duration += 1
         }
         return duration
@@ -164,9 +164,9 @@ class NotificationScheduler(
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
         const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
-        const val UOA_DURATION = 3L
-        const val CLEAR_DATA_DURATION = 3L
-        const val PRIVACY_DURATION = 1L
+        const val UOA_DELAY_DURATION_IN_DAYS = 3L
+        const val CLEAR_DATA_DELAY_DURATION_IN_DAYS = 3L
+        const val PRIVACY_DELAY_DURATION_IN_DAYS = 1L
     }
 }
 
