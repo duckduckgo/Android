@@ -20,6 +20,8 @@ platform :android do
   desc "Upload APK to Play Store"
   lane :deploy_playstore do
 
+    update_fastlane_release_notes()
+
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
     apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
@@ -28,8 +30,12 @@ platform :android do
       apk: apkPath,
       track: 'internal',
       skip_upload_screenshots: true,
-      skip_upload_images: true
+      skip_upload_images: true,
+      validate_only: false
     )
+
+    cleanup_fastlane_release_notes()
+
   end
 
   desc "Upload APK to ad-hoc internal app sharing"
@@ -79,6 +85,17 @@ platform :android do
 
     end
 
+    desc "Clean up local changelist metadata"
+        lane :cleanup_fastlane_release_notes do
+
+          flversion=gradle(task: '-q fastlaneVersionCode')
+          UI.message("Fastlane version is #{flversion}.")
+
+          sh("rm '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
+          sh("rm '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+
+        end
+
     # Note, this currently relies on having `git flow` tools installed.
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
 
@@ -121,8 +138,6 @@ platform :android do
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
-
-          update_fastlane_release_notes()
 
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
 
