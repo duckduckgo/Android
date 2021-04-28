@@ -68,7 +68,7 @@ class FavoritesQuickAccessAdapter(
                     false
                 }
 
-                itemView.quickAccessFaviconImage.name = item.favorite.url.toUri().baseHost ?: ""
+                //itemView.quickAccessFaviconImage.name = item.favorite.url.toUri().baseHost ?: ""
 
                 itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
                     if (event.actionMasked == MotionEvent.ACTION_MOVE) {

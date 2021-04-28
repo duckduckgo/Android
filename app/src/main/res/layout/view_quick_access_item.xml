@@ -41,10 +41,10 @@
             android:src="@drawable/ic_globe_gray_16dp" />
     </com.google.android.material.card.MaterialCardView>
 
-    <com.duckduckgo.app.global.view.FaviconImageView
+    <!-- <com.duckduckgo.app.global.view.FaviconImageView
         android:id="@+id/quickAccessFaviconImage"
         android:layout_width="56dp"
-        android:layout_height="56dp"/>
+        android:layout_height="56dp"/> -->
 
     <TextView
         android:id="@+id/quickAccessTitle"

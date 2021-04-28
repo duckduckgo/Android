@@ -32,8 +32,8 @@ interface FavoritesDao {
     @Query("select * from favorites order by position")
     fun favorites(): Flow<List<FavoriteEntity>>
 
-    @Query("select count(*) from favorites WHERE url LIKE :url")
-    fun favoritesCountByUrl(url: String): Int
+    @Query("select count(*) from favorites WHERE url LIKE :domain")
+    fun favoritesCountByUrl(domain: String): Int
 
     @Delete
     fun delete(favorite: FavoriteEntity)

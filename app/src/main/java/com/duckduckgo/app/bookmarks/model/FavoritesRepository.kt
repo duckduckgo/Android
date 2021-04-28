@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import java.io.Serializable
 
 interface FavoritesRepository {
+    suspend fun favoritesCountByDomain(domain: String): Int
     suspend fun insert(unsavedSite: SavedSite.UnsavedSite): SavedSite.Favorite
     suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite
     suspend fun update(favorite: SavedSite.Favorite)
@@ -57,6 +58,9 @@ sealed class SavedSite(
 }
 
 class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
+    override suspend fun favoritesCountByDomain(domain: String): Int {
+        return favoritesDao.favoritesCountByUrl(domain)
+    }
 
     override suspend fun insert(favorite: SavedSite.UnsavedSite): SavedSite.Favorite {
         val lastPosition = favoritesDao.getLastPosition() ?: 0

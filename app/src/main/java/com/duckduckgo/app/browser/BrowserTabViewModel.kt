@@ -635,11 +635,11 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun prefetchFavicon(faviconUrl: String) {
+    override fun prefetchFavicon(url: String) {
         //faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
-            Timber.i("Favicon prefetch $faviconUrl")
-            val faviconFile = faviconManager.prefetchToTemp(tabId, faviconUrl)
+            Timber.i("Favicon prefetch for $url")
+            val faviconFile = faviconManager.prefetchToTemp(subFolder = tabId, faviconUrl = url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
@@ -674,7 +674,7 @@ class BrowserTabViewModel(
 
         //faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
-            Timber.i("Favicon prefetch $iconUrl")
+            Timber.i("Favicon prefetch touch $iconUrl")
             val faviconFile = faviconManager.prefetchToTemp(tabId, iconUrl, visitedUrl)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
