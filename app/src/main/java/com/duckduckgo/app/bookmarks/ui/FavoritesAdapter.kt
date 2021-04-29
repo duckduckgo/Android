@@ -184,12 +184,12 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
         private fun editFavorite(favorite: Favorite) {
             Timber.i("Editing favorite ${favorite.title}")
-            viewModel.onEditFavoriteRequested(favorite)
+            viewModel.onEditSavedSiteRequested(favorite)
         }
 
         private fun deleteFavorite(favorite: Favorite) {
             Timber.i("Deleting favorite ${favorite.title}")
-            viewModel.onDeleteRequested(favorite)
+            viewModel.onDeleteSavedSiteRequested(favorite)
         }
     }
 }

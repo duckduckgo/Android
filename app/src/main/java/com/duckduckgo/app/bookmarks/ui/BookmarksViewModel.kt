@@ -54,7 +54,7 @@ class BookmarksViewModel(
     )
 
     sealed class Command {
-        class OpenSavedsite(val savedSite: SavedSite) : Command()
+        class OpenSavedSite(val savedSite: SavedSite) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
     }
@@ -128,28 +128,16 @@ class BookmarksViewModel(
         )
     }
 
-    fun onSelected(bookmark: Bookmark) {
-        command.value = OpenSavedsite(bookmark)
+    fun onSelected(savedSite: SavedSite) {
+        command.value = OpenSavedSite(savedSite)
     }
 
-    fun onDeleteRequested(bookmark: Bookmark) {
-        command.value = ConfirmDeleteSavedSite(bookmark)
+    fun onEditSavedSiteRequested(savedSite: SavedSite) {
+        command.value = ShowEditSavedSite(savedSite)
     }
 
-    fun onEditBookmarkRequested(bookmark: Bookmark) {
-        command.value = ShowEditSavedSite(bookmark)
-    }
-
-    fun onSelected(favorite: Favorite) {
-        command.value = OpenSavedsite(favorite)
-    }
-
-    fun onDeleteRequested(favorite: Favorite) {
-        command.value = ConfirmDeleteSavedSite(favorite)
-    }
-
-    fun onEditFavoriteRequested(favorite: Favorite) {
-        command.value = ShowEditSavedSite(favorite)
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        command.value = ConfirmDeleteSavedSite(savedSite)
     }
 
     fun delete(savedSite: SavedSite) {

@@ -82,7 +82,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             Observer {
                 when (it) {
                     is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                    is BookmarksViewModel.Command.OpenSavedsite -> openBookmark(it.savedSite)
+                    is BookmarksViewModel.Command.OpenSavedSite -> openBookmark(it.savedSite)
                     is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                 }
             }

@@ -173,12 +173,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
         private fun editBookmark(bookmark: SavedSite.Bookmark) {
             Timber.i("Editing bookmark ${bookmark.title}")
-            viewModel.onEditBookmarkRequested(bookmark)
+            viewModel.onEditSavedSiteRequested(bookmark)
         }
 
         private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
             Timber.i("Deleting bookmark ${bookmark.title}")
-            viewModel.onDeleteRequested(bookmark)
+            viewModel.onDeleteSavedSiteRequested(bookmark)
         }
     }
 }

@@ -28,7 +28,7 @@ interface FavoritesRepository {
     suspend fun favoritesCountByDomain(domain: String): Int
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
     suspend fun insert(unsavedSite: SavedSite.UnsavedSite): SavedSite.Favorite
-    suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite
+    suspend fun insert(favorite: SavedSite.Favorite)
     suspend fun update(favorite: SavedSite.Favorite)
     suspend fun persistChanges(favorites: List<SavedSite.Favorite>)
     suspend fun favorites(): Flow<List<SavedSite.Favorite>>
@@ -75,10 +75,9 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
     }
 
-    override suspend fun insert(favorite: SavedSite.Favorite): SavedSite.Favorite {
+    override suspend fun insert(favorite: SavedSite.Favorite) {
         val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = favorite.position)
-        val id = favoritesDao.insert(favoriteEntity)
-        return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
+        favoritesDao.insert(favoriteEntity)
     }
 
     override suspend fun update(favorite: SavedSite.Favorite) {

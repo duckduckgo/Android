@@ -91,7 +91,7 @@ class BookmarksViewModelTest {
         val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
         verify(commandObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
-        assertTrue(captor.value is BookmarksViewModel.Command.OpenSavedsite)
+        assertTrue(captor.value is BookmarksViewModel.Command.OpenSavedSite)
     }
 
     @Test
