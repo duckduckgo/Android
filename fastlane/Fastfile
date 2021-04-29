@@ -82,6 +82,7 @@ platform :android do
 
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
 
     end
 
@@ -93,6 +94,7 @@ platform :android do
 
           sh("rm '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
           sh("rm '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+          sh("rm '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
 
         end
 
