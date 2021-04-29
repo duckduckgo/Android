@@ -82,6 +82,7 @@ platform :android do
 
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
       sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
 
     end
 
@@ -93,6 +94,7 @@ platform :android do
 
           sh("rm '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
           sh("rm '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+          sh("rm '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
 
         end
 
@@ -145,7 +147,7 @@ You can always reach us at https://duckduckgo.com/feedback.""")
             
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
             push_git_tags
-            sh "git push origin master"
+            sh "git push origin main"
             sh "git push origin develop"
 
             UI.header("#{newVersion} has been successfully released 🎉")
