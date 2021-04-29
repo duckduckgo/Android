@@ -156,6 +156,7 @@ class BookmarksViewModel(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+                    // TODO: don't delete favicon for urls that can be a fireproof / favorites / location
                     faviconManager.deletePersistedFavicon(savedSite.url)
                     dao.delete(BookmarkEntity(savedSite.id, savedSite.title, savedSite.url))
                 }

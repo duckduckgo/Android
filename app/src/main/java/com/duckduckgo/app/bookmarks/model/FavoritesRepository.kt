@@ -53,6 +53,7 @@ sealed class SavedSite(
         override val url: String
     ) : SavedSite(id, title, url)
 
+    // TODO: review this data class
     data class UnsavedSite(
         override val title: String,
         override val url: String
