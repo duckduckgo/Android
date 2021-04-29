@@ -58,7 +58,7 @@ class TrackerDetectorClientTypeTest {
     @Test
     fun whenUrlMatchesOnlyInBlockingClientThenEvaluateReturnsTrackingEvent() {
         val url = Url.BLOCKED
-        val expected = TrackingEvent(documentUrl, url, null, null, true)
+        val expected = TrackingEvent(documentUrl, url, null, null, true, null)
         assertEquals(expected, testee.evaluate(url, documentUrl))
     }
 

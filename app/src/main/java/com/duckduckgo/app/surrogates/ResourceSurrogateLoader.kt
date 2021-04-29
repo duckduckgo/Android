@@ -50,6 +50,7 @@ class ResourceSurrogateLoader @Inject constructor(
 
         var nextLineIsNewRule = true
 
+        var scriptId = ""
         var ruleName = ""
         var mimeType = ""
         val functionBuilder = StringBuilder()
@@ -66,7 +67,10 @@ class ResourceSurrogateLoader @Inject constructor(
                     ruleName = this[0]
                     mimeType = this[1]
                 }
-                Timber.d("Found new surrogate rule: $ruleName - $mimeType")
+                with(ruleName.split("/")) {
+                    scriptId = this.last()
+                }
+                Timber.d("Found new surrogate rule: $scriptId - $ruleName - $mimeType")
                 nextLineIsNewRule = false
                 return@forEach
             }
@@ -74,6 +78,7 @@ class ResourceSurrogateLoader @Inject constructor(
             if (it.isBlank()) {
                 surrogates.add(
                     SurrogateResponse(
+                        scriptId = scriptId,
                         name = ruleName,
                         mimeType = mimeType,
                         jsFunction = functionBuilder.toString()

@@ -30,6 +30,7 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -111,12 +112,15 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUrl)
         }
 
-        if (shouldBlock(request, documentUrl, webViewClientListener)) {
-            val surrogate = resourceSurrogates.get(url)
-            if (surrogate.responseAvailable) {
-                Timber.d("Surrogate found for $url")
-                webViewClientListener?.surrogateDetected(surrogate)
-                return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+        val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
+        if (trackingEvent?.blocked == true) {
+            trackingEvent.surrogateId?.let { surrogateId ->
+                val surrogate = resourceSurrogates.get(surrogateId)
+                if (surrogate.responseAvailable) {
+                    Timber.d("Surrogate found for $url")
+                    webViewClientListener?.surrogateDetected(surrogate)
+                    return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+                }
             }
 
             Timber.d("Blocking request $url")
@@ -175,15 +179,15 @@ class WebViewRequestInterceptor(
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun shouldBlock(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): Boolean {
+    private fun trackingEvent(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): TrackingEvent? {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {
-            return false
+            return null
         }
 
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl) ?: return false
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl) ?: return null
         webViewClientListener?.trackerDetected(trackingEvent)
-        return trackingEvent.blocked
+        return trackingEvent
     }
 }
