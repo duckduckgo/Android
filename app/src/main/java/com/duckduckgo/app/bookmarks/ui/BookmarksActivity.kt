@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.R.id.action_search
 import com.duckduckgo.app.browser.R.menu.bookmark_activity_menu
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_bookmarks.*
@@ -60,8 +61,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
         favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager)
-        recycler.adapter = ConcatAdapter(favoritesAdapter, bookmarksAdapter)
-        recycler.setItemAnimator(null)
+        recycler.adapter = ConcatAdapter(favoritesAdapter, DividerAdapter(), bookmarksAdapter)
+        recycler.itemAnimator = null
     }
 
     private fun observeViewModel() {
