@@ -55,14 +55,24 @@ class DuckDuckGoBookmarksParser() : BookmarksParser {
 
     override fun parseHtml(document: Document): List<Bookmark> {
         val validBookmarks = mutableListOf<Bookmark>()
-        val bookmarkFolders = document.select("H3").size
-        val bookmarkLinks = document.select("a")
-        bookmarkLinks.forEach { possibleBookmark ->
-            val link = possibleBookmark.attr("href")
-            val title = possibleBookmark.text()
-            val bookmark = Bookmark(title, link)
-            validBookmarks.add(bookmark)
+        val fileItems = document.select("DT")
+
+        fileItems.forEach {
+            val folderItem = it.select("H3")
+            if (folderItem.isNotEmpty()) {
+                // when folders are implemented this is what we need to use
+                return@forEach
+            }
+
+            val linkItem = it.select("a")
+            if (linkItem.isNotEmpty()) {
+                val link = linkItem.attr("href")
+                val title = linkItem.text()
+                val bookmark = Bookmark(title, link)
+                validBookmarks.add(bookmark)
+            }
         }
+
         return validBookmarks
     }
 
