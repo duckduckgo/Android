@@ -2,11 +2,9 @@ package com.duckduckgo.app.bookmarks.service
 
 import android.content.ContentResolver
 import android.net.Uri
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 
 /*
  * Copyright (c) 2021 DuckDuckGo
@@ -26,7 +24,6 @@ import org.jsoup.nodes.Document
 
 interface BookmarksImporter {
     suspend fun import(uri: Uri): ImportBookmarksResult
-    fun import(html: String): ImportBookmarksResult
 }
 
 sealed class ImportBookmarksResult {
@@ -36,7 +33,8 @@ sealed class ImportBookmarksResult {
 
 class DuckDuckGoBookmarksImporter(
     private val contentResolver: ContentResolver,
-    private val dao: BookmarksDao
+    private val dao: BookmarksDao,
+    private val bookmarksParser: BookmarksParser
 ) : BookmarksImporter {
 
     companion object {
@@ -48,9 +46,8 @@ class DuckDuckGoBookmarksImporter(
         return try {
             val bookmarks = contentResolver.openInputStream(uri).use { stream ->
                 val document = Jsoup.parse(stream, CHARSET, BASE_URI)
-                parseDocument(document)
+                bookmarksParser.parseHtml(document)
             }
-
             bookmarks.forEach {
                 dao.insert(BookmarkEntity(title = it.title, url = it.url))
             }
@@ -58,28 +55,5 @@ class DuckDuckGoBookmarksImporter(
         } catch (exception: Exception) {
             ImportBookmarksResult.Error(exception)
         }
-    }
-
-    @VisibleForTesting
-    override fun import(html: String): ImportBookmarksResult {
-        return try {
-            val document = Jsoup.parse(html)
-            val bookmarks = parseDocument(document)
-            return ImportBookmarksResult.Success(bookmarks)
-        } catch (exception: Exception) {
-            ImportBookmarksResult.Error(exception)
-        }
-    }
-
-    private fun parseDocument(document: Document): List<Bookmark> {
-        val validBookmarks = mutableListOf<Bookmark>()
-        val bookmarkLinks = document.select("a")
-        bookmarkLinks.forEach { possibleBookmark ->
-            val link = possibleBookmark.attr("href")
-            val title = possibleBookmark.text()
-            val bookmark = Bookmark(title, link)
-            validBookmarks.add(bookmark)
-        }
-        return validBookmarks
     }
 }

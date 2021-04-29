@@ -38,9 +38,10 @@ class BookmarksModule {
     @Singleton
     fun bookmarksImporter(
         context: Context,
-        bookmarksDao: BookmarksDao
+        bookmarksDao: BookmarksDao,
+        bookmarksParser: BookmarksParser,
     ): BookmarksImporter {
-        return DuckDuckGoBookmarksImporter(context.contentResolver, bookmarksDao)
+        return DuckDuckGoBookmarksImporter(context.contentResolver, bookmarksDao, bookmarksParser)
     }
 
     @Provides
