@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser.favorites
 
-import android.os.Handler
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
 import android.view.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -49,7 +51,6 @@ class FavoritesQuickAccessAdapter(
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
 
     class QuickAccessViewHolder(
-        private val layoutInflater: LayoutInflater,
         itemView: View,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
@@ -57,31 +58,45 @@ class FavoritesQuickAccessAdapter(
         private val onItemSelected: (QuickAccessFavorite) -> Unit,
         private val onEditClicked: (QuickAccessFavorite) -> Unit,
         private val onDeleteClicked: (QuickAccessFavorite) -> Unit
-    ) : RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(itemView), DragDropViewHolderListener {
 
         private var menu: Menu? = null
 
+        private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+            itemView,
+            PropertyValuesHolder.ofFloat("scaleX", 1.2f, 1f),
+            PropertyValuesHolder.ofFloat("scaleY", 1.2f, 1f)
+        ).apply {
+            duration = 150L
+        }
+        private val scaleUp = ObjectAnimator.ofPropertyValuesHolder(
+            itemView,
+            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.2f),
+            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.2f)
+        ).apply {
+            duration = 150L
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
         fun bind(item: QuickAccessFavorite) {
             with(item.favorite) {
                 itemView.quickAccessTitle.text = title
                 loadFavicon(url)
+
                 itemView.quickAccessFaviconCard.setOnLongClickListener {
-                    Timber.i("QuickAccessFav: longPress")
+                    scaleUpFavicon()
                     false
                 }
 
-                // itemView.quickAccessFaviconImage.name = item.favorite.url.toUri().baseHost ?: ""
-
-                itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
-                    if (event.actionMasked == MotionEvent.ACTION_MOVE) {
-                        Timber.i("QuickAccessFav: move")
-                        onMoveListener(this@QuickAccessViewHolder)
-                        Handler().post { menu?.close() }
+                itemView.quickAccessFaviconCard.setOnTouchListener { _, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_MOVE -> onMoveListener(this@QuickAccessViewHolder)
+                        MotionEvent.ACTION_UP -> scaleDownFavicon()
                     }
                     false
                 }
 
-                itemView.quickAccessFaviconCard.setOnCreateContextMenuListener { menu, v, menuInfo ->
+                itemView.quickAccessFaviconCard.setOnCreateContextMenuListener { menu, _, _ ->
                     this@QuickAccessViewHolder.menu = menu
                     Timber.i("QuickAccessFav: setOnCreateContextMenuListener")
                     val editMenuItem: MenuItem = menu.add(Menu.NONE, 1, 1, "Edit")
@@ -106,12 +121,35 @@ class FavoritesQuickAccessAdapter(
                 faviconManager.loadToViewFromPersisted(url, itemView.quickAccessFavicon)
             }
         }
+
+        override fun onDrag() {
+            menu?.close()
+            scaleUpFavicon()
+            itemView.quickAccessTitle.alpha = 0f
+        }
+
+        override fun onItemReleased() {
+            itemView.quickAccessTitle.alpha = 1f
+            scaleDownFavicon()
+        }
+
+        private fun scaleUpFavicon() {
+            if (itemView.scaleX == 1f) {
+                scaleUp.start()
+            }
+        }
+
+        private fun scaleDownFavicon() {
+            if (itemView.scaleX != 1.0f) {
+                scaleDown.start()
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_quick_access_item, parent, false)
-        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
+        return QuickAccessViewHolder(view, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
     }
 
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
@@ -128,4 +166,9 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
         return oldItem.favorite.title == newItem.favorite.title &&
             oldItem.favorite.url == newItem.favorite.url
     }
+}
+
+interface DragDropViewHolderListener {
+    fun onDrag()
+    fun onItemReleased()
 }

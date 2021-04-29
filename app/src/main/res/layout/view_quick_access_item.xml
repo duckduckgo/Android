@@ -30,8 +30,9 @@
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
+        app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="6dp"
-        app:cardElevation="4dp">
+        app:cardElevation="0dp">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
@@ -39,6 +40,7 @@
             android:layout_height="56dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_globe_gray_16dp" />
+
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
