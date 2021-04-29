@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 
 /** This table contains the list of app trackers to be blocked */
-@Entity(tableName = "vpn_app_tracker_bocking")
+@Entity(tableName = "vpn_app_tracker_blocking_list")
 data class AppTracker(
     @PrimaryKey val hostname: String,
     val trackerCompanyId: Int,
@@ -31,7 +31,17 @@ data class AppTracker(
     val isCdn: Boolean
 )
 
-internal data class JsonAppTracker(
+@Entity(tableName = "vpn_app_tracker_blocking_list_metadata")
+data class AppTrackerMetadata(
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    val eTag: String?
+)
+
+data class JsonAppBlockingList(
+    val trackers: Map<String, JsonAppTracker>
+)
+
+class JsonAppTracker(
     val owner: TrackerOwner,
     val app: TrackerApp,
     @field:Json(name = "CDN")

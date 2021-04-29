@@ -23,10 +23,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
@@ -34,7 +34,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 4,
+    exportSchema = true, version = 5,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -44,7 +44,8 @@ import java.util.concurrent.Executors
         HeartBeatEntity::class,
         VpnPhoenixEntity::class,
         VpnNotification::class,
-        AppTracker::class
+        AppTracker::class,
+        AppTrackerMetadata::class
     ]
 )
 
@@ -106,15 +107,14 @@ abstract class VpnDatabase : RoomDatabase() {
                 .use { it.readText() }
                 .also {
                     val trackers = getFullAppTrackerBlockingList(it)
-                    vpnDatabase.vpnAppTrackerBlockingDao().insertAll(trackers)
+                    vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerBlocklist(trackers)
                 }
         }
 
         private fun getFullAppTrackerBlockingList(json: String): List<AppTracker> {
             val moshi = Moshi.Builder().build()
-            val type = Types.newParameterizedType(Map::class.java, String::class.java, JsonAppTracker::class.java)
-            val adapter : JsonAdapter<Map<String, JsonAppTracker>> = moshi.adapter(type)
-            return adapter.fromJson(json).orEmpty()
+            val adapter : JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
+            return adapter.fromJson(json)?.trackers.orEmpty()
                 .filter { !it.value.isCdn }
                 .mapValues {
                     AppTracker(

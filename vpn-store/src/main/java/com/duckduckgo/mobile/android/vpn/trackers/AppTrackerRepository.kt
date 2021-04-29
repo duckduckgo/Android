@@ -21,7 +21,6 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.store.R
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 
 interface AppTrackerRepository {
     fun matchTrackerInLegacyList(hostname: String) : AppTracker?
@@ -45,9 +44,8 @@ class RealAppTrackerRepository(
     }
 
     private fun loadAppTrackers(json: String): List<AppTracker> {
-        val type = Types.newParameterizedType(Map::class.java, String::class.java, JsonAppTracker::class.java)
-        val adapter : JsonAdapter<Map<String, JsonAppTracker>> = moshi.adapter(type)
-        return adapter.fromJson(json).orEmpty()
+        val adapter : JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
+        return adapter.fromJson(json)?.trackers.orEmpty()
             .filter { !it.value.isCdn }
             .mapValues {
                 AppTracker(

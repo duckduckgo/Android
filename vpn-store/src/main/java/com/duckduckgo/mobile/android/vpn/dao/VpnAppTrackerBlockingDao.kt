@@ -16,18 +16,32 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 
 @Dao
 interface VpnAppTrackerBlockingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(tracker: List<AppTracker>)
+    fun insertTrackerBlocklist(tracker: List<AppTracker>)
 
-    @Query("SELECT * FROM vpn_app_tracker_bocking WHERE :subdomain LIKE '%' || hostname LIMIT 1")
+    @Query("SELECT * FROM vpn_app_tracker_blocking_list WHERE :subdomain LIKE '%' || hostname LIMIT 1")
     fun getTrackerBySubdomain(subdomain: String): AppTracker?
+
+    @Query("SELECT * from vpn_app_tracker_blocking_list_metadata ORDER BY id DESC LIMIT 1")
+    fun getTrackerBlocklistMetadata() : AppTrackerMetadata?
+
+    @Insert
+    fun setTrackerBlocklistMetadata(appTrackerMetadata: AppTrackerMetadata)
+
+    @Query("DELETE from vpn_app_tracker_blocking_list")
+    fun deleteTrackerBlockList()
+
+    @Transaction
+    fun updateTrackerBlocklist(blocklist: List<AppTracker>, metadata: AppTrackerMetadata) {
+        setTrackerBlocklistMetadata(metadata)
+        deleteTrackerBlockList()
+        insertTrackerBlocklist(blocklist)
+    }
 }
