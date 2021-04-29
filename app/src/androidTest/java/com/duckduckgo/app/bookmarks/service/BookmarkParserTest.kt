@@ -149,7 +149,10 @@ class BookmarkParserTest {
         assertEquals(4, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals("https://jupyter.duckduckgo.com/notebooks/Mobile/Android%20Monday%20Health%20Check%20(DO%20NOT%20CHANGE).ipynb", firstBookmark.url)
+        assertEquals(
+            "https://jupyter.duckduckgo.com/notebooks/Mobile/Android%20Monday%20Health%20Check%20(DO%20NOT%20CHANGE).ipynb",
+            firstBookmark.url
+        )
         assertEquals("Android Monday Health Check", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
@@ -217,19 +220,24 @@ class BookmarkParserTest {
         val validBookmarks = mutableListOf<Bookmark>()
 
         fileItems.forEach {
-            if (it.hasClass("H3")) {
-                folders ++
+            val folderItem = it.select("H3")
+            if (folderItem.isNotEmpty()) {
+                folders++
+                return
             }
-            if (it.hasClass("a")) {
-                links ++
-                val link = it.attr("href")
-                val title = it.text()
+
+            val linkItem = it.select("a")
+            if (linkItem.isNotEmpty()) {
+                links++
+                val link = linkItem.attr("href")
+                val title = linkItem.text()
                 val bookmark = Bookmark(title, link)
                 validBookmarks.add(bookmark)
             }
         }
 
         assertEquals(9, fileItems.size)
+        assertEquals(2, folders)
+        assertEquals(7, links)
     }
-
 }
