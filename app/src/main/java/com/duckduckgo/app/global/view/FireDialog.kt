@@ -145,7 +145,7 @@ class FireDialog(
     private fun animationEnabled() = settingsDataStore.fireAnimationEnabled && animatorDurationEnabled()
 
     private fun animatorDurationEnabled(): Boolean {
-        val animatorScale = Settings.Global.getFloat(context.contentResolver, ANIMATOR_DURATION_SCALE, 0.0f)
+        val animatorScale = Settings.Global.getFloat(context.contentResolver, ANIMATOR_DURATION_SCALE, 1.0f)
         return animatorScale != 0.0f
     }
 
