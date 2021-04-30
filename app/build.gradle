@@ -198,6 +198,9 @@ dependencies {
     // Play Store referrer library
     playImplementation("com.android.installreferrer:installreferrer:_")
 
+    // HTML
+    implementation 'org.jsoup:jsoup:_'
+
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
