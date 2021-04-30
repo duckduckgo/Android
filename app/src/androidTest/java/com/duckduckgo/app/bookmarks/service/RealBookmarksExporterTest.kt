@@ -33,7 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
-class BookmarkExporterTest {
+class RealBookmarksExporterTest {
 
     @get:Rule
     @Suppress("unused")
@@ -45,7 +45,7 @@ class BookmarkExporterTest {
 
     private lateinit var db: AppDatabase
     private lateinit var dao: BookmarksDao
-    private lateinit var exporter: BookmarksExporter
+    private lateinit var exporter: RealBookmarksExporter
 
     private lateinit var filesDir: File
 
@@ -57,7 +57,7 @@ class BookmarkExporterTest {
             .build()
         dao = db.bookmarksDao()
         filesDir = context.filesDir
-        exporter = DuckDuckGoBookmarksExporter(context.contentResolver, dao, DuckDuckGoBookmarksParser())
+        exporter = RealBookmarksExporter(context.contentResolver, dao, RealBookmarksParser())
     }
 
     @After

@@ -20,15 +20,15 @@ import android.net.Uri
 
 data class Bookmark(val title: String, val url: String)
 
-interface BookmarkManager {
+interface BookmarksManager {
     suspend fun import(uri: Uri): ImportBookmarksResult
     suspend fun export(uri: Uri): ExportBookmarksResult
 }
 
-class DuckDuckGoBookmarkManager constructor(
+class RealBookmarksManager constructor(
     private val bookmarksImporter: BookmarksImporter,
     private val bookmarksExporter: BookmarksExporter,
-) : BookmarkManager {
+) : BookmarksManager {
 
     override suspend fun export(uri: Uri): ExportBookmarksResult {
         return bookmarksExporter.export(uri)

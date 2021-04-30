@@ -18,20 +18,23 @@ package com.duckduckgo.app.bookmarks.di
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.BookmarkManager
+import com.duckduckgo.app.bookmarks.service.BookmarksManager
 import com.duckduckgo.app.bookmarks.service.BookmarksExporter
 import com.duckduckgo.app.bookmarks.service.BookmarksImporter
 import com.duckduckgo.app.bookmarks.service.BookmarksParser
-import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarkManager
-import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksExporter
-import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksImporter
-import com.duckduckgo.app.bookmarks.service.DuckDuckGoBookmarksParser
+import com.duckduckgo.app.bookmarks.service.RealBookmarksManager
+import com.duckduckgo.app.bookmarks.service.RealBookmarksExporter
+import com.duckduckgo.app.bookmarks.service.RealBookmarksImporter
+import com.duckduckgo.app.bookmarks.service.RealBookmarksParser
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 class BookmarksModule {
 
     @Provides
@@ -41,13 +44,13 @@ class BookmarksModule {
         bookmarksDao: BookmarksDao,
         bookmarksParser: BookmarksParser,
     ): BookmarksImporter {
-        return DuckDuckGoBookmarksImporter(context.contentResolver, bookmarksDao, bookmarksParser)
+        return RealBookmarksImporter(context.contentResolver, bookmarksDao, bookmarksParser)
     }
 
     @Provides
     @Singleton
     fun bookmarksParser(): BookmarksParser {
-        return DuckDuckGoBookmarksParser()
+        return RealBookmarksParser()
     }
 
     @Provides
@@ -58,7 +61,7 @@ class BookmarksModule {
         bookmarksDao: BookmarksDao,
         dispatcherProvider: DispatcherProvider
     ): BookmarksExporter {
-        return DuckDuckGoBookmarksExporter(context.contentResolver, bookmarksDao, bookmarksParser, dispatcherProvider)
+        return RealBookmarksExporter(context.contentResolver, bookmarksDao, bookmarksParser, dispatcherProvider)
     }
 
     @Provides
@@ -66,7 +69,7 @@ class BookmarksModule {
     fun bookmarkManager(
         bookmarksImporter: BookmarksImporter,
         bookmarksExporter: BookmarksExporter
-    ): BookmarkManager {
-        return DuckDuckGoBookmarkManager(bookmarksImporter, bookmarksExporter)
+    ): BookmarksManager {
+        return RealBookmarksManager(bookmarksImporter, bookmarksExporter)
     }
 }

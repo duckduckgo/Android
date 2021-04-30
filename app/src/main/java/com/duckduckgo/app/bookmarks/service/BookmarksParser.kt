@@ -16,18 +16,15 @@
 
 package com.duckduckgo.app.bookmarks.service
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 interface BookmarksParser {
     fun generateHtml(bookmarks: List<BookmarkEntity>): String
     fun parseHtml(document: Document): List<Bookmark>
-    fun parseHtml(html: String): List<Bookmark>
 }
 
-class DuckDuckGoBookmarksParser() : BookmarksParser {
+class RealBookmarksParser : BookmarksParser {
 
     override fun generateHtml(bookmarks: List<BookmarkEntity>): String {
         if (bookmarks.isEmpty()) {
@@ -74,11 +71,5 @@ class DuckDuckGoBookmarksParser() : BookmarksParser {
         }
 
         return validBookmarks
-    }
-
-    @VisibleForTesting
-    override fun parseHtml(html: String): List<Bookmark> {
-        val document = Jsoup.parse(html)
-        return parseHtml(document)
     }
 }

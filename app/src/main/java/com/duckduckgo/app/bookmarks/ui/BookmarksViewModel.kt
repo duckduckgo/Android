@@ -20,7 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.BookmarkManager
+import com.duckduckgo.app.bookmarks.service.BookmarksManager
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
 import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
@@ -41,7 +41,7 @@ import javax.inject.Provider
 class BookmarksViewModel(
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
-    private val bookmarksManager: BookmarkManager,
+    private val bookmarksManager: BookmarksManager,
     private val dispatcherProvider: DispatcherProvider
 ) : EditBookmarkListener, ViewModel() {
 
@@ -68,7 +68,7 @@ class BookmarksViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<BookmarkEntity>> = dao.bookmarks()
+    private val bookmarks: LiveData<List<BookmarkEntity>> = dao.getBookmarks()
     private val bookmarksObserver = Observer<List<BookmarkEntity>> { onBookmarksChanged(it!!) }
 
     init {
@@ -143,7 +143,7 @@ class BookmarksViewModel(
 class BookmarksViewModelFactory @Inject constructor(
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
-    private val bookmarksManager: Provider<BookmarkManager>,
+    private val bookmarksManager: Provider<BookmarksManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {

@@ -36,7 +36,7 @@ sealed class ExportBookmarksResult {
     object NoBookmarksExported : ExportBookmarksResult()
 }
 
-class DuckDuckGoBookmarksExporter(
+class RealBookmarksExporter(
     private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
     private val bookmarksParser: BookmarksParser,
@@ -45,7 +45,7 @@ class DuckDuckGoBookmarksExporter(
 
     override suspend fun export(uri: Uri): ExportBookmarksResult {
         val bookmarks = withContext(dispatcher.io()) {
-            bookmarksDao.bookmarksSync()
+            bookmarksDao.getBookmarksSync()
         }
 
         val html = bookmarksParser.generateHtml(bookmarks)

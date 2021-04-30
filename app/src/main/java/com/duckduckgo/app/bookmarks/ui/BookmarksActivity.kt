@@ -86,17 +86,22 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == IMPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data
-            if (selectedFile != null) {
-                viewModel.importBookmarks(selectedFile)
+        when (requestCode) {
+            IMPORT_BOOKMARKS_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    val selectedFile = data?.data
+                    if (selectedFile != null) {
+                        viewModel.importBookmarks(selectedFile)
+                    }
+                }
             }
-        }
-
-        if (requestCode == EXPORT_BOOKMARKS_REQUEST_CODE && resultCode == RESULT_OK) {
-            val selectedFile = data?.data
-            if (selectedFile != null) {
-                viewModel.exportBookmarks(selectedFile)
+            EXPORT_BOOKMARKS_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    val selectedFile = data?.data
+                    if (selectedFile != null) {
+                        viewModel.exportBookmarks(selectedFile)
+                    }
+                }
             }
         }
     }
@@ -130,10 +135,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 }
             }
         )
-    }
-
-    private fun showImportedBookmarksError() {
-        showMessage("Error importing bookmarks, nothing has been imported")
     }
 
     private fun showImportedBookmarks(result: ImportBookmarksResult) {
@@ -207,9 +208,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val searchView = menu?.findItem(action_search)?.actionView as SearchView
+        val searchMenuItem = menu?.findItem(action_search)
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true
+        val searchView = searchMenuItem?.actionView as SearchView
         searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
-        searchView.isVisible = viewModel.viewState.value?.enableSearch == true
         return super.onPrepareOptionsMenu(menu)
     }
 

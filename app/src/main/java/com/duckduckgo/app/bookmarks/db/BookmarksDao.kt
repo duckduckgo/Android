@@ -27,10 +27,10 @@ interface BookmarksDao {
     fun insert(bookmark: BookmarkEntity): Long
 
     @Query("select * from bookmarks")
-    fun bookmarks(): LiveData<List<BookmarkEntity>>
+    fun getBookmarks(): LiveData<List<BookmarkEntity>>
 
     @Query("select * from bookmarks")
-    fun bookmarksSync(): List<BookmarkEntity>
+    fun getBookmarksSync(): List<BookmarkEntity>
 
     @Query("select count(*) from bookmarks WHERE url LIKE :url")
     fun bookmarksCountByUrl(url: String): Int

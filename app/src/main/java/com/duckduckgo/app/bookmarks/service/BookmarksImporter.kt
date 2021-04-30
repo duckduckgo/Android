@@ -31,21 +31,20 @@ sealed class ImportBookmarksResult {
     data class Error(val exception: Exception) : ImportBookmarksResult()
 }
 
-class DuckDuckGoBookmarksImporter(
+class RealBookmarksImporter(
     private val contentResolver: ContentResolver,
     private val dao: BookmarksDao,
     private val bookmarksParser: BookmarksParser
 ) : BookmarksImporter {
 
     companion object {
-        private const val CHARSET = "UTF-8"
         private const val BASE_URI = "duckduckgo.com"
     }
 
     override suspend fun import(uri: Uri): ImportBookmarksResult {
         return try {
             val bookmarks = contentResolver.openInputStream(uri).use { stream ->
-                val document = Jsoup.parse(stream, CHARSET, BASE_URI)
+                val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
                 bookmarksParser.parseHtml(document)
             }
             bookmarks.forEach {
