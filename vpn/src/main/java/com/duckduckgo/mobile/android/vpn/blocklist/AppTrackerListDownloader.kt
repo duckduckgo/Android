@@ -52,7 +52,7 @@ class RealAppTrackerListDownloader @Inject constructor(
         }
 
         val eTag = response.headers()["eTag"]?.removeSurrounding("W/\"", "\"").orEmpty() // removes weak eTag validator
-        val blocklist = response.body().orEmpty()
+        val blocklist = response.body()?.trackers.orEmpty()
             .filter { !it.value.isCdn }
             .mapValues {
                 AppTracker(

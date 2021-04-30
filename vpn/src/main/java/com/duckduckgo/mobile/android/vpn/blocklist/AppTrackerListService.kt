@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.blocklist
 
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import retrofit2.Call
 import retrofit2.http.GET
 
 interface AppTrackerListService {
-    @GET("https://dub.duckduckgo.com/raw/dave/app-tracking/master/data/Android/3.21/exportData/compact.json?token=AAAABKZQGMDVELB7RZXTOYDASPKGE")
-    fun appTrackerBlocklist(): Call<Map<String, JsonAppTracker>>
+    @GET("https://dub.duckduckgo.com/raw/dave/app-tracking/master/tracker-lists/blocklist.json?token=AAAABK34XRKN6O4PU5EFWILASUBFO")
+    fun appTrackerBlocklist(): Call<JsonAppBlockingList>
 }
