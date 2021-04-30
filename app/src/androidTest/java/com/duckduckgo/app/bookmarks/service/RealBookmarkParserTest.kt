@@ -134,8 +134,8 @@ class RealBookmarkParserTest {
         assertEquals(8, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        assertEquals("www.example.com", firstBookmark.url)
-        assertEquals("example", firstBookmark.title)
+        assertEquals("https://as.com/", firstBookmark.url)
+        assertEquals("AS.com", firstBookmark.title)
     }
 
     @Test
