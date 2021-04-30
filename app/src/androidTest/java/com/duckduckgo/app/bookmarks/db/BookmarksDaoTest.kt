@@ -61,7 +61,7 @@ class BookmarksDaoTest {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
         dao.insert(bookmark)
         dao.delete(bookmark)
-        val list = dao.bookmarks().blockingObserve()
+        val list = dao.getBookmarks().blockingObserve()
         assertTrue(list!!.isEmpty())
     }
 
@@ -69,13 +69,13 @@ class BookmarksDaoTest {
     fun whenBookmarkAddedThenItIsInList() {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
         dao.insert(bookmark)
-        val list = dao.bookmarks().blockingObserve()
+        val list = dao.getBookmarks().blockingObserve()
         assertEquals(listOf(bookmark), list)
     }
 
     @Test
     fun whenInInitialStateThenTheBookmarksAreEmpty() {
-        val list = dao.bookmarks().blockingObserve()
+        val list = dao.getBookmarks().blockingObserve()
         assertNotNull(list)
         assertTrue(list!!.isEmpty())
     }
