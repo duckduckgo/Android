@@ -76,7 +76,7 @@ class TrackerDetectorImpl @Inject constructor(
 
             val trackerCompany = entity?.displayName ?: "Undefined"
             webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
-            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl))
+            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl), result.surrogate)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")

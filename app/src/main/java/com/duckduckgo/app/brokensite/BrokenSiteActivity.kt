@@ -46,11 +46,11 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun consumeIntentExtra() {
-        val url = intent.getStringExtra(URL_EXTRA)
-        val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA)
+        val url = intent.getStringExtra(URL_EXTRA).orEmpty()
+        val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA).orEmpty()
         val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
-        val surrogates = intent.getStringExtra(SURROGATES_EXTRA)
-        viewModel.setInitialBrokenSite(url ?: "", blockedTrackers ?: "", surrogates ?: "", upgradedHttps)
+        val surrogates = intent.getStringExtra(SURROGATES_EXTRA).orEmpty()
+        viewModel.setInitialBrokenSite(url, blockedTrackers, surrogates, upgradedHttps)
     }
 
     private fun configureListeners() {

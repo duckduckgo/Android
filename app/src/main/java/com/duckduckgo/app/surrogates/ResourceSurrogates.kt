@@ -16,11 +16,9 @@
 
 package com.duckduckgo.app.surrogates
 
-import android.net.Uri
-
 interface ResourceSurrogates {
     fun loadSurrogates(urls: List<SurrogateResponse>)
-    fun get(uri: Uri): SurrogateResponse
+    fun get(scriptId: String): SurrogateResponse
     fun getAll(): List<SurrogateResponse>
 }
 
@@ -33,10 +31,9 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
         surrogates.addAll(urls)
     }
 
-    override fun get(uri: Uri): SurrogateResponse {
-        val uriString = uri.toString()
+    override fun get(scriptId: String): SurrogateResponse {
 
-        return surrogates.find { uriString.contains(it.name) }
+        return surrogates.find { it.scriptId == scriptId }
             ?: return SurrogateResponse(responseAvailable = false)
     }
 
@@ -46,6 +43,7 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
 }
 
 data class SurrogateResponse(
+    val scriptId: String = "",
     val responseAvailable: Boolean = true,
     val name: String = "",
     val jsFunction: String = "",

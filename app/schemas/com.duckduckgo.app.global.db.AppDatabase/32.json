@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 32,
-    "identityHash": "a52a8eb661c71c2740d7a83f38e3fea7",
+    "identityHash": "be6380785dcbf8f6793f852097f0d224",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -837,44 +837,6 @@
         "foreignKeys": []
       },
       {
-        "tableName": "web_trackers_blocked",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `trackerUrl` TEXT NOT NULL, `trackerCompany` TEXT NOT NULL, `timestamp` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "trackerUrl",
-            "columnName": "trackerUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "trackerCompany",
-            "columnName": "trackerCompany",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "timestamp",
-            "columnName": "timestamp",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "auth_cookies_allowed_domains",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
@@ -898,7 +860,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a52a8eb661c71c2740d7a83f38e3fea7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be6380785dcbf8f6793f852097f0d224')"
     ]
   }
 }

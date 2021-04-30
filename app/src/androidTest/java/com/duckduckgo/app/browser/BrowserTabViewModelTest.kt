@@ -59,7 +59,12 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -109,7 +114,16 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.firstValue
+import com.nhaarman.mockitokotlin2.lastValue
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -129,13 +143,17 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.*
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Captor
+import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -526,7 +544,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         val networkEntity = TestEntity("Network1", "Network1", 10.0)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false, null)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
@@ -777,7 +795,7 @@ class BrowserTabViewModelTest {
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
         }
         assertNotEquals(grade, privacyGradeState().privacyGrade)
     }
@@ -2895,7 +2913,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
     }
@@ -2907,7 +2925,7 @@ class BrowserTabViewModelTest {
         val file = File("test")
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
     }
@@ -2918,9 +2936,22 @@ class BrowserTabViewModelTest {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
 
-        testee.iconReceived(bitmap)
+        testee.iconReceived("https://example.com", bitmap)
 
         verify(mockTabRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedFromPreviousUrkThenDontUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://notexample.com", bitmap)
+
+        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
+        verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
     }
 
     @Test

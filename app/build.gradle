@@ -236,3 +236,9 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase")
     implementation "com.google.firebase:firebase-crashlytics-ktx"
 }
+
+tasks.register('fastlaneVersionCode') {
+    doLast {
+        print buildVersionCode()
+    }
+}

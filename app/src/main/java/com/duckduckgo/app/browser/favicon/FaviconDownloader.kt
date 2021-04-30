@@ -84,4 +84,5 @@ class GlideFaviconDownloader @Inject constructor(
             view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
         }
     }
+
 }

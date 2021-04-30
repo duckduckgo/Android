@@ -67,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 32,
+    exportSchema = true, version = 33,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -393,16 +393,24 @@ class MigrationsProvider(
         }
     }
 
-    // todo: make sure this is not an issue when migrating to main repo
     val MIGRATION_30_TO_31: Migration = object : Migration(30, 31) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
         }
     }
 
     val MIGRATION_31_TO_32: Migration = object : Migration(31, 32) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `auth_cookies_allowed_domains` (`domain` TEXT PRIMARY KEY NOT NULL)")
+            database.execSQL("DELETE FROM tds_domain_entity")
+            database.execSQL("DELETE FROM tds_entity")
+            database.execSQL("DELETE FROM tds_tracker")
+        }
+    }
+
+    // todo: This is VPN project migration, KEEP IT ALWAYS LAST
+    val MIGRATION_32_TO_33: Migration = object : Migration(32, 33) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
         }
     }
 
@@ -450,7 +458,8 @@ class MigrationsProvider(
             MIGRATION_28_TO_29,
             MIGRATION_29_TO_30,
             MIGRATION_30_TO_31,
-            MIGRATION_31_TO_32
+            MIGRATION_31_TO_32,
+            MIGRATION_32_TO_33
         )
 
     @Deprecated(

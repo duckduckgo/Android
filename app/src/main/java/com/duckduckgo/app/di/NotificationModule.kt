@@ -22,6 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
@@ -92,14 +93,16 @@ class NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         useOurAppNotification: UseOurAppNotification,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        appInstallStore: AppInstallStore
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
             useOurAppNotification,
-            variantManager
+            variantManager,
+            appInstallStore
         )
     }
 
