@@ -21,6 +21,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface AppTrackerListService {
-    @GET("https://dub.duckduckgo.com/raw/dave/app-tracking/master/tracker-lists/blocklist.json?token=AAAABK34XRKN6O4PU5EFWILASUBFO")
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/blocklist.json")
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>
 }
