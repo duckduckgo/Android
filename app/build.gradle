@@ -210,3 +210,9 @@ dependencies {
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 }
+
+tasks.register('fastlaneVersionCode') {
+    doLast {
+        print buildVersionCode()
+    }
+}
