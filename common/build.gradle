@@ -28,6 +28,7 @@ dependencies {
     implementation KotlinX.coroutines.android
 
     implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.lifecycle.viewModelKtx
 
     implementation Google.dagger
 
