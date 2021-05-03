@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.favorites
 
+import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -60,7 +61,21 @@ class QuickAccessDragTouchItemListener(
         super.onSelectedChanged(viewHolder, actionState)
         val listener = viewHolder as? DragDropViewHolderListener ?: return
         when (actionState) {
-            ItemTouchHelper.ACTION_STATE_DRAG -> listener.onDrag()
+            ItemTouchHelper.ACTION_STATE_DRAG -> listener.onDragStarted()
         }
+    }
+
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        val listener = viewHolder as? DragDropViewHolderListener ?: return
+        listener.onItemMoved(dX, dY)
     }
 }

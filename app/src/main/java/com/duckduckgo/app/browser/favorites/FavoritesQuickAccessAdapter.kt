@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.absoluteValue
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -60,7 +61,14 @@ class FavoritesQuickAccessAdapter(
         private val onDeleteClicked: (QuickAccessFavorite) -> Unit
     ) : RecyclerView.ViewHolder(itemView), DragDropViewHolderListener {
 
+        private var itemState: ItemState = ItemState.Stale
         private var menu: Menu? = null
+
+        sealed class ItemState {
+            object Stale: ItemState()
+            object LongPress: ItemState()
+            object Drag: ItemState()
+        }
 
         private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
             itemView,
@@ -84,14 +92,24 @@ class FavoritesQuickAccessAdapter(
                 loadFavicon(url)
 
                 itemView.quickAccessFaviconCard.setOnLongClickListener {
+                    itemState = ItemState.LongPress
                     scaleUpFavicon()
                     false
                 }
 
-                itemView.quickAccessFaviconCard.setOnTouchListener { _, event ->
+                itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
                     when (event.actionMasked) {
-                        MotionEvent.ACTION_MOVE -> onMoveListener(this@QuickAccessViewHolder)
-                        MotionEvent.ACTION_UP -> scaleDownFavicon()
+                        MotionEvent.ACTION_MOVE -> {
+                            Timber.i("QuickAccessFav: move!")
+                            if (itemState != ItemState.LongPress) return@setOnTouchListener false
+
+                            Timber.i("QuickAccessFav: onMoveListener")
+                            onMoveListener(this@QuickAccessViewHolder)
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            Timber.i("QuickAccessFav: up!")
+                            onItemReleased()
+                        }
                     }
                     false
                 }
@@ -116,21 +134,31 @@ class FavoritesQuickAccessAdapter(
             }
         }
 
+        override fun onDragStarted() {
+            scaleUpFavicon()
+            itemView.quickAccessTitle.alpha = 0f
+            itemState = ItemState.Drag
+        }
+
+        override fun onItemMoved(dX: Float, dY: Float) {
+            if(itemState != ItemState.Drag) return
+
+            if (dX.absoluteValue > 10 || dY.absoluteValue > 10) {
+                menu?.close()
+            }
+        }
+
+        override fun onItemReleased() {
+            Timber.i("QuickAccessFav: onItemReleased")
+            scaleDownFavicon()
+            itemView.quickAccessTitle.alpha = 1f
+            itemState = ItemState.Stale
+        }
+
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromPersisted(url, itemView.quickAccessFavicon)
             }
-        }
-
-        override fun onDrag() {
-            menu?.close()
-            scaleUpFavicon()
-            itemView.quickAccessTitle.alpha = 0f
-        }
-
-        override fun onItemReleased() {
-            itemView.quickAccessTitle.alpha = 1f
-            scaleDownFavicon()
         }
 
         private fun scaleUpFavicon() {
@@ -169,6 +197,7 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
 }
 
 interface DragDropViewHolderListener {
-    fun onDrag()
+    fun onDragStarted()
+    fun onItemMoved(dX: Float, dY: Float)
     fun onItemReleased()
 }
