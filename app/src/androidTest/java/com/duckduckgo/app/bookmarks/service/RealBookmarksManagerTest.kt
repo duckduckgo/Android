@@ -18,12 +18,9 @@ package com.duckduckgo.app.bookmarks.service
 
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.nhaarman.mockitokotlin2.verify
@@ -92,7 +89,7 @@ class RealBookmarksManagerTest {
         val someUri = Uri.parse("")
         whenever(exporter.export(someUri)).thenReturn(ExportBookmarksResult.Error(Exception()))
 
-        testee.import(someUri)
+        testee.export(someUri)
 
         verify(pixel).fire(AppPixelName.BOOKMARK_EXPORT_ERROR)
     }
@@ -102,4 +99,3 @@ class RealBookmarksManagerTest {
     }
 
 }
-
