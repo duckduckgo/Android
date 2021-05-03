@@ -209,6 +209,15 @@
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
+    <string name="exportBookmarksMenu">Export</string>
+    <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
+    <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
+    <string name="exportBookmarksSuccess">All bookmarks were successfully exported</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
+    <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
+    <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
+    <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
