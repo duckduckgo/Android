@@ -59,9 +59,7 @@ class RealBookmarksManagerTest {
 
         testee.import(someUri)
 
-        val pixelSent = AppPixelName.BOOKMARK_IMPORT_SUCCESS.pixelName.replace("%d", importedBookmarks.size.toString())
-
-        verify(pixel).fire(pixelSent)
+        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedBookmarks.size.toString()))
     }
 
     @Test

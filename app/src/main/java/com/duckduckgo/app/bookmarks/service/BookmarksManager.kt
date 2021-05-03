@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.service
 import android.net.Uri
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.BOOKMARK_COUNT
 import java.util.*
 
 data class Bookmark(val title: String, val url: String)
@@ -55,11 +56,7 @@ class RealBookmarksManager constructor(
                 pixel.fire(AppPixelName.BOOKMARK_IMPORT_ERROR)
             }
             is ImportBookmarksResult.Success -> {
-                val pixelName = String.format(
-                    Locale.US, AppPixelName.BOOKMARK_IMPORT_SUCCESS.pixelName,
-                    result.bookmarks.size
-                )
-                pixel.fire(pixelName)
+                pixel.fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(BOOKMARK_COUNT to result.bookmarks.size.toString()))
             }
         }
         return result

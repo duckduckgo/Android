@@ -216,7 +216,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FAVICON_WRONG_URL_ERROR("m_fwu_r"),
 
-    BOOKMARK_IMPORT_SUCCESS("m_bi_s%d"),
+    BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),
     BOOKMARK_EXPORT_ERROR("m_be_e")
