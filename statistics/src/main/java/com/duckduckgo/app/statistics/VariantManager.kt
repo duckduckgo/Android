@@ -47,9 +47,12 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // InAppUsage Experiments
-            Variant(key = "ma", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mb", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
-            Variant(key = "mc", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() })
+            Variant(key = "ma", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mb", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
+            Variant(key = "mc", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
+
+            Variant(key = "zx", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zy", weight = 1.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage), filterBy = { isEnglishLocale() })
         )
 
         val REFERRER_VARIANTS = listOf(

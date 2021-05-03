@@ -91,30 +91,30 @@ class SiteMonitorTest {
     @Test
     fun whenTrackersAreDetectedThenTrackerCountIsIncremented() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, null, true))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, null, true))
+        testee.trackerDetected(TrackingEvent(document, trackerA, null, null, true, null))
+        testee.trackerDetected(TrackingEvent(document, trackerB, null, null, true, null))
         assertEquals(2, testee.trackerCount)
     }
 
     @Test
     fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCoutnIsZero() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true))
+        testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true, null))
         assertEquals(0, testee.majorNetworkCount)
     }
 
     @Test
     fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOne() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true))
+        testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true, null))
         assertEquals(1, testee.majorNetworkCount)
     }
 
     @Test
     fun whenDuplicateMajorNetworkIsDetectedThenMajorNetworkCountIsStillOne() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true))
-        testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true))
+        testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true, null))
+        testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true, null))
         assertEquals(1, testee.majorNetworkCount)
     }
 

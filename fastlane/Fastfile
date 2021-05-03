@@ -20,15 +20,36 @@ platform :android do
   desc "Upload APK to Play Store"
   lane :deploy_playstore do
 
+    update_fastlane_release_notes()
+
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
     apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
 
     upload_to_play_store(
       apk: apkPath,
-      track: 'internal'
+      track: 'internal',
+      skip_upload_screenshots: true,
+      skip_upload_images: true,
+      validate_only: false
     )
+
+    cleanup_fastlane_release_notes()
+
   end
+
+  desc "Upload APK to ad-hoc internal app sharing"
+  lane :deploy_adhoc do
+
+      props = property_file_read(file: "app/version/version.properties")
+      version = props["VERSION"]
+      apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+      upload_to_play_store_internal_app_sharing(
+        apk: apkPath
+      )
+
+ end
 
   desc "Deploy APK to GitHub"
   lane :deploy_github do
@@ -52,6 +73,30 @@ platform :android do
         is_prerelease: false)
 
     end
+
+    desc "Update local changelist metadata"
+    lane :update_fastlane_release_notes do
+
+      flversion=gradle(task: '-q fastlaneVersionCode')
+      UI.message("Fastlane version is #{flversion}.")
+
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
+
+    end
+
+    desc "Clean up local changelist metadata"
+        lane :cleanup_fastlane_release_notes do
+
+          flversion=gradle(task: '-q fastlaneVersionCode')
+          UI.message("Fastlane version is #{flversion}.")
+
+          sh("rm '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
+          sh("rm '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+          sh("rm '../fastlane/metadata/android/en-CA/changelogs/#{flversion}.txt'")
+
+        end
 
     # Note, this currently relies on having `git flow` tools installed.
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
@@ -89,10 +134,10 @@ platform :android do
           end
 
           File.open('../app/version/release-notes', 'w') do |file|
-            file.write("""## What's new in this release?
+            file.write("""What's new in this release?
 #{releaseNotes}
 
-## Have feedback?
+Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.""")
           end
 
@@ -102,7 +147,7 @@ You can always reach us at https://duckduckgo.com/feedback.""")
             
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
             push_git_tags
-            sh "git push origin master"
+            sh "git push origin main"
             sh "git push origin develop"
 
             UI.header("#{newVersion} has been successfully released 🎉")

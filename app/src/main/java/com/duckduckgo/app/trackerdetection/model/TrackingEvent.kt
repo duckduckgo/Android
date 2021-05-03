@@ -21,5 +21,6 @@ data class TrackingEvent(
     val trackerUrl: String,
     val categories: List<String>?,
     val entity: Entity?,
-    val blocked: Boolean
+    val blocked: Boolean,
+    val surrogateId: String?
 )

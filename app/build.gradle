@@ -198,6 +198,9 @@ dependencies {
     // Play Store referrer library
     playImplementation("com.android.installreferrer:installreferrer:_")
 
+    // HTML
+    implementation 'org.jsoup:jsoup:_'
+
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
@@ -206,4 +209,10 @@ dependencies {
     androidTestImplementation Testing.mockito.kotlin
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+}
+
+tasks.register('fastlaneVersionCode') {
+    doLast {
+        print buildVersionCode()
+    }
 }

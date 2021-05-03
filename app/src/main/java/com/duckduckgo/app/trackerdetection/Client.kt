@@ -37,7 +37,8 @@ interface Client {
     data class Result(
         val matches: Boolean,
         val entityName: String? = null,
-        val categories: List<String>? = null
+        val categories: List<String>? = null,
+        val surrogate: String? = null
     )
 
     val name: ClientName

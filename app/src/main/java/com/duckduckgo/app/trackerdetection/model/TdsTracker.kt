@@ -40,7 +40,8 @@ enum class Action {
 class Rule(
     val rule: String,
     val action: Action?,
-    val exceptions: RuleExceptions?
+    val exceptions: RuleExceptions?,
+    val surrogate: String?
 )
 
 class RuleExceptions(

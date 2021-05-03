@@ -65,7 +65,7 @@ class TrackerNetworksViewModelTest {
 
     @Test
     fun whenTrackersUpdatedWithNoTrackersThenViewModelListIsEmpty() {
-        val input = listOf(TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true))
+        val input = listOf(TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null))
         testee.onSiteChanged(site(trackingEvents = input))
         assertTrue(testee.viewState.value!!.trackingEventsByNetwork.isNotEmpty())
 
@@ -78,21 +78,21 @@ class TrackerNetworksViewModelTest {
 
         val input = listOf(
             // Minor entity with 3 distinct trackers
-            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(2), null, Entity.MINOR_ENTITY_A, true),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(3), null, Entity.MINOR_ENTITY_A, true),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(2), null, Entity.MINOR_ENTITY_A, true, null),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(3), null, Entity.MINOR_ENTITY_A, true, null),
 
             // Minor entity with 1 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(4), null, Entity.MINOR_ENTITY_B, true),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(4), null, Entity.MINOR_ENTITY_B, true, null),
 
             // Major entity with 2 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(7), null, Entity.MAJOR_ENTITY_B, true),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
+            TrackingEvent(Url.DOCUMENT, Url.tracker(7), null, Entity.MAJOR_ENTITY_B, true, null),
 
             // Major entity with 1 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(5), null, Entity.MAJOR_ENTITY_A, true)
+            TrackingEvent(Url.DOCUMENT, Url.tracker(5), null, Entity.MAJOR_ENTITY_A, true, null)
         )
 
         testee.onSiteChanged(site(trackingEvents = input))
