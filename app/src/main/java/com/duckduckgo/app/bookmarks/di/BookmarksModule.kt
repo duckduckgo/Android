@@ -27,6 +27,7 @@ import com.duckduckgo.app.bookmarks.service.RealBookmarksExporter
 import com.duckduckgo.app.bookmarks.service.RealBookmarksImporter
 import com.duckduckgo.app.bookmarks.service.RealBookmarksParser
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -68,8 +69,9 @@ class BookmarksModule {
     @Singleton
     fun bookmarkManager(
         bookmarksImporter: BookmarksImporter,
-        bookmarksExporter: BookmarksExporter
+        bookmarksExporter: BookmarksExporter,
+        pixel: Pixel
     ): BookmarksManager {
-        return RealBookmarksManager(bookmarksImporter, bookmarksExporter)
+        return RealBookmarksManager(bookmarksImporter, bookmarksExporter, pixel)
     }
 }
