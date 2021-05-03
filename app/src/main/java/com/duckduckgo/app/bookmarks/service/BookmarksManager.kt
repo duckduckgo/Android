@@ -17,6 +17,10 @@
 package com.duckduckgo.app.bookmarks.service
 
 import android.net.Uri
+import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
+import java.util.*
 
 data class Bookmark(val title: String, val url: String)
 
@@ -28,13 +32,36 @@ interface BookmarksManager {
 class RealBookmarksManager constructor(
     private val bookmarksImporter: BookmarksImporter,
     private val bookmarksExporter: BookmarksExporter,
+    private val pixel: Pixel
 ) : BookmarksManager {
 
     override suspend fun export(uri: Uri): ExportBookmarksResult {
-        return bookmarksExporter.export(uri)
+        val result = bookmarksExporter.export(uri)
+        when (result){
+            is ExportBookmarksResult.Error -> {
+                pixel.fire(AppPixelName.BOOKMARK_EXPORT_SUCCESS)
+            }
+            ExportBookmarksResult.NoBookmarksExported -> {}
+            ExportBookmarksResult.Success -> {
+                pixel.fire(AppPixelName.BOOKMARK_EXPORT_ERROR)
+            }
+        }
+        return result
     }
 
     override suspend fun import(uri: Uri): ImportBookmarksResult {
-        return bookmarksImporter.import(uri)
+        val result = bookmarksImporter.import(uri)
+        when (result) {
+            is ImportBookmarksResult.Error -> {
+                pixel.fire(AppPixelName.BOOKMARK_IMPORT_ERROR)
+            }
+            is ImportBookmarksResult.Success -> {
+                val pixelName = String.format(
+                    Locale.US, AppPixelName.BOOKMARK_IMPORT_SUCCESS.pixelName,
+                    result.bookmarks.size)
+                pixel.fire(pixelName)
+            }
+        }
+        return result
     }
 }
