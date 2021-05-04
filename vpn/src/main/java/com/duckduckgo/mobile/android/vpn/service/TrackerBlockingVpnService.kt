@@ -26,6 +26,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
+import android.system.OsConstants.AF_INET6
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
@@ -256,6 +257,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
+
+            // Allow IPv6 to go through the VPN
+            // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
+            allowFamily(AF_INET6)
 
             VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
 
