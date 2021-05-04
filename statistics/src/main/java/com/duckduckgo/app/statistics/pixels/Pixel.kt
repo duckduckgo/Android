@@ -70,6 +70,7 @@ interface Pixel {
         const val FIRE_BUTTON_STATE = "fb"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
+        const val BOOKMARK_COUNT = "bco"
     }
 
     object PixelValues {
