@@ -40,11 +40,13 @@ interface EmailDataStore {
 @ExperimentalCoroutinesApi
 class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataStore {
 
+    private val encryptedPreferences: SharedPreferences = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
     override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow.asStateFlow()
 
-    private val encryptedPreferences: SharedPreferences
-        get() = EncryptedSharedPreferences.create(
+    @Synchronized
+    private fun encryptedPreferences(): SharedPreferences {
+        return EncryptedSharedPreferences.create(
             context,
             FILENAME,
             MasterKey.Builder(context)
@@ -53,6 +55,7 @@ class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataS
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
+    }
 
     override var emailToken: String?
         get() = encryptedPreferences.getString(KEY_EMAIL_TOKEN, null)
