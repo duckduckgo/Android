@@ -55,9 +55,9 @@ class TrackerDataDownloader @Inject constructor(
 
             val body = response.body()!!
             val eTag = response.headers().extractETag()
-            Timber.d("Updating tds data from server")
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
+                Timber.d("Updating tds data from server")
                 appDatabase.runInTransaction {
                     trackerDataLoader.persistTds(eTag, body)
                     trackerDataLoader.loadTrackers()
