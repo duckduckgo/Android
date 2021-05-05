@@ -183,9 +183,9 @@ dependencies {
     implementation AndroidX.fragmentKtx
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.extensions
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.lifecycle.process
 
     implementation  AndroidX.lifecycle.commonJava8
     testImplementation AndroidX.archCore.testing
