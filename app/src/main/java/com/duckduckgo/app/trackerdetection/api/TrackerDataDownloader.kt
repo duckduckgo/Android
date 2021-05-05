@@ -23,10 +23,10 @@ import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
-import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
+import okhttp3.Headers
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -54,10 +54,10 @@ class TrackerDataDownloader @Inject constructor(
             }
 
             val body = response.body()!!
-            val eTag = response.headers()["eTag"]?.removeSurrounding("W/\"", "\"").orEmpty() // removes weak eTag validator
+            val eTag = response.headers().extractETag()
+            Timber.d("Updating tds data from server")
             val oldEtag = metadataDao.eTag()
             if (eTag != oldEtag) {
-                Timber.d("Updating tds data from server")
                 appDatabase.runInTransaction {
                     trackerDataLoader.persistTds(eTag, body)
                     trackerDataLoader.loadTrackers()
@@ -106,4 +106,8 @@ class TrackerDataDownloader @Inject constructor(
             return@fromAction
         }
     }
+}
+
+fun Headers.extractETag(): String {
+    return this["eTag"]?.removePrefix("W/")?.removeSurrounding("\"", "\"").orEmpty() // removes weak eTag validator
 }
