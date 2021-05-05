@@ -43,7 +43,7 @@ platform :android do
       releaseNotesBody = File.read(releaseNotesFileBody)
       releaseNotesSuffix = File.read(releaseNotesFileSuffix)
 
-      formatted = "\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
       UI.message("\n#{formatted}")
       formatted
 
