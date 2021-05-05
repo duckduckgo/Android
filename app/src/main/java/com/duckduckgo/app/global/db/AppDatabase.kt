@@ -410,6 +410,7 @@ class MigrationsProvider(
             database.execSQL("DELETE FROM tds_domain_entity")
             database.execSQL("DELETE FROM tds_entity")
             database.execSQL("DELETE FROM tds_tracker")
+            database.execSQL("DELETE FROM tdsMetadata")
         }
     }
 
