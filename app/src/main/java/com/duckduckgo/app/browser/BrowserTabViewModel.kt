@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
+import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
@@ -639,7 +641,7 @@ class BrowserTabViewModel(
         // faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
             Timber.i("Favicon prefetch for $url")
-            val faviconFile = faviconManager.prefetchToTemp(subFolder = tabId, faviconUrl = url)
+            val faviconFile = faviconManager.tryFetchFaviconForUrl(subFolder = tabId, url = url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
@@ -654,9 +656,8 @@ class BrowserTabViewModel(
             Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
             return
         }
-
         viewModelScope.launch {
-            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+            val faviconFile = faviconManager.storeFavicon(currentTab.tabId, ImageFavicon(icon, url))
             faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
@@ -671,12 +672,9 @@ class BrowserTabViewModel(
             Timber.d("Favicon received for a url $visitedUrl, different than the current one $currentUrl")
             return
         }
-
-        // faviconPrefetchJob?.cancel()
-        faviconPrefetchJob = viewModelScope.launch {
-            Timber.i("Favicon prefetch touch $iconUrl")
-            val faviconFile = faviconManager.prefetchToTemp(tabId, iconUrl, visitedUrl)
-            if (faviconFile != null) {
+        viewModelScope.launch {
+            val faviconFile = faviconManager.storeFavicon(currentTab.tabId, UrlFavicon(iconUrl, visitedUrl))
+            faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
         }
