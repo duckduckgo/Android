@@ -86,6 +86,6 @@ class TrackerDataLoader @Inject constructor(
     }
 
     companion object {
-        const val DEFAULT_ETAG = "5c5dda7f1873f3183b141c0739a187ca"
+        const val DEFAULT_ETAG = "961c7d692c985496126cad2d64231243"
     }
 }
