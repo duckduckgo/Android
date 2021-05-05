@@ -53,7 +53,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
      */
     fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
         val host = url?.toUri()?.host
-        val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
+        val omitApplicationComponent = if (host != null) sitesWithUserAgent.any { UriString.sameOrSubdomain(host, it) } else false
         val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
         val shouldUseDesktopAgent =
             if (url != null && host != null) {
@@ -66,7 +66,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
             prefix = prefix.replace(AgentRegex.version, "")
         }
 
-        val application = if (!omitApplicationComponent) applicationComponent else null
+        val application = if (omitApplicationComponent) applicationComponent else null
         return concatWithSpaces(prefix, application, safariComponent)
     }
 
@@ -120,6 +120,11 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         val sitesThatOmitVersion = listOf(
             "ing.nl",
             "chase.com"
+        )
+
+        val sitesWithUserAgent = listOf(
+            "duckduckgo.com",
+            "wikipedia.org"
         )
 
         val sitesThatShouldUseDesktopAgent = listOf(

@@ -54,13 +54,13 @@ class ApiRequestInterceptorTest {
         assertTrue(result.matches(regex))
     }
 
-    @Test
-    fun whenAPIRequestIsRqPixelThenOverrideHeader() {
-        val fakeChain = FakeChain("https://improving.duckduckgo.com/t/rq_0")
-
-        val response = testee.intercept(fakeChain)
-        val header = response.request.header(Header.USER_AGENT)!!
-        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
-        assertTrue(header.matches(regex))
-    }
+//    @Test
+//    fun whenAPIRequestIsRqPixelThenOverrideHeader() {
+//        val fakeChain = FakeChain("https://improving.duckduckgo.com/t/rq_0")
+//
+//        val response = testee.intercept(fakeChain)
+//        val header = response.request.header(Header.USER_AGENT)!!
+//        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+//        assertTrue(header.matches(regex))
+//    }
 }
