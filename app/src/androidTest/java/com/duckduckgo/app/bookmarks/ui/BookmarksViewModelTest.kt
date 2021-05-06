@@ -23,6 +23,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.service.BookmarksManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
@@ -57,11 +58,12 @@ class BookmarksViewModelTest {
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
     private val bookmarksDao: BookmarksDao = mock()
     private val faviconManager: FaviconManager = mock()
+    private val bookmarksManager: BookmarksManager = mock()
 
     private val bookmark = BookmarkEntity(title = "title", url = "www.example.com")
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(bookmarksDao, faviconManager, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(bookmarksDao, faviconManager, bookmarksManager, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -70,7 +72,7 @@ class BookmarksViewModelTest {
     @Before
     fun before() {
         liveData.value = emptyList()
-        whenever(bookmarksDao.bookmarks()).thenReturn(liveData)
+        whenever(bookmarksDao.getBookmarks()).thenReturn(liveData)
     }
 
     @After

@@ -16,11 +16,15 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.BookmarksManager
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
@@ -43,6 +47,7 @@ class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
+    private val bookmarksManager: BookmarksManager,
     private val dispatcherProvider: DispatcherProvider
 ) : EditBookmarkListener, ViewModel() {
 
@@ -57,6 +62,8 @@ class BookmarksViewModel(
         class OpenSavedSite(val savedSite: SavedSite) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
+        data class ImportedBookmarks(val importBookmarksResult: ImportBookmarksResult) : Command()
+        data class ExportedBookmarks(val exportBookmarksResult: ExportBookmarksResult) : Command()
     }
 
     companion object {
@@ -66,8 +73,14 @@ class BookmarksViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<Bookmark>> = dao.bookmarks().map { bookmarks -> bookmarks.map { Bookmark(it.id, it.title ?: "", it.url) } }
-    private val bookmarksObserver = Observer<List<Bookmark>> { onBookmarksChanged(it!!) }
+    private val bookmarks: LiveData<List<SavedSite.Bookmark>> = dao.getBookmarks().map { bookmarks -> bookmarks.map {
+        SavedSite.Bookmark(
+            it.id,
+            it.title ?: "",
+            it.url
+        )
+    } }
+    private val bookmarksObserver = Observer<List<SavedSite.Bookmark>> { onBookmarksChanged(it!!) }
 
     init {
         viewState.value = ViewState()
@@ -173,6 +186,23 @@ class BookmarksViewModel(
         }
     }
 
+    fun importBookmarks(uri: Uri) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val result = bookmarksManager.import(uri)
+            withContext(dispatcherProvider.main()) {
+                command.value = ImportedBookmarks(result)
+            }
+        }
+    }
+
+    fun exportBookmarks(selectedFile: Uri) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val result = bookmarksManager.export(selectedFile)
+            withContext(dispatcherProvider.main()) {
+                command.value = ExportedBookmarks(result)
+            }
+        }
+    }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
@@ -180,6 +210,7 @@ class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
+    private val bookmarksManager: Provider<BookmarksManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -190,6 +221,7 @@ class BookmarksViewModelFactory @Inject constructor(
                         favoritesRepository.get(),
                         dao.get(),
                         faviconManager.get(),
+                        bookmarksManager.get(),
                         dispatcherProvider.get()
                     ) as T
                     )

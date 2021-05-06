@@ -16,6 +16,18 @@
 
 package com.duckduckgo.app.bookmarks.di
 
+import android.content.Context
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.service.BookmarksManager
+import com.duckduckgo.app.bookmarks.service.BookmarksExporter
+import com.duckduckgo.app.bookmarks.service.BookmarksImporter
+import com.duckduckgo.app.bookmarks.service.BookmarksParser
+import com.duckduckgo.app.bookmarks.service.RealBookmarksManager
+import com.duckduckgo.app.bookmarks.service.RealBookmarksExporter
+import com.duckduckgo.app.bookmarks.service.RealBookmarksImporter
+import com.duckduckgo.app.bookmarks.service.RealBookmarksParser
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
@@ -26,8 +38,45 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-@ContributesTo(scope = AppObjectGraph::class)
+@ContributesTo(AppObjectGraph::class)
 class BookmarksModule {
+
+    @Provides
+    @Singleton
+    fun bookmarksImporter(
+        context: Context,
+        bookmarksDao: BookmarksDao,
+        bookmarksParser: BookmarksParser,
+    ): BookmarksImporter {
+        return RealBookmarksImporter(context.contentResolver, bookmarksDao, bookmarksParser)
+    }
+
+    @Provides
+    @Singleton
+    fun bookmarksParser(): BookmarksParser {
+        return RealBookmarksParser()
+    }
+
+    @Provides
+    @Singleton
+    fun bookmarksExporter(
+        context: Context,
+        bookmarksParser: BookmarksParser,
+        bookmarksDao: BookmarksDao,
+        dispatcherProvider: DispatcherProvider
+    ): BookmarksExporter {
+        return RealBookmarksExporter(context.contentResolver, bookmarksDao, bookmarksParser, dispatcherProvider)
+    }
+
+    @Provides
+    @Singleton
+    fun bookmarkManager(
+        bookmarksImporter: BookmarksImporter,
+        bookmarksExporter: BookmarksExporter,
+        pixel: Pixel
+    ): BookmarksManager {
+        return RealBookmarksManager(bookmarksImporter, bookmarksExporter, pixel)
+    }
 
     @Provides
     @Singleton

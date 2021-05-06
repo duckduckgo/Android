@@ -20,15 +20,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
-import com.duckduckgo.app.browser.R.menu.bookmark_activity_menu
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
@@ -37,6 +48,22 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_bookmarks.*
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.android.synthetic.main.activity_bookmarks.bookmarkRootView
+import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
+import kotlinx.android.synthetic.main.content_bookmarks.recycler
+import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.deleteBookmark
+import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.editBookmark
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.favicon
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.overflowMenu
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class BookmarksActivity : DuckDuckGoActivity() {
@@ -56,6 +83,29 @@ class BookmarksActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupBookmarksRecycler()
         observeViewModel()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            IMPORT_BOOKMARKS_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    val selectedFile = data?.data
+                    if (selectedFile != null) {
+                        viewModel.importBookmarks(selectedFile)
+                    }
+                }
+            }
+            EXPORT_BOOKMARKS_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    val selectedFile = data?.data
+                    if (selectedFile != null) {
+                        viewModel.exportBookmarks(selectedFile)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupBookmarksRecycler() {
@@ -84,21 +134,88 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
                     is BookmarksViewModel.Command.OpenSavedSite -> openBookmark(it.savedSite)
                     is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
+                    is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.importBookmarksResult)
+                    is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
                 }
             }
         )
     }
 
+    private fun showImportedBookmarks(result: ImportBookmarksResult) {
+        when (result) {
+            is ImportBookmarksResult.Error -> {
+                showMessage(getString(R.string.importBookmarksError))
+            }
+            is ImportBookmarksResult.Success -> {
+                if (result.bookmarks.isEmpty()) {
+                    showMessage(getString(R.string.importBookmarksEmpty))
+                } else {
+                    showMessage(getString(R.string.importBookmarksSuccess, result.bookmarks.size))
+                }
+            }
+        }
+    }
+
+    private fun showExportedBookmarks(result: ExportBookmarksResult) {
+        when (result) {
+            is ExportBookmarksResult.Error -> {
+                showMessage(getString(R.string.exportBookmarksError))
+            }
+            ExportBookmarksResult.NoBookmarksExported -> {
+                showMessage(getString(R.string.exportBookmarksEmpty))
+            }
+            ExportBookmarksResult.Success -> {
+                showMessage(getString(R.string.exportBookmarksSuccess))
+            }
+        }
+    }
+
+    private fun showMessage(message: String) {
+        Snackbar.make(
+            bookmarkRootView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(bookmark_activity_menu, menu)
-        val searchItem = menu?.findItem(action_search)
-        val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, bookmarksAdapter))
-        return super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.bookmark_import -> {
+                val intent = Intent()
+                    .setType("text/html")
+                    .setAction(Intent.ACTION_GET_CONTENT)
+
+                startActivityForResult(
+                    Intent.createChooser(
+                        intent,
+                        getString(R.string.importBookmarksFileTitle)
+                    ),
+                    IMPORT_BOOKMARKS_REQUEST_CODE
+                )
+            }
+            R.id.bookmark_export -> {
+                val intent = Intent()
+                    .setType("text/html")
+                    .setAction(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
+
+                startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.findItem(action_search)?.isVisible = viewModel.viewState.value?.enableSearch == true
+        val searchMenuItem = menu?.findItem(action_search)
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true
+        val searchView = searchMenuItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, bookmarksAdapter))
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -137,5 +254,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+
+        private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
+        private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
+
+        private val EXPORT_BOOKMARKS_FILE_NAME: String
+            get() = "bookmarks_ddg_${formattedTimestamp()}.html"
+
+        private fun formattedTimestamp(): String = formatter.format(Date())
+        private val formatter: SimpleDateFormat = SimpleDateFormat("MMddYY", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
     }
 }

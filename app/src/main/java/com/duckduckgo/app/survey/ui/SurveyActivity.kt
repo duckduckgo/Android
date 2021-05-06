@@ -134,7 +134,6 @@ class SurveyActivity : DuckDuckGoActivity() {
         webView.gone()
         surveyActivityContainerViewGroup.removeView(webView)
         webView.destroy()
-        webView.webViewClient = null
     }
 
     companion object {

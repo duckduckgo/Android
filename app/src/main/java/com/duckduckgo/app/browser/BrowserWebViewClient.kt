@@ -115,7 +115,9 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
-                    webView.loadUrl(webView.originalUrl)
+                    webView.originalUrl?.let {
+                        webView.loadUrl(it)
+                    }
                     false
                 }
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
