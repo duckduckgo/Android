@@ -16,6 +16,16 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
+### android release_notes_playstore
+```
+fastlane android release_notes_playstore
+```
+Generate release notes for the Play Store
+### android release_notes_github
+```
+fastlane android release_notes_github
+```
+Generate release notes for GitHub
 ### android deploy_playstore
 ```
 fastlane android deploy_playstore

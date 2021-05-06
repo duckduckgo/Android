@@ -17,6 +17,7 @@
 package com.duckduckgo.app
 
 import java.io.BufferedReader
+import java.io.InputStream
 
 object FileUtilities {
 
@@ -24,6 +25,10 @@ object FileUtilities {
 
     private fun readResource(resourceName: String): BufferedReader {
         return javaClass.classLoader!!.getResource(resourceName).openStream().bufferedReader()
+    }
+
+    fun loadResource(resourceName: String): InputStream {
+        return javaClass.classLoader!!.getResource(resourceName).openStream()
     }
 
 }

@@ -36,4 +36,15 @@
     <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
+
+    <!-- Import / Export Bookmarks -->
+    <string name="exportBookmarksMenu">Export</string>
+    <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
+    <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
+    <string name="exportBookmarksSuccess">All bookmarks were successfully exported</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
+    <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
+    <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
+    <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
 </resources>

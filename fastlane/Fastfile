@@ -17,6 +17,42 @@ default_platform(:android)
 
 platform :android do
 
+    # CONSTANTS
+    releaseNotesBodyHeader = "What's new in this release?"
+    releaseNotesSuffixHeader = "Have feedback?"
+    releaseNotesFileBody = "../app/version/release-notes"
+    releaseNotesFileHiring = "../app/version/release-notes-hiring"
+    releaseNotesFileSuffix = "../app/version/release-notes-suffix"
+    releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
+    errorMessageCancelled = "Release cancelled 😢"
+
+  desc "Generate release notes for the Play Store"
+  lane :release_notes_playstore do
+
+    releaseNotesBody = File.read(releaseNotesFileBody)
+    releaseNotesSuffix = File.read(releaseNotesFileSuffix)
+    releaseNotesHiring = File.read(releaseNotesFileHiring)
+
+    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+    UI.message("\n#{formatted}")
+    formatted
+
+  end
+
+  desc "Generate release notes for GitHub"
+    lane :release_notes_github do
+
+      releaseNotesBody = File.read(releaseNotesFileBody)
+      releaseNotesSuffix = File.read(releaseNotesFileSuffix)
+      releaseNotesHiring = File.read(releaseNotesFileHiring)
+
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      UI.message("\n#{formatted}")
+      formatted
+
+    end
+
+
   desc "Upload APK to Play Store"
   lane :deploy_playstore do
 
@@ -56,7 +92,7 @@ platform :android do
 
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
-    releaseNotes = File.read("../app/version/release-notes")
+    releaseNotes = release_notes_github()
     apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
     token = ENV["GITHUB_UPLOAD_TOKEN"]
 
@@ -77,11 +113,14 @@ platform :android do
     desc "Update local changelist metadata"
     lane :update_fastlane_release_notes do
 
-      flversion=gradle(task: '-q fastlaneVersionCode')
-      UI.message("Fastlane version is #{flversion}.")
+      releaseNotes = release_notes_playstore()
 
-      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
-      sh("cp '../app/version/release-notes' '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+      flversion=gradle(task: '-q fastlaneVersionCode')
+      UI.message("App version for fastlane is #{flversion}.\nRelease notes for Play Store:\n\n#{releaseNotes}")
+
+      releaseNotesLocales.each do |locale|
+        File.open("../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt", 'w') do |file| file.write("#{releaseNotes}") end
+      end
 
     end
 
@@ -89,10 +128,10 @@ platform :android do
         lane :cleanup_fastlane_release_notes do
 
           flversion=gradle(task: '-q fastlaneVersionCode')
-          UI.message("Fastlane version is #{flversion}.")
 
-          sh("rm '../fastlane/metadata/android/en-US/changelogs/#{flversion}.txt'")
-          sh("rm '../fastlane/metadata/android/en-GB/changelogs/#{flversion}.txt'")
+          releaseNotesLocales.each do |locale|
+            sh("rm '../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt'")
+          end
 
         end
 
@@ -132,11 +171,7 @@ platform :android do
           end
 
           File.open('../app/version/release-notes', 'w') do |file|
-            file.write("""What's new in this release?
-#{releaseNotes}
-
-Have feedback?
-You can always reach us at https://duckduckgo.com/feedback.""")
+            file.write("""#{releaseNotes}""")
           end
 
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
@@ -145,17 +180,17 @@ You can always reach us at https://duckduckgo.com/feedback.""")
             
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
             push_git_tags
-            sh "git push origin master"
+            sh "git push origin main"
             sh "git push origin develop"
 
-            UI.header("#{newVersion} has been successfully released 🎉")
+            UI.header("#{newVersion} tag has been successfully created. 🎉")
 
           else
-            UI.error "Release cancelled 😢"
+            UI.error errorMessageCancelled
           end
 
         else
-          UI.error "Release cancelled 😢"
+          UI.error errorMessageCancelled
         end
 
         end
