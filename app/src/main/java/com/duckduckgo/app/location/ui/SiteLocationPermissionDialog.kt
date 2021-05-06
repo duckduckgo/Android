@@ -41,7 +41,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    var faviconJob: Job? = null
+    private var faviconJob: Job? = null
 
     interface SiteLocationPermissionDialogListener {
         fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
@@ -71,6 +71,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
 
         val title = rootView.find<TextView>(R.id.sitePermissionDialogTitle)
+        val subtitle = rootView.find<TextView>(R.id.sitePermissionDialogSubtitle)
         val favicon = rootView.find<ImageView>(R.id.sitePermissionDialogFavicon)
         val allowAlways = rootView.find<TextView>(R.id.siteAllowAlwaysLocationPermission)
         val allowOnce = rootView.find<TextView>(R.id.siteAllowOnceLocationPermission)
@@ -84,6 +85,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
         validateBundleArguments()
         populateTitle(title)
+        populateSubtitle(subtitle)
         populateFavicon(favicon)
         configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
         hideExtraViews(allowOnce, denyOnce, extraDivider, anotherDivider)
@@ -102,6 +104,18 @@ class SiteLocationPermissionDialog : DialogFragment() {
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!
             val dialogTitle = getString(R.string.preciseLocationSiteDialogTitle, originUrl.websiteFromGeoLocationsApiOrigin())
             title.text = dialogTitle
+        }
+    }
+
+    private fun populateSubtitle(subtitle: TextView) {
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!
+            val originDomain = originUrl.websiteFromGeoLocationsApiOrigin()
+            if (originDomain == DDG_DOMAIN) {
+                subtitle.text = getString(R.string.preciseLocationDDGDialogSubtitle)
+            } else {
+                subtitle.text = getString(R.string.preciseLocationSiteDialogSubtitle)
+            }
         }
     }
 
@@ -189,6 +203,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
         private const val KEY_EDITING_PERMISSION = "KEY_SCREEN_FROM"
         private const val KEY_TAB_ID = "TAB_ID"
+        private const val DDG_DOMAIN = "duckduckgo.com"
 
         fun instance(origin: String, isEditingPermission: Boolean, tabId: String): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
