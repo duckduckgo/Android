@@ -43,6 +43,17 @@ fun ImageView.loadFavicon(file: File, domain: String) {
         .into(this)
 }
 
+fun ImageView.loadFavicon(bitmap: Bitmap?, domain: String) {
+    val defaultDrawable = generateDefaultDrawable(this.context, domain)
+    Glide.with(context)
+        .load(bitmap)
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
+        .skipMemoryCache(true)
+        .placeholder(defaultDrawable)
+        .error(defaultDrawable)
+        .into(this)
+}
+
 fun ImageView.loadDefaultFavicon(domain: String) {
     this.setImageDrawable(generateDefaultDrawable(this.context, domain))
 }

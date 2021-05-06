@@ -163,7 +163,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromPersisted(url, itemView.favicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.favicon)
             }
         }
 

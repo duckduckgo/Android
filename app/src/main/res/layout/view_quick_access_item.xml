@@ -38,8 +38,7 @@
             android:id="@+id/quickAccessFavicon"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp" />
+            android:importantForAccessibility="no"/>
 
     </com.google.android.material.card.MaterialCardView>
 

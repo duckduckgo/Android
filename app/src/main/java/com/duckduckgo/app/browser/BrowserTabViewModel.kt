@@ -638,10 +638,10 @@ class BrowserTabViewModel(
     }
 
     override fun prefetchFavicon(url: String) {
-        // faviconPrefetchJob?.cancel()
+        faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
             Timber.i("Favicon prefetch for $url")
-            val faviconFile = faviconManager.tryFetchFaviconForUrl(subFolder = tabId, url = url)
+            val faviconFile = faviconManager.tryFetchFaviconForUrl(tabId = tabId, url = url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
             }
@@ -1079,7 +1079,7 @@ class BrowserTabViewModel(
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistFavicon(tabId, domain)
+                        faviconManager.persistCachedFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
@@ -1092,7 +1092,7 @@ class BrowserTabViewModel(
                     onSiteLocationPermissionAlwaysDenied()
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
-                        faviconManager.persistFavicon(tabId, domain)
+                        faviconManager.persistCachedFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.DENY_ONCE -> {
@@ -1346,7 +1346,7 @@ class BrowserTabViewModel(
         val unsavedSite = createSiteToSave()
         val savedBookmark = withContext(dispatchers.io()) {
             if (unsavedSite.url.isNotBlank()) {
-                faviconManager.persistFavicon(tabId, unsavedSite.url)
+                faviconManager.persistCachedFavicon(tabId, unsavedSite.url)
             }
             val bookmarkEntity = BookmarkEntity(title = unsavedSite.title, url = unsavedSite.url)
             val id = bookmarksDao.insert(bookmarkEntity)
@@ -1361,7 +1361,7 @@ class BrowserTabViewModel(
         val unsavedSite = createSiteToSave()
         val savedFavorite = withContext(dispatchers.io()) {
             if (unsavedSite.url.isNotBlank()) {
-                faviconManager.persistFavicon(tabId, unsavedSite.url)
+                faviconManager.persistCachedFavicon(tabId, unsavedSite.url)
             }
             favoritesRepository.insert(unsavedSite)
         }
@@ -1386,7 +1386,7 @@ class BrowserTabViewModel(
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                     pixel.fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
-                    faviconManager.persistFavicon(tabId, url = domain)
+                    faviconManager.persistCachedFavicon(tabId, url = domain)
                 }
             }
         }
@@ -1683,7 +1683,7 @@ class BrowserTabViewModel(
         }
 
         viewModelScope.launch {
-            val favicon: Bitmap? = faviconManager.loadFromTemp(tabId, currentPage)
+            val favicon: Bitmap? = faviconManager.loadFromLocal(tabId = tabId, url = currentPage)
             command.value = AddHomeShortcut(title, currentPage, favicon)
         }
     }

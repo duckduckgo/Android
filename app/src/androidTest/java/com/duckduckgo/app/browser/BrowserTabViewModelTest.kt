@@ -2884,7 +2884,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(url)
         testee.prefetchFavicon(url)
 
-        verify(mockFaviconManager).prefetchToTemp("TAB_ID", url)
+        verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url)
     }
 
     @Test
@@ -2892,7 +2892,7 @@ class BrowserTabViewModelTest {
         val url = "https://www.example.com/"
         val file = File("test")
         givenCurrentSite(url)
-        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(file)
+        whenever(mockFaviconManager.tryFetchFaviconForUrl(any(), any())).thenReturn(file)
 
         testee.prefetchFavicon(url)
 
@@ -2901,7 +2901,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrefetchFaviconAndFaviconDoesNotExistThenDoNotCallUpdateTabFavicon() = coroutineRule.runBlocking {
-        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(null)
+        whenever(mockFaviconManager.tryFetchFaviconForUrl(any(), any())).thenReturn(null)
 
         testee.prefetchFavicon("url")
 
@@ -2915,7 +2915,7 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://example.com", bitmap)
 
-        verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
+        verify(mockFaviconManager).storeFavicon("TAB_ID", bitmap, "https://example.com")
     }
 
     @Test
@@ -2923,7 +2923,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         val file = File("test")
-        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(file)
 
         testee.iconReceived("https://example.com", bitmap)
 
@@ -2934,7 +2934,7 @@ class BrowserTabViewModelTest {
     fun whenIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
-        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
+        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(null)
 
         testee.iconReceived("https://example.com", bitmap)
 
@@ -2946,7 +2946,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         val file = File("test")
-        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(file)
 
         testee.iconReceived("https://notexample.com", bitmap)
 
@@ -2962,7 +2962,7 @@ class BrowserTabViewModelTest {
 
         testee.onSiteLocationPermissionSelected(url, permission)
 
-        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
 
     @Test
@@ -2973,7 +2973,7 @@ class BrowserTabViewModelTest {
 
         testee.onSiteLocationPermissionSelected(url, permission)
 
-        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
 
     @Test
@@ -2983,7 +2983,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNeverAllowed()
 
-        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
 
     @Test
@@ -2993,7 +2993,7 @@ class BrowserTabViewModelTest {
 
         testee.onBookmarkAddRequested()
 
-        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
 
     @Test
@@ -3002,7 +3002,7 @@ class BrowserTabViewModelTest {
 
         testee.onBookmarkAddRequested()
 
-        verify(mockFaviconManager, never()).persistFavicon(any(), any())
+        verify(mockFaviconManager, never()).persistCachedFavicon(any(), any())
     }
 
     @Test
@@ -3013,7 +3013,7 @@ class BrowserTabViewModelTest {
         testee.onFireproofWebsiteMenuClicked()
 
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
-            verify(mockFaviconManager).persistFavicon(any(), eq(this.fireproofWebsiteEntity.domain))
+            verify(mockFaviconManager).persistCachedFavicon(any(), eq(this.fireproofWebsiteEntity.domain))
         }
     }
 

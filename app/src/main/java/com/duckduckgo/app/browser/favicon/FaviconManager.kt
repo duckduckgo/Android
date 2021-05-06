@@ -30,7 +30,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
-import com.duckduckgo.app.global.view.loadDefaultFavicon
 import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
@@ -38,15 +37,14 @@ import timber.log.Timber
 import java.io.File
 
 interface FaviconManager {
-    suspend fun storeFavicon(subFolder: String, faviconSource: FaviconSource): File?
-    suspend fun tryFetchFaviconForUrl(subFolder: String, url: String): File?
-    suspend fun persistFavicon(subFolder: String, url: String)
-    suspend fun loadFromTemp(subFolder: String, url: String): Bitmap? // returns tmp stored image (to be used in add home shortcut)
-    suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView) // load tmp stored image for tabid in view
-    suspend fun loadToViewFromPersisted(url: String, view: ImageView) // load stored persisted image in view
-    suspend fun deletePersistedFavicon(url: String) //removes persisted favicon for url
-    suspend fun deleteOldTempFavicon(subFolder: String, path: String?) //removes favicons in subfolder, except for path file
-    suspend fun deleteAllTemp() //clear data, remove all temp favicons
+    suspend fun storeFavicon(tabId: String, faviconSource: FaviconSource): File?
+    suspend fun tryFetchFaviconForUrl(tabId: String, url: String): File?
+    suspend fun persistCachedFavicon(tabId: String, url: String)
+    suspend fun loadToViewFromLocalOrFallback(tabId: String? = null, url: String, view: ImageView)
+    suspend fun loadFromLocal(tabId: String?, url: String): Bitmap?
+    suspend fun deletePersistedFavicon(url: String)
+    suspend fun deleteOldTempFavicon(tabId: String, path: String?)
+    suspend fun deleteAllTemp()
 }
 
 sealed class FaviconSource {
@@ -64,43 +62,7 @@ class DuckDuckGoFaviconManager constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : FaviconManager {
 
-    override suspend fun loadFromTemp(subFolder: String, url: String): Bitmap? {
-        val domain = url.extractDomain() ?: return null
-        val cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, subFolder, domain)
-        return if (cachedFavicon != null) {
-            faviconDownloader.getFaviconFromDisk(cachedFavicon)
-        } else {
-            null
-        }
-    }
-
-    override suspend fun loadToViewFromPersisted(url: String, view: ImageView) {
-        // avoid displaying the previous favicon when the holder is recycled
-        view.loadDefaultFavicon(url)
-        loadToViewFromDirectory(url, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, view)
-    }
-
-    override suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView) {
-        // avoid displaying the previous favicon when the holder is recycled
-        view.loadDefaultFavicon(url)
-        loadToViewFromDirectory(url, FAVICON_TEMP_DIR, subFolder, view)
-    }
-
-    override suspend fun tryFetchFaviconForUrl(subFolder: String, url: String): File? {
-        val domain = url.extractDomain() ?: return null
-
-        val favicon = downloadFaviconFor(domain)
-
-        return if (favicon != null) {
-            Timber.i("Favicon downloaded for $domain")
-            return saveFavicon(subFolder, favicon, domain)
-        } else {
-            Timber.i("Favicon downloaded null for $domain")
-            null
-        }
-    }
-
-    override suspend fun storeFavicon(subFolder: String, faviconSource: FaviconSource): File? {
+    override suspend fun storeFavicon(tabId: String, faviconSource: FaviconSource): File? {
         val (domain, favicon) = when (faviconSource) {
             is FaviconSource.ImageFavicon -> {
                 val domain = faviconSource.url.extractDomain() ?: return null
@@ -115,12 +77,64 @@ class DuckDuckGoFaviconManager constructor(
             }
         }
 
-        return saveFavicon(subFolder, favicon, domain)
+        return saveFavicon(tabId, favicon, domain)
     }
 
-    override suspend fun persistFavicon(subFolder: String, url: String) {
+    override suspend fun tryFetchFaviconForUrl(tabId: String, url: String): File? {
+        val domain = url.extractDomain() ?: return null
+
+        val favicon = downloadFaviconFor(domain)
+
+        return if (favicon != null) {
+            Timber.i("Favicon downloaded for $domain")
+            return saveFavicon(tabId, favicon, domain)
+        } else {
+            Timber.i("Favicon downloaded null for $domain")
+            null
+        }
+    }
+
+    override suspend fun loadFromLocal(tabId: String?, url: String): Bitmap? {
+        val domain = url.extractDomain() ?: return null
+
+        var cachedFavicon: File? = null
+        if (tabId != null) {
+            cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
+            if (cachedFavicon != null) {
+                Timber.i("Favicon loaded from temp")
+            }
+        }
+        if (cachedFavicon == null) {
+            cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            if (cachedFavicon != null) {
+                Timber.i("Favicon loaded from persisted")
+            }
+        }
+
+        return if (cachedFavicon != null) {
+            faviconDownloader.getFaviconFromDisk(cachedFavicon)
+        } else null
+    }
+
+    override suspend fun loadToViewFromLocalOrFallback(tabId: String?, url: String, view: ImageView) {
+        val bitmap = loadFromLocal(tabId, url)
+
+        if (bitmap == null) {
+            Timber.i("No favicon loaded")
+            view.loadFavicon(bitmap, url)
+            val domain = url.extractDomain() ?: return
+            tryRemoteFallbackFavicon(subFolder = tabId, domain)?.let {
+                view.loadFavicon(it, url)
+            }
+        } else {
+            view.loadFavicon(bitmap, url)
+        }
+
+    }
+
+    override suspend fun persistCachedFavicon(tabId: String, url: String) {
         val domain = url.extractDomain() ?: return
-        val cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, subFolder, domain)
+        val cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
         if (cachedFavicon != null) {
             faviconPersister.copyToDirectory(cachedFavicon, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
         }
@@ -134,33 +148,27 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun deleteOldTempFavicon(subFolder: String, path: String?) {
-        faviconPersister.deleteFaviconsForSubfolder(FAVICON_TEMP_DIR, subFolder, path)
+    override suspend fun deleteOldTempFavicon(tabId: String, path: String?) {
+        faviconPersister.deleteFaviconsForSubfolder(FAVICON_TEMP_DIR, tabId, path)
     }
 
     override suspend fun deleteAllTemp() {
         faviconPersister.deleteAll(FAVICON_TEMP_DIR)
     }
 
-    private suspend fun saveFavicon(subFolder: String, favicon: Bitmap, domain: String): File? {
-        val file = faviconPersister.store(FAVICON_TEMP_DIR, subFolder, favicon, domain)
-        if (file != null) { // Only replace persisted favicons if we stored a new file
+    private suspend fun saveFavicon(subFolder: String?, favicon: Bitmap, domain: String): File? {
+        return if (subFolder != null) {
+            faviconPersister.store(FAVICON_TEMP_DIR, subFolder, favicon, domain)
+                ?.also { replacePersistedFavicons(favicon, domain) }
+        } else {
             replacePersistedFavicons(favicon, domain)
-        }
-        return file
-    }
-
-    private suspend fun loadToViewFromDirectory(url: String, directory: String, subFolder: String, view: ImageView) {
-        val domain = url.extractDomain() ?: return
-        val cachedFavicon = getFaviconForDomainOrFallback(directory, subFolder, domain)
-        cachedFavicon?.let {
-            view.loadFavicon(cachedFavicon, url)
         }
     }
 
     private suspend fun downloadFaviconFor(domain: String): Bitmap? {
         val faviconUrl = getFaviconUrl(domain) ?: return null
         val touchFaviconUrl = getTouchFaviconUrl(domain) ?: return null
+        Timber.i("Favicon will try on $faviconUrl or $touchFaviconUrl")
         faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
             Timber.i("Favicon downloaded from $touchFaviconUrl")
             return it
@@ -170,54 +178,36 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    private fun getFaviconUrl(url: String): Uri? {
-        return if (url.extractDomain().isNullOrBlank()) {
-            "https://$url".toUri().faviconLocation()
+    private fun getFaviconUrl(domain: String): Uri? {
+        return "https://$domain".toUri().faviconLocation()
+    }
+
+    private fun getTouchFaviconUrl(domain: String): Uri? {
+        return "https://$domain".toUri().touchFaviconLocation()
+    }
+
+    private suspend fun replacePersistedFavicons(icon: Bitmap, domain: String): File? {
+        return if (persistedFaviconsForDomain(domain) > 0) {
+            faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
+        } else null
+    }
+
+    private suspend fun tryRemoteFallbackFavicon(subFolder: String?, domain: String): File? {
+        val favicon = downloadFaviconFor(domain)
+        return if (favicon != null) {
+            saveFavicon(subFolder, favicon, domain)
         } else {
-            url.toUri().faviconLocation()
+            null
         }
-    }
-
-    private fun getTouchFaviconUrl(url: String): Uri? {
-        return if (url.extractDomain().isNullOrBlank()) {
-            "https://$url".toUri().touchFaviconLocation()
-        } else {
-            url.toUri().touchFaviconLocation()
-        }
-    }
-
-    private suspend fun replacePersistedFavicons(icon: Bitmap, domain: String) {
-        if (persistedFaviconsForDomain(domain) > 0) {
-            saveToFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
-        }
-    }
-
-    private suspend fun getFaviconForDomainOrFallback(directory: String, subFolder: String, domain: String): File? {
-        val cachedFavicon: File? = faviconPersister.faviconFile(directory, subFolder, domain)
-
-        return if (cachedFavicon == null) {
-            val favicon = downloadFaviconFor(domain)
-            if (favicon != null) {
-                saveToFile(directory, subFolder, favicon, domain)
-            } else {
-                null
-            }
-        } else {
-            cachedFavicon
-        }
-    }
-
-    private suspend fun saveToFile(directory: String, subFolder: String, icon: Bitmap, domain: String): File? {
-        return faviconPersister.store(directory, subFolder, icon, domain)
     }
 
     private suspend fun persistedFaviconsForDomain(domain: String): Int {
         val query = "%$domain%"
         return withContext(dispatcherProvider.io()) {
             bookmarksDao.bookmarksCountByUrl(query) +
-                    locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
-                    fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                    favoritesRepository.favoritesCountByDomain(query)
+                locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
+                fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
+                favoritesRepository.favoritesCountByDomain(query)
         }
     }
 

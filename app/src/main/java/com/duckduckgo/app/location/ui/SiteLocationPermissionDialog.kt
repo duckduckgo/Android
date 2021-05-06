@@ -113,11 +113,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
             originUrl?.let { url ->
                 faviconJob?.cancel()
                 faviconJob = this.lifecycleScope.launch {
-                    if (tabId.isNotBlank()) {
-                        faviconManager.loadToViewFromTemp(tabId, url, imageView)
-                    } else {
-                        faviconManager.loadToViewFromPersisted(url, imageView)
-                    }
+                    faviconManager.loadToViewFromLocalOrFallback(tabId, url, imageView)
                 }
             }
         }

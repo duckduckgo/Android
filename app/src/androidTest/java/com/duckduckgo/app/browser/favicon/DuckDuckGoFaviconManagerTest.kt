@@ -152,7 +152,7 @@ class DuckDuckGoFaviconManagerTest {
         val url = "https://example.com"
         whenever(mockFaviconDownloader.getFaviconFromUrl(url.toUri().faviconLocation()!!)).thenReturn(bitmap)
 
-        testee.prefetchToTemp("subFolder", url)
+        testee.tryFetchFaviconForUrl("subFolder", url)
 
         verify(mockFaviconPersister).store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")
     }
@@ -162,14 +162,14 @@ class DuckDuckGoFaviconManagerTest {
         val url = "https://example.com"
         whenever(mockFaviconDownloader.getFaviconFromUrl(url.toUri().faviconLocation()!!)).thenReturn(null)
 
-        val file = testee.prefetchToTemp("subFolder", url)
+        val file = testee.tryFetchFaviconForUrl("subFolder", url)
 
         assertNull(file)
     }
 
     @Test
     fun whenPrefetchToTempAndDomainDoesNotExistThenReturnNull() = coroutineRule.runBlocking {
-        val file = testee.prefetchToTemp("subFolder", "example.com")
+        val file = testee.tryFetchFaviconForUrl("subFolder", "example.com")
 
         assertNull(file)
     }
@@ -180,7 +180,7 @@ class DuckDuckGoFaviconManagerTest {
         whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
         whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(File("example"))
 
-        testee.saveToTemp("subFolder", bitmap, "example.com")
+        testee.storeFavicon("subFolder", bitmap, "example.com")
 
         verify(mockFaviconPersister).store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, bitmap, "example.com")
     }
@@ -191,7 +191,7 @@ class DuckDuckGoFaviconManagerTest {
         whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
         whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(null)
 
-        testee.saveToTemp("subFolder", bitmap, "example.com")
+        testee.storeFavicon("subFolder", bitmap, "example.com")
 
         verify(mockFaviconPersister, never()).store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, bitmap, "example.com")
     }
@@ -200,7 +200,7 @@ class DuckDuckGoFaviconManagerTest {
     fun whenSaveToTempThenStoreFile() = coroutineRule.runBlocking {
         val bitmap = asBitmap()
 
-        testee.saveToTemp("subFolder", bitmap, "example.com")
+        testee.storeFavicon("subFolder", bitmap, "example.com")
 
         verify(mockFaviconPersister).store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")
     }
@@ -209,14 +209,14 @@ class DuckDuckGoFaviconManagerTest {
     fun whenPersistFaviconThenCopyToPersistedDirectory() = coroutineRule.runBlocking {
         givenFaviconExistsInTemp()
 
-        testee.persistFavicon("subFolder", "example.com")
+        testee.persistCachedFavicon("subFolder", "example.com")
 
         verify(mockFaviconPersister).copyToDirectory(mockFile, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, "example.com")
     }
 
     @Test
     fun whenPersistFaviconIfFaviconDoesNotExistThenDoNotCopyToPersistedDirectory() = coroutineRule.runBlocking {
-        testee.persistFavicon("subFolder", "example.com")
+        testee.persistCachedFavicon("subFolder", "example.com")
 
         verify(mockFaviconPersister, never()).copyToDirectory(any(), any(), any(), any())
     }
