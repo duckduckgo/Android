@@ -16,51 +16,21 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android release_notes_playstore
-```
-fastlane android release_notes_playstore
-```
-Generate release notes for the Play Store
-### android release_notes_github
-```
-fastlane android release_notes_github
-```
-Generate release notes for GitHub
 ### android deploy_playstore
 ```
 fastlane android deploy_playstore
 ```
 Upload APK to Play Store
-### android deploy_adhoc
-```
-fastlane android deploy_adhoc
-```
-Upload APK to ad-hoc internal app sharing
 ### android deploy_github
 ```
 fastlane android deploy_github
 ```
 Deploy APK to GitHub
-### android update_fastlane_release_notes
-```
-fastlane android update_fastlane_release_notes
-```
-Update local changelist metadata
-### android cleanup_fastlane_release_notes
-```
-fastlane android cleanup_fastlane_release_notes
-```
-Clean up local changelist metadata
 ### android release
 ```
 fastlane android release
 ```
 Create new release
-### android determine_release_notes
-```
-fastlane android determine_release_notes
-```
-
 
 ----
 
