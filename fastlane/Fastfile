@@ -75,7 +75,7 @@ platform :android do
   end
 
   desc "Upload APK to ad-hoc internal app sharing"
-  lane :deploy_adhoc do
+  private_lane :deploy_adhoc do
 
       props = property_file_read(file: "app/version/version.properties")
       version = props["VERSION"]
