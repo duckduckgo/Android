@@ -26,9 +26,8 @@ default_platform(:android)
 
 platform :android do
 
-
   desc "Generate release notes for the Play Store"
-  lane :release_notes_playstore do
+  private_lane :release_notes_playstore do
 
     releaseNotesBody = File.read(releaseNotesFileBody)
     releaseNotesSuffix = File.read(releaseNotesFileSuffix)
@@ -41,7 +40,7 @@ platform :android do
   end
 
   desc "Generate release notes for GitHub"
-    lane :release_notes_github do
+    private_lane :release_notes_github do
 
       releaseNotesBody = File.read(releaseNotesFileBody)
       releaseNotesSuffix = File.read(releaseNotesFileSuffix)
@@ -112,7 +111,7 @@ platform :android do
     end
 
     desc "Update local changelist metadata"
-    lane :update_fastlane_release_notes do
+    private_lane :update_fastlane_release_notes do
 
       releaseNotes = release_notes_playstore()
 
@@ -126,7 +125,7 @@ platform :android do
     end
 
     desc "Clean up local changelist metadata"
-        lane :cleanup_fastlane_release_notes do
+        private_lane :cleanup_fastlane_release_notes do
 
           flversion=gradle(task: '-q fastlaneVersionCode')
 
@@ -183,7 +182,7 @@ platform :android do
 
         end
 
-        lane :determine_release_notes do
+        private_lane :determine_release_notes do
 
         commits = changelog_from_git_commits(
             between: [last_git_tag, "HEAD"],
