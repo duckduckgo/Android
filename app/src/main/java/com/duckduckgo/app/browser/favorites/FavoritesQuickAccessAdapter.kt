@@ -65,9 +65,9 @@ class FavoritesQuickAccessAdapter(
         private var menu: Menu? = null
 
         sealed class ItemState {
-            object Stale: ItemState()
-            object LongPress: ItemState()
-            object Drag: ItemState()
+            object Stale : ItemState()
+            object LongPress : ItemState()
+            object Drag : ItemState()
         }
 
         private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
@@ -141,7 +141,7 @@ class FavoritesQuickAccessAdapter(
         }
 
         override fun onItemMoved(dX: Float, dY: Float) {
-            if(itemState != ItemState.Drag) return
+            if (itemState != ItemState.Drag) return
 
             if (dX.absoluteValue > 10 || dY.absoluteValue > 10) {
                 menu?.close()
