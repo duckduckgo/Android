@@ -23,7 +23,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
@@ -109,9 +108,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
-    @Inject
-    lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
-
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -132,9 +128,8 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         ProcessLifecycleOwner.get().lifecycle.apply {
             addObserver(this@DuckDuckGoApplication)
             lifecycleObserverPluginPoint.getPlugins().forEach {
+                Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
                 addObserver(it)
-                Need to add this here
-                it.addObserver(webViewHttpAuthStore)
             }
         }
 
