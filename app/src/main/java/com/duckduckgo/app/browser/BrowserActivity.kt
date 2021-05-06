@@ -48,18 +48,17 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar_mockup.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -289,7 +288,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.onRefreshRequested()
-            is Command.DisplayMessage -> applicationContext?.longToast(command.messageId)
+            is Command.DisplayMessage -> Toast.makeText(applicationContext, command.messageId, Toast.LENGTH_LONG).show()
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
             is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))

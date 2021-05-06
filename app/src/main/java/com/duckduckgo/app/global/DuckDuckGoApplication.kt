@@ -42,13 +42,13 @@ import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -63,7 +63,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
@@ -233,7 +232,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     }
 
     private fun loadTrackerData() {
-        doAsync {
+        GlobalScope.launch {
             trackerDataLoader.loadData()
             resourceSurrogateLoader.loadData()
         }

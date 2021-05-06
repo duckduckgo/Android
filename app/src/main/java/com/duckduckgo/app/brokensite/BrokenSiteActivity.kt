@@ -19,6 +19,7 @@ package com.duckduckgo.app.brokensite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
@@ -29,7 +30,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.content_broken_sites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
-import org.jetbrains.anko.longToast
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
     private val viewModel: BrokenSiteViewModel by bindViewModel()
@@ -101,7 +101,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmAndFinish() {
-        longToast(R.string.brokenSiteSubmitted)
+        Toast.makeText(this, R.string.brokenSiteSubmitted, Toast.LENGTH_LONG).show()
         finishAfterTransition()
     }
 

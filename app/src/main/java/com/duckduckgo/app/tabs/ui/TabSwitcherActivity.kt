@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -48,8 +49,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.contentView
-import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -173,7 +172,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun processCommand(command: Command?) {
         when (command) {
-            is DisplayMessage -> applicationContext?.longToast(command.messageId)
+            is DisplayMessage -> Toast.makeText(applicationContext, command.messageId, Toast.LENGTH_LONG).show()
             is Close -> finishAfterTransition()
         }
     }
@@ -228,11 +227,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onDeletableTab(tab: TabEntity) {
-        Snackbar.make(
-            contentView!!,
-            getString(R.string.tabClosed),
-            Snackbar.LENGTH_LONG
-        )
+        Snackbar.make(toolbar, getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
             .setDuration(3500) // 3.5 seconds
             .setAction(R.string.tabClosedUndo) {
                 // noop, handled in onDismissed callback
