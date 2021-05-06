@@ -123,6 +123,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         )
 
         val sitesWithUserAgent = listOf(
+            "duckduckgo.com",
             "wikipedia.org"
         )
 
