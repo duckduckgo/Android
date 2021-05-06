@@ -73,13 +73,15 @@ class BookmarksViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<SavedSite.Bookmark>> = dao.getBookmarks().map { bookmarks -> bookmarks.map {
-        SavedSite.Bookmark(
-            it.id,
-            it.title ?: "",
-            it.url
-        )
-    } }
+    private val bookmarks: LiveData<List<SavedSite.Bookmark>> = dao.getBookmarks().map { bookmarks ->
+        bookmarks.map {
+            SavedSite.Bookmark(
+                it.id,
+                it.title ?: "",
+                it.url
+            )
+        }
+    }
     private val bookmarksObserver = Observer<List<SavedSite.Bookmark>> { onBookmarksChanged(it!!) }
 
     init {
