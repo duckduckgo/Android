@@ -56,6 +56,11 @@ Clean up local changelist metadata
 fastlane android release
 ```
 Create new release
+### android determine_release_notes
+```
+fastlane android determine_release_notes
+```
+
 
 ----
 
