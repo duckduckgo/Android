@@ -144,10 +144,20 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenStoreCredentialsThenIsSignedInChannelSendsTrue() = coroutineRule.runBlocking {
+    fun whenStoreCredentialsIfCredentialsWereCorrectlyStoredThenIsSignedInChannelSendsTrue() = coroutineRule.runBlocking {
+        whenever(mockEmailDataStore.emailToken).thenReturn("token")
+        whenever(mockEmailDataStore.emailUsername).thenReturn("username")
+
         testee.storeCredentials("token", "username")
 
         assertTrue(testee.signedInFlow().first())
+    }
+
+    @Test
+    fun whenStoreCredentialsIfCredentialsWereNotCorrectlyStoredThenIsSignedInChannelSendsFalse() = coroutineRule.runBlocking {
+        testee.storeCredentials("token", "username")
+
+        assertFalse(testee.signedInFlow().first())
     }
 
     @Test
