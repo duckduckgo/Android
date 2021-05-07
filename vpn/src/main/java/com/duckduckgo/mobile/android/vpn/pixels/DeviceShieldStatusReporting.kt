@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 class DeviceShieldStatusReportingModule {
     @Provides
     @IntoSet
-    fun provideDeviceShieldStatusReporting(workManager: WorkManager): AppLifecycleObserverPlugin {
+    fun provideDeviceShieldStatusReporting(workManager: WorkManager): LifecycleObserver {
         return DeviceShieldStatusReporting(workManager)
     }
 
@@ -51,11 +51,11 @@ class DeviceShieldStatusReportingModule {
 
 class DeviceShieldStatusReporting(
     private val workManager: WorkManager
-) : AppLifecycleObserverPlugin {
+) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleDeviceShieldStatusReporting() {
-        Timber.v("Scheduring the DeviceShieldStatusReporting workder")
+        Timber.v("Scheduling the DeviceShieldStatusReporting worker")
         workManager.cancelAllWorkByTag(WORKER_STATUS_REPORTING_TAG)
 
         PeriodicWorkRequestBuilder<DeviceShieldStatusReportingWorker>(12, TimeUnit.HOURS)

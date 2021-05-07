@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -67,7 +67,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 @ContributesMultibinding(AppObjectGraph::class)
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
-) : AppLifecycleObserverPlugin {
+) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleBlocklistUpdateWork() {

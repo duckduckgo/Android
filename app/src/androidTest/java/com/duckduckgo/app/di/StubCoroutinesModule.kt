@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.plugins.app
+package com.duckduckgo.app.di
 
-import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
-import dagger.multibindings.Multibinds
-
-/**
- * Marker interface for LifecycleObserver that want to observe
- * app lifecycle events
- */
-interface AppLifecycleObserverPlugin: LifecycleObserver
+import dagger.Provides
+import javax.inject.Singleton
 
 @Module
-@ContributesTo(AppObjectGraph::class)
-abstract class AppLifecycleObserverPluginDefaultModule {
-    @Multibinds
-    abstract fun provideDefaultAppLifecycleObserverPlugins(): Set<@JvmSuppressWildcards AppLifecycleObserverPlugin>
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [CoroutinesModule::class]
+)
+class StubCoroutinesModule {
+
+    @Provides
+    @Singleton
+    fun providesDispatcherProvider(): DispatcherProvider {
+        return CoroutineTestRule().testDispatcherProvider
+    }
 }

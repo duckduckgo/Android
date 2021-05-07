@@ -16,19 +16,23 @@
 
 package com.duckduckgo.app.usage.di
 
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
 class AppUsageModule {
 
     @Provides
-    fun appDaysUsedRecorder(appDaysUsedRepository: AppDaysUsedRepository): AppDaysUsedRecorder {
+    @Singleton
+    @IntoSet
+    fun appDaysUsedRecorderObserver(appDaysUsedRepository: AppDaysUsedRepository): LifecycleObserver {
         return AppDaysUsedRecorder(appDaysUsedRepository)
     }
 

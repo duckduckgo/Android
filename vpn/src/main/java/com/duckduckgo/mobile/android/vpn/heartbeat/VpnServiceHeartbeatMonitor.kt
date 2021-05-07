@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
-    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): AppLifecycleObserverPlugin {
+    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): LifecycleObserver {
         return VpnServiceHeartbeatMonitor(workManager)
     }
 
@@ -57,7 +57,7 @@ class VpnServiceHeartbeatMonitorModule {
 
 class VpnServiceHeartbeatMonitor(
     private val workManager: WorkManager
-) : AppLifecycleObserverPlugin {
+) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun startHearbeatMonitor() {

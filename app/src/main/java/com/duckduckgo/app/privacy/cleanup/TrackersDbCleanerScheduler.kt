@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.cleanup
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
@@ -29,7 +30,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -53,7 +53,7 @@ class TrackersDbCleanerSchedulerModule {
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
         workManager: WorkManager
-    ): AppLifecycleObserverPlugin {
+    ): LifecycleObserver {
         return TrackersDbCleanerScheduler(workManager)
     }
 
@@ -83,7 +83,7 @@ class TrackersDbCleanerWorkerInjectorPlugin(
     }
 }
 
-class TrackersDbCleanerScheduler(private val workManager: WorkManager) : AppLifecycleObserverPlugin {
+class TrackersDbCleanerScheduler(private val workManager: WorkManager) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleDbCleaner() {
