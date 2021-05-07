@@ -6,4 +6,4 @@
 	url = https://github.com/duckduckgo/privacy-grade
 [submodule "submodules/autofill"]
 	path = submodules/autofill
-	url = git@github.com:duckduckgo/duckduckgo-autofill.git
+	url = https://github.com/duckduckgo/duckduckgo-autofill
