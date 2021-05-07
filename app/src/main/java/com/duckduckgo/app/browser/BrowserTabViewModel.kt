@@ -1683,7 +1683,7 @@ class BrowserTabViewModel(
         }
 
         viewModelScope.launch {
-            val favicon: Bitmap? = faviconManager.loadFromLocal(tabId = tabId, url = currentPage)
+            val favicon: Bitmap? = faviconManager.loadFromDisk(tabId = tabId, url = currentPage)
             command.value = AddHomeShortcut(title, currentPage, favicon)
         }
     }
