@@ -19,6 +19,8 @@ package com.duckduckgo.app.email.db
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
@@ -34,11 +36,12 @@ class EmailEncryptedSharedPreferencesTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val mockPixel: Pixel = mock()
     lateinit var testee: EmailEncryptedSharedPreferences
 
     @Before
     fun before() {
-        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, mockPixel)
     }
 
     @Test

@@ -26,14 +26,22 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
 // Methods are marked to run in the UiThread because it is the thread of webview
 // if necessary the method impls will change thread to access the http auth dao
-interface WebViewHttpAuthStore : LifecycleObserver {
+interface WebViewHttpAuthStore {
     @UiThread
     fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String)
     @UiThread
@@ -44,12 +52,17 @@ interface WebViewHttpAuthStore : LifecycleObserver {
     suspend fun cleanHttpAuthDatabase()
 }
 
-class RealWebViewHttpAuthStore(
+@ContributesMultibinding(
+    scope = AppObjectGraph::class,
+    boundType = LifecycleObserver::class
+)
+@Singleton
+class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
-    private val authDatabaseLocator: DatabaseLocator,
+    @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
     private val dispatcherProvider: DispatcherProvider
-) : WebViewHttpAuthStore {
+) : WebViewHttpAuthStore, LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onAppCreated() {
@@ -88,4 +101,14 @@ class RealWebViewHttpAuthStore(
     override suspend fun cleanHttpAuthDatabase() {
         databaseCleaner.cleanDatabase(authDatabaseLocator.getDatabasePath())
     }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+abstract class WebViewHttpAuthStoreModule {
+    @Binds
+    @Singleton
+    abstract fun bindWebViewHttpAuthStore(
+        realWebViewHttpAuthStore: RealWebViewHttpAuthStore
+    ): WebViewHttpAuthStore
 }

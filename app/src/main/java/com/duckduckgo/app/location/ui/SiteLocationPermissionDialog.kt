@@ -40,7 +40,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    var faviconJob: Job? = null
+    private var faviconJob: Job? = null
 
     interface SiteLocationPermissionDialogListener {
         fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
@@ -70,6 +70,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
 
         val title = rootView.findViewById<TextView>(R.id.sitePermissionDialogTitle)
+        val subtitle = rootView.findViewById<TextView>(R.id.sitePermissionDialogSubtitle)
         val favicon = rootView.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
         val allowAlways = rootView.findViewById<TextView>(R.id.siteAllowAlwaysLocationPermission)
         val allowOnce = rootView.findViewById<TextView>(R.id.siteAllowOnceLocationPermission)
@@ -83,6 +84,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
         validateBundleArguments()
         populateTitle(title)
+        populateSubtitle(subtitle)
         populateFavicon(favicon)
         configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
         hideExtraViews(allowOnce, denyOnce, extraDivider, anotherDivider)
@@ -96,28 +98,40 @@ class SiteLocationPermissionDialog : DialogFragment() {
         super.onDetach()
     }
 
+    private fun getOriginUrl(): String {
+        return requireArguments().getString(KEY_REQUEST_ORIGIN)!!
+    }
+
+    private fun getTabId(): String {
+        return requireArguments().getString(KEY_TAB_ID)!!
+    }
+
+    private fun isEditingPermissions(): Boolean {
+        return requireArguments().getBoolean(KEY_EDITING_PERMISSION)
+    }
+
     private fun populateTitle(title: TextView) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!
-            val dialogTitle = getString(R.string.preciseLocationSiteDialogTitle, originUrl.websiteFromGeoLocationsApiOrigin())
-            title.text = dialogTitle
+        title.text = getString(R.string.preciseLocationSiteDialogTitle, getOriginUrl().websiteFromGeoLocationsApiOrigin())
+    }
+
+    private fun populateSubtitle(subtitle: TextView) {
+        if (getOriginUrl().websiteFromGeoLocationsApiOrigin() == DDG_DOMAIN) {
+            subtitle.text = getString(R.string.preciseLocationDDGDialogSubtitle)
+        } else {
+            subtitle.text = getString(R.string.preciseLocationSiteDialogSubtitle)
         }
     }
 
     private fun populateFavicon(imageView: ImageView) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val tabId = args.getString(KEY_TAB_ID, "")
+        val originUrl = getOriginUrl()
+        val tabId = getTabId()
 
-            originUrl?.let { url ->
-                faviconJob?.cancel()
-                faviconJob = this.lifecycleScope.launch {
-                    if (tabId.isNotBlank()) {
-                        faviconManager.loadToViewFromTemp(tabId, url, imageView)
-                    } else {
-                        faviconManager.loadToViewFromPersisted(url, imageView)
-                    }
-                }
+        faviconJob?.cancel()
+        faviconJob = this.lifecycleScope.launch {
+            if (tabId.isNotBlank()) {
+                faviconManager.loadToViewFromTemp(tabId, originUrl, imageView)
+            } else {
+                faviconManager.loadToViewFromPersisted(originUrl, imageView)
             }
         }
     }
@@ -128,25 +142,24 @@ class SiteLocationPermissionDialog : DialogFragment() {
         denyOnce: TextView,
         denyAlways: TextView
     ) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!
-            allowAlways.setOnClickListener {
-                dismiss()
-                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ALWAYS)
-            }
-            allowOnce.setOnClickListener {
-                dismiss()
-                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ONCE)
-            }
-            denyOnce.setOnClickListener {
-                dismiss()
-                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ONCE)
-            }
-            denyAlways.setOnClickListener {
-                dismiss()
-                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
-            }
+        val originUrl = getOriginUrl()
+        allowAlways.setOnClickListener {
+            dismiss()
+            listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ALWAYS)
         }
+        allowOnce.setOnClickListener {
+            dismiss()
+            listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ONCE)
+        }
+        denyOnce.setOnClickListener {
+            dismiss()
+            listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ONCE)
+        }
+        denyAlways.setOnClickListener {
+            dismiss()
+            listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
+        }
+
     }
 
     private fun hideExtraViews(
@@ -155,23 +168,16 @@ class SiteLocationPermissionDialog : DialogFragment() {
         dividerOne: View,
         dividerTwo: View
     ) {
-        arguments?.let { args ->
-
-            val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
-            if (isEditing) {
-                dividerOne.gone()
-                dividerTwo.gone()
-                allowOnce.gone()
-                denyOnce.gone()
-            }
+        if (isEditingPermissions()) {
+            dividerOne.gone()
+            dividerTwo.gone()
+            allowOnce.gone()
+            denyOnce.gone()
         }
     }
 
     private fun makeCancellable() {
-        arguments?.let { args ->
-            val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
-            isCancelable = isEditing
-        }
+        isCancelable = isEditingPermissions()
     }
 
     private fun validateBundleArguments() {
@@ -179,6 +185,18 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val args = requireArguments()
         if (!args.containsKey(KEY_REQUEST_ORIGIN)) {
             throw IllegalArgumentException("Bundle arguments required [KEY_REQUEST_ORIGIN")
+        }
+        if (args.getString(KEY_REQUEST_ORIGIN) == null) {
+            throw IllegalArgumentException("Bundle arguments can't be null [KEY_REQUEST_ORIGIN")
+        }
+        if (!args.containsKey(KEY_TAB_ID)) {
+            throw IllegalArgumentException("Bundle arguments required [KEY_TAB_ID")
+        }
+        if (args.getString(KEY_TAB_ID) == null) {
+            throw IllegalArgumentException("Bundle arguments can't be null [KEY_TAB_ID")
+        }
+        if (!args.containsKey(KEY_EDITING_PERMISSION)) {
+            throw IllegalArgumentException("Bundle arguments required [KEY_EDITING_PERMISSION")
         }
     }
 
@@ -188,6 +206,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
         private const val KEY_EDITING_PERMISSION = "KEY_SCREEN_FROM"
         private const val KEY_TAB_ID = "TAB_ID"
+
+        private const val DDG_DOMAIN = "duckduckgo.com"
 
         fun instance(origin: String, isEditingPermission: Boolean, tabId: String): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->

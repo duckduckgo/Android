@@ -17,18 +17,57 @@
 package com.duckduckgo.app.job
 
 import androidx.annotation.CheckResult
+import androidx.annotation.UiThread
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Singleton
 
+@Module
+@ContributesTo(AppObjectGraph::class)
+class AppConfigurationSyncerModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideAppConfigurationSyncer(
+        appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
+        workManager: WorkManager,
+        appConfigurationDownloader: ConfigurationDownloader
+    ): LifecycleObserver {
+        return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
+    }
+}
+
+@VisibleForTesting
 class AppConfigurationSyncer(
     private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
     private val workManager: WorkManager,
     private val appConfigurationDownloader: ConfigurationDownloader
-) {
+) : LifecycleObserver {
+
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun configureDataDownloader() {
+        scheduleImmediateSync()
+            .subscribeOn(Schedulers.io())
+            .doAfterTerminate {
+                scheduleRegularSync()
+            }
+            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+    }
 
     @CheckResult
     fun scheduleImmediateSync(): Completable {

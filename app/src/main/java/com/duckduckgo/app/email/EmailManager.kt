@@ -62,8 +62,8 @@ class AppEmailManager(
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
-            isSignedInStateFlow.emit(true)
         }
     }
 

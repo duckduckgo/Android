@@ -47,4 +47,7 @@
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
     <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+
+    <!-- Precise Location Improvements -->
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
 </resources>
