@@ -29,14 +29,13 @@ import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
 interface PixelSender : LifecycleObserver {
     fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
     fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
 }
 
-class RxPixelSender @Inject constructor(
+class RxPixelSender constructor(
     private val api: PixelService,
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,

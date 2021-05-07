@@ -26,13 +26,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 interface FireAnimationLoader : LifecycleObserver {
     fun preloadSelectedAnimation()
 }
 
-class LottieFireAnimationLoader @Inject constructor(
+class LottieFireAnimationLoader constructor(
     private val context: Context,
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider

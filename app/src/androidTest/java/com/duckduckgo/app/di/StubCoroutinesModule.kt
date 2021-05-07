@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,24 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
-import android.webkit.WebViewDatabase
-import androidx.room.Room
-import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module(includes = [DaoModule::class])
+@Module
 @ContributesTo(
     scope = AppObjectGraph::class,
-    replaces = [DatabaseModule::class]
+    replaces = [CoroutinesModule::class]
 )
-class StubDatabaseModule {
+class StubCoroutinesModule {
 
     @Provides
     @Singleton
-    fun provideWebviewDatabase(context: Context): WebViewDatabase {
-        return WebViewDatabase.getInstance(context)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDatabase(context: Context): AppDatabase {
-        return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+    fun providesDispatcherProvider(): DispatcherProvider {
+        return CoroutineTestRule().testDispatcherProvider
     }
 }
