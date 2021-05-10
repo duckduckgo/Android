@@ -216,6 +216,15 @@
     <string name="bookmarkOverflowContentDescription">Другие параметры закладки %1$s</string>
     <string name="bookmarkEdited">Закладка добавлена</string>
     <string name="bookmarkDeleteConfirmationMessage">Закладка &lt;b&gt;%1$s&lt;/b&gt; удалена</string>
+    <string name="exportBookmarksMenu">Экспорт</string>
+    <string name="exportBookmarksEmpty">Если у вас нет закладок, то и экспортировать будет нечего</string>
+    <string name="exportBookmarksError">Что-то пошло не так, и экспортировать закладки не удалось</string>
+    <string name="exportBookmarksSuccess">Все закладки успешно экспортированы</string>
+    <string name="importBookmarksMenu">Импорт</string>
+    <string name="importBookmarksFileTitle">Выберите файл с закладками для импортирования</string>
+    <string name="importBookmarksError">Что-то пошло не так, и импортировать закладки не удалось</string>
+    <string name="importBookmarksEmpty">В указанном файле нет закладок</string>
+    <string name="importBookmarksSuccess">Закладки (%1$d) успешно импортированы</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Подтвердить</string>
@@ -534,12 +543,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Не позволяйте продавать и распространять ваши данные. DuckDuckGo поможет обеспечит всю необходимую защиту. Активируйте настройку «Глобальный контроль конфиденциальности» (GPC), и мы сообщим сайтам о ваших предпочтениях:&lt;br/&gt;&lt;br/&gt;• Не продавать ваши личные данные.&lt;br/&gt;• Ограничить передачу ваших личных данных другим компаниям.
+        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href="">Подробнее…</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Поскольку Глобальный контроль конфиденциальности (GPC) — это новый стандарт, большинство сайтов еще не распознают его, но мы прилагаем все усилия, чтобы он был принят во всем мире.</b> Однако сайты обязаны реагировать на сигнал только в той мере, в какой это требует применимое законодательство.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Подробнее</u></string>
     <string name="disabled">Отключено</string>
     <string name="enabled">Включено</string>
 </resources>

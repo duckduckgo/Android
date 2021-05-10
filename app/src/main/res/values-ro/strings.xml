@@ -212,6 +212,15 @@
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %1$s</string>
     <string name="bookmarkEdited">Semn de carte adăugat</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
+    <string name="exportBookmarksMenu">Export</string>
+    <string name="exportBookmarksEmpty">Nu ai marcaje, nimic nu va fi exportat</string>
+    <string name="exportBookmarksError">Nu s-au putut exporta marcaje, a apărut o eroare</string>
+    <string name="exportBookmarksSuccess">Toate marcajele au fost exportate cu succes</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
+    <string name="importBookmarksError">Nu s-au putut importa marcaje, a apărut o eroare</string>
+    <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
+    <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
@@ -528,12 +537,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Datele tale nu ar trebui să fie de vânzare. La DuckDuckGo, suntem de acord cu acest lucru. Activează setarea „Global Privacy Control” (GPC) și vom semnaliza site-urilor web preferința ta de a:&lt;br/&gt;&lt;br/&gt;• Nu vinde datele tale personale.&lt;br/&gt;• Limita distribuirea datelor tale personale către alte companii.
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Întrucât Global Privacy Control (GPC) este un nou standard, majoritatea site-urilor web nu îl vor recunoaște încă, dar lucrăm din greu pentru a ne asigura că acesta va fi acceptat în întreaga lume.</b> Cu toate acestea, site-urile web sunt obligate să acționeze la semnal numai în măsura în care legile aplicabile le obligă să facă acest lucru.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Află mai multe</u></string>
     <string name="disabled">Dezactivat</string>
     <string name="enabled">Activat</string>
 </resources>
