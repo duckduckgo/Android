@@ -36,6 +36,13 @@ android {
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
             androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
+            main {
+                java {
+                    resources {
+                        srcDirs += files("$projectDir/../submodules/autofill/dist/".toString())
+                    }
+                }
+            }
         }
     }
     compileOptions {

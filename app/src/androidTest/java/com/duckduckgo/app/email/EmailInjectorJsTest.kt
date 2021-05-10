@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
+import java.io.BufferedReader
 
 class EmailInjectorJsTest {
 
@@ -121,9 +122,7 @@ class EmailInjectorJsTest {
     }
 
     private fun getJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.autofill)
-            .bufferedReader()
-            .use { it.readText() }
+        val js = readResource().use { it?.readText() }.orEmpty()
         return "javascript:$js"
     }
 
@@ -132,5 +131,9 @@ class EmailInjectorJsTest {
             .bufferedReader()
             .use { it.readText() }
         return "javascript:$js"
+    }
+
+    private fun readResource(): BufferedReader? {
+        return javaClass.classLoader?.getResource("autofill.js")?.openStream()?.bufferedReader()
     }
 }

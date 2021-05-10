@@ -22,6 +22,7 @@ import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import java.io.BufferedReader
 
 interface EmailInjector {
     fun injectEmailAutofillJs(webView: WebView, url: String?)
@@ -42,7 +43,7 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
     override fun injectEmailAutofillJs(webView: WebView, url: String?) {
         if (!hasJsBeenInjected && (isDuckDuckGoUrl(url) || emailManager.isSignedIn())) {
             hasJsBeenInjected = true
-            webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context)}", null)
+            webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
         }
     }
 
@@ -61,9 +62,9 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
         private lateinit var functions: String
         private lateinit var aliasFunctions: String
 
-        fun getFunctionsJS(context: Context): String {
+        fun getFunctionsJS(): String {
             if (!this::functions.isInitialized) {
-                functions = context.resources.openRawResource(R.raw.autofill).bufferedReader().use { it.readText() }
+                functions = loadJs("autofill.js")
             }
             return functions
         }
@@ -73,6 +74,12 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
                 aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
             }
             return aliasFunctions.replace("%s", alias.orEmpty())
+        }
+
+        fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
+
+        private fun readResource(resourceName: String): BufferedReader? {
+            return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
         }
     }
 }

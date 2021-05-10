@@ -216,6 +216,15 @@
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %1$s</string>
     <string name="bookmarkEdited">Záložka je pridaná</string>
     <string name="bookmarkDeleteConfirmationMessage">Vymazané: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Exportovať</string>
+    <string name="exportBookmarksEmpty">Nič sa nevyexportuje, pretože nemáte záložky</string>
+    <string name="exportBookmarksError">Nepodarilo sa vyexportovať žiadne záložky, pretože došlo k chybe</string>
+    <string name="exportBookmarksSuccess">Všetky záložky sa úspešne vyexportovali</string>
+    <string name="importBookmarksMenu">Importovať</string>
+    <string name="importBookmarksFileTitle">Vyberte záložku, ktorú chcete naimportovať</string>
+    <string name="importBookmarksError">Nepodarilo sa naimportovať žiadne záložky, pretože došlo k chybe</string>
+    <string name="importBookmarksEmpty">Súbor neobsahuje žiadne záložky na importovanie</string>
+    <string name="importBookmarksSuccess">Úspešne sa naimportovali záložky (%1$d)</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdiť</string>
@@ -534,12 +543,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Vaše údaje by nemali byť na predaj. V DuckDuckGo, súhlasíme. Aktivujte nastavenie „Globálna kontrola súkromia“ (GPC) a webovým serverom oznámime, že uprednostňujete:&lt;br/&gt;&lt;br/&gt;• Nepredávať vaše osobné údaje.&lt;br/&gt;• Obmedzte zdieľanie svojich osobných údajov s inými spoločnosťami.
+        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href="">Ďalšie informácie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Pretože Globálna kontrola súkromia (GPC) je novým štandardom, väčšina webových stránok ho ešte nerozpozná, ale usilovne pracujeme na tom, aby sa stal celosvetovo akceptovaným.</b> Od webových stránok sa však vyžaduje, aby konali na základe signálu iba v rozsahu, v akom ich k tomu prinútia príslušné zákony.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Zistiť viac</u></string>
     <string name="disabled">Zakázané</string>
     <string name="enabled">Povolené</string>
 </resources>
