@@ -22,13 +22,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.goAsync
-import kotlinx.coroutines.delay
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
-    private val appCategoryDetector: AppCategoryDetector
+    private val appCategoryDetector: AppCategoryDetector,
+    private val appTrackerRepository: AppTrackerRepository
 ) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
@@ -38,27 +39,15 @@ class NewAppBroadcastReceiver @Inject constructor(
 
     private fun restartVpn(packageName: String) {
         Timber.d("Newly installed package $packageName")
-        if (appCategoryDetector.getAppCategory(packageName) !is AppCategory.Game) {
-            Timber.i("Newly installed package $packageName is not a game")
-            return
-        }
 
-        val pendingResult = goAsync()
-        goAsync(pendingResult) {
-            if (TrackerBlockingVpnService.isServiceRunning(applicationContext)) {
-                TrackerBlockingVpnService.stopIntent(applicationContext).run {
-                    applicationContext.startService(this)
-                }
-                // notifications have a hard time if we do enable/disable cycle back to back
-                delay(100)
-                TrackerBlockingVpnService.startIntent(applicationContext).run {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        applicationContext.startForegroundService(this)
-                    } else {
-                        applicationContext.startService(this)
-                    }
-                }
+        if (isGame(packageName) || isInExclusionList(packageName)) {
+            Timber.i("Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
+            val pendingResult = goAsync()
+            goAsync(pendingResult) {
+                TrackerBlockingVpnService.restartVpnService(applicationContext)
             }
+        } else {
+            Timber.i("Newly installed package $packageName not in exclusion list")
         }
     }
 
@@ -69,5 +58,13 @@ class NewAppBroadcastReceiver @Inject constructor(
         }.run {
             applicationContext.registerReceiver(this@NewAppBroadcastReceiver, this)
         }
+    }
+
+    private fun isGame(packageName: String): Boolean {
+        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game
+    }
+
+    private fun isInExclusionList(packageName: String): Boolean {
+        return appTrackerRepository.getAppExclusionList().contains(packageName)
     }
 }

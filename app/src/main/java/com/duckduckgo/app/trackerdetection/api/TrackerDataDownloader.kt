@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.app.global.filterBlankItems
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
@@ -26,7 +27,6 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
-import okhttp3.Headers
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -106,8 +106,4 @@ class TrackerDataDownloader @Inject constructor(
             return@fromAction
         }
     }
-}
-
-fun Headers.extractETag(): String {
-    return this["eTag"]?.removePrefix("W/")?.removeSurrounding("\"", "\"").orEmpty() // removes weak eTag validator
 }

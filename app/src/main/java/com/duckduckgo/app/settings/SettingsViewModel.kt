@@ -137,8 +137,12 @@ class SettingsViewModel(
             globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
             emailSetting = getEmailSetting(),
             deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-            excludedAppsInfo = getExcludedAppsInfo()
+            excludedAppsInfo = ""
         )
+        viewModelScope.launch(Dispatchers.IO) {
+            val excludedApps = getExcludedAppsInfo()
+            viewState.postValue(currentViewState().copy(excludedAppsInfo = excludedApps))
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -161,7 +165,7 @@ class SettingsViewModel(
         deviceShieldStatePollingJob?.cancel()
     }
 
-    private fun getExcludedAppsInfo(): String {
+    suspend fun getExcludedAppsInfo(): String {
         val apps = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }
         return when (apps.size) {
             0 -> "None"

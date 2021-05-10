@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.blocklist
+package com.duckduckgo.app.global.extensions
 
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppTrackerExclusionList
-import retrofit2.Call
-import retrofit2.http.GET
+import okhttp3.Headers
 
-interface AppTrackerListService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/blocklist.json")
-    fun appTrackerBlocklist(): Call<JsonAppBlockingList>
-
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTB/1.0/apps-unprotected-temporary.json")
-    fun appTrackerExclusionList(): Call<JsonAppTrackerExclusionList>
+fun Headers.extractETag(): String {
+    return this["eTag"]?.removePrefix("W/")?.removeSurrounding("\"", "\"").orEmpty()
 }

@@ -22,9 +22,7 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
-import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.threeten.bp.OffsetDateTime
@@ -34,7 +32,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 5,
+    exportSchema = true, version = 6,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -45,7 +43,9 @@ import java.util.concurrent.Executors
         VpnPhoenixEntity::class,
         VpnNotification::class,
         AppTracker::class,
-        AppTrackerMetadata::class
+        AppTrackerMetadata::class,
+        AppTrackerExcludedPackage::class,
+        AppTrackerExclusionListMetadata::class
     ]
 )
 
@@ -82,6 +82,7 @@ abstract class VpnDatabase : RoomDatabase() {
                         ioThread {
                             prepopulateUUID(context)
                             prepopulateAppTrackerBlockingList(context, getInstance(context))
+                            prepopulateAppTrackerExclusionList(context, getInstance(context))
                         }
                     }
 
@@ -89,6 +90,7 @@ abstract class VpnDatabase : RoomDatabase() {
                         ioThread {
                             prepopulateUUID(context)
                             prepopulateAppTrackerBlockingList(context, getInstance(context))
+                            prepopulateAppTrackerExclusionList(context, getInstance(context))
                         }
                     }
                 })
@@ -111,6 +113,16 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
+        @VisibleForTesting
+        internal fun prepopulateAppTrackerExclusionList(context: Context, vpnDatabase: VpnDatabase) {
+            context.resources.openRawResource(R.raw.app_tracker_app_exclusion_list).bufferedReader()
+                .use { it.readText() }
+                .also {
+                    val excludedAppPackages = parseAppTrackerExclusionList(it)
+                    vpnDatabase.vpnAppTrackerBlockingDao().insertExclusionList(excludedAppPackages)
+                }
+        }
+
         private fun getFullAppTrackerBlockingList(json: String): List<AppTracker> {
             val moshi = Moshi.Builder().build()
             val adapter : JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
@@ -125,6 +137,14 @@ abstract class VpnDatabase : RoomDatabase() {
                         isCdn = it.value.isCdn
                     )
                 }.map { it.value }
+        }
+
+        private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)
+            return adapter.fromJson(json)?.rules.orEmpty().map {
+                AppTrackerExcludedPackage(it)
+            }
         }
 
     }

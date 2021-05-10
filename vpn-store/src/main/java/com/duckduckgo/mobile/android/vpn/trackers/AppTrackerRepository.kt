@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.trackers
 
 import android.content.Context
+import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.store.R
 import com.squareup.moshi.JsonAdapter
@@ -26,6 +27,9 @@ interface AppTrackerRepository {
     fun matchTrackerInLegacyList(hostname: String) : AppTracker?
 
     fun matchTrackerInFullList(hostname: String): AppTracker?
+
+    @WorkerThread
+    fun getAppExclusionList(): List<String>
 }
 
 class RealAppTrackerRepository(
@@ -41,6 +45,10 @@ class RealAppTrackerRepository(
 
     override fun matchTrackerInFullList(hostname: String): AppTracker? {
         return vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname)
+    }
+
+    override fun getAppExclusionList(): List<String> {
+        return vpnAppTrackerBlockingDao.getAppExclusionList().map { it.packageId }
     }
 
     private fun loadAppTrackers(json: String): List<AppTracker> {

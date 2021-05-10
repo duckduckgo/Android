@@ -22,12 +22,16 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.device_shield.ui.DeviceShieldExcludedAppView
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import kotlinx.android.synthetic.main.activity_device_shield_exclusion_list.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DeviceShieldExclusionListActivity : DuckDuckGoActivity() {
@@ -39,19 +43,21 @@ class DeviceShieldExclusionListActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_shield_exclusion_list)
         setupToolbar(toolbar)
-        setupExclusionList()
+        lifecycleScope.launch {
+            setupExclusionList().forEach { appView -> deviceShieldExclusionAppListContainer.addView(appView) }
+        }
     }
 
     private fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
-        return kotlin.runCatching {
+        return runCatching {
             getApplicationIcon(packageName)
         }.getOrNull()
     }
 
-    private fun setupExclusionList() {
-        deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }.asSequence()
+    private suspend fun setupExclusionList(): Sequence<DeviceShieldExcludedAppView> = withContext(Dispatchers.IO) {
+        return@withContext deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }.asSequence()
             .map {
-                DeviceShieldExcludedAppView(this).apply {
+                DeviceShieldExcludedAppView(this@DeviceShieldExclusionListActivity).apply {
                     appName = "${it.name}"
                     appType = it.type
                     appIcon = packageManager.safeGetApplicationIcon(it.packageName)
@@ -67,7 +73,7 @@ class DeviceShieldExclusionListActivity : DuckDuckGoActivity() {
                         }
                     }
                 }
-            }.forEach { appView -> deviceShieldExclusionAppListContainer.addView(appView) }
+            }
     }
 
     companion object {

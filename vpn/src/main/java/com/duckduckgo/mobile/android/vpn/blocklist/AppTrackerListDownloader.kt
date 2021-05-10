@@ -17,15 +17,24 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.squareup.anvil.annotations.ContributesBinding
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
     val blocklist: List<AppTracker> = listOf()
+)
+
+data class AppTrackerExclusionList(
+    val etag: ETag = ETag.InvalidETag,
+    val excludedPackages: List<AppTrackerExcludedPackage> = listOf()
 )
 
 sealed class ETag {
@@ -36,6 +45,9 @@ sealed class ETag {
 interface AppTrackerListDownloader {
     @WorkerThread
     fun downloadAppTrackerBlocklist(): AppTrackerBlocklist
+
+    @WorkerThread
+    fun downloadAppTrackerExclusionList(): AppTrackerExclusionList
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -44,14 +56,16 @@ class RealAppTrackerListDownloader @Inject constructor(
 ) : AppTrackerListDownloader {
     override fun downloadAppTrackerBlocklist(): AppTrackerBlocklist {
         Timber.d("Downloading the app tracker blocklist...")
-        val response = appTrackerListService.appTrackerBlocklist().execute()
+        val response = runCatching {
+            appTrackerListService.appTrackerBlocklist().execute()
+        }.getOrDefault(Response.error(400, "".toResponseBody(null)))
 
         if (!response.isSuccessful) {
             Timber.e("Fail to download the app tracker blocklist, error code: ${response.code()}")
             return AppTrackerBlocklist()
         }
 
-        val eTag = response.headers()["eTag"]?.removeSurrounding("W/\"", "\"").orEmpty() // removes weak eTag validator
+        val eTag = response.headers().extractETag()
         val blocklist = response.body()?.trackers.orEmpty()
             .filter { !it.value.isCdn }
             .mapValues {
@@ -67,5 +81,25 @@ class RealAppTrackerListDownloader @Inject constructor(
         Timber.d("Received the app tracker blocklist, size: ${blocklist.size}")
 
         return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist)
+    }
+
+    override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {
+        Timber.d("Downloading the app tracker exclusion list...")
+        val response = runCatching {
+            appTrackerListService.appTrackerExclusionList().execute()
+        }.getOrDefault(Response.error(400, "".toResponseBody(null)))
+
+        if (!response.isSuccessful) {
+            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
+            return AppTrackerExclusionList()
+        }
+
+        val eTag = response.headers().extractETag()
+        val exclusionList = response.body()?.rules.orEmpty()
+            .map { AppTrackerExcludedPackage(it) }
+
+        Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
+
+        return AppTrackerExclusionList(etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
     }
 }

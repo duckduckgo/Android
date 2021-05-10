@@ -18,6 +18,8 @@ package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 
 @Dao
@@ -43,5 +45,27 @@ interface VpnAppTrackerBlockingDao {
         setTrackerBlocklistMetadata(metadata)
         deleteTrackerBlockList()
         insertTrackerBlocklist(blocklist)
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertExclusionList(exclusionList: List<AppTrackerExcludedPackage>)
+
+    @Query("SELECT * from vpn_app_tracker_exclusion_list")
+    fun getAppExclusionList(): List<AppTrackerExcludedPackage>
+
+    @Insert
+    fun setExclusionListMetadata(appTrackerExclusionListMetadata: AppTrackerExclusionListMetadata)
+
+    @Query("SELECT * from vpn_app_tracker_exclusion_list_metadata ORDER BY id DESC LIMIT 1")
+    fun getExclusionListMetadata() : AppTrackerExclusionListMetadata?
+
+    @Query("DELETE from vpn_app_tracker_exclusion_list")
+    fun deleteExclusionList()
+
+    @Transaction
+    fun updateExclusionList(exclusionList: List<AppTrackerExcludedPackage>, metadata: AppTrackerExclusionListMetadata) {
+        setExclusionListMetadata(metadata)
+        deleteExclusionList()
+        insertExclusionList(exclusionList)
     }
 }

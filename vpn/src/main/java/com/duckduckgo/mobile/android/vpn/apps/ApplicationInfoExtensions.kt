@@ -41,10 +41,6 @@ fun ApplicationInfo.parseAppCategory(): AppCategory {
     }
 }
 
-fun ApplicationInfo.shouldBeInExclusionList(): Boolean {
-    return VpnExclusionList.isDdgApp(packageName) || VpnExclusionList.EXCLUDED_APPS.contains(packageName) || isGame()
-}
-
 fun ApplicationInfo.getAppCategoryCompat(): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         category

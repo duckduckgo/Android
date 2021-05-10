@@ -37,6 +37,8 @@ dependencies {
 
     implementation JakeWharton.timber
 
+    implementation Square.okHttp3.okHttp
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2

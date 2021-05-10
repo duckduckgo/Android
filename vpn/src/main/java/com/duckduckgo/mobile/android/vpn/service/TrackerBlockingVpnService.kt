@@ -175,7 +175,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
-                startVpn()
+                launch { startVpn() }
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
@@ -187,7 +187,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         return returnCode
     }
 
-    private fun startVpn() {
+    private suspend fun startVpn() = withContext(Dispatchers.IO) {
         Timber.i("VPN log: Starting VPN")
         notifyVpnStart()
 
@@ -254,7 +254,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     }
 
-    private fun establishVpnInterface() {
+    private suspend fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
 
@@ -455,6 +455,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 }
             }
             return false
+        }
+
+        suspend fun restartVpnService(context: Context) {
+            val applicationContext = context.applicationContext
+            if (isServiceRunning(applicationContext)) {
+                stopIntent(applicationContext).run {
+                    applicationContext.startService(this)
+                }
+                // notifications have a hard time if we do enable/disable cycle back to back
+                delay(100)
+                startIntent(applicationContext).run {
+                    if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        applicationContext.startForegroundService(this)
+                    } else {
+                        applicationContext.startService(this)
+                    }
+                }
+            }
         }
 
         private const val ACTION_START_VPN = "ACTION_START_VPN"

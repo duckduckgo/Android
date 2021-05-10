@@ -18,15 +18,20 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface DeviceShieldExcludedApps {
     /** @return the list of installed apps currently excluded */
-    fun getExclusionAppList(): List<VpnExcludedInstalledAppInfo>
+    suspend fun getExclusionAppList(): List<VpnExcludedInstalledAppInfo>
 
     /** Remove the app to the exclusion list so that its traffic does not go through the VPN */
     fun removeFromExclusionList(packageName: String)
@@ -36,18 +41,23 @@ interface DeviceShieldExcludedApps {
 }
 
 @ContributesBinding(AppObjectGraph::class)
+@Singleton
 class RealDeviceShieldExcludedApps @Inject constructor(
     private val context: Context,
-    private val packageManager: PackageManager
+    private val packageManager: PackageManager,
+    private val appTrackerRepository: AppTrackerRepository,
+    private val dispatcherProvider: DispatcherProvider
 ) : DeviceShieldExcludedApps {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences("com.duckduckgo.mobile.android.vpn.exclusions", Context.MODE_MULTI_PROCESS)
 
-    override fun getExclusionAppList(): List<VpnExcludedInstalledAppInfo> {
-        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+    override suspend fun getExclusionAppList(): List<VpnExcludedInstalledAppInfo> = withContext(dispatcherProvider.io()) {
+        val exclusionList = appTrackerRepository.getAppExclusionList()
+
+        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
-            .filter { it.shouldBeInExclusionList() }
+            .filter { shouldBeInExclusionList(it, exclusionList) }
             .map {
                 VpnExcludedInstalledAppInfo(
                     packageName = it.packageName,
@@ -60,6 +70,12 @@ class RealDeviceShieldExcludedApps @Inject constructor(
             }
             .sortedBy { it.name }
             .toList()
+    }
+
+    private fun shouldBeInExclusionList(appInfo: ApplicationInfo, exclusionList: List<String>): Boolean {
+        return VpnExclusionList.isDdgApp(appInfo.packageName) ||
+            exclusionList.contains(appInfo.packageName) ||
+            appInfo.isGame()
     }
 
     override fun removeFromExclusionList(packageName: String) {
