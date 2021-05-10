@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -30,7 +31,7 @@ import java.nio.ByteBuffer
 
 interface VpnTrackerDetector {
 
-    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType
+    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean, originatingApp: AppNameResolver.OriginatingApp): RequestTrackerType
 }
 
 class DomainBasedTrackerDetector(
@@ -40,7 +41,7 @@ class DomainBasedTrackerDetector(
     private val vpnDatabase: VpnDatabase
 ) : VpnTrackerDetector {
 
-    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
+    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean, originatingApp: AppNameResolver.OriginatingApp): RequestTrackerType {
         if (isLocalAddress) {
             Timber.v("%s is a local address; not looking for trackers", packet.ip4Header.destinationAddress)
             tcb.trackerTypeDetermined = true
@@ -56,19 +57,30 @@ class DomainBasedTrackerDetector(
 
         tcb.trackerTypeDetermined = true
 
-        trackerListProvider.findTracker(hostname)?.let { tracker ->
-            tcb.isTracker = true
-            tcb.trackerHostName = tracker.hostname
-            Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
-            insertTracker(tracker)
-            deviceShieldPixels.trackerBlocked()
-            return Tracker(tracker.hostname)
+        trackerListProvider.findTracker(hostname)?.let { appTracker ->
+            val trackerModel = Tracker(appTracker.hostname)
+            if (isTrackerInExceptionRules(trackerModel, originatingApp)) {
+                Timber.d("Tracker ${appTracker.hostname} is excluded in App $originatingApp")
+            } else {
+                tcb.isTracker = true
+                tcb.trackerHostName = appTracker.hostname
+                Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
+                insertTracker(appTracker)
+                deviceShieldPixels.trackerBlocked()
+                return Tracker(appTracker.hostname)
+            }
         }
 
         tcb.isTracker = false
         Timber.v("Determined %s is not a tracker %s", hostname, tcb.ipAndPort)
 
         return RequestTrackerType.NotTracker(hostname)
+    }
+
+    private fun isTrackerInExceptionRules(tracker: Tracker, originatingApp: AppNameResolver.OriginatingApp): Boolean {
+        val exceptionRule = vpnDatabase.vpnAppTrackerBlockingDao().getRuleByTrackerDomain(tracker.hostName)
+
+        return exceptionRule != null && exceptionRule.packageNames.contains(originatingApp.packageId)
     }
 
     private fun insertTracker(tracker: AppTracker) {

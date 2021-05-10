@@ -17,10 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
-import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.*
 
 @Dao
 interface VpnAppTrackerBlockingDao {
@@ -67,5 +64,28 @@ interface VpnAppTrackerBlockingDao {
         setExclusionListMetadata(metadata)
         deleteExclusionList()
         insertExclusionList(exclusionList)
+    }
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTrackerExceptionRules(trackerExceptionRules: List<AppTrackerExceptionRule>)
+
+    @Query("SELECT * from vpn_app_tracker_exception_rules WHERE rule = :domain LIMIT 1")
+    fun getRuleByTrackerDomain(domain: String): AppTrackerExceptionRule?
+
+    @Insert
+    fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
+
+    @Query("SELECT * from vpn_app_tracker_exception_rules_metadata ORDER BY id DESC LIMIT 1")
+    fun getTrackerExceptionRulesMetadata() : AppTrackerExceptionRuleMetadata?
+
+    @Query("DELETE from vpn_app_tracker_exception_rules")
+    fun deleteTrackerExceptionRules()
+
+    @Transaction
+    fun updateTrackerExceptionRules(exceptionRules: List<AppTrackerExceptionRule>, metadata: AppTrackerExceptionRuleMetadata) {
+        setTrackerExceptionRulesMetadata(metadata)
+        deleteTrackerExceptionRules()
+        insertTrackerExceptionRules(exceptionRules)
     }
 }

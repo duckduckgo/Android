@@ -288,8 +288,8 @@ class TcpDeviceToNetwork(
             }
 
             val isLocalAddress = determineIfLocalIpAddress(packet)
-            val requestType = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress)
             val requestingApp = determineRequestingApp(tcb, packet)
+            val requestType = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress, requestingApp)
             Timber.i("App $requestingApp attempting to send $payloadSize bytes to ${tcb.ipAndPort}. $requestType")
 
             if (requestType is RequestTrackerType.Tracker) {
@@ -331,14 +331,14 @@ class TcpDeviceToNetwork(
         queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 
-    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
+    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean, requestingApp: OriginatingApp): RequestTrackerType {
         if (tcb.trackerTypeDetermined) {
             return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
                 tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
             )
         }
 
-        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress)
+        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress, requestingApp)
     }
 
     private fun determineIfLocalIpAddress(packet: Packet): Boolean {

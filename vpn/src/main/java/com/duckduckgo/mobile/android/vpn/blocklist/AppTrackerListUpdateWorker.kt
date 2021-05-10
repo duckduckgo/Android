@@ -24,6 +24,7 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.Dispatchers
@@ -38,27 +39,69 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            Timber.d("Updating the app tracker bloclist")
-            val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
-            when (blocklist.etag) {
-                is ETag.ValidETag -> {
-                    val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag
-                    val updatedEtag = blocklist.etag.value
+            val updateBlocklistResult = updateTrackerBlocklist()
+            val updateRulesResult = updateTrackerExceptionRules()
 
-                    if (updatedEtag == currentEtag) {
-                        Timber.v("Downloaded blocklist has same eTag, noop")
-                        return@withContext Result.success()
-                    }
+            val success = Result.success()
+            if (updateBlocklistResult != success || updateRulesResult != success) {
+                Timber.w("One of the app tracker list updates failed, scheduling a retry")
+                return@withContext Result.retry()
+            }
 
-                    Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                    vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, AppTrackerMetadata(eTag = blocklist.etag.value))
+            Timber.w("Tracker list updates success")
+            return@withContext success
+        }
+    }
 
-                    return@withContext Result.success()
+    private fun updateTrackerBlocklist(): Result {
+        Timber.d("Updating the app tracker bloclist")
+        val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
+        when (blocklist.etag) {
+            is ETag.ValidETag -> {
+                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag
+                val updatedEtag = blocklist.etag.value
+
+                if (updatedEtag == currentEtag) {
+                    Timber.v("Downloaded blocklist has same eTag, noop")
+                    return Result.success()
                 }
-                else -> {
-                    Timber.w("Received app tracker blocklist with invalid eTag")
-                    return@withContext Result.retry()
+
+                Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
+                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, AppTrackerMetadata(eTag = blocklist.etag.value))
+
+                return Result.success()
+            }
+            else -> {
+                Timber.w("Received app tracker blocklist with invalid eTag")
+                return Result.retry()
+            }
+        }
+    }
+
+    private fun updateTrackerExceptionRules(): Result {
+        Timber.d("Updating the app tracker exception rules")
+        val exceptionRules = appTrackerListDownloader.downloadAppTrackerExceptionRules()
+        when (exceptionRules.etag) {
+            is ETag.ValidETag -> {
+                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag
+                val updatedEtag = exceptionRules.etag.value
+
+                if (updatedEtag == currentEtag) {
+                    Timber.v("Downloaded exception rules has same eTag, noop")
+                    return Result.success()
                 }
+
+                Timber.d("Updating the app tracker rules, eTag: ${exceptionRules.etag.value}")
+                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerExceptionRules(
+                    exceptionRules.trackerExceptionRules,
+                    AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value)
+                )
+
+                return Result.success()
+            }
+            else -> {
+                Timber.w("Received app tracker exception rules with invalid eTag")
+                return Result.retry()
             }
         }
     }

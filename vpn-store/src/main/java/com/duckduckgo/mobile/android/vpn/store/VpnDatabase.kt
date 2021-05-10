@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
@@ -32,7 +33,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 6,
+    exportSchema = true, version = 7,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -45,7 +46,9 @@ import java.util.concurrent.Executors
         AppTracker::class,
         AppTrackerMetadata::class,
         AppTrackerExcludedPackage::class,
-        AppTrackerExclusionListMetadata::class
+        AppTrackerExclusionListMetadata::class,
+        AppTrackerExceptionRule::class,
+        AppTrackerExceptionRuleMetadata::class
     ]
 )
 
@@ -153,6 +156,8 @@ abstract class VpnDatabase : RoomDatabase() {
 object VpnTypeConverters {
 
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+    private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
     @TypeConverter
     @JvmStatic
@@ -166,6 +171,18 @@ object VpnTypeConverters {
     @JvmStatic
     fun fromOffsetDateTime(date: OffsetDateTime?): String? {
         return date?.format(formatter)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toStringList(value: String): List<String> {
+        return stringListAdapter.fromJson(value)!!
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromStringList(value: List<String>): String {
+        return stringListAdapter.toJson(value)
     }
 }
 

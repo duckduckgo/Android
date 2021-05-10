@@ -48,6 +48,19 @@ data class AppTrackerExclusionListMetadata(
     val eTag: String?
 )
 
+@Entity(tableName = "vpn_app_tracker_exception_rules")
+data class AppTrackerExceptionRule(
+    @PrimaryKey
+    val rule: String,
+    val packageNames: List<String>
+)
+
+
+@Entity(tableName = "vpn_app_tracker_exception_rules_metadata")
+data class AppTrackerExceptionRuleMetadata(
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    val eTag: String?
+)
 
 data class JsonAppBlockingList(
     val trackers: Map<String, JsonAppTracker>
@@ -73,4 +86,9 @@ data class TrackerApp(
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
     val rules: List<String>
+)
+
+/** JSON Model that represents the app tracker rule list */
+data class JsonAppTrackerExceptionRules(
+    val rules: List<AppTrackerExceptionRule>
 )
