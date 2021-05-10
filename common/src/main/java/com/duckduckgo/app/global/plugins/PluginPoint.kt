@@ -23,5 +23,5 @@ interface PluginPoint<T> {
     /**
      * @return the list of plugins of type <T>
      */
-    fun getPlugins(): List<T>
+    fun getPlugins(): Collection<T>
 }

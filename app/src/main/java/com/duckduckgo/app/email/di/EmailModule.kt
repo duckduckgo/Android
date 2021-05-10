@@ -27,6 +27,7 @@ import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
@@ -47,7 +48,7 @@ class EmailModule {
     }
 
     @Provides
-    fun providesEmailDataStore(context: Context): EmailDataStore {
-        return EmailEncryptedSharedPreferences(context)
+    fun providesEmailDataStore(context: Context, pixel: Pixel): EmailDataStore {
+        return EmailEncryptedSharedPreferences(context, pixel)
     }
 }
