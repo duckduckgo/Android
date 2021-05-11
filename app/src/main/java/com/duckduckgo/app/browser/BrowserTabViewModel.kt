@@ -316,6 +316,7 @@ class BrowserTabViewModel(
             class ShowDownloadFinishedNotification(val file: File, val mimeType: String?) : DownloadCommand()
             object ShowDownloadInProgressNotification : DownloadCommand()
         }
+        class EditWithSelectedQuery(val query: String) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -1516,8 +1517,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        omnibarViewState.value = currentOmnibarViewState().copy(isEditing = false, omnibarText = query, shouldMoveCaretToEnd = true)
-        autoCompleteViewState.value = AutoCompleteViewState(showSuggestions = false)
+        command.value = EditWithSelectedQuery(query)
     }
 
     fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu) {

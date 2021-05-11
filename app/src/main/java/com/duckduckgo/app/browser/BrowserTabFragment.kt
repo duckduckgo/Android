@@ -655,6 +655,10 @@ class BrowserTabFragment :
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
             is Command.InjectEmailAddress -> injectEmailAddress(it.address)
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
+            is Command.EditWithSelectedQuery -> {
+                omnibarTextInput.setText(it.query)
+                omnibarTextInput.setSelection(it.query.length)
+            }
         }
     }
 
