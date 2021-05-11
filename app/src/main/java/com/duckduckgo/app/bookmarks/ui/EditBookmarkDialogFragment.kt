@@ -26,7 +26,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
-import org.jetbrains.anko.find
 
 class EditBookmarkDialogFragment : DialogFragment() {
 
@@ -39,8 +38,8 @@ class EditBookmarkDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val rootView = View.inflate(activity, R.layout.edit_bookmark, null)
-        val titleInput = rootView.find<EditText>(R.id.titleInput)
-        val urlInput = rootView.find<EditText>(R.id.urlInput)
+        val titleInput = rootView.findViewById<EditText>(R.id.titleInput)
+        val urlInput = rootView.findViewById<EditText>(R.id.urlInput)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
