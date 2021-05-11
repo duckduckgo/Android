@@ -168,7 +168,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     }
 
     private fun loadTrackerData() {
-        GlobalScope.launch {
+        applicationCoroutineScope.launch {
             trackerDataLoader.loadData()
             resourceSurrogateLoader.loadData()
         }
