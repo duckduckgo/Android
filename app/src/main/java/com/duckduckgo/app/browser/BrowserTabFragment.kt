@@ -26,7 +26,10 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -56,9 +59,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -93,8 +94,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
+import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
@@ -117,20 +118,13 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
@@ -248,8 +242,10 @@ class BrowserTabFragment :
     private lateinit var decorator: BrowserTabFragmentDecorator
 
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
+    private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
 
-    private lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
+    private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -336,7 +332,8 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureQuickAccessGrid()
+        configureOmnibarQuickAccessGrid()
+        configureHomeTabQuickAccessGrid()
 
         decorator.decorateWithFeatures()
 
@@ -944,13 +941,47 @@ class BrowserTabFragment :
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureQuickAccessGrid() {
-        configureQuickAccessGridLayout()
-        quickAccessAdapter = FavoritesQuickAccessAdapter(
-            this, faviconManager,
-            { viewHolder ->
-                itemTouchHelper.startDrag(viewHolder)
-            },
+    private fun configureOmnibarQuickAccessGrid() {
+        configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
+        omnibarQuickAccessAdapter = createQuickAccessAdapter { viewHolder ->
+            quickAccessSuggestionsRecyclerView.enableAnimation()
+            omnibarQuickAccessItemTouchHelper.startDrag(viewHolder)
+        }
+        omnibarQuickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessSuggestionsRecyclerView, omnibarQuickAccessAdapter)
+        quickAccessSuggestionsRecyclerView.adapter = omnibarQuickAccessAdapter
+        quickAccessSuggestionsRecyclerView.disableAnimation()
+    }
+
+    private fun configureHomeTabQuickAccessGrid() {
+        configureQuickAccessGridLayout(quickAccessRecyclerView)
+        quickAccessAdapter = createQuickAccessAdapter { viewHolder ->
+            quickAccessRecyclerView.enableAnimation()
+            quickAccessItemTouchHelper.startDrag(viewHolder)
+        }
+        quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
+        quickAccessRecyclerView.adapter = quickAccessAdapter
+        quickAccessRecyclerView.disableAnimation()
+    }
+
+    private fun createQuickAccessItemHolder(recyclerView: RecyclerView, apapter: FavoritesQuickAccessAdapter): ItemTouchHelper {
+        return ItemTouchHelper(
+            QuickAccessDragTouchItemListener(
+                apapter,
+                object : QuickAccessDragTouchItemListener.DragDropListener {
+                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+                        viewModel.onQuickAccessListChanged(listElements)
+                        recyclerView.disableAnimation()
+                    }
+                }
+            )
+        ).also {
+            it.attachToRecyclerView(recyclerView)
+        }
+    }
+
+    private fun createQuickAccessAdapter(onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
+        return FavoritesQuickAccessAdapter(
+            this, faviconManager, onMoveListener,
             {
                 viewModel.onQuickAccesItemClicked(it.favorite)
             },
@@ -961,27 +992,14 @@ class BrowserTabFragment :
                 viewModel.onDeleteQuickAccessItemRequested(it.favorite)
             }
         )
-        itemTouchHelper = ItemTouchHelper(
-            QuickAccessDragTouchItemListener(
-                quickAccessAdapter,
-                object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-                        viewModel.onQuickAccessListChanged(listElements)
-                    }
-                }
-            )
-        )
-
-        itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
-        quickAccessRecyclerView.adapter = quickAccessAdapter
     }
 
-    private fun configureQuickAccessGridLayout() {
+    private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
-        quickAccessRecyclerView.layoutManager = layoutManager
+        recyclerView.layoutManager = layoutManager
         val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
-        quickAccessRecyclerView.setPadding(sidePadding, 8.toPx(), sidePadding, 8.toPx())
+        recyclerView.setPadding(sidePadding, 8.toPx(), sidePadding, 8.toPx())
     }
 
     private fun configurePrivacyGrade() {
@@ -1322,7 +1340,8 @@ class BrowserTabFragment :
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
-        configureQuickAccessGridLayout()
+        configureQuickAccessGridLayout(quickAccessRecyclerView)
+        configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
     }
 
     fun onBackPressed(): Boolean {
@@ -1773,10 +1792,18 @@ class BrowserTabFragment :
                 lastSeenAutoCompleteViewState = viewState
 
                 if (viewState.showSuggestions) {
-                    autoCompleteSuggestionsList.show()
-                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                    if (viewState.searchResults.suggestions.isNotEmpty()) {
+                        autoCompleteSuggestionsList.show()
+                        quickAccessSuggestionsRecyclerView.gone()
+                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                    } else if (viewState.favorites.isNotEmpty()) {
+                        autoCompleteSuggestionsList.gone()
+                        quickAccessSuggestionsRecyclerView.show()
+                        omnibarQuickAccessAdapter.submitList(viewState.favorites)
+                    }
                 } else {
                     autoCompleteSuggestionsList.gone()
+                    quickAccessSuggestionsRecyclerView.gone()
                 }
             }
         }

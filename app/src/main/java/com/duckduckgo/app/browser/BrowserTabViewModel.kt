@@ -245,7 +245,8 @@ class BrowserTabViewModel(
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
+        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
     data class LocationPermission(val origin: String, val callback: GeolocationPermissions.Callback)
@@ -430,7 +431,9 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             favoritesRepository.favorites().collect { favorite ->
                 Timber.i("BrowserTab favs: collect $favorite")
-                ctaViewState.value = currentCtaViewState().copy(favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                val favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
+                ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
+                autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
             }
         }
     }
@@ -589,7 +592,7 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
-        autoCompleteViewState.value = AutoCompleteViewState(false)
+        autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
@@ -1297,15 +1300,20 @@ class BrowserTabViewModel(
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
         // determine if empty list to be shown, or existing search results
-        val autoCompleteSearchResults = if (query.isBlank()) {
+        val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
         } else {
             currentAutoCompleteViewState().searchResults
         }
 
+        val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
+
         val currentOmnibarViewState = currentOmnibarViewState()
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
-        val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
+        var showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
+        if (!showAutoCompleteSuggestions) {
+            showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && !hasQueryChanged && favoritesAvailable && autoCompleteSuggestionsEnabled
+        }
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
         val showPrivacyGrade = !hasFocus
@@ -1335,7 +1343,7 @@ class BrowserTabViewModel(
 
         Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
-        autoCompleteViewState.value = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
+        autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = showAutoCompleteSuggestions, searchResults = autoCompleteSearchResults)
 
         if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())

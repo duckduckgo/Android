@@ -48,6 +48,18 @@
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/quickAccessSuggestionsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?toolbarBgColor"
+        android:backgroundTint="?toolbarBgColor"
+        android:clipToPadding="false"
+        android:elevation="4dp"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="visible" />
+
     <include layout="@layout/include_new_browser_tab"
         android:visibility="gone"/>
 
