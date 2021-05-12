@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.favorites
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -26,12 +27,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.BookmarksPopupMenu
 import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
+import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_POSITION
+import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
+import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_quick_access_menu.view.*
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
@@ -89,38 +92,63 @@ class FavoritesQuickAccessAdapter(
             duration = 150L
         }
 
-        @SuppressLint("ClickableViewAccessibility")
         fun bind(item: QuickAccessFavorite) {
             with(item.favorite) {
                 itemView.quickAccessTitle.text = title
                 loadFavicon(url)
-
-                itemView.quickAccessFaviconCard.setOnLongClickListener {
-                    itemState = ItemState.LongPress
-                    scaleUpFavicon()
-                    showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
-                    false
-                }
-
-                itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
-                    when (event.actionMasked) {
-                        MotionEvent.ACTION_MOVE -> {
-                            Timber.i("QuickAccessFav: move!")
-                            if (itemState != ItemState.LongPress) return@setOnTouchListener false
-
-                            Timber.i("QuickAccessFav: onMoveListener")
-                            onMoveListener(this@QuickAccessViewHolder)
-                        }
-                        MotionEvent.ACTION_UP -> {
-                            Timber.i("QuickAccessFav: up!")
-                            onItemReleased()
-                        }
-                    }
-                    false
-                }
-
-                itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
+                configureClickListeners(item)
+                configureTouchListener()
             }
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun configureTouchListener() {
+            itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_MOVE -> {
+                        Timber.i("QuickAccessFav: move!")
+                        if (itemState != ItemState.LongPress) return@setOnTouchListener false
+
+                        Timber.i("QuickAccessFav: onMoveListener")
+                        onMoveListener(this@QuickAccessViewHolder)
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        Timber.i("QuickAccessFav: up!")
+                        onItemReleased()
+                    }
+                }
+                false
+            }
+        }
+
+        fun bindFromPayload(item: QuickAccessFavorite, payloads: MutableList<Any>) {
+            for (payload in payloads) {
+                val bundle = payload as Bundle
+
+                for (key: String in bundle.keySet()) {
+                    Timber.v("$key changed - Need an update for $item")
+                }
+
+                bundle[DIFF_KEY_TITLE]?.let {
+                    itemView.quickAccessTitle.text = it as String
+                }
+
+                bundle[DIFF_KEY_URL]?.let {
+                    loadFavicon(it as String)
+                }
+
+                configureClickListeners(item)
+            }
+        }
+
+        private fun configureClickListeners(item: QuickAccessFavorite) {
+            itemView.quickAccessFaviconCard.setOnLongClickListener {
+                itemState = ItemState.LongPress
+                scaleUpFavicon()
+                showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
+                false
+            }
+            itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
         }
 
         private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
@@ -153,7 +181,7 @@ class FavoritesQuickAccessAdapter(
             itemState = ItemState.Stale
         }
 
-        private fun loadFavicon(url: String) {
+        fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.quickAccessFavicon)
             }
@@ -181,6 +209,14 @@ class FavoritesQuickAccessAdapter(
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+            return
+        }
+        holder.bindFromPayload(getItem(position), payloads)
+    }
 }
 
 class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite>() {
@@ -190,7 +226,32 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
 
     override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
         return oldItem.favorite.title == newItem.favorite.title &&
-            oldItem.favorite.url == newItem.favorite.url
+            oldItem.favorite.url == newItem.favorite.url &&
+            oldItem.favorite.position == newItem.favorite.position
+    }
+
+    override fun getChangePayload(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Any? {
+        val diffBundle = Bundle()
+
+        if (oldItem.favorite.title != newItem.favorite.title) {
+            diffBundle.putString(DIFF_KEY_TITLE, newItem.favorite.title)
+        }
+
+        if (oldItem.favorite.url != newItem.favorite.url) {
+            diffBundle.putString(DIFF_KEY_URL, newItem.favorite.url)
+        }
+
+        if (oldItem.favorite.position != newItem.favorite.position) {
+            diffBundle.putInt(DIFF_KEY_POSITION, newItem.favorite.position)
+        }
+
+        return diffBundle
+    }
+
+    companion object {
+        const val DIFF_KEY_TITLE = "title"
+        const val DIFF_KEY_URL = "url"
+        const val DIFF_KEY_POSITION = "position"
     }
 }
 

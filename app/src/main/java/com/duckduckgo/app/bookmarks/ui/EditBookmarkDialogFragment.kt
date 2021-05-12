@@ -67,7 +67,7 @@ class EditBookmarkDialogFragment : DialogFragment() {
             }
             is SavedSite.Favorite -> {
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
+                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString(), position = savedSite.position)
                 )
             }
         }
@@ -86,7 +86,6 @@ class EditBookmarkDialogFragment : DialogFragment() {
     }
 
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
-    private fun getExistingId(): Long = getSavedSite().id
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
 
