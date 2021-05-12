@@ -63,20 +63,22 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
 
     override suspend fun insert(title: String, url: String): SavedSite.Favorite {
-        val lastPosition = favoritesDao.getLastPosition() ?: 0
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
+        val lastPosition = favoritesDao.getLastPosition() ?: 0
         val favoriteEntity = FavoriteEntity(title = titleOrFallback, url = url, position = lastPosition + 1)
         val id = favoritesDao.insert(favoriteEntity)
         return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
     }
 
     override suspend fun insert(favorite: SavedSite.Favorite) {
-        val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = favorite.position)
+        if (favorite.url.isEmpty()) return
+        val favoriteEntity = FavoriteEntity(title = favorite.titleOrFallback(), url = favorite.url, position = favorite.position)
         favoritesDao.insert(favoriteEntity)
     }
 
     override suspend fun update(favorite: SavedSite.Favorite) {
-        favoritesDao.update(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
+        if (favorite.url.isEmpty()) return
+        favoritesDao.update(FavoriteEntity(favorite.id, favorite.titleOrFallback(), favorite.url, favorite.position))
     }
 
     override suspend fun persistChanges(favorites: List<SavedSite.Favorite>) {
@@ -91,5 +93,6 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 
+    private fun SavedSite.Favorite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
     private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> = this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
 }

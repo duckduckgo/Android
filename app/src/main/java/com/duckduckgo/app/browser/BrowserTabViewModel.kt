@@ -1370,14 +1370,15 @@ class BrowserTabViewModel(
         val url = url ?: return
         val title = title ?: ""
 
-        val savedFavorite = withContext(dispatchers.io()) {
+        withContext(dispatchers.io()) {
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
+                favoritesRepository.insert(title = title, url = url)
+            } else null
+        }?.let {
+            withContext(dispatchers.main()) {
+                command.value = ShowFavoriteAddedConfirmation(it)
             }
-            favoritesRepository.insert(title = title, url = url)
-        }
-        withContext(dispatchers.main()) {
-            command.value = ShowFavoriteAddedConfirmation(savedFavorite)
         }
     }
 
