@@ -63,10 +63,10 @@ fun ImageView.loadDefaultFavicon(domain: String) {
 
 private fun generateDefaultDrawable(context: Context, domain: String): Drawable {
     return object : Drawable() {
-        private val baseHost: String = domain.toUri().baseHost ?: throw IllegalArgumentException("domain should be a valid domain")
+        private val baseHost: String = domain.toUri().baseHost ?: ""
 
         private val letter
-            get() = baseHost.firstOrNull().toString().toUpperCase(Locale.getDefault())
+            get() = baseHost.firstOrNull()?.toString()?.toUpperCase(Locale.getDefault()) ?: ""
 
         private val palette = listOf(
             "#94B3AF",
