@@ -22,9 +22,9 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.FirstParty
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.ThirdParty
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -44,7 +44,7 @@ interface VpnTrackerDetector {
 class DomainBasedTrackerDetector(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val hostnameExtractor: HostnameExtractor,
-    private val trackerListProvider: TrackerListProvider,
+    private val appTrackerRepository: AppTrackerRepository,
     private val vpnDatabase: VpnDatabase
 ) : VpnTrackerDetector {
 
@@ -71,9 +71,9 @@ class DomainBasedTrackerDetector(
 
         tcb.trackerTypeDetermined = true
 
-        return when (val trackerType = trackerListProvider.findTracker(hostname, requestingApp.packageId)) {
+        return when (val trackerType = appTrackerRepository.findTracker(hostname, requestingApp.packageId)) {
             is FirstParty -> {
-                Timber.d("Determined %s to be a 1st party tracker for %s, both owned by %s [%s]", hostname, requestingApp.packageId, trackerType.tracker.owner.name, tcb.ipAndPort)
+                Timber.d("Determined $hostname to be a 1st party tracker for ${requestingApp.packageId}, both owned by ${trackerType.tracker.owner.name} [${tcb.ipAndPort}]")
                 tcb.isTracker = false
                 RequestTrackerType.NotTracker(hostname)
             }
@@ -87,7 +87,13 @@ class DomainBasedTrackerDetector(
                 } else {
                     tcb.isTracker = true
                     tcb.trackerHostName = trackerHostname
-                    Timber.i("Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]", hostname, requestingApp.packageId, trackerType.tracker.owner.name, tcb.ipAndPort)
+                    Timber.i(
+                        "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
+                        hostname,
+                        requestingApp.packageId,
+                        trackerType.tracker.owner.name,
+                        tcb.ipAndPort
+                    )
                     insertTracker(trackerType.tracker)
                     deviceShieldPixels.trackerBlocked()
                     RequestTrackerType.Tracker(trackerType.tracker.hostname)

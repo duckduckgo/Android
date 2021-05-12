@@ -130,9 +130,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             it.isChecked = viewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
-        menu.findItem(R.id.useFullBlockList)?.let {
-            it.isChecked = viewModel.getUseFullBlockListPreference()
-        }
         return true
     }
 
@@ -156,11 +153,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             R.id.customDnsServer -> {
                 val enabled = !item.isChecked
                 viewModel.useCustomDnsServer(enabled)
-                true
-            }
-            R.id.useFullBlockList -> {
-                val enabled = !item.isChecked
-                viewModel.useFullBlockList(enabled)
                 true
             }
             else -> super.onOptionsItemSelected(item)

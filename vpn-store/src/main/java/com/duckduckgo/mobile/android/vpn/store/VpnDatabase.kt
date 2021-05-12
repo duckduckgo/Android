@@ -137,6 +137,7 @@ abstract class VpnDatabase : RoomDatabase() {
         private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
             return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
+
         private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)

@@ -18,21 +18,16 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.dao.VpnPreferencesDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.*
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.FirstParty
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.ThirdParty
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import com.squareup.moshi.Moshi
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,13 +44,10 @@ class DomainBasedTrackerDetectorTest {
     private lateinit var testee: DomainBasedTrackerDetector
 
     private val hostnameExtractor: HostnameExtractor = mock()
-    private lateinit var preferencesDao: VpnPreferencesDao
     private lateinit var vpnDatabase: VpnDatabase
-    private lateinit var trackerDao: VpnTrackerDao
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val tcb: TCB = mock()
-    private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
-
+    private val appTrackerRepository: AppTrackerRepository = mock()
     private val defaultOriginatingApp = AppNameResolver.OriginatingApp("foo.id.com", "Foo App")
 
     @Before
@@ -70,17 +62,8 @@ class DomainBasedTrackerDetectorTest {
         vpnDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        trackerDao = vpnDatabase.vpnTrackerDao()
-        preferencesDao = vpnDatabase.vpnPreferencesDao()
 
-        val appTrackerRepository = RealAppTrackerRepository(
-            appContext,
-            Moshi.Builder().build(),
-            vpnAppTrackerBlockingDao
-        )
-        val trackerListProvider = RealTrackerListProvider(preferencesDao, appTrackerRepository).apply { setUseFullTrackerList(false) }
-
-        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, trackerListProvider, vpnDatabase)
+        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
     }
 
     @Test
@@ -98,19 +81,38 @@ class DomainBasedTrackerDetectorTest {
     }
 
     @Test
-    fun whenHostnameInTrackerListExactMatchThenTrackerTypeTracker() {
-        val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
-        type.assertIsTracker(trackerDomain)
+    fun whenTrackerType3rdPartyThenTrackerBlocked() {
+        val trackerDomain = "doubleclick.net".also {
+            givenExtractedHostname(it)
+            whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
+        }
+        testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
+        assertTrue(tcb.isTracker)
+        assertTrue(tcb.trackerTypeDetermined)
+        assertEquals(trackerDomain, tcb.trackerHostName)
         verify(deviceShieldPixels).trackerBlocked()
     }
 
     @Test
-    fun whenHostnameSuffixMatchesThenTrackerTypeTracker() {
-        givenExtractedHostname("foo.bar.doubleclick.net")
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
-        type.assertIsTracker("doubleclick.net")
-        verify(deviceShieldPixels).trackerBlocked()
+    fun whenTrackerType1stPartyThenTrackerNotBlocked() {
+        "doubleclick.net".also {
+            givenExtractedHostname(it)
+            whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aFirstPartyTracker(it))
+        }
+        testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
+        assertFalse(tcb.isTracker)
+        verify(deviceShieldPixels, never()).trackerBlocked()
+    }
+
+    @Test
+    fun whenTrackerTypeNotATrackerThenTrackerNotBlocked() {
+        "doubleclick.net".also {
+            givenExtractedHostname(it)
+            whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(AppTrackerType.NotTracker)
+        }
+        testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
+        assertFalse(tcb.isTracker)
+        verify(deviceShieldPixels, never()).trackerBlocked()
     }
 
     @Test
@@ -134,23 +136,9 @@ class DomainBasedTrackerDetectorTest {
             )
         )
 
-        val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
+        "doubleclick.net".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("foo.id.com", "Foo App"))
         type.assertNotTracker()
-    }
-
-    @Test
-    fun whenTrackerDetectedButFindsNoMatchingExceptionRuleThenReturnTracker() {
-        vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerExceptionRules(
-            listOf(
-                AppTrackerExceptionRule(rule = "doubleclick.net", listOf("foo.nomatch.id"))
-            )
-        )
-
-        val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("foo.id.com", "Foo App"))
-        type.assertIsTracker(trackerDomain)
-        verify(deviceShieldPixels).trackerBlocked()
     }
 
     private fun givenExtractedHostname(desiredHostname: String?) {
@@ -161,13 +149,20 @@ class DomainBasedTrackerDetectorTest {
         assertTrue(this is NotTracker)
     }
 
-    private fun RequestTrackerType.assertIsTracker(trackerHostName: String) {
-        assertTrue(this is Tracker)
-        assertEquals(trackerHostName, (this as Tracker).hostName)
-    }
-
     private fun aPacket() = Packet(ByteBuffer.allocate(24))
     private fun aPayload() = ByteBuffer.allocate(0)
     private fun aLocalAddress() = true
     private fun aRemoteAddress() = false
+
+    private fun aThirdPartyTracker(trackerDomain: String) = ThirdParty(anAppTracker(trackerDomain))
+    private fun aFirstPartyTracker(trackerDomain: String) = FirstParty(anAppTracker(trackerDomain))
+
+    private fun anAppTracker(trackerDomain: String) = AppTracker(
+        trackerDomain,
+        0,
+        TrackerOwner("", ""),
+        TrackerApp(0, 0.0),
+        false
+    )
+
 }

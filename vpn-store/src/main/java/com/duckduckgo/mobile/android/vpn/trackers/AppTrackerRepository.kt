@@ -16,40 +16,19 @@
 
 package com.duckduckgo.mobile.android.vpn.trackers
 
-import android.content.Context
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
-import com.duckduckgo.mobile.android.vpn.store.R
-import com.squareup.moshi.Moshi
-import timber.log.Timber
 
 interface AppTrackerRepository {
-    fun matchTrackerInLegacyList(hostname: String): AppTrackerType
-
-    fun matchTrackerInFullList(hostname: String, packageName: String): AppTrackerType
+    fun findTracker(hostname: String, packageName: String): AppTrackerType
 
     @WorkerThread
     fun getAppExclusionList(): List<String>
 }
 
-class RealAppTrackerRepository(
-    private val context: Context,
-    private val moshi: Moshi,
-    private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao
-) : AppTrackerRepository {
+class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao) : AppTrackerRepository {
 
-    override fun matchTrackerInLegacyList(hostname: String): AppTrackerType {
-        val json = context.resources.openRawResource(R.raw.reduced_app_trackers_blocklist).bufferedReader().use { it.readText() }
-        val tracker = loadAppTrackers(json).first.firstOrNull { hostname.endsWith(it.hostname) }
-        return if (tracker == null) {
-            AppTrackerType.NotTracker
-        } else {
-            // For the legacy list, we don't know if the tracker is 1st/3rd party; always assume 3rd party
-            AppTrackerType.ThirdParty(tracker)
-        }
-    }
-
-    override fun matchTrackerInFullList(hostname: String, packageName: String): AppTrackerType {
+    override fun findTracker(hostname: String, packageName: String): AppTrackerType {
         val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname) ?: return AppTrackerType.NotTracker
         val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
         if (firstPartyTracker(tracker, entityName)) {
@@ -62,10 +41,6 @@ class RealAppTrackerRepository(
     private fun firstPartyTracker(tracker: AppTracker, entityName: AppTrackerPackage?): Boolean {
         if (entityName == null) return false
         return tracker.owner.name == entityName.entityName
-    }
-
-    private fun loadAppTrackers(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
-        return AppTrackerJsonParser.parseAppTrackerJson(moshi, json)
     }
 
     override fun getAppExclusionList(): List<String> {

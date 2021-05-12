@@ -22,7 +22,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,7 +33,6 @@ class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnPreferences: VpnPreferences,
     private val applicationContext: Context,
-    private val trackerListProvider: TrackerListProvider
 ) : ViewModel(), LifecycleObserver {
 
     private var vpnUpdateJob: Job? = null
@@ -72,11 +70,9 @@ class PrivacyReportViewModel(
     }
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
-    fun getUseFullBlockListPreference(): Boolean = vpnPreferences.getUseFullBlockListPreference().also { trackerListProvider.setUseFullTrackerList(it) }
     fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
     fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
     fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
-    fun useFullBlockList(useFullBLocklist: Boolean) = vpnPreferences.useFullBlockList(useFullBLocklist).also { trackerListProvider.setUseFullTrackerList(useFullBLocklist) }
 
     object PrivacyReportView {
         sealed class State {

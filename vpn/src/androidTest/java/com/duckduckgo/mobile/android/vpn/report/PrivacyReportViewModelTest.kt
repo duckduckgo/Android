@@ -27,10 +27,8 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.mock
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -57,7 +55,6 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnTrackerDao: VpnTrackerDao
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val trackerListProvider: TrackerListProvider = mock()
 
     private lateinit var testee: PrivacyReportViewModel
 
@@ -71,7 +68,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, vpnPreferences, context, trackerListProvider)
+        testee = PrivacyReportViewModel(repository, vpnPreferences, context)
     }
 
     private fun prepareDb() {

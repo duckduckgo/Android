@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.trackers
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.moshi.Moshi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -39,37 +38,22 @@ class AppTrackerRepositoryTest {
             VpnDatabase.prepopulateAppTrackerBlockingList(context, this)
         }
 
-        appTrackerRepository = RealAppTrackerRepository(context, Moshi.Builder().build(), vpnDatabase.vpnAppTrackerBlockingDao())
+        appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao())
     }
 
     @Test
-    fun whenMatchTrackerInFullListAndHostnameIsTrackerThenReturnTracker() {
-        assertTrackerTypeFound(appTrackerRepository.matchTrackerInFullList("g.doubleclick.net", ""))
+    fun whenHostnameIsTrackerThenReturnTracker() {
+        assertTrackerTypeFound(appTrackerRepository.findTracker("g.doubleclick.net", ""))
     }
 
     @Test
-    fun whenMatchTrackerInLegacyListAndHostnameIsTrackerThenReturnTracker() {
-        assertTrackerTypeFound(appTrackerRepository.matchTrackerInLegacyList("g.doubleclick.net"))
+    fun whenSubdomainIsTrackerThenReturnTracker() {
+        assertTrackerTypeFound(appTrackerRepository.findTracker("foo.g.doubleclick.net", ""))
     }
 
     @Test
-    fun whenMatchTrackerInFullListAndSubdomainIsTrackerThenReturnTracker() {
-        assertTrackerTypeFound(appTrackerRepository.matchTrackerInFullList("foo.g.doubleclick.net", ""))
-    }
-
-    @Test
-    fun whenMatchTrackerInLegacyListAndSubdomainIsTrackerThenReturnTracker() {
-        assertTrackerTypeFound(appTrackerRepository.matchTrackerInLegacyList("foo.g.doubleclick.net"))
-    }
-
-    @Test
-    fun whenMatchTrackerInFullListAndHostnameIsNotTrackerThenReturnNull() {
-        assertNotTrackerType(appTrackerRepository.matchTrackerInFullList("not.tracker.net", ""))
-    }
-
-    @Test
-    fun whenMatchTrackerInLegacyListAndHostnameIsNotTrackerThenReturnNull() {
-        assertNotTrackerType(appTrackerRepository.matchTrackerInLegacyList("not.tracker.net"))
+    fun whenHostnameIsNotTrackerThenReturnNull() {
+        assertNotTrackerType(appTrackerRepository.findTracker("not.tracker.net", ""))
     }
 
     private fun assertTrackerTypeFound(tracker: AppTrackerType) {

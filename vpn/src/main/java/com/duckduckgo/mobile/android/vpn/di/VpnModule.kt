@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetecto
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.RoomPacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -104,10 +104,10 @@ class VpnModule {
     fun providesVpnTrackerDetector(
         deviceShieldPixels: DeviceShieldPixels,
         hostnameExtractor: HostnameExtractor,
-        trackerListProvider: TrackerListProvider,
+        appTrackerRepository: AppTrackerRepository,
         vpnDatabase: VpnDatabase
     ): VpnTrackerDetector {
-        return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, trackerListProvider, vpnDatabase)
+        return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
     }
 
     @VpnScope
