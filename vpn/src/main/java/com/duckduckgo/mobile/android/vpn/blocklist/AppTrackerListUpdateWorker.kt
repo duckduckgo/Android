@@ -67,7 +67,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 }
 
                 Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, AppTrackerMetadata(eTag = blocklist.etag.value))
+                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
 
                 return Result.success()
             }

@@ -20,13 +20,13 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.store.R
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import timber.log.Timber
 
 interface AppTrackerRepository {
-    fun matchTrackerInLegacyList(hostname: String) : AppTracker?
+    fun matchTrackerInLegacyList(hostname: String): AppTrackerType
 
-    fun matchTrackerInFullList(hostname: String): AppTracker?
+    fun matchTrackerInFullList(hostname: String, packageName: String): AppTrackerType
 
     @WorkerThread
     fun getAppExclusionList(): List<String>
@@ -38,31 +38,38 @@ class RealAppTrackerRepository(
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao
 ) : AppTrackerRepository {
 
-    override fun matchTrackerInLegacyList(hostname: String): AppTracker? {
+    override fun matchTrackerInLegacyList(hostname: String): AppTrackerType {
         val json = context.resources.openRawResource(R.raw.reduced_app_trackers_blocklist).bufferedReader().use { it.readText() }
-        return loadAppTrackers(json).firstOrNull { hostname.endsWith(it.hostname) }
+        val tracker = loadAppTrackers(json).first.firstOrNull { hostname.endsWith(it.hostname) }
+        return if (tracker == null) {
+            AppTrackerType.NotTracker
+        } else {
+            // For the legacy list, we don't know if the tracker is 1st/3rd party; always assume 3rd party
+            AppTrackerType.ThirdParty(tracker)
+        }
     }
 
-    override fun matchTrackerInFullList(hostname: String): AppTracker? {
-        return vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname)
+    override fun matchTrackerInFullList(hostname: String, packageName: String): AppTrackerType {
+        val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname) ?: return AppTrackerType.NotTracker
+        val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
+        if (firstPartyTracker(tracker, entityName)) {
+            return AppTrackerType.FirstParty(tracker)
+        }
+
+        return AppTrackerType.ThirdParty(tracker)
+    }
+
+    private fun firstPartyTracker(tracker: AppTracker, entityName: AppTrackerPackage?): Boolean {
+        if (entityName == null) return false
+        return tracker.owner.name == entityName.entityName
+    }
+
+    private fun loadAppTrackers(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+        return AppTrackerJsonParser.parseAppTrackerJson(moshi, json)
     }
 
     override fun getAppExclusionList(): List<String> {
         return vpnAppTrackerBlockingDao.getAppExclusionList().map { it.packageId }
     }
 
-    private fun loadAppTrackers(json: String): List<AppTracker> {
-        val adapter : JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
-        return adapter.fromJson(json)?.trackers.orEmpty()
-            .filter { !it.value.isCdn }
-            .mapValues {
-                AppTracker(
-                    hostname = it.key,
-                    trackerCompanyId = it.value.owner.displayName.hashCode(),
-                    owner = it.value.owner,
-                    app = it.value.app,
-                    isCdn = it.value.isCdn
-                )
-        }.map { it.value }
-    }
 }

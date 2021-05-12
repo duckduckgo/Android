@@ -20,6 +20,9 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
+import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,7 +33,8 @@ import javax.inject.Inject
 
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
-    val blocklist: List<AppTracker> = listOf()
+    val blocklist: List<AppTracker> = listOf(),
+    val appPackages: List<AppTrackerPackage> = listOf()
 )
 
 data class AppTrackerExclusionList(
@@ -78,21 +82,22 @@ class RealAppTrackerListDownloader @Inject constructor(
         }
 
         val eTag = response.headers().extractETag()
-        val blocklist = response.body()?.trackers.orEmpty()
-            .filter { !it.value.isCdn }
-            .mapValues {
-                AppTracker(
-                    hostname = it.key,
-                    trackerCompanyId = it.value.owner.displayName.hashCode(),
-                    owner = it.value.owner,
-                    app = it.value.app,
-                    isCdn = it.value.isCdn
-                )
-            }.map { it.value }
+        val responseBody = response.body()
 
-        Timber.d("Received the app tracker blocklist, size: ${blocklist.size}")
+        val blocklist = extractBlocklist(responseBody)
+        val packages = extractAppPackages(responseBody)
 
-        return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist)
+        Timber.d("Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}")
+
+        return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages)
+    }
+
+    private fun extractBlocklist(response: JsonAppBlockingList?): List<AppTracker> {
+        return AppTrackerJsonParser.parseAppTrackers(response)
+    }
+
+    private fun extractAppPackages(response: JsonAppBlockingList?): List<AppTrackerPackage> {
+        return AppTrackerJsonParser.parseAppPackages(response)
     }
 
     override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {

@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 interface TrackerListProvider {
     @WorkerThread
-    fun findTracker(hostname: String): AppTracker?
+    fun findTracker(hostname: String, packageName: String): AppTrackerType
     fun setUseFullTrackerList(useFullList: Boolean)
 }
 
@@ -35,9 +35,9 @@ class RealTrackerListProvider(
 ) : TrackerListProvider {
 
     @WorkerThread
-    override fun findTracker(hostname: String): AppTracker? {
+    override fun findTracker(hostname: String, packageName: String): AppTrackerType {
         return if (shouldUseFullTrackerList()) {
-            appTrackerRepository.matchTrackerInFullList(hostname)
+            appTrackerRepository.matchTrackerInFullList(hostname, packageName)
         } else {
             appTrackerRepository.matchTrackerInLegacyList(hostname)
         }

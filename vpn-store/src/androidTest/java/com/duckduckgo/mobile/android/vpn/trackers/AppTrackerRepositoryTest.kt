@@ -44,31 +44,39 @@ class AppTrackerRepositoryTest {
 
     @Test
     fun whenMatchTrackerInFullListAndHostnameIsTrackerThenReturnTracker() {
-        assertNotNull(appTrackerRepository.matchTrackerInFullList("g.doubleclick.net"))
+        assertTrackerTypeFound(appTrackerRepository.matchTrackerInFullList("g.doubleclick.net", ""))
     }
 
     @Test
     fun whenMatchTrackerInLegacyListAndHostnameIsTrackerThenReturnTracker() {
-        assertNotNull(appTrackerRepository.matchTrackerInLegacyList("g.doubleclick.net"))
+        assertTrackerTypeFound(appTrackerRepository.matchTrackerInLegacyList("g.doubleclick.net"))
     }
 
     @Test
     fun whenMatchTrackerInFullListAndSubdomainIsTrackerThenReturnTracker() {
-        assertNotNull(appTrackerRepository.matchTrackerInFullList("foo.g.doubleclick.net"))
+        assertTrackerTypeFound(appTrackerRepository.matchTrackerInFullList("foo.g.doubleclick.net", ""))
     }
 
     @Test
     fun whenMatchTrackerInLegacyListAndSubdomainIsTrackerThenReturnTracker() {
-        assertNotNull(appTrackerRepository.matchTrackerInLegacyList("foo.g.doubleclick.net"))
+        assertTrackerTypeFound(appTrackerRepository.matchTrackerInLegacyList("foo.g.doubleclick.net"))
     }
 
     @Test
     fun whenMatchTrackerInFullListAndHostnameIsNotTrackerThenReturnNull() {
-        assertNull(appTrackerRepository.matchTrackerInFullList("not.tracker.net"))
+        assertNotTrackerType(appTrackerRepository.matchTrackerInFullList("not.tracker.net", ""))
     }
 
     @Test
     fun whenMatchTrackerInLegacyListAndHostnameIsNotTrackerThenReturnNull() {
-        assertNull(appTrackerRepository.matchTrackerInLegacyList("not.tracker.net"))
+        assertNotTrackerType(appTrackerRepository.matchTrackerInLegacyList("not.tracker.net"))
+    }
+
+    private fun assertTrackerTypeFound(tracker: AppTrackerType) {
+        assertFalse(tracker is AppTrackerType.NotTracker)
+    }
+
+    private fun assertNotTrackerType(tracker: AppTrackerType) {
+        assertTrue(tracker is AppTrackerType.NotTracker)
     }
 }

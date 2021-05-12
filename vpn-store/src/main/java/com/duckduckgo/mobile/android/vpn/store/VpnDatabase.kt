@@ -24,6 +24,10 @@ import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
+import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser.Companion.parseAppTrackerJson
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.threeten.bp.OffsetDateTime
@@ -33,7 +37,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 7,
+    exportSchema = true, version = 8,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -48,7 +52,8 @@ import java.util.concurrent.Executors
         AppTrackerExcludedPackage::class,
         AppTrackerExclusionListMetadata::class,
         AppTrackerExceptionRule::class,
-        AppTrackerExceptionRuleMetadata::class
+        AppTrackerExceptionRuleMetadata::class,
+        AppTrackerPackage::class
     ]
 )
 
@@ -112,7 +117,10 @@ abstract class VpnDatabase : RoomDatabase() {
                 .use { it.readText() }
                 .also {
                     val trackers = getFullAppTrackerBlockingList(it)
-                    vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerBlocklist(trackers)
+                    with(vpnDatabase.vpnAppTrackerBlockingDao()) {
+                        insertTrackerBlocklist(trackers.first)
+                        insertAppPackages(trackers.second)
+                    }
                 }
         }
 
@@ -126,22 +134,9 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun getFullAppTrackerBlockingList(json: String): List<AppTracker> {
-            val moshi = Moshi.Builder().build()
-            val adapter : JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
-            return adapter.fromJson(json)?.trackers.orEmpty()
-                .filter { !it.value.isCdn }
-                .mapValues {
-                    AppTracker(
-                        hostname = it.key,
-                        trackerCompanyId = it.value.owner.displayName.hashCode(),
-                        owner = it.value.owner,
-                        app = it.value.app,
-                        isCdn = it.value.isCdn
-                    )
-                }.map { it.value }
+        private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+            return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
-
         private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)
