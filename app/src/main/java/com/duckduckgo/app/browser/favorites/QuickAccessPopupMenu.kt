@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 import com.duckduckgo.app.browser.R
-import timber.log.Timber
 
 class QuickAccessPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_quick_access_menu)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
