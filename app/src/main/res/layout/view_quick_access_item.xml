@@ -30,9 +30,9 @@
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="0dp">
+        app:cardBackgroundColor="?attr/colorPrimary"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="4dp">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
