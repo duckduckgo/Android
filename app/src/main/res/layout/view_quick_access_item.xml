@@ -20,7 +20,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="15dp">
+    android:padding="15dp"
+    android:clipToPadding="false">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
