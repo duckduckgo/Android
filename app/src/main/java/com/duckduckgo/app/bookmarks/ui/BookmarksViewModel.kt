@@ -111,7 +111,6 @@ class BookmarksViewModel(
                     editFavorite(savedSite)
                 }
             }
-            is SavedSite.UnsavedSite -> throw IllegalArgumentException("Illegal SavedSite to edit received")
         }
     }
 

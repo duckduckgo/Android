@@ -27,7 +27,7 @@ import java.io.Serializable
 interface FavoritesRepository {
     suspend fun favoritesCountByDomain(domain: String): Int
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
-    suspend fun insert(unsavedSite: SavedSite.UnsavedSite): SavedSite.Favorite
+    suspend fun insert(title: String, url: String): SavedSite.Favorite
     suspend fun insert(favorite: SavedSite.Favorite)
     suspend fun update(favorite: SavedSite.Favorite)
     suspend fun persistChanges(favorites: List<SavedSite.Favorite>)
@@ -52,12 +52,6 @@ sealed class SavedSite(
         override val title: String,
         override val url: String
     ) : SavedSite(id, title, url)
-
-    // TODO: review this data class
-    data class UnsavedSite(
-        override val title: String,
-        override val url: String
-    ) : SavedSite(0, title, url)
 }
 
 class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
@@ -68,9 +62,10 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
     override fun favoritesObservable() =
         favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
 
-    override suspend fun insert(favorite: SavedSite.UnsavedSite): SavedSite.Favorite {
+    override suspend fun insert(title: String, url: String): SavedSite.Favorite {
         val lastPosition = favoritesDao.getLastPosition() ?: 0
-        val favoriteEntity = FavoriteEntity(title = favorite.title, url = favorite.url, position = lastPosition + 1)
+        val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
+        val favoriteEntity = FavoriteEntity(title = titleOrFallback, url = url, position = lastPosition + 1)
         val id = favoritesDao.insert(favoriteEntity)
         return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
     }

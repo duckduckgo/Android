@@ -43,7 +43,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.model.SavedSite.UnsavedSite
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
@@ -1352,14 +1351,15 @@ class BrowserTabViewModel(
     }
 
     suspend fun onBookmarkAddRequested() {
-        val unsavedSite = createSiteToSave()
+        val url = url ?: return
+        val title = title ?: ""
         val savedBookmark = withContext(dispatchers.io()) {
-            if (unsavedSite.url.isNotBlank()) {
-                faviconManager.persistCachedFavicon(tabId, unsavedSite.url)
+            if (url.isNotBlank()) {
+                faviconManager.persistCachedFavicon(tabId, url)
             }
-            val bookmarkEntity = BookmarkEntity(title = unsavedSite.title, url = unsavedSite.url)
+            val bookmarkEntity = BookmarkEntity(title = title, url = url)
             val id = bookmarksDao.insert(bookmarkEntity)
-            SavedSite.Bookmark(id, unsavedSite.title, unsavedSite.url)
+            SavedSite.Bookmark(id, title, url)
         }
         withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(savedBookmark)
@@ -1367,22 +1367,18 @@ class BrowserTabViewModel(
     }
 
     suspend fun onAddFavoriteMenuClicked() {
-        val unsavedSite = createSiteToSave()
+        val url = url ?: return
+        val title = title ?: ""
+
         val savedFavorite = withContext(dispatchers.io()) {
-            if (unsavedSite.url.isNotBlank()) {
-                faviconManager.persistCachedFavicon(tabId, unsavedSite.url)
+            if (url.isNotBlank()) {
+                faviconManager.persistCachedFavicon(tabId, url)
             }
-            favoritesRepository.insert(unsavedSite)
+            favoritesRepository.insert(title = title, url = url)
         }
         withContext(dispatchers.main()) {
             command.value = ShowFavoriteAddedConfirmation(savedFavorite)
         }
-    }
-
-    private fun createSiteToSave(): UnsavedSite {
-        val url = url ?: ""
-        val title = title ?: ""
-        return UnsavedSite(title, url)
     }
 
     fun onFireproofWebsiteMenuClicked() {
@@ -1456,7 +1452,6 @@ class BrowserTabViewModel(
                     editFavorite(savedSite)
                 }
             }
-            is UnsavedSite -> throw IllegalArgumentException("Illegal SavedSite to edit received")
         }
     }
 
