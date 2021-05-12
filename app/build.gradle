@@ -32,6 +32,13 @@ android {
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
             androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
+            main {
+                java {
+                    resources {
+                        srcDirs += files("$projectDir/../submodules/autofill/dist/".toString())
+                    }
+                }
+            }
         }
     }
     compileOptions {
@@ -151,10 +158,6 @@ dependencies {
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
-
-    // Anko
-    implementation "org.jetbrains.anko:anko-commons:_"
-    implementation "org.jetbrains.anko:anko-design:_"
 
     // Android KTX
     implementation AndroidX.core.ktx

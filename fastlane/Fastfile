@@ -13,11 +13,7 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-default_platform(:android)
-
-platform :android do
-
-    # CONSTANTS
+ # CONSTANTS
     releaseNotesBodyHeader = "What's new in this release?"
     releaseNotesSuffixHeader = "Have feedback?"
     releaseNotesFileBody = "../app/version/release-notes"
@@ -26,8 +22,12 @@ platform :android do
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     errorMessageCancelled = "Release cancelled 😢"
 
+default_platform(:android)
+
+platform :android do
+
   desc "Generate release notes for the Play Store"
-  lane :release_notes_playstore do
+  private_lane :release_notes_playstore do
 
     releaseNotesBody = File.read(releaseNotesFileBody)
     releaseNotesSuffix = File.read(releaseNotesFileSuffix)
@@ -40,7 +40,7 @@ platform :android do
   end
 
   desc "Generate release notes for GitHub"
-    lane :release_notes_github do
+    private_lane :release_notes_github do
 
       releaseNotesBody = File.read(releaseNotesFileBody)
       releaseNotesSuffix = File.read(releaseNotesFileSuffix)
@@ -75,7 +75,7 @@ platform :android do
   end
 
   desc "Upload APK to ad-hoc internal app sharing"
-  lane :deploy_adhoc do
+  private_lane :deploy_adhoc do
 
       props = property_file_read(file: "app/version/version.properties")
       version = props["VERSION"]
@@ -111,7 +111,7 @@ platform :android do
     end
 
     desc "Update local changelist metadata"
-    lane :update_fastlane_release_notes do
+    private_lane :update_fastlane_release_notes do
 
       releaseNotes = release_notes_playstore()
 
@@ -125,7 +125,7 @@ platform :android do
     end
 
     desc "Clean up local changelist metadata"
-        lane :cleanup_fastlane_release_notes do
+        private_lane :cleanup_fastlane_release_notes do
 
           flversion=gradle(task: '-q fastlaneVersionCode')
 
@@ -141,27 +141,14 @@ platform :android do
     desc "Create new release"
       lane :release do
 
-        UI.header "Creating a new release"
-        UI.message ("Checking current branch: #{git_branch}")
-
         ensure_git_status_clean
+        ensure_git_branch( branch: 'develop' )
 
-        ensure_git_branch(
-          branch: 'develop'
-        )
+        releaseNotes = determine_release_notes()
 
         newVersion = prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
-        releaseNotes = prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
-        commits = changelog_from_git_commits(
-            between: [last_git_tag, "HEAD"],
-            pretty: "- %s",
-            date_format: "short",
-            match_lightweight_tag: false,
-            merge_commit_filtering: "exclude_merges"
-        )
-        UI.message ("Performing a new release for #{newVersion}")
 
-        if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nCommits Since Last Release:\n#{commits}\nRelease Notes:\n#{releaseNotes}\n")
+        if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
           UI.success "Creating release branch for release/#{newVersion}"
 
           sh "git flow release start #{newVersion}"
@@ -193,6 +180,33 @@ platform :android do
           UI.error errorMessageCancelled
         end
 
+        end
+
+        private_lane :determine_release_notes do
+
+        commits = changelog_from_git_commits(
+            between: [last_git_tag, "HEAD"],
+            pretty: "- %s",
+            date_format: "short",
+            match_lightweight_tag: false,
+            merge_commit_filtering: "exclude_merges"
+        )
+
+            existingReleaseNotes = File.read(releaseNotesFileBody)
+            UI.important("Existing release notes:\n")
+            UI.message("#{existingReleaseNotes}\n")
+            choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
+              "Bug fixes and other improvements",
+            ]
+
+            rl = case choice
+                when "KEEP EXISTING"
+                    existingReleaseNotes
+                when "CUSTOM"
+                    prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
+                else
+                    choice
+            end
         end
 
 end

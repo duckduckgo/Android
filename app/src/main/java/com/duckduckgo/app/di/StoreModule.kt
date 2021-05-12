@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.di
 
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
@@ -32,10 +33,12 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.OfflinePixelCountSharedPreferences
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
+import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import dagger.Binds
 import dagger.Module
+import dagger.multibindings.IntoSet
 
 @Module
 abstract class StoreModule {
@@ -56,6 +59,10 @@ abstract class StoreModule {
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
 
     @Binds
+    @IntoSet
+    abstract fun bindAppInstallStoreObserver(appInstallStore: AppInstallStore): LifecycleObserver
+
+    @Binds
     abstract fun bindDataClearingStore(store: UnsentForgetAllPixelStoreSharedPreferences): UnsentForgetAllPixelStore
 
     @Binds
@@ -65,5 +72,13 @@ abstract class StoreModule {
     abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
 
     @Binds
+    @IntoSet
+    abstract fun bindUserStageStoreObserver(userStageStore: UserStageStore): LifecycleObserver
+
+    @Binds
     abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
+
+    @Binds
+    @IntoSet
+    abstract fun bindTabsDbSanitizerObserver(tabsDbSanitizer: TabsDbSanitizer): LifecycleObserver
 }

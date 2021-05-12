@@ -219,5 +219,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
     BOOKMARK_EXPORT_SUCCESS("m_be_a"),
-    BOOKMARK_EXPORT_ERROR("m_be_e")
+    BOOKMARK_EXPORT_ERROR("m_be_e"),
+
+    ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
+    ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e")
 }

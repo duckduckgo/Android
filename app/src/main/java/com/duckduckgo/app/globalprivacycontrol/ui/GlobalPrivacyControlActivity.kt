@@ -20,6 +20,11 @@ import android.content.Context
 import android.content.Intent
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.os.Bundle
+import android.text.*
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
+import android.view.View
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -33,6 +38,12 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
 
     private val viewModel: GlobalPrivacyControlViewModel by bindViewModel()
 
+    private val clickableSpan = object : ClickableSpan() {
+        override fun onClick(widget: View) {
+            viewModel.onLearnMoreSelected()
+        }
+    }
+
     private val globalPrivacyControlToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onUserToggleGlobalPrivacyControl(isChecked)
     }
@@ -42,18 +53,33 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_global_privacy_control)
         setupToolbar(toolbar)
         configureUiEventHandlers()
-        setupUi()
+        configureClickableLink()
         observeViewModel()
     }
 
-    private fun setupUi() {
-        val description = getString(R.string.globalPrivacyControlDescription)
-        globalPrivacyControlDescription.text = description.html(this)
+    private fun configureClickableLink() {
+        val htmlGPCText = getString(R.string.globalPrivacyControlDescription).html(this)
+        val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
+        val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
+        urlSpans?.forEach {
+            gpcSpannableString.apply {
+                setSpan(
+                    clickableSpan,
+                    gpcSpannableString.getSpanStart(it),
+                    gpcSpannableString.getSpanEnd(it),
+                    gpcSpannableString.getSpanFlags(it)
+                )
+                removeSpan(it)
+            }
+        }
+        globalPrivacyControlDescription.apply {
+            text = gpcSpannableString
+            movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun configureUiEventHandlers() {
         globalPrivacyControlToggle.setOnCheckedChangeListener(globalPrivacyControlToggleListener)
-        globalPrivacyControlLink.setOnClickListener { viewModel.onLearnMoreSelected() }
     }
 
     private fun observeViewModel() {

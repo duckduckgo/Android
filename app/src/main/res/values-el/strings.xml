@@ -208,6 +208,15 @@
     <string name="bookmarkOverflowContentDescription">Περισσότερες επιλογές για σελιδοδείκτη %1$s</string>
     <string name="bookmarkEdited">Προστέθηκε σελιδοδείκτης</string>
     <string name="bookmarkDeleteConfirmationMessage">Διαγράφηκε &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Εξαγωγή</string>
+    <string name="exportBookmarksEmpty">Δεν έχετε σελιδοδείκτες, οπότε δεν θα εξαχθεί κάτι</string>
+    <string name="exportBookmarksError">Δεν ήταν δυνατή η εξαγωγή σελιδοδεικτών, κάτι πήγε λάθος</string>
+    <string name="exportBookmarksSuccess">Η εξαγωγή όλων των σελιδοδεικτών πραγματοποιήθηκε με επιτυχία</string>
+    <string name="importBookmarksMenu">Εισαγωγή</string>
+    <string name="importBookmarksFileTitle">Επιλέξτε αρχείο σελιδοδείκτη προς εισαγωγή</string>
+    <string name="importBookmarksError">Δεν ήταν δυνατή η εισαγωγή σελιδοδεικτών, κάτι πήγε λάθος</string>
+    <string name="importBookmarksEmpty">Το αρχείο δεν έχει σελιδοδείκτες προς εισαγωγή</string>
+    <string name="importBookmarksSuccess">Επιτυχής εισαγωγή %1$d σελιδοδεικτών</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Επιβεβαίωση</string>
@@ -522,12 +531,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Τα δεδομένα σας δεν πρέπει να πωλούνται. Στην DuckDuckGo συμφωνούμε. Ενεργοποιήστε τη ρύθμιση \"Παγκόσμιος έλεγχος απορρήτου\" (GPC) και θα ενημερώσουμε τους ιστότοπους για την προτίμησή σας:&lt;br/&gt;&lt;br/&gt;• Να μην πωλούν τα προσωπικά δεδομένα σας.&lt;br/&gt;• Να περιορίσουν την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες.
+        <![CDATA[Το DuckDuckGo αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href="">Μάθετε περισσότερα</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlToggle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Καθώς ο Παγκόσμιος έλεγχος απορρήτου (GPC) αποτελεί νέο πρότυπο, οι περισσότεροι ιστότοποι δεν θα το αναγνωρίζουν ακόμη, αλλά εργαζόμαστε σκληρά ώστε να εξασφαλίσουμε ότι θα γίνει αποδεκτό παγκοσμίως.</b> Ωστόσο, οι ιστότοποι είναι υποχρεωμένοι να ενεργούν μόνο στον βαθμό που τους υποχρεώνουν οι ισχύοντες νόμοι.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Μάθετε περισσότερα</u></string>
     <string name="disabled">Απενεργοποιήθηκε</string>
     <string name="enabled">Ενεργοποιήθηκε</string>
 </resources>

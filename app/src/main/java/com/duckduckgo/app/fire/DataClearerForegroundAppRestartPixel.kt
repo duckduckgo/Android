@@ -53,6 +53,13 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
         get() = preferences.getInt(KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS, 0)
 
     @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onAppCreated() {
+        Timber.i("onAppCreated firePendingPixels")
+        firePendingPixels()
+    }
+
+    @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         Timber.i("Registered App on_stop")
