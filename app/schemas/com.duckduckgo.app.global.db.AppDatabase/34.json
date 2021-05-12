@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 34,
-    "identityHash": "510e71539a55991713303ff3c2c46c09",
+    "identityHash": "7e459183134182e23524e089ee6e638f",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -465,7 +465,17 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_favorites_title_url",
+            "unique": true,
+            "columnNames": [
+              "title",
+              "url"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `${TABLE_NAME}` (`title`, `url`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -898,7 +908,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '510e71539a55991713303ff3c2c46c09')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e459183134182e23524e089ee6e638f')"
     ]
   }
 }

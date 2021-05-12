@@ -421,6 +421,7 @@ class MigrationsProvider(
     val MIGRATION_33_TO_34: Migration = object : Migration(33, 34) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `favorites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `position` INTEGER NOT NULL)")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `favorites` (`title`, `url`)")
         }
     }
 
