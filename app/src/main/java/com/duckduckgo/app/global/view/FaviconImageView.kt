@@ -25,6 +25,7 @@ import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
 import okio.ByteString.Companion.encodeUtf8
@@ -38,6 +39,7 @@ fun ImageView.loadFavicon(file: File, domain: String) {
         .load(file)
         .diskCacheStrategy(DiskCacheStrategy.NONE)
         .skipMemoryCache(true)
+        .transform(RoundedCorners(10))
         .placeholder(defaultDrawable)
         .error(defaultDrawable)
         .into(this)
@@ -49,6 +51,7 @@ fun ImageView.loadFavicon(bitmap: Bitmap?, domain: String) {
         .load(bitmap)
         .diskCacheStrategy(DiskCacheStrategy.NONE)
         .skipMemoryCache(true)
+        .transform(RoundedCorners(10))
         .placeholder(defaultDrawable)
         .error(defaultDrawable)
         .into(this)
