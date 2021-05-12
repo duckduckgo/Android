@@ -26,11 +26,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.BookmarksPopupMenu
 import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
+import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_quick_access_menu.view.*
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -52,6 +55,7 @@ class FavoritesQuickAccessAdapter(
     data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
 
     class QuickAccessViewHolder(
+        private val inflater: LayoutInflater,
         itemView: View,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
@@ -62,7 +66,7 @@ class FavoritesQuickAccessAdapter(
     ) : RecyclerView.ViewHolder(itemView), DragDropViewHolderListener {
 
         private var itemState: ItemState = ItemState.Stale
-        private var menu: Menu? = null
+        private var popupMenu: QuickAccessPopupMenu? = null
 
         sealed class ItemState {
             object Stale : ItemState()
@@ -94,6 +98,7 @@ class FavoritesQuickAccessAdapter(
                 itemView.quickAccessFaviconCard.setOnLongClickListener {
                     itemState = ItemState.LongPress
                     scaleUpFavicon()
+                    showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
                     false
                 }
 
@@ -114,23 +119,16 @@ class FavoritesQuickAccessAdapter(
                     false
                 }
 
-                itemView.quickAccessFaviconCard.setOnCreateContextMenuListener { menu, _, _ ->
-                    this@QuickAccessViewHolder.menu = menu
-                    Timber.i("QuickAccessFav: setOnCreateContextMenuListener")
-                    val editMenuItem: MenuItem = menu.add(Menu.NONE, 1, 1, "Edit")
-                    val deleteMenuItem: MenuItem = menu.add(Menu.NONE, 2, 2, "Delete")
-                    editMenuItem.setOnMenuItemClickListener {
-                        onEditClicked(item)
-                        true
-                    }
-
-                    deleteMenuItem.setOnMenuItemClickListener {
-                        onDeleteClicked(item)
-                        true
-                    }
-                }
-
                 itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
+            }
+        }
+
+        private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
+            popupMenu = QuickAccessPopupMenu(layoutInflater).apply {
+                val view = this.contentView
+                onMenuItemClicked(view.editSavedSite) { onEditClicked(item) }
+                onMenuItemClicked(view.deleteSavedSite) { onDeleteClicked(item) }
+                this.show(itemView, anchor)
             }
         }
 
@@ -144,7 +142,7 @@ class FavoritesQuickAccessAdapter(
             if (itemState != ItemState.Drag) return
 
             if (dX.absoluteValue > 10 || dY.absoluteValue > 10) {
-                menu?.close()
+                popupMenu?.dismiss()
             }
         }
 
@@ -177,7 +175,7 @@ class FavoritesQuickAccessAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_quick_access_item, parent, false)
-        return QuickAccessViewHolder(view, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
+        return QuickAccessViewHolder(inflater, view, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
     }
 
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
