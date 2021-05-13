@@ -205,7 +205,7 @@
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
-    <string name="savedSiteDialogTitleHint">title</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
     <string name="savedSiteDialogTitleEdit">Edit</string>
     <string name="noBookmarks">No bookmarks added yet</string>
