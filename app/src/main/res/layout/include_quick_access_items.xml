@@ -27,6 +27,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:overScrollMode="never"
+        android:paddingTop="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="8"
         tools:listItem="@layout/view_quick_access_item"
