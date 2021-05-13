@@ -208,6 +208,15 @@
     <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %1$s</string>
     <string name="bookmarkEdited">Bladwijzer toegevoegd</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; verwijderd</string>
+    <string name="exportBookmarksMenu">Exporteren</string>
+    <string name="exportBookmarksEmpty">Je hebt geen bladwijzers, dus er wordt niets geëxporteerd</string>
+    <string name="exportBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geëxporteerd</string>
+    <string name="exportBookmarksSuccess">Alle bladwijzers zijn geëxporteerd</string>
+    <string name="importBookmarksMenu">Importeren</string>
+    <string name="importBookmarksFileTitle">Selecteer een bladwijzerbestand om te importeren</string>
+    <string name="importBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geïmporteerd</string>
+    <string name="importBookmarksEmpty">Dit bestand bevat geen bladwijzers om te importeren</string>
+    <string name="importBookmarksSuccess">%1$d bladwijzers geïmporteerd</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bevestigen</string>
@@ -522,12 +531,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Je gegevens zouden niet te koop moeten zijn. Bij DuckDuckGo zijn we het daarmee eens. Activeer de instelling \'Global Privacy Control\' (GCP) en we laten websites weten om:&lt;br/&gt;&lt;br/&gt; • Je persoonsgegevens niet te verkopen.&lt;br/&gt; • Het delen van je persoonsgegevens met andere bedrijven te beperken.
+        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href="">Meer informatie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Doordat Global Privacy Control (GPC) een nieuwe standaard is, herkennen de meeste websites deze nog niet. We werken er hard aan om ervoor te zorgen dat GCP wereldwijd wordt geaccepteerd.</b> Maar websites zijn alleen verplicht om op dit signaal te reageren voor zover de toepasselijke wetgeving dat vereist.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Meer informatie</u></string>
     <string name="disabled">Uitgeschakeld</string>
     <string name="enabled">Ingeschakeld</string>
 </resources>

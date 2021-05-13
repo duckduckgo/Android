@@ -212,6 +212,15 @@
     <string name="bookmarkOverflowContentDescription">Vairāk opciju grāmatzīmei %1$s</string>
     <string name="bookmarkEdited">Pievienota grāmatzīme</string>
     <string name="bookmarkDeleteConfirmationMessage">Dzēsts: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Eksportēt</string>
+    <string name="exportBookmarksEmpty">Tev nav grāmatzīmju, nekas netiks eksportēts</string>
+    <string name="exportBookmarksError">Nevar eksportēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
+    <string name="exportBookmarksSuccess">Visas grāmatzīmes tika sekmīgi eksportētas</string>
+    <string name="importBookmarksMenu">Importēt</string>
+    <string name="importBookmarksFileTitle">Atlasi importējamo grāmatzīmju failu</string>
+    <string name="importBookmarksError">Nevar importēt nevienu grāmatzīmi, kaut kas nav pareizi</string>
+    <string name="importBookmarksEmpty">Failā nav importējamu grāmatzīmju</string>
+    <string name="importBookmarksSuccess">Sekmīgi importētas %1$d grāmatzīmes</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Apstiprināt</string>
@@ -528,12 +537,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Tavi dati nav paredzēti pārdošanai. DuckDuckGo tam piekrīt. Aktivizē iestatījumu “Globālā privātuma kontrole” (GPC), un mēs vietnēm paziņosim, ka tu izvēlies:&lt;br/&gt;&lt;br/&gt; • Nepārdot savus personas datus.&lt;br/&gt; • Ierobežot savu personas datu koplietošanu ar citiem uzņēmumiem.
+        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href="">Uzzini vairāk</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Globālā privātuma kontrole (GPC) ir jauns standarts. Lielākā daļa vietņu to vēl neatpazīst, taču mēs cītīgi strādājam pie tā, lai tas tiktu ievērots visā pasaulē.</b> Tomēr vietnēm ir obligāti jārīkojas tikai uz tām attiecināmo piemērojamo tiesību aktu ietvaros.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Uzzināt vairāk</u></string>
     <string name="disabled">Atspējots</string>
     <string name="enabled">Iespējots</string>
 </resources>

@@ -23,7 +23,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
-import org.jetbrains.anko.find
 
 class SystemLocationPermissionDialog : DialogFragment() {
 
@@ -41,10 +40,10 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
         val rootView = layoutInflater.inflate(R.layout.content_system_location_permission_dialog, null)
 
-        val subtitle = rootView.find<TextView>(R.id.systemPermissionDialogSubtitle)
-        val allowLocationPermission = rootView.find<TextView>(R.id.allowLocationPermission)
-        val denyLocationPermission = rootView.find<TextView>(R.id.denyLocationPermission)
-        val neverAllowLocationPermission = rootView.find<TextView>(R.id.neverAllowLocationPermission)
+        val subtitle = rootView.findViewById<TextView>(R.id.systemPermissionDialogSubtitle)
+        val allowLocationPermission = rootView.findViewById<TextView>(R.id.allowLocationPermission)
+        val denyLocationPermission = rootView.findViewById<TextView>(R.id.denyLocationPermission)
+        val neverAllowLocationPermission = rootView.findViewById<TextView>(R.id.neverAllowLocationPermission)
 
         val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setView(rootView)

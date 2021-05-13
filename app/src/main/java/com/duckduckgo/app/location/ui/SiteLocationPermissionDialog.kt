@@ -33,7 +33,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.find
 import javax.inject.Inject
 
 class SiteLocationPermissionDialog : DialogFragment() {
@@ -70,15 +69,15 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
         val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
 
-        val title = rootView.find<TextView>(R.id.sitePermissionDialogTitle)
-        val subtitle = rootView.find<TextView>(R.id.sitePermissionDialogSubtitle)
-        val favicon = rootView.find<ImageView>(R.id.sitePermissionDialogFavicon)
-        val allowAlways = rootView.find<TextView>(R.id.siteAllowAlwaysLocationPermission)
-        val allowOnce = rootView.find<TextView>(R.id.siteAllowOnceLocationPermission)
-        val denyOnce = rootView.find<TextView>(R.id.siteDenyOnceLocationPermission)
-        val denyAlways = rootView.find<TextView>(R.id.siteDenyAlwaysLocationPermission)
-        val extraDivider = rootView.find<View>(R.id.siteAllowOnceLocationPermissionDivider)
-        val anotherDivider = rootView.find<View>(R.id.siteDenyLocationPermissionDivider)
+        val title = rootView.findViewById<TextView>(R.id.sitePermissionDialogTitle)
+        val subtitle = rootView.findViewById<TextView>(R.id.sitePermissionDialogSubtitle)
+        val favicon = rootView.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
+        val allowAlways = rootView.findViewById<TextView>(R.id.siteAllowAlwaysLocationPermission)
+        val allowOnce = rootView.findViewById<TextView>(R.id.siteAllowOnceLocationPermission)
+        val denyOnce = rootView.findViewById<TextView>(R.id.siteDenyOnceLocationPermission)
+        val denyAlways = rootView.findViewById<TextView>(R.id.siteDenyAlwaysLocationPermission)
+        val extraDivider = rootView.findViewById<View>(R.id.siteAllowOnceLocationPermissionDivider)
+        val anotherDivider = rootView.findViewById<View>(R.id.siteDenyLocationPermissionDivider)
 
         val alertDialog = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setView(rootView)
