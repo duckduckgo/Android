@@ -29,12 +29,11 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
-import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
-import kotlinx.android.synthetic.main.view_boomark_empty_hint.view.*
-import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.*
+import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
+import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
+import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
+import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class BookmarksAdapter(
     private val layoutInflater: LayoutInflater,
@@ -68,15 +67,15 @@ class BookmarksAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_TYPE -> {
-                val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
                 return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
             }
             BOOKMARK_SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_section_title, parent, false)
                 return BookmarkScreenViewHolders.SectionTitle(view)
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_boomark_empty_hint, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_empty_hint, parent, false)
                 BookmarkScreenViewHolders.EmptyHint(view)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -113,13 +112,13 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
     class SectionTitle(itemView: View) : BookmarkScreenViewHolders(itemView) {
         fun bind() {
-            itemView.locationPermissionsSectionTitle.setText(R.string.bookmarksSectionTitle)
+            itemView.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
         }
     }
 
     class EmptyHint(itemView: View) : BookmarkScreenViewHolders(itemView) {
         fun bind() {
-            itemView.bookmarksEmptyHint.setText(R.string.bookmarksEmptyHint)
+            itemView.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
         }
     }
 
@@ -162,22 +161,20 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         }
 
         private fun showOverFlowMenu(anchor: ImageView, bookmark: SavedSite.Bookmark) {
-            val popupMenu = BookmarksPopupMenu(layoutInflater)
+            val popupMenu = SavedSitePopupMenu(layoutInflater)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editBookmark) { editBookmark(bookmark) }
-                onMenuItemClicked(view.deleteBookmark) { deleteBookmark(bookmark) }
+                onMenuItemClicked(view.editSavedSite) { editBookmark(bookmark) }
+                onMenuItemClicked(view.deleteSavedSite) { deleteBookmark(bookmark) }
             }
             popupMenu.show(itemView, anchor)
         }
 
         private fun editBookmark(bookmark: SavedSite.Bookmark) {
-            Timber.i("Editing bookmark ${bookmark.title}")
             viewModel.onEditSavedSiteRequested(bookmark)
         }
 
         private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
-            Timber.i("Deleting bookmark ${bookmark.title}")
             viewModel.onDeleteSavedSiteRequested(bookmark)
         }
     }

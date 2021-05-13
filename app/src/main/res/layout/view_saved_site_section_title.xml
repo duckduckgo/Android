@@ -14,20 +14,8 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bookmarksEmptyHint"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fontFamily="sans-serif"
-    android:gravity="center"
-    android:lineSpacingExtra="4sp"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/savedSiteSectionTitle"
+    style="@style/SavedSiteSectionTitle"
     android:paddingStart="16dp"
-    android:paddingTop="24dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="24dp"
-    android:text="@string/bookmarksEmptyHint"
-    android:textColor="?attr/bookmarkEmptyTextColor"
-    android:textSize="16sp"
-    android:textStyle="normal"
-    tools:text="Lorem ipsum dolor sit amet" />
+    android:paddingEnd="16dp" />

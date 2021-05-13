@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.toStringDropScheme
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
 interface AutoComplete {
@@ -70,7 +69,7 @@ class AutoCompleteApi @Inject constructor(
 
         return savedSitesObservable.zipWith(
             getAutoCompleteSearchResults(query),
-            BiFunction { bookmarksResults, searchResults ->
+            { bookmarksResults, searchResults ->
                 AutoCompleteResult(
                     query = query,
                     suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase }

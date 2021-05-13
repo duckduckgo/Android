@@ -69,7 +69,7 @@
         android:fontFamily="sans-serif"
         android:paddingTop="2dp"
         android:paddingBottom="4dp"
-        android:textColor="?attr/bookmarkSubtitleTextColor"
+        android:textColor="?attr/savedSiteSubtitleTextColor"
         android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"

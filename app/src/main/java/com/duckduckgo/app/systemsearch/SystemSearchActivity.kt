@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -50,7 +50,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bookmarks.*
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.activity_system_search.appBarLayout
 import kotlinx.android.synthetic.main.activity_system_search.autocompleteSuggestions
@@ -195,18 +194,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         quickAccessRecyclerView.layoutManager = layoutManager
         quickAccessAdapter = FavoritesQuickAccessAdapter(
             this, faviconManager,
-            { viewHolder ->
-                itemTouchHelper.startDrag(viewHolder)
-            },
-            {
-                viewModel.onQuickAccesItemClicked(it)
-            },
-            {
-                viewModel.onEditQuickAccessItemRequested(it)
-            },
-            {
-                viewModel.onDeleteQuickAccessItemRequested(it)
-            }
+            { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
+            { viewModel.onQuickAccesItemClicked(it) },
+            { viewModel.onEditQuickAccessItemRequested(it) },
+            { viewModel.onDeleteQuickAccessItemRequested(it) }
         )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
@@ -236,7 +227,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
-        val dialog = EditBookmarkDialogFragment.instance(savedSite)
+        val dialog = EditSavedSiteDialogFragment.instance(savedSite)
         dialog.show(supportFragmentManager, "EDIT_BOOKMARK")
         dialog.listener = viewModel
     }

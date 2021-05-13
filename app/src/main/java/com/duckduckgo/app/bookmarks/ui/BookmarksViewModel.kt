@@ -28,7 +28,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
-import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -39,7 +39,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -49,10 +48,9 @@ class BookmarksViewModel(
     private val faviconManager: FaviconManager,
     private val bookmarksManager: BookmarksManager,
     private val dispatcherProvider: DispatcherProvider
-) : EditBookmarkListener, ViewModel() {
+) : EditSavedSiteListener, ViewModel() {
 
     data class ViewState(
-        val showFavorites: Boolean = false,
         val enableSearch: Boolean = false,
         val bookmarks: List<Bookmark> = emptyList(),
         val favorites: List<Favorite> = emptyList()
@@ -73,16 +71,10 @@ class BookmarksViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<SavedSite.Bookmark>> = dao.getBookmarks().map { bookmarks ->
-        bookmarks.map {
-            SavedSite.Bookmark(
-                it.id,
-                it.title ?: "",
-                it.url
-            )
-        }
+    private val bookmarks: LiveData<List<Bookmark>> = dao.getBookmarks().map { bookmarks ->
+        bookmarks.map { Bookmark(it.id, it.title ?: "", it.url) }
     }
-    private val bookmarksObserver = Observer<List<SavedSite.Bookmark>> { onBookmarksChanged(it!!) }
+    private val bookmarksObserver = Observer<List<Bookmark>> { onBookmarksChanged(it!!) }
 
     init {
         viewState.value = ViewState()
@@ -127,7 +119,6 @@ class BookmarksViewModel(
     }
 
     private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
-        Timber.i("Bookmark received: $bookmarks")
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
@@ -135,11 +126,7 @@ class BookmarksViewModel(
     }
 
     private fun onFavoritesChanged(favorites: List<Favorite>) {
-        Timber.i("Favorites received: $favorites")
-        viewState.value = viewState.value?.copy(
-            showFavorites = favorites.isNotEmpty(),
-            favorites = favorites
-        )
+        viewState.value = viewState.value?.copy(favorites = favorites)
     }
 
     fun onSelected(savedSite: SavedSite) {
@@ -158,7 +145,6 @@ class BookmarksViewModel(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    // TODO: don't delete favicon for urls that can be a fireproof / favorites / location
                     faviconManager.deletePersistedFavicon(savedSite.url)
                     dao.delete(BookmarkEntity(savedSite.id, savedSite.title, savedSite.url))
                 }

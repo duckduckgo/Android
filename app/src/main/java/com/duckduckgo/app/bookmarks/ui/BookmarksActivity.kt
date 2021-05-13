@@ -23,8 +23,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
@@ -37,14 +35,9 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bookmarks.*
-import kotlinx.android.synthetic.main.content_bookmarks.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.activity_bookmarks.bookmarkRootView
 import kotlinx.android.synthetic.main.content_bookmarks.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -103,7 +96,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(
             this,
-            Observer { viewState ->
+            { viewState ->
                 viewState?.let {
                     favoritesAdapter.favoriteItems = it.favorites.map { FavoritesAdapter.FavoriteItem(it) }
                     bookmarksAdapter.bookmarkItems = it.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }
@@ -114,10 +107,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         viewModel.command.observe(
             this,
-            Observer {
+            {
                 when (it) {
                     is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                    is BookmarksViewModel.Command.OpenSavedSite -> openBookmark(it.savedSite)
+                    is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
                     is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                     is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.importBookmarksResult)
                     is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
@@ -205,12 +198,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
-        val dialog = EditBookmarkDialogFragment.instance(savedSite)
+        val dialog = EditSavedSiteDialogFragment.instance(savedSite)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
 
-    private fun openBookmark(savedSite: SavedSite) {
+    private fun openSavedSite(savedSite: SavedSite) {
         startActivity(BrowserActivity.intent(this, savedSite.url))
         finish()
     }

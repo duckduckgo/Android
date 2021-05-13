@@ -21,7 +21,7 @@
     android:paddingTop="20dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/bookmarkTitleInputContainer"
+        android:id="@+id/savedSiteTitleInputContainer"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="20dp"
@@ -35,25 +35,25 @@
             android:id="@+id/titleInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bookmarkDialogTitleHint"
+            android:hint="@string/savedSiteDialogTitleHint"
             android:inputType="text|textCapWords" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/bookmarkUrlInputContainer"
+        android:id="@+id/savedSiteUrlInputContainer"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         style="@style/TextInputLayoutTheme"
-        app:layout_constraintTop_toBottomOf="@id/bookmarkTitleInputContainer">
+        app:layout_constraintTop_toBottomOf="@id/savedSiteTitleInputContainer">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/urlInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bookmarkDialogUrlHint"
+            android:hint="@string/savedSiteDialogUrlHint"
             android:inputType="textUri" />
 
     </com.google.android.material.textfield.TextInputLayout>

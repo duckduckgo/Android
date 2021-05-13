@@ -24,7 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.global.DefaultDispatcherProvider
@@ -63,7 +63,7 @@ class SystemSearchViewModel(
     private val favoritesRepository: FavoritesRepository,
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
-) : ViewModel(), EditBookmarkDialogFragment.EditBookmarkListener {
+) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
         val visible: Boolean,

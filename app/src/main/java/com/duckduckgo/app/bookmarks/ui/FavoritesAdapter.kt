@@ -29,12 +29,11 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
-import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.*
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
-import kotlinx.android.synthetic.main.view_boomark_empty_hint.view.*
-import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.*
+import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
+import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
+import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
+import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class FavoritesAdapter(
     private val layoutInflater: LayoutInflater,
@@ -68,15 +67,15 @@ class FavoritesAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             FAVORITE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
                 return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_section_title, parent, false)
                 return FavoritesScreenViewHolders.SectionTitle(view)
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_boomark_empty_hint, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_empty_hint, parent, false)
                 FavoritesScreenViewHolders.EmptyHint(view)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -120,13 +119,13 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
     class SectionTitle(itemView: View) : FavoritesScreenViewHolders(itemView) {
         fun bind() {
-            itemView.locationPermissionsSectionTitle.setText(R.string.favoritesSectionTitle)
+            itemView.savedSiteSectionTitle.setText(R.string.favoritesSectionTitle)
         }
     }
 
     class EmptyHint(itemView: View) : FavoritesScreenViewHolders(itemView) {
         fun bind() {
-            itemView.bookmarksEmptyHint.setText(R.string.favoritesEmptyHint)
+            itemView.savedSiteEmptyHint.setText(R.string.favoritesEmptyHint)
         }
     }
 
@@ -173,22 +172,20 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun showOverFlowMenu(anchor: ImageView, favorite: Favorite) {
-            val popupMenu = BookmarksPopupMenu(layoutInflater)
+            val popupMenu = SavedSitePopupMenu(layoutInflater)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editBookmark) { editFavorite(favorite) }
-                onMenuItemClicked(view.deleteBookmark) { deleteFavorite(favorite) }
+                onMenuItemClicked(view.editSavedSite) { editFavorite(favorite) }
+                onMenuItemClicked(view.deleteSavedSite) { deleteFavorite(favorite) }
             }
             popupMenu.show(itemView, anchor)
         }
 
         private fun editFavorite(favorite: Favorite) {
-            Timber.i("Editing favorite ${favorite.title}")
             viewModel.onEditSavedSiteRequested(favorite)
         }
 
         private fun deleteFavorite(favorite: Favorite) {
-            Timber.i("Deleting favorite ${favorite.title}")
             viewModel.onDeleteSavedSiteRequested(favorite)
         }
     }

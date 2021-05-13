@@ -62,7 +62,7 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
@@ -984,15 +984,9 @@ class BrowserTabFragment :
     private fun createQuickAccessAdapter(onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
-            {
-                viewModel.onQuickAccesItemClicked(it.favorite)
-            },
-            {
-                viewModel.onEditSavedSiteRequested(it.favorite)
-            },
-            {
-                viewModel.onDeleteQuickAccessItemRequested(it.favorite)
-            }
+            { viewModel.onQuickAccesItemClicked(it.favorite) },
+            { viewModel.onEditSavedSiteRequested(it.favorite) },
+            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )
     }
 
@@ -1001,7 +995,7 @@ class BrowserTabFragment :
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
         recyclerView.layoutManager = layoutManager
         val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
-        recyclerView.setPadding(sidePadding, 8.toPx(), sidePadding, 8.toPx())
+        recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)
     }
 
     private fun configurePrivacyGrade() {
@@ -1207,7 +1201,7 @@ class BrowserTabFragment :
     private fun bookmarkAdded(bookmark: SavedSite.Bookmark) {
         Snackbar.make(browserLayout, R.string.bookmarkAddedMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmark)
+                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(bookmark)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
             }
@@ -1217,7 +1211,7 @@ class BrowserTabFragment :
     private fun favoriteAdded(favorite: SavedSite.Favorite) {
         Snackbar.make(browserLayout, R.string.favoriteAddedMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditBookmarkDialogFragment.instance(favorite)
+                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(favorite)
                 addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
             }
@@ -1225,7 +1219,7 @@ class BrowserTabFragment :
     }
 
     private fun editSavedSite(savedSite: SavedSite) {
-        val addBookmarkDialog = EditBookmarkDialogFragment.instance(savedSite)
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
         addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
     }
@@ -1680,8 +1674,6 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
                     launch {
-                        // TODO: do we need a pixel here?
-                        // pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                         viewModel.onAddFavoriteMenuClicked()
                     }
                 }

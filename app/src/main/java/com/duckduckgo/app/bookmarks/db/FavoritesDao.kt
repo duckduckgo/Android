@@ -42,9 +42,6 @@ interface FavoritesDao {
     @Query("select * from favorites")
     fun favoritesObservable(): Single<List<FavoriteEntity>>
 
-    @Query("select CAST(COUNT(*) AS BIT) from favorites")
-    suspend fun hasBookmarks(): Boolean
-
     @Query("select position from favorites where position = ( select MAX(position) from favorites)")
     suspend fun getLastPosition(): Int?
 

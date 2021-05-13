@@ -28,23 +28,23 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 
-class EditBookmarkDialogFragment : DialogFragment() {
+class EditSavedSiteDialogFragment : DialogFragment() {
 
-    interface EditBookmarkListener {
+    interface EditSavedSiteListener {
         fun onSavedSiteEdited(savedSite: SavedSite)
     }
 
-    var listener: EditBookmarkListener? = null
+    var listener: EditSavedSiteListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = View.inflate(activity, R.layout.edit_bookmark, null)
+        val rootView = View.inflate(activity, R.layout.edit_saved_site, null)
         val titleInput = rootView.findViewById<EditText>(R.id.titleInput)
         val urlInput = rootView.findViewById<EditText>(R.id.urlInput)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(R.string.bookmarkDialogTitleEdit)
+            .setTitle(R.string.savedSiteDialogTitleEdit)
             .setPositiveButton(R.string.dialogSave) { _, _ ->
                 userAcceptedDialog(titleInput, urlInput)
             }
@@ -67,7 +67,7 @@ class EditBookmarkDialogFragment : DialogFragment() {
             }
             is SavedSite.Favorite -> {
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString(), position = savedSite.position)
+                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
                 )
             }
         }
@@ -100,15 +100,12 @@ class EditBookmarkDialogFragment : DialogFragment() {
     companion object {
         private const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(savedSite: SavedSite): EditBookmarkDialogFragment {
-
-            val dialog = EditBookmarkDialogFragment()
+        fun instance(savedSite: SavedSite): EditSavedSiteDialogFragment {
+            val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
-
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)
             dialog.arguments = bundle
             return dialog
         }
     }
-
 }
