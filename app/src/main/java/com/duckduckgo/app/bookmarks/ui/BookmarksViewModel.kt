@@ -106,29 +106,6 @@ class BookmarksViewModel(
         }
     }
 
-    private suspend fun editBookmark(bookmark: Bookmark) {
-        withContext(dispatcherProvider.io()) {
-            dao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
-        }
-    }
-
-    private suspend fun editFavorite(favorite: Favorite) {
-        withContext(dispatcherProvider.io()) {
-            favoritesRepository.update(favorite)
-        }
-    }
-
-    private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
-        viewState.value = viewState.value?.copy(
-            bookmarks = bookmarks,
-            enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
-        )
-    }
-
-    private fun onFavoritesChanged(favorites: List<Favorite>) {
-        viewState.value = viewState.value?.copy(favorites = favorites)
-    }
-
     fun onSelected(savedSite: SavedSite) {
         command.value = OpenSavedSite(savedSite)
     }
@@ -189,6 +166,29 @@ class BookmarksViewModel(
                 command.value = ExportedBookmarks(result)
             }
         }
+    }
+
+    private suspend fun editBookmark(bookmark: Bookmark) {
+        withContext(dispatcherProvider.io()) {
+            dao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+        }
+    }
+
+    private suspend fun editFavorite(favorite: Favorite) {
+        withContext(dispatcherProvider.io()) {
+            favoritesRepository.update(favorite)
+        }
+    }
+
+    private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
+        viewState.value = viewState.value?.copy(
+            bookmarks = bookmarks,
+            enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
+        )
+    }
+
+    private fun onFavoritesChanged(favorites: List<Favorite>) {
+        viewState.value = viewState.value?.copy(favorites = favorites)
     }
 }
 
