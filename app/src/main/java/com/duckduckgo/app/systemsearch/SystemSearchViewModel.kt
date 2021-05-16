@@ -284,7 +284,7 @@ class SystemSearchViewModel(
     fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
         viewModelScope.launch(dispatchers.io()) {
             Timber.i("Persist favorites $newList")
-            favoritesRepository.persistChanges(newList.map { it.favorite })
+            favoritesRepository.updateWithPosition(newList.map { it.favorite })
         }
     }
 

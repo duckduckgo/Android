@@ -30,7 +30,7 @@ interface FavoritesRepository {
     suspend fun insert(title: String, url: String): SavedSite.Favorite
     suspend fun insert(favorite: SavedSite.Favorite)
     suspend fun update(favorite: SavedSite.Favorite)
-    suspend fun persistChanges(favorites: List<SavedSite.Favorite>)
+    suspend fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     suspend fun favorites(): Flow<List<SavedSite.Favorite>>
     suspend fun delete(favorite: SavedSite.Favorite)
 }
@@ -81,7 +81,7 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         favoritesDao.update(FavoriteEntity(favorite.id, favorite.titleOrFallback(), favorite.url, favorite.position))
     }
 
-    override suspend fun persistChanges(favorites: List<SavedSite.Favorite>) {
+    override suspend fun updateWithPosition(favorites: List<SavedSite.Favorite>) {
         favoritesDao.persistChanges(favorites)
     }
 

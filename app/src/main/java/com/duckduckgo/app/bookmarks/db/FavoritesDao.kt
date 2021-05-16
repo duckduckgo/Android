@@ -49,7 +49,7 @@ interface FavoritesDao {
     fun favorite(id: Long): FavoriteEntity?
 
     @Transaction
-    suspend fun persistChanges(favorites: List<SavedSite.Favorite>) {
+    fun persistChanges(favorites: List<SavedSite.Favorite>) {
         favorites.forEachIndexed { index, favorite ->
             val favoriteEntity = favorite(favorite.id) ?: return
             favoriteEntity.position = index
