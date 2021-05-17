@@ -20,7 +20,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Observable
@@ -124,13 +123,14 @@ class AutoCompleteApiTest {
         )
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
             Single.just(
-            listOf(
-                favorite(title = "title", url = "https://favexample.com"),
-                favorite(title = "title", url = "https://favfoo.com"),
-                favorite(title = "title", url = "https://favbar.com"),
-                favorite(title = "title", url = "https://favbaz.com")
+                listOf(
+                    favorite(title = "title", url = "https://favexample.com"),
+                    favorite(title = "title", url = "https://favfoo.com"),
+                    favorite(title = "title", url = "https://favbar.com"),
+                    favorite(title = "title", url = "https://favbaz.com")
+                )
             )
-        ))
+        )
 
         val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
@@ -169,10 +169,10 @@ class AutoCompleteApiTest {
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
             Single.just(
                 listOf(
-                    favorite(title ="title example", url = "https://example.com"),
-                    favorite(title ="title foo", url = "https://foo.com/path/to/foo"),
-                    favorite(title ="title foo", url = "https://foo.com"),
-                    favorite(title ="title bar", url = "https://bar.com")
+                    favorite(title = "title example", url = "https://example.com"),
+                    favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
+                    favorite(title = "title foo", url = "https://foo.com"),
+                    favorite(title = "title bar", url = "https://bar.com")
                 )
             )
         )

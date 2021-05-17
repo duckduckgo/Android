@@ -24,12 +24,15 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -56,6 +59,8 @@ class SystemSearchViewModelTest {
     private val mockUserStageStore: UserStageStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
+    private val mockFavoritesRepository: FavoritesRepository = mock()
+    private val mockFaviconManager: FaviconManager = mock()
     private val mockPixel: Pixel = mock()
 
     private val commandObserver: Observer<Command> = mock()
@@ -69,7 +74,7 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -102,7 +107,7 @@ class SystemSearchViewModelTest {
     fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() = coroutineRule.runBlocking {
         (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
         testee =
-            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
+            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
         testee.resetViewState()
         testee.userUpdatedQuery("test")
 
@@ -152,10 +157,10 @@ class SystemSearchViewModelTest {
     fun whenUserUpdatesQueryThenViewStateUpdated() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resultsViewState.value
+        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
         assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState?.appResults)
-        assertEquals(autocompleteQueryResult, newViewState?.autocompleteResults)
+        assertEquals(appQueryResult, newViewState.appResults)
+        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
     }
 
     @Test
@@ -163,10 +168,10 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
-        val newViewState = testee.resultsViewState.value
+        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
         assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState?.appResults)
-        assertEquals(autocompleteQueryResult, newViewState?.autocompleteResults)
+        assertEquals(appQueryResult, newViewState.appResults)
+        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
     }
 
     @Test
@@ -174,7 +179,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userRequestedClear()
 
-        val newViewState = testee.resultsViewState.value
+        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
         assertNotNull(newViewState)
         assertTrue(newViewState!!.appResults.isEmpty())
         assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)
@@ -185,7 +190,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
-        val newViewState = testee.resultsViewState.value
+        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
         assertNotNull(newViewState)
         assertTrue(newViewState!!.appResults.isEmpty())
         assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)

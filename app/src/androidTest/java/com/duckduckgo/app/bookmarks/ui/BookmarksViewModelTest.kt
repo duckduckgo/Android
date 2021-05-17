@@ -32,8 +32,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
@@ -68,8 +66,8 @@ class BookmarksViewModelTest {
     private val faviconManager: FaviconManager = mock()
     private val bookmarksManager: BookmarksManager = mock()
 
-    private val bookmark = SavedSite.Bookmark(id= 0, title = "title", url = "www.example.com")
-    private val favorite = SavedSite.Favorite(id= 0, title = "title", url = "www.example.com", position = 0)
+    private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com")
+    private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
     private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url)
 
     private val testee: BookmarksViewModel by lazy {
@@ -100,7 +98,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFavoriteInsertedThenRepositoryUpdated()= coroutineRule.runBlocking {
+    fun whenFavoriteInsertedThenRepositoryUpdated() = coroutineRule.runBlocking {
         testee.insert(favorite)
 
         verify(favoritesRepository).insert(favorite)
@@ -165,10 +163,12 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFavoritesChangedThenObserverNotified() = coroutineRule.runBlocking {
-        whenever(favoritesRepository.favorites()).thenReturn(flow {
-            emit(emptyList<SavedSite.Favorite>())
-            emit(listOf(favorite))
-        })
+        whenever(favoritesRepository.favorites()).thenReturn(
+            flow {
+                emit(emptyList<SavedSite.Favorite>())
+                emit(listOf(favorite))
+            }
+        )
         testee
         val captor: ArgumentCaptor<BookmarksViewModel.ViewState> = ArgumentCaptor.forClass(BookmarksViewModel.ViewState::class.java)
         verify(viewStateObserver).onChanged(captor.capture())
