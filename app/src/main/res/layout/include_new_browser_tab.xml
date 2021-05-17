@@ -20,6 +20,7 @@
     android:id="@+id/newTabLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">
 
