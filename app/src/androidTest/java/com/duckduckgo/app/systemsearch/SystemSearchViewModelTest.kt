@@ -341,6 +341,17 @@ class SystemSearchViewModelTest {
         verify(mockFavoritesRepository).updateWithPosition(listOf(savedSite))
     }
 
+    @Test
+    fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf(listOf(savedSite)))
+        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
+
+        val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
+        assertEquals(1, viewState.favorites.size)
+        assertEquals(savedSite, viewState.favorites.first().favorite)
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
