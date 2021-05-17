@@ -317,17 +317,25 @@ class SystemSearchViewModel(
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
-        val favorite = savedSite as? SavedSite.Favorite ?: return
-        viewModelScope.launch(dispatchers.io() + NonCancellable) {
-            faviconManager.deletePersistedFavicon(savedSite.url)
-            favoritesRepository.delete(favorite)
+        when (savedSite) {
+            is SavedSite.Favorite -> {
+                viewModelScope.launch(dispatchers.io() + NonCancellable) {
+                    faviconManager.deletePersistedFavicon(savedSite.url)
+                    favoritesRepository.delete(savedSite)
+                }
+            }
+            else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
         }
     }
 
     fun insertQuickAccessItem(savedSite: SavedSite) {
-        val favorite = savedSite as? SavedSite.Favorite ?: return
-        viewModelScope.launch(dispatchers.io()) {
-            favoritesRepository.insert(favorite)
+        when (savedSite) {
+            is SavedSite.Favorite -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    favoritesRepository.insert(savedSite)
+                }
+            }
+            else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
         }
     }
 }

@@ -25,7 +25,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,6 +37,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -74,6 +77,7 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
+        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
         testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
@@ -179,10 +183,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userRequestedClear()
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertTrue(newViewState!!.appResults.isEmpty())
-        assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)
+        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
     }
 
     @Test
@@ -190,10 +191,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertTrue(newViewState!!.appResults.isEmpty())
-        assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)
+        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
     }
 
     @Test
@@ -274,6 +272,73 @@ class SystemSearchViewModelTest {
         testee.onUserSelectedToEditQuery(query)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.EditQuery(query), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenQuickAccessItemClickedThenLaunchBrowser() {
+        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+
+        testee.onQuickAccesItemClicked(quickAccessItem)
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowser(quickAccessItem.favorite.url), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenQuickAccessItemEditRequestedThenLaunchEditDialog() {
+        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+
+        testee.onEditQuickAccessItemRequested(quickAccessItem)
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchEditDialog(quickAccessItem.favorite), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenQuickAccessItemDeleteRequestedThenShowDeleteConfirmation() {
+        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+
+        testee.onDeleteQuickAccessItemRequested(quickAccessItem)
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenQuickAccessEditedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+
+        testee.onSavedSiteEdited(savedSite)
+
+        verify(mockFavoritesRepository).update(savedSite)
+    }
+
+    @Test
+    fun whenQuickAccessDeletedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+
+        testee.deleteQuickAccessItem(savedSite)
+
+        verify(mockFavoritesRepository).delete(savedSite)
+    }
+
+    @Test
+    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+
+        testee.insertQuickAccessItem(savedSite)
+
+        verify(mockFavoritesRepository).insert(savedSite)
+    }
+
+    @Test
+    fun whenQuickAccessListChangedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSites = listOf(QuickAccessFavorite(savedSite))
+
+        testee.onQuickAccessListChanged(savedSites)
+
+        verify(mockFavoritesRepository).updateWithPosition(listOf(savedSite))
     }
 
     private suspend fun whenOnboardingShowing() {
