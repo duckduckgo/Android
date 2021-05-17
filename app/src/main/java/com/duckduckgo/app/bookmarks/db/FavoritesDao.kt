@@ -43,7 +43,7 @@ interface FavoritesDao {
     fun favoritesObservable(): Single<List<FavoriteEntity>>
 
     @Query("select position from favorites where position = ( select MAX(position) from favorites)")
-    suspend fun getLastPosition(): Int?
+    fun getLastPosition(): Int?
 
     @Query("select * from favorites where id = :id")
     fun favorite(id: Long): FavoriteEntity?

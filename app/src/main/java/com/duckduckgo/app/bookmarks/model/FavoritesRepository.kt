@@ -25,14 +25,14 @@ import kotlinx.coroutines.flow.map
 import java.io.Serializable
 
 interface FavoritesRepository {
-    suspend fun favoritesCountByDomain(domain: String): Int
+    fun favoritesCountByDomain(domain: String): Int
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
-    suspend fun insert(title: String, url: String): SavedSite.Favorite
-    suspend fun insert(favorite: SavedSite.Favorite)
-    suspend fun update(favorite: SavedSite.Favorite)
-    suspend fun updateWithPosition(favorites: List<SavedSite.Favorite>)
+    fun insert(title: String, url: String): SavedSite.Favorite
+    fun insert(favorite: SavedSite.Favorite)
+    fun update(favorite: SavedSite.Favorite)
+    fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
-    suspend fun delete(favorite: SavedSite.Favorite)
+    fun delete(favorite: SavedSite.Favorite)
 }
 
 sealed class SavedSite(
@@ -55,14 +55,14 @@ sealed class SavedSite(
 }
 
 class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
-    override suspend fun favoritesCountByDomain(domain: String): Int {
+    override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
     }
 
     override fun favoritesObservable() =
         favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
 
-    override suspend fun insert(title: String, url: String): SavedSite.Favorite {
+    override fun insert(title: String, url: String): SavedSite.Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val lastPosition = favoritesDao.getLastPosition() ?: 0
         val favoriteEntity = FavoriteEntity(title = titleOrFallback, url = url, position = lastPosition + 1)
@@ -70,18 +70,18 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         return SavedSite.Favorite(id, favoriteEntity.title, favoriteEntity.url, favoriteEntity.position)
     }
 
-    override suspend fun insert(favorite: SavedSite.Favorite) {
+    override fun insert(favorite: SavedSite.Favorite) {
         if (favorite.url.isEmpty()) return
         val favoriteEntity = FavoriteEntity(title = favorite.titleOrFallback(), url = favorite.url, position = favorite.position)
         favoritesDao.insert(favoriteEntity)
     }
 
-    override suspend fun update(favorite: SavedSite.Favorite) {
+    override fun update(favorite: SavedSite.Favorite) {
         if (favorite.url.isEmpty()) return
         favoritesDao.update(FavoriteEntity(favorite.id, favorite.titleOrFallback(), favorite.url, favorite.position))
     }
 
-    override suspend fun updateWithPosition(favorites: List<SavedSite.Favorite>) {
+    override fun updateWithPosition(favorites: List<SavedSite.Favorite>) {
         favoritesDao.persistChanges(favorites)
     }
 
@@ -89,7 +89,7 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
     }
 
-    override suspend fun delete(favorite: SavedSite.Favorite) {
+    override fun delete(favorite: SavedSite.Favorite) {
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 
