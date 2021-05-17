@@ -82,6 +82,16 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         phoenixDao.delete()
     }
 
+    @WorkerThread
+    fun getBlockedTrackersCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
+        return trackerDao.getTrackersCountBetween(startTime(), endTime)
+    }
+
+    @WorkerThread
+    fun getTrackingAppsCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
+        return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
+    }
+
     private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {
 
         var dataSent = 0L

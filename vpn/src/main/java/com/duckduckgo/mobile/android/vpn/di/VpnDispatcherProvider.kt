@@ -16,16 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 
-interface VpnDispatcherProvider {
-
-    fun main(): CoroutineDispatcher = Dispatchers.Main
-    fun default(): CoroutineDispatcher = Dispatchers.Default
-    fun io(): CoroutineDispatcher = Dispatchers.IO
-    fun unconfined(): CoroutineDispatcher = Dispatchers.Unconfined
-
-}
+interface VpnDispatcherProvider : DispatcherProvider
 
 class DefaultVpnDispatcherProvider : VpnDispatcherProvider

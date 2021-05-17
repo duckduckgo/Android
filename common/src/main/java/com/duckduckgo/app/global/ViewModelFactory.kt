@@ -20,7 +20,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPluginPoint
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {

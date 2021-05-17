@@ -16,8 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -87,14 +88,8 @@ class DomainBasedTrackerDetector(
                 } else {
                     tcb.isTracker = true
                     tcb.trackerHostName = trackerHostname
-                    Timber.i(
-                        "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
-                        hostname,
-                        requestingApp.packageId,
-                        trackerType.tracker.owner.name,
-                        tcb.ipAndPort
-                    )
-                    insertTracker(trackerType.tracker)
+                    Timber.i("Determined $hostname to be a 3rd party tracker for ${requestingApp.packageId}, tracker owned by ${trackerType.tracker.owner.name} [${tcb.ipAndPort}]")
+                    insertTracker(trackerType.tracker, requestingApp)
                     deviceShieldPixels.trackerBlocked()
                     RequestTrackerType.Tracker(trackerType.tracker.hostname)
                     RequestTrackerType.Tracker(trackerHostname)
@@ -114,10 +109,11 @@ class DomainBasedTrackerDetector(
         return exceptionRule != null && exceptionRule.packageNames.contains(originatingApp.packageId)
     }
 
-    private fun insertTracker(tracker: AppTracker) {
+    private fun insertTracker(tracker: AppTracker, requestingApp: AppNameResolver.OriginatingApp) {
         val vpnTracker = VpnTracker(
             trackerCompanyId = tracker.trackerCompanyId,
             company = tracker.owner.displayName,
+            trackingApp = TrackingApp(requestingApp.packageId, requestingApp.appName),
             domain = tracker.hostname
         )
         Timber.i("Inserting $vpnTracker as tracker")

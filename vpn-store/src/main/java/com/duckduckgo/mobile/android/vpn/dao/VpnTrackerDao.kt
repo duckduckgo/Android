@@ -38,4 +38,9 @@ interface VpnTrackerDao {
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
+    @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
+    fun getTrackersCountBetween(startTime: String, endTime: String): Flow<Int>
+
+    @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
+    fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
 }

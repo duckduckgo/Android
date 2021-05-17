@@ -18,6 +18,7 @@
 
 package com.duckduckgo.mobile.android.vpn.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
@@ -28,6 +29,7 @@ data class VpnTracker(
     val trackerCompanyId: Int,
     val domain: String,
     val company: String,
+    @Embedded val trackingApp: TrackingApp,
     val timestamp: String = DatabaseDateFormatter.timestamp()
 )
 
@@ -57,3 +59,8 @@ data class VpnPreferences(
     @PrimaryKey val preference: String,
     val value: Boolean
 )
+
+data class TrackingApp(val packageId: String, val appDisplayName: String) {
+    override fun toString(): String = "package=$packageId ($appDisplayName)"
+}
+

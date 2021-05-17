@@ -21,6 +21,7 @@ import android.text.style.StyleSpan
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
@@ -354,7 +355,8 @@ class DeviceShieldNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC")
+        val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC", trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 
@@ -364,7 +366,8 @@ class DeviceShieldNotificationFactoryTest {
         trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ): VpnTracker {
-        return VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = trackerCompanyName)
+        val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
+        return VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = trackerCompanyName, trackingApp = defaultTrackingApp)
     }
 
 }

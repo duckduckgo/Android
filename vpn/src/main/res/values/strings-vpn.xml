@@ -147,4 +147,8 @@
     <string name="trackerProfilingInfoFirstParagraph">Let’s take the prime example — Google. If you ask most people what Google’s business is they will say “search,” but Google actually makes a lot of its money from serving ads on other sites.\n\nPut simply, Google isn’t a search company, they’re an advertising company.\n\nPrinceton’s WebTAP privacy project recently found that Google’s trackers are installed on 75% of the top million Internet websites. (The next closest is Facebook at 25%!)</string>
     <string name="trackerProfilingInfoSecondParagraph">Google sells ads not only on their search engine, but also on over 2.2 million other websites and over 1 million apps. Every time you visit one of these sites or apps, Google is storing that information and using it to target ads at you.\n\nThat’s why you may have seen ads tracking you across the net!\n\nDuckDuckGo Privacy Browser blocks many trackers from Google and other companies as you browse. With Device Shield, we can block trackers in other apps, too. This reduces what companies know about you overall, so you can enjoy peace of mind!</string>
 
+    <!--  Device Shield Activity -->
+    <string name="deviceShieldActivityPastWeek">Past Week</string>
+    <string name="deviceShieldActivityTitle">Device Shield Activity</string>
+
 </resources>

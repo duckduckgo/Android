@@ -44,6 +44,13 @@
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity"
             />
 
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:theme="@style/Theme.AndroidVpn"
+            android:label="@string/deviceShieldActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            />
+
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"

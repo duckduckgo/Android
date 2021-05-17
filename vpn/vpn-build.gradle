@@ -18,6 +18,8 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'kotlin-android-extensions'
+
 }
 
 apply from: "$rootDir/spotless.gradle"
@@ -87,10 +89,9 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase")
     implementation "com.google.firebase:firebase-crashlytics-ktx"
 
-    implementation AndroidX.lifecycle.extensions
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtimeKtx
-    implementation  AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
 
     // Dagger
