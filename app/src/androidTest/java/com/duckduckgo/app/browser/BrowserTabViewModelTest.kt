@@ -38,6 +38,8 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.FireButton
@@ -46,6 +48,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -148,8 +151,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
@@ -263,6 +265,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockEmailManager: EmailManager
 
+    @Mock
+    private lateinit var mockFavoritesRepository: FavoritesRepository
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -303,12 +308,13 @@ class BrowserTabViewModelTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockFavoritesRepository)
         val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
+        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -375,7 +381,8 @@ class BrowserTabViewModelTest {
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
-            emailManager = mockEmailManager
+            emailManager = mockEmailManager,
+            favoritesRepository = mockFavoritesRepository
         )
 
         testee.loadData("abc", null, false)
@@ -527,8 +534,15 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.editBookmark(0, "A title", "www.example.com")
+        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com"))
         verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+    }
+
+    @Test
+    fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
+        val favorite = SavedSite.Favorite(0, "A title", "www.example.com", 1)
+        testee.onSavedSiteEdited(favorite)
+        verify(mockFavoritesRepository).update(favorite)
     }
 
     @Test
@@ -1399,19 +1413,17 @@ class BrowserTabViewModelTest {
         testee.titleReceived("Foo Title")
         testee.onBookmarkAddRequested()
         val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-        assertEquals("foo.com", command.url)
-        assertEquals("Foo Title", command.title)
+        assertEquals("foo.com", command.bookmark.url)
+        assertEquals("Foo Title", command.bookmark.title)
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = coroutineRule.runBlocking {
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
         whenever(mockBookmarksDao.insert(any())).thenReturn(1)
+
         testee.onBookmarkAddRequested()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
-        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-        assertEquals(1, command.bookmarkId)
-        assertEquals("", command.title)
-        assertEquals("", command.url)
+
+        verify(mockBookmarksDao, times(0)).insert(any<BookmarkEntity>())
     }
 
     @Test
@@ -1695,7 +1707,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = coroutineRule.runBlocking {
         testee.onUserSelectedToEditQuery("foo")
-        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+
+        assertCommandIssued<Command.EditWithSelectedQuery>()
     }
 
     @Test
@@ -2915,7 +2928,7 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://example.com", bitmap)
 
-        verify(mockFaviconManager).storeFavicon("TAB_ID", bitmap, "https://example.com")
+        verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(bitmap, "https://example.com"))
     }
 
     @Test
@@ -2923,7 +2936,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         val file = File("test")
-        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(file)
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
 
         testee.iconReceived("https://example.com", bitmap)
 
@@ -2934,7 +2947,7 @@ class BrowserTabViewModelTest {
     fun whenIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
-        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(null)
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(null)
 
         testee.iconReceived("https://example.com", bitmap)
 
@@ -2946,7 +2959,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         val file = File("test")
-        whenever(mockFaviconManager.storeFavicon(any(), any(), any())).thenReturn(file)
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
 
         testee.iconReceived("https://notexample.com", bitmap)
 
@@ -3021,7 +3034,7 @@ class BrowserTabViewModelTest {
     fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() = coroutineRule.runBlocking {
         val url = "http://example.com"
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
-        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(bitmap)
+        whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(bitmap)
         loadUrl(url, "A title")
 
         testee.onPinPageToHomeSelected()
@@ -3036,7 +3049,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() = coroutineRule.runBlocking {
         val url = "http://example.com"
-        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(null)
+        whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
         loadUrl(url, "A title")
 
         testee.onPinPageToHomeSelected()

@@ -31,7 +31,7 @@ interface FavoritesRepository {
     suspend fun insert(favorite: SavedSite.Favorite)
     suspend fun update(favorite: SavedSite.Favorite)
     suspend fun updateWithPosition(favorites: List<SavedSite.Favorite>)
-    suspend fun favorites(): Flow<List<SavedSite.Favorite>>
+    fun favorites(): Flow<List<SavedSite.Favorite>>
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -85,7 +85,7 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         favoritesDao.persistChanges(favorites)
     }
 
-    override suspend fun favorites(): Flow<List<SavedSite.Favorite>> {
+    override fun favorites(): Flow<List<SavedSite.Favorite>> {
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
     }
 
