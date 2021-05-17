@@ -20,7 +20,8 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
     android:clipToPadding="false">
 
     <com.google.android.material.card.MaterialCardView
@@ -31,6 +32,8 @@
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         app:cardBackgroundColor="?attr/colorPrimary"
         app:cardCornerRadius="10dp"
         app:cardElevation="4dp">
@@ -50,7 +53,9 @@
         android:layout_gravity="center_horizontal"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxLines="1"
+        android:maxLines="2"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
         android:paddingTop="8dp"
         android:textColor="?normalTextColor"
         android:textSize="12sp"
