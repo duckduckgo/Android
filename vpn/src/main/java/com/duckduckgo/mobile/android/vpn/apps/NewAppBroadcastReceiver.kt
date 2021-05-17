@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.annotation.MainThread
+import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -31,6 +33,8 @@ class NewAppBroadcastReceiver @Inject constructor(
     private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository
 ) : BroadcastReceiver() {
+
+    @MainThread
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
@@ -40,14 +44,14 @@ class NewAppBroadcastReceiver @Inject constructor(
     private fun restartVpn(packageName: String) {
         Timber.d("Newly installed package $packageName")
 
-        if (isGame(packageName) || isInExclusionList(packageName)) {
-            Timber.i("Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
-            val pendingResult = goAsync()
-            goAsync(pendingResult) {
+        val pendingResult = goAsync()
+        goAsync(pendingResult) {
+            if (isGame(packageName) || isInExclusionList(packageName)) {
+                Timber.i("Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
+            } else {
+                Timber.i("Newly installed package $packageName not in exclusion list")
             }
-        } else {
-            Timber.i("Newly installed package $packageName not in exclusion list")
         }
     }
 
@@ -64,6 +68,7 @@ class NewAppBroadcastReceiver @Inject constructor(
         return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game
     }
 
+    @WorkerThread
     private fun isInExclusionList(packageName: String): Boolean {
         return appTrackerRepository.getAppExclusionList().contains(packageName)
     }

@@ -19,10 +19,10 @@ package com.duckduckgo.mobile.android.vpn.trackers
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 
+@WorkerThread
 interface AppTrackerRepository {
     fun findTracker(hostname: String, packageName: String): AppTrackerType
 
-    @WorkerThread
     fun getAppExclusionList(): List<String>
 }
 
