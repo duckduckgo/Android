@@ -23,9 +23,9 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.view.childrenRecursiveSequence
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import kotlinx.android.synthetic.main.settings_toggle_option_with_subtitle.view.*
-import org.jetbrains.anko.childrenRecursiveSequence
 
 class SettingsToggleOptionWithSubtitle : FrameLayout {
 

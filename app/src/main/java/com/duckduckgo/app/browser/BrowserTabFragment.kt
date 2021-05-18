@@ -86,8 +86,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
+import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
@@ -119,8 +119,6 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -880,7 +878,7 @@ class BrowserTabFragment :
     }
 
     private fun showToast(@StringRes messageId: Int) {
-        context?.applicationContext?.longToast(messageId)
+        Toast.makeText(context?.applicationContext, messageId, Toast.LENGTH_LONG).show()
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
@@ -1142,7 +1140,15 @@ class BrowserTabFragment :
     }
 
     private fun launchSharePageChooser(url: String) {
-        activity?.share(url, "")
+        val intent = Intent(Intent.ACTION_SEND).also {
+            it.type = "text/plain"
+            it.putExtra(Intent.EXTRA_TEXT, url)
+        }
+        try {
+            startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
     }
 
     override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {

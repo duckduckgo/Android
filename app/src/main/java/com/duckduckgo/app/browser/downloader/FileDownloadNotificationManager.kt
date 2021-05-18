@@ -21,12 +21,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationRegistrar.ChannelType
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 @AnyThread
@@ -36,8 +37,8 @@ class FileDownloadNotificationManager @Inject constructor(
 ) {
 
     fun showDownloadInProgressNotification() {
-        applicationContext.runOnUiThread {
-            applicationContext.longToast(getString(R.string.downloadInProgress))
+        mainThreadHandler().post {
+            Toast.makeText(applicationContext, R.string.downloadInProgress, Toast.LENGTH_LONG).show()
 
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADING.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
@@ -49,9 +50,8 @@ class FileDownloadNotificationManager @Inject constructor(
     }
 
     fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?) {
-
-        applicationContext.runOnUiThread {
-            applicationContext.longToast(getString(R.string.downloadComplete))
+        mainThreadHandler().post {
+            Toast.makeText(applicationContext, R.string.downloadComplete, Toast.LENGTH_LONG).show()
 
             val i = Intent(Intent.ACTION_VIEW)
             i.setDataAndType(uri, mimeType)
@@ -69,7 +69,7 @@ class FileDownloadNotificationManager @Inject constructor(
     }
 
     fun showDownloadFailedNotification() {
-        applicationContext.runOnUiThread {
+        mainThreadHandler().post {
 
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadFailed))
@@ -79,6 +79,8 @@ class FileDownloadNotificationManager @Inject constructor(
             notificationManager.notify(NOTIFICATION_ID, notification)
         }
     }
+
+    private fun mainThreadHandler() = Handler(Looper.getMainLooper())
 
     companion object {
         private const val NOTIFICATION_ID = 1

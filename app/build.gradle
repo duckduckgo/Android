@@ -181,10 +181,6 @@ dependencies {
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
-    // Anko
-    implementation "org.jetbrains.anko:anko-commons:_"
-    implementation "org.jetbrains.anko:anko-design:_"
-
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.fragmentKtx
