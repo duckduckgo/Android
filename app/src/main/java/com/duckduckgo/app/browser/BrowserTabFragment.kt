@@ -1793,15 +1793,15 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
-                if (viewState.showSuggestions) {
-                    if (viewState.searchResults.suggestions.isNotEmpty()) {
-                        autoCompleteSuggestionsList.show()
-                        quickAccessSuggestionsRecyclerView.gone()
-                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
-                    } else if (viewState.favorites.isNotEmpty()) {
+                if (viewState.showSuggestions || viewState.showFavorites) {
+                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
                         autoCompleteSuggestionsList.gone()
                         quickAccessSuggestionsRecyclerView.show()
                         omnibarQuickAccessAdapter.submitList(viewState.favorites)
+                    } else {
+                        autoCompleteSuggestionsList.show()
+                        quickAccessSuggestionsRecyclerView.gone()
+                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                     }
                 } else {
                     autoCompleteSuggestionsList.gone()
