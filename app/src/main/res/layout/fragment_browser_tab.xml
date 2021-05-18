@@ -54,6 +54,7 @@
         android:layout_height="match_parent"
         android:background="?toolbarBgColor"
         android:backgroundTint="?toolbarBgColor"
+        android:paddingTop="15dp"
         android:clipToPadding="false"
         android:elevation="4dp"
         android:visibility="gone"
