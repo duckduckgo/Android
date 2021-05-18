@@ -38,6 +38,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
@@ -45,7 +46,6 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
-import dummy.VpnViewModelFactory
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
 import nl.dionsegijn.konfetti.KonfettiView
@@ -60,7 +60,7 @@ import javax.inject.Inject
 class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_report) {
 
     @Inject
-    lateinit var viewModelFactory: VpnViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding

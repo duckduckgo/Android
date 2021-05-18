@@ -34,6 +34,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
@@ -41,7 +42,6 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import dummy.VpnViewModelFactory
 import nl.dionsegijn.konfetti.KonfettiView
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
@@ -54,7 +54,7 @@ import javax.inject.Inject
 class DeviceShieldFragment : Fragment() {
 
     @Inject
-    lateinit var viewModelFactory: VpnViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding

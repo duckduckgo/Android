@@ -18,16 +18,20 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.content.Context
 import androidx.lifecycle.*
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
@@ -84,6 +88,22 @@ class PrivacyReportViewModel(
                     val lastTracker = trackers.first()
                     return CompanyTrackers(lastTracker.company, trackers.size, lastTracker)
                 }
+            }
+        }
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class PrivacyReportViewModelFactory @Inject constructor(
+    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
+    private val vpnPreferences: VpnPreferences,
+    private val context: Context
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PrivacyReportViewModel::class.java) -> (PrivacyReportViewModel(appTrackerBlockingStatsRepository, vpnPreferences, context) as T)
+                else -> null
             }
         }
     }

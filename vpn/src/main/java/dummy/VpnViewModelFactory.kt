@@ -21,13 +21,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import dummy.ui.VpnControllerViewModel
 import dummy.ui.VpnPreferences
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(
+    message = "Do not add more view models here."
+)
 class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceFactory() {
 
     @Inject
@@ -42,14 +43,10 @@ class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceF
     @Inject
     lateinit var vpnPreferences: VpnPreferences
 
-    @Inject
-    lateinit var appTrackerRepository: AppTrackerRepository
-
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
                 isAssignableFrom(VpnControllerViewModel::class.java) -> vpnControllerViewModel()
-                isAssignableFrom(PrivacyReportViewModel::class.java) -> privacyReportViewModel()
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
         } as T
@@ -62,13 +59,4 @@ class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceF
             vpnPreferences = vpnPreferences
         )
     }
-
-    private fun privacyReportViewModel(): PrivacyReportViewModel {
-        return PrivacyReportViewModel(
-            repository = appTrackerBlockingStatsRepository,
-            vpnPreferences = vpnPreferences,
-            applicationContext = applicationContext,
-        )
-    }
-
 }

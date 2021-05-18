@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import android.annotation.TargetApi
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
@@ -33,7 +32,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
@@ -109,11 +107,4 @@ class VpnModule {
     ): VpnTrackerDetector {
         return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
     }
-
-    @VpnScope
-    @Provides
-    fun providesVpnPreferences(context: Context): VpnPreferences {
-        return VpnPreferences(context)
-    }
-
 }
