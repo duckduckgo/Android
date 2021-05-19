@@ -26,11 +26,9 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
-    private lateinit var binding: ActivityAboutDuckDuckGoBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAboutDuckDuckGoBinding.inflate(layoutInflater)
+        val binding = ActivityAboutDuckDuckGoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
