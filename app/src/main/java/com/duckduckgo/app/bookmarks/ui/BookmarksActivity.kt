@@ -272,7 +272,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             get() = "bookmarks_ddg_${formattedTimestamp()}.html"
 
         private fun formattedTimestamp(): String = formatter.format(Date())
-        private val formatter: SimpleDateFormat = SimpleDateFormat("MMddYY", Locale.US).apply {
+        private val formatter: SimpleDateFormat = SimpleDateFormat("yyyyMMdd", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
     }
