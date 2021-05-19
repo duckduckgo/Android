@@ -20,9 +20,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import android.view.LayoutInflater
 import android.widget.RelativeLayout
-import kotlinx.android.synthetic.main.view_tab_switcher_button.view.*
+import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
 
 class TabSwitcherButton @JvmOverloads constructor(
     context: Context,
@@ -30,22 +30,16 @@ class TabSwitcherButton @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
+    private val binding = ViewTabSwitcherButtonBinding.inflate(LayoutInflater.from(context), this)
+
     var count = 0
         set(value) {
             field = value
             val text = if (count < 100) "$count" else "~"
-            tabCount.text = text
+            binding.tabCount.text = text
         }
 
     var hasUnread = false
-        set(value) {
-            field = value
-        }
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        View.inflate(context, R.layout.view_tab_switcher_button, this)
-    }
 
     fun increment(callback: () -> Unit) {
         fadeOutCount {
@@ -65,12 +59,12 @@ class TabSwitcherButton @JvmOverloads constructor(
         val listener = object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 // otherwise on end keeps being called repeatedly
-                tabCount.animate().setListener(null)
+                binding.tabCount.animate().setListener(null)
                 callback()
             }
         }
 
-        tabCount.animate()
+        binding.tabCount.animate()
             .setDuration(300)
             .alpha(0.0f)
             .setListener(listener)
@@ -78,7 +72,7 @@ class TabSwitcherButton @JvmOverloads constructor(
     }
 
     private fun fadeInCount() {
-        tabCount.animate()
+        binding.tabCount.animate()
             .setDuration(300)
             .alpha(1.0f)
             .start()
