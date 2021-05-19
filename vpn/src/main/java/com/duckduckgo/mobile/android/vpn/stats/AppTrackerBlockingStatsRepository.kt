@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -50,6 +51,11 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     @WorkerThread
     fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTracker> {
         return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker -> tracker.timestamp >= startTime() }
+    }
+
+    @WorkerThread
+    fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>> {
+        return trackerDao.getPagedTrackersSince(startTime())
     }
 
     fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {

@@ -8,24 +8,18 @@
     <application>
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity"
-            android:label="@string/privacyReportToolbarTitle"
-            android:theme="@style/Theme.AndroidVpn"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-
-        <activity
             android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
             android:label="@string/title_activity_vpn_controller"
             android:process=":vpn"
-            android:parentActivityName=".ui.report.PrivacyReportActivity"
+            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar">
         </activity>
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar"
-            android:parentActivityName=".ui.report.PrivacyReportActivity"
+            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
             android:process=":vpn" >
         </activity>
 
@@ -41,7 +35,7 @@
             android:name="com.duckduckgo.mobile.android.vpn.ui.report.TrackerProfilingInfoActivity"
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/trackerProfilingActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
 
         <activity
@@ -49,6 +43,13 @@
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/deviceShieldActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            />
+
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldMostRecentActivity"
+            android:theme="@style/Theme.AndroidVpn"
+            android:label="@string/deviceShieldMostRecentActivityTitle"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
 
         <service

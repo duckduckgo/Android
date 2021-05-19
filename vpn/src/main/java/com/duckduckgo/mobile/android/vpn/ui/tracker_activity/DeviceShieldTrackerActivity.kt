@@ -19,15 +19,27 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.ResultReceiver
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
+import com.duckduckgo.mobile.android.vpn.ui.report.TrackerProfilingInfoActivity
 import dagger.android.AndroidInjection
+import dummy.ui.VpnControllerActivity
+import dummy.ui.VpnDiagnosticsActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_shield_activity) {
@@ -35,15 +47,51 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private lateinit var pastWeekView: PastWeekTrackerActivityView
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
+
+    private lateinit var trackerBlockedCountView: PastWeekTrackerActivityContentView
+    private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
+    private lateinit var ctaShowAll: View
+    private lateinit var ctaTrackerFaq: View
     private val pastWeekTrackerActivityViewModel: PastWeekTrackerActivityViewModel by bindViewModel()
+    private val privacyReportViewModel: PrivacyReportViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         AndroidInjection.inject(this)
 
-        pastWeekView = findViewById(R.id.past_week)
+        trackerBlockedCountView = findViewById(R.id.trackers_blocked_count)
+        trackingAppsCountView = findViewById(R.id.tracking_apps_count)
+        ctaShowAll = findViewById(R.id.cta_show_all)
+        ctaTrackerFaq = findViewById(R.id.cta_tracker_faq)
+
+        ctaShowAll.setOnClickListener {
+            startActivity(DeviceShieldMostRecentActivity.intent(this))
+        }
+
+        ctaTrackerFaq.setOnClickListener {
+            TrackerProfilingInfoActivity.intent(this).also {
+                deviceShieldPixels.privacyReportArticleDisplayed()
+                startActivity(it)
+            }
+        }
+
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.activity_list,
+                DeviceShieldActivityFeedFragment.newInstance(
+                    DeviceShieldActivityFeedFragment.ActivityFeedConfig(
+                        maxRows = 5,
+                        timeWindow = 5,
+                        timeWindowUnits = TimeUnit.DAYS,
+                        showTimeWindowHeadings = false
+                    )
+                ),
+                null
+            )
+            .commitNow()
 
         lifecycleScope.launch {
             pastWeekTrackerActivityViewModel.getBlockedTrackersCount()
@@ -51,16 +99,98 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
                     TrackerCountInfo(trackers, apps)
                 }
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    pastWeekView.trackersCount = it.stringTrackerCount()
-                    pastWeekView.trackingAppsCount = it.stringAppsCount()
-                }
+                .collect { updateCounts(it) }
+        }
+
+        deviceShieldPixels.didShowPrivacyReport()
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+
+        intent.getParcelableExtra<ResultReceiver>(RESULT_RECEIVER_EXTRA)?.let {
+            it.send(ON_LAUNCHED_CALLED_SUCCESS, null)
+        }
+    }
+
+    override fun onBackPressed() {
+        onSupportNavigateUp()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
+    private fun updateCounts(trackerCountInfo: TrackerCountInfo) {
+        trackerBlockedCountView.count = trackerCountInfo.stringTrackerCount()
+        trackingAppsCountView.count = trackerCountInfo.stringAppsCount()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.vpn_debug_menu, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        super.onPrepareOptionsMenu(menu)
+        menu.findItem(R.id.debugLogging).isChecked = privacyReportViewModel.getDebugLoggingPreference()
+        menu.findItem(R.id.customDnsServer)?.let {
+            it.isChecked = privacyReportViewModel.isCustomDnsServerSet()
+            it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.reportFeedback -> {
+                launchFeedback(); true
+            }
+            R.id.dataScreen -> {
+                startActivity(VpnControllerActivity.intent(this)); true
+            }
+            R.id.diagnosticsScreen -> {
+                startActivity(VpnDiagnosticsActivity.intent(this)); true
+            }
+            R.id.debugLogging -> {
+                val enabled = !item.isChecked
+                privacyReportViewModel.useDebugLogging(enabled)
+                reconfigureTimber(enabled)
+                true
+            }
+            R.id.customDnsServer -> {
+                val enabled = !item.isChecked
+                privacyReportViewModel.useCustomDnsServer(enabled)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun launchFeedback() {
+        startActivity(Intent(Intent.ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL))
+    }
+
+    private fun reconfigureTimber(debugLoggingEnabled: Boolean) {
+        if (debugLoggingEnabled) {
+            Timber.uprootAll()
+            Timber.plant(Timber.DebugTree())
+            Timber.w("Logging Started")
+        } else {
+            Timber.w("Logging Ended")
+            Timber.uprootAll()
         }
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, DeviceShieldTrackerActivity::class.java)
+        private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
+        private const val ON_LAUNCHED_CALLED_SUCCESS = 0
+
+        fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
+            return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
+                putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
+            }
         }
     }
 

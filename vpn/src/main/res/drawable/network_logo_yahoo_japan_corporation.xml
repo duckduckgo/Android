@@ -1,0 +1,46 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
+  <path
+      android:pathData="M11,11m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:strokeWidth="1"
+      android:fillColor="@color/almostBlackDark"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M15.1898,5.7444C14.6104,5.6784 14.4369,6.05 14.3953,6.5169C14.168,8.9956 13.9529,11.4742 13.7304,13.9944L14.1069,14.1093C14.6642,11.6111 15.2216,9.1202 15.7667,6.6367C15.8718,6.1356 15.6322,5.8031 15.1898,5.7444Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M13.5667,5.8936L12.2418,5.8936C12.1686,5.9962 12.1017,6.1031 12.0413,6.2138C11.2444,7.5802 10.4231,8.9222 9.5529,10.3889C9.4111,10.1713 9.3329,10.054 9.262,9.9342C8.492,8.6387 7.7318,7.3407 6.9471,6.0598C6.907,5.9986 6.8594,5.9428 6.8053,5.8936L5.5,5.8936L5.5196,5.9351C6.5536,7.7 7.6047,9.4698 8.6044,11.2616C8.8157,11.6675 8.9303,12.1167 8.9393,12.5742C8.9833,13.8527 8.954,15.1336 8.954,16.3998L10.1029,16.3998L10.1029,13.6938C10.0344,12.2564 10.4916,10.9902 11.2884,9.768C12.0853,8.5458 12.8089,7.2111 13.5667,5.8936Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M13.6718,14.9747C13.3692,14.9697 13.0936,15.1482 12.9743,15.4263C12.8551,15.7045 12.9158,16.0272 13.128,16.2429C13.3403,16.4587 13.6619,16.5248 13.942,16.4101C14.2221,16.2955 14.4051,16.0229 14.4051,15.7202C14.4084,15.5236 14.3326,15.3339 14.1947,15.1938C14.0568,15.0536 13.8684,14.9746 13.6718,14.9747Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

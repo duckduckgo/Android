@@ -26,7 +26,7 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 
 class DeviceShieldEnabledNotificationBuilder {
 
@@ -51,7 +51,7 @@ class DeviceShieldEnabledNotificationBuilder {
 
             registerOngoingNotificationChannel(context)
 
-            val privacyReportIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
+            val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -79,7 +79,7 @@ class DeviceShieldEnabledNotificationBuilder {
 
             registerOngoingNotificationChannel(context)
 
-            val privacyReportIntent = PrivacyReportActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
+            val privacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = notificationPressHandler)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(privacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)

@@ -128,6 +128,8 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
 
+    implementation "com.github.bumptech.glide:glide:_"
+
     // Testing dependencies
     testImplementation Testing.mockito.kotlin
     testImplementation "junit:junit:_"

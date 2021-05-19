@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
+  <path
+      android:pathData="M11,0C4.9249,0 0,4.9249 0,11C0,17.0751 4.9249,22 11,22C17.0751,22 22,17.0751 22,11C22,4.9249 17.0751,0 11,0ZM16.8313,8.0101C16.8313,8.1427 16.8313,8.2752 16.8313,8.4024C16.8313,12.3783 13.807,16.9586 8.2752,16.9586C6.6382,16.9631 5.0348,16.4946 3.6578,15.6094C3.899,15.6352 4.1415,15.6476 4.3841,15.6465C5.7381,15.65 7.0538,15.1971 8.1188,14.361C6.8319,14.3382 5.7017,13.4999 5.3065,12.2749C5.494,12.3057 5.6837,12.3217 5.8737,12.3227C6.1421,12.3223 6.4094,12.2876 6.6689,12.2193C5.2646,11.9363 4.2552,10.7017 4.2569,9.2692L4.2569,9.232C4.6738,9.4645 5.1396,9.5953 5.6166,9.6137C4.7782,9.0561 4.2747,8.1158 4.2754,7.1089C4.2739,6.5753 4.4148,6.051 4.6836,5.5901C6.2113,7.4711 8.4659,8.6147 10.886,8.7364C10.8372,8.5099 10.8123,8.2789 10.8118,8.0472C10.8118,6.3872 12.1575,5.0414 13.8176,5.0414C14.65,5.0393 15.4458,5.383 16.0149,5.9904C16.6886,5.8616 17.3345,5.6158 17.9234,5.2641C17.6994,5.96 17.2278,6.5495 16.5981,6.9207C17.1951,6.8541 17.7786,6.6977 18.3289,6.4569C17.9196,7.0552 17.4124,7.5803 16.8287,8.0101L16.8313,8.0101Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

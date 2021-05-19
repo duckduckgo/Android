@@ -33,6 +33,11 @@ data class VpnTracker(
     val timestamp: String = DatabaseDateFormatter.timestamp()
 )
 
+data class BucketizedVpnTracker(
+    val bucket: String,
+    @Embedded val vpnTracker: VpnTracker
+)
+
 @Entity(tableName = "vpn_state")
 data class VpnState(
     @PrimaryKey val id: Long = 1,

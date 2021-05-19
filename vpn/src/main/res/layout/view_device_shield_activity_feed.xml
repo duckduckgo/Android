@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
@@ -15,14 +16,20 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity">
+    android:layout_height="match_parent">
 
-    <include layout="@layout/content_vpn_privacy_report" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/activity_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listItem="@layout/view_device_shield_activity_entry"
+        />
+</FrameLayout>
 
-</LinearLayout>

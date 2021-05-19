@@ -37,7 +37,7 @@ class AppTrackerJsonParser {
             .mapValues {
                 AppTracker(
                     hostname = it.key,
-                    trackerCompanyId = it.value.owner.displayName.hashCode(),
+                    trackerCompanyId = it.value.owner.name.hashCode(),
                     owner = it.value.owner,
                     app = it.value.app,
                     isCdn = it.value.isCdn

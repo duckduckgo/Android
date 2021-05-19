@@ -53,7 +53,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import kotlinx.android.synthetic.main.content_settings_device_shield.*
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
@@ -323,7 +323,7 @@ class SettingsActivity :
 
     private fun launchDeviceShieldPrivacyReport() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(PrivacyReportActivity.intent(this), options)
+        startActivity(DeviceShieldTrackerActivity.intent(this), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -370,7 +370,7 @@ class SettingsActivity :
     private fun handleDeviceShieldOnboardingResult(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
             Timber.i("VPN enabled during device shield onboarding")
-            startActivity(PrivacyReportActivity.intent(this, celebrate = true))
+            startActivity(DeviceShieldTrackerActivity.intent(this))
         } else {
             Timber.i("VPN NOT enabled during device shield onboarding")
         }

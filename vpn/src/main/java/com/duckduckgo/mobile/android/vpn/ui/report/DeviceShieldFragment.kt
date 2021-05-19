@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import nl.dionsegijn.konfetti.KonfettiView
@@ -136,7 +137,7 @@ class DeviceShieldFragment : Fragment() {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 Timber.i("User enabled VPN during onboarding")
-                startActivity(PrivacyReportActivity.intent(requireActivity(), celebrate = true))
+                startActivity(DeviceShieldTrackerActivity.intent(requireActivity()))
             }
             else -> {
                 Timber.i("User cancelled onboarding and refused VPN permission")
@@ -161,7 +162,7 @@ class DeviceShieldFragment : Fragment() {
 
     private fun bindListeners(view: View) {
         deviceShieldInfoLayout.setOnClickListener {
-            startActivity(PrivacyReportActivity.intent(requireActivity())).also {
+            startActivity(DeviceShieldTrackerActivity.intent(requireActivity())).also {
                 deviceShieldPixels.didPressNewTabSummary()
             }
         }

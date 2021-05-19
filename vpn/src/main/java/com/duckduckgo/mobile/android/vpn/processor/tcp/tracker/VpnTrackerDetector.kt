@@ -112,7 +112,7 @@ class DomainBasedTrackerDetector(
     private fun insertTracker(tracker: AppTracker, requestingApp: AppNameResolver.OriginatingApp) {
         val vpnTracker = VpnTracker(
             trackerCompanyId = tracker.trackerCompanyId,
-            company = tracker.owner.displayName,
+            company = tracker.owner.name,
             trackingApp = TrackingApp(requestingApp.packageId, requestingApp.appName),
             domain = tracker.hostname
         )

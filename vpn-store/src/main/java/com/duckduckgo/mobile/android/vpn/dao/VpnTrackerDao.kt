@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import kotlinx.coroutines.flow.Flow
 
@@ -28,6 +29,9 @@ interface VpnTrackerDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: VpnTracker)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertAll(tracker: List<VpnTracker>)
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
@@ -43,4 +47,7 @@ interface VpnTrackerDao {
 
     @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
+
+    @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC")
+    fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 }

@@ -150,5 +150,18 @@
     <!--  Device Shield Activity -->
     <string name="deviceShieldActivityPastWeek">Past Week</string>
     <string name="deviceShieldActivityTitle">Device Shield Activity</string>
+    <string name="deviceShieldMostRecentActivityTitle">All Recent Activity</string>
+    <string name="deviceShieldActivityMostRecent">Most Recent</string>
+    <string name="deviceShieldActivityCtaShowAll">View All Recent Activity</string>
+    <string name="deviceShieldActivityCtaFAQ">What are app trackers?</string>
+    <string name="deviceShieldActivityTrackersBlocked">%d trackers blocked in <![CDATA[<b>%s</b>]]> app</string>
+    <plurals name="deviceShieldActivityTrackersCount">
+        <item quantity="one">%1$s</item>
+        <item quantity="other">%1$s and %2$d other(s)</item>
+    </plurals>
+    <string name="deviceShieldActivityToday">Today</string>
+    <string name="deviceShieldActivityYesterday">Yesterday</string>
+    <string name="deviceShieldActivityDaysAgo">%d days ago</string>
+    <string name="deviceShieldActivityEmptyListMessage">No Activity Yet</string>
 
 </resources>

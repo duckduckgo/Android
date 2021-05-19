@@ -16,16 +16,125 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity">
+    android:fillViewport="true"
+    >
 
-    <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityView
-        android:id="@+id/past_week"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/past_week_activity"
+            style="@style/DeviceShield.PrivacyReport.Toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="23dp"
+            android:paddingBottom="20dp"
+            android:layout_marginStart="16dp"
+            android:textAllCaps="true"
+            android:text="@string/deviceShieldActivityPastWeek"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
+                android:id="@+id/trackers_blocked_count"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:title="Blocked"
+                app:text="0"
+                app:footer="Trackers"
+                />
+
+            <View
+                android:id="@+id/vertical_divider"
+                android:background="@color/whiteSix"
+                android:layout_height="match_parent"
+                android:layout_width="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                />
+
+
+            <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
+                android:id="@+id/tracking_apps_count"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                app:title="Across"
+                app:text="0"
+                app:footer="Apps"
+                />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/horizontal_divider"
+            android:background="@color/whiteSix"
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:layout_marginTop="23dp" />
+
+        <TextView
+            android:id="@+id/most_recent_activity"
+            style="@style/DeviceShield.PrivacyReport.Toggle"
+            android:paddingTop="23dp"
+            android:paddingBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textAllCaps="true"
+            android:text="@string/deviceShieldActivityMostRecent"
+            />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/activity_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+
+        <TextView
+            android:id="@+id/cta_show_all"
+            style="@style/DeviceShield.PrivacyReport.Toggle"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAllCaps="false"
+            android:padding="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/deviceShieldActivityCtaShowAll"
+            android:background="?selectableItemBackground"
+            />
+
+        <View
+            android:background="@color/whiteSix"
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:layout_marginTop="14dp" />
+
+        <TextView
+            android:id="@+id/cta_tracker_faq"
+            style="@style/DeviceShield.PrivacyReport.Toggle"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAllCaps="false"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="52dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:text="@string/deviceShieldActivityCtaFAQ"
+            android:background="?selectableItemBackground"
+            />
+
+    </LinearLayout>
+</ScrollView>
