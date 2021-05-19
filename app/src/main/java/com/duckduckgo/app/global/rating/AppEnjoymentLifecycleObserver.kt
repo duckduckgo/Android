@@ -24,13 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-interface AppEnjoymentLifecycleObserver : LifecycleObserver
-
 class AppEnjoymentAppCreationObserver(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val promptTypeDecider: PromptTypeDecider
-) :
-    AppEnjoymentLifecycleObserver {
+) : LifecycleObserver {
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

@@ -40,36 +40,4 @@
         android:text="@string/globalPrivacyControlToggle"
         android:theme="@style/SettingsSwitchTheme" />
 
-    <View
-        android:id="@+id/settingsSectionPrivacyBottomDivider"
-        style="@style/SettingsGroupDivider" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/globalPrivacyControlExplanation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="40dp"
-        android:lineSpacingExtra="4sp"
-        android:text="@string/globalPrivacyControlDescriptionLegal"
-        android:textColor="?attr/settingsMinorTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/globalPrivacyControlLink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="16dp"
-        android:lineSpacingExtra="4sp"
-        android:text="@string/globalPrivacyControlLearnMore"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal" />
-
 </LinearLayout>

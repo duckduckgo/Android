@@ -21,6 +21,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +30,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
+import java.security.GeneralSecurityException
 
 interface EmailDataStore {
     var emailToken: String?
@@ -38,35 +42,45 @@ interface EmailDataStore {
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataStore {
+class EmailEncryptedSharedPreferences(private val context: Context, private val pixel: Pixel) : EmailDataStore {
 
+    private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
     override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow.asStateFlow()
 
-    private val encryptedPreferences: SharedPreferences
-        get() = EncryptedSharedPreferences.create(
-            context,
-            FILENAME,
-            MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build(),
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+    @Synchronized
+    private fun encryptedPreferences(): SharedPreferences? {
+        try {
+            return EncryptedSharedPreferences.create(
+                context,
+                FILENAME,
+                MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: IOException) {
+            pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
+        } catch (e: GeneralSecurityException) {
+            pixel.enqueueFire(AppPixelName.ENCRYPTED_GENERAL_EXCEPTION)
+        }
+        return null
+    }
 
     override var emailToken: String?
-        get() = encryptedPreferences.getString(KEY_EMAIL_TOKEN, null)
+        get() = encryptedPreferences?.getString(KEY_EMAIL_TOKEN, null)
         set(value) {
-            encryptedPreferences.edit(commit = true) {
+            encryptedPreferences?.edit(commit = true) {
                 if (value == null) remove(KEY_EMAIL_TOKEN)
                 else putString(KEY_EMAIL_TOKEN, value)
             }
         }
 
     override var nextAlias: String?
-        get() = encryptedPreferences.getString(KEY_NEXT_ALIAS, null)
+        get() = encryptedPreferences?.getString(KEY_NEXT_ALIAS, null)
         set(value) {
-            encryptedPreferences.edit(commit = true) {
+            encryptedPreferences?.edit(commit = true) {
                 if (value == null) remove(KEY_NEXT_ALIAS)
                 else putString(KEY_NEXT_ALIAS, value)
                 GlobalScope.launch {
@@ -76,9 +90,9 @@ class EmailEncryptedSharedPreferences(private val context: Context) : EmailDataS
         }
 
     override var emailUsername: String?
-        get() = encryptedPreferences.getString(KEY_EMAIL_USERNAME, null)
+        get() = encryptedPreferences?.getString(KEY_EMAIL_USERNAME, null)
         set(value) {
-            encryptedPreferences.edit(commit = true) {
+            encryptedPreferences?.edit(commit = true) {
                 if (value == null) remove(KEY_EMAIL_USERNAME)
                 else putString(KEY_EMAIL_USERNAME, value)
             }

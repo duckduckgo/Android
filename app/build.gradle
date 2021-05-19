@@ -32,6 +32,13 @@ android {
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
             androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
+            main {
+                java {
+                    resources {
+                        srcDirs += files("$projectDir/../submodules/autofill/dist/".toString())
+                    }
+                }
+            }
         }
     }
     compileOptions {
@@ -151,18 +158,14 @@ dependencies {
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
-    // Anko
-    implementation "org.jetbrains.anko:anko-commons:_"
-    implementation "org.jetbrains.anko:anko-design:_"
-
     // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.fragmentKtx
 
     // ViewModel and LiveData
-    implementation AndroidX.lifecycle.extensions
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.lifecycle.process
 
     implementation  AndroidX.lifecycle.commonJava8
     testImplementation AndroidX.archCore.testing
@@ -197,6 +200,9 @@ dependencies {
 
     // Play Store referrer library
     playImplementation("com.android.installreferrer:installreferrer:_")
+
+    // HTML
+    implementation 'org.jsoup:jsoup:_'
 
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner

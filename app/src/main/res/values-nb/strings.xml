@@ -208,6 +208,15 @@
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %1$s</string>
     <string name="bookmarkEdited">Bokmerke lagt til</string>
     <string name="bookmarkDeleteConfirmationMessage">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Eksporter</string>
+    <string name="exportBookmarksEmpty">Du har ingen bokmerker, ingenting blir eksportert</string>
+    <string name="exportBookmarksError">Vi kunne ikke eksportere noen av bokmerkene, noe gikk galt</string>
+    <string name="exportBookmarksSuccess">Alle bokmerkene ble eksportert</string>
+    <string name="importBookmarksMenu">Importer</string>
+    <string name="importBookmarksFileTitle">Velg en bokmerkefil du vil importere</string>
+    <string name="importBookmarksError">Vi kunne ikke importere noen av bokmerkene, noe gikk galt</string>
+    <string name="importBookmarksEmpty">Filen har ingen bokmerker å importere</string>
+    <string name="importBookmarksSuccess">%1$d bokmerker ble importert</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekreft</string>
@@ -522,12 +531,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Informasjonen din bør ikke være til salgs. Hos DuckDuckGo deler vi denne oppfatningen. Aktiver innstillingen «Global Privacy Control» (GPC), så opplyser vi nettsteder om at du foretrekker å:&lt;br/&gt;&lt;br/&gt; • ikke selge dine personlige data.&lt;br/&gt; • begrense deling av personopplysninger med andre selskaper.
+        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href="">Finn ut mer</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Siden Global Privacy Control (GPC) er en ny standard, gjenkjennes den nok ennå ikke av nettsteder flest, men vi jobber hardt for å sikre at den blir anerkjent verden over.</b> Nettsteder er imidlertid kun pålagt å ta til følge denne opplysningsmeldingen når gjeldende lover pålegger dem å gjøre det.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Les mer</u></string>
     <string name="disabled">Deaktivert</string>
     <string name="enabled">Aktivert</string>
 </resources>

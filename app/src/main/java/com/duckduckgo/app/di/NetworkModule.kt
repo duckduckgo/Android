@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.work.WorkManager
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
@@ -29,11 +28,8 @@ import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
-import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
-import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -167,16 +163,6 @@ class NetworkModule {
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =
         retrofit.create(FeedbackService::class.java)
-
-    @Provides
-    @Singleton
-    fun appConfigurationSyncer(
-        appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
-        workManager: WorkManager,
-        appConfigurationDownloader: ConfigurationDownloader
-    ): AppConfigurationSyncer {
-        return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
-    }
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

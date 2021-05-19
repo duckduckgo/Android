@@ -25,7 +25,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository
 ) : LifecycleObserver {

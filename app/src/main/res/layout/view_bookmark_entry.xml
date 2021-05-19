@@ -22,7 +22,7 @@
     android:paddingTop="14dp"
     android:paddingBottom="14dp"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingEnd="10dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
@@ -85,7 +85,6 @@
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
         android:paddingStart="14dp"
-        android:paddingEnd="14dp"
         android:scaleType="center"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -208,6 +208,15 @@
     <string name="bookmarkOverflowContentDescription">Mais opções para o marcador %1$s</string>
     <string name="bookmarkEdited">Favorito adicionado</string>
     <string name="bookmarkDeleteConfirmationMessage">Eliminado: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="exportBookmarksMenu">Exportar</string>
+    <string name="exportBookmarksEmpty">Não tem marcadores, nada será exportado</string>
+    <string name="exportBookmarksError">Não foi possível exportar quaisquer marcadores, algo correu mal</string>
+    <string name="exportBookmarksSuccess">Todos os marcadores foram exportados com êxito</string>
+    <string name="importBookmarksMenu">Importar</string>
+    <string name="importBookmarksFileTitle">Selecione um ficheiro de marcadores para importar</string>
+    <string name="importBookmarksError">Não foi possível importar quaisquer marcadores, algo correu mal</string>
+    <string name="importBookmarksEmpty">O ficheiro não tem marcadores para importar</string>
+    <string name="importBookmarksSuccess">%1$d marcadores importados com êxito</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmar</string>
@@ -522,12 +531,10 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlDescription">
-        Os seus dados não devem estar à venda. Na DuckDuckGo, concordamos. Ative a configuração de \'\'Controlo Global de Privacidade\'\' (CGP) e enviaremos um sinal aos sites da sua preferência para:&lt;br/&gt;&lt;br/&gt; • Não vender os seus dados pessoais.&lt;br/&gt; • Limite a partilha dos seus dados pessoais com outras empresas.
+        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href="">Saiba mais</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>
-    <string name="globalPrivacyControlDescriptionLegal"><b>Como o Controlo Global de Privacidade (CGP) é um novo padrão, a maioria dos websites ainda não o reconhecem, mas estamos a trabalhar arduamente para garantir que seja aceite em todo o mundo.</b> Contudo, os websites só são obrigados a agir ao sinal na medida em que as leis aplicáveis os obrigam a fazê-lo.</string>
-    <string name="globalPrivacyControlLearnMore"><u>Saiba mais</u></string>
     <string name="disabled">Desativado</string>
     <string name="enabled">Ativado</string>
 </resources>

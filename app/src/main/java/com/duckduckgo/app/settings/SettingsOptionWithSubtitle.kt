@@ -22,10 +22,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
 import com.duckduckgo.app.browser.R
-import org.jetbrains.anko.childrenRecursiveSequence
 
 class SettingsOptionWithSubtitle : ConstraintLayout {
 
@@ -56,8 +57,15 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
     }
 
     override fun setEnabled(enabled: Boolean) {
-        root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
+        recursiveEnable(enabled)
         super.setEnabled(enabled)
+    }
+
+    fun View.recursiveEnable(enabled: Boolean) {
+        (this as? ViewGroup)?.children?.forEach {
+            it.isEnabled = enabled
+            it.recursiveEnable(enabled)
+        }
     }
 
 }
