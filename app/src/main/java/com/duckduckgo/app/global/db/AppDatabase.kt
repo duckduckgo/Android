@@ -412,6 +412,7 @@ class MigrationsProvider(val context: Context) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"USE_OUR_APP_NOTIFICATION\" OR appStage = \"USE_OUR_APP_ONBOARDING\"")
             database.execSQL("DELETE FROM user_events WHERE id = \"USE_OUR_APP_SHORTCUT_ADDED\" OR id = \"USE_OUR_APP_FIREPROOF_DIALOG_SEEN\"")
+            database.execSQL("DELETE FROM dismissed_cta WHERE ctaId = \"USE_OUR_APP\" OR ctaId = \"USE_OUR_APP_DELETION\"")
         }
     }
 
