@@ -318,7 +318,7 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_22_TO_23: Migration = object : Migration(22, 23) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"AppStage.USE_OUR_APP_NOTIFICATION\"")
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"USE_OUR_APP_NOTIFICATION\"")
         }
     }
 
