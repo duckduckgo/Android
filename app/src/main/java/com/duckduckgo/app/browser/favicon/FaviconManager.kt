@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 
 interface FaviconManager {
@@ -69,7 +68,6 @@ class DuckDuckGoFaviconManager constructor(
             is FaviconSource.ImageFavicon -> {
                 val domain = faviconSource.url.extractDomain() ?: return null
                 invalidateCacheIfNewDomain(tabId, domain)
-                Timber.i("Favicon received for ${faviconSource.url}")
                 Pair(domain, faviconSource.icon)
             }
             is FaviconSource.UrlFavicon -> {
@@ -78,7 +76,6 @@ class DuckDuckGoFaviconManager constructor(
                 if (shouldSkipNetworkRequest(tabId, faviconSource)) return null
                 val bitmap = faviconDownloader.getFaviconFromUrl(faviconSource.faviconUrl.toUri()) ?: return null
                 addFaviconUrlToCache(tabId, faviconSource)
-                Timber.i("Favicon downloaded for $domain from ${faviconSource.faviconUrl}")
                 Pair(domain, bitmap)
             }
         }
@@ -92,10 +89,8 @@ class DuckDuckGoFaviconManager constructor(
         val favicon = downloadFaviconFor(domain)
 
         return if (favicon != null) {
-            Timber.i("Favicon downloaded for $domain")
-            return saveFavicon(tabId, favicon, domain)
+            saveFavicon(tabId, favicon, domain)
         } else {
-            Timber.i("Favicon downloaded null for $domain")
             null
         }
     }
@@ -106,15 +101,9 @@ class DuckDuckGoFaviconManager constructor(
         var cachedFavicon: File? = null
         if (tabId != null) {
             cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
-            if (cachedFavicon != null) {
-                Timber.i("Favicon loaded from temp")
-            }
         }
         if (cachedFavicon == null) {
             cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
-            if (cachedFavicon != null) {
-                Timber.i("Favicon loaded from persisted")
-            }
         }
 
         return if (cachedFavicon != null) {
@@ -126,7 +115,6 @@ class DuckDuckGoFaviconManager constructor(
         val bitmap = loadFromDisk(tabId, url)
 
         if (bitmap == null) {
-            Timber.i("No favicon loaded")
             view.loadFavicon(bitmap, url)
             val domain = url.extractDomain() ?: return
             tryRemoteFallbackFavicon(subFolder = tabId, domain)?.let {
@@ -175,12 +163,9 @@ class DuckDuckGoFaviconManager constructor(
     private suspend fun downloadFaviconFor(domain: String): Bitmap? {
         val faviconUrl = getFaviconUrl(domain) ?: return null
         val touchFaviconUrl = getTouchFaviconUrl(domain) ?: return null
-        Timber.i("Favicon will try on $faviconUrl or $touchFaviconUrl")
         faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
-            Timber.i("Favicon downloaded from $touchFaviconUrl")
             return it
         } ?: faviconDownloader.getFaviconFromUrl(faviconUrl).let {
-            Timber.i("Favicon downloaded from $faviconUrl")
             return it
         }
     }

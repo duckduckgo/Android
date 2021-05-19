@@ -1998,7 +1998,6 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-                Timber.i("BrowserTab favs: renderIfChanged $viewState")
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
@@ -2060,7 +2059,6 @@ class BrowserTabFragment :
         }
 
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-            Timber.i("BrowserTab favs: showHomeBackground $favorites")
             if (favorites.isEmpty()) {
                 homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.visibility = GONE
@@ -2072,7 +2070,6 @@ class BrowserTabFragment :
         }
 
         private fun hideHomeBackground() {
-            Timber.i("BrowserTab favs: hideHomeBackground")
             homeBackgroundLogo.hideLogo()
             quickAccessRecyclerView.visibility = GONE
         }

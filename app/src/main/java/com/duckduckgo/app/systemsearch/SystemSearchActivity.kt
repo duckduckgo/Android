@@ -28,7 +28,6 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -62,7 +61,6 @@ import kotlinx.android.synthetic.main.activity_system_search.results
 import kotlinx.android.synthetic.main.activity_system_search.resultsContent
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -132,14 +130,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureObservers() {
         viewModel.onboardingViewState.observe(
             this,
-            Observer<SystemSearchViewModel.OnboardingViewState> {
+            {
                 it?.let { renderOnboardingViewState(it) }
             }
         )
         viewModel.resultsViewState.observe(
             this,
             {
-                Timber.i("SystemSearchActivity d: $it")
                 when (it) {
                     is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
                         renderResultsViewState(it)
@@ -152,7 +149,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         )
         viewModel.command.observe(
             this,
-            Observer {
+            {
                 processCommand(it)
             }
         )

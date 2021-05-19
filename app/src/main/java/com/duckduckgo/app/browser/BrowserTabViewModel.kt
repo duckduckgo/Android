@@ -431,7 +431,6 @@ class BrowserTabViewModel(
 
         viewModelScope.launch {
             favoritesRepository.favorites().collect { favorite ->
-                Timber.i("BrowserTab favs: collect $favorite")
                 val favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
                 ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
                 autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
@@ -644,7 +643,6 @@ class BrowserTabViewModel(
     override fun prefetchFavicon(url: String) {
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
-            Timber.i("Favicon prefetch for $url")
             val faviconFile = faviconManager.tryFetchFaviconForUrl(tabId = tabId, url = url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
@@ -1309,7 +1307,7 @@ class BrowserTabViewModel(
 
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
-        val showFavoritesAsSuggestions= if (!showAutoCompleteSuggestions) {
+        val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
             val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
             val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
@@ -1987,7 +1985,6 @@ class BrowserTabViewModel(
 
     fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            Timber.i("Persist favorites $newList")
             favoritesRepository.updateWithPosition(newList.map { it.favorite })
         }
     }

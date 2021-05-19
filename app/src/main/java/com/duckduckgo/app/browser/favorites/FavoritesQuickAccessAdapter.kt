@@ -104,14 +104,11 @@ class FavoritesQuickAccessAdapter(
             itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_MOVE -> {
-                        Timber.i("QuickAccessFav: move!")
                         if (itemState != ItemState.LongPress) return@setOnTouchListener false
 
-                        Timber.i("QuickAccessFav: onMoveListener")
                         onMoveListener(this@QuickAccessViewHolder)
                     }
                     MotionEvent.ACTION_UP -> {
-                        Timber.i("QuickAccessFav: up!")
                         onItemReleased()
                     }
                 }
@@ -173,13 +170,12 @@ class FavoritesQuickAccessAdapter(
         }
 
         override fun onItemReleased() {
-            Timber.i("QuickAccessFav: onItemReleased")
             scaleDownFavicon()
             itemView.quickAccessTitle.alpha = 1f
             itemState = ItemState.Stale
         }
 
-        fun loadFavicon(url: String) {
+        private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.quickAccessFavicon)
             }

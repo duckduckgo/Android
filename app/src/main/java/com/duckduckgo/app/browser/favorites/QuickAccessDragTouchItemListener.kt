@@ -20,7 +20,6 @@ import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import timber.log.Timber
 
 class QuickAccessDragTouchItemListener(
     private val favoritesQuickAccessAdapter: FavoritesQuickAccessAdapter,
@@ -38,7 +37,6 @@ class QuickAccessDragTouchItemListener(
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        Timber.v("QuickAccessDragTouchItemListener onMove ${viewHolder.bindingAdapterPosition} to ${target.bindingAdapterPosition}")
         val items = favoritesQuickAccessAdapter.currentList.toMutableList()
         val quickAccessFavorite = items[viewHolder.bindingAdapterPosition]
         items.removeAt(viewHolder.bindingAdapterPosition)
