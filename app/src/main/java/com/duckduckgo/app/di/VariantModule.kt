@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.global.useourapp.UseOurAppMigrationManager
 import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
@@ -36,9 +35,4 @@ class VariantModule {
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
 
-    @Provides
-    @Singleton
-    fun useOurAppMigrationManager(weightedRandomizer: WeightedRandomizer): UseOurAppMigrationManager {
-        return UseOurAppMigrationManager(weightedRandomizer)
-    }
 }

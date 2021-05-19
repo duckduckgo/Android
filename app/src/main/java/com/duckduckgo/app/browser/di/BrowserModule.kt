@@ -55,7 +55,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -271,8 +270,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun domLoginDetector(settingsDataStore: SettingsDataStore, useOurAppDetector: UseOurAppDetector): DOMLoginDetector {
-        return JsLoginDetector(settingsDataStore, useOurAppDetector)
+    fun domLoginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
+        return JsLoginDetector(settingsDataStore)
     }
 
     @Provides

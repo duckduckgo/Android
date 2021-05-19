@@ -24,10 +24,8 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -47,11 +45,7 @@ class AppDatabaseTest {
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
-    private val mockSettingsDataStore = mock<SettingsDataStore>()
-    private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
-
-    private val migrationsProvider: MigrationsProvider =
-        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
 
     @Before
     fun setup() {
@@ -266,7 +260,7 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion22To23IfUserStageIsUseOurAppNotificationThenMigrateToEstablished() {
         testHelper.createDatabase(TEST_DB_NAME, 22).use {
-            givenUserStageIs(it, AppStage.USE_OUR_APP_NOTIFICATION)
+            it.execSQL("INSERT INTO `userStage` values (1, 'USE_OUR_APP_NOTIFICATION') ")
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
             val stage = getUserStage(it)

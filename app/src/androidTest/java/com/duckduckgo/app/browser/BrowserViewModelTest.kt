@@ -29,8 +29,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.runBlocking
@@ -102,7 +100,6 @@ class BrowserViewModelTest {
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
-            useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel
         )
@@ -212,15 +209,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutIfUrlIsUseOurAppDomainThenFirePixel() {
-        val url = "http://m.$USE_OUR_APP_DOMAIN"
-        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
-        testee.onOpenShortcut(url)
-        verify(mockPixel).fire(AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
-    }
-
-    @Test
-    fun whenOpenShortcutIfUrlIsNotUSeOurAppUrlThenFirePixel() {
+    fun whenOpenShortcutThenFirePixel() {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
