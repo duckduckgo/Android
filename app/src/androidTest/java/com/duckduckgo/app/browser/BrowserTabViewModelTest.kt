@@ -1102,12 +1102,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOmnibarFocusedAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
+    fun whenOmnibarFocusedWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(favorites = listOf(QuickAccessFavorite(Favorite(1, "title", "http://example.com", 1))))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = false)
-        assertTrue(autoCompleteViewState().showSuggestions)
-        assertTrue(autoCompleteViewState().searchResults.suggestions.isEmpty())
+        testee.onOmnibarInputStateChanged("https://example.com", true, hasQueryChanged = false)
+        assertFalse(autoCompleteViewState().showSuggestions)
+        assertTrue(autoCompleteViewState().showFavorites)
     }
 
     @Test
