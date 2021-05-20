@@ -71,7 +71,7 @@ class AutoCompleteApi @Inject constructor(
         autoCompleteService.autoComplete(query)
             .flatMapIterable { it }
             .map {
-                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.nav ?: UriString.isWebUrl(it.phrase)))
+                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
             }
             .toList()
             .onErrorReturn { emptyList() }

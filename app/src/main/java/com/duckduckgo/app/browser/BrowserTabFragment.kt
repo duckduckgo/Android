@@ -971,8 +971,8 @@ class BrowserTabFragment :
             viewModel.fireAutocompletePixel(suggestion)
             withContext(Dispatchers.Main) {
                 val origin = when (suggestion) {
-                    is AutoCompleteBookmarkSuggestion -> FromAutocomplete(nav = null)
-                    is AutoCompleteSearchSuggestion -> FromAutocomplete(nav = suggestion.isUrl)
+                    is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = null)
+                    is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
                 }
                 viewModel.onUserSubmittedQuery(suggestion.phrase, origin)
             }

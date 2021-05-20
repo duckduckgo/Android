@@ -96,30 +96,30 @@ class QueryUrlConverterTest {
     }
 
     @Test
-    fun whenQueryOriginIsFromAutocompleteAndNavIsFalseThenSearchQueryBuilt() {
+    fun whenQueryOriginIsFromAutocompleteAndIsNavIsFalseThenSearchQueryBuilt() {
         val input = "example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = false))
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = false))
         assertDuckDuckGoSearchQuery("example.com", result)
     }
 
     @Test
-    fun whenQueryOriginIsFromAutocompleteAndNavIsTrueThenUrlReturned() {
+    fun whenQueryOriginIsFromAutocompleteAndIsNavIsTrueThenUrlReturned() {
         val input = "http://example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = true))
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
         assertEquals(input, result)
     }
 
     @Test
-    fun whenQueryOriginIsFromAutocompleteAndNavIsNullAndIsUrlThenUrlReturned() {
+    fun whenQueryOriginIsFromAutocompleteAndIsNavIsNullAndIsUrlThenUrlReturned() {
         val input = "http://example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = null))
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
         assertEquals(input, result)
     }
 
     @Test
-    fun whenQueryOriginIsFromAutocompleteAndNavIsNullAndIsNotUrlThenSearchQueryBuilt() {
+    fun whenQueryOriginIsFromAutocompleteAndIsNavIsNullAndIsNotUrlThenSearchQueryBuilt() {
         val input = "foo"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = null))
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
         assertDuckDuckGoSearchQuery("foo", result)
     }
 

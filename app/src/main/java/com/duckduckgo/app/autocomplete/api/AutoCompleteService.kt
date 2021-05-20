@@ -28,8 +28,8 @@ interface AutoCompleteService {
     fun autoComplete(
         @Query("q") query: String,
         @Query("kl") languageCode: String = Locale.getDefault().language,
-        @Query("nav") nav: String = "1"
+        @Query("is_nav") nav: String = "1"
     ): Observable<List<AutoCompleteServiceRawResult>>
 }
 
-data class AutoCompleteServiceRawResult(val phrase: String, val nav: Boolean?)
+data class AutoCompleteServiceRawResult(val phrase: String, val isNav: Boolean?)
