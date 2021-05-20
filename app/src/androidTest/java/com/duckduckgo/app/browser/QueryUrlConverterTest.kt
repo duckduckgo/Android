@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -78,6 +79,48 @@ class QueryUrlConverterTest {
         val expected = "http://$input"
         val result = testee.convertQueryToUrl(input)
         assertEquals(expected, result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromUserAndIsQueryThenSearchQueryBuilt() {
+        val input = "foo"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser)
+        assertDuckDuckGoSearchQuery("foo", result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromUserAndIsUrlThenUrlReturned() {
+        val input = "http://example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromAutocompleteAndNavIsFalseThenSearchQueryBuilt() {
+        val input = "example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = false))
+        assertDuckDuckGoSearchQuery("example.com", result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromAutocompleteAndNavIsTrueThenUrlReturned() {
+        val input = "http://example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = true))
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromAutocompleteAndNavIsNullAndIsUrlThenUrlReturned() {
+        val input = "http://example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = null))
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromAutocompleteAndNavIsNullAndIsNotUrlThenSearchQueryBuilt() {
+        val input = "foo"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(nav = null))
+        assertDuckDuckGoSearchQuery("foo", result)
     }
 
     private fun assertDuckDuckGoSearchQuery(query: String, url: String) {
