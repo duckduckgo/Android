@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -77,7 +75,6 @@ class BrowserViewModel(
     sealed class Command {
         object Refresh : Command()
         data class Query(val query: String) : Command()
-        data class DisplayMessage(@StringRes val messageId: Int) : Command()
         object LaunchPlayStore : Command()
         object LaunchFeedbackView : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
@@ -164,10 +161,6 @@ class BrowserViewModel(
 
     fun receivedDashboardResult(resultCode: Int) {
         if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
-    }
-
-    fun onClearComplete() {
-        command.value = DisplayMessage(R.string.fireDataCleared)
     }
 
     /**
