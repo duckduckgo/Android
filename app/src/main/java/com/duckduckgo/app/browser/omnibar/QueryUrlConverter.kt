@@ -30,11 +30,11 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
 
     override fun convertQueryToUrl(searchQuery: String, vertical: String?, queryOrigin: QueryOrigin): String {
         val isUrl = when (queryOrigin) {
-            is QueryOrigin.FromAutocomplete -> queryOrigin.nav ?: UriString.isWebUrl(searchQuery)
+            is QueryOrigin.FromAutocomplete -> queryOrigin.nav
             is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
         }
 
-        if (isUrl) {
+        if (isUrl == true) {
             return convertUri(searchQuery)
         }
 
