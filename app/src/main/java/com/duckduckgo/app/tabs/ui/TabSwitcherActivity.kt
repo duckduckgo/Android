@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -42,7 +41,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -172,7 +170,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun processCommand(command: Command?) {
         when (command) {
-            is DisplayMessage -> Toast.makeText(applicationContext, command.messageId, Toast.LENGTH_LONG).show()
             is Close -> finishAfterTransition()
         }
     }
@@ -202,7 +199,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore
         )
-        dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
 
@@ -240,7 +236,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> launch { viewModel.purgeDeletableTabs() }
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */ }
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */
+                        }
                     }
                 }
             })

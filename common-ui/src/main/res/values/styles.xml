@@ -86,7 +86,7 @@
         <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/cornflowerBlue</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:selectable">false</item>
