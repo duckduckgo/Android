@@ -110,13 +110,6 @@ class QueryUrlConverterTest {
     }
 
     @Test
-    fun whenQueryOriginIsFromAutocompleteAndIsNavIsNullAndIsUrlThenUrlReturned() {
-        val input = "http://example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
-        assertEquals(input, result)
-    }
-
-    @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsNullAndIsNotUrlThenSearchQueryBuilt() {
         val input = "foo"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
