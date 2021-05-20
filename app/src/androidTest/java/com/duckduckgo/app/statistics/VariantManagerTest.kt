@@ -32,14 +32,14 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -73,14 +73,14 @@ class VariantManagerTest {
     @Test
     fun newInBrowserControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "zx" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun newInBrowserInAppUsageVariantHasExpectedWeightAndKillOnboardingAndInAppUsageFeatures() {
         val variant = variants.first { it.key == "zy" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(KillOnboarding))
         assertTrue(variant.hasFeature(InAppUsage))
