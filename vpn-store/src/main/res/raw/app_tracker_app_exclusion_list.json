@@ -67,6 +67,17 @@
     "org.mozilla.fennec_aurora",
     "org.mozilla.fennec",
     "com.google.android.apps.chrome",
-    "org.chromium.chrome"
+    "org.chromium.chrome",
+    "com.microsoft.bing",
+    "com.yahoo.mobile.client.android.search",
+    "com.google.android.apps.searchlite",
+    "com.baidu.searchbox",
+    "ru.yandex.searchplugin",
+    "com.ecosia.android",
+    "com.qwant.liberty",
+    "com.qwantjunior.mobile",
+    "com.nhn.android.search",
+    "cz.seznam.sbrowser",
+    "com.coccoc.trinhduyet"
   ]
 }
