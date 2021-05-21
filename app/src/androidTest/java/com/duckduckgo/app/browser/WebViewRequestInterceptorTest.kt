@@ -525,6 +525,16 @@ class WebViewRequestInterceptorTest {
         assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
     }
 
+    @Test
+    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = runBlocking<Unit> {
+        assertNull(testee.shouldInterceptFromServiceWorker(request = null, documentUrl = "foo.com"))
+    }
+
+    @Test
+    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = runBlocking<Unit> {
+        assertNull(testee.shouldInterceptFromServiceWorker(request = mockRequest, documentUrl = null))
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
