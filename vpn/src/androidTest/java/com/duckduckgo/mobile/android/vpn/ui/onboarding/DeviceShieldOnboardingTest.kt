@@ -48,7 +48,7 @@ class DeviceShieldOnboardingTest {
 
         whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences)
 
-        deviceShieldOnboardingStore = DeviceShieldOnboardingStoreModule().provideDeviceShieldOnboardingStore(mockContext)
+        deviceShieldOnboardingStore = DeviceShieldOnboardingModule().provideDeviceShieldOnboardingStore(mockContext)
         deviceShieldOnboarding = DeviceShieldOnboardingModule().provideDeviceShieldOnboarding(mockContext)
     }
 

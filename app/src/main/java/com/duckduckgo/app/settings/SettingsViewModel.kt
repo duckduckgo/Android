@@ -41,7 +41,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -73,9 +72,7 @@ class SettingsViewModel(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
-        val deviceShieldEnabled: Boolean = false,
-        val excludedAppsInfo: String = ""
+        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff
     )
 
     sealed class EmailSetting {
@@ -97,13 +94,9 @@ class SettingsViewModel(
         object LaunchAppIcon : Command()
         object LaunchFireAnimationSettings : Command()
         object LaunchGlobalPrivacyControl : Command()
-        object LaunchExcludedAppList : Command()
-        object LaunchDeviceShieldPrivacyReport : Command()
+        object LaunchBetaFeatures : Command()
         object UpdateTheme : Command()
         object LaunchEmailDialog : Command()
-        object LaunchDeviceShieldOnboarding : Command()
-        object StartDeviceShield : Command()
-        object StopDeviceShield : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -135,29 +128,8 @@ class SettingsViewModel(
             appIcon = settingsDataStore.appIcon,
             selectedFireAnimation = settingsDataStore.selectedFireAnimation,
             globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-            emailSetting = getEmailSetting(),
-            deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-            excludedAppsInfo = ""
+            emailSetting = getEmailSetting()
         )
-        viewModelScope.launch(Dispatchers.IO) {
-            val excludedApps = getExcludedAppsInfo()
-            viewState.postValue(currentViewState().copy(excludedAppsInfo = excludedApps))
-        }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun pollDeviceShieldState() {
-        deviceShieldStatePollingJob = viewModelScope.launch {
-            while (isActive) {
-                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
-                if (currentViewState().deviceShieldEnabled != isDeviceShieldEnabled) {
-                    viewState.value = currentViewState().copy(
-                        deviceShieldEnabled = isDeviceShieldEnabled
-                    )
-                }
-                delay(1_000)
-            }
-        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -211,20 +183,16 @@ class SettingsViewModel(
         command.value = Command.LaunchFireproofWebsites
     }
 
-    fun onExcludedAppsClicked() {
-        command.value = Command.LaunchExcludedAppList
-    }
-
-    fun onDeviceShieldPrivacyReportClicked() {
-        command.value = Command.LaunchDeviceShieldPrivacyReport
-    }
-
     fun onLocationClicked() {
         command.value = Command.LaunchLocation
     }
 
     fun onGlobalPrivacyControlClicked() {
         command.value = Command.LaunchGlobalPrivacyControl
+    }
+
+    fun onBetaFeatureSettingsClicked() {
+        command.value = Command.LaunchBetaFeatures
     }
 
     fun onEmailLogout() {
@@ -246,23 +214,6 @@ class SettingsViewModel(
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
-    }
-
-    fun onDeviceShieldSettingChanged(enabled: Boolean) {
-        Timber.i("Device Shield, is now enabled: $enabled")
-
-        if (enabled) {
-            deviceShieldPixels.enableFromSettings()
-        } else {
-            deviceShieldPixels.disableFromSettings()
-        }
-
-        val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(appContext)
-        command.value = when {
-            enabled && deviceShieldOnboardingIntent != null -> Command.LaunchDeviceShieldOnboarding
-            enabled -> Command.StartDeviceShield
-            else -> Command.StopDeviceShield
-        }
     }
 
     private fun obtainVersion(variantKey: String): String {

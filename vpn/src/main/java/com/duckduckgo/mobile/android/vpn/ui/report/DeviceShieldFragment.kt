@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
@@ -77,9 +76,11 @@ class DeviceShieldFragment : Fragment() {
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        AndroidSupportInjection.inject(this)
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
         configureViewReferences(view)
         bindListeners(view)
+        observeViewModel()
         return view
     }
 
@@ -91,11 +92,6 @@ class DeviceShieldFragment : Fragment() {
         deviceShieldDisabledLayout = view.findViewById(R.id.deviceShieldDisabledCardView)
 
         viewKonfetti = view.findViewById(R.id.deviceShieldKonfetti)
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
     }
 
     override fun onResume() {
@@ -143,11 +139,6 @@ class DeviceShieldFragment : Fragment() {
                 Timber.i("User cancelled onboarding and refused VPN permission")
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        observeViewModel()
     }
 
     private fun observeViewModel() {

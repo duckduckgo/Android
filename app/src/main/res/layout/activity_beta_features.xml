@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,12 +14,27 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/settingsSectionGeneral"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.beta.BetaFeaturesActivity">
+
+    <include layout="@layout/include_toolbar" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="4sp"
+        android:padding="16dp"
+        android:text="@string/betaFeaturesDescription"
+        android:textColor="?attr/settingsMinorTextColor"
+        android:textSize="14sp"
+        android:textStyle="normal" />
 
     <TextView
         android:id="@+id/deviceShieldTitle"
@@ -29,9 +44,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/deviceShieldEnable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/betaFeaturesEnableDeviceShield"
+        app:subtitle="@string/deviceShieldBlockTrackers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceShieldTitle" />
+
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/deviceShieldToggle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:toggleTitle="@string/deviceShield"
         app:toggleSubTitle="@string/deviceShieldBlockTrackers"
@@ -41,7 +66,7 @@
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/deviceShieldPrivacyReportText"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +76,7 @@
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/deviceShieldExcludedAppsText"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,4 +84,4 @@
         app:subtitle="TODO"
         app:title="@string/deviceShieldExcludedApps" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

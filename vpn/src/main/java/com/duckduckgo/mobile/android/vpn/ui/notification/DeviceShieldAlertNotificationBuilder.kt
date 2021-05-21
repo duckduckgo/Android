@@ -75,7 +75,7 @@ class DeviceShieldAlertNotificationBuilder {
                 .addAction(
                     NotificationCompat.Action(
                         R.drawable.ic_vpn_notification_24,
-                        context.getString(R.string.deviceShieldOnboardingTitle),
+                        context.getString(R.string.deviceShieldEnable),
                         restartVpnIntent
                     )
                 )

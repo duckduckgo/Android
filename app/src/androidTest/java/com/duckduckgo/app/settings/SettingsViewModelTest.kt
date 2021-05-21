@@ -298,6 +298,14 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenBetaFeaturesClickedThenCommandIsLaunchBetaFeatures() {
+        testee.onBetaFeatureSettingsClicked()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBetaFeatures, commandCaptor.firstValue)
+    }
+
+    @Test
     fun whenDeviceShieldIsOnThenCommandIsStopDeviceShield() {
         testee.onDeviceShieldSettingChanged(true)
         testee.command.blockingObserve()

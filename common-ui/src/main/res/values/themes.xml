@@ -239,7 +239,7 @@
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
 
-    <style name="Theme.AndroidVpn" parent="Theme.Design.Light">
+    <style name="Theme.AndroidVpn" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/whiteFive</item>
         <item name="colorPrimaryDark">@color/whiteFive</item>
         <item name="colorAccent">@color/warmBlue</item>
@@ -247,9 +247,13 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="Theme.AndroidVpn.NoActionBar" parent="Theme.Design.NoActionBar">
+    <style name="Theme.AndroidVpn.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
+        <item name="android:statusBarColor">@color/grey</item>
     </style>
 
     <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

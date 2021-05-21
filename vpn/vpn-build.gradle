@@ -94,6 +94,8 @@ dependencies {
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
 
+    implementation "androidx.viewpager2:viewpager2:_"
+
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     implementation Google.dagger

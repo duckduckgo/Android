@@ -1878,7 +1878,9 @@ class BrowserTabFragment :
 
         private fun showCta(configuration: Cta) {
             when (configuration) {
-                is HomePanelCta.DeviceShieldCta -> fragment_device_shield_container.show()
+                is HomePanelCta.DeviceShieldCta -> {
+                    fragment_device_shield_container.show()
+                }
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> {
                     showDaxCta(configuration)

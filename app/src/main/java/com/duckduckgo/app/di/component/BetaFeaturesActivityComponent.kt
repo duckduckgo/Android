@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.di
+package com.duckduckgo.app.di.component
+
+import com.duckduckgo.app.beta.BetaFeaturesActivity
+import com.duckduckgo.app.di.ActivityScoped
+import com.duckduckgo.di.scopes.AppObjectGraph
 
 import com.duckduckgo.di.scopes.ActivityObjectGraph
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -29,25 +30,25 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@ActivityScoped
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ActivityObjectGraph::class
 )
-interface DeviceShieldOnboardingActivityComponent : AndroidInjector<DeviceShieldOnboardingActivity> {
+interface BetaFeaturesActivityComponent : AndroidInjector<BetaFeaturesActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DeviceShieldOnboardingActivity>
+    interface Factory : AndroidInjector.Factory<BetaFeaturesActivity>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface DeviceShieldOnboardingActivityComponentProvider {
-    fun provideDeviceShieldOnboardingActivityComponentFactory(): DeviceShieldOnboardingActivityComponent.Factory
+interface BetaFeaturesActivityComponentProvider {
+    fun provideBetaFeaturesActivityComponentFactory(): BetaFeaturesActivityComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class DeviceShieldOnboardingActivityBindingModule {
+abstract class BetaFeaturesActivityBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(DeviceShieldOnboardingActivity::class)
-    abstract fun bindDeviceShieldOnboardingActivityComponentFactory(factory: DeviceShieldOnboardingActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(BetaFeaturesActivity::class)
+    abstract fun bindBetaFeaturesActivityComponentFactory(factory: BetaFeaturesActivityComponent.Factory): AndroidInjector.Factory<*>
 }

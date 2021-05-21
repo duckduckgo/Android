@@ -27,8 +27,12 @@
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
-            android:theme="@style/Theme.AndroidVpn"
-            android:label="@string/privacyReportDeviceShieldEnableLabel"
+            android:theme="@style/Theme.AndroidVpn.Onboarding"
+            />
+
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity"
+            android:theme="@style/Theme.AndroidVpn.Onboarding"
             />
 
         <activity
@@ -39,10 +43,17 @@
             />
 
         <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
+            android:theme="@style/Theme.AndroidVpn"
+            android:label="@string/deviceShieldFAQActivityTitle"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            />
+
+        <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/deviceShieldActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:parentActivityName="com.duckduckgo.app.beta.BetaFeaturesActivity"
             />
 
         <activity

@@ -21,85 +21,96 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
+    android:background="@color/white"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
-    <ScrollView
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/onboarding_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingBottom="16dp"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toTopOf="@+id/askVpnPermissionButton"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/onboarding_next_cta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <ImageButton
+        android:id="@+id/onboarding_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="50dp"
-                android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
-                android:src="@drawable/device_shield_onboarding_illustration" />
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:fontFamily="sans-serif-black"
-                android:lineSpacingExtra="6sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/deviceShieldOnboardingSubtitle"
-                android:textAlignment="center"
-                android:textColor="@color/newBlack"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:fontFamily="sans-serif"
-                android:lineSpacingExtra="6sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="@string/deviceShieldOnboardingDescription"
-                android:textAlignment="center"
-                android:textColor="@color/brownishGrayTwo"
-                android:textSize="14sp"
-                android:textStyle="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        </LinearLayout>
-    </ScrollView>
-
-
-    <Button
-        android:id="@+id/askVpnPermissionButton"
-        style="@style/OnboardingButtonPrimaryRoundedCta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="@string/deviceShieldOnboardingCta"
-        android:textAlignment="center"
+    <ImageButton
+        android:id="@+id/onboarding_next_cta"
+        style="@style/OnboardingButtonCircleCta"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/ic_baseline_arrow_forward_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_max="1000dp"
         app:layout_constraintWidth_percent="1" />
 
+    <LinearLayout
+        android:id="@+id/onboarding_cta_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:orientation="vertical"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/DeviceShieldOnboardingCta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/onboarding_switch_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/deviceShieldEnable"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="1" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/onboarding_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/onboarding_faq_cta"
+            android:layout_marginTop="8dp"
+            style="@style/DeviceShieldOnboardingCta"
+            android:background="@drawable/onboarding_faq_device_shield_cta_bg"
+            android:textColor="@color/cornflowerBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_arrow_forward_24"
+            android:text="@string/deviceShieldFAQCta" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

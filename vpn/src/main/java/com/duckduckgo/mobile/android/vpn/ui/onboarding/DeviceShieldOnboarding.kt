@@ -21,10 +21,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.DeviceShieldOnboardingObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import javax.inject.Inject
+import javax.inject.Named
 
 interface DeviceShieldOnboarding {
     /**
@@ -35,38 +38,38 @@ interface DeviceShieldOnboarding {
 
 interface DeviceShieldOnboardingStore {
     fun onboardingDidShow()
-
     fun onboardingDidNotShow()
-}
-
-private fun Context.deviceShieldOnboardingSharePrefs(): SharedPreferences {
-    return getSharedPreferences(DeviceShieldOnboardingActivity::class.qualifiedName, Context.MODE_PRIVATE)
+    fun hasOnboardingBeenShown(): Boolean
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-class DeviceShieldOnboardingModule {
+class DeviceShieldOnboardingPreferencesModule {
     @Provides
-    fun provideDeviceShieldOnboarding(context: Context): DeviceShieldOnboarding {
-        return DeviceShieldOnboardingImpl(context.deviceShieldOnboardingSharePrefs())
+    @Named("DeviceShieldOnboardingPreferences")
+    fun provideDeviceShieldOnboardingPreferences(context: Context): SharedPreferences {
+        return context.getSharedPreferences(DeviceShieldOnboardingActivity::class.qualifiedName, Context.MODE_PRIVATE)
     }
 }
 
 @Module
-@ContributesTo(DeviceShieldOnboardingObjectGraph::class)
-class DeviceShieldOnboardingStoreModule {
-    @Provides
-    fun provideDeviceShieldOnboardingStore(context: Context): DeviceShieldOnboardingStore {
-        return DeviceShieldOnboardingImpl(context.deviceShieldOnboardingSharePrefs())
-    }
+@ContributesTo(AppObjectGraph::class)
+abstract class DeviceShieldOnboardingModule {
+
+    @Binds
+    abstract fun bindDeviceShieldOnboardingStore(deviceShieldOnboardingImpl: DeviceShieldOnboardingImpl): DeviceShieldOnboardingStore
 }
 
-private class DeviceShieldOnboardingImpl(
-    private val preferences: SharedPreferences
+@ContributesBinding(
+    scope = AppObjectGraph::class,
+    boundType = DeviceShieldOnboarding::class
+)
+class DeviceShieldOnboardingImpl @Inject constructor(
+    @Named("DeviceShieldOnboardingPreferences") private val preferences: SharedPreferences
 ) : DeviceShieldOnboarding, DeviceShieldOnboardingStore {
 
     override fun prepare(context: Context): Intent? {
-        val didShowOnboarding = preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
+        val didShowOnboarding = hasOnboardingBeenShown()
 
         return if (didShowOnboarding) null else Intent(context, DeviceShieldOnboardingActivity::class.java)
     }
@@ -77,6 +80,10 @@ private class DeviceShieldOnboardingImpl(
 
     override fun onboardingDidNotShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false) }
+    }
+
+    override fun hasOnboardingBeenShown(): Boolean {
+        return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
     companion object {

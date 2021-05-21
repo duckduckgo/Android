@@ -43,25 +43,11 @@
             app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneral" />
 
         <include
-            android:id="@+id/settingsSectionDeviceShield"
-            layout="@layout/content_settings_device_shield"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneralBottomDivider" />
-
-        <View
-            android:id="@+id/settingsSectionDeviceShieldBottomDivider"
-            style="@style/SettingsGroupDivider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionDeviceShield" />
-
-        <include
             android:id="@+id/settingsSectionPrivacy"
             layout="@layout/content_settings_privacy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionDeviceShieldBottomDivider" />
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneralBottomDivider" />
 
         <View
             android:id="@+id/settingsSectionPrivacyBottomDivider"
