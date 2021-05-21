@@ -147,7 +147,7 @@
 
     <!--  Beta Features - Device Shield  -->
     <string name="deviceShield">Device Shield</string>
-    <string name="deviceShieldPrivacyReport">Privacy Report</string>
+    <string name="deviceShieldPrivacyReport">Device Shield Activity</string>
     <string name="deviceShieldPrivacyReportSubtitle">View a summary of trackers blocked</string>
     <string name="deviceShieldBlockTrackers">Block trackers in apps on your device</string>
     <string name="deviceShieldExcludedApps">Excluded Apps</string>
