@@ -491,6 +491,50 @@ class WebViewRequestInterceptorTest {
         verify(webView, never()).loadUrl(any())
     }
 
+    @Test
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
+        whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
+
+        configureShouldNotUpgrade()
+        configureShouldBlock()
+        val response = testee.shouldInterceptFromServiceWorker(
+            request = mockRequest,
+            documentUrl = "foo.com"
+        )
+
+        assertCancelledResponse(response)
+    }
+
+    @Test
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
+        val availableSurrogate = SurrogateResponse(
+            scriptId = "testId",
+            responseAvailable = true,
+            mimeType = "application/javascript",
+            jsFunction = "javascript replacement function goes here"
+        )
+        whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
+
+        configureShouldNotUpgrade()
+        configureShouldBlock()
+        val response = testee.shouldInterceptFromServiceWorker(
+            request = mockRequest,
+            documentUrl = "foo.com"
+        )
+
+        assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
+    }
+
+    @Test
+    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = runBlocking<Unit> {
+        assertNull(testee.shouldInterceptFromServiceWorker(request = null, documentUrl = "foo.com"))
+    }
+
+    @Test
+    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = runBlocking<Unit> {
+        assertNull(testee.shouldInterceptFromServiceWorker(request = mockRequest, documentUrl = null))
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
