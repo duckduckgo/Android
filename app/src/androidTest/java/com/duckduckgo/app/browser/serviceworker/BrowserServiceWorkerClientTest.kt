@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.serviceworker
 
 import android.webkit.WebResourceRequest
+import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -30,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
+@SdkSuppress(minSdkVersion=24)
 class BrowserServiceWorkerClientTest {
 
     @get:Rule
