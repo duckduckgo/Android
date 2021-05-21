@@ -31,7 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-@SdkSuppress(minSdkVersion=24)
+@SdkSuppress(minSdkVersion = 24)
 class BrowserServiceWorkerClientTest {
 
     @get:Rule
