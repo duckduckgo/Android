@@ -40,6 +40,7 @@ abstract class UncaughtExceptionDao {
 enum class UncaughtExceptionSource {
     GLOBAL,
     SHOULD_INTERCEPT_REQUEST,
+    SHOULD_INTERCEPT_REQUEST_FROM_SERVICE_WORKER,
     ON_PAGE_STARTED,
     ON_PAGE_FINISHED,
     SHOULD_OVERRIDE_REQUEST,
