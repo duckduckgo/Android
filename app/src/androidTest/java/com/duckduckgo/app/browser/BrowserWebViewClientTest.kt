@@ -37,8 +37,7 @@ import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -84,7 +83,7 @@ class BrowserWebViewClientTest {
             dosDetector,
             globalPrivacyControl,
             thirdPartyCookieManager,
-            GlobalScope,
+            TestCoroutineScope(),
             coroutinesTestRule.testDispatcherProvider,
             emailInjector
         )

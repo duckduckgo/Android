@@ -287,12 +287,12 @@ class TabDataRepository @Inject constructor(
 
     private fun deleteOldFavicon(tabId: String, currentFavicon: String? = null) {
         Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
-        GlobalScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
+        appCoroutineScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
     private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {
         Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
-        GlobalScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
+        appCoroutineScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }
 
     /**

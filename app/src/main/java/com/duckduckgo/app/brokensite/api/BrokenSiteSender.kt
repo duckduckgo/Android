@@ -25,8 +25,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -40,10 +40,11 @@ class BrokenSiteSubmitter(
     private val tdsMetadataDao: TdsMetadataDao,
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        GlobalScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,

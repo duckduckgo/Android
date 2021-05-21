@@ -31,6 +31,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,7 +49,7 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(UseOurAppDetector(mockUserEventsStore), mockPixel, mockUserEventsStore, coroutinesTestRule.testDispatcherProvider, mockVariantManager)
+        testee = ShortcutReceiver(UseOurAppDetector(mockUserEventsStore), mockPixel, mockUserEventsStore, coroutinesTestRule.testDispatcherProvider, mockVariantManager, TestCoroutineScope())
     }
 
     @Test

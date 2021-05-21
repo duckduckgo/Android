@@ -137,6 +137,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -375,7 +376,8 @@ class BrowserTabViewModelTest {
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
-            emailManager = mockEmailManager
+            emailManager = mockEmailManager,
+            appCoroutineScope = TestCoroutineScope()
         )
 
         testee.loadData("abc", null, false)

@@ -76,6 +76,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     lateinit var userEventsStore: UserEventsStore
 
+    @Inject
+    lateinit var appCoroutineScope: CoroutineScope
+
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager) }
@@ -197,7 +200,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             ctaViewModel = ctaViewModel,
             pixel = pixel,
             settingsDataStore = settingsDataStore,
-            userEventsStore = userEventsStore
+            userEventsStore = userEventsStore,
+            appCoroutineScope = appCoroutineScope
         )
         dialog.show()
     }

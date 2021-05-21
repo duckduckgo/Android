@@ -30,7 +30,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -38,6 +38,7 @@ import javax.inject.Provider
 
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
+    private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -85,7 +86,7 @@ class WhitelistViewModel(
             command.value = ShowWhitelistFormatError
             return
         }
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             addEntryToDatabase(entry)
         }
     }
@@ -99,7 +100,7 @@ class WhitelistViewModel(
             command.value = ShowWhitelistFormatError
             return
         }
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             deleteEntryFromDatabase(old)
             addEntryToDatabase(new)
         }
@@ -110,7 +111,7 @@ class WhitelistViewModel(
     }
 
     fun onEntryDeleted(entry: UserWhitelistedDomain) {
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             deleteEntryFromDatabase(entry)
         }
     }
@@ -126,12 +127,13 @@ class WhitelistViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class WhitelistViewModelFactory @Inject constructor(
-    private val dao: Provider<UserWhitelistDao>
+    private val dao: Provider<UserWhitelistDao>,
+    private val appCoroutineScope: Provider<CoroutineScope>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get()) as T)
+                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get(), appCoroutineScope.get()) as T)
                 else -> null
             }
         }

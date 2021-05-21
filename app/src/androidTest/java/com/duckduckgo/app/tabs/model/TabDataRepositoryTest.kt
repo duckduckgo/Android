@@ -37,12 +37,12 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -444,6 +444,7 @@ class TabDataRepositoryTest {
         job.cancel()
     }
 
+    @ExperimentalCoroutinesApi
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
         return TabDataRepository(
             dao,
@@ -451,7 +452,7 @@ class TabDataRepositoryTest {
             mockWebViewPreviewPersister,
             mockFaviconManager,
             useOurAppDetector,
-            GlobalScope
+            TestCoroutineScope()
         )
     }
 

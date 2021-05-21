@@ -204,6 +204,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var emailInjector: EmailInjector
 
+    @Inject
+    lateinit var appCoroutineScope: CoroutineScope
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -965,7 +968,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(Dispatchers.Main) {
                 viewModel.onUserSubmittedQuery(suggestion.phrase)

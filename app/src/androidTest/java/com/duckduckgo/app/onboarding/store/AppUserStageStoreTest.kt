@@ -28,6 +28,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +44,7 @@ class AppUserStageStoreTest {
     private val variantManager: VariantManager = mock()
     private val appInstallStore: AppInstallStore = mock()
 
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, variantManager, appInstallStore)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, variantManager, appInstallStore, TestCoroutineScope())
 
     @Test
     fun whenGetUserAppStageThenReturnCurrentStage() = coroutineRule.runBlocking {

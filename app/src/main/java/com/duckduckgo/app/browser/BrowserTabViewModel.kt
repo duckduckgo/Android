@@ -152,7 +152,8 @@ class BrowserTabViewModel(
     private val fileDownloader: FileDownloader,
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
-    private val emailManager: EmailManager
+    private val emailManager: EmailManager,
+    private val appCoroutineScope: CoroutineScope
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -1395,7 +1396,7 @@ class BrowserTabViewModel(
 
     fun onWhitelistSelected() {
         val domain = site?.domain ?: return
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             if (isWhitelisted(domain)) {
                 removeFromWhitelist(domain)
             } else {
@@ -1919,12 +1920,13 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val fileDownloader: Provider<FileDownloader>,
     private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
-    private val emailManager: Provider<EmailManager>
+    private val emailManager: Provider<EmailManager>,
+    private val appCoroutineScope: Provider<CoroutineScope>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get()) as T
                 else -> null
             }
         }

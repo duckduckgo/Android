@@ -50,7 +50,6 @@ import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -107,6 +106,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
+    @Inject
+    lateinit var appCoroutineScope: CoroutineScope
+
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -142,7 +144,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
         }
@@ -227,7 +229,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initialize()
         }
