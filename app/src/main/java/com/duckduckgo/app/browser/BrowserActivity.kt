@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -89,6 +90,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     lateinit var userEventsStore: UserEventsStore
 
     @Inject
+    @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
     private var currentTab: BrowserTabFragment? = null

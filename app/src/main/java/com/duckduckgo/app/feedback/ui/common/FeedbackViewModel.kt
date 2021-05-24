@@ -18,6 +18,7 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.Command.Exit
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
@@ -41,7 +42,7 @@ import javax.inject.Provider
 class FeedbackViewModel(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 

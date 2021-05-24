@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.ui
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -48,7 +49,7 @@ class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     networkLeaderboardDao: NetworkLeaderboardDao,
     private val pixel: Pixel,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 

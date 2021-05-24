@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
@@ -71,6 +72,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     lateinit var dispatcher: DispatcherProvider
 
     @Inject
+    @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
     override fun onCreate() {

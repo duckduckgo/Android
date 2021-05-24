@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -107,6 +108,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
+    @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
     private var launchedByFireAction: Boolean = false
