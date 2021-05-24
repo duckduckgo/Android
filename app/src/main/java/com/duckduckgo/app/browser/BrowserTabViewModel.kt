@@ -269,8 +269,7 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
-        class ShowBookmarkAddedConfirmation(val bookmark: SavedSite.Bookmark) : Command()
-        class ShowFavoriteAddedConfirmation(val favorite: SavedSite.Favorite) : Command()
+        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite) : Command()
         class ShowEditSavedSiteDialog(val savedSite: SavedSite) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
@@ -1365,7 +1364,7 @@ class BrowserTabViewModel(
             SavedSite.Bookmark(id, title, url)
         }
         withContext(dispatchers.main()) {
-            command.value = ShowBookmarkAddedConfirmation(savedBookmark)
+            command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
         }
     }
 
@@ -1380,7 +1379,7 @@ class BrowserTabViewModel(
             } else null
         }?.let {
             withContext(dispatchers.main()) {
-                command.value = ShowFavoriteAddedConfirmation(it)
+                command.value = ShowSavedSiteAddedConfirmation(it)
             }
         }
     }

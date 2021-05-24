@@ -557,19 +557,19 @@ class BrowserTabViewModelTest {
         testee.onBookmarkAddRequested()
         verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
+        assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
 
     @Test
     fun whenFavoriteAddedThenRepositoryUpdatedAndUserNotified() = coroutineRule.runBlocking {
-        val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
         loadUrl("www.example.com", "A title")
         whenever(mockFavoritesRepository.insert(any(), any())).thenReturn(savedSite)
 
         testee.onAddFavoriteMenuClicked()
 
         verify(mockFavoritesRepository).insert(title = "A title", url = "www.example.com")
-        assertCommandIssued<Command.ShowFavoriteAddedConfirmation>()
+        assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
     }
 
     @Test
@@ -582,7 +582,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessItemClickedThenSubmitNewQuery() {
-        val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
 
         testee.onQuickAccesItemClicked(savedSite)
 
@@ -593,7 +593,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
-        val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
 
         testee.deleteQuickAccessItem(savedSite)
 
@@ -602,7 +602,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
-        val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
 
         testee.insertQuickAccessItem(savedSite)
 
@@ -611,7 +611,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
@@ -1485,9 +1485,9 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
         testee.onBookmarkAddRequested()
-        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-        assertEquals("foo.com", command.bookmark.url)
-        assertEquals("Foo Title", command.bookmark.title)
+        val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
+        assertEquals("foo.com", command.savedSite.url)
+        assertEquals("Foo Title", command.savedSite.title)
     }
 
     @Test

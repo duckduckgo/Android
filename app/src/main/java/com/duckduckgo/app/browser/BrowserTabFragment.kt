@@ -563,8 +563,7 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
-            is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmark)
-            is Command.ShowFavoriteAddedConfirmation -> favoriteAdded(it.favorite)
+            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSite)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
@@ -1204,21 +1203,15 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private fun bookmarkAdded(bookmark: SavedSite.Bookmark) {
-        Snackbar.make(browserLayout, R.string.bookmarkAddedMessage, Snackbar.LENGTH_LONG)
+    private fun savedSiteAdded(savedSite: SavedSite) {
+        val snackbarMessage = when(savedSite) {
+            is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
+            is SavedSite.Favorite -> R.string.favoriteAddedMessage
+        }
+        Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(bookmark)
-                addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
-                addBookmarkDialog.listener = viewModel
-            }
-            .show()
-    }
-
-    private fun favoriteAdded(favorite: SavedSite.Favorite) {
-        Snackbar.make(browserLayout, R.string.favoriteAddedMessage, Snackbar.LENGTH_LONG)
-            .setAction(R.string.edit) {
-                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(favorite)
-                addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
+                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
+                addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
             }
             .show()
@@ -1226,7 +1219,7 @@ class BrowserTabFragment :
 
     private fun editSavedSite(savedSite: SavedSite) {
         val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
-        addBookmarkDialog.show(childFragmentManager, ADD_FAVORITE_FRAGMENT_TAG)
+        addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
     }
 
@@ -1566,8 +1559,7 @@ class BrowserTabFragment :
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
 
-        private const val ADD_BOOKMARK_FRAGMENT_TAG = "ADD_BOOKMARK"
-        private const val ADD_FAVORITE_FRAGMENT_TAG = "ADD_FAVORITE"
+        private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
         private const val LAYOUT_TRANSITION_MS = 200L
 
