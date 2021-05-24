@@ -324,7 +324,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
-        viewModel.deleteQuickAccessItem(savedSite)
         Snackbar.make(
             rootView,
             message,

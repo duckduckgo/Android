@@ -314,10 +314,10 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
+    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
 
         verify(mockFavoritesRepository).delete(savedSite)
     }

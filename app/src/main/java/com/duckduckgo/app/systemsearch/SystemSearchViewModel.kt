@@ -296,6 +296,7 @@ class SystemSearchViewModel(
     }
 
     fun onDeleteQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        deleteQuickAccessItem(it.favorite)
         command.value = Command.DeleteSavedSiteConfirmation(it.favorite)
     }
 
@@ -315,7 +316,7 @@ class SystemSearchViewModel(
         }
     }
 
-    fun deleteQuickAccessItem(savedSite: SavedSite) {
+    private fun deleteQuickAccessItem(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io() + NonCancellable) {
