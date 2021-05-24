@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPluginPoint
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {

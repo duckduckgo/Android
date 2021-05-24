@@ -67,6 +67,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
@@ -554,7 +555,7 @@ class BrowserTabViewModel(
         pixel.fire(pixelName, params)
     }
 
-    fun onUserSubmittedQuery(query: String) {
+    fun onUserSubmittedQuery(query: String, queryOrigin: QueryOrigin = QueryOrigin.FromUser) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -574,7 +575,7 @@ class BrowserTabViewModel(
         }
 
         val verticalParameter = extractVerticalParameter(url)
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {

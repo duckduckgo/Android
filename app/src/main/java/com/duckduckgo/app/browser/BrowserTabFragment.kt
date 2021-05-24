@@ -61,6 +61,7 @@ import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.*
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -87,6 +88,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -1054,7 +1056,11 @@ class BrowserTabFragment :
         GlobalScope.launch {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(Dispatchers.Main) {
-                viewModel.onUserSubmittedQuery(suggestion.phrase)
+                val origin = when (suggestion) {
+                    is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = true)
+                    is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
+                }
+                viewModel.onUserSubmittedQuery(suggestion.phrase, origin)
             }
         }
     }

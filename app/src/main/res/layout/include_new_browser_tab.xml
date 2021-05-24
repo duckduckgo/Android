@@ -14,59 +14,65 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTabLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize"
-    android:foreground="@android:color/transparent"
+    android:fillViewport="true"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
     tools:showIn="@layout/fragment_browser_tab">
 
-    <include layout="@layout/include_quick_access_items"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:layout_width="0dp"
-        android:alpha="0"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/duckDuckGoLogoDescription"
-        android:src="@drawable/logo_full"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="180dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="180dp"
-        android:visibility="gone"/>
-
-    <include
-        layout="@layout/include_dax_dialog_cta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp"
-        android:visibility="gone"/>
-
-    <LinearLayout
-        android:id="@+id/ctaContainer"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:elevation="12dp"
-        android:outlineProvider="paddedBounds"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:foreground="@android:color/transparent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <include layout="@layout/include_quick_access_items"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageView
+            android:id="@+id/ddgLogo"
+            android:layout_width="0dp"
+            android:alpha="0"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/duckDuckGoLogoDescription"
+            android:src="@drawable/logo_full"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="180dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="180dp"
+            android:visibility="gone"/>
+
+        <include
+            layout="@layout/include_dax_dialog_cta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="600dp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/ctaContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:elevation="12dp"
+            android:outlineProvider="paddedBounds"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

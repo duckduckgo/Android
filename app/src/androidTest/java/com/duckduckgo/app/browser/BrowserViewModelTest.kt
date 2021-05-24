@@ -21,7 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -111,7 +110,7 @@ class BrowserViewModelTest {
 
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
         }
     }
 
@@ -175,13 +174,6 @@ class BrowserViewModelTest {
     fun whenUnknownDashboardResultReceivedThenNoCommandTriggered() {
         testee.receivedDashboardResult(1111)
         verify(mockCommandObserver, never()).onChanged(any())
-    }
-
-    @Test
-    fun whenClearCompleteThenMessageDisplayed() {
-        testee.onClearComplete()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
     }
 
     @Test

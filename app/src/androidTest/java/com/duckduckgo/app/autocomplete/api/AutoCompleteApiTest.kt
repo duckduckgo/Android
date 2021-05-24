@@ -149,10 +149,10 @@ class AutoCompleteApiTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
             Observable.just(
                 listOf(
-                    AutoCompleteServiceRawResult("example.com"),
-                    AutoCompleteServiceRawResult("foo.com"),
-                    AutoCompleteServiceRawResult("bar.com"),
-                    AutoCompleteServiceRawResult("baz.com")
+                    AutoCompleteServiceRawResult("example.com", false),
+                    AutoCompleteServiceRawResult("foo.com", true),
+                    AutoCompleteServiceRawResult("bar.com", true),
+                    AutoCompleteServiceRawResult("baz.com", true)
                 )
             )
         )
@@ -215,10 +215,10 @@ class AutoCompleteApiTest {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
             Observable.just(
                 listOf(
-                    AutoCompleteServiceRawResult("example.com"),
-                    AutoCompleteServiceRawResult("foo.com"),
-                    AutoCompleteServiceRawResult("bar.com"),
-                    AutoCompleteServiceRawResult("baz.com")
+                    AutoCompleteServiceRawResult("example.com", false),
+                    AutoCompleteServiceRawResult("foo.com", true),
+                    AutoCompleteServiceRawResult("bar.com", true),
+                    AutoCompleteServiceRawResult("baz.com", true)
                 )
             )
         )
@@ -240,7 +240,7 @@ class AutoCompleteApiTest {
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "example.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "example.com", false),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
             ),
