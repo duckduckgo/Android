@@ -177,17 +177,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
 
-    USE_OUR_APP_NOTIFICATION_SUFFIX("uoa"),
-    USE_OUR_APP_DIALOG_SHOWN("m_uoa_d"),
-    USE_OUR_APP_DIALOG_OK("m_uoa_d_ok"),
-    USE_OUR_APP_SHORTCUT_ADDED("m_uoa_s_a"),
-    USE_OUR_APP_DIALOG_DELETE_SHOWN("m_uoa_dd"),
-    UOA_VISITED_AFTER_SHORTCUT("m_uoa_vas"),
-    UOA_VISITED_AFTER_NOTIFICATION("m_uoa_van"),
-    UOA_VISITED_AFTER_DELETE_CTA("m_uoa_vad"),
-    UOA_VISITED("m_uoa_v"),
-
-    USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),
 

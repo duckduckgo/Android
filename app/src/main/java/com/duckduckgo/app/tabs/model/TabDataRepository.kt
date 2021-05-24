@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -45,7 +44,6 @@ class TabDataRepository @Inject constructor(
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
-    private val useOurAppDetector: UseOurAppDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
@@ -146,13 +144,8 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun selectByUrlOrNewTab(url: String) {
-        val query = if (useOurAppDetector.isUseOurAppUrl(url)) {
-            UseOurAppDetector.USE_OUR_APP_DOMAIN_QUERY
-        } else {
-            url
-        }
 
-        val tabId = tabsDao.selectTabByUrl(query)
+        val tabId = tabsDao.selectTabByUrl(url)
         if (tabId != null) {
             select(tabId)
         } else {

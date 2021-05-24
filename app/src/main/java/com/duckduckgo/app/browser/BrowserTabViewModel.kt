@@ -62,11 +62,11 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -78,9 +78,6 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -89,7 +86,6 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -148,13 +144,11 @@ class BrowserTabViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
-    private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
     private val fileDownloader: FileDownloader,
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
-    private val emailManager: EmailManager,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    private val emailManager: EmailManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -388,8 +382,6 @@ class BrowserTabViewModel(
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
         viewModelScope.launch(dispatchers.io()) {
-            useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain)
-
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
                     command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
@@ -428,7 +420,6 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
-            sendPixelIfUseOurAppSiteVisitedFirstTime(it)
             onUserSubmittedQuery(it)
         }
     }
@@ -533,7 +524,7 @@ class BrowserTabViewModel(
         pixel.fire(pixelName, params)
     }
 
-    fun onUserSubmittedQuery(query: String) {
+    fun onUserSubmittedQuery(query: String, queryOrigin: QueryOrigin = QueryOrigin.FromUser) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -553,7 +544,7 @@ class BrowserTabViewModel(
         }
 
         val verticalParameter = extractVerticalParameter(url)
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
@@ -803,14 +794,7 @@ class BrowserTabViewModel(
 
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
-        val previousUrl = site?.url
-
         buildSiteFactory(url, title)
-
-        // Navigating from different website to use our app website
-        if (!useOurAppDetector.isUseOurAppUrl(previousUrl)) {
-            sendPixelIfUseOurAppSiteVisitedFirstTime(url)
-        }
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
@@ -850,27 +834,6 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
-    }
-
-    private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
-        if (useOurAppDetector.isUseOurAppUrl(url)) {
-            viewModelScope.launch { sendUseOurAppSiteVisitedPixel() }
-        }
-    }
-
-    private suspend fun sendUseOurAppSiteVisitedPixel() {
-        withContext(dispatchers.io()) {
-            val isShortcutAdded = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-            val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
-            val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
-
-            when {
-                deleteCtaShown -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
-                isShortcutAdded != null -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
-                isUseOurAppNotificationSeen -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
-                else -> pixel.fire(AppPixelName.UOA_VISITED)
-            }
-        }
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
@@ -1397,7 +1360,7 @@ class BrowserTabViewModel(
 
     fun onWhitelistSelected() {
         val domain = site?.domain ?: return
-        appCoroutineScope.launch(dispatchers.io()) {
+        GlobalScope.launch(dispatchers.io()) {
             if (isWhitelisted(domain)) {
                 removeFromWhitelist(domain)
             } else {
@@ -1660,23 +1623,14 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is UseOurAppCta -> navigateToUrlAndLaunchShortcut(url = USE_OUR_APP_SHORTCUT_URL, title = USE_OUR_APP_SHORTCUT_TITLE)
             else -> return
         }
-    }
-
-    private fun navigateToUrlAndLaunchShortcut(url: String, title: String): AddHomeShortcut {
-        onUserSubmittedQuery(url)
-        return AddHomeShortcut(title, url)
     }
 
     fun onUserClickCtaSecondaryButton() {
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
-            if (cta is UseOurAppCta) {
-                command.value = ShowKeyboard
-            }
         }
     }
 
@@ -1916,18 +1870,16 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val userEventsStore: Provider<UserEventsStore>,
     private val notificationDao: Provider<NotificationDao>,
-    private val useOurAppDetector: Provider<UseOurAppDetector>,
     private val variantManager: Provider<VariantManager>,
     private val fileDownloader: Provider<FileDownloader>,
     private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
-    private val emailManager: Provider<EmailManager>,
-    private val appCoroutineScope: Provider<CoroutineScope>
+    private val emailManager: Provider<EmailManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), useOurAppDetector.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get()) as T
                 else -> null
             }
         }

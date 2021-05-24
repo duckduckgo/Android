@@ -23,48 +23,30 @@ import android.os.Build
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
-import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ShortcutReceiver @Inject constructor(
-    private val useOurAppDetector: UseOurAppDetector,
     private val pixel: Pixel,
-    private val userEventsStore: UserEventsStore,
-    private val dispatcher: DispatcherProvider,
-    private val variantManager: VariantManager,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    private val dispatcher: DispatcherProvider
 ) :
     BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val originUrl = intent?.getStringExtra(SHORTCUT_URL_ARG)
         val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
 
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {
-                Toast.makeText(it, it.getString(R.string.useOurAppShortcutAddedText, title), Toast.LENGTH_SHORT).show()
+                Toast.makeText(it, it.getString(R.string.shortcutAddedText, title), Toast.LENGTH_SHORT).show()
             }
         }
 
-        appCoroutineScope.launch(dispatcher.io()) {
-            if (useOurAppDetector.isUseOurAppUrl(originUrl)) {
-                pixel.fire(AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.InAppUsage)) {
-                    userEventsStore.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-                }
-            } else {
-                pixel.fire(AppPixelName.SHORTCUT_ADDED)
-            }
+        GlobalScope.launch(dispatcher.io()) {
+            pixel.fire(AppPixelName.SHORTCUT_ADDED)
         }
     }
 

@@ -16,17 +16,9 @@
 
 package com.duckduckgo.app.onboarding.store
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.VariantManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface UserStageStore : LifecycleObserver {
@@ -37,18 +29,8 @@ interface UserStageStore : LifecycleObserver {
 
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
-    private val dispatcher: DispatcherProvider,
-    private val variantManager: VariantManager,
-    private val appInstallStore: AppInstallStore,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) : UserStageStore, LifecycleObserver {
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onAppResumed() {
-        appCoroutineScope.launch(dispatcher.io()) {
-            moveUserToEstablished3DaysAfterInstall()
-        }
-    }
+    private val dispatcher: DispatcherProvider
+) : UserStageStore {
 
     override suspend fun getUserAppStage(): AppStage {
         return withContext(dispatcher.io()) {
@@ -62,8 +44,6 @@ class AppUserStageStore @Inject constructor(
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
                 AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
-                AppStage.USE_OUR_APP_NOTIFICATION -> AppStage.ESTABLISHED
-                AppStage.USE_OUR_APP_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.ESTABLISHED -> AppStage.ESTABLISHED
             }
 
@@ -79,16 +59,6 @@ class AppUserStageStore @Inject constructor(
         userStageDao.updateUserStage(appStage)
     }
 
-    private suspend fun moveUserToEstablished3DaysAfterInstall() {
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.KillOnboarding)) {
-            if (appInstallStore.hasInstallTimestampRecorded() && daxOnboardingActive()) {
-                val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - appInstallStore.installTimestamp)
-                if (days >= 3) {
-                    moveToStage(AppStage.ESTABLISHED)
-                }
-            }
-        }
-    }
 }
 
 suspend fun UserStageStore.isNewUser(): Boolean {
@@ -97,8 +67,4 @@ suspend fun UserStageStore.isNewUser(): Boolean {
 
 suspend fun UserStageStore.daxOnboardingActive(): Boolean {
     return this.getUserAppStage() == AppStage.DAX_ONBOARDING
-}
-
-suspend fun UserStageStore.useOurAppOnboarding(): Boolean {
-    return this.getUserAppStage() == AppStage.USE_OUR_APP_ONBOARDING
 }

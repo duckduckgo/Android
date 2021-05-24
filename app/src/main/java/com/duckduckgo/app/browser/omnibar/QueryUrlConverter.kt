@@ -28,8 +28,13 @@ import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
-    override fun convertQueryToUrl(searchQuery: String, vertical: String?): String {
-        if (UriString.isWebUrl(searchQuery)) {
+    override fun convertQueryToUrl(searchQuery: String, vertical: String?, queryOrigin: QueryOrigin): String {
+        val isUrl = when (queryOrigin) {
+            is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
+            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
+        }
+
+        if (isUrl == true) {
             return convertUri(searchQuery)
         }
 

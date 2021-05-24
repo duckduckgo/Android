@@ -141,7 +141,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()

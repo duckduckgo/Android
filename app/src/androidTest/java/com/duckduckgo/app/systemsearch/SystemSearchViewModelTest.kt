@@ -33,7 +33,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -282,7 +281,7 @@ class SystemSearchViewModelTest {
             override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
             override fun insert(userStage: UserStage) {}
         }
-        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider, mock(), mock(), TestCoroutineScope())
+        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider)
     }
 
     companion object {
