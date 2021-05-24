@@ -656,7 +656,7 @@ class BrowserTabViewModel(
             Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
             return
         }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, ImageFavicon(icon, url))
             faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
