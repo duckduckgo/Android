@@ -18,6 +18,8 @@ package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import dagger.Lazy
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -32,7 +34,7 @@ interface FavoritesRepository {
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
-    fun delete(favorite: SavedSite.Favorite)
+    suspend fun delete(favorite: SavedSite.Favorite)
 }
 
 sealed class SavedSite(
@@ -54,7 +56,10 @@ sealed class SavedSite(
     ) : SavedSite(id, title, url)
 }
 
-class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : FavoritesRepository {
+class FavoritesDataRepository(
+    private val favoritesDao: FavoritesDao,
+    private val faviconManager: Lazy<FaviconManager>,
+) : FavoritesRepository {
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
     }
@@ -89,7 +94,8 @@ class FavoritesDataRepository(private val favoritesDao: FavoritesDao) : Favorite
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
     }
 
-    override fun delete(favorite: SavedSite.Favorite) {
+    override suspend fun delete(favorite: SavedSite.Favorite) {
+        faviconManager.get().deletePersistedFavicon(favorite.url)
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 

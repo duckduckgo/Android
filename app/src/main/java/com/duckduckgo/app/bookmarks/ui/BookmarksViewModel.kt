@@ -128,7 +128,6 @@ class BookmarksViewModel(
             }
             is Favorite -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                    faviconManager.deletePersistedFavicon(savedSite.url)
                     favoritesRepository.delete(savedSite)
                 }
             }

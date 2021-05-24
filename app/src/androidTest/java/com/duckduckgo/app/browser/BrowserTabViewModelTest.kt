@@ -592,7 +592,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeletedThenRepositoryUpdated() {
+    fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val savedSite = SavedSite.Favorite(1, "title", "http://example.com", 0)
 
         testee.deleteQuickAccessItem(savedSite)

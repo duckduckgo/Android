@@ -23,13 +23,17 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import dagger.Lazy
+import org.mockito.Mockito.verify
 
 @ExperimentalCoroutinesApi
 class FavoritesDataRepositoryTest {
@@ -37,6 +41,12 @@ class FavoritesDataRepositoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
     private lateinit var db: AppDatabase
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var repository: FavoritesRepository
@@ -47,7 +57,7 @@ class FavoritesDataRepositoryTest {
             .allowMainThreadQueries()
             .build()
         favoritesDao = db.favoritesDao()
-        repository = FavoritesDataRepository(favoritesDao)
+        repository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
     }
 
     @Test
@@ -119,13 +129,14 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteDeletedThenDatabaseUpdated() {
+    fun whenFavoriteDeletedThenDatabaseUpdated() = coroutineRule.runBlocking {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         givenFavorite(favorite)
 
         repository.delete(favorite)
 
         assertNull(favoritesDao.favorite(favorite.id))
+        verify(mockFaviconManager).deletePersistedFavicon(favorite.url)
     }
 
     private fun givenFavorite(vararg favorite: Favorite) {

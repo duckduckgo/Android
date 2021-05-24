@@ -1972,7 +1972,6 @@ class BrowserTabViewModel(
     fun deleteQuickAccessItem(savedSite: SavedSite) {
         val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io() + NonCancellable) {
-            faviconManager.deletePersistedFavicon(savedSite.url)
             favoritesRepository.delete(favorite)
         }
     }

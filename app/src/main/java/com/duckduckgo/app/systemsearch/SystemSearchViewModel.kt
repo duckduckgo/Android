@@ -319,7 +319,6 @@ class SystemSearchViewModel(
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io() + NonCancellable) {
-                    faviconManager.deletePersistedFavicon(savedSite.url)
                     favoritesRepository.delete(savedSite)
                 }
             }

@@ -320,7 +320,6 @@ class SystemSearchViewModelTest {
         testee.deleteQuickAccessItem(savedSite)
 
         verify(mockFavoritesRepository).delete(savedSite)
-        verify(mockFaviconManager).deletePersistedFavicon(savedSite.url)
     }
 
     @Test

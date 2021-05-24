@@ -116,7 +116,6 @@ class BookmarksViewModelTest {
     fun whenFavoriteDeletedThenDeleteFromRepository() = coroutineRule.runBlocking {
         testee.delete(favorite)
 
-        verify(faviconManager).deletePersistedFavicon(favorite.url)
         verify(favoritesRepository).delete(favorite)
     }
 

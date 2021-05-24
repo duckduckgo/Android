@@ -31,8 +31,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -80,7 +82,7 @@ class BookmarksModule {
 
     @Provides
     @Singleton
-    fun favoriteRepository(favoritesDao: FavoritesDao): FavoritesRepository {
-        return FavoritesDataRepository(favoritesDao)
+    fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
+        return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 }
