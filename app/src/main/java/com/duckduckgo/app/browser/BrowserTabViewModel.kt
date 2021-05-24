@@ -429,13 +429,11 @@ class BrowserTabViewModel(
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            favoritesRepository.favorites().collect { favorite ->
-                val favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
-                ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
-                autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
-            }
-        }
+        favoritesRepository.favorites().onEach { favorite ->
+            val favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
+            ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
+            autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
+        }.launchIn(viewModelScope)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
