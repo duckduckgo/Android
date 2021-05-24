@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.webkit.*
 import androidx.core.net.toUri
@@ -32,15 +33,18 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.lang.RuntimeException
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -152,6 +156,17 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() = runBlocking {
+        val exception = RuntimeException()
+        val mockHandler = mock<HttpAuthHandler>()
+        val mockWebView = mock<WebView>()
+        whenever(mockWebView.url).thenThrow(exception)
+        testee.onReceivedHttpAuthRequest(mockWebView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
+        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenShouldInterceptRequestThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
         val webResourceRequest = mock<WebResourceRequest>()
         testee.shouldInterceptRequest(webView, webResourceRequest)
@@ -208,9 +223,43 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageFinishedCalledThenFlushCookies() {
+        testee.onPageFinished(webView, null)
+        verify(cookieManager).flush()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedThrowsExceptionThenRecordException() = runBlocking {
+        val exception = RuntimeException()
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.url).thenThrow(exception)
+        testee.onPageFinished(mockWebView, null)
+        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageStartedCalledThenResetInjectedJsFlagCalled() {
         testee.onPageStarted(webView, null, null)
         verify(emailInjector).resetInjectedJsFlag()
+    }
+
+    @Test
+    fun whenOnPageStartedThrowsExceptionThenRecordException() = runBlocking {
+        val exception = RuntimeException()
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.url).thenThrow(exception)
+        testee.onPageStarted(mockWebView, null, null)
+        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_STARTED)
+    }
+
+    @Test
+    fun whenShouldOverrideThrowsExceptionThenRecordException() = runBlocking {
+        val exception = RuntimeException()
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
+        testee.shouldOverrideUrlLoading(webView, "")
+        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
     }
 
     private class TestWebView(context: Context) : WebView(context)
