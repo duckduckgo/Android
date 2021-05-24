@@ -33,6 +33,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,6 +56,7 @@ class NotificationHandlerServiceTest {
         testee.notificationManager = NotificationManagerCompat.from(context)
         testee.userStageStore = mockUserStageStore
         testee.dispatcher = coroutinesTestRule.testDispatcherProvider
+        testee.appCoroutineScope = TestCoroutineScope()
     }
 
     @Test

@@ -42,7 +42,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -70,6 +70,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var dispatcher: DispatcherProvider
 
+    @Inject
+    lateinit var appCoroutineScope: CoroutineScope
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -86,7 +89,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
             USE_OUR_APP -> {
-                GlobalScope.launch(dispatcher.io()) {
+                appCoroutineScope.launch(dispatcher.io()) {
                     userStageStore.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
                     onAppLaunched(pixelSuffix)
                 }
