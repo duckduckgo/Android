@@ -1204,7 +1204,7 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSite: SavedSite) {
-        val snackbarMessage = when(savedSite) {
+        val snackbarMessage = when (savedSite) {
             is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
             is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
