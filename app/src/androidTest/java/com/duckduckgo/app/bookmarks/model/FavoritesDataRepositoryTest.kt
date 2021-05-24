@@ -37,10 +37,6 @@ class FavoritesDataRepositoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
-
     private lateinit var db: AppDatabase
     private lateinit var favoritesDao: FavoritesDao
     private lateinit var repository: FavoritesRepository
@@ -55,7 +51,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenInsertFavoriteThenReturnSavedSite() = coroutineRule.runBlocking {
+    fun whenInsertFavoriteThenReturnSavedSite() {
         givenNoFavoritesStored()
 
         val savedSite = repository.insert("title", "http://example.com")
@@ -66,7 +62,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenInsertFavoriteWithoutTitleThenSavedSiteUsesUrlAsTitle() = coroutineRule.runBlocking {
+    fun whenInsertFavoriteWithoutTitleThenSavedSiteUsesUrlAsTitle() {
         givenNoFavoritesStored()
 
         val savedSite = repository.insert("", "http://example.com")
@@ -77,7 +73,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenUserHasFavoritesAndInsertFavoriteThenSavedSiteUsesNextPosition() = coroutineRule.runBlocking {
+    fun whenUserHasFavoritesAndInsertFavoriteThenSavedSiteUsesNextPosition() {
         givenMoreFavoritesStored()
 
         val savedSite = repository.insert("Favorite", "http://favexample.com")
@@ -88,7 +84,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenDataSourceChangesThenNewListReceived() = coroutineRule.runBlocking {
+    fun whenDataSourceChangesThenNewListReceived() {
         givenNoFavoritesStored()
 
         repository.insert("Favorite", "http://favexample.com")
@@ -100,7 +96,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteUpdatedThenDatabaseChanged() = coroutineRule.runBlocking {
+    fun whenFavoriteUpdatedThenDatabaseChanged() {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         givenFavorite(favorite)
         val updatedFavorite = favorite.copy(position = 3)
@@ -111,7 +107,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenListReceivedThenUpdateItemsWithNewPositionInDatabase() = coroutineRule.runBlocking {
+    fun whenListReceivedThenUpdateItemsWithNewPositionInDatabase() {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         val favorite2 = Favorite(2, "Favorite2", "http://favexample2.com", 2)
         givenFavorite(favorite, favorite2)
@@ -123,7 +119,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteDeletedThenDatabaseUpdated() = coroutineRule.runBlocking {
+    fun whenFavoriteDeletedThenDatabaseUpdated() {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         givenFavorite(favorite)
 
@@ -143,7 +139,7 @@ class FavoritesDataRepositoryTest {
         favoritesDao.insert(FavoriteEntity(title = "title 2", url = "http://other.com", position = 1))
     }
 
-    private suspend fun givenNoFavoritesStored() {
+    private fun givenNoFavoritesStored() {
         assertNull(favoritesDao.getLastPosition())
     }
 

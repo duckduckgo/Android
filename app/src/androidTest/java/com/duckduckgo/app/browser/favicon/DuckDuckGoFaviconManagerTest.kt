@@ -60,7 +60,7 @@ class DuckDuckGoFaviconManagerTest {
     private lateinit var testee: FaviconManager
 
     @Before
-    fun setup() = coroutineRule.runBlocking {
+    fun setup() {
         whenever(mockFavoriteRepository.favoritesCountByDomain(any())).thenReturn(0)
         testee = DuckDuckGoFaviconManager(
             mockFaviconPersister,
