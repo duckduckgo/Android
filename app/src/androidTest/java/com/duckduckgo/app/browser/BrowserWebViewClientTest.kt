@@ -38,9 +38,11 @@ import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -223,9 +225,11 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenFlushCookies() {
+    fun whenOnPageFinishedCalledThenFlushCookies() = runBlocking {
         testee.onPageFinished(webView, null)
-        verify(cookieManager).flush()
+        withContext(Dispatchers.IO) {
+            verify(cookieManager).flush()
+        }
     }
 
     @UiThreadTest
