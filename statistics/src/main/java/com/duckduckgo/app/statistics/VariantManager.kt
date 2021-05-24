@@ -28,9 +28,7 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object InAppUsage : VariantFeature()
-        object KillOnboarding : VariantFeature()
-        object RemoveDay1AndDay3Notifications : VariantFeature()
+
     }
 
     companion object {
@@ -45,14 +43,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // InAppUsage Experiments
-            Variant(key = "ma", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mb", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
-            Variant(key = "mc", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications), filterBy = { isEnglishLocale() }),
-
-            Variant(key = "zx", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zy", weight = 0.0, features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage), filterBy = { isEnglishLocale() })
         )
 
         val REFERRER_VARIANTS = listOf(

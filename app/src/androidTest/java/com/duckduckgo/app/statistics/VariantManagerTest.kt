@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -41,49 +40,6 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    // Use our app experiment
-    @Test
-    fun inBrowserControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "ma" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun inBrowserSecondControlVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingFeatures() {
-        val variant = variants.first { it.key == "mb" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(2, variant.features.size)
-        assertTrue(variant.hasFeature(KillOnboarding))
-        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
-    }
-
-    @Test
-    fun inBrowserInAppUsageVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingAndInAppUsageFeatures() {
-        val variant = variants.first { it.key == "mc" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(3, variant.features.size)
-        assertTrue(variant.hasFeature(KillOnboarding))
-        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
-        assertTrue(variant.hasFeature(InAppUsage))
-    }
-
-    @Test
-    fun newInBrowserControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zx" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun newInBrowserInAppUsageVariantHasExpectedWeightAndKillOnboardingAndInAppUsageFeatures() {
-        val variant = variants.first { it.key == "zy" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(2, variant.features.size)
-        assertTrue(variant.hasFeature(KillOnboarding))
-        assertTrue(variant.hasFeature(InAppUsage))
     }
 
     @Test

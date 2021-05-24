@@ -58,23 +58,23 @@ class UserEventsDaoTest {
 
     @Test
     fun whenGetUserEventAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
-        assertNull(testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+        assertNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED))
     }
 
     @Test
     fun whenInsertingUserEventThenTimestampIsNotNull() = coroutineRule.runBlocking {
-        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
 
-        assertNotNull(testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertNotNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
     }
 
     @Test
     fun whenInsertingSameUserEventThenReplaceOldTimestamp() = coroutineRule.runBlocking {
-        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        val timestamp = testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp
+        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+        val timestamp = testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp
 
-        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
 
-        assertNotEquals(timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertNotEquals(timestamp, testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
     }
 }
