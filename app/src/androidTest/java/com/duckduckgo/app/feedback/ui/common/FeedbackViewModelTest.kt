@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.feedback.ui.common
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.annotation.UiThreadTest
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
@@ -27,17 +30,30 @@ import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @Suppress("RemoveExplicitTypeArguments")
 class FeedbackViewModelTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val schedulers = InstantSchedulersRule()
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: FeedbackViewModel
 
@@ -50,10 +66,11 @@ class FeedbackViewModelTest {
     private val updateViewCommand
         get() = testee.updateViewCommand.value?.fragmentViewState
 
+    @ExperimentalCoroutinesApi
     @Before
     @UiThreadTest
     fun setup() {
-        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter)
+        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -110,18 +127,14 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenSubmitted() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userGavePositiveFeedbackNoDetails()
-        }
+        testee.userGavePositiveFeedbackNoDetails()
 
         verify(feedbackSubmitter).sendPositiveFeedback(null)
     }
 
     @Test
     fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userGavePositiveFeedbackNoDetails()
-        }
+        testee.userGavePositiveFeedbackNoDetails()
 
         val command = captureCommand() as Command.Exit
         assertTrue(command.feedbackSubmitted)
@@ -129,18 +142,14 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userProvidedPositiveOpenEndedFeedback("foo")
-        }
+        testee.userProvidedPositiveOpenEndedFeedback("foo")
 
         verify(feedbackSubmitter).sendPositiveFeedback("foo")
     }
 
     @Test
     fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userProvidedPositiveOpenEndedFeedback("foo")
-        }
+        testee.userProvidedPositiveOpenEndedFeedback("foo")
 
         val command = captureCommand() as Command.Exit
         assertTrue(command.feedbackSubmitted)
@@ -148,25 +157,19 @@ class FeedbackViewModelTest {
 
     @Test
     fun whenUserProvidesNegativeFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
-        }
+        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
         verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
     }
 
     @Test
     fun whenUserProvidesNegativeFeedbackNoSubReasonThenFeedbackSubmitted() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "foo")
-        }
+        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "foo")
         verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "foo")
     }
 
     @Test
     fun whenUserProvidesNegativeFeedbackEmptyOpenEndedFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "")
-        }
+        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "")
         verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "")
     }
 
