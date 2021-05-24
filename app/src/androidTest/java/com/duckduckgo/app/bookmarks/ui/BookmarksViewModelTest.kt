@@ -105,16 +105,16 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkDeletedThenDaoUpdated() = coroutineRule.runBlocking {
-        testee.delete(bookmark)
+    fun whenBookmarkDeleteRequestedThenDaoUpdated() = coroutineRule.runBlocking {
+        testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
         verify(bookmarksDao).delete(bookmarkEntity)
     }
 
     @Test
-    fun whenFavoriteDeletedThenDeleteFromRepository() = coroutineRule.runBlocking {
-        testee.delete(favorite)
+    fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = coroutineRule.runBlocking {
+        testee.onDeleteSavedSiteRequested(favorite)
 
         verify(favoritesRepository).delete(favorite)
     }

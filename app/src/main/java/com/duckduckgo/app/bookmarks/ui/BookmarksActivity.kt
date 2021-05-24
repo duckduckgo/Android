@@ -210,7 +210,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
-        viewModel.delete(savedSite)
         Snackbar.make(
             bookmarkRootView,
             message,

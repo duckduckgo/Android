@@ -115,10 +115,11 @@ class BookmarksViewModel(
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        delete(savedSite)
         command.value = ConfirmDeleteSavedSite(savedSite)
     }
 
-    fun delete(savedSite: SavedSite) {
+    private fun delete(savedSite: SavedSite) {
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
