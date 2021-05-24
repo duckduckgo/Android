@@ -32,9 +32,6 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
-    <string name="addFavoriteMenuTitle">Add Favorite</string>
-    <string name="favoriteAddedMessage">Favorite added</string>
-    <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
 
     <!-- Downloading files -->
@@ -205,17 +202,13 @@
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
-    <string name="savedSiteDialogTitleHint">Title</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Edit</string>
+    <string name="bookmarkTitleHint">Bookmark title</string>
+    <string name="bookmarkUrlHint">Bookmark URL</string>
+    <string name="bookmarkTitleEdit">Edit bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
-    <string name="bookmarksSectionTitle">Bookmarks</string>
-    <string name="favoritesSectionTitle">Favorites</string>
-    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
-    <string name="favoritesEmptyHint">No favorites added yet</string>
     <string name="exportBookmarksMenu">Export</string>
     <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
     <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
