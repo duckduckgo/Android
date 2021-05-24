@@ -39,10 +39,10 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class FeedbackViewModel(
-        private val playStoreUtils: PlayStoreUtils,
-        private val feedbackSubmitter: FeedbackSubmitter,
-        private val appCoroutineScope: CoroutineScope,
-        private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val playStoreUtils: PlayStoreUtils,
+    private val feedbackSubmitter: FeedbackSubmitter,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
