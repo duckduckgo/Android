@@ -23,8 +23,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -40,9 +38,7 @@ class JsLoginDetectorTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val settingsDataStore: SettingsDataStore = mock()
-    private val userEventsStore: UserEventsStore = mock()
-
-    private val testee = JsLoginDetector(settingsDataStore, UseOurAppDetector(userEventsStore))
+    private val testee = JsLoginDetector(settingsDataStore)
 
     @UiThreadTest
     @Test

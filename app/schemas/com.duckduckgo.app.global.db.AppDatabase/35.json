@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 34,
-    "identityHash": "be6380785dcbf8f6793f852097f0d224",
+    "version": 35,
+    "identityHash": "7e459183134182e23524e089ee6e638f",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -428,6 +428,54 @@
           "autoGenerate": true
         },
         "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "favorites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `position` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_favorites_title_url",
+            "unique": true,
+            "columnNames": [
+              "title",
+              "url"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `${TABLE_NAME}` (`title`, `url`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -860,7 +908,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be6380785dcbf8f6793f852097f0d224')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e459183134182e23524e089ee6e638f')"
     ]
   }
 }
