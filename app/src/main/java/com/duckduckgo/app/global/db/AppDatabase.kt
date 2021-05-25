@@ -24,6 +24,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.db.FavoriteEntity
+import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
@@ -65,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 34,
+    exportSchema = true, version = 35,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -79,6 +81,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
+        FavoriteEntity::class,
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
@@ -123,6 +126,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
+    abstract fun favoritesDao(): FavoritesDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
@@ -416,6 +420,13 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_34_TO_35: Migration = object : Migration(34, 35) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `favorites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `position` INTEGER NOT NULL)")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `favorites` (`title`, `url`)")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
@@ -462,7 +473,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_30_TO_31,
             MIGRATION_31_TO_32,
             MIGRATION_32_TO_33,
-            MIGRATION_33_TO_34
+            MIGRATION_33_TO_34,
+            MIGRATION_34_TO_35
         )
 
     @Deprecated(

@@ -178,7 +178,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromPersisted(url, itemView.fireproofWebsiteEntryFavicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.fireproofWebsiteEntryFavicon)
             }
         }
 

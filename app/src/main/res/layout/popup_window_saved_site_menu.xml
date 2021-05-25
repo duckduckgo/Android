@@ -23,12 +23,12 @@
     android:background="@drawable/popup_menu_bg">
 
     <TextView
-        android:id="@+id/editBookmark"
+        android:id="@+id/editSavedSite"
         style="@style/BrowserTextMenuItem"
         android:text="@string/edit" />
 
     <TextView
-        android:id="@+id/deleteBookmark"
+        android:id="@+id/deleteSavedSite"
         style="@style/BrowserTextMenuItem"
         android:text="@string/delete" />
 
