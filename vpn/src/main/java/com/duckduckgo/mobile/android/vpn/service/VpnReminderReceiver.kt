@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPre
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -104,7 +105,7 @@ fun goAsync(
     coroutineScope: CoroutineScope = GlobalScope,
     block: suspend () -> Unit
 ) {
-    coroutineScope.launch {
+    coroutineScope.launch(Dispatchers.IO) {
         try {
             block()
         } finally {
