@@ -44,12 +44,13 @@ class DeviceShieldOnboardingTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
+        MockitoAnnotations.initMocks(this)
 
         whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences)
 
-        deviceShieldOnboardingStore = DeviceShieldOnboardingModule().provideDeviceShieldOnboardingStore(mockContext)
-        deviceShieldOnboarding = DeviceShieldOnboardingModule().provideDeviceShieldOnboarding(mockContext)
+        val preferences = DeviceShieldOnboardingPreferencesModule().provideDeviceShieldOnboardingPreferences(mockContext)
+        deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(preferences)
+        deviceShieldOnboarding = DeviceShieldOnboardingImpl(preferences)
     }
 
     @Test
