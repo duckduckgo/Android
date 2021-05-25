@@ -30,7 +30,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.beta.BetaFeaturesActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -51,7 +50,6 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
