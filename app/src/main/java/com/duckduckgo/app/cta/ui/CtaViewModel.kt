@@ -197,9 +197,6 @@ class CtaViewModel @Inject constructor(
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
-            canShowDeviceShieldCta() -> {
-                DeviceShieldCta
-            }
             else -> null
         }
     }
@@ -234,16 +231,9 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
-        // for appTB we don't want to show the widget cta
-        // return widgetCapabilities.supportsStandardWidgetAdd &&
-        //     !widgetCapabilities.hasInstalledWidgets &&
-        //     !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
-        return false
-    }
-
-    @WorkerThread
-    private fun canShowDeviceShieldCta(): Boolean {
-        return daxDialogEndShown()
+        return widgetCapabilities.supportsStandardWidgetAdd &&
+            !widgetCapabilities.hasInstalledWidgets &&
+            !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     @WorkerThread
