@@ -356,18 +356,19 @@ class DeviceShieldNotificationFactoryTest {
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC", trackingApp = defaultTrackingApp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC", companyDisplayName = "Tracking", trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 
     private fun aTrackerAndCompany(
         domain: String = "example.com",
         trackerCompanyName: String = "Tracking LLC",
+        trackerCompanyDisplayName: String = "Tracking",
         trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ): VpnTracker {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        return VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = trackerCompanyName, trackingApp = defaultTrackingApp)
+        return VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = trackerCompanyName, companyDisplayName = trackerCompanyDisplayName, trackingApp = defaultTrackingApp)
     }
 
 }

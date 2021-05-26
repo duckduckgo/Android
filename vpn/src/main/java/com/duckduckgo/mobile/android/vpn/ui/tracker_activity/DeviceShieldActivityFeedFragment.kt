@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.flow.collect
@@ -50,7 +51,10 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         AndroidInjection.inject(this)
 
         trackerFeedAdapter.showTimeWindowHeadings(config.showTimeWindowHeadings)
-        view.findViewById<RecyclerView>(R.id.activity_recycler_view).adapter = trackerFeedAdapter
+        with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
+            layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+            adapter = trackerFeedAdapter
+        }
 
         addRepeatingJob(Lifecycle.State.CREATED) {
             activityFeedViewModel.getMostRecentTrackers(DeviceShieldActivityFeedViewModel.TimeWindow(config.timeWindow.toLong(), config.timeWindowUnits))

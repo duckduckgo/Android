@@ -160,7 +160,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         timestamp: String = bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", trackingApp = defaultTrackingApp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", companyDisplayName = "", trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 

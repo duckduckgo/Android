@@ -29,6 +29,7 @@ data class VpnTracker(
     val trackerCompanyId: Int,
     val domain: String,
     val company: String,
+    val companyDisplayName: String,
     @Embedded val trackingApp: TrackingApp,
     val timestamp: String = DatabaseDateFormatter.timestamp()
 )
@@ -68,4 +69,5 @@ data class VpnPreferences(
 data class TrackingApp(val packageId: String, val appDisplayName: String) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
+
 

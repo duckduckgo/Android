@@ -19,35 +19,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="8dp"
     >
-
-    <TextView
-        android:id="@+id/date_heading"
-        style="@style/DeviceShield.PrivacyReport.Toggle"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:textAllCaps="false"
-        android:paddingStart="0dp"
-        android:paddingEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:textSize="16sp"
-        tools:text="Yesterday"
-        android:background="?selectableItemBackground"
-        android:visibility="gone"
-        tools:visibility="visible"
-        />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
     >
 
         <ImageView
@@ -69,14 +54,18 @@
 
             <TextView
                 android:id="@+id/activity_message"
-                style="@style/Widget.AppCompat.TextView"
+                style="@style/DeviceShield.PrivacyReport.PastWeekCounters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/almostBlackDark"
                 tools:text="10 trackers blocked in Uber app"
                 />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tracker_badges"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -86,9 +75,11 @@
 
             <TextView
                 android:id="@+id/activity_time_since"
-                style="@style/Widget.AppCompat.TextView"
+                style="@style/DeviceShield.PrivacyReport.PastWeekCounters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/warmerGray"
                 tools:text="2m ago"
                 />
         </LinearLayout>

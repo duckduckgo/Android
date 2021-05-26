@@ -30,14 +30,11 @@
 
         <TextView
             android:id="@+id/past_week_activity"
-            style="@style/DeviceShield.PrivacyReport.Toggle"
+            style="@style/SettingsSectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="23dp"
-            android:paddingBottom="20dp"
-            android:layout_marginStart="16dp"
-            android:textAllCaps="true"
             android:text="@string/deviceShieldActivityPastWeek"
+            android:textSize="14sp"
             />
 
         <LinearLayout
@@ -85,14 +82,11 @@
 
         <TextView
             android:id="@+id/most_recent_activity"
-            style="@style/DeviceShield.PrivacyReport.Toggle"
-            android:paddingTop="23dp"
-            android:paddingBottom="20dp"
+            style="@style/SettingsSectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:textAllCaps="true"
             android:text="@string/deviceShieldActivityMostRecent"
+            android:textSize="14sp"
             />
 
         <androidx.fragment.app.FragmentContainerView
@@ -104,35 +98,39 @@
 
         <TextView
             android:id="@+id/cta_show_all"
-            style="@style/DeviceShield.PrivacyReport.Toggle"
+            style="@style/SettingsItem"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:textColor="@color/cornflowerBlue"
             android:textAllCaps="false"
-            android:padding="8dp"
             android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginBottom="22dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/deviceShieldActivityCtaShowAll"
             android:background="?selectableItemBackground"
+            android:textSize="16sp"
             />
 
         <View
             android:background="@color/whiteSix"
             android:layout_height="1dp"
             android:layout_width="match_parent"
-            android:layout_marginTop="14dp" />
+            />
 
         <TextView
             android:id="@+id/cta_tracker_faq"
-            style="@style/DeviceShield.PrivacyReport.Toggle"
+            style="@style/SettingsItem"
+            android:textColor="@color/cornflowerBlue"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textAllCaps="false"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="52dp"
-            android:layout_marginStart="8dp"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/deviceShieldActivityCtaFAQ"
+            android:textSize="16sp"
             android:background="?selectableItemBackground"
             />
 

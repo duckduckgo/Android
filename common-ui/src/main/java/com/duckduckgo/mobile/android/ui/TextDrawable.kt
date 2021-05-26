@@ -238,7 +238,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     }
 
     interface IShapeBuilder {
-        fun beginConfig(): IConfigBuilder?
+        fun beginConfig(): IConfigBuilder
         fun rect(): IBuilder?
         fun round(): IBuilder?
         fun roundRect(radius: Int): IBuilder?

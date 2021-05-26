@@ -168,10 +168,9 @@
     <string name="deviceShieldActivityCtaShowAll">View All Recent Activity</string>
     <string name="deviceShieldActivityCtaFAQ">What are app trackers?</string>
     <string name="deviceShieldActivityTrackersBlocked">%d trackers blocked in <![CDATA[<b>%s</b>]]> app</string>
-    <plurals name="deviceShieldActivityTrackersCount">
-        <item quantity="one">%1$s</item>
-        <item quantity="other">%1$s and %2$d other(s)</item>
-    </plurals>
+    <string name="deviceShieldActivityTrackersCountOne">%1$s</string>
+    <string name="deviceShieldActivityTrackersCountTwo">%1$s and 1 other</string>
+    <string name="deviceShieldActivityTrackersCountMany">%1$s and %2$d others</string>
     <string name="deviceShieldActivityToday">Today</string>
     <string name="deviceShieldActivityYesterday">Yesterday</string>
     <string name="deviceShieldActivityDaysAgo">%d days ago</string>

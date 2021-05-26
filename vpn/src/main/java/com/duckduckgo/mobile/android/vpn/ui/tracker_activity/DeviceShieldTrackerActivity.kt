@@ -83,7 +83,7 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
                 R.id.activity_list,
                 DeviceShieldActivityFeedFragment.newInstance(
                     DeviceShieldActivityFeedFragment.ActivityFeedConfig(
-                        maxRows = 5,
+                        maxRows = 6,
                         timeWindow = 5,
                         timeWindowUnits = TimeUnit.DAYS,
                         showTimeWindowHeadings = false

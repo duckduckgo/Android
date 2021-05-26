@@ -62,9 +62,15 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         fun bind(trackerInfo: TrackerInfo) {
-            val badge = badgeIcon(view.context, trackerInfo.company)
+            val badge = badgeIcon(view.context, trackerInfo.companyName)
             if (badge == null) {
-                (view as ImageView).setImageDrawable(TextDrawable.builder().buildRound(trackerInfo.company.take(1), Color.DKGRAY))
+                (view as ImageView).setImageDrawable(
+                    TextDrawable.builder()
+                        .beginConfig()
+                        .fontSize(50)
+                        .endConfig()
+                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
+                )
             } else {
                 (view as ImageView).setImageResource(badge)
             }
@@ -87,7 +93,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         override fun getNewListSize() = new.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return old[oldItemPosition].company == new[newItemPosition].company
+            return old[oldItemPosition].companyName == new[newItemPosition].companyName
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

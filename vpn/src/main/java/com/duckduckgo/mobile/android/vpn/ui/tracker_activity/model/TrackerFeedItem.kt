@@ -30,10 +30,12 @@ sealed class TrackerFeedItem(open val id: Int) {
     ) : TrackerFeedItem(id)
 
     object TrackerEmptyFeed : TrackerFeedItem(0)
+
+    data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
 }
 
 data class TrackerInfo(
-    val company: String,
-    val domain: String,
+    val companyName: String,
+    val companyDisplayName: String,
     val timestamp: String
 )

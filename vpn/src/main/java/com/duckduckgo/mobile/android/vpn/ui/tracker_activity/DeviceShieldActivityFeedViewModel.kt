@@ -63,9 +63,20 @@ class DeviceShieldActivityFeedViewModel(
                 val trackerList = mutableListOf<TrackerInfo>()
                 perTrackerData.forEach { trackerBucket ->
                     val trackerCompanyName = trackerBucket.value.first().vpnTracker.company
+                    val trackerCompanyDisplayName = trackerBucket.value.first().vpnTracker.companyDisplayName
                     val timestamp = trackerBucket.value.sortedByDescending { it.vpnTracker.timestamp }.first().vpnTracker.timestamp
-                    trackerList.add(TrackerInfo(company = trackerCompanyName, domain = trackerBucket.key, timestamp = timestamp))
+                    trackerList.add(
+                        TrackerInfo(
+                            companyName = trackerCompanyName,
+                            companyDisplayName = trackerCompanyDisplayName,
+                            timestamp = timestamp
+                        )
+                    )
                     totalTrackerCount += trackerBucket.value.size
+                }
+
+                if (firstInBucket) {
+                    sourceData.add(TrackerFeedItem.TrackerFeedItemHeader(item.vpnTracker.timestamp))
                 }
 
                 sourceData.add(

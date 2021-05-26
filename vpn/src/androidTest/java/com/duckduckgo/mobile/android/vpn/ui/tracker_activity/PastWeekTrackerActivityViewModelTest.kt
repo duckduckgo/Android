@@ -47,6 +47,7 @@ class PastWeekTrackerActivityViewModelTest {
         defaultTracker = VpnTracker(
             trackerCompanyId = 1,
             company = "Google LLC",
+            companyDisplayName = "Google",
             trackingApp = TrackingApp("app.foo.com", "Foo app"),
             domain = "doubleclick.net"
         )
@@ -63,6 +64,7 @@ class PastWeekTrackerActivityViewModelTest {
         val tracker = VpnTracker(
             trackerCompanyId = 1,
             company = "Google LLC",
+            companyDisplayName = "Google",
             trackingApp = TrackingApp("app.foo.com", "Foo app"),
             domain = "doubleclick.net"
         )
