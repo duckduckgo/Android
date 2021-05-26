@@ -28,8 +28,13 @@ import com.duckduckgo.app.bookmarks.service.RealBookmarksImporter
 import com.duckduckgo.app.bookmarks.service.RealBookmarksParser
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -73,5 +78,11 @@ class BookmarksModule {
         pixel: Pixel
     ): BookmarksManager {
         return RealBookmarksManager(bookmarksImporter, bookmarksExporter, pixel)
+    }
+
+    @Provides
+    @Singleton
+    fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
+        return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 }

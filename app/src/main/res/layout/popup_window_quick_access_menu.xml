@@ -14,19 +14,20 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/popup_menu_bg">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listItem="@layout/view_bookmark_entry" />
+    <TextView
+        android:id="@+id/editSavedSite"
+        style="@style/BrowserTextMenuItem"
+        android:text="@string/edit" />
 
-</merge>
+    <TextView
+        android:id="@+id/deleteSavedSite"
+        style="@style/BrowserTextMenuItem"
+        android:text="@string/delete" />
+
+</LinearLayout>

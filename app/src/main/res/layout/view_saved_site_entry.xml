@@ -22,7 +22,6 @@
     android:paddingTop="14dp"
     android:paddingBottom="14dp"
     android:paddingStart="16dp"
-    android:paddingEnd="10dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
@@ -41,8 +40,7 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp" />
+            android:importantForAccessibility="no"/>
     </FrameLayout>
 
     <TextView
@@ -70,7 +68,7 @@
         android:fontFamily="sans-serif"
         android:paddingTop="2dp"
         android:paddingBottom="4dp"
-        android:textColor="?attr/bookmarkSubtitleTextColor"
+        android:textColor="?attr/savedSiteSubtitleTextColor"
         android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -85,6 +83,7 @@
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
         android:paddingStart="14dp"
+        android:paddingEnd="10dp"
         android:scaleType="center"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"
