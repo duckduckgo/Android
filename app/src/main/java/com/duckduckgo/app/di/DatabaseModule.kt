@@ -20,7 +20,6 @@ import android.content.Context
 import android.webkit.WebViewDatabase
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -49,11 +48,7 @@ class DatabaseModule {
     }
 
     @Provides
-    fun provideDatabaseMigrations(
-        context: Context,
-        settingsDataStore: SettingsDataStore,
-        addToHomeCapabilityDetector: AddToHomeCapabilityDetector
-    ): MigrationsProvider {
-        return MigrationsProvider(context, settingsDataStore, addToHomeCapabilityDetector)
+    fun provideDatabaseMigrations(context: Context, settingsDataStore: SettingsDataStore): MigrationsProvider {
+        return MigrationsProvider(context, settingsDataStore)
     }
 }

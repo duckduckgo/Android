@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,9 +17,9 @@
 
 <resources>
 
-    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge" />
+    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
-    <style name="AppTheme.Base" parent="BaseAppTheme">
+    <style name="AppTheme" parent="BaseAppTheme">
 
         <!-- These neutral colors cover cases before dynamic theme can be applied
              such as the app launch color -->
@@ -36,7 +37,7 @@
         <item name="android:colorEdgeEffect">@color/newBlack</item>
     </style>
 
-    <style name="AppTheme.Base.BaseDark">
+    <style name="AppTheme.BaseDark">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
@@ -65,9 +66,9 @@
         <item name="bookmarkIconColor">@color/white</item>
         <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
-        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
+        <item name="savedSiteSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
@@ -86,8 +87,6 @@
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/greyishBrownTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/warGreyTwo</item>
         <item name="brokenSitesButtonRippleColor">@color/white</item>
-        <item name="topCallToActionDescriptionColor">@color/grayish</item>
-        <item name="topCallToActionBackgroundColor">@color/greyishBrownTwo</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -98,7 +97,7 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
     </style>
 
-    <style name="AppTheme.Dark" parent="AppTheme.Base.BaseDark" />
+    <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
 
     <style name="AppTheme.Dark.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -116,7 +115,7 @@
           * AppTheme.Light in values-v23/themes.xml
           * SplashTheme.Light
     -->
-    <style name="AppTheme.Base.BaseLight">
+    <style name="AppTheme.BaseLight">
         <item name="colorPrimary">@color/lightThemePrimary</item>
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
@@ -143,11 +142,11 @@
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
         <item name="bookmarkTitleTextColor">@color/almostBlackDark</item>
+        <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
-        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
+        <item name="savedSiteSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
@@ -166,8 +165,6 @@
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
         <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
-        <item name="topCallToActionDescriptionColor">@color/almostBlackDark</item>
-        <item name="topCallToActionBackgroundColor">@color/white</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
         <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
@@ -178,7 +175,7 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
     </style>
 
-    <style name="AppTheme.Light" parent="AppTheme.Base.BaseLight">
+    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
         <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
         <item name="android:statusBarColor">@color/almostBlack</item>
     </style>

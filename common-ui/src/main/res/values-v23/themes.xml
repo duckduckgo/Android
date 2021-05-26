@@ -18,11 +18,11 @@
 
 <resources>
 
-    <style name="AppTheme.Dark" parent="AppTheme.Base.BaseDark">
+    <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <style name="AppTheme.Light" parent="AppTheme.Base.BaseLight">
+    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
         <item name="android:windowLightStatusBar">true</item>
     </style>
 

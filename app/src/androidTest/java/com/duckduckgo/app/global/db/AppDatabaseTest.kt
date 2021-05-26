@@ -24,7 +24,6 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -48,10 +47,8 @@ class AppDatabaseTest {
 
     private val context = mock<Context>()
     private val mockSettingsDataStore = mock<SettingsDataStore>()
-    private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
 
-    private val migrationsProvider: MigrationsProvider =
-        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
 
     @Before
     fun setup() {
@@ -266,7 +263,7 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion22To23IfUserStageIsUseOurAppNotificationThenMigrateToEstablished() {
         testHelper.createDatabase(TEST_DB_NAME, 22).use {
-            givenUserStageIs(it, AppStage.USE_OUR_APP_NOTIFICATION)
+            givenUserStageIs(it, "USE_OUR_APP_NOTIFICATION")
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
             val stage = getUserStage(it)
@@ -361,12 +358,84 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion33To34ThenValidationSucceeds() {
+    fun whenMigratingFromVersion33o34ThenValidationSucceeds() {
         createDatabaseAndMigrate(33, 34, migrationsProvider.MIGRATION_33_TO_34)
+    }
+
+    @Test
+    fun whenMigratingFromVersion33To34IfUserStageIsUseOurAppNotificationThenMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 33).use {
+            givenUserStageIs(it, "USE_OUR_APP_NOTIFICATION")
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion33To34IfUserStageIsUseOurAppOnboardingThenMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 33).use {
+            givenUserStageIs(it, "USE_OUR_APP_ONBOARDING")
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion33To34IfUseOurAppEventsExistThenEventsAreDeletedFromDatabase() {
+        testHelper.createDatabase(TEST_DB_NAME, 33).use {
+            it.execSQL("INSERT INTO `user_events` values ('USE_OUR_APP_SHORTCUT_ADDED', 1) ")
+            it.execSQL("INSERT INTO `user_events` values ('USE_OUR_APP_FIREPROOF_DIALOG_SEEN', 1) ")
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+
+            val eventsCount = it.query("select count(*) from user_events").run {
+                moveToFirst()
+                getInt(0)
+            }
+
+            assertEquals(0, eventsCount)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion33To34IfUseOurAppCtasExistThenCtasAreDeletedFromDatabase() {
+        testHelper.createDatabase(TEST_DB_NAME, 33).use {
+            it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP') ")
+            it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP_DELETION') ")
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+
+            val ctaCount = it.query("select count(*) from dismissed_cta").run {
+                moveToFirst()
+                getInt(0)
+            }
+
+            assertEquals(0, ctaCount)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion34To35ThenValidationSucceeds() {
+        createDatabaseAndMigrate(34, 35, migrationsProvider.MIGRATION_34_TO_35)
+    }
+
+    @Test
+    fun whenMigratingFromVersion35To36ThenValidationSucceeds() {
+        createDatabaseAndMigrate(35, 36, migrationsProvider.MIGRATION_35_TO_36)
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
         database.execSQL("INSERT INTO `userStage` values (1, '${appStage.name}') ")
+    }
+
+    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: String) {
+        database.execSQL("INSERT INTO `userStage` values (1, '$appStage') ")
     }
 
     private fun getUserStage(database: SupportSQLiteDatabase): String {

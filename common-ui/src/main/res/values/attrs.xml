@@ -43,6 +43,8 @@
     <attr name="websiteListFaviconBackground" format="color" />
     <attr name="bookmarkTitleTextColor" format="color" />
     <attr name="bookmarkSubtitleTextColor" format="color" />
+    <attr name="savedSiteSubtitleTextColor" format="color" />
+    <attr name="savedSiteEmptyTextColor" format="color" />
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />
     <attr name="settingsMinorTextColor" format="color" />

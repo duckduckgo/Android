@@ -23,6 +23,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.BookmarksManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.runBlocking
@@ -30,9 +32,10 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.After
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,26 +56,32 @@ class BookmarksViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
+    private val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
+    private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
+
     private val liveData = MutableLiveData<List<BookmarkEntity>>()
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
-    private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
     private val bookmarksDao: BookmarksDao = mock()
+    private val favoritesRepository: FavoritesRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val bookmarksManager: BookmarksManager = mock()
 
-    private val bookmark = BookmarkEntity(title = "title", url = "www.example.com")
+    private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com")
+    private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
+    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(bookmarksDao, faviconManager, bookmarksManager, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarksDao, faviconManager, bookmarksManager, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
     }
 
     @Before
-    fun before() {
+    fun before() = coroutineRule.runBlocking {
         liveData.value = emptyList()
         whenever(bookmarksDao.getBookmarks()).thenReturn(liveData)
+        whenever(favoritesRepository.favorites()).thenReturn(flowOf())
     }
 
     @After
@@ -82,27 +91,64 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkDeletedThenDaoUpdated() {
-        testee.delete(bookmark)
-        verify(bookmarksDao).delete(bookmark)
+    fun whenBookmarkInsertedThenDaoUpdated() {
+        testee.insert(bookmark)
+
+        verify(bookmarksDao).insert(bookmarkEntity)
     }
 
     @Test
-    fun whenBookmarkSelectedThenOpenCommand() {
+    fun whenFavoriteInsertedThenRepositoryUpdated() = coroutineRule.runBlocking {
+        testee.insert(favorite)
+
+        verify(favoritesRepository).insert(favorite)
+    }
+
+    @Test
+    fun whenBookmarkDeleteRequestedThenDaoUpdated() = coroutineRule.runBlocking {
+        testee.onDeleteSavedSiteRequested(bookmark)
+
+        verify(faviconManager).deletePersistedFavicon(bookmark.url)
+        verify(bookmarksDao).delete(bookmarkEntity)
+    }
+
+    @Test
+    fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = coroutineRule.runBlocking {
+        testee.onDeleteSavedSiteRequested(favorite)
+
+        verify(favoritesRepository).delete(favorite)
+    }
+
+    @Test
+    fun whenBookmarkEditedThenDaoUpdated() = coroutineRule.runBlocking {
+        testee.onSavedSiteEdited(bookmark)
+
+        verify(bookmarksDao).update(bookmarkEntity)
+    }
+
+    @Test
+    fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
+        testee.onSavedSiteEdited(favorite)
+
+        verify(favoritesRepository).update(favorite)
+    }
+
+    @Test
+    fun whenSavedSiteSelectedThenOpenCommand() {
         testee.onSelected(bookmark)
-        val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
+
         verify(commandObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
-        assertTrue(captor.value is BookmarksViewModel.Command.OpenBookmark)
+        assertTrue(captor.value is BookmarksViewModel.Command.OpenSavedSite)
     }
 
     @Test
     fun whenDeleteRequestedThenConfirmCommand() {
-        testee.onDeleteRequested(bookmark)
-        val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
+        testee.onDeleteSavedSiteRequested(bookmark)
+
         verify(commandObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
-        assertTrue(captor.value is BookmarksViewModel.Command.ConfirmDeleteBookmark)
+        assertTrue(captor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
     }
 
     @Test
@@ -115,14 +161,17 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkDeletedThenFaviconDeleted() = coroutineRule.runBlocking {
-        testee.delete(bookmark)
-        verify(faviconManager).deletePersistedFavicon(bookmark.url)
-    }
-
-    @Test
-    fun whenBookmarkInsertedThenDaoUpdated() {
-        testee.insert(bookmark)
-        verify(bookmarksDao).insert(bookmark)
+    fun whenFavoritesChangedThenObserverNotified() = coroutineRule.runBlocking {
+        whenever(favoritesRepository.favorites()).thenReturn(
+            flow {
+                emit(emptyList<SavedSite.Favorite>())
+                emit(listOf(favorite))
+            }
+        )
+        testee
+        val captor: ArgumentCaptor<BookmarksViewModel.ViewState> = ArgumentCaptor.forClass(BookmarksViewModel.ViewState::class.java)
+        verify(viewStateObserver).onChanged(captor.capture())
+        assertNotNull(captor.value)
+        assertEquals(1, captor.value.favorites.size)
     }
 }

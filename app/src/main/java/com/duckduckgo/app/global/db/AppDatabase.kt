@@ -24,7 +24,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.bookmarks.db.FavoriteEntity
+import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
@@ -67,7 +68,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 34,
+    exportSchema = true, version = 36,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -81,6 +82,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TabEntity::class,
         TabSelectionEntity::class,
         BookmarkEntity::class,
+        FavoriteEntity::class,
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
@@ -126,6 +128,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
+    abstract fun favoritesDao(): FavoritesDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
@@ -145,11 +148,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(
-    val context: Context,
-    val settingsDataStore: SettingsDataStore,
-    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
-) {
+class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -326,7 +325,7 @@ class MigrationsProvider(
 
     val MIGRATION_22_TO_23: Migration = object : Migration(22, 23) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\"")
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"USE_OUR_APP_NOTIFICATION\"")
         }
     }
 
@@ -416,8 +415,23 @@ class MigrationsProvider(
         }
     }
 
-    // todo: This is VPN project migration, KEEP IT ALWAYS LAST
     val MIGRATION_33_TO_34: Migration = object : Migration(33, 34) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"USE_OUR_APP_NOTIFICATION\" OR appStage = \"USE_OUR_APP_ONBOARDING\"")
+            database.execSQL("DELETE FROM user_events WHERE id = \"USE_OUR_APP_SHORTCUT_ADDED\" OR id = \"USE_OUR_APP_FIREPROOF_DIALOG_SEEN\"")
+            database.execSQL("DELETE FROM dismissed_cta WHERE ctaId = \"USE_OUR_APP\" OR ctaId = \"USE_OUR_APP_DELETION\"")
+        }
+    }
+
+    val MIGRATION_34_TO_35: Migration = object : Migration(34, 35) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `favorites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `position` INTEGER NOT NULL)")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `favorites` (`title`, `url`)")
+        }
+    }
+
+    // todo: This is VPN project migration, KEEP IT ALWAYS LAST
+    val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
         }
@@ -469,7 +483,9 @@ class MigrationsProvider(
             MIGRATION_30_TO_31,
             MIGRATION_31_TO_32,
             MIGRATION_32_TO_33,
-            MIGRATION_33_TO_34
+            MIGRATION_33_TO_34,
+            MIGRATION_34_TO_35,
+            MIGRATION_35_TO_36,
         )
 
     @Deprecated(
