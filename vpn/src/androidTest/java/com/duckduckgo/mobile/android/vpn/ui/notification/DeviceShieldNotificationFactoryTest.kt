@@ -83,7 +83,7 @@ class DeviceShieldNotificationFactoryTest {
 
     @Test
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundFromTwoCompanies() {
-        val trackers = listOf(aTrackerAndCompany(), aTrackerAndCompany(trackerCompanyName = "NotGoogle", trackerCompanyId = 1))
+        val trackers = listOf(aTrackerAndCompany(), aTrackerAndCompany(trackerCompanyDisplayName = "NotGoogle", trackerCompanyId = 1))
         val notification = factory.createTrackersCountDeviceShieldNotification(trackers)
 
         Assert.assertEquals("2 trackers blocked (past hour)", notification.title.toString())
@@ -116,8 +116,8 @@ class DeviceShieldNotificationFactoryTest {
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundFromThreeCompanies() {
         val trackers = listOf(
             aTrackerAndCompany(),
-            aTrackerAndCompany(trackerCompanyName = "NotGoogle", trackerCompanyId = 1),
-            aTrackerAndCompany(trackerCompanyName = "NotFacebook", trackerCompanyId = 2)
+            aTrackerAndCompany(trackerCompanyDisplayName = "NotGoogle", trackerCompanyId = 1),
+            aTrackerAndCompany(trackerCompanyDisplayName = "NotFacebook", trackerCompanyId = 2)
         )
         val notification = factory.createTrackersCountDeviceShieldNotification(trackers)
 
@@ -155,9 +155,9 @@ class DeviceShieldNotificationFactoryTest {
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundFromThreeOrMoreCompanies() {
         val trackers = listOf(
             aTrackerAndCompany(),
-            aTrackerAndCompany(trackerCompanyName = "NotGoogle", trackerCompanyId = 1),
-            aTrackerAndCompany(trackerCompanyName = "NotFacebook", trackerCompanyId = 2),
-            aTrackerAndCompany(trackerCompanyName = "NotAmazon", trackerCompanyId = 3)
+            aTrackerAndCompany(trackerCompanyDisplayName = "NotGoogle", trackerCompanyId = 1),
+            aTrackerAndCompany(trackerCompanyDisplayName = "NotFacebook", trackerCompanyId = 2),
+            aTrackerAndCompany(trackerCompanyDisplayName = "NotAmazon", trackerCompanyId = 3)
         )
         val notification = factory.createTrackersCountDeviceShieldNotification(trackers)
 
@@ -356,14 +356,14 @@ class DeviceShieldNotificationFactoryTest {
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking LLC", companyDisplayName = "Tracking", trackingApp = defaultTrackingApp)
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "Tracking", companyDisplayName = "Tracking LLC", trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 
     private fun aTrackerAndCompany(
         domain: String = "example.com",
-        trackerCompanyName: String = "Tracking LLC",
-        trackerCompanyDisplayName: String = "Tracking",
+        trackerCompanyName: String = "Tracking",
+        trackerCompanyDisplayName: String = "Tracking LLC",
         trackerCompanyId: Int = -1,
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ): VpnTracker {

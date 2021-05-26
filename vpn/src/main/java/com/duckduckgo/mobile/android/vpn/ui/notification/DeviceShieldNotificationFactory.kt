@@ -54,48 +54,48 @@ class DeviceShieldNotificationFactory @Inject constructor(
         } else {
             when (trackerCompaniesTotal) {
                 1 -> {
-                    val nonStyledText = resources.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().company)
-                    nonStyledText.applyBoldSpanTo(listOf(trackerCompanies.first().company))
+                    val nonStyledText = resources.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().companyDisplayName)
+                    nonStyledText.applyBoldSpanTo(listOf(trackerCompanies.first().companyDisplayName))
                 }
                 2 -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationTwoCompaniesBlocked,
-                        trackerCompanies.first().company,
-                        trackerCompanies[1].company
+                        trackerCompanies.first().companyDisplayName,
+                        trackerCompanies[1].companyDisplayName
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().company,
-                            trackerCompanies[1].company
+                            trackerCompanies.first().companyDisplayName,
+                            trackerCompanies[1].companyDisplayName
                         )
                     )
                 }
                 3 -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationThreeCompaniesBlocked,
-                        trackerCompanies.first().company,
-                        trackerCompanies[1].company,
-                        trackerCompanies[2].company
+                        trackerCompanies.first().companyDisplayName,
+                        trackerCompanies[1].companyDisplayName,
+                        trackerCompanies[2].companyDisplayName
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().company,
-                            trackerCompanies[1].company,
-                            trackerCompanies[2].company
+                            trackerCompanies.first().companyDisplayName,
+                            trackerCompanies[1].companyDisplayName,
+                            trackerCompanies[2].companyDisplayName
                         )
                     )
                 }
                 else -> {
                     val nonStyledText = resources.getString(
                         R.string.deviceShieldNotificationFourCompaniesBlocked,
-                        trackerCompanies.first().company,
-                        trackerCompanies[1].company,
+                        trackerCompanies.first().companyDisplayName,
+                        trackerCompanies[1].companyDisplayName,
                         trackerCompaniesTotal - 2
                     )
                     nonStyledText.applyBoldSpanTo(
                         listOf(
-                            trackerCompanies.first().company,
-                            trackerCompanies[1].company
+                            trackerCompanies.first().companyDisplayName,
+                            trackerCompanies[1].companyDisplayName
                         )
                     )
                 }
@@ -141,7 +141,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
         }
 
-        val company = topOffender.first().company
+        val company = topOffender.first().companyDisplayName
         val textToStyle = resources.getString(R.string.deviceShieldDailyTopCompanyNotification, company)
 
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))
@@ -157,14 +157,14 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
         }
         val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldDailyCompanyBlocked, topOffender.size, topOffender.size)
-        val company = topOffender.first().company
+        val company = topOffender.first().companyDisplayName
         val textToStyle =
             resources.getString(R.string.deviceShieldDailyCompanyBlockedNotification, company, totalTrackers)
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company, totalTrackers)))
     }
 
     private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val lastCompany = trackers.first().company
+        val lastCompany = trackers.first().companyDisplayName
         val textToStyle = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany)
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany)))
     }
@@ -204,7 +204,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 topOffender = it
             }
         }
-        val company = topOffender.first().company
+        val company = topOffender.first().companyDisplayName
         val textToStyle = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotification, company)
 
         return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))
