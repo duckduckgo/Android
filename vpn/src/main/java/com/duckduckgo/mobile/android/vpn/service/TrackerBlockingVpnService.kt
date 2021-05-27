@@ -218,7 +218,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTracker>) {
         if (trackersBlocked.isNotEmpty()) {
-            val deviceShieldNotification = deviceShieldNotificationFactory.createTrackersCountDeviceShieldNotification(trackersBlocked)
+            val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationNewTrackerFound(trackersBlocked)
             val notification = DeviceShieldEnabledNotificationBuilder
                 .buildTrackersBlockedNotification(this, deviceShieldNotification, ongoingNotificationPressedHandler)
             notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
@@ -383,7 +383,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        val deviceShieldNotification = deviceShieldNotificationFactory.createEnabledDeviceShieldNotification()
+        val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationDeviceShieldEnabled()
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder

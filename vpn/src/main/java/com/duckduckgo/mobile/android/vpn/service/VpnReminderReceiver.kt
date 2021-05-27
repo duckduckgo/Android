@@ -59,10 +59,10 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")
                     val notification = if (wasReminderNotificationShown(context)) {
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true, notificationPressedHandler)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
                     } else {
                         notificationWasShown(context)
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false, notificationPressedHandler)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
                     }
 
                     deviceShieldPixels.didShowReminderNotification()

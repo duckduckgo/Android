@@ -20,10 +20,12 @@ import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastDay
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class DeviceShieldNotificationFactory @Inject constructor(
@@ -31,183 +33,238 @@ class DeviceShieldNotificationFactory @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 ) {
 
-    fun createEnabledDeviceShieldNotification(): DeviceShieldNotification {
-        val title = SpannableStringBuilder(resources.getString(R.string.deviceShieldOnInitialNotification))
-        return DeviceShieldNotification(title)
-    }
+    @VisibleForTesting
+    val dailyNotificationFactory = DeviceShieldDailyNotificationFactory()
 
-    fun createTrackersCountDeviceShieldNotification(trackersBlocked: List<VpnTracker>): DeviceShieldNotification {
-        val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompanyId }.size
-        val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompanyId }
-
-        val title = when {
-            trackersBlocked.isEmpty() -> SpannableStringBuilder(resources.getString(R.string.deviceShieldOnNoTrackersNotificationHeader))
-            else -> {
-                val trackerText = resources.getQuantityString(R.plurals.deviceShieldOnNotificationTrackers, trackersBlocked.size, trackersBlocked.size)
-                val textToStyle = trackerText.plus(resources.getString(R.string.deviceShieldOnNoTrackersNotificationMessageTimeSuffix))
-                textToStyle.applyBoldSpanTo(listOf(trackerText))
-            }
-        }
-
-        val message = if (trackersBlocked.isEmpty()) {
-            SpannableStringBuilder(resources.getString(R.string.deviceShieldOnNoTrackersNotificationMessage))
-        } else {
-            when (trackerCompaniesTotal) {
-                1 -> {
-                    val nonStyledText = resources.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().companyDisplayName)
-                    nonStyledText.applyBoldSpanTo(listOf(trackerCompanies.first().companyDisplayName))
-                }
-                2 -> {
-                    val nonStyledText = resources.getString(
-                        R.string.deviceShieldNotificationTwoCompaniesBlocked,
-                        trackerCompanies.first().companyDisplayName,
-                        trackerCompanies[1].companyDisplayName
-                    )
-                    nonStyledText.applyBoldSpanTo(
-                        listOf(
-                            trackerCompanies.first().companyDisplayName,
-                            trackerCompanies[1].companyDisplayName
-                        )
-                    )
-                }
-                3 -> {
-                    val nonStyledText = resources.getString(
-                        R.string.deviceShieldNotificationThreeCompaniesBlocked,
-                        trackerCompanies.first().companyDisplayName,
-                        trackerCompanies[1].companyDisplayName,
-                        trackerCompanies[2].companyDisplayName
-                    )
-                    nonStyledText.applyBoldSpanTo(
-                        listOf(
-                            trackerCompanies.first().companyDisplayName,
-                            trackerCompanies[1].companyDisplayName,
-                            trackerCompanies[2].companyDisplayName
-                        )
-                    )
-                }
-                else -> {
-                    val nonStyledText = resources.getString(
-                        R.string.deviceShieldNotificationFourCompaniesBlocked,
-                        trackerCompanies.first().companyDisplayName,
-                        trackerCompanies[1].companyDisplayName,
-                        trackerCompaniesTotal - 2
-                    )
-                    nonStyledText.applyBoldSpanTo(
-                        listOf(
-                            trackerCompanies.first().companyDisplayName,
-                            trackerCompanies[1].companyDisplayName
-                        )
-                    )
-                }
-            }
-        }
-
-        return DeviceShieldNotification(title = title, message = message)
-    }
+    @VisibleForTesting
+    val weeklyNotificationFactory = DeviceShieldWeeklyNotificationFactory()
 
     fun createDailyDeviceShieldNotification(): DeviceShieldNotification {
         val randomNumber = (0..3).shuffled().first()
-        return createDailyDeviceShieldNotification(randomNumber)
-    }
-
-    @VisibleForTesting
-    fun createDailyDeviceShieldNotification(dailyNotificationType: Int): DeviceShieldNotification {
-
-        val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
-
-        if (trackers.isEmpty()) {
-            return DeviceShieldNotification(hidden = true)
-        }
-        return when (dailyNotificationType) {
-            0 -> createDailyTotalTrackersNotification(trackers)
-            1 -> createDailyTopTrackerCompanyNotification(trackers)
-            2 -> createDailyTopTrackerCompanyNumbersNotification(trackers)
-            else -> createDailyLastCompanyAttemptNotification(trackers)
-        }.copy(notificationVariant = dailyNotificationType)
-    }
-
-    private fun createDailyTotalTrackersNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
-        val textToStyle = resources.getString(R.string.deviceShieldDailyTrackersNotification, totalTrackers)
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers)))
-    }
-
-    private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompanyId }
-        var topOffender = perCompany.values.first()
-        perCompany.values.forEach {
-            if (it.size > topOffender.size) {
-                topOffender = it
-            }
-        }
-
-        val company = topOffender.first().companyDisplayName
-        val textToStyle = resources.getString(R.string.deviceShieldDailyTopCompanyNotification, company)
-
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))
-
-    }
-
-    private fun createDailyTopTrackerCompanyNumbersNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompanyId }
-        var topOffender = perCompany.values.first()
-        perCompany.values.forEach {
-            if (it.size > topOffender.size) {
-                topOffender = it
-            }
-        }
-        val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldDailyCompanyBlocked, topOffender.size, topOffender.size)
-        val company = topOffender.first().companyDisplayName
-        val textToStyle =
-            resources.getString(R.string.deviceShieldDailyCompanyBlockedNotification, company, totalTrackers)
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company, totalTrackers)))
-    }
-
-    private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val lastCompany = trackers.first().companyDisplayName
-        val textToStyle = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany)
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany)))
+        return dailyNotificationFactory.createDailyDeviceShieldNotification(randomNumber)
     }
 
     fun createWeeklyDeviceShieldNotification(): DeviceShieldNotification {
         val randomNumber = (0..1).shuffled().first()
-        return createWeeklyDeviceShieldNotification(randomNumber)
+        return weeklyNotificationFactory.createWeeklyDeviceShieldNotification(randomNumber)
     }
 
-    @VisibleForTesting
-    fun createWeeklyDeviceShieldNotification(randomNumber: Int): DeviceShieldNotification {
-        val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastWeek() })
-        if (trackers.isEmpty()) {
-            return DeviceShieldNotification(hidden = true)
+    fun createNotificationDeviceShieldEnabled(): DeviceShieldNotification {
+        val title = SpannableStringBuilder(resources.getString(R.string.deviceShieldOnInitialNotification))
+        return DeviceShieldNotification(title)
+    }
+
+    fun createNotificationNewTrackerFound(trackersBlocked: List<VpnTracker>): DeviceShieldNotification {
+        val numberOfApps = trackersBlocked.distinctBy { it.trackingApp.packageId }
+        if (trackersBlocked.isEmpty() || numberOfApps.isEmpty()) return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.deviceShieldOnNoTrackersNotificationHeader)))
+
+        val prefix = resources.getString(R.string.deviceShieldOnNotificationPrefix)
+        val numberOfAppsString = resources.getQuantityString(R.plurals.deviceShieldNotificationNumberOfApps, numberOfApps.size, numberOfApps.size)
+        val suffixTime = resources.getString(R.string.deviceShieldOnNoTrackersNotificationMessageTimeSuffix)
+        val notificationText = "$prefix$numberOfAppsString $suffixTime"
+
+        Timber.i("createTrackersCountDeviceShieldNotification [$notificationText]")
+        return DeviceShieldNotification(
+            notificationText.applyBoldSpanTo(
+                listOf(
+                    numberOfAppsString
+                )
+            )
+        )
+    }
+
+    private fun getNumberOfAppsContainingTopOffender(trackers: List<VpnTracker>, topOffender: VpnTracker): Map<TrackingApp, List<VpnTracker>> {
+        return trackers.filter { it.trackerCompanyId == topOffender.trackerCompanyId }.groupBy { it.trackingApp }
+    }
+
+    inner class DeviceShieldDailyNotificationFactory {
+
+        fun createDailyDeviceShieldNotification(dailyNotificationType: Int): DeviceShieldNotification {
+
+            val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
+            Timber.i("createDailyDeviceShieldNotification. ${trackers.size} trackers in the last day. Notification type: $dailyNotificationType")
+
+            if (trackers.isEmpty()) {
+                return DeviceShieldNotification(hidden = true)
+            }
+
+            val apps = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+            val firstAppName = apps.firstOrNull()?.first?.appDisplayName ?: ""
+
+            return when (dailyNotificationType) {
+                0 -> createDailyTotalTrackersNotification(trackers, apps.size, firstAppName)
+                1 -> createDailyTopTrackerCompanyNotification(trackers)
+                2 -> createDailyNotificationTopAppsContainingTrackers(apps)
+                else -> createDailyLastCompanyAttemptNotification(trackers)
+            }.copy(notificationVariant = dailyNotificationType)
         }
 
-        return when (randomNumber) {
-            0 -> createWeeklyReportNotification(trackers)
-            else -> createWeeklyTopTrackerCompanyNotification(trackers)
+        private fun createDailyTotalTrackersNotification(trackers: List<VpnTracker>, apps: Int, firstAppName: String): DeviceShieldNotification {
+            val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
+            val textPrefix = resources.getString(R.string.deviceShieldDailyTrackersNotificationPrefix)
+            val numberTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
+            val optionalNumberApps = if (apps == 0) "" else {
+                " ${resources.getQuantityString(R.plurals.deviceShieldDailyTrackersNotificationSuffixNumApps, apps, apps, firstAppName)}"
+            }
+            val textSuffix = resources.getString(R.string.deviceShieldDailyNotificationPastDaySuffix)
+            val textToStyle = "$textPrefix $numberTrackers$optionalNumberApps $textSuffix"
+
+            Timber.i("createDailyTotalTrackersNotification. Trackers=${trackers.size}. Apps=$apps. Output=[$textToStyle]")
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers)))
+        }
+
+        private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+            val topOffender = getTopOffender(trackers)
+            val numberApps = getNumberOfAppsContainingTopOffender(trackers, topOffender).size
+
+            val prefix = resources.getString(R.string.deviceShieldDailyTopCompanyNotificationPrefix, topOffender.company)
+            val numAppsText = resources.getQuantityString(R.plurals.deviceShieldNotificationNumberOfApps, numberApps, numberApps)
+            val pastDaySuffix = resources.getString(R.string.deviceShieldNotificationPastDaySuffix)
+            val seeMoreSuffix = resources.getString(R.string.deviceShieldNotificationSeeMoreSuffix)
+            val fullString = "$prefix$numAppsText $pastDaySuffix $seeMoreSuffix"
+
+            Timber.i("createDailyTopTrackerCompanyNotification: $fullString")
+            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.company, seeMoreSuffix)))
+        }
+
+        private fun createDailyNotificationTopAppsContainingTrackers(apps: List<Pair<TrackingApp, List<VpnTracker>>>): DeviceShieldNotification {
+            if (apps.isEmpty()) {
+                return DeviceShieldNotification(hidden = true)
+            }
+
+            val firstAppName = apps.first().first.appDisplayName
+            val second: TrackingApp? = apps.getOrNull(1)?.first
+
+            val prefix = resources.getString(R.string.deviceShieldDailyCompanyBlockedNotificationPrefix, firstAppName)
+            val optionalSecondApp =
+                if (second != null) " ${resources.getString(R.string.deviceShieldDailyCompanyBlockedNotificationOptionalSecondApp, second.appDisplayName)}" else ""
+
+            val suffix = resources.getString(R.string.deviceShieldDailyNotificationPastDaySuffix)
+
+            val textToStyle = "$prefix$optionalSecondApp $suffix"
+            val wordsToBold = mutableListOf(firstAppName)
+            if (second != null) wordsToBold.add(second.appDisplayName)
+
+            Timber.i("createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${wordsToBold.joinToString(separator = ", ")}}")
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))
+        }
+
+        private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+            val lastCompany = trackers.first()
+            val latestApp = lastCompany.trackingApp.appDisplayName
+            val filteredForLatestTrackerCompany = trackers.filter { it.trackerCompanyId == lastCompany.trackerCompanyId }
+            val timesBlocked = filteredForLatestTrackerCompany.size
+            val appsContainingLatestTracker = filteredForLatestTrackerCompany.groupBy { it.trackingApp }
+
+            val prefix = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany.company)
+            val numberOfTimesString = resources.getQuantityString(R.plurals.deviceShieldNumberTimes, timesBlocked, timesBlocked)
+            val latestAppString = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotificationInApp, latestApp)
+            val otherApps = (appsContainingLatestTracker.size - 1).coerceAtLeast(0)
+
+            val otherAppsCount = if (otherApps == 0) "" else resources.getQuantityString(
+                R.plurals.deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps,
+                otherApps,
+                otherApps
+            )
+            val pastDaySuffix = resources.getString(R.string.deviceShieldDailyNotificationPastDaySuffix)
+
+            val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
+            Timber.i("createDailyLastCompanyAttemptNotification. [$textToStyle]")
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.company)))
+        }
+
+        private fun getTopOffender(trackers: List<VpnTracker>): VpnTracker {
+            val perCompany = trackers.groupBy { it.trackerCompanyId }
+            var topOffender = perCompany.values.first()
+            perCompany.values.forEach {
+                if (it.size > topOffender.size) {
+                    topOffender = it
+                }
+            }
+
+            return topOffender.first()
         }
     }
 
-    private fun createWeeklyReportNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompanyId }
-        val totalCompanies = resources.getQuantityString(R.plurals.deviceShieldDailyCompany, perCompany.keys.size, perCompany.keys.size)
-        val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
-        val textToStyle = resources.getString(R.string.deviceShieldWeeklyCompanyTrackersBlockedNotification, totalCompanies, totalTrackers)
+    inner class DeviceShieldWeeklyNotificationFactory {
 
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers, totalCompanies)))
-    }
+        @VisibleForTesting
+        fun createWeeklyDeviceShieldNotification(randomNumber: Int): DeviceShieldNotification {
+            val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastWeek() })
+            if (trackers.isEmpty()) {
+                return DeviceShieldNotification(hidden = true)
+            }
 
-    private fun createWeeklyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
-        val perCompany = trackers.groupBy { it.trackerCompanyId }
-        var topOffender = perCompany.values.first()
-        perCompany.values.forEach {
-            if (it.size > topOffender.size) {
-                topOffender = it
+            return when (randomNumber) {
+                0 -> createWeeklyReportNotification(trackers)
+                else -> createWeeklyTopTrackerCompanyNotification(trackers)
             }
         }
-        val company = topOffender.first().companyDisplayName
-        val textToStyle = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotification, company)
 
-        return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(company)))
+        private fun createWeeklyReportNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+            val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+            val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
+            val latestApp = perApp.first().first.appDisplayName
+            val latestAppString = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotificationInApp, latestApp)
+
+            val prefix = resources.getString(R.string.deviceShieldWeeklyCompanyTrackersBlockedNotificationPrefix)
+            val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackers.size, trackers.size)
+            val optionalOtherAppsString = if (otherAppsSize == 0) "" else resources.getQuantityString(
+                R.plurals.deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps, otherAppsSize, otherAppsSize
+            )
+            val pastWeekSuffix = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotificationSuffix)
+
+            val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+
+            Timber.i("createWeeklyReportNotification. $textToStyle\nTotal apps: ${perApp.size}. Other apps: $otherAppsSize")
+
+            return DeviceShieldNotification(
+                textToStyle.applyBoldSpanTo(
+                    listOf(
+                        totalTrackers,
+                        latestAppString
+                    )
+                )
+            )
+        }
+
+        private fun createWeeklyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
+            val perCompany: Map<Int, List<VpnTracker>> = trackers.groupBy { it.trackerCompanyId }
+            var topOffender = perCompany.values.first()
+            perCompany.values.forEach {
+                if (it.size > topOffender.size) {
+                    topOffender = it
+                }
+            }
+            val company = topOffender.first().company
+            val appsContainingTrackerEntity = getNumberOfAppsContainingTopOffender(trackers, topOffender.first())
+            val prefixString = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotificationPrefix, company)
+            val numberOfApps = appsContainingTrackerEntity.size
+            val mostRecentAppContainingTracker = trackers.firstOrNull { it.trackerCompanyId == topOffender.first().trackerCompanyId }
+                ?: return DeviceShieldNotification(hidden = true)
+
+            val numberOfAppsString = resources.getQuantityString(R.plurals.deviceShieldNotificationNumberOfApps, numberOfApps, numberOfApps)
+            val mostRecentAppString =
+                resources.getQuantityString(
+                    R.plurals.deviceShieldWeeklyCompanyTeaserNotificationIncludingApp,
+                    numberOfApps,
+                    mostRecentAppContainingTracker.trackingApp.appDisplayName
+                )
+            val suffixString = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotificationSuffix)
+
+            val textToStyle = "$prefixString$numberOfAppsString$mostRecentAppString$suffixString"
+            Timber.i("createWeeklyTopTrackerCompanyNotification. text=$textToStyle")
+            return DeviceShieldNotification(
+                textToStyle.applyBoldSpanTo(
+                    listOf(
+                        company,
+                        numberOfAppsString,
+                        mostRecentAppString
+                    )
+                )
+            )
+        }
+
     }
 
     data class DeviceShieldNotification(

@@ -33,7 +33,7 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Device Shield is enabled and blocking trackers across your whole device" />
+            tools:text="@string/privacyReportEnabledTooltip" />
 
         <TextView
             android:id="@+id/deviceShieldNotificationMessage"

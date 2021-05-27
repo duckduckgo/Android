@@ -31,46 +31,70 @@
     <string name="vpnTrackersNone">"No trackers blocked yet"</string>
     <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
     <string name="vpnDataTransferred">"%s\n%s packets"</string>
+    <string name="vpnReportIssueLabel">Report Issue</string>
 
     <!-- Device Shield Ongoing Notification -->
-    <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking trackers across your whole device"</string>
-    <string name="deviceShieldOnNoTrackersNotificationHeader">"Scanning for trackers… beep… boop"</string>
-    <string name="deviceShieldOnNoTrackersNotificationMessage">"No trackers blocked"</string>
+    <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking trackers across your apps"</string>
+    <string name="deviceShieldOnNoTrackersNotificationHeader">"Scanning for tracking activity… beep… boop"</string>
+    <string name="deviceShieldOnNoTrackersNotificationMessage">"No trackers blocked in apps"</string>
+    <string name="deviceShieldOnNotificationPrefix">Trackers blocked</string>
     <plurals name="deviceShieldOnNotificationTrackers">
         <item quantity="one">%d tracker blocked</item>
         <item quantity="other">%d trackers blocked</item>
     </plurals>
-    <string name="deviceShieldOnNoTrackersNotificationMessageTimeSuffix">" (past hour)"</string>
-    <string name="deviceShieldNotificationFourCompaniesBlocked">"%s, %s and %d more companies"</string>
-    <string name="deviceShieldNotificationThreeCompaniesBlocked">"%s, %s and %s"</string>
-    <string name="deviceShieldNotificationTwoCompaniesBlocked">"%s and %s"</string>
-    <string name="deviceShieldNotificationOneCompanyBlocked">"from %s"</string>
-    <string name="deviceShieldDisabledNotification">"Device Shield disabled. Tap to continue blocking trackers in apps."</string>
+    <string name="deviceShieldOnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
+    <string name="deviceShieldDisabledNotification">Device Shield disabled. Tap to continue blocking trackers across your apps.</string>
     <string name="deviceShieldDisabledNotificationAction">"Enable Device Shield"</string>
 
     <!-- Device Shield Daily Notification -->
-    <string name="deviceShieldDailyTrackersNotification">"Device Shield has blocked %s so far. Tap to view your full Privacy Report."</string>
+    <string name="deviceShieldDailyTrackersNotificationPrefix">Device Shield blocked</string>
     <plurals name="deviceShieldTrackers">
         <item quantity="one">%d tracker</item>
         <item quantity="other">%d trackers</item>
     </plurals>
-    <string name="deviceShieldDailyTopCompanyNotification">%s is your top blocked company so far 😮</string>
-    <string name="deviceShieldDailyCompanyBlockedNotification">"Device Shield has blocked %s %s so far"</string>
-    <plurals name="deviceShieldDailyCompanyBlocked">
+    <plurals name="deviceShieldDailyTrackersNotificationSuffixNumApps">
+        <item quantity="one">in 1 app, %2$s</item>
+        <item quantity="other">across %1$d apps, including %2$s</item>
+    </plurals>
+
+    <string name="deviceShieldDailyNotificationPastDaySuffix">(past day).</string>
+
+    <string name="deviceShieldDailyTopCompanyNotificationPrefix">%s tried to track you</string>
+    <plurals name="deviceShieldNotificationNumberOfApps">
+        <item quantity="one">" in %d app"</item>
+        <item quantity="other">" across %d apps"</item>
+    </plurals>
+    <string name="deviceShieldNotificationPastDaySuffix">(past day).</string>
+    <string name="deviceShieldNotificationSeeMoreSuffix">See More</string>
+    <string name="deviceShieldDailyCompanyBlockedNotificationPrefix">Device Shield blocked the most trackers in %s</string>
+    <string name="deviceShieldDailyCompanyBlockedNotificationOptionalSecondApp">and %s</string>
+
+    <plurals name="deviceShieldNumberTimes">
         <item quantity="one">%d time</item>
         <item quantity="other">%d times</item>
     </plurals>
 
-    <string name="deviceShieldDailyLastCompanyBlockedNotification">"%s was the last company who tried to track you 😱 (Device Shield blocked them!)"</string>
+    <string name="deviceShieldDailyLastCompanyBlockedNotification">Device Shield blocked %s</string>
+    <string name="deviceShieldDailyLastCompanyBlockedNotificationInApp">in %s</string>
+    <plurals name="deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps">
+        <item quantity="one">" and 1 other app"</item>
+        <item quantity="other">" and %d other apps"</item>
+    </plurals>
 
     <!-- Device Shield Weekly Notification -->
     <string name="deviceShieldEnable">Enable Device Shield</string>
     <string name="deviceShieldWeeklyCompanyTrackersBlockedNotification">"Device Shield blocked %s and %s (past week)"</string>
+    <string name="deviceShieldWeeklyCompanyTrackersBlockedNotificationPrefix">"Device Shield blocked"</string>
     <plurals name="deviceShieldDailyCompany">
         <item quantity="one">%d company</item>
         <item quantity="other">%d companies</item>
     </plurals>
-    <string name="deviceShieldWeeklyCompanyTeaserNotification">"See how many times Device Shield blocked %s (past week)"</string>
+    <string name="deviceShieldWeeklyCompanyTeaserNotificationPrefix">Device Shield blocked %s"</string>
+    <plurals name="deviceShieldWeeklyCompanyTeaserNotificationIncludingApp">
+        <item quantity="one">", %s"</item>
+        <item quantity="other">", including %s"</item>
+    </plurals>
+    <string name="deviceShieldWeeklyCompanyTeaserNotificationSuffix">" (past week)."</string>
 
     <!-- Debug Screens -->
     <string name="vpnReportFeedback">Send feedback</string>
@@ -134,8 +158,14 @@
     <string name="deviceShieldLastTrackerBlocked">%s blocked %s</string>
 
     <plurals name="deviceShieldCtaTrackersBlocked">
-        <item quantity="one">%d tracker blocked in other apps this week</item>
-        <item quantity="other">%d trackers blocked in other apps this week</item>
+        <item quantity="one">%d tracker blocked</item>
+        <item quantity="other">%d trackers blocked</item>
+    </plurals>
+
+    <plurals name="deviceShieldCtaTrackersBlockedOtherApps">
+        <item quantity="one">in %1$s</item>
+        <item quantity="two">in %1$s and 1 other app</item>
+        <item quantity="other">in %1$s and %2$d other apps</item>
     </plurals>
 
     <!-- Beta Features -->

@@ -46,16 +46,16 @@ class DeviceShieldAlertNotificationBuilder {
             }
         }
 
-        fun buildReminderNotification(context: Context, silent: Boolean, onNotificationPressedCallback: ResultReceiver? = null): Notification {
+        fun buildReminderNotification(context: Context, silent: Boolean): Notification {
             registerAlertChannel(context)
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
             registerAlertChannel(context)
 
-            val vpnPrivacyReportIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = onNotificationPressedCallback)
-            val vpnPrivacyReportPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(vpnPrivacyReportIntent)
+            val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+                // need to use fully qualified class name since it is in a different module
+                addNextIntentWithParentStack(Intent(context, Class.forName("com.duckduckgo.app.beta.BetaFeaturesActivity")))
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
@@ -67,11 +67,12 @@ class DeviceShieldAlertNotificationBuilder {
             return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(vpnPrivacyReportPendingIntent)
+                .setContentIntent(onNotificationTapPendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSilent(silent)
+                .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .addAction(
                     NotificationCompat.Action(
                         R.drawable.ic_vpn_notification_24,
@@ -111,9 +112,11 @@ class DeviceShieldAlertNotificationBuilder {
                 .setSilent(silent)
                 .setCustomContentView(content)
                 .setAutoCancel(true)
+                .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .setChannelId(VPN_ALERTS_CHANNEL_ID)
                 .build()
         }
+
     }
 
 }
