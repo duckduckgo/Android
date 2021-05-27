@@ -29,6 +29,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -46,7 +47,7 @@ class NextPageLoginDetectionTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val loginDetector = NextPageLoginDetection(mockSettingsDataStore)
+    private val loginDetector = NextPageLoginDetection(mockSettingsDataStore, TestCoroutineScope())
 
     private val loginObserver = mock<Observer<LoginDetected>>()
     private val loginEventCaptor = argumentCaptor<LoginDetected>()

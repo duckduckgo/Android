@@ -40,6 +40,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -142,9 +143,10 @@ class NetworkModule {
         variantManager: VariantManager,
         tdsMetadataDao: TdsMetadataDao,
         pixel: Pixel,
-        globalPrivacyControl: GlobalPrivacyControl
+        globalPrivacyControl: GlobalPrivacyControl,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, globalPrivacyControl, pixel)
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, globalPrivacyControl, pixel, appCoroutineScope)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
@@ -156,9 +158,10 @@ class NetworkModule {
         variantManager: VariantManager,
         apiKeyMapper: SubReasonApiMapper,
         statisticsStore: StatisticsDataStore,
-        pixel: Pixel
+        pixel: Pixel,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel)
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =

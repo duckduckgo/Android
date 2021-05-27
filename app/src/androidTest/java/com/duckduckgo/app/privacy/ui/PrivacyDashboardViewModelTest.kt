@@ -37,6 +37,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -63,8 +64,9 @@ class PrivacyDashboardViewModelTest {
     private var commandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
 
+    @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, networkLeaderboardDao, mockPixel, coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
