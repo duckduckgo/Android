@@ -11,13 +11,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- Change back android:label to @string/appName after VPN merge -->
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="${appIcon}"
         android:roundIcon="${appIconRound}"
-        android:label="@string/deviceShieldAppName"
+        android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -57,7 +56,7 @@
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
             android:icon="${appIcon}"
             android:roundIcon="${appIconRound}"
-            android:label="@string/deviceShieldAppName">
+            android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -146,6 +145,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
             android:roundIcon="@mipmap/ic_launcher_silhouette_round"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -199,7 +199,7 @@
                 <data android:scheme="http" />
             </intent-filter>
 
-<!--             Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them-->
+            <!-- Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -214,14 +214,14 @@
                 <data android:mimeType="application/xhtml+xml" />
             </intent-filter>
 
-<!--             Allows apps to consume links and text shared from other apps e.g chrome-->
+            <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
-<!--             Allow app to be opened using an NFC tag-->
+            <!-- Allow app to be opened using an NFC tag -->
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
