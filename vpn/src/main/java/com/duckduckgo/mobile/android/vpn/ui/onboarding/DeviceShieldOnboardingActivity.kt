@@ -22,7 +22,6 @@ import android.net.VpnService
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.CompoundButton
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
