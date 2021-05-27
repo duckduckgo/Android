@@ -288,7 +288,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.onRefreshRequested()
-            is Command.DisplayMessage -> Toast.makeText(applicationContext, command.messageId, Toast.LENGTH_LONG).show()
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
             is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
@@ -320,7 +319,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         dialog.clearStarted = {
             removeObservers()
         }
-        dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
             pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)

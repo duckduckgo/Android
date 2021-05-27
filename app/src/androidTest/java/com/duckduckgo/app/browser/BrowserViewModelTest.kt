@@ -21,7 +21,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -29,8 +28,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.runBlocking
@@ -102,7 +99,6 @@ class BrowserViewModelTest {
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
-            useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel
         )
@@ -111,7 +107,7 @@ class BrowserViewModelTest {
 
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
         }
     }
 
@@ -178,13 +174,6 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenClearCompleteThenMessageDisplayed() {
-        testee.onClearComplete()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
-    }
-
-    @Test
     fun whenUserSelectedToRateAppThenPlayStoreCommandTriggered() {
         testee.onUserSelectedToRateApp(PromptCount.first())
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -212,15 +201,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutIfUrlIsUseOurAppDomainThenFirePixel() {
-        val url = "http://m.$USE_OUR_APP_DOMAIN"
-        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
-        testee.onOpenShortcut(url)
-        verify(mockPixel).fire(AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
-    }
-
-    @Test
-    fun whenOpenShortcutIfUrlIsNotUSeOurAppUrlThenFirePixel() {
+    fun whenOpenShortcutThenFirePixel() {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)

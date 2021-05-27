@@ -27,8 +27,9 @@ interface AutoCompleteService {
     @GET("${AppUrl.Url.API}/ac/")
     fun autoComplete(
         @Query("q") query: String,
-        @Query("kl") languageCode: String = Locale.getDefault().language
+        @Query("kl") languageCode: String = Locale.getDefault().language,
+        @Query("is_nav") nav: String = "1"
     ): Observable<List<AutoCompleteServiceRawResult>>
 }
 
-data class AutoCompleteServiceRawResult(val phrase: String)
+data class AutoCompleteServiceRawResult(val phrase: String, val isNav: Boolean?)

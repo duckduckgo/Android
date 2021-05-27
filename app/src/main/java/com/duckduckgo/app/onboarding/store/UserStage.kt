@@ -31,8 +31,6 @@ data class UserStage(
 enum class AppStage {
     NEW,
     DAX_ONBOARDING,
-    USE_OUR_APP_NOTIFICATION,
-    USE_OUR_APP_ONBOARDING,
     ESTABLISHED;
 }
 
@@ -40,7 +38,11 @@ class StageTypeConverter {
 
     @TypeConverter
     fun toStage(stage: String): AppStage {
-        return AppStage.valueOf(stage)
+        return try {
+            AppStage.valueOf(stage)
+        } catch (ex: IllegalArgumentException) {
+            AppStage.ESTABLISHED
+        }
     }
 
     @TypeConverter

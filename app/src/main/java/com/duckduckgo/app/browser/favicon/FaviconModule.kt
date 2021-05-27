@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -35,6 +36,7 @@ class FaviconModule {
         bookmarksDao: BookmarksDao,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         locationPermissionsRepository: LocationPermissionsRepository,
+        favoritesRepository: FavoritesRepository,
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider
     ): FaviconManager {
@@ -43,6 +45,7 @@ class FaviconModule {
             bookmarksDao,
             fireproofWebsiteRepository,
             locationPermissionsRepository,
+            favoritesRepository,
             faviconDownloader,
             dispatcherProvider
         )

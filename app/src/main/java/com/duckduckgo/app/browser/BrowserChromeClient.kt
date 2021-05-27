@@ -86,8 +86,17 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
 
     override fun onReceivedIcon(webView: WebView, icon: Bitmap) {
         webView.url?.let {
+            Timber.i("Favicon bitmap received: ${webView.url}")
             webViewClientListener?.iconReceived(it, icon)
         }
+    }
+
+    override fun onReceivedTouchIconUrl(view: WebView?, url: String?, precomposed: Boolean) {
+        Timber.i("Favicon touch received: ${view?.url}, $url")
+        val visitedUrl = view?.url ?: return
+        val iconUrl = url ?: return
+        webViewClientListener?.iconReceived(visitedUrl, iconUrl)
+        super.onReceivedTouchIconUrl(view, url, precomposed)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

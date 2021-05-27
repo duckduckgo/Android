@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
@@ -105,7 +106,7 @@ class FileBasedFaviconPersister(
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
         if (existingFile.exists()) {
-
+            Timber.i("Favicon favicon exists for $domain in $subFolder")
             val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
             existingFavicon?.let {

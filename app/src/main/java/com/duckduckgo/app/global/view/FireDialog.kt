@@ -60,7 +60,6 @@ class FireDialog(
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
-    var clearComplete: (() -> Unit) = {}
     val ctaVisible: Boolean
         get() = daxCtaContainer?.isVisible == true
 

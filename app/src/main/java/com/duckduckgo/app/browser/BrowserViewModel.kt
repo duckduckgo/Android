@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -38,7 +36,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -61,8 +58,7 @@ class BrowserViewModel(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val pixel: Pixel,
-    private val useOurAppDetector: UseOurAppDetector
+    private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -79,7 +75,6 @@ class BrowserViewModel(
     sealed class Command {
         object Refresh : Command()
         data class Query(val query: String) : Command()
-        data class DisplayMessage(@StringRes val messageId: Int) : Command()
         object LaunchPlayStore : Command()
         object LaunchFeedbackView : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
@@ -168,10 +163,6 @@ class BrowserViewModel(
         if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
     }
 
-    fun onClearComplete() {
-        command.value = DisplayMessage(R.string.fireDataCleared)
-    }
-
     /**
      * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
      * This method will await until the ApplicationClearDataState.FINISHED event is received before observing for other changes
@@ -230,11 +221,7 @@ class BrowserViewModel(
     fun onOpenShortcut(url: String) {
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            if (useOurAppDetector.isUseOurAppUrl(url)) {
-                pixel.fire(AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
-            } else {
-                pixel.fire(AppPixelName.SHORTCUT_OPENED)
-            }
+            pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
 }
@@ -247,13 +234,12 @@ class BrowserViewModelFactory @Inject constructor(
     val appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
     val appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
     val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    val pixel: Provider<Pixel>,
-    val useOurAppDetector: Provider<UseOurAppDetector>
+    val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), useOurAppDetector.get()) as T
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get()) as T
                 else -> null
             }
         }

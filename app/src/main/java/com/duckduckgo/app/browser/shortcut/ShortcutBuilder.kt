@@ -26,11 +26,10 @@ import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import java.util.UUID
 import javax.inject.Inject
 
-class ShortcutBuilder @Inject constructor(private val useOurAppDetector: UseOurAppDetector) {
+class ShortcutBuilder @Inject constructor() {
 
     private fun buildPinnedPageShortcut(context: Context, homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut): ShortcutInfoCompat {
         val intent = Intent(context, BrowserActivity::class.java)
@@ -39,7 +38,6 @@ class ShortcutBuilder @Inject constructor(private val useOurAppDetector: UseOurA
         intent.putExtra(SHORTCUT_EXTRA_ARG, true)
 
         val icon = when {
-            useOurAppDetector.isUseOurAppUrl(homeShortcut.url) -> IconCompat.createWithResource(context, R.drawable.ic_fb_favicon)
             homeShortcut.icon != null -> IconCompat.createWithBitmap(homeShortcut.icon)
             else -> IconCompat.createWithResource(context, R.drawable.logo_mini)
         }
@@ -52,10 +50,10 @@ class ShortcutBuilder @Inject constructor(private val useOurAppDetector: UseOurA
     }
 
     private fun buildPendingIntent(context: Context, url: String, title: String): PendingIntent? {
-        val pinnedShortcutCallbackIntent = Intent(USE_OUR_APP_SHORTCUT_ADDED_ACTION)
+        val pinnedShortcutCallbackIntent = Intent(SHORTCUT_ADDED_ACTION)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_URL_ARG, url)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_TITLE_ARG, title)
-        return PendingIntent.getBroadcast(context, USE_OUR_APP_SHORTCUT_ADDED_CODE, pinnedShortcutCallbackIntent, FLAG_UPDATE_CURRENT)
+        return PendingIntent.getBroadcast(context, SHORTCUT_ADDED_CODE, pinnedShortcutCallbackIntent, FLAG_UPDATE_CURRENT)
     }
 
     fun requestPinShortcut(context: Context, homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut) {
@@ -66,8 +64,8 @@ class ShortcutBuilder @Inject constructor(private val useOurAppDetector: UseOurA
     }
 
     companion object {
-        const val USE_OUR_APP_SHORTCUT_ADDED_ACTION: String = "useOurAppShortcutAdded"
-        const val USE_OUR_APP_SHORTCUT_ADDED_CODE = 9000
+        const val SHORTCUT_ADDED_ACTION: String = "appShortcutAdded"
+        const val SHORTCUT_ADDED_CODE = 9000
 
         const val SHORTCUT_EXTRA_ARG = "shortCutAdded"
         const val SHORTCUT_URL_ARG = "shortcutUrl"
