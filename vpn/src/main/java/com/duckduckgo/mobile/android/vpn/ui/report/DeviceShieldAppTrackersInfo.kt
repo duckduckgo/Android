@@ -19,24 +19,36 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 
-class TrackerProfilingInfoActivity : AppCompatActivity(R.layout.activity_tracker_profiling_info) {
+class DeviceShieldAppTrackersInfo : AppCompatActivity(R.layout.activity_app_trackers_info) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        findViewById<TextView>(R.id.trackerProfilingInfoHyperlink).setOnClickListener {
+            startActivity(DeviceShieldFAQActivity.intent(this))
+        }
+
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
     override fun onBackPressed() {
-        onSupportNavigateUp()
+        finish()
     }
 
     companion object {
 
         fun intent(context: Context): Intent {
-            return Intent(context, TrackerProfilingInfoActivity::class.java)
+            return Intent(context, DeviceShieldAppTrackersInfo::class.java)
         }
 
     }

@@ -144,6 +144,7 @@
     <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
     <string name="betaFeaturesDescription">For a limited time, you can try new features before we release them. Beta features are experimental and may affect device performance.</string>
     <string name="betaFeaturesEnableDeviceShield">Enable Device Shield</string>
+    <string name="deviceShieldExcludedAppsSubtitle">Apps excluded so they work normally</string>
 
     <!--  Beta Features - Device Shield  -->
     <string name="deviceShield">Device Shield</string>

@@ -24,8 +24,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
@@ -44,20 +44,21 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var viewPager: ViewPager2
+    private lateinit var onboardingHeader: ImageView
+    private lateinit var indicatorOne: ImageView
+    private lateinit var indicatorTwo: ImageView
+    private lateinit var indicatorThree: ImageView
+    private lateinit var indicators: List<ImageView>
+
     private lateinit var nextOnboardingPageCta: ImageButton
     private lateinit var enableDeviceShieldLayout: View
     private lateinit var onboardingFAQCta: Button
     private lateinit var onboardingClose: ImageButton
-    private lateinit var enableDeviceShieldToggle: SwitchCompat
+    private lateinit var enableDeviceShieldToggle: View
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
-
-    private val deviceShieldToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onDeviceShieldSettingChanged(isChecked)
-        startVpnIfAllowed()
-    }
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,41 +67,65 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         AndroidInjection.inject(this)
 
         bindViews()
+        configureUI()
     }
 
     private fun bindViews() {
         onboardingClose = findViewById(R.id.onboarding_close)
-        onboardingClose.setOnClickListener {
-            close()
-        }
-
-        enableDeviceShieldToggle = findViewById(R.id.onboarding_switch)
-        enableDeviceShieldToggle.setOnCheckedChangeListener(deviceShieldToggleListener)
-
+        enableDeviceShieldToggle = findViewById(R.id.onboarding_switch_layout)
+        onboardingHeader = findViewById(R.id.onboarding_page_header)
+        indicatorOne = findViewById(R.id.onboarding_active_indicator_one)
+        indicatorTwo = findViewById(R.id.onboarding_active_indicator_two)
+        indicatorThree = findViewById(R.id.onboarding_active_indicator_three)
+        indicators = listOf(indicatorOne, indicatorTwo, indicatorThree)
         viewPager = findViewById(R.id.onboarding_pager)
+        enableDeviceShieldLayout = findViewById(R.id.onboarding_cta_layout)
+        onboardingFAQCta = findViewById(R.id.onboarding_faq_cta)
+        nextOnboardingPageCta = findViewById(R.id.onboarding_next_cta)
+    }
+
+    private fun configureUI() {
+        viewPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages)
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                if (position == 2) {
-                    showEnableCTA()
-                } else {
-                    showNextPageCTA()
-                }
+                showOnboardindPage(position)
                 super.onPageSelected(position)
             }
         })
-        viewPager.adapter = DeviceShieldOnboardingAdapter()
 
-        enableDeviceShieldLayout = findViewById(R.id.onboarding_cta_layout)
-        onboardingFAQCta = findViewById(R.id.onboarding_faq_cta)
         onboardingFAQCta.setOnClickListener {
             DeviceShieldFAQActivity.intent(this).also {
                 startActivity(it)
             }
         }
-        nextOnboardingPageCta = findViewById(R.id.onboarding_next_cta)
+
         nextOnboardingPageCta.setOnClickListener {
             viewPager.currentItem = viewPager.currentItem + 1
         }
+
+        onboardingClose.setOnClickListener {
+            close()
+        }
+
+        enableDeviceShieldToggle.setOnClickListener {
+            startVpnIfAllowed()
+        }
+    }
+
+    private fun showOnboardindPage(position: Int) {
+        val page = viewModel.pages[position]
+        if (position == 2) {
+            showEnableCTA()
+        } else {
+            showNextPageCTA()
+        }
+
+        onboardingHeader.setImageResource(page.imageHeader)
+
+        indicators.forEach { indicatorImage ->
+            indicatorImage.setImageResource(R.drawable.ic_inactive_dot)
+        }
+        indicators[position].setImageResource(R.drawable.ic_active_dot)
     }
 
     private fun showEnableCTA() {
@@ -170,6 +195,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private fun startVpn() {
         startService(TrackerBlockingVpnService.startIntent(this))
+        viewModel.onDeviceShieldEnabled(true)
         setResult(RESULT_OK)
         finish()
     }

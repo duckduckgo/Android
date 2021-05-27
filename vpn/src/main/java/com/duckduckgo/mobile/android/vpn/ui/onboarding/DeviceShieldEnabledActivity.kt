@@ -43,6 +43,7 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
     private lateinit var deviceShieldActivityCta: Button
     private lateinit var settingsCta: TextView
     private lateinit var viewKonfetti: KonfettiView
+    private lateinit var close: View
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +54,10 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
     }
 
     private fun bindViews() {
+        close = findViewById(R.id.onboarding_close)
+        close.setOnClickListener {
+            close()
+        }
         deviceShieldActivityCta = findViewById(R.id.onboarding_enabled_activity_cta)
         deviceShieldActivityCta.setOnClickListener {
             startActivity(DeviceShieldTrackerActivity.intent(this))

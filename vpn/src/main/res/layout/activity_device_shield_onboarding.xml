@@ -24,6 +24,54 @@
     android:background="@color/white"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
+    <ImageView
+        android:id="@+id/onboarding_page_header"
+        android:layout_width="0dp"
+        android:layout_height="260dp"
+        android:background="@color/light_blue"
+        android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+        android:paddingTop="65dp"
+        android:paddingBottom="12dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/device_shield_onboarding_page_one_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/onboarding_active_indicator"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginTop="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header">
+
+        <ImageView
+            android:id="@+id/onboarding_active_indicator_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_inactive_dot" />
+
+        <ImageView
+            android:id="@+id/onboarding_active_indicator_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_inactive_dot"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"/>
+
+        <ImageView
+            android:id="@+id/onboarding_active_indicator_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_inactive_dot" />
+
+    </LinearLayout>
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_pager"
         android:layout_width="match_parent"
@@ -32,13 +80,12 @@
         app:layout_constraintBottom_toTopOf="@+id/onboarding_next_cta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/onboarding_active_indicator" />
 
     <ImageButton
         android:id="@+id/onboarding_close"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
         android:background="?selectableItemBackground"
         android:src="@drawable/ic_baseline_close_24"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +96,7 @@
         style="@style/OnboardingButtonCircleCta"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="65dp"
         android:src="@drawable/ic_baseline_arrow_forward_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,6 +118,7 @@
         app:layout_constraintWidth_percent="1">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/onboarding_switch_layout"
             style="@style/DeviceShieldOnboardingCta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -80,20 +128,25 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:text="@string/deviceShieldEnable"
+                android:textAlignment="viewStart"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/onboarding_switch"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="1" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/onboarding_switch"
+                android:theme="@style/DeviceShieldOnboardingSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="false"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

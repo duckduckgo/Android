@@ -70,7 +70,6 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
                     deviceShieldEnable.isVisible = !viewState.deviceShieldOnboardingComplete
 
                     deviceShieldToggle.quietlySetIsChecked(it.deviceShieldEnabled, deviceShieldToggleListener)
-                    deviceShieldExcludedAppsText.setSubtitle(it.excludedAppsInfo)
                 }
             }
         )

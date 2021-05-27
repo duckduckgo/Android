@@ -36,7 +36,7 @@
             />
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.report.TrackerProfilingInfoActivity"
+            android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo"
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/trackerProfilingActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"

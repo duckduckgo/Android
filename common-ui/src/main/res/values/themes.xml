@@ -261,8 +261,8 @@
         <item name="android:statusBarColor">@color/grey</item>
     </style>
 
-    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
-    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
 
 </resources>

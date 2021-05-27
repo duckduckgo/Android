@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
@@ -29,6 +30,23 @@ class DeviceShieldOnboardingViewModel(
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 ) : ViewModel() {
 
+    data class OnboardingPage(val imageHeader: Int, val title: Int, val text: Int)
+
+    val pages = listOf(
+        OnboardingPage(
+            R.drawable.device_shield_onboarding_page_one_header,
+            R.string.deviceShieldOnboardingLastPageOneTitle, R.string.deviceShieldOnboardingLatsPageOneSubtitle
+        ),
+        OnboardingPage(
+            R.drawable.device_shield_onboarding_page_two_header,
+            R.string.deviceShieldOnboardingLastPageTwoTitle, R.string.deviceShieldOnboardingLastPageTwoSubTitle
+        ),
+        OnboardingPage(
+            R.drawable.device_shield_onboarding_page_three_header,
+            R.string.deviceShieldOnboardingLastPageThreeTitle, R.string.deviceShieldOnboardingLastPageThreeSubTitle
+        )
+    )
+
     fun onStart() {
         deviceShieldOnboardingStore.onboardingDidShow()
     }
@@ -37,7 +55,7 @@ class DeviceShieldOnboardingViewModel(
         deviceShieldOnboardingStore.onboardingDidNotShow()
     }
 
-    fun onDeviceShieldSettingChanged(enabled: Boolean) {
+    fun onDeviceShieldEnabled(enabled: Boolean) {
         Timber.i("Device Shield, is now enabled: $enabled")
 
         // TODO: This is only needed if we need pixels for this, it wasn't discussed but my guess is we need them
@@ -49,6 +67,7 @@ class DeviceShieldOnboardingViewModel(
         }
 
     }
+
 }
 
 @ContributesMultibinding(AppObjectGraph::class)

@@ -23,13 +23,15 @@
 
     <include layout="@layout/include_toolbar" />
 
-    <com.google.android.material.textview.MaterialTextView
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
+        android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
+        android:layout_marginBottom="@dimen/settingsItemHorizontalPadding"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
-        android:padding="16dp"
         android:text="@string/deviceShieldExcludedAppsFeature"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"

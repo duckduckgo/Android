@@ -37,21 +37,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <FrameLayout
+            <ImageView
+                android:id="@+id/onboarding_enabled_header"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/light_blue">
+                android:layout_height="260dp"
+                android:background="@color/light_blue"
+                android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+                android:paddingTop="80dp"
+                android:paddingBottom="12dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/device_shield_onboarding_page_two_header" />
 
-                <ImageView
-                    android:id="@+id/onboarding_enabled_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
-                    android:src="@drawable/device_shield_onboarding_page_two_header" />
-
-            </FrameLayout>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -90,8 +86,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="50dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="60dp"
                 android:text="@string/deviceShieldEnabledActivityCTA" />
 
             <TextView
@@ -107,6 +103,15 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <ImageButton
+        android:id="@+id/onboarding_close"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <nl.dionsegijn.konfetti.KonfettiView
         android:id="@+id/deviceShieldKonfetti"

@@ -76,6 +76,8 @@
     <color name="warmBlue">#3f66d5</color>
     <color name="cornflowerBlue">#678fff</color>
     <color name="cornflowerDark">#5078e9</color>
+    <color name="cornflowerBorder">#3969EF</color>
+    <color name="cornflowerDisabled">#A1BAFF</color>
     <color name="skyBlue">#42bffe</color>
     <color name="carolinaBlue">#94b0ff</color>
 

@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="none"
-    android:paddingBottom="24dp"
+    android:clipToPadding="false"
     android:background="@color/white"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
@@ -90,24 +90,6 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQHeaderStyle"
             android:layout_marginTop="32dp"
-            android:text="@string/deviceShieldFAQThirdHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/deviceShieldFAQThirdText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
             android:text="@string/deviceShieldFAQFourthHeader"
             android:paddingStart="35dp"
             android:paddingEnd="35dp" />
@@ -120,6 +102,14 @@
             android:text="@string/deviceShieldFAQFourthText"
             android:paddingStart="35dp"
             android:paddingEnd="35dp"/>
+
+        <ImageView
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="60dp"
+            android:layout_gravity="center"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_red_dax"/>
 
     </LinearLayout>
 </ScrollView>

@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
-import com.duckduckgo.mobile.android.vpn.ui.report.TrackerProfilingInfoActivity
+import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import dagger.android.AndroidInjection
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
@@ -72,7 +72,7 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
         }
 
         ctaTrackerFaq.setOnClickListener {
-            TrackerProfilingInfoActivity.intent(this).also {
+            DeviceShieldAppTrackersInfo.intent(this).also {
                 deviceShieldPixels.privacyReportArticleDisplayed()
                 startActivity(it)
             }

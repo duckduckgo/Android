@@ -10,9 +10,9 @@
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 50316,
-      "versionName": "5.3.16",
-      "outputFile": "duckduckgo-5.3.16-play-release.apk"
+      "versionCode": 50327,
+      "versionName": "5.3.27",
+      "outputFile": "duckduckgo-5.3.27-play-release.apk"
     }
   ]
 }

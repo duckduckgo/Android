@@ -29,8 +29,13 @@ class DeviceShieldFAQActivity : AppCompatActivity(R.layout.activity_device_shiel
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     override fun onBackPressed() {
-        onSupportNavigateUp()
+        finish()
     }
 
     companion object {

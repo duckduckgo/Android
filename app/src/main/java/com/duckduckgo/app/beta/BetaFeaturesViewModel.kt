@@ -35,7 +35,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -66,11 +65,6 @@ class BetaFeaturesViewModel(
         )
 
         viewModelScope.launch {
-            val excludedApps = withContext(dispatchers.io()) {
-                getExcludedAppsInfo()
-            }
-            viewState.postValue(currentViewState().copy(excludedAppsInfo = excludedApps))
-
             while (isActive) {
                 val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
                 if (currentViewState().deviceShieldEnabled != isDeviceShieldEnabled) {
@@ -81,16 +75,6 @@ class BetaFeaturesViewModel(
                 }
                 delay(1_000)
             }
-        }
-    }
-
-    suspend fun getExcludedAppsInfo(): String {
-        val apps = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }
-        return when (apps.size) {
-            0 -> "None"
-            1 -> "${apps.first().name}"
-            2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
-            else -> "${apps.first().name}, ${apps.take(2)[1].name} and more"
         }
     }
 
@@ -125,8 +109,7 @@ class BetaFeaturesViewModel(
 
     data class ViewState(
         val deviceShieldEnabled: Boolean = false,
-        val deviceShieldOnboardingComplete: Boolean = false,
-        val excludedAppsInfo: String = ""
+        val deviceShieldOnboardingComplete: Boolean = false
     )
 
     sealed class Command {
