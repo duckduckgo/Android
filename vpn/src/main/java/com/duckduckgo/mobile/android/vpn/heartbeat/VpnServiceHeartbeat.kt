@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import android.content.Context
 import android.os.Process
+import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -36,7 +37,10 @@ interface VpnServiceHeartbeat {
 
 @ContributesBinding(VpnObjectGraph::class)
 @VpnScope
-class VpnServiceHeartbeatImpl @Inject constructor(private val context: Context) : VpnServiceHeartbeat {
+class VpnServiceHeartbeatImpl @Inject constructor(
+    private val context: Context,
+    private val workManager: WorkManager
+) : VpnServiceHeartbeat {
     private val isActive = AtomicBoolean(false)
 
     override suspend fun startHeartbeat() {
@@ -44,7 +48,7 @@ class VpnServiceHeartbeatImpl @Inject constructor(private val context: Context) 
             isActive.set(TrackerBlockingVpnService.isServiceRunning(context))
             while (isActive.get()) {
                 Timber.d("(${Process.myPid()}) - Sending heartbeat")
-                context.startService(VpnHeartbeatReceiverService.aliveServiceIntent(context, HEART_BEAT_PERIOD_SECONDS, TimeUnit.SECONDS))
+                VpnHeartbeatReceiverWorker.sendAliveHeartbeat(workManager, HEART_BEAT_PERIOD_SECONDS)
                 delay(TimeUnit.SECONDS.toMillis(HEART_BEAT_PERIOD_SECONDS))
             }
         }
@@ -52,7 +56,7 @@ class VpnServiceHeartbeatImpl @Inject constructor(private val context: Context) 
 
     override fun stopHeartbeat() {
         isActive.set(false)
-        context.startService(VpnHeartbeatReceiverService.stoppedServiceIntent(context))
+        VpnHeartbeatReceiverWorker.sendStopHeartbeat(workManager)
     }
 
     companion object {

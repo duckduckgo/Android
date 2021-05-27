@@ -17,12 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatReceiverService.Companion.EXTRA_HEART_BEAT_TYPE_ALIVE
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatReceiverService.Companion.EXTRA_HEART_BEAT_TYPE_STOPPED
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatReceiverWorker.Companion.DATA_HEART_BEAT_TYPE_ALIVE
 
 fun HeartBeatEntity.isAlive(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_ALIVE == type
-}
-fun HeartBeatEntity.isStopped(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_STOPPED == type
+    return DATA_HEART_BEAT_TYPE_ALIVE == type
 }

@@ -17,77 +17,32 @@
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import android.content.Context
-import android.content.Intent
 import android.os.Build
+import android.os.Process
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.heartbeat.HeartBeatUtils.Companion.getAppExitReason
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatReceiverService.Companion.EXTRA_HEART_BEAT_TYPE_ALIVE
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class VpnServiceHeartbeatProcessor @Inject constructor(
     private val context: Context,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    interface Listener {
-        fun onStopReceived()
 
-        fun onAliveReceived()
-
-        fun onAliveMissed()
-    }
-
-    private fun Intent.getHeartbeatType(): String {
-        return getStringExtra(VpnHeartbeatReceiverService.EXTRA_HEART_BEAT_TYPE).orEmpty()
-    }
-
-    private fun Intent.getHeartbeatValidityWindow(): Long {
-        return getLongExtra(VpnHeartbeatReceiverService.EXTRA_VALID_PERIOD_SEC, -1)
-    }
-
-    @WorkerThread
-    fun checkLastHeartBeat(listener: Listener) {
+    suspend fun didReceivedAliveLastTime(): Boolean = withContext(dispatcherProvider.io()) {
         val lastHeartBeat = vpnDatabase.vpnHeartBeatDao().hearBeats().maxByOrNull { it.timestamp }
-        if (lastHeartBeat?.isAlive() == true) listener.onAliveMissed()
+        return@withContext lastHeartBeat?.isAlive() ?: false
     }
 
-    @WorkerThread
-    fun processHeartBeat(intent: Intent, listener: Listener) {
-
-        val type = intent.getHeartbeatType()
-
-        val storedTimestamp = vpnDatabase.vpnHeartBeatDao().insertType(type).timestamp
-
-        if (EXTRA_HEART_BEAT_TYPE_ALIVE != type) {
-            listener.onStopReceived()
-            return
-        }
-
-        listener.onAliveReceived()
-
-        val validityWindowSeconds = intent.getHeartbeatValidityWindow()
-
-        // we don't want to block the receiver so that it can continue receiving HBs
-        GlobalScope.launch {
-            if (validityWindowSeconds > 0) {
-                delay(TimeUnit.SECONDS.toMillis((validityWindowSeconds * TIMEOUT_MULTIPLIER).toLong()))
-                val lastHeartBeat = vpnDatabase.vpnHeartBeatDao().hearBeats().maxByOrNull { it.timestamp }
-
-                if (lastHeartBeat?.isAlive() == true && storedTimestamp == lastHeartBeat.timestamp) {
-                    listener.onAliveMissed()
-                }
-            }
-        }
-    }
-
-    @WorkerThread
-    fun restartVpnService() {
+    suspend fun restartVpnService() = withContext(dispatcherProvider.io()) {
         vpnDatabase.vpnPhoenixDao().insert(VpnPhoenixEntity(reason = getAppExitReason(context)))
         TrackerBlockingVpnService.startIntent(context).also {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -96,6 +51,28 @@ class VpnServiceHeartbeatProcessor @Inject constructor(
                 context.startService(it)
             }
         }
+    }
+
+    suspend fun onStopReceive() = withContext(dispatcherProvider.io()) {
+        vpnDatabase.vpnHeartBeatDao().insertType(VpnHeartbeatReceiverWorker.DATA_HEART_BEAT_TYPE_STOPPED)
+        Timber.v("(${Process.myPid()}) heartbeat STOP received")
+    }
+
+    @WorkerThread
+    suspend fun onAliveReceivedDidNextOneArrived(validityWindowSeconds: Long): Boolean = withContext(dispatcherProvider.io()) {
+
+        val storedTimestamp = vpnDatabase.vpnHeartBeatDao().insertType(VpnHeartbeatReceiverWorker.DATA_HEART_BEAT_TYPE_ALIVE).timestamp
+
+        Timber.v("(${Process.myPid()}) heartbeat ALIVE")
+
+        if (validityWindowSeconds > 0) {
+            delay(TimeUnit.SECONDS.toMillis((validityWindowSeconds * TIMEOUT_MULTIPLIER).toLong()))
+            val lastHeartBeat = vpnDatabase.vpnHeartBeatDao().hearBeats().maxByOrNull { it.timestamp }
+
+            return@withContext lastHeartBeat?.isAlive() == true && storedTimestamp == lastHeartBeat.timestamp
+        }
+
+        return@withContext false
     }
 
     companion object {

@@ -341,8 +341,6 @@
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
-        <service android:name="com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatReceiverService" />
-
         <receiver android:name="com.duckduckgo.widget.SearchWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

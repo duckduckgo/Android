@@ -16,96 +16,97 @@
 
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
+import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
+import com.duckduckgo.mobile.android.vpn.runBlocking
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class VpnServiceHeartbeatProcessorTest {
 
-    private val vpnDatabase: VpnDatabase = mock()
-    private val phoenixDao: VpnPhoenixDao = mock()
+    private lateinit var db: VpnDatabase
+
+    private val fakeDb: VpnDatabase = mock()
     private val heartBeatDao: VpnHeartBeatDao = mock()
-    private val listener: VpnServiceHeartbeatProcessor.Listener = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    private val aliveEntity = HeartBeatEntity("ALIVE")
-    private val stopEntity = HeartBeatEntity("STOPPED")
-
     private lateinit var processor: VpnServiceHeartbeatProcessor
+    private val aliveEntity = HeartBeatEntity("ALIVE", 1000)
+    private val anotherAliveEntity = HeartBeatEntity("ALIVE", 2000)
+
+    private val vpnCoroutineTestRule = VpnCoroutineTestRule()
 
     @Before
     fun setup() {
         AndroidThreeTen.init(context)
 
-        whenever(vpnDatabase.vpnPhoenixDao()).thenReturn(phoenixDao)
-        whenever(vpnDatabase.vpnHeartBeatDao()).thenReturn(heartBeatDao)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
+        whenever(fakeDb.vpnHeartBeatDao()).thenReturn(heartBeatDao)
+
+        processor = VpnServiceHeartbeatProcessor(context, db, vpnCoroutineTestRule.testDispatcherProvider)
+    }
+
+    @Test
+    fun whenOnStoppedReceivedThenInsertInHeartBeatDatabase() = vpnCoroutineTestRule.runBlocking {
+        processor.onStopReceive()
+
+        assertEquals(1, db.vpnHeartBeatDao().hearBeats().size)
+        assertEquals("STOPPED", db.vpnHeartBeatDao().hearBeats()[0].type)
+    }
+
+    @Test
+    fun whenOnAliveReceivedThenInsertInHeartBeatDatabase() = vpnCoroutineTestRule.runBlocking {
+        processor.onAliveReceivedDidNextOneArrived(1)
+
+        assertEquals(1, db.vpnHeartBeatDao().hearBeats().size)
+        assertEquals("ALIVE", db.vpnHeartBeatDao().hearBeats()[0].type)
+    }
+
+    @Test
+    fun whenOnAliveReceivedAndNextAliveIsMissedThenReturnTrue() = vpnCoroutineTestRule.runBlocking {
+        assertTrue(processor.onAliveReceivedDidNextOneArrived(1))
+    }
+
+    @Test
+    fun whenOnAliveReceivedAndNextAliveArrivesThenReturnFalse() = vpnCoroutineTestRule.runBlocking {
         whenever(heartBeatDao.insertType(eq("ALIVE"))).thenReturn(aliveEntity)
-        whenever(heartBeatDao.insertType(eq("STOPPED"))).thenReturn(stopEntity)
+        whenever(heartBeatDao.hearBeats()).thenReturn(listOf(anotherAliveEntity))
 
-        processor = VpnServiceHeartbeatProcessor(context, vpnDatabase)
+        val fakeProcessor = VpnServiceHeartbeatProcessor(context, fakeDb, vpnCoroutineTestRule.testDispatcherProvider)
+
+        assertFalse(fakeProcessor.onAliveReceivedDidNextOneArrived(1))
     }
 
     @Test
-    fun whenAliveThenInsertInHeartBeatDatabase() {
-        VpnHeartbeatReceiverService.aliveServiceIntent(context, 1, TimeUnit.SECONDS).also {
-            processor.processHeartBeat(it, listener)
-        }
-
-        verify(heartBeatDao).insertType("ALIVE")
+    fun whenWasLastHeartbeatAliveAndNoDbEntryThenReturnFalse() = vpnCoroutineTestRule.runBlocking {
+        assertFalse(processor.didReceivedAliveLastTime())
     }
 
     @Test
-    fun whenAliveThenCallOnAliveReceived() {
-        VpnHeartbeatReceiverService.aliveServiceIntent(context, 1, TimeUnit.SECONDS).also {
-            processor.processHeartBeat(it, listener)
-        }
+    fun whenWasLastHeartbeatAliveAndLastIsStoppedEntryThenReturnFalse() = vpnCoroutineTestRule.runBlocking {
+        db.vpnHeartBeatDao().insertType("STOPPED")
 
-        verify(listener).onAliveReceived()
-        verifyNoMoreInteractions(listener)
+        assertFalse(processor.didReceivedAliveLastTime())
     }
 
     @Test
-    fun whenStoppedThenCallOnStopReceived() {
-        VpnHeartbeatReceiverService.stoppedServiceIntent(context).also {
-            processor.processHeartBeat(it, listener)
-        }
+    fun whenWasLastHeartbeatAliveAndLastIsAliveEntryThenReturnTrue() = vpnCoroutineTestRule.runBlocking {
+        db.vpnHeartBeatDao().insertType("ALIVE")
 
-        verify(listener).onStopReceived()
-        verifyNoMoreInteractions(listener)
-    }
-
-    @Test
-    fun whenCheckLastHeartBeatAndNoDbEntryThenNoop() {
-        processor.checkLastHeartBeat(listener)
-
-        verifyZeroInteractions(listener)
-    }
-
-    @Test
-    fun whenCheckLastHeartBeatAndLastIsStoppedEntryThenNoop() {
-        whenever(heartBeatDao.hearBeats()).thenReturn(listOf(stopEntity))
-
-        processor.checkLastHeartBeat(listener)
-
-        verifyZeroInteractions(listener)
-    }
-
-    @Test
-    fun whenCheckLastHeartBeatAndLastIsAliveEntryThenOnAliveMissed() {
-        whenever(heartBeatDao.hearBeats()).thenReturn(listOf(aliveEntity))
-
-        processor.checkLastHeartBeat(listener)
-
-        verify(listener).onAliveMissed()
+        assertTrue(processor.didReceivedAliveLastTime())
     }
 }

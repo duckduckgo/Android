@@ -93,6 +93,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
+            android:enabled="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
