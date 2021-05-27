@@ -38,11 +38,8 @@ import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -158,7 +155,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
         val exception = RuntimeException()
         val mockHandler = mock<HttpAuthHandler>()
         val mockWebView = mock<WebView>()
@@ -225,16 +222,14 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenFlushCookies() = runBlocking {
+    fun whenOnPageFinishedCalledThenFlushCookies() {
         testee.onPageFinished(webView, null)
-        withContext(Dispatchers.IO) {
-            verify(cookieManager).flush()
-        }
+        verify(cookieManager).flush()
     }
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnPageFinishedThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
         val exception = RuntimeException()
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenThrow(exception)
@@ -250,7 +245,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnPageStartedThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnPageStartedThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
         val exception = RuntimeException()
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenThrow(exception)
@@ -259,7 +254,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldOverrideThrowsExceptionThenRecordException() = runBlocking {
+    fun whenShouldOverrideThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, "")

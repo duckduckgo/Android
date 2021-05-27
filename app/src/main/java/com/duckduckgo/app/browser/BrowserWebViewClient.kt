@@ -192,7 +192,7 @@ class BrowserWebViewClient(
     }
 
     private fun flushCookies() {
-        appCoroutineScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
         }
     }
