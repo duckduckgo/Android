@@ -65,8 +65,9 @@
         <item name="bookmarkIconColor">@color/white</item>
         <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
-        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
+        <item name="savedSiteSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
@@ -140,10 +141,11 @@
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
         <item name="bookmarkTitleTextColor">@color/almostBlackDark</item>
+        <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
-        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
+        <item name="savedSiteSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>

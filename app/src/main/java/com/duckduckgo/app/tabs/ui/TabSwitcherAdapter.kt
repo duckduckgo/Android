@@ -125,7 +125,7 @@ class TabSwitcherAdapter(
     private fun loadFavicon(tab: TabEntity, view: ImageView) {
         val url = tab.url ?: return
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromTemp(tab.tabId, url, view)
+            faviconManager.loadToViewFromLocalOrFallback(tab.tabId, url, view)
         }
     }
 
