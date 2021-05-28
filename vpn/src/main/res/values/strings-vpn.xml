@@ -206,6 +206,17 @@
     <string name="deviceShieldActivityYesterday">Yesterday</string>
     <string name="deviceShieldActivityDaysAgo">%d days ago</string>
     <string name="deviceShieldActivityEmptyListMessage">No Activity Yet</string>
+    <string name="deviceShieldActivityPastWeekDefault">-</string>
+    <string name="deviceShieldActivityPastWeekBlocked">Blocked</string>
+    <string name="deviceShieldActivityPastWeekAcross">Across</string>
+    <plurals name="deviceShieldActivityPastWeekTrackerCount">
+        <item quantity="one">Tracker</item>
+        <item quantity="other">Trackers</item>
+    </plurals>
+    <plurals name="deviceShieldActivityPastWeekAppCount">
+        <item quantity="one">App</item>
+        <item quantity="other">Apps</item>
+    </plurals>
 
     <!--  Device Shield Enabled Activity -->
     <string name="deviceShieldEnabledTitle">Hooray! You’re all set up.</string>

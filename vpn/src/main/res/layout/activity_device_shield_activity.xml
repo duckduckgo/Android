@@ -47,9 +47,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                app:title="Blocked"
-                app:text="0"
-                app:footer="Trackers"
+                android:text="@string/deviceShieldActivityPastWeekBlocked"
                 />
 
             <View
@@ -67,9 +65,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                app:title="Across"
-                app:text="0"
-                app:footer="Apps"
+                android:text="@string/deviceShieldActivityPastWeekAcross"
                 />
         </LinearLayout>
 

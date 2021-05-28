@@ -32,8 +32,8 @@ class PastWeekTrackerActivityContentView : FrameLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)
-        title = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_title) ?: ""
-        count = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_text) ?: ""
+        text = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_android_text) ?: ""
+        count = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_count) ?: ""
         footer = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_footer) ?: ""
         attributes.recycle()
     }
@@ -51,11 +51,11 @@ class PastWeekTrackerActivityContentView : FrameLayout {
         get() { return root.content_text.text.toString() }
         set(value) { root.content_text.text = value }
 
-    private var title: String
+    var text: String
         get() { return root.content_title.text.toString() }
         set(value) { root.content_title.text = value }
 
-    private var footer: String
+    var footer: String
         get() { return root.content_footer.text.toString() }
         set(value) { root.content_footer.text = value }
 }

@@ -124,7 +124,10 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
 
     private fun updateCounts(trackerCountInfo: TrackerCountInfo) {
         trackerBlockedCountView.count = trackerCountInfo.stringTrackerCount()
+        trackerBlockedCountView.footer = resources.getQuantityString(R.plurals.deviceShieldActivityPastWeekTrackerCount, trackerCountInfo.trackers.value)
+
         trackingAppsCountView.count = trackerCountInfo.stringAppsCount()
+        trackingAppsCountView.footer = resources.getQuantityString(R.plurals.deviceShieldActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -40,7 +40,7 @@ import javax.inject.Inject
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:
  *
- * $ adb shell am broadcast -a --es times <N> --es hago <M>
+ * $ adb shell am broadcast -a track --es times <N> --es hago <M>
  *
  * where `--es times <N>` is optional and is the number of trackers to be sent
  * where `--es hago <M>` is optional and is the timestamp (hours ago) for the trackers
