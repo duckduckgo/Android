@@ -68,8 +68,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_red",
-                    appIconRound: "@mipmap/ic_launcher_red_round"
+                    appIcon: "@mipmap/ic_launcher_black",
+                    appIconRound: "@mipmap/ic_launcher_black_round"
             ]
         }
     }
