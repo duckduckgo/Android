@@ -144,7 +144,7 @@
     <string name="deviceShieldOnboardingLastPageTwoTitle">What is Device Shield?</string>
     <string name="deviceShieldOnboardingLastPageTwoSubTitle">Device Shield <b>prevents most companies from collecting your data</b> through apps they don’t own.\n\nWorking in the background, it helps <b>protect you night and day.</b></string>
     <string name="deviceShieldOnboardingLastPageThreeTitle">Who sees your data?</string>
-    <string name="deviceShieldOnboardingLastPageThreeSubTitle">Device Shield is <b>free</b>, and you can enjoy all your apps as you normally would.\n\nYou’ll be asked to set up a VPN connection, but <b>Device Shield never sends data off your device to DuckDuckGo.</b></string>
+    <string name="deviceShieldOnboardingLastPageThreeSubTitle"><b>Device Shield is free</b>, and you can enjoy all your apps as you normally would.\n\nDevice Shield uses a VPN connection differently than a standard VPN. <b>It never sends data off your device to DuckDuckGo.</b></string>
     <string name="deviceShieldOnboardingDescription">Device Shield uses a virtual private network (VPN) permission to block many hidden trackers in other apps you’ve installed.\n\nUnlike a regular VPN, Device Shield doesn’t send any personal information from your device to DuckDuckGo.</string>
     <string name="deviceShieldOnboardingCta">Ask My Permission</string>
     <string name="deviceShieldFAQCta">Device Shield FAQ</string>
