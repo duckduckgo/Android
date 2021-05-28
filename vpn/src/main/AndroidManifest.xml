@@ -53,7 +53,7 @@
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:theme="@style/Theme.AndroidVpn"
             android:label="@string/deviceShieldActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.beta.BetaFeaturesActivity"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             />
 
         <activity
