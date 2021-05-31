@@ -107,19 +107,23 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
-        viewState.value = currentViewState().copy(
-            loading = false,
-            lightThemeEnabled = isLightTheme,
-            autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-            isAppDefaultBrowser = defaultBrowserAlready,
-            showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-            version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-            appIcon = settingsDataStore.appIcon,
-            selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-            emailSetting = getEmailSetting()
-        )
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    loading = false,
+                    lightThemeEnabled = isLightTheme,
+                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                    isAppDefaultBrowser = defaultBrowserAlready,
+                    showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
+                    version = obtainVersion(variant.key),
+                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
+                    appIcon = settingsDataStore.appIcon,
+                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
+                    globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
+                    emailSetting = getEmailSetting()
+                )
+            )
+        }
     }
 
     private fun getEmailSetting(): EmailSetting {
@@ -184,14 +188,16 @@ class SettingsViewModel @Inject constructor(
 
     fun onEmailLogout() {
         emailManager.signOut()
-        viewState.value = currentViewState().copy(emailSetting = EmailSetting.EmailSettingOff)
+        viewModelScope.launch { viewState.emit(currentViewState().copy(emailSetting = EmailSetting.EmailSettingOff)) }
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
-        viewState.value = currentViewState().copy(lightThemeEnabled = enabled)
-        viewModelScope.launch { command.emit(Command.UpdateTheme) }
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
+            command.emit(Command.UpdateTheme)
+        }
 
         val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
         pixel.fire(pixelName)
@@ -200,7 +206,7 @@ class SettingsViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
     }
 
     private fun obtainVersion(variantKey: String): String {
@@ -218,13 +224,17 @@ class SettingsViewModel @Inject constructor(
 
         settingsDataStore.automaticallyClearWhatOption = clearWhatNewSetting
 
-        viewState.value = currentViewState().copy(
-            automaticallyClearData = AutomaticallyClearData(
-                clearWhatOption = clearWhatNewSetting,
-                clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    automaticallyClearData = AutomaticallyClearData(
+                        clearWhatOption = clearWhatNewSetting,
+                        clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
+                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
+                    )
+                )
             )
-        )
+        }
     }
 
     private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
@@ -242,12 +252,16 @@ class SettingsViewModel @Inject constructor(
         }
 
         settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
-        viewState.value = currentViewState().copy(
-            automaticallyClearData = AutomaticallyClearData(
-                settingsDataStore.automaticallyClearWhatOption,
-                clearWhenNewSetting
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    automaticallyClearData = AutomaticallyClearData(
+                        settingsDataStore.automaticallyClearWhatOption,
+                        clearWhenNewSetting
+                    )
+                )
             )
-        )
+        }
     }
 
     fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
@@ -257,9 +271,9 @@ class SettingsViewModel @Inject constructor(
         }
         settingsDataStore.selectedFireAnimation = selectedFireAnimation
         fireAnimationLoader.preloadSelectedAnimation()
-        viewState.value = currentViewState().copy(
-            selectedFireAnimation = selectedFireAnimation
-        )
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(selectedFireAnimation = selectedFireAnimation))
+        }
         pixel.fire(FIRE_ANIMATION_NEW_SELECTED, mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
@@ -269,7 +283,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun currentViewState(): ViewState {
-        return viewState.value!!
+        return viewState.value
     }
 
     private fun ClearWhatOption.pixelEvent(): PixelName {

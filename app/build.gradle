@@ -214,6 +214,7 @@ dependencies {
     androidTestImplementation Testing.mockito.kotlin
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    androidTestImplementation 'app.cash.turbine:turbine:_'
 }
 
 tasks.register('fastlaneVersionCode') {
