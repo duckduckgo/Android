@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.settings
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -38,6 +37,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -82,15 +83,15 @@ class SettingsViewModel @Inject constructor(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
-        object LaunchFireAnimationSettings : Command()
+        data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
         object LaunchEmailDialog : Command()
+        data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
+        data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
-        value = ViewState()
-    }
+    private val viewState = MutableStateFlow(ViewState())
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -134,6 +135,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
+    }
+
     fun onEmailSettingClicked() {
         if (getEmailSetting() is EmailSetting.EmailSettingOn) {
             command.value = Command.LaunchEmailDialog
@@ -149,7 +154,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeFireAnimation() {
-        command.value = Command.LaunchFireAnimationSettings
+        command.value = Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
@@ -159,6 +164,14 @@ class SettingsViewModel @Inject constructor(
 
     fun onLocationClicked() {
         command.value = Command.LaunchLocation
+    }
+
+    fun onAutomaticallyClearWhatClicked() {
+        command.value = Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)
+    }
+
+    fun onAutomaticallyClearWhenClicked() {
+        command.value = Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)
     }
 
     fun onGlobalPrivacyControlClicked() {
