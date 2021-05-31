@@ -17,12 +17,12 @@
 package com.duckduckgo.app.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DuckDuckGoTheme
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -37,8 +37,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -93,7 +93,7 @@ class SettingsViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
 
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private val command = MutableSharedFlow<Command>()
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -139,43 +139,47 @@ class SettingsViewModel @Inject constructor(
         return viewState
     }
 
+    fun commands(): Flow<Command> {
+        return command
+    }
+
     fun onEmailSettingClicked() {
         if (getEmailSetting() is EmailSetting.EmailSettingOn) {
-            command.value = Command.LaunchEmailDialog
+            viewModelScope.launch { command.emit(Command.LaunchEmailDialog) }
         }
     }
 
     fun userRequestedToSendFeedback() {
-        command.value = Command.LaunchFeedback
+        viewModelScope.launch { command.emit(Command.LaunchFeedback) }
     }
 
     fun userRequestedToChangeIcon() {
-        command.value = Command.LaunchAppIcon
+        viewModelScope.launch { command.emit(Command.LaunchAppIcon) }
     }
 
     fun userRequestedToChangeFireAnimation() {
-        command.value = Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)
+        viewModelScope.launch { command.emit(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
     fun onFireproofWebsitesClicked() {
-        command.value = Command.LaunchFireproofWebsites
+        viewModelScope.launch { command.emit(Command.LaunchFireproofWebsites) }
     }
 
     fun onLocationClicked() {
-        command.value = Command.LaunchLocation
+        viewModelScope.launch { command.emit(Command.LaunchLocation) }
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        command.value = Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)
+        viewModelScope.launch { command.emit(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
     }
 
     fun onAutomaticallyClearWhenClicked() {
-        command.value = Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)
+        viewModelScope.launch { command.emit(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
     }
 
     fun onGlobalPrivacyControlClicked() {
-        command.value = Command.LaunchGlobalPrivacyControl
+        viewModelScope.launch { command.emit(Command.LaunchGlobalPrivacyControl) }
     }
 
     fun onEmailLogout() {
@@ -187,7 +191,7 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
         viewState.value = currentViewState().copy(lightThemeEnabled = enabled)
-        command.value = Command.UpdateTheme
+        viewModelScope.launch { command.emit(Command.UpdateTheme) }
 
         val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
         pixel.fire(pixelName)
@@ -261,7 +265,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onManageWhitelistSelected() {
         pixel.fire(SETTINGS_MANAGE_WHITELIST)
-        command.value = Command.LaunchWhitelist
+        viewModelScope.launch { command.emit(Command.LaunchWhitelist) }
     }
 
     private fun currentViewState(): ViewState {

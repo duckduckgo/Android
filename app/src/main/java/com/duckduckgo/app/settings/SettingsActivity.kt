@@ -27,7 +27,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
@@ -130,12 +129,10 @@ class SettingsActivity :
                 }
             }.launchIn(lifecycleScope)
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun setEmailSetting(emailData: EmailSetting) {
