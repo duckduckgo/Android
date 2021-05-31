@@ -41,6 +41,12 @@
     <string name="emailProtectionJoiningDescription">Joining will place you in line by storing a timestamp locally on your device.</string>
     <string name="notificationChannelEmailWaitlist">Email waitlist</string>
 
+    <!-- Beta Features -->
+    <string name="betaFeaturesActivityTitle">Beta Features</string>
+    <string name="betaFeaturesTitle">Beta Features</string>
+    <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
+    <string name="betaFeaturesDescription">For a limited time, you can try new features before we release them. Beta features are experimental and may affect device performance.</string>
+
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
 

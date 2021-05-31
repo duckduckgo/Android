@@ -29,10 +29,8 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
@@ -46,7 +44,7 @@ class EmailProtectionViewModel(
 ) : ViewModel() {
 
     private val viewState: MutableStateFlow<UiState> = MutableStateFlow(calculateUiState())
-    val viewFlow: StateFlow<UiState> = viewState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UiState.NotJoinedQueue)
+    val viewFlow: StateFlow<UiState> = viewState
 
     private val commandChannel = Channel<Command>(Channel.BUFFERED)
     val commandsFlow = commandChannel.receiveAsFlow()

@@ -26,10 +26,9 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.beta.BetaFeaturesActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -41,7 +40,6 @@ import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
-import com.duckduckgo.app.settings.SettingsViewModel.EmailSetting
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -104,7 +102,7 @@ class SettingsActivity :
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
         automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
-        emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
+        betaFeaturesSetting.setOnClickListener { viewModel.onBetaFeatureSettingsClicked() }
     }
 
     private fun observeViewModel() {
@@ -120,7 +118,6 @@ class SettingsActivity :
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
-                    setEmailSetting(it.emailSetting)
                 }
             }
         )
@@ -131,17 +128,6 @@ class SettingsActivity :
                 processCommand(it)
             }
         )
-    }
-
-    private fun setEmailSetting(emailData: EmailSetting) {
-        when (emailData) {
-            is EmailSetting.EmailSettingOff -> {
-                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionDisabled))
-            }
-            is EmailSetting.EmailSettingOn -> {
-                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionEnabledFor, emailData.emailAddress))
-            }
-        }
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -169,12 +155,6 @@ class SettingsActivity :
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun launchEmailDialog() {
-        val dialog = SettingsEmailLogoutDialog.create()
-        dialog.show(supportFragmentManager, EMAIL_DIALOG_TAG)
-        dialog.onLogout = { viewModel.onEmailLogout() }
-    }
-
     private fun launchAutomaticallyClearWhatDialog() {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
@@ -197,8 +177,7 @@ class SettingsActivity :
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
-            is Command.LaunchEmailSignOut -> launchEmailDialog()
-            is Command.LaunchEmailSignIn -> launchEmailProtection()
+            is Command.LaunchBetaFeatures -> launchBetaFeaturesScreen()
         }
     }
 
@@ -254,9 +233,9 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
-    private fun launchEmailProtection() {
+    private fun launchBetaFeaturesScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(EmailProtectionActivity.intent(this), options)
+        startActivity(BetaFeaturesActivity.intent(this), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -309,7 +288,6 @@ class SettingsActivity :
         private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
-        private const val EMAIL_DIALOG_TAG = "EMAIL_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
 

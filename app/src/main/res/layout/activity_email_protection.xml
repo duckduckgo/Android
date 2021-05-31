@@ -17,14 +17,103 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="16dp"
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.email.ui.EmailProtectionActivity">
 
     <include layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_email_protection" />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/emailPrivacyDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4sp"
+            android:paddingTop="12dp"
+            android:text="@string/emailProtectionDescription"
+            android:textColor="?attr/settingsMinorTextColor"
+            android:textSize="14sp"
+            android:textStyle="normal" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/duckAddressButton"
+            style="@style/DaxDialogButton.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/emailProtectionHaveAnAddress" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/inviteCodeButton"
+            style="@style/DaxDialogButton.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/emailProtectionInviteCode" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/waitListButton"
+            style="@style/DaxDialogButton.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/emailProtectionWaitlist" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/inLineTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4sp"
+            android:paddingTop="12dp"
+            android:text="@string/emailProtectionLineTitle"
+            android:textColor="?attr/settingsItemTextColor"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/inLineDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4sp"
+            android:text="@string/emailProtectionLineDescription"
+            android:textColor="?attr/settingsMinorTextColor"
+            android:textSize="14sp"
+            android:textStyle="normal" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/blogPostButton"
+                style="@style/DaxDialogButton.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/emailProtectionReadBlog"
+                app:layout_constraintBottom_toTopOf="@id/readPrivacyButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/readPrivacyButton"
+                style="@style/DaxDialogButton.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/emailProtectionReadPrivacy"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

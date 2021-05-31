@@ -81,10 +81,11 @@
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/emailSetting"
+        android:id="@+id/betaFeaturesSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsEmailProtection"
+        app:title="@string/betaFeaturesTitle"
+        app:subtitle="@string/betaFeaturesSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/whitelist" />

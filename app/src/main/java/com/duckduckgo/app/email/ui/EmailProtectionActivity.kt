@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
-import kotlinx.android.synthetic.main.content_email_protection.*
+import kotlinx.android.synthetic.main.activity_email_protection.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
