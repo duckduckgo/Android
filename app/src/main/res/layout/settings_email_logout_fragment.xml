@@ -28,7 +28,7 @@
         android:layout_margin="16dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
-        android:text="@string/settingsEmailAutofillEnabledFor"
+        android:text="@string/settingsEmailProtectionEnabledFor"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"

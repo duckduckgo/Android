@@ -16,8 +16,9 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Email Autofill -->
-    <string name="settingsEmailAutofill">Email Autofill</string>
-    <string name="settingsEmailAutofillEnabledFor">Enabled for %1$s</string>
+    <string name="emailProtectionActivityTitle">Email Protection</string>
+    <string name="settingsEmailProtection">Email Protection</string>
+    <string name="settingsEmailProtectionEnabledFor">Enabled for %1$s</string>
     <string name="autofillSettingCancel">Cancel</string>
     <string name="autofillSettingDisable">Disable</string>
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
@@ -26,7 +27,19 @@
     <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
-
+    <string name="settingsEmailProtectionDisabled">Off</string>
+    <string name="emailProtectionDescription">Get a Duck Address to improve your email privacy without the pain of switching providers. Add it here to enable email for autofill in the app.</string>
+    <string name="emailProtectionHaveAnAddress">I have a Duck Address</string>
+    <string name="emailProtectionInviteCode">I have an invite Code</string>
+    <string name="emailProtectionWaitlist">Join Duck Address Waitlist</string>
+    <string name="emailProtectionReadBlog">Read our Duck Address blog post</string>
+    <string name="emailProtectionReadPrivacy">Read our Privacy Guarantees</string>
+    <string name="emailProtectionLineTitle">You\'re in line!</string>
+    <string name="emailProtectionCodeTitle">Here is your code!</string>
+    <string name="emailProtectionLineDescription">You joined the waitlist on %1$s and will be notified when it\'s your turn.</string>
+    <string name="emailProtectionCodeDescription">Use this code (%1$s) to sign up.</string>
+    <string name="emailProtectionJoiningDescription">Joining will place you in line by storing a timestamp locally on your device.</string>
+    <string name="notificationChannelEmailWaitlist">Email waitlist</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>

@@ -21,12 +21,14 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
+import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.notification.model.WaitlistCodeNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
@@ -70,6 +72,15 @@ class NotificationModule {
         privacyProtectionCountDao: PrivacyProtectionCountDao
     ): PrivacyProtectionNotification {
         return PrivacyProtectionNotification(context, notificationDao, privacyProtectionCountDao)
+    }
+
+    @Provides
+    fun provideWaitlistCodeNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        emailDataStore: EmailDataStore
+    ): WaitlistCodeNotification {
+        return WaitlistCodeNotification(context, notificationDao, emailDataStore)
     }
 
     @Provides

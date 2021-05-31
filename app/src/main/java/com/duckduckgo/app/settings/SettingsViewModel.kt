@@ -85,7 +85,8 @@ class SettingsViewModel @Inject constructor(
         object LaunchFireAnimationSettings : Command()
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
-        object LaunchEmailDialog : Command()
+        object LaunchEmailSignOut : Command()
+        object LaunchEmailSignIn : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -135,8 +136,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onEmailSettingClicked() {
-        if (getEmailSetting() is EmailSetting.EmailSettingOn) {
-            command.value = Command.LaunchEmailDialog
+        when (getEmailSetting()) {
+            is EmailSetting.EmailSettingOff -> command.value = Command.LaunchEmailSignIn
+            is EmailSetting.EmailSettingOn -> command.value = Command.LaunchEmailSignOut
         }
     }
 

@@ -29,14 +29,13 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
-import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
@@ -111,7 +110,7 @@ class SettingsActivity :
     private fun observeViewModel() {
         viewModel.viewState.observe(
             this,
-            Observer { viewState ->
+            { viewState ->
                 viewState?.let {
                     version.setSubtitle(it.version)
                     lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
@@ -128,7 +127,7 @@ class SettingsActivity :
 
         viewModel.command.observe(
             this,
-            Observer {
+            {
                 processCommand(it)
             }
         )
@@ -137,11 +136,10 @@ class SettingsActivity :
     private fun setEmailSetting(emailData: EmailSetting) {
         when (emailData) {
             is EmailSetting.EmailSettingOff -> {
-                emailSetting.gone()
+                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionDisabled))
             }
             is EmailSetting.EmailSettingOn -> {
-                emailSetting.show()
-                emailSetting.setSubtitle(getString(R.string.settingsEmailAutofillEnabledFor, emailData.emailAddress))
+                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionEnabledFor, emailData.emailAddress))
             }
         }
     }
@@ -199,7 +197,8 @@ class SettingsActivity :
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
-            is Command.LaunchEmailDialog -> launchEmailDialog()
+            is Command.LaunchEmailSignOut -> launchEmailDialog()
+            is Command.LaunchEmailSignIn -> launchEmailProtection()
         }
     }
 
@@ -253,6 +252,11 @@ class SettingsActivity :
     private fun launchGlobalPrivacyControl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
+    }
+
+    private fun launchEmailProtection() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(EmailProtectionActivity.intent(this), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {

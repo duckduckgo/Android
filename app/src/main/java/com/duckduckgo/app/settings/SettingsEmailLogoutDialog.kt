@@ -43,11 +43,11 @@ class SettingsEmailLogoutDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val rootView = View.inflate(activity, R.layout.settings_email_logout_fragment, null)
         val message = rootView.findViewById<MaterialTextView>(R.id.emailDialogText)
-        message.text = getString(R.string.settingsEmailAutofillEnabledFor, emailManager.getEmailAddress().orEmpty())
+        message.text = getString(R.string.settingsEmailProtectionEnabledFor, emailManager.getEmailAddress().orEmpty())
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(getString(R.string.settingsEmailAutofill))
+            .setTitle(getString(R.string.settingsEmailProtection))
             .setNegativeButton(R.string.autofillSettingCancel) { _, _ ->
                 dismiss()
             }

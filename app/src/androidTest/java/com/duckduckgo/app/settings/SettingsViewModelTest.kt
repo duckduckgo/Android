@@ -351,12 +351,12 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailSettingClickedAndUserIsSignedInThenLaunchEmailDialogCommandSent() {
+    fun whenOnEmailSettingClickedAndUserIsSignedInThenLaunchEmailSignOutCommandSent() {
         givenUserIsSignedInAndHasAliasAvailable()
 
         testee.onEmailSettingClicked()
 
-        assertCommandIssued<Command.LaunchEmailDialog>()
+        assertCommandIssued<Command.LaunchEmailSignOut>()
     }
 
     private fun latestViewState() = testee.viewState.value!!
