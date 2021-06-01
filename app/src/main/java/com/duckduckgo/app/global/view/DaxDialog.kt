@@ -193,13 +193,15 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
         context?.let {
             val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
-            binding.toolbarDialogLayout.setBackgroundColor(toolbarColor)
-            binding.hiddenText.text = daxText.html(it)
-            binding.primaryCta.text = primaryButtonText
-            binding.secondaryCta.text = secondaryButtonText
-            binding.secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
-            binding.dialogText.typingDelayInMs = typingDelayInMs
-            binding.hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
+            with(binding) {
+                toolbarDialogLayout.setBackgroundColor(toolbarColor)
+                hiddenText.text = daxText.html(it)
+                primaryCta.text = primaryButtonText
+                secondaryCta.text = secondaryButtonText
+                secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
+                dialogText.typingDelayInMs = typingDelayInMs
+                hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
+            }
         }
     }
 
