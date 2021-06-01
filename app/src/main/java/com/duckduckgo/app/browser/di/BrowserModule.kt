@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -55,7 +56,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -271,8 +271,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun domLoginDetector(settingsDataStore: SettingsDataStore, useOurAppDetector: UseOurAppDetector): DOMLoginDetector {
-        return JsLoginDetector(settingsDataStore, useOurAppDetector)
+    fun domLoginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
+        return JsLoginDetector(settingsDataStore)
     }
 
     @Provides
@@ -281,8 +281,11 @@ class BrowserModule {
     }
 
     @Provides
-    fun navigationAwareLoginDetector(settingsDataStore: SettingsDataStore): NavigationAwareLoginDetector {
-        return NextPageLoginDetection(settingsDataStore)
+    fun navigationAwareLoginDetector(
+        settingsDataStore: SettingsDataStore,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): NavigationAwareLoginDetector {
+        return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
 
     @Provides
@@ -312,4 +315,9 @@ class BrowserModule {
     fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
+
+    @Provides
+    @Singleton
+    @IntoSet
+    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
 }

@@ -88,6 +88,7 @@ fun Uri.domain(): String? = this.host
 
 // to obtain a favicon for a website, we go directly to the site and look for /favicon.ico
 private const val faviconBaseUrlFormat = "%s://%s/favicon.ico"
+private const val touchFaviconBaseUrlFormat = "%s://%s/apple-touch-icon.png"
 
 fun Uri?.faviconLocation(): Uri? {
     if (this == null) return null
@@ -95,6 +96,14 @@ fun Uri?.faviconLocation(): Uri? {
     if (host.isNullOrBlank()) return null
     val isHttps = this.isHttps
     return parse(String.format(faviconBaseUrlFormat, if (isHttps) "https" else "http", host))
+}
+
+fun Uri?.touchFaviconLocation(): Uri? {
+    if (this == null) return null
+    val host = this.host
+    if (host.isNullOrBlank()) return null
+    val isHttps = this.isHttps
+    return parse(String.format(touchFaviconBaseUrlFormat, if (isHttps) "https" else "http", host))
 }
 
 fun Uri.getValidUrl(): ValidUrl? {

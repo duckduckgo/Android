@@ -144,6 +144,7 @@ dependencies {
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+    implementation AndroidX.recyclerView
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
     implementation Square.okHttp3.okHttp

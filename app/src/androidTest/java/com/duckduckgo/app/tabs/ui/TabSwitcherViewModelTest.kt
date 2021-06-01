@@ -21,7 +21,6 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -103,14 +102,6 @@ class TabSwitcherViewModelTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
-    }
-
-    @Test
-    fun whenClearCompleteThenMessageDisplayedAndSwitcherClosed() {
-        testee.onClearComplete()
-        verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
-        assertEquals(Command.DisplayMessage(R.string.fireDataCleared), commandCaptor.allValues[0])
-        assertEquals(Command.Close, commandCaptor.allValues[1])
     }
 
     @Test

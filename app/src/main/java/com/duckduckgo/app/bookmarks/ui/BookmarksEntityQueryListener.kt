@@ -17,17 +17,16 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.appcompat.widget.SearchView
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.model.SavedSite
 
 class BookmarksEntityQueryListener(
-    val bookmarks: List<BookmarkEntity>?,
-    val adapter: BookmarksActivity.BookmarksAdapter
+    val bookmarks: List<SavedSite.Bookmark>?,
+    val adapter: BookmarksAdapter
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         if (bookmarks != null) {
-            adapter.bookmarks = filter(newText, bookmarks)
-            adapter.notifyDataSetChanged()
+            adapter.bookmarkItems = filter(newText, bookmarks)
         }
         return true
     }
@@ -36,11 +35,11 @@ class BookmarksEntityQueryListener(
         return false
     }
 
-    private fun filter(query: String, bookmarks: List<BookmarkEntity>): List<BookmarkEntity> {
+    private fun filter(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
         val lowercaseQuery = query.toLowerCase()
         return bookmarks.filter {
-            val lowercaseTitle = it.title?.toLowerCase()
-            lowercaseTitle?.contains(lowercaseQuery) == true || it.url.contains(lowercaseQuery)
-        }
+            val lowercaseTitle = it.title.toLowerCase()
+            lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
+        }.map { BookmarksAdapter.BookmarkItem(it) }
     }
 }

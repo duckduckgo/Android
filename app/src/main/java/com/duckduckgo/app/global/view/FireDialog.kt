@@ -43,7 +43,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -56,11 +55,11 @@ class FireDialog(
     private val clearPersonalDataAction: ClearDataAction,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore
+    private val userEventsStore: UserEventsStore,
+    private val appCoroutineScope: CoroutineScope
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
-    var clearComplete: (() -> Unit) = {}
     val ctaVisible: Boolean
         get() = daxCtaContainer?.isVisible == true
 
@@ -116,7 +115,7 @@ class FireDialog(
         cta.showCta(daxCtaContainer)
         ctaViewModel.onCtaShown(cta)
         onClearDataOptionsDismissed = {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 ctaViewModel.onUserDismissedCta(cta)
             }
         }
@@ -134,7 +133,7 @@ class FireDialog(
         }
         clearStarted()
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)

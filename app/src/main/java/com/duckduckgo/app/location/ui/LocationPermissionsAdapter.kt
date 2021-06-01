@@ -257,7 +257,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromPersisted(url, itemView.locationPermissionEntryFavicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.locationPermissionEntryFavicon)
             }
         }
 

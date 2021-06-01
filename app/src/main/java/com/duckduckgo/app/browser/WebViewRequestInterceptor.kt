@@ -44,6 +44,12 @@ interface RequestInterceptor {
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?
     ): WebResourceResponse?
+
+    @WorkerThread
+    suspend fun shouldInterceptFromServiceWorker(
+        request: WebResourceRequest?,
+        documentUrl: String?
+    ): WebResourceResponse?
 }
 
 class WebViewRequestInterceptor(
@@ -112,18 +118,37 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUrl)
         }
 
+        return getWebResourceResponse(request, documentUrl, webViewClientListener)
+    }
+
+    override suspend fun shouldInterceptFromServiceWorker(
+        request: WebResourceRequest?,
+        documentUrl: String?
+    ): WebResourceResponse? {
+
+        if (documentUrl == null) return null
+        if (request == null) return null
+
+        if (TrustedSites.isTrusted(documentUrl)) {
+            return null
+        }
+
+        return getWebResourceResponse(request, documentUrl, null)
+    }
+
+    private fun getWebResourceResponse(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.blocked == true) {
             trackingEvent.surrogateId?.let { surrogateId ->
                 val surrogate = resourceSurrogates.get(surrogateId)
                 if (surrogate.responseAvailable) {
-                    Timber.d("Surrogate found for $url")
+                    Timber.d("Surrogate found for ${request.url}")
                     webViewClientListener?.surrogateDetected(surrogate)
                     return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
                 }
             }
 
-            Timber.d("Blocking request $url")
+            Timber.d("Blocking request ${request.url}")
             privacyProtectionCountDao.incrementBlockedTrackerCount()
             return WebResourceResponse(null, null, null)
         }

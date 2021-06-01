@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -50,7 +51,6 @@ import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -107,6 +107,10 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
+
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -137,12 +141,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
         }
@@ -227,7 +231,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initialize()
         }

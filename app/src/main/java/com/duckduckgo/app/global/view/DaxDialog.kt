@@ -128,7 +128,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        if (activity != null) {
+        if (activity != null && _binding != null) {
             binding.dialogText.cancelAnimation()
             daxDialogListener?.onDaxDialogDismiss()
         }

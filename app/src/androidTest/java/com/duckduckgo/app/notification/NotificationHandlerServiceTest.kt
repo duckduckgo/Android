@@ -23,10 +23,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.USE_OUR_APP
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -44,7 +40,6 @@ class NotificationHandlerServiceTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private var mockPixel: Pixel = mock()
-    private var mockUserStageStore: UserStageStore = mock()
     private var testee = NotificationHandlerService()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -53,7 +48,6 @@ class NotificationHandlerServiceTest {
         testee.pixel = mockPixel
         testee.context = context
         testee.notificationManager = NotificationManagerCompat.from(context)
-        testee.userStageStore = mockUserStageStore
         testee.dispatcher = coroutinesTestRule.testDispatcherProvider
     }
 
@@ -73,23 +67,5 @@ class NotificationHandlerServiceTest {
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
         verify(mockPixel).fire(eq("mnot_c_abc"), any(), any())
-    }
-
-    @Test
-    fun whenIntentIsUseOurAppThenCorrespondingPixelIsFired() {
-        val intent = Intent(context, NotificationHandlerService::class.java)
-        intent.type = USE_OUR_APP
-        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
-        testee.onHandleIntent(intent)
-        verify(mockPixel).fire(eq("mnot_l_abc"), any(), any())
-    }
-
-    @Test
-    fun whenIntentIsUseOurAppThenRegisterInUseOurAppOnboardingStage() = coroutinesTestRule.runBlocking {
-        val intent = Intent(context, NotificationHandlerService::class.java)
-        intent.type = USE_OUR_APP
-        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
-        testee.onHandleIntent(intent)
-        verify(mockUserStageStore).moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
     }
 }

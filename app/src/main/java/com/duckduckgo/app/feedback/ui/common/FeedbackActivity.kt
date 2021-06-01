@@ -170,7 +170,7 @@ class FeedbackActivity :
      * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userSelectedToRateApp() }
+        viewModel.userSelectedToRateApp()
     }
 
     override fun userSelectedToGiveFeedback() {
@@ -178,18 +178,18 @@ class FeedbackActivity :
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userGavePositiveFeedbackNoDetails() }
+        viewModel.userGavePositiveFeedbackNoDetails()
     }
 
     override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
+        viewModel.userProvidedPositiveOpenEndedFeedback(feedback)
     }
 
     /**
      * Negative feedback listeners
      */
     override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
+        viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
     }
 
     /**
@@ -223,7 +223,7 @@ class FeedbackActivity :
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
+        viewModel.onProvidedBrokenSiteFeedback(feedback, url)
     }
 
     private fun hideKeyboard() {

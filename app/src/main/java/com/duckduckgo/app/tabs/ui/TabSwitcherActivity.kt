@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -32,6 +31,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -42,7 +42,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -77,6 +76,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -172,7 +175,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun processCommand(command: Command?) {
         when (command) {
-            is DisplayMessage -> Toast.makeText(applicationContext, command.messageId, Toast.LENGTH_LONG).show()
             is Close -> finishAfterTransition()
         }
     }
@@ -200,9 +202,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             ctaViewModel = ctaViewModel,
             pixel = pixel,
             settingsDataStore = settingsDataStore,
-            userEventsStore = userEventsStore
+            userEventsStore = userEventsStore,
+            appCoroutineScope = appCoroutineScope
         )
-        dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
 
@@ -240,7 +242,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> launch { viewModel.purgeDeletableTabs() }
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */ }
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */
+                        }
                     }
                 }
             })

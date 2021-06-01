@@ -30,7 +30,8 @@ class TabSwitcherButton @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private val binding = ViewTabSwitcherButtonBinding.inflate(LayoutInflater.from(context), this)
+    private var _binding: ViewTabSwitcherButtonBinding? = null
+    private val binding get() = _binding!!
 
     var count = 0
         set(value) {
@@ -40,6 +41,11 @@ class TabSwitcherButton @JvmOverloads constructor(
         }
 
     var hasUnread = false
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        _binding = ViewTabSwitcherButtonBinding.inflate(LayoutInflater.from(context), this)
+    }
 
     fun increment(callback: () -> Unit) {
         fadeOutCount {
