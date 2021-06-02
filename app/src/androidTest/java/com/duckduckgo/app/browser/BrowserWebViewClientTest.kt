@@ -71,7 +71,6 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
-    private val webViewClientListener: WebViewClientListener = mock()
 
     @UiThreadTest
     @Before
@@ -268,20 +267,32 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkDetectedAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
-        whenever(webResourceRequest.isRedirect).thenReturn(true)
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
-        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+    fun whenAppLinkDetectedThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
+        val urlType = SpecialUrlDetector.UrlType.AppLink()
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verify(listener).appLinkClicked(urlType)
+        } else {
+            assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+            verify(listener, never()).appLinkClicked(any())
+        }
     }
 
     @Test
-    fun whenAppLinkDetectedThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
-        whenever(webResourceRequest.isRedirect).thenReturn(false)
-        val urlType = SpecialUrlDetector.UrlType.AppLink()
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        testee.webViewClientListener = webViewClientListener
-        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(webViewClientListener).appLinkClicked(urlType)
+    fun whenAppLinkDetectedAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(webResourceRequest.isRedirect).thenReturn(true)
+            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verify(listener, never()).appLinkClicked(any())
+        } else {
+            assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+            verify(listener, never()).appLinkClicked(any())
+        }
     }
 
     private class TestWebView(context: Context) : WebView(context)

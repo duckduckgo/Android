@@ -80,7 +80,7 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, isForMainFrame = true, isRedirect = false)
+        return shouldOverride(view, url, isForMainFrame = true, isRedirect = true)
     }
 
     /**
