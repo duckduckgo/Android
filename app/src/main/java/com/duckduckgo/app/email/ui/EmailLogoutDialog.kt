@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings
+package com.duckduckgo.app.email.ui
 
 import android.app.Dialog
 import android.content.Context
@@ -28,7 +28,7 @@ import com.google.android.material.textview.MaterialTextView
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class SettingsEmailLogoutDialog : DialogFragment() {
+class EmailLogoutDialog : DialogFragment() {
 
     @Inject
     lateinit var emailManager: EmailManager
@@ -41,17 +41,17 @@ class SettingsEmailLogoutDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val rootView = View.inflate(activity, R.layout.settings_email_logout_fragment, null)
+        val rootView = View.inflate(activity, R.layout.email_dialog_fragment, null)
         val message = rootView.findViewById<MaterialTextView>(R.id.emailDialogText)
-        message.text = getString(R.string.settingsEmailProtectionEnabledFor, emailManager.getEmailAddress().orEmpty())
+        message.text = getString(R.string.emailSignOutDialogText)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(getString(R.string.settingsEmailProtection))
-            .setNegativeButton(R.string.autofillSettingCancel) { _, _ ->
+            .setTitle(getString(R.string.emailSignOutDialogTitle))
+            .setNegativeButton(R.string.emailSignOutDialogCancel) { _, _ ->
                 dismiss()
             }
-            .setPositiveButton(R.string.autofillSettingDisable) { _, _ ->
+            .setPositiveButton(R.string.emailSignOutDialogDisable) { _, _ ->
                 dialog?.let {
                     onLogout()
                 }
@@ -62,7 +62,7 @@ class SettingsEmailLogoutDialog : DialogFragment() {
     }
 
     companion object {
-        fun create(): SettingsEmailLogoutDialog = SettingsEmailLogoutDialog()
+        fun create(): EmailLogoutDialog = EmailLogoutDialog()
     }
 
 }

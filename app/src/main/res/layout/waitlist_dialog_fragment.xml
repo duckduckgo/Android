@@ -22,13 +22,13 @@
     android:paddingEnd="10dp">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/emailDialogText"
+        android:id="@+id/waitlistDialogText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
-        android:text="@string/settingsEmailProtectionEnabledFor"
+        android:text="@string/waitlistNotificationDialogDescription"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"

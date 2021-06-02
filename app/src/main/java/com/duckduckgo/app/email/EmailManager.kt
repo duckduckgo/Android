@@ -19,10 +19,9 @@ package com.duckduckgo.app.email
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.ui.EmailProtectionViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,10 +35,11 @@ interface EmailManager : LifecycleObserver {
     fun storeCredentials(token: String, username: String)
     fun signOut()
     fun getEmailAddress(): String?
+    fun waitlistState(): AppEmailManager.WaitlistState
+    fun joinWaitlist(timestamp: Int, token: String)
+    fun getInviteCode(): String
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class AppEmailManager(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
@@ -80,6 +80,25 @@ class AppEmailManager(
         }
     }
 
+    override fun waitlistState(): WaitlistState {
+        if (emailDataStore.waitlistTimestamp != -1 && emailDataStore.inviteCode == null) {
+            return WaitlistState.JoinedQueue
+        }
+        emailDataStore.inviteCode?.let {
+            return WaitlistState.InBeta
+        }
+        return WaitlistState.NotJoinedQueue
+    }
+
+    override fun joinWaitlist(timestamp: Int, token: String) {
+        if (emailDataStore.waitlistTimestamp == -1) { emailDataStore.waitlistTimestamp = timestamp }
+        if (emailDataStore.waitlistToken == null) { emailDataStore.waitlistToken = token }
+    }
+
+    override fun getInviteCode(): String {
+        return emailDataStore.inviteCode.orEmpty()
+    }
+
     private fun consumeAlias(): String? {
         val alias = nextAliasFlow.value
         emailDataStore.clearNextAlias()
@@ -107,6 +126,12 @@ class AppEmailManager(
                 Timber.w(it, "Failed to fetch alias")
             }
         }
+    }
+
+    sealed class WaitlistState {
+        object NotJoinedQueue : WaitlistState()
+        object JoinedQueue : WaitlistState()
+        object InBeta : WaitlistState()
     }
 
     companion object {

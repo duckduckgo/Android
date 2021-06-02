@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.app.settings.SettingsEmailLogoutDialog
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.app.email.ui.EmailFaqActivity
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -33,21 +33,21 @@ import dagger.multibindings.IntoMap
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface SettingsEmailLogoutDialogComponent : AndroidInjector<SettingsEmailLogoutDialog> {
+interface EmailFaqActivityComponent : AndroidInjector<EmailFaqActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<SettingsEmailLogoutDialog>
+    interface Factory : AndroidInjector.Factory<EmailFaqActivity>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface SettingsEmailLogoutDialogComponentProvider {
-    fun provideSettingsEmailLogoutDialogComponentFactory(): SettingsEmailLogoutDialogComponent.Factory
+interface EmailFaqActivityComponentComponentProvider {
+    fun provideEmailFaqActivityComponentFactory(): EmailFaqActivityComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class SettingsEmailLogoutDialogBindingModule {
+abstract class EmailFaqActivityComponentBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(SettingsEmailLogoutDialog::class)
-    abstract fun bindSettingsEmailLogoutDialogComponentFactory(factory: SettingsEmailLogoutDialogComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(EmailFaqActivity::class)
+    abstract fun bindEmailFaqActivityComponentFactory(factory: EmailFaqActivityComponent.Factory): AndroidInjector.Factory<*>
 }

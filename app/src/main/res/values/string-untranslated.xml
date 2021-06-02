@@ -16,36 +16,77 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Email Autofill -->
-    <string name="emailProtectionActivityTitle">Email Protection</string>
-    <string name="settingsEmailProtection">Email Protection</string>
-    <string name="settingsEmailProtectionEnabledFor">Enabled for %1$s</string>
-    <string name="autofillSettingCancel">Cancel</string>
-    <string name="autofillSettingDisable">Disable</string>
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
     <string name="autofillTooltipUseYourAlias">Use %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
     <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
-    <string name="settingsEmailProtectionDisabled">Off</string>
-    <string name="emailProtectionDescription">Get a Duck Address to improve your email privacy without the pain of switching providers. Add it here to enable email for autofill in the app.</string>
-    <string name="emailProtectionHaveAnAddress">I have a Duck Address</string>
-    <string name="emailProtectionInviteCode">I have an invite Code</string>
-    <string name="emailProtectionWaitlist">Join Duck Address Waitlist</string>
-    <string name="emailProtectionReadBlog">Read our Duck Address blog post</string>
-    <string name="emailProtectionReadPrivacy">Read our Privacy Guarantees</string>
-    <string name="emailProtectionLineTitle">You\'re in line!</string>
-    <string name="emailProtectionCodeTitle">Here is your code!</string>
-    <string name="emailProtectionLineDescription">You joined the waitlist on %1$s and will be notified when it\'s your turn.</string>
-    <string name="emailProtectionCodeDescription">Use this code (%1$s) to sign up.</string>
-    <string name="emailProtectionJoiningDescription">Joining will place you in line by storing a timestamp locally on your device.</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Remove Email Protection?</string>
+    <string name="emailSignOutDialogText">Removing Email Protection from this device will not delete your Duck Address.</string>
+    <string name="emailSignOutDialogCancel">Cancel</string>
+    <string name="emailSignOutDialogDisable">Remove</string>
+
+
+    <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Email waitlist</string>
+    <string name="waitlistNotificationTitle">Your Email Protection Invitation is Here!</string>
+    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it’s your turn to try our Email Protection feature. Tap to view your invitation.</string>
+
+    <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it’s your turn?</string>
+    <string name="waitlistNotificationDialogNoThanks">NO THANKS</string>
+    <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionFaqActivityTitle">Email Protection</string>
+    <string name="emailProtectionActivityTitle">Email Protection</string>
+    <string name="emailProtectionFooterDescription">
+        <![CDATA[We never store your emails. Learn more in our <b><a href="">Privacy Guarantees</a></b>. If you already have a Duck Address, <b><a href="">add it to this device.</a></b>]]>
+    </string>
+
+    <string name="emailProtectionInviteCodeCta">I have an invite Code</string>
+    <string name="emailProtectionWaitlistCta">Join the Waitlist</string>
+    <string name="emailProtectionGetStartedCta">Get Started</string>
+
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Email Privacy, Simplified</string>
+    <string name="emailProtectionDescriptionJoin">
+        <![CDATA[Enjoy privacy while reading your email and giving out your email address, without the pain of switching email providers. <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
+    </string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">You\'re on the list</string>
+    <string name="emailProtectionDescriptionJoined">
+        <![CDATA[Your invitation will be available soon. If you asked us to notify you, we\'ll do just that. <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
+    </string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
+    <string name="emailProtectionDescriptionInBeta">
+        <![CDATA[Need a refresher? <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
+    </string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Primary Duck Address</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[The <b>Email Protection</b> integration gives you the option to fill in your <b>Primary Duck Address</b> or a newly generated <b>Private Duck Address</b> into email fields as you browse the web.<br/><br/>If you would like to delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
     <!-- Beta Features -->
     <string name="betaFeaturesActivityTitle">Beta Features</string>
     <string name="betaFeaturesTitle">Beta Features</string>
     <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
     <string name="betaFeaturesDescription">For a limited time, you can try new features before we release them. Beta features are experimental and may affect device performance.</string>
+    <string name="betaFeaturesEmail">Email</string>
+    <string name="betaFeaturesEmailProtectionTitle">Email Protection</string>
+    <string name="betaFeaturesEmailProtectionSubtitleWaitlist">Join the waitlist</string>
+    <string name="betaFeaturesEmailProtectionSubtitleDisabled">Disabled</string>
+    <string name="betaFeaturesEmailProtectionSubtitleEnabled">Enabled</string>
+    <string name="betaFeaturesEmailProtectionDescription">Block email trackers and hide your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>

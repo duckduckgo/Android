@@ -24,8 +24,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.addRepeatingJob
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
+import com.duckduckgo.app.email.ui.EmailProtectionSignOutActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.settings.SettingsEmailLogoutDialog
 import kotlinx.android.synthetic.main.activity_beta_features.emailSetting
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -51,7 +51,7 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
             this,
             { viewState ->
                 viewState?.let {
-                    setEmailSetting(it.emailSetting)
+                    setEmailSetting(it.emailState)
                 }
             }
         )
@@ -64,14 +64,11 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
         )
     }
 
-    private fun setEmailSetting(emailData: BetaFeaturesViewModel.EmailSetting) {
+    private fun setEmailSetting(emailData: BetaFeaturesViewModel.EmailState) {
         when (emailData) {
-            is BetaFeaturesViewModel.EmailSetting.EmailSettingOff -> {
-                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionDisabled))
-            }
-            is BetaFeaturesViewModel.EmailSetting.EmailSettingOn -> {
-                emailSetting.setSubtitle(getString(R.string.settingsEmailProtectionEnabledFor, emailData.emailAddress))
-            }
+            is BetaFeaturesViewModel.EmailState.Disabled -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleDisabled))
+            is BetaFeaturesViewModel.EmailState.Enabled -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleEnabled))
+            is BetaFeaturesViewModel.EmailState.JoinWaitlist -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleWaitlist))
         }
     }
 
@@ -79,10 +76,9 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
         emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
     }
 
-    private fun launchEmailDialog() {
-        val dialog = SettingsEmailLogoutDialog.create()
-        dialog.show(supportFragmentManager, EMAIL_DIALOG_TAG)
-        dialog.onLogout = { viewModel.onEmailLogout() }
+    private fun launchEmailProtectionSignOut(email: String) {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(EmailProtectionSignOutActivity.intent(this, email), options)
     }
 
     private fun launchEmailProtection() {
@@ -92,14 +88,12 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: BetaFeaturesViewModel.Command) {
         when (it) {
-            is BetaFeaturesViewModel.Command.LaunchEmailSignOut -> launchEmailDialog()
+            is BetaFeaturesViewModel.Command.LaunchEmailSignOut -> launchEmailProtectionSignOut(it.emailAddress)
             is BetaFeaturesViewModel.Command.LaunchEmailSignIn -> launchEmailProtection()
         }
     }
 
     companion object {
-        private const val EMAIL_DIALOG_TAG = "EMAIL_DIALOG_FRAGMENT"
-
         fun intent(context: Context): Intent {
             return Intent(context, BetaFeaturesActivity::class.java)
         }

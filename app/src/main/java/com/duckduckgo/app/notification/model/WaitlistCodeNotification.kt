@@ -38,7 +38,7 @@ class WaitlistCodeNotification(
 
     override suspend fun canShow(): Boolean {
 
-        if (notificationDao.exists(id)) {
+        if (notificationDao.exists(id) || !emailDataStore.sendNotification) {
             Timber.v("Notification already seen")
             return false
         }
@@ -54,14 +54,14 @@ class WaitlistCodeNotification(
 class WaitlistCodeSpecification(context: Context, code: String?) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.EMAIL_WAITLIST
     override val systemId = NotificationRegistrar.NotificationId.EmailWaitlist
-    override val name = "You are in the beta"
-    override val icon = R.drawable.notification_fire
-    override val title: String = "You are in the beta!"
-    override val description: String = "Your code is $code"
+    override val name = context.getString(R.string.waitlistNotificationTitle)
+    override val icon = R.drawable.notification_logo
+    override val title: String = context.getString(R.string.waitlistNotificationTitle)
+    override val description: String = context.getString(R.string.waitlistNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val pixelSuffix = "ec"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = R.color.cornflowerBlue
+    override val color: Int = R.color.ic_launcher_red_background
 }

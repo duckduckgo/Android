@@ -42,9 +42,9 @@
         style="@style/SettingsGroupDivider"/>
 
     <TextView
-        android:id="@+id/deviceShieldTitle"
+        android:id="@+id/emailTitle"
         style="@style/SettingsSectionTitle"
-        android:text="EMAIL"
+        android:text="@string/betaFeaturesEmail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -53,9 +53,15 @@
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsEmailProtection"
+        app:title="@string/betaFeaturesEmailProtectionTitle"
+        app:subtitle="@string/betaFeaturesEmailProtectionSubtitleWaitlist"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/whitelist" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/emailSettingDescription"
+        style="@style/SettingsMinorText"
+        android:layout_marginTop="8dp"
+        android:text="@string/betaFeaturesEmailProtectionDescription" />
 
 </LinearLayout>

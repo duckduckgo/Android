@@ -23,12 +23,11 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.security.GeneralSecurityException
@@ -40,16 +39,17 @@ interface EmailDataStore {
     var inviteCode: String?
     var waitlistTimestamp: Int
     var waitlistToken: String?
+    var sendNotification: Boolean
     fun nextAliasFlow(): StateFlow<String?>
 }
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class EmailEncryptedSharedPreferences(private val context: Context, private val pixel: Pixel) : EmailDataStore {
+class EmailEncryptedSharedPreferences(private val context: Context, private val pixel: Pixel, private val appCoroutineScope: CoroutineScope) : EmailDataStore {
 
     private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
-    override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow.asStateFlow()
+    override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
@@ -86,7 +86,7 @@ class EmailEncryptedSharedPreferences(private val context: Context, private val 
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) remove(KEY_NEXT_ALIAS)
                 else putString(KEY_NEXT_ALIAS, value)
-                GlobalScope.launch {
+                appCoroutineScope.launch {
                     nextAliasSharedFlow.emit(value)
                 }
             }
@@ -127,6 +127,14 @@ class EmailEncryptedSharedPreferences(private val context: Context, private val 
             }
         }
 
+    override var sendNotification: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_SEND_NOTIFICATION, false) ?: false
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_SEND_NOTIFICATION, value)
+            }
+        }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
         const val KEY_EMAIL_TOKEN = "KEY_EMAIL_TOKEN"
@@ -135,5 +143,6 @@ class EmailEncryptedSharedPreferences(private val context: Context, private val 
         const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
         const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
         const val KEY_INVITE_CODE = "KEY_INVITE_CODE"
+        const val KEY_SEND_NOTIFICATION = "KEY_SEND_NOTIFICATION"
     }
 }
