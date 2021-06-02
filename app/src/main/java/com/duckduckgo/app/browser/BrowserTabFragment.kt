@@ -96,6 +96,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -221,6 +222,10 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     var messageFromPreviousTab: Message? = null
 
@@ -1052,7 +1057,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(Dispatchers.Main) {
                 val origin = when (suggestion) {

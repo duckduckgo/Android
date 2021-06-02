@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +39,7 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(mockPixel, coroutinesTestRule.testDispatcherProvider)
+        testee = ShortcutReceiver(mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test

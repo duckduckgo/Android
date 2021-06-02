@@ -26,6 +26,9 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.beta.BetaFeaturesActivity
 import com.duckduckgo.app.browser.R
@@ -50,6 +53,8 @@ import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class SettingsActivity :
@@ -99,17 +104,17 @@ class SettingsActivity :
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-        automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
-        automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
+        automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+        automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
         betaFeaturesSetting.setOnClickListener { viewModel.onBetaFeatureSettingsClicked() }
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this,
-            { viewState ->
-                viewState?.let {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState ->
+                viewState.let {
                     version.setSubtitle(it.version)
                     lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                     autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
@@ -119,15 +124,12 @@ class SettingsActivity :
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                 }
-            }
-        )
+            }.launchIn(lifecycleScope)
 
-        viewModel.command.observe(
-            this,
-            {
-                processCommand(it)
-            }
-        )
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -155,14 +157,14 @@ class SettingsActivity :
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun launchAutomaticallyClearWhatDialog() {
-        val dialog = SettingsAutomaticallyClearWhatFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhatOption)
+    private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
+        val dialog = SettingsAutomaticallyClearWhatFragment.create(option)
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
     }
 
-    private fun launchAutomaticallyClearWhenDialog() {
-        val dialog = SettingsAutomaticallyClearWhenFragment.create(viewModel.viewState.value?.automaticallyClearData?.clearWhenOption)
+    private fun launchAutomaticallyClearWhenDialog(option: ClearWhenOption) {
+        val dialog = SettingsAutomaticallyClearWhenFragment.create(option)
         dialog.show(supportFragmentManager, CLEAR_WHEN_DIALOG_TAG)
         pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
@@ -176,8 +178,12 @@ class SettingsActivity :
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
             is Command.LaunchBetaFeatures -> launchBetaFeaturesScreen()
+            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
+            is Command.LaunchEmailDialog -> launchEmailDialog()
+            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
+            is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
+            null -> TODO()
         }
     }
 
@@ -223,8 +229,8 @@ class SettingsActivity :
         startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
     }
 
-    private fun launchFireAnimationSelector() {
-        val dialog = SettingsFireAnimationSelectorFragment.create(viewModel.viewState.value?.selectedFireAnimation)
+    private fun launchFireAnimationSelector(animation: FireAnimation) {
+        val dialog = SettingsFireAnimationSelectorFragment.create(animation)
         dialog.show(supportFragmentManager, FIRE_ANIMATION_SELECTOR_TAG)
     }
 

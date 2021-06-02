@@ -45,7 +45,11 @@ interface EmailDataStore {
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class EmailEncryptedSharedPreferences(private val context: Context, private val pixel: Pixel, private val appCoroutineScope: CoroutineScope) : EmailDataStore {
+class EmailEncryptedSharedPreferences(
+    private val context: Context,
+    private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
+) : EmailDataStore {
 
     private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
