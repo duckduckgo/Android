@@ -803,10 +803,10 @@ class BrowserTabFragment :
     }
 
     private fun openAppLinkDialog(
-            appIntent: Intent?,
-            excludedComponents: List<ComponentName>?,
-            url: String? = null,
-            headers: Map<String, String> = emptyMap()
+        appIntent: Intent?,
+        excludedComponents: List<ComponentName>?,
+        url: String? = null,
+        headers: Map<String, String> = emptyMap()
     ) {
         context?.let {
             if (appIntent != null) {
@@ -924,26 +924,26 @@ class BrowserTabFragment :
 
         if (isShowing != true) {
             alertDialog = AlertDialog.Builder(context)
-                    .setTitle(R.string.launchingAssociatedApp)
-                    .setMessage(getString(R.string.confirmOpenAssociatedApp))
-                    .setPositiveButton(R.string.yes) { _, _ ->
-                        onClick()
+                .setTitle(R.string.launchingAssociatedApp)
+                .setMessage(getString(R.string.confirmOpenAssociatedApp))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    onClick()
+                }
+                .setNeutralButton(R.string.closeTab) { dialog, _ ->
+                    dialog.dismiss()
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
                     }
-                    .setNeutralButton(R.string.closeTab) { dialog, _ ->
-                        dialog.dismiss()
-                        launch {
-                            viewModel.closeCurrentTab()
-                            destroyWebView()
-                        }
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                    if (url != null) {
+                        webView?.loadUrl(url, headers)
+                    } else {
+                        showToast(R.string.unableToOpenLink)
                     }
-                    .setNegativeButton(R.string.no) { _, _ ->
-                        if (url != null) {
-                            webView?.loadUrl(url, headers)
-                        } else {
-                            showToast(R.string.unableToOpenLink)
-                        }
-                    }
-                    .show()
+                }
+                .show()
         }
     }
 
