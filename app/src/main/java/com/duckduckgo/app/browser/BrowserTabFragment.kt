@@ -26,10 +26,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -46,6 +43,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.AnyThread
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -629,8 +627,11 @@ class BrowserTabFragment :
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleExternalAppLink -> {
-                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false, it.headers)
+            is Command.HandleAppLink -> {
+                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.url, it.headers)
+            }
+            is Command.HandleNonHttpAppLink -> {
+                openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -801,6 +802,31 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
+    private fun openAppLinkDialog(
+            appIntent: Intent?,
+            excludedComponents: List<ComponentName>?,
+            url: String? = null,
+            headers: Map<String, String> = emptyMap()
+    ) {
+        context?.let {
+            if (appIntent != null) {
+                launchAppLinkDialog(it, url, headers) { it.startActivity(appIntent) }
+            } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val title = getString(R.string.openExternalApp)
+                val chooserIntent = getChooserIntent(url, title, excludedComponents)
+                launchAppLinkDialog(it, url, headers) { it.startActivity(chooserIntent) }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
+        val urlIntent = Intent.parseUri(url, 0)
+        val chooserIntent = Intent.createChooser(urlIntent, title)
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+        return chooserIntent
+    }
+
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
@@ -890,6 +916,34 @@ class BrowserTabFragment :
                     dialog.dismiss()
                 }
                 .show()
+        }
+    }
+
+    private fun launchAppLinkDialog(context: Context, url: String?, headers: Map<String, String>, onClick: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(context)
+                    .setTitle(R.string.launchingAssociatedApp)
+                    .setMessage(getString(R.string.confirmOpenAssociatedApp))
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        onClick()
+                    }
+                    .setNeutralButton(R.string.closeTab) { dialog, _ ->
+                        dialog.dismiss()
+                        launch {
+                            viewModel.closeCurrentTab()
+                            destroyWebView()
+                        }
+                    }
+                    .setNegativeButton(R.string.no) { _, _ ->
+                        if (url != null) {
+                            webView?.loadUrl(url, headers)
+                        } else {
+                            showToast(R.string.unableToOpenLink)
+                        }
+                    }
+                    .show()
         }
     }
 

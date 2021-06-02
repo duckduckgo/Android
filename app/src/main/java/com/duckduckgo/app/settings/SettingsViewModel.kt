@@ -65,7 +65,8 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff
+        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
+        val appLinksEnabled: Boolean = true
     )
 
     sealed class EmailSetting {
@@ -122,7 +123,8 @@ class SettingsViewModel @Inject constructor(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-                    emailSetting = getEmailSetting()
+                    emailSetting = getEmailSetting(),
+                    appLinksEnabled = settingsDataStore.appLinksEnabled
                 )
             )
         }
@@ -209,6 +211,12 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
         viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+    }
+
+    fun onAppLinksSettingChanged(enabled: Boolean) {
+        Timber.i("User changed app links setting, is now enabled: $enabled")
+        settingsDataStore.appLinksEnabled = enabled
+        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksEnabled = enabled)) }
     }
 
     private fun obtainVersion(variantKey: String): String {

@@ -49,7 +49,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
-import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
@@ -278,7 +279,8 @@ class BrowserTabViewModel(
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        class HandleExternalAppLink(val appLink: IntentType, val headers: Map<String, String>) : Command()
+        class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
+        class HandleAppLink(val appLink: AppLink, val headers: Map<String, String>) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -568,8 +570,8 @@ class BrowserTabViewModel(
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         val type = specialUrlDetector.determineType(trimmedInput)
-        if (type is IntentType) {
-            externalAppLinkClicked(type)
+        if (type is NonHttpAppLink) {
+            nonHttpAppLinkClicked(type)
         } else {
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
@@ -1752,8 +1754,12 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
-    override fun externalAppLinkClicked(appLink: IntentType) {
-        command.value = HandleExternalAppLink(appLink, getUrlHeaders())
+    override fun appLinkClicked(appLink: AppLink) {
+        command.value = HandleAppLink(appLink, getUrlHeaders())
+    }
+
+    override fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
+        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders())
     }
 
     override fun openMessageInNewTab(message: Message) {

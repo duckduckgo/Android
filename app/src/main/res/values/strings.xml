@@ -65,6 +65,12 @@
     <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
+    <!-- Opening app links -->
+    <string name="launchingAssociatedApp">Open in associated app?</string>
+    <string name="confirmOpenAssociatedApp">Would you like to leave DuckDuckGo to view this content in another app?</string>
+    <string name="settingTitleOpenLinksInAssociatedApps">Open Links in Associated Apps</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Disable to prevent links from automatically opening in other installed apps.</string>
+
     <!-- Tabs -->
     <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabs</string>

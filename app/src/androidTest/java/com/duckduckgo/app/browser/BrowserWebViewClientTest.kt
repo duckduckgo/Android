@@ -38,6 +38,8 @@ import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
@@ -68,6 +70,8 @@ class BrowserWebViewClientTest {
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
+    private val webResourceRequest: WebResourceRequest = mock()
+    private val webViewClientListener: WebViewClientListener = mock()
 
     @UiThreadTest
     @Before
@@ -91,6 +95,8 @@ class BrowserWebViewClientTest {
             emailInjector
         )
         testee.webViewClientListener = listener
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
     }
 
     @UiThreadTest
@@ -259,6 +265,23 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, "")
         verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
+    }
+
+    @Test
+    fun whenAppLinkDetectedAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
+        whenever(webResourceRequest.isRedirect).thenReturn(true)
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+    }
+
+    @Test
+    fun whenAppLinkDetectedThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.AppLink()
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+        testee.webViewClientListener = webViewClientListener
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(webViewClientListener).appLinkClicked(urlType)
     }
 
     private class TestWebView(context: Context) : WebView(context)

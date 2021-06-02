@@ -68,9 +68,10 @@ class BrowserWebViewClient(
     /**
      * This is the new method of url overriding available from API 24 onwards
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
     }
 
     /**
@@ -79,13 +80,13 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, true)
+        return shouldOverride(view, url, isForMainFrame = true, isRedirect = false)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean, isRedirect: Boolean): Boolean {
 
         Timber.v("shouldOverride $url")
         try {
@@ -108,7 +109,14 @@ class BrowserWebViewClient(
                     webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
                     true
                 }
-                is SpecialUrlDetector.UrlType.IntentType -> {
+                is SpecialUrlDetector.UrlType.AppLink -> {
+                    if (isRedirect) {
+                        return false
+                    }
+                    launchExternalApp(urlType)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found intent type link for $urlType.url")
                     launchExternalApp(urlType)
                     true
@@ -142,8 +150,12 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.IntentType) {
-        webViewClientListener?.externalAppLinkClicked(urlType)
+    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.NonHttpAppLink) {
+        webViewClientListener?.nonHttpAppLinkClicked(urlType)
+    }
+
+    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.AppLink) {
+        webViewClientListener?.appLinkClicked(urlType)
     }
 
     @UiThread

@@ -16,9 +16,15 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
+import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -31,14 +37,17 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class IntentType(val url: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
+        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val url: String? = null) : UrlType()
+        class NonHttpAppLink(val url: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val url: String) : UrlType()
     }
-
 }
 
-class SpecialUrlDetectorImpl : SpecialUrlDetector {
+class SpecialUrlDetectorImpl(
+    private val context: Context,
+    private val settingsDataStore: SettingsDataStore
+) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
@@ -49,7 +58,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> UrlType.Web(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> checkForAppLink(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             JAVASCRIPT_SCHEME -> UrlType.SearchQuery(uriString)
             null -> UrlType.SearchQuery(uriString)
@@ -68,6 +77,52 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
+    private fun checkForAppLink(uriString: String): UrlType {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && settingsDataStore.appLinksEnabled) {
+            try {
+                val activities = queryActivities(uriString)
+                val nonBrowserActivities = keepNonBrowserActivities(activities)
+
+                if (nonBrowserActivities.isNotEmpty()) {
+                    nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
+                        val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
+                        return UrlType.AppLink(appIntent = nonBrowserIntent, url = uriString)
+                    }
+                    val excludedComponents = getExcludedComponents(activities)
+                    return UrlType.AppLink(excludedComponents = excludedComponents, url = uriString)
+                }
+            } catch (e: URISyntaxException) {
+                Timber.w(e, "Failed to parse uri $uriString")
+            }
+        }
+        return UrlType.Web(uriString)
+    }
+
+    @Throws(URISyntaxException::class)
+    private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
+        val browsableIntent = Intent.parseUri(uriString, 0)
+        browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
+        return context.packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
+    }
+
+    private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {
+        return activities.filter { resolveInfo ->
+            resolveInfo.filter != null && !(resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0)
+        }
+    }
+    @Throws(URISyntaxException::class)
+    private fun buildNonBrowserIntent(nonBrowserActivity: ResolveInfo, uriString: String): Intent {
+        val intent = Intent.parseUri(uriString, 0)
+        intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
+        return intent
+    }
+
+    private fun getExcludedComponents(activities: List<ResolveInfo>): List<ComponentName> {
+        return activities.filter { resolveInfo ->
+            resolveInfo.filter != null && (resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0)
+        }.map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
+    }
+
     private fun checkForIntent(scheme: String, uriString: String): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
         if (scheme.matches(validUriSchemeRegex)) {
@@ -81,7 +136,7 @@ class SpecialUrlDetectorImpl : SpecialUrlDetector {
         return try {
             val intent = Intent.parseUri(uriString, 0)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
-            UrlType.IntentType(url = uriString, intent = intent, fallbackUrl = fallbackUrl)
+            UrlType.NonHttpAppLink(url = uriString, intent = intent, fallbackUrl = fallbackUrl)
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
             return UrlType.Unknown(uriString)

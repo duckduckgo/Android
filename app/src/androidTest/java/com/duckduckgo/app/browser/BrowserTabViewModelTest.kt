@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
@@ -264,6 +265,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockFavoritesRepository: FavoritesRepository
 
+    @Mock
+    private lateinit var mockContext: Context
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -352,7 +356,7 @@ class BrowserTabViewModelTest {
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetectorImpl(),
+            specialUrlDetector = SpecialUrlDetectorImpl(mockContext, mockSettingsStore),
             faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
@@ -3011,24 +3015,24 @@ class BrowserTabViewModelTest {
     @Test
     fun whenExternalAppLinkClickedIfGpcIsEnabledThenAddHeaderToUrl() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
-        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
-        testee.externalAppLinkClicked(intentType)
+        testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
         assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
     }
 
     @Test
     fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
-        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
-        testee.externalAppLinkClicked(intentType)
+        testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
         assertTrue(command.headers.isEmpty())
     }
 
@@ -3195,6 +3199,13 @@ class BrowserTabViewModelTest {
         testee.showEmailTooltip()
 
         assertCommandNotIssued<Command.ShowEmailTooltip>()
+    }
+
+    @Test
+    fun whenAppLinkClickedThenAppLinkCommandSent() {
+        testee.appLinkClicked(SpecialUrlDetector.UrlType.AppLink())
+
+        assertCommandIssued<Command.HandleAppLink>()
     }
 
     private suspend fun givenFireButtonPulsing() {
