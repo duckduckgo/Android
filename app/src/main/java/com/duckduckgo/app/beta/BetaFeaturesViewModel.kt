@@ -17,17 +17,19 @@
 package com.duckduckgo.app.beta
 
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -35,30 +37,28 @@ class BetaFeaturesViewModel(
     private val emailManager: EmailManager
 ) : ViewModel(), LifecycleObserver {
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
-        value = ViewState()
+    private val viewState: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
+    val viewFlow: StateFlow<ViewState> = viewState
+
+    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val commandsFlow = commandChannel.receiveAsFlow()
+
+    fun resume() {
+        viewModelScope.launch {
+            emitViewState()
+        }
     }
 
-    private fun currentViewState(): ViewState {
-        return viewState.value!!
-    }
-
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    init {
-        emailManager.signedInFlow().onEach {
-            loadInitialData()
-        }.launchIn(viewModelScope)
-    }
-
-    fun loadInitialData() {
-        viewState.value = ViewState(emailState = getEmailState())
+    private suspend fun emitViewState() {
+        viewState.emit(ViewState(emailState = getEmailState()))
     }
 
     fun onEmailSettingClicked() {
-        when (val emailSetting = getEmailSetting()) {
-            is EmailSetting.EmailSettingOff -> command.value = Command.LaunchEmailSignIn
-            is EmailSetting.EmailSettingOn -> command.value = Command.LaunchEmailSignOut(emailSetting.emailAddress)
+        viewModelScope.launch {
+            when (val emailSetting = getEmailSetting()) {
+                is EmailSetting.EmailSettingOff -> commandChannel.send(Command.LaunchEmailSignIn)
+                is EmailSetting.EmailSettingOn -> commandChannel.send(Command.LaunchEmailSignOut(emailSetting.emailAddress))
+            }
         }
     }
 

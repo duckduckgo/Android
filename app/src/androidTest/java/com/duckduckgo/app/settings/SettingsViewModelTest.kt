@@ -23,14 +23,12 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.EmailSetting
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -77,9 +75,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
-    @Mock
-    private lateinit var mockEmailManager: EmailManager
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -89,7 +84,7 @@ class SettingsViewModelTest {
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockEmailManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
@@ -375,75 +370,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserNotSignedInOnEmailThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        testee.viewState().test {
-            givenUserIsNotSignedIn()
-            testee.start()
-
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserSignedInOnEmailAndEmailAddressIsNotNullThenEmailSettingIsOn() = coroutineTestRule.runBlocking {
-        givenUserIsSignedInAndHasAliasAvailable()
-        testee.start()
-
-        testee.viewState().test {
-            assertTrue(expectItem().emailSetting is EmailSetting.EmailSettingOn)
-
-            cancelAndConsumeRemainingEvents()
-        }
-
-    }
-
-    @Test
-    fun whenUserSignedInOnEmailAndEmailAddressIsNullThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        testee.start()
-
-        testee.viewState().test {
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnEmailLogoutThenSignOutIsCalled() {
-        testee.onEmailLogout()
-
-        verify(mockEmailManager).signOut()
-    }
-
-    @Test
-    fun whenOnEmailLogoutThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        testee.viewState().test {
-            testee.onEmailLogout()
-
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnEmailSettingClickedAndUserIsSignedInThenLaunchEmailDialogCommandSent() = coroutineTestRule.runBlocking {
-        testee.commands().test {
-            givenUserIsSignedInAndHasAliasAvailable()
-
-            testee.onEmailSettingClicked()
-
-            assertEquals(Command.LaunchEmailDialog, expectItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialog() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onAutomaticallyClearWhatClicked()
@@ -465,13 +391,15 @@ class SettingsViewModelTest {
         }
     }
 
-    private fun givenUserIsSignedInAndHasAliasAvailable() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-    }
+    @Test
+    fun whenOnBetaFeatureSettingsClickedThenEmitCommandLaunchBetaFeatures() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            testee.onBetaFeatureSettingsClicked()
 
-    private fun givenUserIsNotSignedIn() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
+            assertEquals(Command.LaunchBetaFeatures, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {

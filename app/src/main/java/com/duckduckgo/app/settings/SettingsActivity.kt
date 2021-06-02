@@ -180,7 +180,6 @@ class SettingsActivity :
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchBetaFeatures -> launchBetaFeaturesScreen()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
-            is Command.LaunchEmailDialog -> launchEmailDialog()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             null -> TODO()

@@ -21,17 +21,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.addRepeatingJob
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.email.ui.EmailProtectionSignOutActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_beta_features.emailSetting
 import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class BetaFeaturesActivity : DuckDuckGoActivity() {
 
     private val viewModel: BetaFeaturesViewModel by bindViewModel()
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.viewFlow.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { setEmailSetting(it.emailState) }.launchIn(lifecycleScope)
+        viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,29 +48,11 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
 
         configureUiEventHandlers()
-        observeViewModel()
     }
 
-    private fun observeViewModel() {
-        addRepeatingJob(Lifecycle.State.CREATED) {
-            viewModel.loadInitialData()
-        }
-
-        viewModel.viewState.observe(
-            this,
-            { viewState ->
-                viewState?.let {
-                    setEmailSetting(it.emailState)
-                }
-            }
-        )
-
-        viewModel.command.observe(
-            this,
-            {
-                processCommand(it)
-            }
-        )
+    override fun onResume() {
+        super.onResume()
+        viewModel.resume()
     }
 
     private fun setEmailSetting(emailData: BetaFeaturesViewModel.EmailState) {

@@ -20,14 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
-import com.duckduckgo.app.beta.BetaFeaturesViewModel
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
-import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.waitlist.WaitlistSyncWorkRequestBuilder
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow

@@ -19,7 +19,6 @@ package com.duckduckgo.app.email
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
