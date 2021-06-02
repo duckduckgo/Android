@@ -92,11 +92,6 @@ class SpecialUrlDetectorImplTest {
         whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildBrowserResolveInfo()))
         val type = testee.determineType("https://example.com")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
-        } else {
-            verifyZeroInteractions(mockPackageManager)
-        }
         assertTrue(type is Web)
     }
 
@@ -114,7 +109,6 @@ class SpecialUrlDetectorImplTest {
         whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
         given(mockPackageManager.queryIntentActivities(any(), anyInt())).willAnswer { throw URISyntaxException("", "") }
         val type = testee.determineType("https://example.com")
-        verifyZeroInteractions(mockPackageManager)
         assertTrue(type is Web)
     }
 
