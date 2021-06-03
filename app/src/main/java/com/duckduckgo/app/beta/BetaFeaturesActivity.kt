@@ -38,7 +38,7 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.viewFlow.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { setEmailSetting(it.emailState) }.launchIn(lifecycleScope)
+        viewModel.viewFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { setEmailSetting(it.emailState) }.launchIn(lifecycleScope)
         viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
     }
 

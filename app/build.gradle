@@ -171,7 +171,6 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
-    implementation AndroidX.lifecycle.runtimeKtx
 
     implementation  AndroidX.lifecycle.commonJava8
     testImplementation AndroidX.archCore.testing
