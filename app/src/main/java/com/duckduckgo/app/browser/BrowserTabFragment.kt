@@ -929,13 +929,6 @@ class BrowserTabFragment :
                 .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
                 }
-                .setNeutralButton(R.string.closeTab) { dialog, _ ->
-                    dialog.dismiss()
-                    launch {
-                        viewModel.closeCurrentTab()
-                        destroyWebView()
-                    }
-                }
                 .setNegativeButton(R.string.no) { _, _ ->
                     if (url != null) {
                         webView?.loadUrl(url, headers)

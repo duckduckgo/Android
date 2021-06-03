@@ -110,7 +110,7 @@ class BrowserWebViewClient(
                     true
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
-                    if (isRedirect) {
+                    if (isRedirect || !isForMainFrame) {
                         return false
                     }
                     launchExternalApp(urlType)

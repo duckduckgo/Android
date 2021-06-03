@@ -268,28 +268,42 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenAppLinkDetectedThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
-        val urlType = SpecialUrlDetector.UrlType.AppLink()
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val urlType = SpecialUrlDetector.UrlType.AppLink()
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener).appLinkClicked(urlType)
-        } else {
-            assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener, never()).appLinkClicked(any())
         }
     }
 
     @Test
     fun whenAppLinkDetectedAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
             whenever(webResourceRequest.isRedirect).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).appLinkClicked(any())
-        } else {
+        }
+    }
+
+    @Test
+    fun whenAppLinkDetectedAndIsNotForMainFrameThenReturnFalse() = coroutinesTestRule.runBlocking {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verify(listener, never()).appLinkClicked(any())
+        }
+    }
+
+    @Test
+    fun whenAppLinkDetectedOnApiLessThan24ThenReturnFalse() = coroutinesTestRule.runBlocking {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
             assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener, never()).appLinkClicked(any())
         }
