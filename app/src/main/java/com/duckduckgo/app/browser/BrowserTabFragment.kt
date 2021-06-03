@@ -118,6 +118,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -1488,7 +1489,7 @@ class BrowserTabFragment :
     @SuppressLint("NewApi")
     private fun launchAddWidget() {
         val context = context ?: return
-        val provider = ComponentName(context, SearchWidgetLight::class.java)
+        val provider = ComponentName(context, SearchAndFavoritesWidget::class.java)
         AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
     }
 

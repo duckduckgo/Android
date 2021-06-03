@@ -324,6 +324,14 @@
             android:label="@string/globalPrivacyControlActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
 
+        <activity
+            android:name="com.duckduckgo.app.WidgetThemeConfiguration"
+            android:label="Widget Configuration">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -346,6 +354,15 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info_light" />
+        </receiver>
+
+        <receiver android:name="com.duckduckgo.widget.SearchAndFavoritesWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/search_favorites_widget_info" />
         </receiver>
 
     </application>
