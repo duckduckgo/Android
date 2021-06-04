@@ -33,7 +33,7 @@
     <string name="clearButtonContentDescription">Vymazat vyhledávací vstup</string>
     <string name="no_compatible_third_party_app_installed">Nebyla nainstalována žádná kompatibilní aplikace</string>
     <string name="addBookmarkMenuTitle">Přidat záložku</string>
-    <string name="requestDesktopSiteMenuTitle">Stránka plochy</string>
+    <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
@@ -477,7 +477,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Weby s ochranou</string>
     <string name="settingsFireproofWebsites">Weby s ochranou</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Web s ochranou</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ochránit web</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt;je nyní chráněný! Pro správu navštivte Nastavení.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
