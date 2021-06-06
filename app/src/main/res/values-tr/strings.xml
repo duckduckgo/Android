@@ -20,7 +20,7 @@
     <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserMaybeLater">Belki Sonra</string>
     <string name="defaultBrowserLetsDoIt">Varsayılan tarayıcı olarak ayarla</string>
-    <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla linkleri açın.</string>
     <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
     <!-- Browser Activity -->
@@ -29,7 +29,7 @@
     <string name="back">Geri</string>
     <string name="forward">İleri</string>
 
-    <string name="omnibarInputHint">URL\'yi arayın veya bir URL yazın</string>
+    <string name="omnibarInputHint">Ara ya da URL gir</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
@@ -83,7 +83,7 @@
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
-    <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
+    <string name="privacyProtectionEnabled">SİTE KORUMASI ETKİN</string>
     <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
@@ -164,10 +164,10 @@
     <string name="settingsAutomaticallyClearWhen">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktifse</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktifse</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktifse</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktifse</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
 
     <!-- About Activity -->
