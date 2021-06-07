@@ -64,6 +64,7 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+    var appLinkTriggered = false
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -110,14 +111,18 @@ class BrowserWebViewClient(
                     true
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
-                    if (isRedirect || !isForMainFrame) {
+                    Timber.i("Found app link for ${urlType.url}")
+                    if (isRedirect && appLinkTriggered || !isForMainFrame) {
                         return false
                     }
                     launchExternalApp(urlType)
                     true
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
-                    Timber.i("Found intent type link for $urlType.url")
+                    Timber.i("Found intent type link for ${urlType.url}")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkTriggered) {
+                        return true
+                    }
                     launchExternalApp(urlType)
                     true
                 }
@@ -176,6 +181,7 @@ class BrowserWebViewClient(
             emailInjector.resetInjectedJsFlag()
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+            appLinkTriggered = false
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)

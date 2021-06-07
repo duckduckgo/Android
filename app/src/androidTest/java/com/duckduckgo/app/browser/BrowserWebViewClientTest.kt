@@ -45,7 +45,6 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.lang.RuntimeException
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -279,11 +278,12 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkDetectedAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
+    fun whenAppLinkTriggeredAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
             whenever(webResourceRequest.isRedirect).thenReturn(true)
             whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+            testee.appLinkTriggered = true
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).appLinkClicked(any())
         }

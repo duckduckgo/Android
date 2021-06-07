@@ -928,10 +928,12 @@ class BrowserTabFragment :
                 .setMessage(getString(R.string.confirmOpenAssociatedApp))
                 .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
+                    webViewClient.appLinkTriggered = false
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
                     if (url != null) {
                         webView?.loadUrl(url, headers)
+                        webViewClient.appLinkTriggered = true
                     } else {
                         showToast(R.string.unableToOpenLink)
                     }
