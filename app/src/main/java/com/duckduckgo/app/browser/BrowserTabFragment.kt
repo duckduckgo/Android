@@ -924,7 +924,7 @@ class BrowserTabFragment :
 
         if (isShowing != true) {
             alertDialog = AlertDialog.Builder(context)
-                .setTitle(R.string.launchingExternalApp)
+                .setTitle(R.string.appLinkDialogTitle)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
