@@ -43,19 +43,19 @@ class EmailProtectionViewModel(
     private val waitlistSyncWorkRequestBuilder: WaitlistSyncWorkRequestBuilder,
 ) : ViewModel() {
 
-    private val viewState: MutableStateFlow<UiState> = MutableStateFlow(UiState(waitlistState = emailManager.waitlistState()))
-    val viewFlow: StateFlow<UiState> = viewState
+    private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(ViewState(waitlistState = emailManager.waitlistState()))
+    val viewState: StateFlow<ViewState> = viewStateFlow
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val commandsFlow = commandChannel.receiveAsFlow()
+    val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
         data class OpenUrl(val url: String, val openInBrowser: Boolean) : Command()
-        data class ShowErrorMessage(val error: String) : Command()
+        object ShowErrorMessage : Command()
         object ShowNotificationDialog : Command()
     }
 
-    data class UiState(val waitlistState: AppEmailManager.WaitlistState)
+    data class ViewState(val waitlistState: AppEmailManager.WaitlistState)
 
     fun haveADuckAddress() {
         viewModelScope.launch {
@@ -75,7 +75,7 @@ class EmailProtectionViewModel(
         }.onSuccess {
             joinedWaitlist(it.timestamp, it.token)
         }.onFailure {
-            commandChannel.send(Command.ShowErrorMessage("Something went wrong"))
+            commandChannel.send(Command.ShowErrorMessage)
         }
     }
 
@@ -94,7 +94,7 @@ class EmailProtectionViewModel(
     private fun joinedWaitlist(timestamp: Int, token: String) {
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
-            viewState.emit(UiState(emailManager.waitlistState()))
+            viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             commandChannel.send(Command.ShowNotificationDialog)
         }
 

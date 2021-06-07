@@ -50,8 +50,8 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        viewModel.viewFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
-        viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,22 +72,22 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         getStartedButton.setOnClickListener { viewModel.haveAnInviteCode() }
     }
 
-    private fun render(uiState: EmailProtectionViewModel.UiState) {
-        when (uiState.waitlistState) {
+    private fun render(viewState: EmailProtectionViewModel.ViewState) {
+        when (viewState.waitlistState) {
             is AppEmailManager.WaitlistState.JoinedQueue -> renderJoinedQueue()
             is AppEmailManager.WaitlistState.InBeta -> renderInBeta()
             is AppEmailManager.WaitlistState.NotJoinedQueue -> renderNotJoinedQueue()
         }
     }
 
-    private fun renderErrorMessage(error: String) {
-        Toast.makeText(applicationContext, error, Toast.LENGTH_LONG).show()
+    private fun renderErrorMessage() {
+        Toast.makeText(applicationContext, R.string.emailProtectionErrorJoiningWaitlist, Toast.LENGTH_LONG).show()
     }
 
     private fun executeCommand(command: EmailProtectionViewModel.Command) {
         when (command) {
             is EmailProtectionViewModel.Command.OpenUrl -> openWebsite(command.url, command.openInBrowser)
-            is EmailProtectionViewModel.Command.ShowErrorMessage -> renderErrorMessage(command.error)
+            is EmailProtectionViewModel.Command.ShowErrorMessage -> renderErrorMessage()
             is EmailProtectionViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
         }
     }
