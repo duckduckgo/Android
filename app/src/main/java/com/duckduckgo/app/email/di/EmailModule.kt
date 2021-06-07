@@ -68,8 +68,7 @@ class EmailModule {
     @Provides
     fun providesWaitlistCodeFetcher(
         context: Context,
-        emailService: EmailService,
-        emailDataStore: EmailDataStore,
+        emailManager: EmailManager,
         notification: WaitlistCodeNotification,
         factory: NotificationFactory,
         notificationDao: NotificationDao,
@@ -77,7 +76,7 @@ class EmailModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): WaitlistCodeFetcher {
-        return AppWaitlistCodeFetcher(context, emailService, emailDataStore, notification, factory, notificationDao, manager, dispatcherProvider, appCoroutineScope)
+        return AppWaitlistCodeFetcher(context, emailManager, notification, factory, notificationDao, manager, dispatcherProvider, appCoroutineScope)
     }
 
     @Provides

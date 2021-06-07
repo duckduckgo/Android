@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface EmailManager : LifecycleObserver {
@@ -37,6 +38,8 @@ interface EmailManager : LifecycleObserver {
     fun waitlistState(): AppEmailManager.WaitlistState
     fun joinWaitlist(timestamp: Int, token: String)
     fun getInviteCode(): String
+    fun doesCodeAlreadyExist(): Boolean
+    suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
 }
 
 class AppEmailManager(
@@ -98,6 +101,32 @@ class AppEmailManager(
         return emailDataStore.inviteCode.orEmpty()
     }
 
+    override suspend fun fetchInviteCode(): FetchCodeResult {
+        Timber.i("Running email waitlist sync")
+        val token = emailDataStore.waitlistToken
+        val timestamp = emailDataStore.waitlistTimestamp
+        if (doesCodeAlreadyExist()) return FetchCodeResult.CodeExisted
+        return withContext(dispatcherProvider.io()) {
+            try {
+                Timber.i("Running waitlist status")
+                val waitlistTimestamp = emailService.waitlistStatus().timestamp
+                if (timestamp >= waitlistTimestamp && token != null) {
+                    val inviteCode = emailService.getCode(token).code
+                    Timber.i("Running waitlist getcode response is $inviteCode")
+                    if (inviteCode.isNotEmpty()) {
+                        emailDataStore.inviteCode = inviteCode
+                        return@withContext FetchCodeResult.Code
+                    }
+                }
+                return@withContext FetchCodeResult.NoCode
+            } catch (e: Exception) {
+                return@withContext FetchCodeResult.NoCode
+            }
+        }
+    }
+
+    override fun doesCodeAlreadyExist(): Boolean = emailDataStore.inviteCode != null
+
     private fun consumeAlias(): String? {
         val alias = nextAliasFlow.value
         emailDataStore.clearNextAlias()
@@ -125,6 +154,12 @@ class AppEmailManager(
                 Timber.w(it, "Failed to fetch alias")
             }
         }
+    }
+
+    sealed class FetchCodeResult {
+        object Code: FetchCodeResult()
+        object NoCode: FetchCodeResult()
+        object CodeExisted: FetchCodeResult()
     }
 
     sealed class WaitlistState {

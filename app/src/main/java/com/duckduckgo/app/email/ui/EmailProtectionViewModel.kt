@@ -98,7 +98,7 @@ class EmailProtectionViewModel(
             commandChannel.send(Command.ShowNotificationDialog)
         }
 
-        val workRequest = waitlistSyncWorkRequestBuilder.appConfigurationWork()
+        val workRequest = waitlistSyncWorkRequestBuilder.wailistWork()
         workManager.enqueueUniquePeriodicWork(WaitlistSyncWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }
 

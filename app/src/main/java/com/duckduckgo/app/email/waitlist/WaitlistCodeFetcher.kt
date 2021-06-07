@@ -21,10 +21,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import androidx.work.ListenableWorker
 import androidx.work.WorkManager
-import com.duckduckgo.app.email.api.EmailService
-import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.AppEmailManager
+import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
+import com.duckduckgo.app.email.AppEmailManager.FetchCodeResult.*
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.waitlist.WaitlistSyncWorkRequestBuilder.Companion.EMAIL_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationFactory
@@ -37,13 +38,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface WaitlistCodeFetcher : LifecycleObserver {
-    suspend fun fetchInviteCode(): ListenableWorker.Result
+    suspend fun fetchInviteCode()
 }
 
 class AppWaitlistCodeFetcher(
     private val context: Context,
-    private val emailService: EmailService,
-    private val emailDataStore: EmailDataStore,
+    private val emailManager: EmailManager,
     private val notification: WaitlistCodeNotification,
     private val factory: NotificationFactory,
     private val notificationDao: NotificationDao,
@@ -55,46 +55,26 @@ class AppWaitlistCodeFetcher(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun configureWaitlistCodeFetcher() {
         appCoroutineScope.launch {
-            if (doesCodeAlreadyExist()) {
+            if (emailManager.doesCodeAlreadyExist()) {
+                cancelWorker()
                 return@launch
-            } else if (emailDataStore.waitlistTimestamp > -1 && emailDataStore.waitlistToken != null) {
+            } else if (emailManager.waitlistState() == JoinedQueue) {
                 fetchInviteCode()
             }
         }
     }
 
-    override suspend fun fetchInviteCode(): ListenableWorker.Result {
+    override suspend fun fetchInviteCode() {
         Timber.i("Running email waitlist sync")
-        val token = emailDataStore.waitlistToken
-        val timestamp = emailDataStore.waitlistTimestamp
-        if (doesCodeAlreadyExist()) return ListenableWorker.Result.success()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            try {
-                Timber.i("Running waitlist status")
-                val waitlistTimestamp = emailService.waitlistStatus().timestamp
-                if (timestamp > waitlistTimestamp && token != null) {
-                    val inviteCode = emailService.getCode(token).code
-                    Timber.i("Running waitlist getcode response is $inviteCode")
-                    if (inviteCode.isNotEmpty()) {
-                        emailDataStore.inviteCode = inviteCode
-                        sendNotification()
-                        cancelWorker()
-                    }
+            when (emailManager.fetchInviteCode()) {
+                CodeExisted -> cancelWorker()
+                Code -> sendNotification()
+                NoCode -> {
+                    // NOOP
                 }
-                ListenableWorker.Result.success()
-            } catch (e: Exception) {
-                ListenableWorker.Result.failure()
             }
         }
-        return ListenableWorker.Result.success()
-    }
-
-    private fun doesCodeAlreadyExist(): Boolean {
-        if (emailDataStore.inviteCode != null) {
-            cancelWorker()
-            return true
-        }
-        return false
     }
 
     private fun cancelWorker() {

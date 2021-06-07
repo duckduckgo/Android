@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 class WaitlistSyncWorkRequestBuilder @Inject constructor() {
 
-    fun appConfigurationWork(): PeriodicWorkRequest {
+    fun wailistWork(): PeriodicWorkRequest {
         return PeriodicWorkRequestBuilder<EmailWaitlistWorker>(1, TimeUnit.HOURS)
             .setConstraints(networkAvailable())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.HOURS)
@@ -55,7 +55,8 @@ class EmailWaitlistWorker(context: Context, workerParams: WorkerParameters) : Co
     lateinit var waitlistCodeFetcher: WaitlistCodeFetcher
 
     override suspend fun doWork(): Result {
-        return waitlistCodeFetcher.fetchInviteCode()
+        waitlistCodeFetcher.fetchInviteCode()
+        return Result.success()
     }
 }
 
