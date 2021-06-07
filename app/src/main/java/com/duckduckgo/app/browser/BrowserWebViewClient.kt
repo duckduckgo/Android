@@ -112,7 +112,7 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.url}")
-                    if (isRedirect && appLinkTriggered || !isForMainFrame) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || isRedirect && appLinkTriggered || !isForMainFrame) {
                         return false
                     }
                     launchExternalApp(urlType)
