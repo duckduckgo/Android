@@ -18,6 +18,7 @@ package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailService
@@ -182,6 +183,62 @@ class AppEmailManagerTest {
         whenever(mockEmailDataStore.emailUsername).thenReturn("username")
 
         assertEquals("username$DUCK_EMAIL_DOMAIN", testee.getEmailAddress())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampExistsAndCodeDoesNotExistThenReturnJoinedQueue() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+
+        assertEquals(JoinedQueue, testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampExistsAndCodeExistsThenReturnInBeta() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.inviteCode).thenReturn("abcde")
+
+        assertEquals(InBeta, testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampAndCodeDoesNotExistThenReturnNotJoinedQueue() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(-1)
+        whenever(mockEmailDataStore.inviteCode).thenReturn(null)
+
+        assertEquals(NotJoinedQueue, testee.waitlistState())
+    }
+
+    @Test
+    fun whenJoinWaitlistIfTimestampAndTokenDidNotExistThenStoreTimestampAndToken() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(-1)
+        whenever(mockEmailDataStore.waitlistToken).thenReturn(null)
+
+        testee.joinWaitlist(1234, "abcde")
+
+        verify(mockEmailDataStore).waitlistTimestamp = 1234
+        verify(mockEmailDataStore).waitlistToken = "abcde"
+    }
+    @Test
+    fun whenJoinWaitlistIfTimestampAndTokenDidExistThenStoreTimestampAndTokenAreNotStored() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.waitlistToken).thenReturn("abcde")
+
+        testee.joinWaitlist(4321, "edcba")
+
+        verify(mockEmailDataStore, never()).waitlistTimestamp = 4321
+        verify(mockEmailDataStore, never()).waitlistToken = "edcba"
+    }
+
+    @Test
+    fun whenGetInviteCodeIfCodeExistsThenReturnCode() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn("abcde")
+        assertEquals("abcde", testee.getInviteCode())
+    }
+
+    @Test
+    fun whenGetInviteCodeIfCodeDoesNotExistThenReturnEmpty() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn(null)
+        assertEquals("", testee.getInviteCode())
     }
 
     private suspend fun givenNextAliasExists() {
