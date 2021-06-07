@@ -27,8 +27,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.email.api.EmailAlias
+import com.duckduckgo.app.email.api.EmailInviteCodeResponse
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.api.WaitlistResponse
+import com.duckduckgo.app.email.api.WaitlistStatusResponse
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.LOGIN_URL
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Command.*
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.ADDRESS_BLOG_POST
@@ -39,24 +42,15 @@ import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Proxy
+import java.lang.Exception
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -69,7 +63,6 @@ class EmailProtectionViewModelTest {
 
     private val mockEmailManager: EmailManager = mock()
     private var mockEmailService: EmailService = mock()
-    private lateinit var emailService: EmailService
     private val waitlistBuilder: WaitlistSyncWorkRequestBuilder = WaitlistSyncWorkRequestBuilder()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val server = MockWebServer()
@@ -175,9 +168,8 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenJoinTheWaitlistAndCallFailsThenEmitShowErrorMessageCommand() = runBlocking {
-        givenJoinWaitlistFails()
-        testee = EmailProtectionViewModel(mockEmailManager, emailService, workManager, waitlistBuilder)
+    fun whenJoinTheWaitlistAndCallFailsThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
+        testee = EmailProtectionViewModel(mockEmailManager, TestEmailService(), workManager, waitlistBuilder)
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -213,29 +205,13 @@ class EmailProtectionViewModelTest {
         workManager = WorkManager.getInstance(context)
     }
 
-    private fun givenJoinWaitlistFails() {
-        configureStubNetworking()
-        queueError()
-    }
+    class TestEmailService : EmailService {
+        override suspend fun newAlias(authorization: String): EmailAlias = EmailAlias("test")
 
-    private fun queueError() {
-        server.enqueue(MockResponse().setResponseCode(400))
-    }
+        override suspend fun joinWaitlist(): WaitlistResponse { throw Exception() }
 
-    private fun configureStubNetworking() {
-        server.start()
+        override suspend fun waitlistStatus(): WaitlistStatusResponse = WaitlistStatusResponse(1234)
 
-        val okHttpClient = OkHttpClient.Builder()
-            .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(InetAddress.getLocalHost(), server.port)))
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(server.url("localhost/").toString())
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
-            .build()
-
-        emailService = retrofit.create(EmailService::class.java)
+        override suspend fun getCode(token: String): EmailInviteCodeResponse = EmailInviteCodeResponse("token")
     }
 }
