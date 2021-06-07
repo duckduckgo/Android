@@ -924,8 +924,8 @@ class BrowserTabFragment :
 
         if (isShowing != true) {
             alertDialog = AlertDialog.Builder(context)
-                .setTitle(R.string.launchingAssociatedApp)
-                .setMessage(getString(R.string.confirmOpenAssociatedApp))
+                .setTitle(R.string.launchingExternalApp)
+                .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
                     webViewClient.appLinkTriggered = false
