@@ -43,18 +43,18 @@ class EmailProtectionSignOutActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
     }
 
     private val contactUsSpan = object : NonUnderlinedClickableSpan() {
         override fun onClick(widget: View) {
             val intent = Intent(Intent.ACTION_SENDTO)
             intent.data = Uri.parse("mailto:support@duck.com")
-            openExternalDialog(intent)
+            openExternalApp(intent)
         }
     }
 
-    private fun openExternalDialog(intent: Intent) {
+    private fun openExternalApp(intent: Intent) {
         val title = getString(R.string.openExternalApp)
         val intentChooser = Intent.createChooser(intent, title)
         startActivity(intentChooser)
@@ -82,7 +82,7 @@ class EmailProtectionSignOutActivity : DuckDuckGoActivity() {
         val htmlString = getString(R.string.emailProtectionSignOutFooter).html(this)
         val spannableString = SpannableStringBuilder(htmlString)
         val urlSpans = htmlString.getSpans(0, htmlString.length, URLSpan::class.java)
-        urlSpans?.forEachIndexed { index, urlSpan ->
+        urlSpans?.forEach { urlSpan ->
             spannableString.apply {
                 setSpan(
                     contactUsSpan,

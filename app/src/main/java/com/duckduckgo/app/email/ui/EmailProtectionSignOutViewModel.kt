@@ -34,7 +34,7 @@ class EmailProtectionSignOutViewModel(
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val commandsFlow = commandChannel.receiveAsFlow()
+    val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
         object SignOut : Command()
