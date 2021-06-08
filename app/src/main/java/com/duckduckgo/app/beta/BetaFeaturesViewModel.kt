@@ -37,75 +37,26 @@ class BetaFeaturesViewModel(
     private val emailManager: EmailManager
 ) : ViewModel(), LifecycleObserver {
 
-    private val viewState: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
-    val viewFlow: StateFlow<ViewState> = viewState
-
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commandsFlow = commandChannel.receiveAsFlow()
 
-    fun resume() {
-        viewModelScope.launch {
-            emitViewState()
-        }
-    }
-
-    private suspend fun emitViewState() {
-        viewState.emit(ViewState(emailState = getEmailState()))
-    }
-
     fun onEmailSettingClicked() {
         viewModelScope.launch {
-            when (val emailSetting = getEmailSetting()) {
-                is EmailSetting.EmailSettingOff -> commandChannel.send(Command.LaunchEmailSignIn)
-                is EmailSetting.EmailSettingOn -> commandChannel.send(Command.LaunchEmailSignOut(emailSetting.emailAddress))
-            }
-        }
-    }
-
-    private fun getEmailState(): EmailState {
-        return when (getEmailSetting()) {
-            is EmailSetting.EmailSettingOff -> {
-                when (emailManager.waitlistState()) {
-                    is AppEmailManager.WaitlistState.InBeta -> EmailState.Disabled
-                    is AppEmailManager.WaitlistState.JoinedQueue -> EmailState.Disabled
-                    is AppEmailManager.WaitlistState.NotJoinedQueue -> EmailState.JoinWaitlist
+            val emailAddress = emailManager.getEmailAddress()
+            if (emailManager.isSignedIn()) {
+                when (emailAddress) {
+                    null -> commandChannel.send(Command.LaunchEmailSignIn)
+                    else -> commandChannel.send(Command.LaunchEmailSignOut(emailAddress))
                 }
+            } else {
+                commandChannel.send(Command.LaunchEmailSignIn)
             }
-            is EmailSetting.EmailSettingOn -> EmailState.Enabled
         }
     }
-
-    private fun getEmailSetting(): EmailSetting {
-        val emailAddress = emailManager.getEmailAddress()
-
-        return if (emailManager.isSignedIn()) {
-            when (emailAddress) {
-                null -> EmailSetting.EmailSettingOff
-                else -> EmailSetting.EmailSettingOn(emailAddress)
-            }
-        } else {
-            EmailSetting.EmailSettingOff
-        }
-    }
-
-    sealed class EmailSetting {
-        object EmailSettingOff : EmailSetting()
-        data class EmailSettingOn(val emailAddress: String) : EmailSetting()
-    }
-
-    data class ViewState(
-        val emailState: EmailState = EmailState.JoinWaitlist
-    )
 
     sealed class Command {
         data class LaunchEmailSignOut(val emailAddress: String) : Command()
         object LaunchEmailSignIn : Command()
-    }
-
-    sealed class EmailState {
-        object JoinWaitlist : EmailState()
-        object Enabled : EmailState()
-        object Disabled : EmailState()
     }
 }
 

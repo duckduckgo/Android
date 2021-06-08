@@ -50,78 +50,24 @@ class BetaFeaturesViewModelTest {
     }
 
     @Test
-    fun whenUserNotInQueueThenEmitJoinWaitlistState() = coroutineTestRule.runBlocking {
-        givenUserIsNotInQueue()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.JoinWaitlist)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserInQueueThenEmitDisabledState() = coroutineTestRule.runBlocking {
-        givenUserIsInQueue()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.Disabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserInBetaAndNotSignedInThenEmitDisabledState() = coroutineTestRule.runBlocking {
-        givenUserIsInBeta()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.Disabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserInBetaAndSignedInAndHasEmailThenEmitEnabledState() = coroutineTestRule.runBlocking {
-        givenUserIsInBetaAndSignedIn()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.Enabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserIsSignedInAndHasEmailThenEmitEnabledState() = coroutineTestRule.runBlocking {
-        givenUserIsSignedInAndHasAliasAvailable()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.Enabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserIsSignedInAndEmailAddressIsNullThenEmitDisabledState() = coroutineTestRule.runBlocking {
-        givenUserIsSignedInAndDoesNotHaveAliasAvailable()
-        testee.resume()
-        testee.viewFlow.test {
-            assert(expectItem().emailState is BetaFeaturesViewModel.EmailState.Disabled)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnEmailSettingClickedAndUserIsSignedInThenEmitLaunchEmailSignOutCommandWithCorrectEmailAddress() = coroutineTestRule.runBlocking {
         testee.commandsFlow.test {
-            givenUserIsSignedInAndHasAliasAvailable()
+            givenUserIsSignedIn()
             testee.onEmailSettingClicked()
 
             assertEquals(BetaFeaturesViewModel.Command.LaunchEmailSignOut("test@duck.com"), expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEmailSettingClickedAndUserIsSignedInWithNoEmailThenEmitLaunchEmailSignInCommand() = coroutineTestRule.runBlocking {
+        testee.commandsFlow.test {
+            givenUserIsSignedInEmailIsNull()
+            testee.onEmailSettingClicked()
+
+            assertEquals(BetaFeaturesViewModel.Command.LaunchEmailSignIn, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -143,35 +89,13 @@ class BetaFeaturesViewModelTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
     }
 
-    private fun givenUserIsSignedInAndHasAliasAvailable() {
+    private fun givenUserIsSignedIn() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
     }
 
-    private fun givenUserIsSignedInAndDoesNotHaveAliasAvailable() {
+    private fun givenUserIsSignedInEmailIsNull() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-    }
-
-    private fun givenUserIsNotInQueue() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.NotJoinedQueue)
-    }
-
-    private fun givenUserIsInQueue() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue)
-    }
-
-    private fun givenUserIsInBeta() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
-    }
-
-    private fun givenUserIsInBetaAndSignedIn() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
     }
 }

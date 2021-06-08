@@ -80,13 +80,9 @@
     <string name="betaFeaturesActivityTitle">Beta Features</string>
     <string name="betaFeaturesTitle">Beta Features</string>
     <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
-    <string name="betaFeaturesDescription">For a limited time, you can try new features before we release them. Beta features are experimental and may affect device performance.</string>
-    <string name="betaFeaturesEmail">Email</string>
+    <string name="betaFeaturesDescription">Beta features are experimental so please bear with us!</string>
     <string name="betaFeaturesEmailProtectionTitle">Email Protection</string>
-    <string name="betaFeaturesEmailProtectionSubtitleWaitlist">Join the waitlist</string>
-    <string name="betaFeaturesEmailProtectionSubtitleDisabled">Disabled</string>
-    <string name="betaFeaturesEmailProtectionSubtitleEnabled">Enabled</string>
-    <string name="betaFeaturesEmailProtectionDescription">Block email trackers and hide your address</string>
+    <string name="betaFeaturesEmailProtectionSubtitle">Block email trackers and hide your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>

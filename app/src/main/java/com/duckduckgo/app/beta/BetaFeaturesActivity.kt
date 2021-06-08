@@ -38,7 +38,6 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.viewFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { setEmailSetting(it.emailState) }.launchIn(lifecycleScope)
         viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
     }
 
@@ -48,19 +47,6 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
 
         configureUiEventHandlers()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.resume()
-    }
-
-    private fun setEmailSetting(emailData: BetaFeaturesViewModel.EmailState) {
-        when (emailData) {
-            is BetaFeaturesViewModel.EmailState.Disabled -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleDisabled))
-            is BetaFeaturesViewModel.EmailState.Enabled -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleEnabled))
-            is BetaFeaturesViewModel.EmailState.JoinWaitlist -> emailSetting.setSubtitle(getString(R.string.betaFeaturesEmailProtectionSubtitleWaitlist))
-        }
     }
 
     private fun configureUiEventHandlers() {
