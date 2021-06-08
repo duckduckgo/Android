@@ -45,7 +45,7 @@ class WaitlistWorkRequestBuilder @Inject constructor() {
             .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
 
         if (withDelay) {
-            requestBuilder.setInitialDelay(1, TimeUnit.MINUTES)
+            requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
         }
 
         return requestBuilder.build()
@@ -77,9 +77,7 @@ class EmailWaitlistWorker(private val context: Context, workerParams: WorkerPara
         when (emailManager.fetchInviteCode()) {
             AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
             AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(context, notification)
-            AppEmailManager.FetchCodeResult.NoCode -> {
-                WorkManager.getInstance(context).enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
-            }
+            AppEmailManager.FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
         }
 
         return Result.success()
