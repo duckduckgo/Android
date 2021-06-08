@@ -46,6 +46,7 @@ class EmailFaqActivity : DuckDuckGoActivity() {
                 useWideViewPort = true
                 builtInZoomControls = true
                 displayZoomControls = false
+                javaScriptEnabled = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(true)
                 setSupportZoom(true)
