@@ -55,7 +55,7 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
 
         return when (timeDifferenceDate) {
             0L, 1L -> TimePassed.fromMilliseconds(timeDifferenceMillis).shortFormat()
-            else -> "$timeDifferenceDate days ago"
+            else -> context.getString(R.string.deviceShieldActivityDaysAgo, timeDifferenceDate)
         }
     }
 

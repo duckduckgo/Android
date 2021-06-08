@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -52,7 +53,8 @@ class DeviceShieldActivityFeedViewModelTest {
 
         viewModel = DeviceShieldActivityFeedViewModel(
             AppTrackerBlockingStatsRepository(db),
-            VpnCoroutineTestRule().testDispatcherProvider
+            VpnCoroutineTestRule().testDispatcherProvider,
+            TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
         )
     }
 
@@ -84,8 +86,8 @@ class DeviceShieldActivityFeedViewModelTest {
                             TrackerInfo(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName, TEST_TIMESTAMP)
                         ),
                         timestamp = TEST_TIMESTAMP,
-                        trackersTotalCount = 2,
-                        firstInBucket = true
+                        displayTimestamp = "just now",
+                        trackersTotalCount = 2
                     ),
                     TrackerFeedItem.TrackerFeedData(
                         id = dummyTrackers[2].id(),
@@ -95,8 +97,8 @@ class DeviceShieldActivityFeedViewModelTest {
                             TrackerInfo(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName, TEST_TIMESTAMP),
                         ),
                         timestamp = TEST_TIMESTAMP,
-                        trackersTotalCount = 1,
-                        firstInBucket = false
+                        displayTimestamp = "just now",
+                        trackersTotalCount = 1
                     )
                 ),
                 expectItem()

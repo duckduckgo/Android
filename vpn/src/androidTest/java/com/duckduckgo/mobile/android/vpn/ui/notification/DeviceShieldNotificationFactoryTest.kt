@@ -113,6 +113,7 @@ class DeviceShieldNotificationFactoryTest {
             domain = domain,
             timestamp = timestamp,
             company = trackerCompanyName,
+            companyDisplayName = trackerCompanyName,
             trackingApp = appContainingTracker
         )
     }

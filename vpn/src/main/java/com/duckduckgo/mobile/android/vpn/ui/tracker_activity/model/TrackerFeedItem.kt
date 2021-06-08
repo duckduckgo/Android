@@ -26,7 +26,7 @@ sealed class TrackerFeedItem(open val id: Int) {
         val trackers: List<TrackerInfo>,
         val trackersTotalCount: Int,
         val timestamp: String,
-        val firstInBucket: Boolean = false
+        val displayTimestamp: String
     ) : TrackerFeedItem(id)
 
     object TrackerEmptyFeed : TrackerFeedItem(0)

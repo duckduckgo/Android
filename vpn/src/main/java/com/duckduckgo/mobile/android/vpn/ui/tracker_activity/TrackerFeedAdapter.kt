@@ -50,7 +50,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, showHeadings)
+            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData)
             is TrackerEmptyFeedViewHolder -> holder.bind(context.getString(R.string.deviceShieldActivityEmptyListMessage))
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
@@ -58,7 +58,7 @@ class TrackerFeedAdapter @Inject constructor(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder.create(parent)
-            DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent, timeDiffFormatter)
+            DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent)
             else -> TrackerFeedHeaderViewHolder.create(parent, timeDiffFormatter)
         }
     }
@@ -124,12 +124,12 @@ class TrackerFeedAdapter @Inject constructor(
         }
     }
 
-    private class TrackerFeedViewHolder(view: View, val timeDiffFormatter: TimeDiffFormatter) : RecyclerView.ViewHolder(view) {
+    private class TrackerFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         companion object {
-            fun create(parent: ViewGroup, timeDiffFormatter: TimeDiffFormatter): TrackerFeedViewHolder {
+            fun create(parent: ViewGroup): TrackerFeedViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val view = inflater.inflate(R.layout.view_device_shield_activity_entry, parent, false)
-                return TrackerFeedViewHolder(view, timeDiffFormatter)
+                return TrackerFeedViewHolder(view)
             }
         }
 
@@ -143,7 +143,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         var packageManager: PackageManager = view.context.packageManager
 
-        fun bind(tracker: TrackerFeedItem.TrackerFeedData?, showHeadings: Boolean = true) {
+        fun bind(tracker: TrackerFeedItem.TrackerFeedData?) {
             tracker?.let { item ->
                 with(activityMessage) {
                     val styledText = HtmlCompat
@@ -156,8 +156,7 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                val timestamp = LocalDateTime.parse(item.timestamp)
-                val trackerInfoMessage = "${item.trackers.asInfoMessage()} · ${timeDiffFormatter.formatTimePassed(LocalDateTime.now(), timestamp)}"
+                val trackerInfoMessage = "${item.trackers.asInfoMessage()} · ${item.displayTimestamp}"
                 timeSinceTrackerBlocked.text = trackerInfoMessage
 
                 Glide.with(trackingAppIcon.context.applicationContext)

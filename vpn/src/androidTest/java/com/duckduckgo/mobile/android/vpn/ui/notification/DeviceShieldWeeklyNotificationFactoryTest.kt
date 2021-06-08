@@ -159,6 +159,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             domain = domain,
             timestamp = timestamp,
             company = company,
+            companyDisplayName = company,
             trackingApp = appContainingTracker
         )
         vpnTrackerDao.insert(tracker)
