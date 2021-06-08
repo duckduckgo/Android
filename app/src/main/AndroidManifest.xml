@@ -336,6 +336,10 @@
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service android:name="com.duckduckgo.widget.FavoritesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
         <receiver android:name="com.duckduckgo.widget.SearchWidget">

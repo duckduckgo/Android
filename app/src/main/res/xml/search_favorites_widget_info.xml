@@ -18,13 +18,14 @@
 
 
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialKeyguardLayout="@layout/search_widget"
-    android:initialLayout="@layout/search_widget"
-    android:minWidth="314dp"
-    android:minHeight="40dp"
+    android:initialKeyguardLayout="@layout/search_favorites_widget"
+    android:initialLayout="@layout/search_favorites_widget"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
     android:configure="com.duckduckgo.app.WidgetThemeConfiguration"
-    android:minResizeWidth="174dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
     android:previewImage="@drawable/search_favorites_widget_preview"
-    android:resizeMode="horizontal"
+    android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen|keyguard" />

@@ -32,6 +32,7 @@ import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.widget.FavoritesWidgetService
 import com.duckduckgo.widget.SearchWidget
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
@@ -97,6 +98,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     }
 
     fun inject(searchWidget: SearchWidget)
+
+    fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only only for test
     @Named("api")

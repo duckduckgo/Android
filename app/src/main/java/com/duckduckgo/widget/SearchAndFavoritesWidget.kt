@@ -16,9 +16,111 @@
 
 package com.duckduckgo.widget
 
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import android.widget.RemoteViews
+import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import timber.log.Timber
 
 
-class SearchAndFavoritesWidget() : AppWidgetProvider() {
+class SearchAndFavoritesWidget(val layoutId: Int = R.layout.search_favorites_widget) : AppWidgetProvider() {
 
+    companion object {
+        const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
+        const val EXTRA_ITEM_URL = "EXTRA_ITEM_URL"
+    }
+
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        Timber.i("SearchAndFavoritesWidget - onUpdate")
+        appWidgetIds.forEach { id ->
+            updateWidget(context, appWidgetManager, id, null)
+        }
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+        Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
+        updateWidget(context, appWidgetManager, appWidgetId, newOptions)
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+    }
+
+    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+        Timber.i("SearchAndFavoritesWidget - onDeleted")
+        super.onDeleted(context, appWidgetIds)
+    }
+
+    override fun onEnabled(context: Context?) {
+        Timber.i("SearchAndFavoritesWidget - onEnabled")
+        super.onEnabled(context)
+    }
+
+    override fun onDisabled(context: Context?) {
+        Timber.i("SearchAndFavoritesWidget - onDisabled")
+        super.onDisabled(context)
+    }
+
+    override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
+        Timber.i("SearchAndFavoritesWidget - onRestored")
+        super.onRestored(context, oldWidgetIds, newWidgetIds)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Timber.i("SearchAndFavoritesWidget - onReceive")
+        val instance = AppWidgetManager.getInstance(context)
+        val componentName = ComponentName(context, SearchAndFavoritesWidget::class.java)
+        instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
+
+        super.onReceive(context, intent)
+    }
+
+    private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+        val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) //portrait
+        var maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) //landscape
+        var minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) //landscape
+        var maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) //portrait
+
+        if(newOptions != null) {
+            minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) //portrait
+            maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) //landscape
+            minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) //landscape
+            maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) //portrait
+        }
+
+        val remoteViews = RemoteViews(context.packageName, layoutId)
+
+        val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
+        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
+
+        remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+
+        val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
+        adapterIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        adapterIntent.setData(Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME)))
+        remoteViews.setRemoteAdapter(appWidgetId, R.id.favoritesGrid, adapterIntent)
+        remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
+
+        if(minWidth <= 110) {
+            remoteViews.setViewVisibility(R.id.searchInputBox, View.GONE)
+        } else {
+            remoteViews.setViewVisibility(R.id.searchInputBox, View.VISIBLE)
+        }
+
+        appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+        //appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+    }
+
+    private fun buildPendingIntent(context: Context): PendingIntent {
+        val intent = SystemSearchActivity.fromWidget(context)
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 }
