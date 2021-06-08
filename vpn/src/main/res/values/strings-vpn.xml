@@ -34,23 +34,23 @@
     <string name="vpnReportIssueLabel">Report Issue</string>
 
     <!-- Device Shield Ongoing Notification -->
-    <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking trackers across your apps"</string>
+    <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking tracking attempts across your apps"</string>
     <string name="deviceShieldOnNoTrackersNotificationHeader">"Scanning for tracking activity… beep… boop"</string>
-    <string name="deviceShieldOnNoTrackersNotificationMessage">"No trackers blocked in apps"</string>
-    <string name="deviceShieldOnNotificationPrefix">Trackers blocked</string>
+    <string name="deviceShieldOnNoTrackersNotificationMessage">"No tracking attempts blocked in apps"</string>
+    <string name="deviceShieldOnNotificationPrefix">Tracking attempts blocked</string>
     <plurals name="deviceShieldOnNotificationTrackers">
         <item quantity="one">%d tracker blocked</item>
         <item quantity="other">%d trackers blocked</item>
     </plurals>
     <string name="deviceShieldOnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
-    <string name="deviceShieldDisabledNotification">Device Shield disabled. Tap to continue blocking trackers across your apps.</string>
+    <string name="deviceShieldDisabledNotification">Device Shield disabled. Tap to continue blocking tracking attempts across your apps.</string>
     <string name="deviceShieldDisabledNotificationAction">"Enable Device Shield"</string>
 
     <!-- Device Shield Daily Notification -->
     <string name="deviceShieldDailyTrackersNotificationPrefix">Device Shield blocked</string>
     <plurals name="deviceShieldTrackers">
-        <item quantity="one">%d tracker</item>
-        <item quantity="other">%d trackers</item>
+        <item quantity="one">%d tracking attempt</item>
+        <item quantity="other">%d tracking attempts</item>
     </plurals>
     <plurals name="deviceShieldDailyTrackersNotificationSuffixNumApps">
         <item quantity="one">in 1 app, %2$s</item>
@@ -66,7 +66,7 @@
     </plurals>
     <string name="deviceShieldNotificationPastDaySuffix">(past day).</string>
     <string name="deviceShieldNotificationSeeMoreSuffix">See More</string>
-    <string name="deviceShieldDailyCompanyBlockedNotificationPrefix">Device Shield blocked the most trackers in %s</string>
+    <string name="deviceShieldDailyCompanyBlockedNotificationPrefix">Device Shield blocked the most tracking attempts in %s</string>
     <string name="deviceShieldDailyCompanyBlockedNotificationOptionalSecondApp">and %s</string>
 
     <plurals name="deviceShieldNumberTimes">
@@ -198,10 +198,10 @@
     <string name="deviceShieldActivityMostRecent">Most Recent</string>
     <string name="deviceShieldActivityCtaShowAll">View All Recent Activity</string>
     <string name="deviceShieldActivityCtaFAQ">What are app trackers?</string>
-    <string name="deviceShieldActivityTrackersBlocked">%d trackers blocked in <![CDATA[<b>%s</b>]]> app</string>
-    <string name="deviceShieldActivityTrackersCountOne">%1$s</string>
-    <string name="deviceShieldActivityTrackersCountTwo">%1$s and 1 other</string>
-    <string name="deviceShieldActivityTrackersCountMany">%1$s and %2$d others</string>
+    <string name="deviceShieldActivityTrackersBlocked">%d tracking attempts blocked in <![CDATA[<b>%s</b>]]> app</string>
+    <string name="deviceShieldActivityTrackersCountOne">from %1$s</string>
+    <string name="deviceShieldActivityTrackersCountTwo">from %1$s and 1 other</string>
+    <string name="deviceShieldActivityTrackersCountMany">from %1$s and %2$d others</string>
     <string name="deviceShieldActivityToday">Today</string>
     <string name="deviceShieldActivityYesterday">Yesterday</string>
     <string name="deviceShieldActivityDaysAgo">%d days ago</string>
@@ -210,8 +210,8 @@
     <string name="deviceShieldActivityPastWeekBlocked">Blocked</string>
     <string name="deviceShieldActivityPastWeekAcross">Across</string>
     <plurals name="deviceShieldActivityPastWeekTrackerCount">
-        <item quantity="one">Tracker</item>
-        <item quantity="other">Trackers</item>
+        <item quantity="one">Tracking attempt</item>
+        <item quantity="other">Tracking attempts</item>
     </plurals>
     <plurals name="deviceShieldActivityPastWeekAppCount">
         <item quantity="one">App</item>
