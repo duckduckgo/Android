@@ -72,7 +72,13 @@ class EmailProtectionViewModel(
         runCatching {
             emailService.joinWaitlist()
         }.onSuccess {
-            joinedWaitlist(it.timestamp, it.token)
+            val timestamp = it.timestamp
+            val token = it.token
+            if (timestamp != null && !token.isNullOrBlank()) {
+                joinedWaitlist(it.timestamp, it.token)
+            } else {
+                commandChannel.send(Command.ShowErrorMessage)
+            }
         }.onFailure {
             commandChannel.send(Command.ShowErrorMessage)
         }

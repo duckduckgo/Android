@@ -51,7 +51,6 @@ class WaitlistNotificationDialog : DialogFragment() {
             .setPositiveButton(R.string.waitlistNotificationDialogNotifyMe) { _, _ ->
                 emailDataStore.sendNotification = true
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
