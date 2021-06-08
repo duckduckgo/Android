@@ -64,6 +64,7 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         inviteCodeButton.setOnClickListener { viewModel.haveAnInviteCode() }
+        duckAddressButton.setOnClickListener { viewModel.haveADuckAddress() }
         waitListButton.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.joinTheWaitlist()
@@ -102,8 +103,9 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         waitListButton.gone()
         inviteCodeButton.gone()
         getStartedButton.show()
+        duckAddressButton.show()
         statusTitle.text = getString(R.string.emailProtectionStatusTitleInBeta)
-        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionInBeta, listOf(readBlogSpan))
+        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionInBeta, readBlogSpan)
     }
 
     private fun renderJoinedQueue() {
@@ -111,8 +113,9 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         waitListButton.gone()
         inviteCodeButton.show()
         getStartedButton.gone()
+        duckAddressButton.show()
         statusTitle.text = getString(R.string.emailProtectionStatusTitleJoined)
-        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionJoined, listOf(readBlogSpan))
+        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionJoined, readBlogSpan)
     }
 
     private fun renderNotJoinedQueue() {
@@ -120,8 +123,9 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         waitListButton.show()
         inviteCodeButton.show()
         getStartedButton.gone()
+        duckAddressButton.show()
         statusTitle.text = getString(R.string.emailProtectionStatusTitleJoin)
-        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, listOf(readBlogSpan))
+        setClickableSpan(emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, readBlogSpan)
     }
 
     private val readBlogSpan = object : NonUnderlinedClickableSpan() {
@@ -136,24 +140,18 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val signInSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.haveADuckAddress()
-        }
-    }
-
     private fun configureClickableLink() {
-        setClickableSpan(footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan, signInSpan))
+        setClickableSpan(footerDescription, R.string.emailProtectionFooterDescription, privacyGuaranteeSpan)
     }
 
-    private fun setClickableSpan(view: MaterialTextView, stringId: Int, spans: List<NonUnderlinedClickableSpan>) {
+    private fun setClickableSpan(view: MaterialTextView, stringId: Int, span: NonUnderlinedClickableSpan) {
         val htmlString = getString(stringId).html(this)
         val spannableString = SpannableStringBuilder(htmlString)
         val urlSpans = htmlString.getSpans(0, htmlString.length, URLSpan::class.java)
-        urlSpans?.forEachIndexed { index, urlSpan ->
+        urlSpans?.forEach { urlSpan ->
             spannableString.apply {
                 setSpan(
-                    spans[index],
+                    span,
                     spannableString.getSpanStart(urlSpan),
                     spannableString.getSpanEnd(urlSpan),
                     spannableString.getSpanFlags(urlSpan)

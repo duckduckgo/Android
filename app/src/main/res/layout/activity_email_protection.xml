@@ -77,6 +77,13 @@
             android:text="@string/emailProtectionWaitlistCta" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/getStartedButton"
+            style="@style/EmailButton.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="@string/emailProtectionGetStartedCta" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/inviteCodeButton"
             style="@style/EmailButton.Secondary"
             android:layout_width="match_parent"
@@ -84,11 +91,11 @@
             android:text="@string/emailProtectionInviteCodeCta" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/getStartedButton"
-            style="@style/EmailButton.Primary"
+            android:id="@+id/duckAddressButton"
+            style="@style/EmailButton.Secondary"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="@string/emailProtectionGetStartedCta" />
+            android:text="@string/emailProtectionDuckAddressCta" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

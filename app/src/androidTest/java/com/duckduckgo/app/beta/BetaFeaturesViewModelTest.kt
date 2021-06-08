@@ -18,7 +18,6 @@ package com.duckduckgo.app.beta
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.whenever

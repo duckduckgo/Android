@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.google.android.material.textview.MaterialTextView
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -39,6 +40,8 @@ class WaitlistNotificationDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val rootView = View.inflate(activity, R.layout.email_dialog_fragment, null)
+        val message = rootView.findViewById<MaterialTextView>(R.id.emailDialogText)
+        message.text = getString(R.string.waitlistNotificationDialogDescription)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)

@@ -337,7 +337,7 @@
             android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
         <activity
             android:name="com.duckduckgo.app.email.ui.EmailProtectionSignOutActivity"
-            android:label="@string/emailProtectionActivityTitle"
+            android:label="@string/emailProtectionSignOutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.beta.BetaFeaturesActivity" />
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"

@@ -38,13 +38,17 @@ import javax.inject.Inject
 
 class WaitlistWorkRequestBuilder @Inject constructor() {
 
-    fun waitlistRequestWork(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
+    fun waitlistRequestWork(withDelay: Boolean = true): OneTimeWorkRequest {
+        val requestBuilder = OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
             .setConstraints(networkAvailable())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.HOURS)
-            .setInitialDelay(1, TimeUnit.MINUTES)
             .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
-            .build()
+
+        if (withDelay) {
+            requestBuilder.setInitialDelay(1, TimeUnit.MINUTES)
+        }
+
+        return requestBuilder.build()
     }
 
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()

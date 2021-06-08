@@ -45,6 +45,7 @@
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="32dp"
         app:title="@string/betaFeaturesEmailProtectionTitle"
         app:subtitle="@string/betaFeaturesEmailProtectionSubtitle"
         app:layout_constraintEnd_toEndOf="parent"

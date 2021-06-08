@@ -29,50 +29,42 @@
     <string name="emailSignOutDialogCancel">Cancel</string>
     <string name="emailSignOutDialogDisable">Remove</string>
 
-
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Email waitlist</string>
     <string name="waitlistNotificationTitle">Your Email Protection Invitation is Here!</string>
-    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it’s your turn to try our Email Protection feature. Tap to view your invitation.</string>
+    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it\'s your turn to try our Email Protection feature. Tap to view your invitation.</string>
 
-    <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it’s your turn?</string>
+    <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
     <string name="waitlistNotificationDialogNoThanks">NO THANKS</string>
     <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionFaqActivityTitle">Email Protection</string>
+    <string name="emailProtectionSignOutActivityTitle">Email Protection</string>
     <string name="emailProtectionActivityTitle">Email Protection</string>
-    <string name="emailProtectionFooterDescription">
-        <![CDATA[We never store your emails. Learn more in our <b><a href="">Privacy Guarantees</a></b>. If you already have a Duck Address, <b><a href="">add it to this device.</a></b>]]>
-    </string>
+    <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
+    <string name="emailProtectionDuckAddressCta">I have a Duck Address</string>
     <string name="emailProtectionInviteCodeCta">I have an invite Code</string>
     <string name="emailProtectionWaitlistCta">Join the Waitlist</string>
     <string name="emailProtectionGetStartedCta">Get Started</string>
 
-
     <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Email Privacy, Simplified</string>
-    <string name="emailProtectionDescriptionJoin">
-        <![CDATA[Enjoy privacy while reading your email and giving out your email address, without the pain of switching email providers. <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
-    </string>
+    <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">You\'re on the list</string>
-    <string name="emailProtectionDescriptionJoined">
-        <![CDATA[Your invitation will be available soon. If you asked us to notify you, we\'ll do just that. <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
-    </string>
+    <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
+    <string name="emailProtectionDescriptionJoined"><![CDATA[If you asked us to notify you, we\'ll do just that. <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
-    <string name="emailProtectionDescriptionInBeta">
-        <![CDATA[Need a refresher? <a href=""><b>Read our Announcement</b></a> to learn more about Email Protection from DuckDuckGo.]]>
-    </string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Need a refresher? <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Primary Duck Address</string>
     <string name="emailProtectionSignOutFooter">
-        <![CDATA[The <b>Email Protection</b> integration gives you the option to fill in your <b>Primary Duck Address</b> or a newly generated <b>Private Duck Address</b> into email fields as you browse the web.<br/><br/>If you would like to delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+        <![CDATA[Removing Email Protection from this device removes the option to fill in your Primary Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
