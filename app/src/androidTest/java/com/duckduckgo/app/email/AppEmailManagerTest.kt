@@ -331,7 +331,7 @@ class AppEmailManagerTest {
         aliasSharedFlow.emit("alias")
     }
 
-    class TestEmailService: EmailService {
+    class TestEmailService : EmailService {
         override suspend fun newAlias(authorization: String): EmailAlias = EmailAlias("alias")
         override suspend fun joinWaitlist(): WaitlistResponse = WaitlistResponse("token", 12345)
         override suspend fun waitlistStatus(): WaitlistStatusResponse {

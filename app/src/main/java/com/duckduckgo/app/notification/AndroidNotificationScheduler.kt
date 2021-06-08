@@ -18,16 +18,11 @@ package com.duckduckgo.app.notification
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_SHOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
@@ -84,27 +79,11 @@ class NotificationScheduler(
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-        lateinit var manager: NotificationManagerCompat
-        lateinit var factory: NotificationFactory
+        lateinit var notificationSender: NotificationSender
         lateinit var notification: SchedulableNotification
-        lateinit var notificationDao: NotificationDao
-        lateinit var pixel: Pixel
 
         override suspend fun doWork(): Result {
-
-            if (!notification.canShow()) {
-                Timber.v("Notification no longer showable")
-                return Result.success()
-            }
-
-            val specification = notification.buildSpecification()
-            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
-            val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
-            notificationDao.insert(Notification(notification.id))
-            manager.notify(specification.systemId, systemNotification)
-
-            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+            notificationSender.sendNotification(context, notification)
             return Result.success()
         }
     }
@@ -118,19 +97,13 @@ class NotificationScheduler(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
-    private val notificationManagerCompat: NotificationManagerCompat,
-    private val notificationDao: NotificationDao,
-    private val notificationFactory: NotificationFactory,
-    private val pixel: Pixel,
+    private val notificationSender: NotificationSender,
     private val clearDataNotification: ClearDataNotification
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is NotificationScheduler.ClearDataNotificationWorker) {
-            worker.manager = notificationManagerCompat
-            worker.notificationDao = notificationDao
-            worker.factory = notificationFactory
-            worker.pixel = pixel
+            worker.notificationSender = notificationSender
             worker.notification = clearDataNotification
             return true
         }
@@ -140,19 +113,13 @@ class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
-    private val notificationManagerCompat: NotificationManagerCompat,
-    private val notificationDao: NotificationDao,
-    private val notificationFactory: NotificationFactory,
-    private val pixel: Pixel,
+    private val notificationSender: NotificationSender,
     private val privacyProtectionNotification: PrivacyProtectionNotification
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is NotificationScheduler.PrivacyNotificationWorker) {
-            worker.manager = notificationManagerCompat
-            worker.notificationDao = notificationDao
-            worker.factory = notificationFactory
-            worker.pixel = pixel
+            worker.notificationSender = notificationSender
             worker.notification = privacyProtectionNotification
             return true
         }

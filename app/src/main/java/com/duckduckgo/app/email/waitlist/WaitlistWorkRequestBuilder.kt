@@ -22,22 +22,27 @@ import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.duckduckgo.app.email.AppEmailManager
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.app.notification.model.WaitlistCodeNotification
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class WaitlistSyncWorkRequestBuilder @Inject constructor() {
+class WaitlistWorkRequestBuilder @Inject constructor() {
 
-    fun wailistWork(): PeriodicWorkRequest {
-        return PeriodicWorkRequestBuilder<EmailWaitlistWorker>(1, TimeUnit.HOURS)
+    fun waitlistRequestWork(): OneTimeWorkRequest {
+        return OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
             .setConstraints(networkAvailable())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.HOURS)
-            .setInitialDelay(5, TimeUnit.SECONDS)
+            .setInitialDelay(1, TimeUnit.MINUTES)
             .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
             .build()
     }
@@ -49,25 +54,48 @@ class WaitlistSyncWorkRequestBuilder @Inject constructor() {
     }
 }
 
-class EmailWaitlistWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class EmailWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     @Inject
-    lateinit var waitlistCodeFetcher: WaitlistCodeFetcher
+    lateinit var emailManager: EmailManager
+
+    @Inject
+    lateinit var notificationSender: NotificationSender
+
+    @Inject
+    lateinit var notification: WaitlistCodeNotification
+
+    @Inject
+    lateinit var waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder
 
     override suspend fun doWork(): Result {
-        waitlistCodeFetcher.fetchInviteCode()
+
+        when (emailManager.fetchInviteCode()) {
+            AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
+            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(context, notification)
+            AppEmailManager.FetchCodeResult.NoCode -> {
+                WorkManager.getInstance(context).enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
+            }
+        }
+
         return Result.success()
     }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
 class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val waitlistCodeFetcher: WaitlistCodeFetcher
+    private val emailManager: EmailManager,
+    private val notificationSender: NotificationSender,
+    private val notification: WaitlistCodeNotification,
+    private val waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder,
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is EmailWaitlistWorker) {
-            worker.waitlistCodeFetcher = waitlistCodeFetcher
+            worker.emailManager = emailManager
+            worker.notificationSender = notificationSender
+            worker.notification = notification
+            worker.waitlistWorkRequestBuilder = waitlistWorkRequestBuilder
             return true
         }
         return false

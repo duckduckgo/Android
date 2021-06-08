@@ -18,12 +18,11 @@ package com.duckduckgo.app.email.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
-import com.duckduckgo.app.email.waitlist.WaitlistSyncWorkRequestBuilder
+import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -40,7 +39,7 @@ class EmailProtectionViewModel(
     private val emailManager: EmailManager,
     private val emailService: EmailService,
     private val workManager: WorkManager,
-    private val waitlistSyncWorkRequestBuilder: WaitlistSyncWorkRequestBuilder,
+    private val waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(ViewState(waitlistState = emailManager.waitlistState()))
@@ -97,9 +96,7 @@ class EmailProtectionViewModel(
             viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             commandChannel.send(Command.ShowNotificationDialog)
         }
-
-        val workRequest = waitlistSyncWorkRequestBuilder.wailistWork()
-        workManager.enqueueUniquePeriodicWork(WaitlistSyncWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
+        workManager.enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
     }
 
     companion object {
@@ -116,12 +113,12 @@ class EmailProtectionViewModelFactory @Inject constructor(
     private val emailManager: Provider<EmailManager>,
     private val emailService: Provider<EmailService>,
     private val workManager: Provider<WorkManager>,
-    private val waitlistSyncWorkRequestBuilder: Provider<WaitlistSyncWorkRequestBuilder>,
+    private val waitlistWorkRequestBuilder: Provider<WaitlistWorkRequestBuilder>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(EmailProtectionViewModel::class.java) -> (EmailProtectionViewModel(emailManager.get(), emailService.get(), workManager.get(), waitlistSyncWorkRequestBuilder.get()) as T)
+                isAssignableFrom(EmailProtectionViewModel::class.java) -> (EmailProtectionViewModel(emailManager.get(), emailService.get(), workManager.get(), waitlistWorkRequestBuilder.get()) as T)
                 else -> null
             }
         }

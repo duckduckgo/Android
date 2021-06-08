@@ -37,15 +37,13 @@ import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Command.*
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.ADDRESS_BLOG_POST
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.PRIVACY_GUARANTEE
 import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.SIGN_UP_URL
-import com.duckduckgo.app.email.waitlist.WaitlistSyncWorkRequestBuilder
+import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -63,9 +61,8 @@ class EmailProtectionViewModelTest {
 
     private val mockEmailManager: EmailManager = mock()
     private var mockEmailService: EmailService = mock()
-    private val waitlistBuilder: WaitlistSyncWorkRequestBuilder = WaitlistSyncWorkRequestBuilder()
+    private val waitlistBuilder: WaitlistWorkRequestBuilder = WaitlistWorkRequestBuilder()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val server = MockWebServer()
 
     private lateinit var workManager: WorkManager
     private lateinit var testee: EmailProtectionViewModel
@@ -75,11 +72,6 @@ class EmailProtectionViewModelTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(NotJoinedQueue)
         initializeWorkManager()
         testee = EmailProtectionViewModel(mockEmailManager, mockEmailService, workManager, waitlistBuilder)
-    }
-
-    @After
-    fun tearDown() {
-        server.shutdown()
     }
 
     @Test
@@ -190,7 +182,7 @@ class EmailProtectionViewModelTest {
 
     private fun getScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(WaitlistSyncWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
+            .getWorkInfosByTag(WaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }

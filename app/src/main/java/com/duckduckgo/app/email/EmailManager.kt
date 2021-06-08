@@ -157,9 +157,9 @@ class AppEmailManager(
     }
 
     sealed class FetchCodeResult {
-        object Code: FetchCodeResult()
-        object NoCode: FetchCodeResult()
-        object CodeExisted: FetchCodeResult()
+        object Code : FetchCodeResult()
+        object NoCode : FetchCodeResult()
+        object CodeExisted : FetchCodeResult()
     }
 
     sealed class WaitlistState {

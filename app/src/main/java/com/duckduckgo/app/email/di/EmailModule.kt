@@ -17,8 +17,8 @@
 package com.duckduckgo.app.email.di
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleObserver
+import androidx.work.WorkManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.AppEmailManager
@@ -31,8 +31,7 @@ import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
 import com.duckduckgo.app.email.waitlist.AppWaitlistCodeFetcher
 import com.duckduckgo.app.email.waitlist.WaitlistCodeFetcher
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.WaitlistCodeNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
@@ -68,15 +67,14 @@ class EmailModule {
     @Provides
     fun providesWaitlistCodeFetcher(
         context: Context,
+        workManager: WorkManager,
         emailManager: EmailManager,
         notification: WaitlistCodeNotification,
-        factory: NotificationFactory,
-        notificationDao: NotificationDao,
-        manager: NotificationManagerCompat,
+        notificationSender: NotificationSender,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): WaitlistCodeFetcher {
-        return AppWaitlistCodeFetcher(context, emailManager, notification, factory, notificationDao, manager, dispatcherProvider, appCoroutineScope)
+        return AppWaitlistCodeFetcher(context, workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
     }
 
     @Provides
