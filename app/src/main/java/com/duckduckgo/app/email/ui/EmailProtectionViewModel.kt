@@ -100,8 +100,8 @@ class EmailProtectionViewModel(
     }
 
     companion object {
-        const val PRIVACY_GUARANTEE = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/"
-        const val ADDRESS_BLOG_POST = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/"
+        const val PRIVACY_GUARANTEE = "https://quack.duckduckgo.com/email/privacy-guarantees"
+        const val ADDRESS_BLOG_POST = "https://quack.duckduckgo.com/email/learn-more"
         const val SIGN_UP_URL = "https://quack.duckduckgo.com/email/signup?inviteCode="
         const val LOGIN_URL = "https://quack.duckduckgo.com/email/login"
     }
