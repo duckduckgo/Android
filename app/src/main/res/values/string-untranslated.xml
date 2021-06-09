@@ -71,7 +71,7 @@
     <!-- Beta Features -->
     <string name="betaFeaturesActivityTitle">Beta Features</string>
     <string name="betaFeaturesTitle">Beta Features</string>
-    <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
+    <string name="betaFeaturesSubtitle">Try new features we\'re working on</string>
     <string name="betaFeaturesDescription">Beta features are experimental so please bear with us!</string>
     <string name="betaFeaturesEmailProtectionTitle">Email Protection</string>
     <string name="betaFeaturesEmailProtectionSubtitle">Block email trackers and hide your address</string>
