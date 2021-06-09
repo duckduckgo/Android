@@ -61,11 +61,7 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         inviteCodeButton.setOnClickListener { viewModel.haveAnInviteCode() }
         duckAddressButton.setOnClickListener { viewModel.haveADuckAddress() }
-        waitListButton.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.joinTheWaitlist()
-            }
-        }
+        waitListButton.setOnClickListener { viewModel.joinTheWaitlist() }
         getStartedButton.setOnClickListener { viewModel.haveAnInviteCode() }
     }
 

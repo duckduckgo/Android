@@ -68,19 +68,21 @@ class EmailProtectionViewModel(
         }
     }
 
-    suspend fun joinTheWaitlist() {
-        runCatching {
-            emailService.joinWaitlist()
-        }.onSuccess {
-            val timestamp = it.timestamp
-            val token = it.token
-            if (timestamp != null && !token.isNullOrBlank()) {
-                joinedWaitlist(it.timestamp, it.token)
-            } else {
+    fun joinTheWaitlist() {
+        viewModelScope.launch {
+            runCatching {
+                emailService.joinWaitlist()
+            }.onSuccess {
+                val timestamp = it.timestamp
+                val token = it.token
+                if (timestamp != null && !token.isNullOrBlank()) {
+                    joinedWaitlist(it.timestamp, it.token)
+                } else {
+                    commandChannel.send(Command.ShowErrorMessage)
+                }
+            }.onFailure {
                 commandChannel.send(Command.ShowErrorMessage)
             }
-        }.onFailure {
-            commandChannel.send(Command.ShowErrorMessage)
         }
     }
 
