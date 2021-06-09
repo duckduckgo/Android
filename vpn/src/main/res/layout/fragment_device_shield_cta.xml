@@ -53,8 +53,7 @@
                     android:layout_marginTop="22dp"
                     android:layout_width="28dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_device_shield_on" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     style="@style/DeviceShield.PrivacyReport.Title"
