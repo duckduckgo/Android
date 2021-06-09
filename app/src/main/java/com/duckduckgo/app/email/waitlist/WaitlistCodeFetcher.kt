@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.email.waitlist
 
-import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -37,7 +36,6 @@ interface WaitlistCodeFetcher : LifecycleObserver {
 }
 
 class AppWaitlistCodeFetcher(
-    private val context: Context,
     private val workManager: WorkManager,
     private val emailManager: EmailManager,
     private val notification: SchedulableNotification,
@@ -64,7 +62,7 @@ class AppWaitlistCodeFetcher(
                 }
                 Code -> {
                     workManager.cancelAllWorkByTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
-                    notificationSender.sendNotification(context, notification)
+                    notificationSender.sendNotification(notification)
                 }
                 NoCode -> {
                     // NOOP

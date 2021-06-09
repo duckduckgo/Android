@@ -76,7 +76,7 @@ class EmailWaitlistWorker(private val context: Context, workerParams: WorkerPara
 
         when (emailManager.fetchInviteCode()) {
             AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
-            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(context, notification)
+            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(notification)
             AppEmailManager.FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
         }
 

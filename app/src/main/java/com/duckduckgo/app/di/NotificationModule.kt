@@ -109,11 +109,12 @@ class NotificationModule {
     @Provides
     @Singleton
     fun providesNotificationSender(
+        context: Context,
         pixel: Pixel,
         manager: NotificationManagerCompat,
         factory: NotificationFactory,
         notificationDao: NotificationDao
     ): NotificationSender {
-        return AppNotificationSender(pixel, manager, factory, notificationDao)
+        return AppNotificationSender(context, pixel, manager, factory, notificationDao)
     }
 }

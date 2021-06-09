@@ -66,7 +66,6 @@ class EmailModule {
     @Singleton
     @Provides
     fun providesWaitlistCodeFetcher(
-        context: Context,
         workManager: WorkManager,
         emailManager: EmailManager,
         notification: WaitlistCodeNotification,
@@ -74,7 +73,7 @@ class EmailModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): WaitlistCodeFetcher {
-        return AppWaitlistCodeFetcher(context, workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
+        return AppWaitlistCodeFetcher(workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
     }
 
     @Provides

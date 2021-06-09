@@ -26,17 +26,18 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 interface NotificationSender {
-    suspend fun sendNotification(context: Context, notification: SchedulableNotification)
+    suspend fun sendNotification(notification: SchedulableNotification)
 }
 
 class AppNotificationSender(
+    private val context: Context,
     private val pixel: Pixel,
     private val manager: NotificationManagerCompat,
     private val factory: NotificationFactory,
     private val notificationDao: NotificationDao
 ) : NotificationSender {
 
-    override suspend fun sendNotification(context: Context, notification: SchedulableNotification) {
+    override suspend fun sendNotification(notification: SchedulableNotification) {
         if (!notification.canShow()) {
             Timber.v("Notification no longer showable")
             return

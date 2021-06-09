@@ -41,7 +41,6 @@ import kotlinx.android.synthetic.main.activity_email_protection.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class EmailProtectionActivity : DuckDuckGoActivity() {
 

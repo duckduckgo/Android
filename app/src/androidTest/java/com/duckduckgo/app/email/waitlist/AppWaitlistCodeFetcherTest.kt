@@ -60,7 +60,7 @@ class AppWaitlistCodeFetcherTest {
     @Before
     fun before() {
         initializeWorkManager()
-        testee = AppWaitlistCodeFetcher(context, workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        testee = AppWaitlistCodeFetcher(workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test
@@ -90,7 +90,7 @@ class AppWaitlistCodeFetcherTest {
 
         testee.fetchInviteCode()
 
-        verify(mockNotificationSender).sendNotification(context, mockNotification)
+        verify(mockNotificationSender).sendNotification(mockNotification)
     }
 
     @Test
@@ -100,7 +100,7 @@ class AppWaitlistCodeFetcherTest {
 
         testee.fetchInviteCode()
 
-        verify(mockNotificationSender, never()).sendNotification(context, mockNotification)
+        verify(mockNotificationSender, never()).sendNotification(mockNotification)
         assertWaitlistWorkerIsEnqueued()
     }
 

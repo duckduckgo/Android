@@ -83,7 +83,7 @@ class NotificationScheduler(
         lateinit var notification: SchedulableNotification
 
         override suspend fun doWork(): Result {
-            notificationSender.sendNotification(context, notification)
+            notificationSender.sendNotification(notification)
             return Result.success()
         }
     }
