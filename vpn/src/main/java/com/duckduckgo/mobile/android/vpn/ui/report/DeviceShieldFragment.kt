@@ -196,7 +196,7 @@ class DeviceShieldFragment : Fragment() {
 
     private fun startVpn() {
         Snackbar.make(deviceShieldInfoLayout, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_SHORT).show()
-        requireActivity().startService(TrackerBlockingVpnService.startIntent(requireActivity()))
+        TrackerBlockingVpnService.startService(requireActivity())
         launchKonfetti()
     }
 

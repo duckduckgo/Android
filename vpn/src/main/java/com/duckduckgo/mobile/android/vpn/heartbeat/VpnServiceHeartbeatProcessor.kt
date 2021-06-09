@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import android.content.Context
-import android.os.Build
 import android.os.Process
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
@@ -44,13 +43,7 @@ class VpnServiceHeartbeatProcessor @Inject constructor(
 
     suspend fun restartVpnService() = withContext(dispatcherProvider.io()) {
         vpnDatabase.vpnPhoenixDao().insert(VpnPhoenixEntity(reason = getAppExitReason(context)))
-        TrackerBlockingVpnService.startIntent(context).also {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(it)
-            } else {
-                context.startService(it)
-            }
-        }
+        TrackerBlockingVpnService.startService(context)
     }
 
     suspend fun onStopReceive() = withContext(dispatcherProvider.io()) {

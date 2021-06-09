@@ -153,11 +153,11 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
     }
 
     private fun startDeviceShield() {
-        startService(TrackerBlockingVpnService.startIntent(this))
+        TrackerBlockingVpnService.startService(this)
     }
 
     private fun stopDeviceShield() {
-        startService(TrackerBlockingVpnService.stopIntent(this))
+        TrackerBlockingVpnService.stopService(this)
     }
 
     private sealed class VpnPermissionStatus {

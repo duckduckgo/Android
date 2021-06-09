@@ -85,16 +85,9 @@ class VpnServiceHeartbeatMonitor(
 
                 vpnPhoenixDao.insert(VpnPhoenixEntity(reason = HeartBeatUtils.getAppExitReason(context)))
 
-                TrackerBlockingVpnService.startIntent(context).also {
-                    deviceShieldPixels.suddenKillBySystem()
-                    deviceShieldPixels.automaticRestart()
-
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        context.startForegroundService(it)
-                    } else {
-                        context.startService(it)
-                    }
-                }
+                deviceShieldPixels.suddenKillBySystem()
+                deviceShieldPixels.automaticRestart()
+                TrackerBlockingVpnService.startService(context)
             }
 
             return Result.success()

@@ -430,13 +430,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             return Intent(context, TrackerBlockingVpnService::class.java)
         }
 
-        fun startIntent(context: Context): Intent {
+        private fun startIntent(context: Context): Intent {
             return serviceIntent(context).also {
                 it.action = ACTION_START_VPN
             }
         }
 
-        fun stopIntent(context: Context): Intent {
+        private fun stopIntent(context: Context): Intent {
             return serviceIntent(context).also {
                 it.action = ACTION_STOP_VPN
             }
@@ -457,21 +457,41 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             return false
         }
 
+        fun startService(context: Context) {
+            val applicationContext = context.applicationContext
+
+            if (isServiceRunning(applicationContext)) return
+
+            startIntent(applicationContext).run {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    applicationContext.startForegroundService(this)
+                } else {
+                    applicationContext.startService(this)
+                }
+            }
+        }
+
+        fun stopService(context: Context) {
+            val applicationContext = context.applicationContext
+
+            if (!isServiceRunning(applicationContext)) return
+
+            stopIntent(applicationContext).run {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    applicationContext.startForegroundService(this)
+                } else {
+                    applicationContext.startService(this)
+                }
+            }
+        }
+
         suspend fun restartVpnService(context: Context) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
-                stopIntent(applicationContext).run {
-                    applicationContext.startService(this)
-                }
+                stopService(applicationContext)
                 // notifications have a hard time if we do enable/disable cycle back to back
                 delay(100)
-                startIntent(applicationContext).run {
-                    if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        applicationContext.startForegroundService(this)
-                    } else {
-                        applicationContext.startService(this)
-                    }
-                }
+                startService(applicationContext)
             }
         }
 

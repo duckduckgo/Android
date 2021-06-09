@@ -47,7 +47,7 @@ class DeviceShieldTileService : TileService() {
     override fun onClick() {
         if (TrackerBlockingVpnService.isServiceRunning(this)) {
             deviceShieldPixels.disableFromQuickSettingsTile()
-            startService(TrackerBlockingVpnService.stopIntent(this))
+            TrackerBlockingVpnService.stopService(this)
         } else {
             deviceShieldPixels.enableFromQuickSettingsTile()
             if (hasVpnPermission()) {
@@ -92,11 +92,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun startDeviceShield() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(TrackerBlockingVpnService.startIntent(this))
-        } else {
-            startService(TrackerBlockingVpnService.startIntent(this))
-        }
+        TrackerBlockingVpnService.startService(this)
     }
 }
 
@@ -146,7 +142,7 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
     }
 
     private fun startDeviceShield() {
-        startService(TrackerBlockingVpnService.startIntent(this))
+        TrackerBlockingVpnService.startService(this)
     }
 
     @Suppress("DEPRECATION")
