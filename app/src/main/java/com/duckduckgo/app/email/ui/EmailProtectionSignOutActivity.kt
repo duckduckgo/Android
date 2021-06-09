@@ -40,12 +40,6 @@ class EmailProtectionSignOutActivity : DuckDuckGoActivity() {
 
     private val viewModel: EmailProtectionSignOutViewModel by bindViewModel()
 
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
-    }
-
     private val contactUsSpan = object : NonUnderlinedClickableSpan() {
         override fun onClick(widget: View) {
             val intent = Intent(Intent.ACTION_SENDTO)
@@ -63,6 +57,8 @@ class EmailProtectionSignOutActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_email_sign_out_protection)
+
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
         setupToolbar(toolbar)
         configureUiEventHandlers()
         configureUi()

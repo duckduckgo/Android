@@ -36,16 +36,12 @@ class BetaFeaturesActivity : DuckDuckGoActivity() {
 
     private val viewModel: BetaFeaturesViewModel by bindViewModel()
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_beta_features)
-        setupToolbar(toolbar)
 
+        viewModel.commandsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
+        setupToolbar(toolbar)
         configureUiEventHandlers()
     }
 

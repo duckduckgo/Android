@@ -47,16 +47,12 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private val viewModel: EmailProtectionViewModel by bindViewModel()
 
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_email_protection)
+
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
         setupToolbar(toolbar)
         configureUiEventHandlers()
         configureClickableLink()
