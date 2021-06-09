@@ -266,9 +266,9 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenFetchInviteCodeIfTimestampIsGreaterThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
+    fun whenFetchInviteCodeIfTimestampIsSmallerThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
         givenUserIsInWaitlist()
-        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1))
+        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(12345))
 
         testee.fetchInviteCode()
 

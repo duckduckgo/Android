@@ -108,7 +108,7 @@ class AppEmailManager(
         return withContext(dispatcherProvider.io()) {
             try {
                 val waitlistTimestamp = emailService.waitlistStatus().timestamp
-                if (timestamp >= waitlistTimestamp && token != null) {
+                if (waitlistTimestamp >= timestamp && token != null) {
                     val inviteCode = emailService.getCode(token).code
                     if (inviteCode.isNotEmpty()) {
                         emailDataStore.inviteCode = inviteCode
