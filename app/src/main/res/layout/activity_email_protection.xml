@@ -14,7 +14,7 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
+-->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -54,10 +54,10 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:fontFamily="sans-serif"
-        android:textAlignment="center"
         android:lineSpacingExtra="4sp"
         android:paddingTop="8dp"
         android:text="@string/emailProtectionDescriptionJoin"
+        android:textAlignment="center"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal" />
@@ -65,10 +65,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="24dp">
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical">
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/waitListButton"
             style="@style/EmailButton.Primary"
