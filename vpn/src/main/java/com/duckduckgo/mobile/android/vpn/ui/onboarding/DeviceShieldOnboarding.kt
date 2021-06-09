@@ -83,7 +83,8 @@ class DeviceShieldOnboardingImpl @Inject constructor(
     }
 
     override fun hasOnboardingBeenShown(): Boolean {
-        return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
+//        return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
+        return false
     }
 
     companion object {

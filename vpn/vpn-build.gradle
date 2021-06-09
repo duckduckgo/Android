@@ -96,6 +96,9 @@ dependencies {
 
     implementation "androidx.viewpager2:viewpager2:_"
 
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     implementation Google.dagger

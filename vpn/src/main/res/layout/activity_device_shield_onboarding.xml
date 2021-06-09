@@ -24,28 +24,46 @@
     android:background="@color/white"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/onboarding_page_header"
         android:layout_width="0dp"
         android:layout_height="260dp"
-        android:background="@color/light_blue"
-        android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
-        android:paddingTop="65dp"
-        android:paddingBottom="12dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/device_shield_onboarding_page_one_header"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/onboarding_page_animation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="40dp"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop"
+            app:lottie_imageAssetsFolder="images"
+            app:lottie_loop="true" />
+
+        <ImageView
+            android:id="@+id/onboarding_page_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="65dp"
+            android:paddingBottom="12dp"
+            android:background="@color/light_blue"
+            android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop"
+            android:src="@drawable/device_shield_onboarding_page_one_header" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/onboarding_active_indicator"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="28dp"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal"
-        android:layout_marginTop="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header">
@@ -60,9 +78,9 @@
             android:id="@+id/onboarding_active_indicator_two"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_inactive_dot"
             android:paddingStart="4dp"
-            android:paddingEnd="4dp"/>
+            android:paddingEnd="4dp"
+            android:src="@drawable/ic_inactive_dot" />
 
         <ImageView
             android:id="@+id/onboarding_active_indicator_three"
@@ -142,13 +160,13 @@
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/onboarding_switch"
-                android:theme="@style/DeviceShieldOnboardingSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
+                android:clickable="false"
+                android:theme="@style/DeviceShieldOnboardingSwitch"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -157,14 +175,14 @@
 
         <Button
             android:id="@+id/onboarding_faq_cta"
-            android:layout_marginTop="8dp"
             style="@style/DeviceShieldOnboardingCta"
-            android:background="@drawable/onboarding_faq_device_shield_cta_bg"
-            android:textColor="@color/cornflowerBlue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/onboarding_faq_device_shield_cta_bg"
             android:src="@drawable/ic_baseline_arrow_forward_24"
-            android:text="@string/deviceShieldFAQCta" />
+            android:text="@string/deviceShieldFAQCta"
+            android:textColor="@color/cornflowerBlue" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

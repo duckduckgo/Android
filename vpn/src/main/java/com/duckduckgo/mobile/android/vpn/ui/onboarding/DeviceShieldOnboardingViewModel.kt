@@ -34,11 +34,11 @@ class DeviceShieldOnboardingViewModel(
 
     val pages = listOf(
         OnboardingPage(
-            R.drawable.device_shield_onboarding_page_one_header,
+            R.raw.device_shield_tracker_count,
             R.string.deviceShieldOnboardingLastPageOneTitle, R.string.deviceShieldOnboardingLatsPageOneSubtitle
         ),
         OnboardingPage(
-            R.drawable.device_shield_onboarding_page_two_header,
+            R.raw.device_shield_tracking_apps,
             R.string.deviceShieldOnboardingLastPageTwoTitle, R.string.deviceShieldOnboardingLastPageTwoSubTitle
         ),
         OnboardingPage(
