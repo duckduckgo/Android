@@ -28,6 +28,7 @@
         android:id="@+id/onboarding_page_header"
         android:layout_width="0dp"
         android:layout_height="260dp"
+        android:background="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -48,7 +49,6 @@
             android:layout_height="match_parent"
             android:paddingTop="65dp"
             android:paddingBottom="12dp"
-            android:background="@color/light_blue"
             android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
             android:importantForAccessibility="no"
             android:scaleType="centerCrop"
