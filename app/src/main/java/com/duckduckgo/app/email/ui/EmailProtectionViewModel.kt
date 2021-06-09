@@ -103,8 +103,8 @@ class EmailProtectionViewModel(
             emailManager.joinWaitlist(timestamp, token)
             viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             commandChannel.send(Command.ShowNotificationDialog)
+            workManager.enqueue(waitlistWorkRequestBuilder.waitlistRequestWork(withDelay = false))
         }
-        workManager.enqueue(waitlistWorkRequestBuilder.waitlistRequestWork(withDelay = false))
     }
 
     companion object {
