@@ -29,7 +29,6 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 interface WaitlistCodeFetcher : LifecycleObserver {
     suspend fun fetchInviteCode()
@@ -54,7 +53,6 @@ class AppWaitlistCodeFetcher(
     }
 
     override suspend fun fetchInviteCode() {
-        Timber.i("Running email waitlist sync")
         appCoroutineScope.launch(dispatcherProvider.io()) {
             when (emailManager.fetchInviteCode()) {
                 CodeExisted -> {

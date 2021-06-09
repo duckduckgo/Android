@@ -102,17 +102,14 @@ class AppEmailManager(
     }
 
     override suspend fun fetchInviteCode(): FetchCodeResult {
-        Timber.i("Running email waitlist sync")
         val token = emailDataStore.waitlistToken
         val timestamp = emailDataStore.waitlistTimestamp
         if (doesCodeAlreadyExist()) return FetchCodeResult.CodeExisted
         return withContext(dispatcherProvider.io()) {
             try {
-                Timber.i("Running waitlist status")
                 val waitlistTimestamp = emailService.waitlistStatus().timestamp
                 if (timestamp >= waitlistTimestamp && token != null) {
                     val inviteCode = emailService.getCode(token).code
-                    Timber.i("Running waitlist getcode response is $inviteCode")
                     if (inviteCode.isNotEmpty()) {
                         emailDataStore.inviteCode = inviteCode
                         return@withContext FetchCodeResult.Code

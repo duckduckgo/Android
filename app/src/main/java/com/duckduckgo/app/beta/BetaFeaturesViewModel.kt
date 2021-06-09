@@ -39,12 +39,9 @@ class BetaFeaturesViewModel(
 
     fun onEmailSettingClicked() {
         viewModelScope.launch {
-            val emailAddress = emailManager.getEmailAddress()
             if (emailManager.isSignedIn()) {
-                when (emailAddress) {
-                    null -> commandChannel.send(Command.LaunchEmailSignIn)
-                    else -> commandChannel.send(Command.LaunchEmailSignOut(emailAddress))
-                }
+                val emailAddress = emailManager.getEmailAddress() // If signed in there is always a non-null address
+                commandChannel.send(Command.LaunchEmailSignOut(emailAddress!!))
             } else {
                 commandChannel.send(Command.LaunchEmailSignIn)
             }

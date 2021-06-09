@@ -61,18 +61,6 @@ class BetaFeaturesViewModelTest {
     }
 
     @Test
-    fun whenOnEmailSettingClickedAndUserIsSignedInWithNoEmailThenEmitLaunchEmailSignInCommand() = coroutineTestRule.runBlocking {
-        testee.commandsFlow.test {
-            givenUserIsSignedInEmailIsNull()
-            testee.onEmailSettingClicked()
-
-            assertEquals(BetaFeaturesViewModel.Command.LaunchEmailSignIn, expectItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnEmailSettingClickedAndUserIsNotSignedInThenEmitLaunchEmailSignInCommand() = coroutineTestRule.runBlocking {
         testee.commandsFlow.test {
             givenUserIsNotSignedIn()
@@ -90,11 +78,6 @@ class BetaFeaturesViewModelTest {
 
     private fun givenUserIsSignedIn() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-    }
-
-    private fun givenUserIsSignedInEmailIsNull() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
     }
 }
