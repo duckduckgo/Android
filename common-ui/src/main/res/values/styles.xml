@@ -542,6 +542,8 @@
         <item name="android:textColor">@color/almostBlackDark</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="SavedSiteSectionTitle">
