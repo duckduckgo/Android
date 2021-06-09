@@ -17,7 +17,6 @@
 package com.duckduckgo.app.email.waitlist
 
 import android.content.Context
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
@@ -38,14 +37,15 @@ import javax.inject.Inject
 
 class WaitlistWorkRequestBuilder @Inject constructor() {
 
-    fun waitlistRequestWork(withDelay: Boolean = true): OneTimeWorkRequest {
+    fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest {
         val requestBuilder = OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
             .setConstraints(networkAvailable())
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.HOURS)
             .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
 
-        if (withDelay) {
+        if (withBigDelay) {
             requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
+        } else {
+            requestBuilder.setInitialDelay(5, TimeUnit.MINUTES)
         }
 
         return requestBuilder.build()

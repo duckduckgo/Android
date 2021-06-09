@@ -24,16 +24,16 @@ class WaitlistWorkRequestBuilderTest {
     private val testee = WaitlistWorkRequestBuilder()
 
     @Test
-    fun whenWithDelayIsFalseThenDelayIsZero() {
-        val request = testee.waitlistRequestWork(withDelay = false)
+    fun whenWithBigDelayIsFalseThenDelayIsFiveMins() {
+        val request = testee.waitlistRequestWork(withBigDelay = false)
         val delay = request.workSpec.initialDelay
 
-        assertEquals(0, delay)
+        assertEquals(FIVE_MINS_IN_MS, delay)
     }
 
     @Test
-    fun whenWithDelayIsTrueThenDelayIsOne() {
-        val request = testee.waitlistRequestWork(withDelay = true)
+    fun whenWithDelayIsTrueThenDelayIsOneDay() {
+        val request = testee.waitlistRequestWork(withBigDelay = true)
         val delay = request.workSpec.initialDelay
 
         assertEquals(ONE_DAY_IN_MS, delay)
@@ -41,5 +41,6 @@ class WaitlistWorkRequestBuilderTest {
 
     companion object {
         const val ONE_DAY_IN_MS: Long = 86_400_000
+        const val FIVE_MINS_IN_MS: Long = 300_000
     }
 }
