@@ -99,28 +99,21 @@
             android:text="@string/emailProtectionDuckAddressCta" />
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/footerDescription"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="20dp">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/footerDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="35dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
-            android:text="@string/emailProtectionFooterDescription"
-            android:textAlignment="center"
-            android:textColor="?attr/settingsMinorTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginBottom="35dp"
+        android:fontFamily="sans-serif"
+        android:gravity="bottom|center_horizontal"
+        android:lineSpacingExtra="4sp"
+        android:text="@string/emailProtectionFooterDescription"
+        android:textColor="?attr/settingsMinorTextColor"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </LinearLayout>
