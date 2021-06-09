@@ -20,6 +20,7 @@ import androidx.lifecycle.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -67,7 +68,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
-        val perSessionData = trackerData.groupBy { it.bucket }
+        // FIXME exclude false positive of DDG app
+        // we don't yet know the reason why the DDG app appears sometimes in the list of of tracking apps
+        // for now we manually exclude while we investigate the root cause
+        val perSessionData = trackerData.filter { !VpnExclusionList.isDdgApp(it.vpnTracker.trackingApp.packageId) }.groupBy { it.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
             val perAppData = sessionTrackers.groupBy { it.vpnTracker.trackingApp.packageId }

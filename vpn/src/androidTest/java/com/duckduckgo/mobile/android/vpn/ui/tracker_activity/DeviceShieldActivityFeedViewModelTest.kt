@@ -112,7 +112,22 @@ class DeviceShieldActivityFeedViewModelTest {
     fun whenGetMostRecentTrackersIsNotEmptyAndOutsideTimeWindowThenEmitEmpty() = runBlocking {
         db.vpnTrackerDao().insert(dummyTrackers[3])
 
+        // we always start with empty, that's why we expect two items
         viewModel.getMostRecentTrackers(timeWindow).test {
+            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetMostRecentTrackersContainsDuckDuckGoAppFilterEntryOut() = runBlocking {
+        db.vpnTrackerDao().insert(dummyTrackers[4])
+
+        // we always start with empty, that's why we expect two items
+        viewModel.getMostRecentTrackers(timeWindow).test {
+            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -178,6 +193,17 @@ private val dummyTrackers = listOf(
         trackingApp = TrackingApp(
             packageId = "foo.package.id",
             appDisplayName = "Foo"
+        )
+    ),
+    VpnTracker(
+        timestamp = TEST_TIMESTAMP,
+        trackerCompanyId = 0,
+        domain = "doubleclick.net",
+        company = "Google LLC",
+        companyDisplayName = "Google",
+        trackingApp = TrackingApp(
+            packageId = "com.duckduckgo.mobile.android.vpn",
+            appDisplayName = "DuckDuckGo"
         )
     )
 )
