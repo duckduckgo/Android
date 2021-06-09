@@ -21,6 +21,7 @@ import android.content.Context
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -106,7 +107,8 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector
+        emailInjector: EmailInjector,
+        appLinksHandler: AppLinksHandler
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -123,7 +125,8 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector
+            emailInjector,
+            appLinksHandler
         )
     }
 

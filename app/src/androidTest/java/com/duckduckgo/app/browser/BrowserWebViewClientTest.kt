@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.webkit.*
@@ -25,6 +26,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -70,6 +72,7 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
+    private val appLinksHandler: AppLinksHandler = AppLinksHandler()
 
     @UiThreadTest
     @Before
@@ -90,7 +93,8 @@ class BrowserWebViewClientTest {
             thirdPartyCookieManager,
             TestCoroutineScope(),
             coroutinesTestRule.testDispatcherProvider,
-            emailInjector
+            emailInjector,
+            appLinksHandler
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
@@ -278,12 +282,12 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkTriggeredAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
+    fun whenAppLinkOpenedInBrowserAndIsRedirectThenReturnFalse() = coroutinesTestRule.runBlocking {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
             whenever(webResourceRequest.isRedirect).thenReturn(true)
             whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            testee.appLinkTriggered = true
+            testee.appLinksHandler.enterBrowserState()
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).appLinkClicked(any())
         }
@@ -295,8 +299,33 @@ class BrowserWebViewClientTest {
             whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink())
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            testee.appLinksHandler.enterBrowserState()
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).appLinkClicked(any())
+        }
+    }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedAfterAppLinkOpenedInBrowserThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink("", Intent(), ""))
+            whenever(webResourceRequest.isRedirect).thenReturn(false)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            testee.appLinksHandler.enterBrowserState()
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verify(listener).nonHttpAppLinkClicked(any())
+        }
+    }
+
+    @Test
+    fun whenNonHttpRedirectDetectedAfterAppLinkOpenedInBrowserThenReturnTrueAndDontLaunchExternalApp() = coroutinesTestRule.runBlocking {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink("", Intent(), ""))
+            whenever(webResourceRequest.isRedirect).thenReturn(true)
+            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+            testee.appLinksHandler.enterBrowserState()
+            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+            verify(listener, never()).nonHttpAppLinkClicked(any())
         }
     }
 
@@ -307,6 +336,24 @@ class BrowserWebViewClientTest {
             assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener, never()).appLinkClicked(any())
         }
+    }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedOnApiLessThan24ThenReturnTrueAndLaunchExternalApp() = coroutinesTestRule.runBlocking {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink("", Intent(), ""))
+            assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+            verify(listener).nonHttpAppLinkClicked(any())
+        }
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenResetAppLinkState() {
+        appLinksHandler.enterBrowserState()
+        assertTrue(appLinksHandler.appLinkOpenedInBrowser)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        assertFalse(appLinksHandler.appLinkOpenedInBrowser)
     }
 
     private class TestWebView(context: Context) : WebView(context)

@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -59,12 +60,12 @@ class BrowserWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val emailInjector: EmailInjector
+    private val emailInjector: EmailInjector,
+    val appLinksHandler: AppLinksHandler
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
-    var appLinkTriggered = false
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -81,7 +82,7 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, isForMainFrame = true, isRedirect = true)
+        return shouldOverride(view, url, isForMainFrame = true, isRedirect = false)
     }
 
     /**
@@ -112,19 +113,11 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.url}")
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || isRedirect && appLinkTriggered || !isForMainFrame) {
-                        return false
-                    }
-                    launchExternalApp(urlType)
-                    true
+                    return appLinksHandler.handleAppLink(isRedirect, isForMainFrame) { launchExternalApp(urlType) }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
-                    Timber.i("Found intent type link for ${urlType.url}")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkTriggered) {
-                        return true
-                    }
-                    launchExternalApp(urlType)
-                    true
+                    Timber.i("Found non-http app link for ${urlType.url}")
+                    return appLinksHandler.handleNonHttpAppLink(isRedirect) { launchExternalApp(urlType) }
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
@@ -181,7 +174,7 @@ class BrowserWebViewClient(
             emailInjector.resetInjectedJsFlag()
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            appLinkTriggered = false
+            appLinksHandler.reset()
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
