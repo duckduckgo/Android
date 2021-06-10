@@ -121,7 +121,7 @@
                     android:layout_marginTop="18dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/privacyReportEnableLabel"
-                    app:srcCompat="@drawable/ic_device_shield_off" />
+                    app:srcCompat="@drawable/ic_apptb_warning" />
 
                 <TextView
                     android:id="@+id/textView3"
