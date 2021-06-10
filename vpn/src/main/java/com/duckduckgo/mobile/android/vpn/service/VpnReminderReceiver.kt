@@ -75,13 +75,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
             Timber.v("Vpn will restart because the user asked it")
             deviceShieldPixels.enableFromReminderNotification()
             goAsync(pendingResult) {
-                TrackerBlockingVpnService.startIntent(context).also {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(it)
-                    } else {
-                        context.startService(it)
-                    }
-                }
+                TrackerBlockingVpnService.startService(context)
             }
         }
     }

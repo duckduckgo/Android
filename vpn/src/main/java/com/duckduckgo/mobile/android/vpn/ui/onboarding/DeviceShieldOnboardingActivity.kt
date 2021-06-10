@@ -221,7 +221,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     }
 
     private fun startVpn() {
-        startService(TrackerBlockingVpnService.startIntent(this))
+        TrackerBlockingVpnService.startService(this)
         viewModel.onDeviceShieldEnabled(true)
         setResult(RESULT_OK)
         finish()

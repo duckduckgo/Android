@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.trackers
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-
 class AppTrackerJsonParser {
 
     companion object {
