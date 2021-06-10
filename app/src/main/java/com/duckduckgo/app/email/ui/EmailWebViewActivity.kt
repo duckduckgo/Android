@@ -78,6 +78,14 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (binding.simpleWebview.canGoBack()) {
+            binding.simpleWebview.goBack()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     companion object {
         const val URL_EXTRA = "URL_EXTRA"
 
