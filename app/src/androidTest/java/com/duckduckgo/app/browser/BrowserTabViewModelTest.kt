@@ -3203,7 +3203,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAppLinkClickedThenAppLinkCommandSent() {
-        testee.appLinkClicked(SpecialUrlDetector.UrlType.AppLink())
+        testee.appLinkClicked(SpecialUrlDetector.UrlType.AppLink(url = "https://example.com"))
 
         assertCommandIssued<Command.HandleAppLink>()
     }

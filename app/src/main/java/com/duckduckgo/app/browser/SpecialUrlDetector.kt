@@ -37,7 +37,7 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val url: String? = null) : UrlType()
+        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val url: String) : UrlType()
         class NonHttpAppLink(val url: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val url: String) : UrlType()

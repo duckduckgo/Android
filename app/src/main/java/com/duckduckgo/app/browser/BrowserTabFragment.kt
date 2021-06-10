@@ -805,7 +805,7 @@ class BrowserTabFragment :
     private fun openAppLinkDialog(
         appIntent: Intent?,
         excludedComponents: List<ComponentName>?,
-        url: String? = null,
+        url: String,
         headers: Map<String, String> = emptyMap()
     ) {
         context?.let {
@@ -919,7 +919,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchAppLinkDialog(context: Context, url: String?, headers: Map<String, String>, onClick: () -> Unit) {
+    private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, onClick: () -> Unit) {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
@@ -931,12 +931,8 @@ class BrowserTabFragment :
                     webViewClient.appLinksHandler.reset()
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
-                    if (url != null) {
-                        webView?.loadUrl(url, headers)
-                        webViewClient.appLinksHandler.enterBrowserState()
-                    } else {
-                        showToast(R.string.unableToOpenLink)
-                    }
+                    webView?.loadUrl(url, headers)
+                    webViewClient.appLinksHandler.enterBrowserState()
                 }
                 .show()
         }
