@@ -28,9 +28,9 @@ import android.net.VpnService
 import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -90,9 +90,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
 
     @Inject
-    lateinit var vpnServiceHeartbeat: VpnServiceHeartbeat
-
-    @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
     @Inject
@@ -106,6 +103,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var newAppBroadcastReceiver: NewAppBroadcastReceiver
+
+    @Inject
+    lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
     private val queues = VpnQueues()
 
@@ -211,8 +211,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        launch {
-            vpnServiceHeartbeat.startHeartbeat()
+        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+            Timber.v("VPN log: starting ${it.javaClass} callback")
+            it.onVpnStarted(this)
         }
     }
 
@@ -334,8 +335,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tunInterface = null
 
         sendStopPixels(reason)
-        if (reason !is VpnStopReason.Error) {
-            vpnServiceHeartbeat.stopHeartbeat()
+        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+            Timber.v("VPN log: stopping ${it.javaClass} callback")
+            it.onVpnStopped(this, reason)
         }
 
         stopForeground(true)
@@ -548,7 +550,7 @@ class VpnQueues {
     }
 }
 
-private sealed class VpnStopReason {
+sealed class VpnStopReason {
     object SelfStop : VpnStopReason()
     object Error : VpnStopReason()
     object Revoked : VpnStopReason()
