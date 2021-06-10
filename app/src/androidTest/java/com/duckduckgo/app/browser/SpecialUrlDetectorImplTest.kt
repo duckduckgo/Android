@@ -114,11 +114,10 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenAppLinksEnabledAndOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
-        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
-        val type = testee.determineType("https://example.com")
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
@@ -126,19 +125,15 @@ class SpecialUrlDetectorImplTest {
             assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
             assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
             assertNull(appLinkType.excludedComponents)
-        } else {
-            verifyZeroInteractions(mockPackageManager)
-            assertTrue(type is Web)
         }
     }
 
     @Test
     fun whenAppLinksEnabledAndMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
-        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
-        val type = testee.determineType("https://example.com")
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
@@ -147,7 +142,14 @@ class SpecialUrlDetectorImplTest {
             assertEquals(EXAMPLE_BROWSER_PACKAGE, appLinkType.excludedComponents!![0].packageName)
             assertEquals(EXAMPLE_BROWSER_ACTIVITY_NAME, appLinkType.excludedComponents!![0].className)
             assertNull(appLinkType.appIntent)
-        } else {
+        }
+    }
+
+    @Test
+    fun whenAppLinkCheckedOnApiLessThan24ThenReturnWebType() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
+            val type = testee.determineType("https://example.com")
             verifyZeroInteractions(mockPackageManager)
             assertTrue(type is Web)
         }
