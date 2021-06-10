@@ -22,7 +22,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.beta.BetaFeaturesActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <TextView
         android:layout_width="match_parent"

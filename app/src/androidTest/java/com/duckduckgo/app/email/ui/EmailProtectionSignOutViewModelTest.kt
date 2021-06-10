@@ -55,14 +55,6 @@ class EmailProtectionSignOutViewModelTest {
     }
 
     @Test
-    fun whenOnEmailLogoutThenEmitCloseScreenCommand() = coroutineRule.runBlocking {
-        testee.commands.test {
-            testee.onEmailLogout()
-            assertEquals(CloseScreen, expectItem())
-        }
-    }
-
-    @Test
     fun whenOnEmailLogoutThenCallSignOut() {
         testee.onEmailLogout()
         verify(mockEmailManager).signOut()

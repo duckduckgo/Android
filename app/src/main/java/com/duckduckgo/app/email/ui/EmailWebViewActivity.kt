@@ -16,45 +16,65 @@
 
 package com.duckduckgo.app.email.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebSettings
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.BrowserWebViewClient
+import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_email_faq.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
-class EmailFaqActivity : DuckDuckGoActivity() {
+class EmailWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
+    @Inject
+    lateinit var webViewClient: BrowserWebViewClient
+
+    @Inject
+    lateinit var emailInjector: EmailInjector
+
+    private lateinit var binding: ActivityEmailWebviewBinding
+
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_email_faq)
+        binding = ActivityEmailWebviewBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
         setupToolbar(toolbar)
 
         val url = intent.getStringExtra(URL_EXTRA)
 
-        simpleWebview?.let {
+        binding.simpleWebview.let {
+            it.webViewClient = webViewClient
+
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
+                javaScriptEnabled = true
+                domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 builtInZoomControls = true
                 displayZoomControls = false
-                javaScriptEnabled = true
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(true)
+                databaseEnabled = false
                 setSupportZoom(true)
             }
+            emailInjector.addJsInterface(it) { }
         }
 
         url?.let {
-            simpleWebview.loadUrl(it)
+            binding.simpleWebview.loadUrl(it)
         }
     }
 
@@ -62,7 +82,7 @@ class EmailFaqActivity : DuckDuckGoActivity() {
         const val URL_EXTRA = "URL_EXTRA"
 
         fun intent(context: Context, urlExtra: String): Intent {
-            val intent = Intent(context, EmailFaqActivity::class.java)
+            val intent = Intent(context, EmailWebViewActivity::class.java)
             intent.putExtra(URL_EXTRA, urlExtra)
             return intent
         }

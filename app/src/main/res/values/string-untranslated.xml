@@ -39,7 +39,7 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionFaqActivityTitle">Email Protection</string>
+    <string name="emailProtectionWebViewActivityTitle">Email Protection</string>
     <string name="emailProtectionSignOutActivityTitle">Email Protection</string>
     <string name="emailProtectionActivityTitle">Email Protection</string>
     <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>

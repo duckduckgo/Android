@@ -16,43 +16,22 @@
 
 package com.duckduckgo.app.email.ui
 
-import android.util.Log
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.work.Configuration
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.impl.utils.SynchronousExecutor
-import androidx.work.testing.WorkManagerTestInitHelper
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.email.api.EmailAlias
-import com.duckduckgo.app.email.api.EmailInviteCodeResponse
-import com.duckduckgo.app.email.api.EmailService
-import com.duckduckgo.app.email.api.WaitlistResponse
-import com.duckduckgo.app.email.api.WaitlistStatusResponse
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.LOGIN_URL
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Command.*
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.ADDRESS_BLOG_POST
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.PRIVACY_GUARANTEE
-import com.duckduckgo.app.email.ui.EmailProtectionViewModel.Companion.SIGN_UP_URL
-import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.lang.Exception
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-@FlowPreview
 @ExperimentalCoroutinesApi
 class EmailProtectionViewModelTest {
 
@@ -60,182 +39,43 @@ class EmailProtectionViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockEmailManager: EmailManager = mock()
-    private var mockEmailService: EmailService = mock()
-    private val waitlistBuilder: WaitlistWorkRequestBuilder = WaitlistWorkRequestBuilder()
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    private lateinit var workManager: WorkManager
+    private val emailStateFlow = MutableStateFlow(false)
     private lateinit var testee: EmailProtectionViewModel
 
     @Before
     fun before() {
-        whenever(mockEmailManager.waitlistState()).thenReturn(NotJoinedQueue)
-        initializeWorkManager()
-        testee = EmailProtectionViewModel(mockEmailManager, mockEmailService, workManager, waitlistBuilder)
+        whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
+        testee = EmailProtectionViewModel(mockEmailManager)
     }
 
     @Test
-    fun whenViewModelCreatedThenEmitWaitlistState() = coroutineRule.runBlocking {
+    fun whenViewModelCreatedThenEmitEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
-            assert(expectItem().waitlistState is NotJoinedQueue)
+            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenHaveADuckAddressThenEmitCommandOpenUrlInBrowserWithCorrectUrl() = coroutineRule.runBlocking {
-        testee.commands.test {
-            testee.haveADuckAddress()
-            assertEquals(OpenUrl(url = LOGIN_URL, openInBrowser = true), expectItem())
-        }
-    }
-
-    @Test
-    fun whenHaveAnInviteCodeThenEmitCommandOpenUrlInBrowserWithCorrectUrl() = coroutineRule.runBlocking {
-        val inviteCode = "abcde"
-        whenever(mockEmailManager.getInviteCode()).thenReturn(inviteCode)
-        val expectedURL = "$SIGN_UP_URL$inviteCode"
-
-        testee.commands.test {
-            testee.haveAnInviteCode()
-            assertEquals(OpenUrl(url = expectedURL, openInBrowser = true), expectItem())
-        }
-    }
-
-    @Test
-    fun whenReadBlogPostThenEmitCommandOpenUrlNotInBrowserWithCorrectUrl() = coroutineRule.runBlocking {
-        testee.commands.test {
-            testee.readBlogPost()
-            assertEquals(OpenUrl(url = ADDRESS_BLOG_POST, openInBrowser = false), expectItem())
-        }
-    }
-
-    @Test
-    fun whenReadPrivacyGuaranteeThenEmitCommandOpenUrlNotInBrowserWithCorrectUrl() = coroutineRule.runBlocking {
-        testee.commands.test {
-            testee.readPrivacyGuarantees()
-            assertEquals(OpenUrl(url = PRIVACY_GUARANTEE, openInBrowser = false), expectItem())
-        }
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallTimestampIsNullThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
-        whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("token", null))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
-
-        testee.commands.test {
-            testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
-        }
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallTokenIsNullThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
-        whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse(null, 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
-
-        testee.commands.test {
-            testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
-        }
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallTokenIsEmptyThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
-        whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("", 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
-
-        testee.commands.test {
-            testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
-        }
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenJoinWaitlistCalled() = coroutineRule.runBlocking {
-        givenJoinWaitlistSuccessful()
-
-        testee.joinTheWaitlist()
-
-        verify(mockEmailManager).joinWaitlist(12345, "token")
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitWaitlistState() = coroutineRule.runBlocking {
-        givenJoinWaitlistSuccessful()
-
+    fun whenSignedInFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
-            assert(expectItem().waitlistState is NotJoinedQueue)
+            emailStateFlow.emit(false)
+            (expectItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
 
-            testee.joinTheWaitlist()
-
-            assert(expectItem().waitlistState is JoinedQueue)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitShowNotificationDialogCommand() = coroutineRule.runBlocking {
-        givenJoinWaitlistSuccessful()
+    fun whenSignedInFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
+        testee.viewState.test {
+            emailStateFlow.emit(true)
+            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
-        testee.commands.test {
-            testee.joinTheWaitlist()
-
-            assertEquals(ShowNotificationDialog, expectItem())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
-    @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEnqueueEmailWaitlistWork() = coroutineRule.runBlocking {
-        givenJoinWaitlistSuccessful()
-
-        testee.joinTheWaitlist()
-
-        assertWaitlistWorkerIsEnqueued()
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallFailsThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
-        testee = EmailProtectionViewModel(mockEmailManager, TestEmailService(), workManager, waitlistBuilder)
-
-        testee.commands.test {
-            testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
-        }
-    }
-
-    private fun assertWaitlistWorkerIsEnqueued() {
-        val scheduledWorkers = getScheduledWorkers()
-        assertFalse(scheduledWorkers.isEmpty())
-    }
-
-    private fun givenJoinWaitlistSuccessful() = coroutineRule.runBlocking {
-        whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("token", 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
-    }
-
-    private fun getScheduledWorkers(): List<WorkInfo> {
-        return workManager
-            .getWorkInfosByTag(WaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
-            .get()
-            .filter { it.state == WorkInfo.State.ENQUEUED }
-    }
-
-    private fun initializeWorkManager() {
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .build()
-
-        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
-        workManager = WorkManager.getInstance(context)
-    }
-
-    class TestEmailService : EmailService {
-        override suspend fun newAlias(authorization: String): EmailAlias = EmailAlias("test")
-
-        override suspend fun joinWaitlist(): WaitlistResponse { throw Exception() }
-
-        override suspend fun waitlistStatus(): WaitlistStatusResponse = WaitlistStatusResponse(1234)
-
-        override suspend fun getCode(token: String): EmailInviteCodeResponse = EmailInviteCodeResponse("token")
-    }
 }

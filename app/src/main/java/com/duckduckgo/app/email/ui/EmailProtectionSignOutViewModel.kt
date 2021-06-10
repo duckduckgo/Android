@@ -38,7 +38,6 @@ class EmailProtectionSignOutViewModel(
 
     sealed class Command {
         object SignOut : Command()
-        object CloseScreen : Command()
     }
 
     fun signOut() {
@@ -50,7 +49,6 @@ class EmailProtectionSignOutViewModel(
     fun onEmailLogout() {
         viewModelScope.launch {
             emailManager.signOut()
-            commandChannel.send(Command.CloseScreen)
         }
     }
 }

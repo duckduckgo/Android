@@ -22,9 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.app.email.ui.EmailProtectionSignOutActivity">
-
-    <include layout="@layout/include_toolbar" />
+    tools:context="com.duckduckgo.app.email.ui.EmailProtectionSignOutFragment">
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/primaryAddress"

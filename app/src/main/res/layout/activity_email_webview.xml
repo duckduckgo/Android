@@ -23,7 +23,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.about.AboutDuckDuckGoActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <WebView
         android:id="@+id/simpleWebview"

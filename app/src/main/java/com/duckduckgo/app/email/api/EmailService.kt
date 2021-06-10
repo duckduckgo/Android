@@ -26,14 +26,14 @@ interface EmailService {
     @POST("https://quack.duckduckgo.com/api/email/addresses")
     suspend fun newAlias(@Header("Authorization") authorization: String): EmailAlias
 
-    @POST("https://quack.duckduckgo.com/api/waitlist/join")
+    @POST("https://quack.duckduckgo.com/api/auth/waitlist/join")
     suspend fun joinWaitlist(): WaitlistResponse
 
-    @GET("https://quack.duckduckgo.com/api/waitlist/status")
+    @GET("https://quack.duckduckgo.com/api/auth/waitlist/status")
     suspend fun waitlistStatus(): WaitlistStatusResponse
 
     @FormUrlEncoded
-    @POST("https://quack.duckduckgo.com/api/waitlist/code")
+    @POST("https://quack.duckduckgo.com/api/auth/waitlist/code")
     suspend fun getCode(@Field("token") token: String): EmailInviteCodeResponse
 }
 

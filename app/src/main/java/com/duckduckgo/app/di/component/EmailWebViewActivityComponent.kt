@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.app.email.ui.EmailProtectionSignOutActivity
+import com.duckduckgo.app.email.ui.EmailWebViewActivity
 import com.duckduckgo.di.scopes.AppObjectGraph
-
 import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -34,21 +33,21 @@ import dagger.multibindings.IntoMap
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface EmailProtectionSignOutActivityComponent : AndroidInjector<EmailProtectionSignOutActivity> {
+interface EmailWebViewActivityComponent : AndroidInjector<EmailWebViewActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<EmailProtectionSignOutActivity>
+    interface Factory : AndroidInjector.Factory<EmailWebViewActivity>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface EmailProtectionSignOutActivityComponentProvider {
-    fun provideEmailProtectionSignOutActivityComponentFactory(): EmailProtectionSignOutActivityComponent.Factory
+interface EmailWebViewActivityComponentComponentProvider {
+    fun provideEmailWebViewActivityComponentFactory(): EmailWebViewActivityComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class EmailProtectionSignOutActivityBindingModule {
+abstract class EmailWebViewActivityComponentBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(EmailProtectionSignOutActivity::class)
-    abstract fun bindEmailProtectionSignOutActivityComponentFactory(factory: EmailProtectionSignOutActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(EmailWebViewActivity::class)
+    abstract fun bindEmailWebViewActivityComponentFactory(factory: EmailWebViewActivityComponent.Factory): AndroidInjector.Factory<*>
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.app.email.ui.EmailFaqActivity
+import com.duckduckgo.app.email.ui.EmailProtectionSignOutFragment
 import com.duckduckgo.di.scopes.AppObjectGraph
+
 import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -33,21 +34,21 @@ import dagger.multibindings.IntoMap
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface EmailFaqActivityComponent : AndroidInjector<EmailFaqActivity> {
+interface EmailProtectionSignOutFragmentComponent : AndroidInjector<EmailProtectionSignOutFragment> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<EmailFaqActivity>
+    interface Factory : AndroidInjector.Factory<EmailProtectionSignOutFragment>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface EmailFaqActivityComponentComponentProvider {
-    fun provideEmailFaqActivityComponentFactory(): EmailFaqActivityComponent.Factory
+interface EmailProtectionSignOutFragmentComponentProvider {
+    fun provideEmailProtectionSignOutFragmentComponentFactory(): EmailProtectionSignOutFragmentComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class EmailFaqActivityComponentBindingModule {
+abstract class EmailProtectionSignOutFragmentBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(EmailFaqActivity::class)
-    abstract fun bindEmailFaqActivityComponentFactory(factory: EmailFaqActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(EmailProtectionSignOutFragment::class)
+    abstract fun bindEmailProtectionSignOutFragmentComponentFactory(factory: EmailProtectionSignOutFragmentComponent.Factory): AndroidInjector.Factory<*>
 }

@@ -19,7 +19,6 @@ package com.duckduckgo.app.beta
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -28,40 +27,29 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class BetaFeaturesViewModel(
-    private val emailManager: EmailManager
-) : ViewModel(), LifecycleObserver {
+class BetaFeaturesViewModel : ViewModel(), LifecycleObserver {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commandsFlow = commandChannel.receiveAsFlow()
 
     fun onEmailSettingClicked() {
         viewModelScope.launch {
-            if (emailManager.isSignedIn()) {
-                val emailAddress = emailManager.getEmailAddress() // If signed in there is always a non-null address
-                commandChannel.send(Command.LaunchEmailSignOut(emailAddress!!))
-            } else {
-                commandChannel.send(Command.LaunchEmailSignIn)
-            }
+            commandChannel.send(Command.LaunchEmailProtection)
         }
     }
 
     sealed class Command {
-        data class LaunchEmailSignOut(val emailAddress: String) : Command()
-        object LaunchEmailSignIn : Command()
+        object LaunchEmailProtection : Command()
     }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
-class BetaFeaturesViewModelFactory @Inject constructor(
-    private val emailManager: Provider<EmailManager>,
-) : ViewModelFactoryPlugin {
+class BetaFeaturesViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BetaFeaturesViewModel::class.java) -> (BetaFeaturesViewModel(emailManager.get()) as T)
+                isAssignableFrom(BetaFeaturesViewModel::class.java) -> (BetaFeaturesViewModel() as T)
                 else -> null
             }
         }

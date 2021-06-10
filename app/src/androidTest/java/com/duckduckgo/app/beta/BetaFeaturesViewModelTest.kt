@@ -18,16 +18,13 @@ package com.duckduckgo.app.beta
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.beta.BetaFeaturesViewModel.Command.*
 import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
@@ -39,45 +36,19 @@ class BetaFeaturesViewModelTest {
 
     private lateinit var testee: BetaFeaturesViewModel
 
-    @Mock
-    private lateinit var mockEmailManager: EmailManager
-
     @Before
     fun before() {
-        MockitoAnnotations.openMocks(this)
-        testee = BetaFeaturesViewModel(mockEmailManager)
+        testee = BetaFeaturesViewModel()
     }
 
     @Test
-    fun whenOnEmailSettingClickedAndUserIsSignedInThenEmitLaunchEmailSignOutCommandWithCorrectEmailAddress() = coroutineTestRule.runBlocking {
+    fun whenOnEmailSettingClickedThenEmitLaunchEmailProtectionCommand() = coroutineTestRule.runBlocking {
         testee.commandsFlow.test {
-            givenUserIsSignedIn()
             testee.onEmailSettingClicked()
 
-            assertEquals(BetaFeaturesViewModel.Command.LaunchEmailSignOut("test@duck.com"), expectItem())
+            assertEquals(LaunchEmailProtection, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenOnEmailSettingClickedAndUserIsNotSignedInThenEmitLaunchEmailSignInCommand() = coroutineTestRule.runBlocking {
-        testee.commandsFlow.test {
-            givenUserIsNotSignedIn()
-            testee.onEmailSettingClicked()
-
-            assertEquals(BetaFeaturesViewModel.Command.LaunchEmailSignIn, expectItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    private fun givenUserIsNotSignedIn() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-    }
-
-    private fun givenUserIsSignedIn() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
     }
 }

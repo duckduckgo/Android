@@ -17,103 +17,19 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.email.ui.EmailProtectionActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/headerImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        app:srcCompat="@drawable/contact_us" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/statusTitle"
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
-        android:paddingTop="24dp"
-        android:text="@string/emailProtectionStatusTitleJoin"
-        android:textAlignment="center"
-        android:textColor="?attr/settingsItemTextColor"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/emailPrivacyDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
-        android:paddingTop="8dp"
-        android:text="@string/emailProtectionDescriptionJoin"
-        android:textAlignment="center"
-        android:textColor="?attr/settingsMinorTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="24dp"
-        android:orientation="vertical">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/waitListButton"
-            style="@style/EmailButton.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="@string/emailProtectionWaitlistCta" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/getStartedButton"
-            style="@style/EmailButton.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="@string/emailProtectionGetStartedCta" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/inviteCodeButton"
-            style="@style/EmailButton.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="@string/emailProtectionInviteCodeCta" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/duckAddressButton"
-            style="@style/EmailButton.Secondary"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="@string/emailProtectionDuckAddressCta" />
-    </LinearLayout>
-
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/footerDescription"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="35dp"
-        android:fontFamily="sans-serif"
-        android:gravity="bottom|center_horizontal"
-        android:lineSpacingExtra="4sp"
-        android:text="@string/emailProtectionFooterDescription"
-        android:textColor="?attr/settingsMinorTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
