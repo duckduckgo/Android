@@ -154,17 +154,6 @@
       },
       "CDN": false
     },
-    "graph.facebook.com": {
-      "owner": {
-        "name": "Facebook, Inc.",
-        "displayName": "Facebook"
-      },
-      "app": {
-        "score": 475,
-        "prevalence": 0.573
-      },
-      "CDN": false
-    },
     "g.doubleclick.net": {
       "owner": {
         "name": "Google LLC",

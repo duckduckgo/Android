@@ -78,22 +78,11 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenReporDisableThenFireDailyPixel() {
+    fun whenReportDisableThenFireDailyPixel() {
         deviceShieldPixels.reportDisabled()
         deviceShieldPixels.reportDisabled()
 
         verify(pixel).fire(DeviceShieldPixelNames.DS_DISABLE_DAILY.pixelName)
-        verifyNoMoreInteractions(pixel)
-    }
-
-    @Test
-    fun whenEnableFromNewTabThenFireUniqueDailyAndCountPixels() {
-        deviceShieldPixels.enableFromNewTab()
-        deviceShieldPixels.enableFromNewTab()
-
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB)
         verifyNoMoreInteractions(pixel)
     }
 
