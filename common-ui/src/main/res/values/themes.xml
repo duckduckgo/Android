@@ -244,25 +244,16 @@
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
 
-    <style name="Theme.AndroidVpn" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/whiteFive</item>
-        <item name="colorPrimaryDark">@color/whiteFive</item>
-        <item name="colorAccent">@color/warmBlue</item>
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
-        <item name="android:windowLightStatusBar">true</item>
+    <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
     </style>
 
-    <style name="Theme.AndroidVpn.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">512dp</item>
     </style>
 
-    <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
-        <item name="android:statusBarColor">@color/grey</item>
+    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorAccent</item>
     </style>
-
-    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
-
-    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
 
 </resources>

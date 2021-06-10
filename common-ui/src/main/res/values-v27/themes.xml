@@ -35,18 +35,4 @@
         <item name="android:navigationBarColor">@color/white</item>
     </style>
 
-    <style name="FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">?toolbarBgColor</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="bottomSheetStyle">@style/FireDialogStyle</item>
-    </style>
-
-    <style name="EmailTooltip" parent="@style/Theme.Design.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">?toolbarBgColor</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="bottomSheetStyle">@style/EmailTooltipStyle</item>
-    </style>
-
 </resources>
