@@ -125,6 +125,7 @@ android {
 dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
+    implementation project(path: ':common-ui')
     implementation project(path: ':di')
 
     implementation AndroidX.legacy.supportV4
