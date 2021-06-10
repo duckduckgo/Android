@@ -100,7 +100,7 @@ class SpecialUrlDetectorImpl(
 
     @Throws(URISyntaxException::class)
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
-        val browsableIntent = Intent.parseUri(uriString, 0)
+        val browsableIntent = Intent.parseUri(uriString, URI_FLAG)
         browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
         return context.packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
     }
@@ -112,7 +112,7 @@ class SpecialUrlDetectorImpl(
     }
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(nonBrowserActivity: ResolveInfo, uriString: String): Intent {
-        val intent = Intent.parseUri(uriString, 0)
+        val intent = Intent.parseUri(uriString, URI_FLAG)
         intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
         return intent
     }
@@ -134,7 +134,7 @@ class SpecialUrlDetectorImpl(
 
     private fun buildIntent(uriString: String): UrlType {
         return try {
-            val intent = Intent.parseUri(uriString, 0)
+            val intent = Intent.parseUri(uriString, URI_FLAG)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
             UrlType.NonHttpAppLink(url = uriString, intent = intent, fallbackUrl = fallbackUrl)
         } catch (e: URISyntaxException) {
@@ -163,6 +163,7 @@ class SpecialUrlDetectorImpl(
         private const val DATA_SCHEME = "data"
         private const val JAVASCRIPT_SCHEME = "javascript"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
+        private const val URI_FLAG = 0
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20
         const val EMAIL_MAX_LENGTH = 1000
