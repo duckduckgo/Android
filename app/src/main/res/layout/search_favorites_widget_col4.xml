@@ -23,6 +23,7 @@
     android:paddingTop="16dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
+    android:paddingBottom="16dp"
     android:background="@drawable/search_widget_favorites_background">
 
     <RelativeLayout
@@ -74,5 +75,6 @@
         android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:verticalSpacing="24dp"
         android:numColumns="4"/>
 </LinearLayout>

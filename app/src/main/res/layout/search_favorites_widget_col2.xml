@@ -22,8 +22,8 @@
     android:orientation="vertical"
     android:paddingTop="16dp"
     android:paddingBottom="16dp"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:background="@drawable/search_widget_favorites_background">
 
     <RelativeLayout
