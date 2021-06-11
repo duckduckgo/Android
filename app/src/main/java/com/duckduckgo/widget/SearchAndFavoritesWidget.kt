@@ -29,10 +29,13 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
 import timber.log.Timber
 
 
-class SearchAndFavoritesWidget(val layoutId: Int = R.layout.search_favorites_widget) : AppWidgetProvider() {
+class SearchAndFavoritesWidget() : AppWidgetProvider() {
+
+    private var layoutId: Int = R.layout.search_favorites_widget_col2
 
     companion object {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
@@ -96,6 +99,19 @@ class SearchAndFavoritesWidget(val layoutId: Int = R.layout.search_favorites_wid
             maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) //portrait
         }
 
+        //pixel 2 -> 2x2 -> 214 x 176
+        //nexus 5 -> 2x2 -> 156 x 204
+
+        val (columns, rows) = getCurrentWidgetSize(minWidth, maxWidth, minHeight, maxHeight)
+        Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
+
+        layoutId = when(columns) {
+            2 -> R.layout.search_favorites_widget_col2
+            3 -> R.layout.search_favorites_widget_col3
+            4 -> R.layout.search_favorites_widget_col4
+            else -> R.layout.search_favorites_widget_col4
+        }
+
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
@@ -105,8 +121,9 @@ class SearchAndFavoritesWidget(val layoutId: Int = R.layout.search_favorites_wid
 
         val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
         adapterIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        adapterIntent.setData(Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME)))
-        remoteViews.setRemoteAdapter(appWidgetId, R.id.favoritesGrid, adapterIntent)
+        adapterIntent.putExtra(MAX_ITEMS_EXTRAS, columns * rows)
+        adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
 
         if(minWidth <= 110) {
@@ -116,7 +133,57 @@ class SearchAndFavoritesWidget(val layoutId: Int = R.layout.search_favorites_wid
         }
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-        //appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+    }
+
+    private fun getCurrentWidgetSize(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
+        val columns = calculateColumns(minWidth)
+        val rows = calculateRows(maxHeight)
+
+        return Pair(columns, rows)
+    }
+
+    private fun calculateColumns(width: Int): Int {
+        val margins = 32
+        val item = 72
+        val divider = 8
+        var n = 2
+        var totalSize = (n * item) + ((n - 1) * divider) + margins
+
+        Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
+
+        while (totalSize < width) {
+            ++n
+            totalSize = (n * item) + ((n - 1) * divider) + margins
+            Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
+        }
+        return n - 1
+    }
+
+    private fun calculateRows(height: Int): Int {
+        val searchBar = 44 + 24
+        val margins = 32
+        val item = 78
+        val divider = 24
+        var n = 1
+        var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
+
+        Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
+
+        while (totalSize < height) {
+            ++n
+            totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
+            Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
+        }
+
+        return n - 1
+    }
+
+    private fun getCurrentWidgetSizeBasedOnGuidelines(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
+        val rows = ((maxHeight + 30) / 70)
+        val columns = ((minWidth + 30) / 70)
+
+        return Pair(rows, columns)
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {

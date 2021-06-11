@@ -34,11 +34,17 @@ import javax.inject.Inject
 
 class FavoritesWidgetService: RemoteViewsService() {
 
+    companion object {
+        const val MAX_ITEMS_EXTRAS = "MAX_ITEMS_EXTRAS"
+    }
+
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
     class FavoritesWidgetItemFactory(val context: Context, intent: Intent): RemoteViewsFactory {
+
+        private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
 
         @Inject
         lateinit var favoritesDataRepository: FavoritesRepository
@@ -63,15 +69,18 @@ class FavoritesWidgetService: RemoteViewsService() {
 
         override fun getCount(): Int {
             Timber.i("SearchAndFavoritesWidget - getCount")
-            return domains.size
+            return maxItems
         }
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
-            val item = domains[position]
+            val item = if (position < domains.size) domains[position] else null
             val remoteViews = RemoteViews(context.packageName, R.layout.view_favorite_widget_item)
             remoteViews.setTextViewText(R.id.quickAccessTitle, item)
-            configureClickListener(remoteViews, item)
+            item?.let {
+                configureClickListener(remoteViews, item)
+            }
+
             return remoteViews
         }
 
