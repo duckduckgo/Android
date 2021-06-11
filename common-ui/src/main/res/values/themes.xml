@@ -17,7 +17,7 @@
 
 <resources>
 
-    <style name="BaseAppTheme.Base" parent="Theme.MaterialComponents.Light.Bridge"/>
+    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
     <style name="AppTheme" parent="BaseAppTheme">
 
