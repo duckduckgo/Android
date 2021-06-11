@@ -37,6 +37,9 @@ class DeviceShieldAlertNotificationBuilder {
     companion object {
 
         private const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
+        private const val TRACKER_COMPANY_GOOGLE = "Google"
+        private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
+        private const val TRACKER_COMPANY_AMAZON = "Amazon"
 
         private fun registerAlertChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -89,11 +92,30 @@ class DeviceShieldAlertNotificationBuilder {
             deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
             onNotificationPressedCallback: ResultReceiver
         ): Notification {
-
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
+
+            val notificationImage = getNotificationImage(deviceShieldNotification)
+            notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
+
             return buildNotification(context, notificationLayout, false, onNotificationPressedCallback)
+        }
+
+        private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_GOOGLE)){
+               return R.drawable.ic_apptb_google
+            }
+
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_AMAZON)){
+                return R.drawable.ic_apptb_amazon
+            }
+
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_FACEBOOK)){
+                return R.drawable.ic_apptb_facebook
+            }
+
+            return R.drawable.ic_apptb_default
         }
 
         private fun buildNotification(context: Context, content: RemoteViews, silent: Boolean, resultReceiver: ResultReceiver? = null): Notification {
@@ -116,6 +138,7 @@ class DeviceShieldAlertNotificationBuilder {
                 .setChannelId(VPN_ALERTS_CHANNEL_ID)
                 .build()
         }
+
 
     }
 

@@ -203,6 +203,9 @@ dependencies {
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:$workManager"
@@ -211,9 +214,6 @@ dependencies {
 
     // Dagger
     kapt Google.dagger.compiler
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
 
     // Glide
     implementation "com.github.bumptech.glide:glide:_"

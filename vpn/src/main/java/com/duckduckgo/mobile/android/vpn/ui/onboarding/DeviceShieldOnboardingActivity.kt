@@ -30,6 +30,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -44,6 +46,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private lateinit var viewPager: ViewPager2
     private lateinit var onboardingHeader: ImageView
+    private lateinit var onboardingAnimation: LottieAnimationView
     private lateinit var indicatorOne: ImageView
     private lateinit var indicatorTwo: ImageView
     private lateinit var indicatorThree: ImageView
@@ -72,7 +75,8 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     private fun bindViews() {
         onboardingClose = findViewById(R.id.onboarding_close)
         enableDeviceShieldToggle = findViewById(R.id.onboarding_switch_layout)
-        onboardingHeader = findViewById(R.id.onboarding_page_header)
+        onboardingHeader = findViewById(R.id.onboarding_page_image)
+        onboardingAnimation = findViewById(R.id.onboarding_page_animation)
         indicatorOne = findViewById(R.id.onboarding_active_indicator_one)
         indicatorTwo = findViewById(R.id.onboarding_active_indicator_two)
         indicatorThree = findViewById(R.id.onboarding_active_indicator_three)
@@ -113,18 +117,42 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private fun showOnboardindPage(position: Int) {
         val page = viewModel.pages[position]
-        if (position == 2) {
-            showEnableCTA()
-        } else {
-            showNextPageCTA()
-        }
 
-        onboardingHeader.setImageResource(page.imageHeader)
+        when (position) {
+            0 -> {
+                showNextPageCTA()
+                showAnimationView(page.imageHeader)
+            }
+            1 -> {
+                showNextPageCTA()
+                showAnimationView(page.imageHeader)
+            }
+            2 -> {
+                showHeaderView(page.imageHeader)
+                showEnableCTA()
+            }
+        }
 
         indicators.forEach { indicatorImage ->
             indicatorImage.setImageResource(R.drawable.ic_inactive_dot)
         }
         indicators[position].setImageResource(R.drawable.ic_active_dot)
+    }
+
+    private fun showAnimationView(animation: Int){
+        onboardingAnimation.isVisible = true
+        onboardingHeader.isVisible = false
+
+        LottieCompositionFactory.fromRawRes(this, animation)
+        onboardingAnimation.setAnimation(animation)
+        onboardingAnimation.playAnimation()
+    }
+
+    private fun showHeaderView(image: Int){
+        onboardingAnimation.isVisible = false
+        onboardingHeader.isVisible = true
+
+        onboardingHeader.setImageResource(image)
     }
 
     private fun showEnableCTA() {

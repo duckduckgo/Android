@@ -19,6 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:maxHeight="200dp"
     android:orientation="horizontal">
 
     <TextView
@@ -35,8 +36,8 @@
         android:id="@+id/deviceShieldNotificationStatusIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:scaleType="center"
-        android:src="@drawable/ic_device_shield_report"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_apptb_default"
         tools:ignore="ContentDescription" />
 
 </LinearLayout>

@@ -23,6 +23,8 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifier
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
@@ -74,7 +76,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val perSessionData = trackerData.filter { !VpnExclusionList.isDdgApp(it.vpnTracker.trackingApp.packageId) }.groupBy { it.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
-            val perAppData = sessionTrackers.groupBy { it.vpnTracker.trackingApp.packageId }
+            val perAppData = sessionTrackers.filter { it.vpnTracker.trackingApp.appDisplayName != OriginatingAppPackageIdentifierStrategy.UNKNOWN }
+                .groupBy { it.vpnTracker.trackingApp.packageId }
             var firstInBucket = true
 
             perAppData.values.forEach { appTrackers ->

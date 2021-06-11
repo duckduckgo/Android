@@ -26,6 +26,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -142,6 +143,10 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
             it.isChecked = privacyReportViewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
+        menu.findItem(R.id.diagnosticsScreen).isVisible = BuildConfig.DEBUG
+        menu.findItem(R.id.dataScreen).isVisible = BuildConfig.DEBUG
+        menu.findItem(R.id.debugLogging).isVisible = BuildConfig.DEBUG
+        menu.findItem(R.id.customDnsServer).isVisible = BuildConfig.DEBUG
         return true
     }
 

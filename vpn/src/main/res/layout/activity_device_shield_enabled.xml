@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/onboarding_enabled_header"
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
@@ -45,8 +45,12 @@
                 android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
                 android:paddingTop="80dp"
                 android:paddingBottom="12dp"
+                android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
-                android:src="@drawable/device_shield_onboarding_page_two_header" />
+                app:lottie_autoPlay="true"
+                app:lottie_rawRes="@raw/device_shield_tracking_apps"
+                app:lottie_imageAssetsFolder="images"
+                app:lottie_loop="true" />
 
 
             <ImageView
