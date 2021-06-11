@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
@@ -142,7 +141,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
@@ -267,7 +265,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockFavoritesRepository: FavoritesRepository
 
     @Mock
-    private lateinit var mockPackageManager: PackageManager
+    private lateinit var mockSpecialUrlDetector: SpecialUrlDetector
 
     @Mock
     private lateinit var mockAppLinksHandler: AppLinksHandler
@@ -363,7 +361,7 @@ class BrowserTabViewModelTest {
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetectorImpl(mockPackageManager, mockSettingsStore),
+            specialUrlDetector = mockSpecialUrlDetector,
             faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
@@ -1131,6 +1129,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+    }
+
+    @Test
+    fun whenEnteringAppLinkQueryThenNavigateInBrowser() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3211,7 +3217,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleAppLinkCalledThenHandleAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.AppLink(url = "")
+        val urlType = SpecialUrlDetector.UrlType.AppLink(url = "http://example.com")
         testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
         verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
@@ -3220,7 +3226,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("", Intent(), "")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("http://example.com", Intent(), "http://example.com")
         testee.handleNonHttpAppLink(urlType, false)
         verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
@@ -3237,6 +3243,14 @@ class BrowserTabViewModelTest {
     fun whenEnterAppLinkBrowserStateCalledThenEnterBrowserState() {
         testee.enterAppLinkBrowserState()
         verify(mockAppLinksHandler).enterBrowserState()
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(url = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        assertCommandIssued<Command.OpenAppLinkInBrowser>()
     }
 
     private suspend fun givenFireButtonPulsing() {
