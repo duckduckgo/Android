@@ -28,7 +28,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.content_dax_dialog.*
+import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
 
 interface DaxDialog {
     fun setDaxText(daxText: String)
@@ -47,6 +47,9 @@ interface DaxDialogListener {
 
 class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
+    private var _binding: ContentDaxDialogBinding? = null
+    private val binding get() = _binding!!
+
     private var daxText: String = ""
     private var primaryButtonText: String = ""
     private var secondaryButtonText: String = ""
@@ -61,8 +64,10 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         daxDialogListener = listener
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.content_dax_dialog, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = ContentDaxDialogBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -102,6 +107,11 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         }
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     override fun getTheme(): Int {
         return R.style.DaxDialogFragment
     }
@@ -118,8 +128,8 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        if (activity != null) {
-            dialogText?.cancelAnimation()
+        if (activity != null && _binding != null) {
+            binding.dialogText.cancelAnimation()
             daxDialogListener?.onDaxDialogDismiss()
         }
         daxDialogListener = null
@@ -139,35 +149,37 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     override fun setDialogAndStartAnimation() {
         setDialog()
         setListeners()
-        dialogText.startTypingAnimation(daxText, true)
+        binding.dialogText.startTypingAnimation(daxText, true)
     }
 
     private fun setListeners() {
-        hideText.setOnClickListener {
-            dialogText.cancelAnimation()
-            daxDialogListener?.onDaxDialogHideClick()
-            dismiss()
-        }
-
-        primaryCta.setOnClickListener {
-            dialogText.cancelAnimation()
-            daxDialogListener?.onDaxDialogPrimaryCtaClick()
-            dismiss()
-        }
-
-        secondaryCta.setOnClickListener {
-            dialogText.cancelAnimation()
-            daxDialogListener?.onDaxDialogSecondaryCtaClick()
-            dismiss()
-        }
-
-        dialogContainer.setOnClickListener {
-            if (dismissible) {
+        with(binding) {
+            hideText.setOnClickListener {
                 dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogHideClick()
                 dismiss()
-            } else {
-                if (!dialogText.hasAnimationFinished()) {
-                    dialogText.finishAnimation()
+            }
+
+            primaryCta.setOnClickListener {
+                dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogPrimaryCtaClick()
+                dismiss()
+            }
+
+            secondaryCta.setOnClickListener {
+                dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogSecondaryCtaClick()
+                dismiss()
+            }
+
+            dialogContainer.setOnClickListener {
+                if (dismissible) {
+                    dialogText.cancelAnimation()
+                    dismiss()
+                } else {
+                    if (!dialogText.hasAnimationFinished()) {
+                        dialogText.finishAnimation()
+                    }
                 }
             }
         }
@@ -181,13 +193,15 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
         context?.let {
             val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
-            toolbarDialogLayout.setBackgroundColor(toolbarColor)
-            hiddenText.text = daxText.html(it)
-            primaryCta.text = primaryButtonText
-            secondaryCta.text = secondaryButtonText
-            secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
-            dialogText.typingDelayInMs = typingDelayInMs
-            hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
+            with(binding) {
+                toolbarDialogLayout.setBackgroundColor(toolbarColor)
+                hiddenText.text = daxText.html(it)
+                primaryCta.text = primaryButtonText
+                secondaryCta.text = secondaryButtonText
+                secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
+                dialogText.typingDelayInMs = typingDelayInMs
+                hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
+            }
         }
     }
 

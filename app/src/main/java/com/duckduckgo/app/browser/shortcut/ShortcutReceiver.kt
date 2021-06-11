@@ -23,16 +23,18 @@ import android.os.Build
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ShortcutReceiver @Inject constructor(
     private val pixel: Pixel,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) :
     BroadcastReceiver() {
 
@@ -45,7 +47,7 @@ class ShortcutReceiver @Inject constructor(
             }
         }
 
-        GlobalScope.launch(dispatcher.io()) {
+        appCoroutineScope.launch(dispatcher.io()) {
             pixel.fire(AppPixelName.SHORTCUT_ADDED)
         }
     }

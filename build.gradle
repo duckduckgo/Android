@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.21'
+    ext.kotlin_version = '1.4.30'
     ext.spotless = "5.7.0"
     ext.anvil_version = "2.2.0"
 
@@ -13,7 +13,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
@@ -30,7 +29,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
 }
 

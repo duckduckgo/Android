@@ -26,7 +26,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
@@ -44,7 +44,8 @@ class FireAndForgetFeedbackSubmitter(
     private val variantManager: VariantManager,
     private val apiKeyMapper: SubReasonApiMapper,
     private val statisticsDataStore: StatisticsDataStore,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
         Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
@@ -54,7 +55,7 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             runCatching {
                 submitFeedback(
                     openEnded = openEnded,
@@ -74,7 +75,7 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForPositiveFeedback())
 
         if (openEnded != null) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 runCatching { submitFeedback(openEnded = openEnded, rating = POSITIVE_FEEDBACK) }
                     .onSuccess { Timber.i("Successfully submitted feedback") }
                     .onFailure { Timber.w(it, "Failed to send feedback") }
@@ -89,7 +90,7 @@ class FireAndForgetFeedbackSubmitter(
         val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             runCatching {
                 submitFeedback(
                     rating = NEGATIVE_FEEDBACK,

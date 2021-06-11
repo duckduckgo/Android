@@ -29,6 +29,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +46,7 @@ class WebViewHttpAuthStoreTest {
     private val webView: WebView = mock()
     private val databaseLocator = AuthDatabaseLocator(context)
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestCoroutineScope())
 
     @Test
     @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)

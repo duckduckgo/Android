@@ -25,14 +25,18 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepository: UncaughtExceptionRepository) : WebChromeClient() {
+class BrowserChromeClient @Inject constructor(
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 
@@ -50,7 +54,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.goFullScreen(view)
 
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
                 throw e
             }
@@ -63,7 +67,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.exitFullScreen()
             customView = null
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
                 throw e
             }
@@ -77,7 +81,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
                 throw e
             }
@@ -103,7 +107,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
         try {
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
                 throw e
             }
@@ -115,7 +119,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
             true
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
                 throw e
             }

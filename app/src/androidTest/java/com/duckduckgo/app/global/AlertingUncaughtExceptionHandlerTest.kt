@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +46,8 @@ class AlertingUncaughtExceptionHandlerTest {
             mockDefaultExceptionHandler,
             mockPixelCountDataStore,
             mockUncaughtExceptionRepository,
-            coroutineTestRule.testDispatcherProvider
+            coroutineTestRule.testDispatcherProvider,
+            TestCoroutineScope()
         )
     }
 
