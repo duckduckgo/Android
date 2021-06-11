@@ -808,14 +808,12 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String> = emptyMap()
     ) {
-        context?.let {
-            if (appIntent != null) {
-                launchAppLinkDialog(it, url, headers) { it.startActivity(appIntent) }
-            } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val title = getString(R.string.openExternalApp)
-                val chooserIntent = getChooserIntent(url, title, excludedComponents)
-                launchAppLinkDialog(it, url, headers) { it.startActivity(chooserIntent) }
-            }
+        if (appIntent != null) {
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(appIntent) }
+        } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val title = getString(R.string.openExternalApp)
+            val chooserIntent = getChooserIntent(url, title, excludedComponents)
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(chooserIntent) }
         }
     }
 
