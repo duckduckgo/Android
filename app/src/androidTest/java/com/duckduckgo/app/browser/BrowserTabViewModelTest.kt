@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
@@ -267,7 +267,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockFavoritesRepository: FavoritesRepository
 
     @Mock
-    private lateinit var mockContext: Context
+    private lateinit var mockPackageManager: PackageManager
 
     @Mock
     private lateinit var mockAppLinksHandler: AppLinksHandler
@@ -363,7 +363,7 @@ class BrowserTabViewModelTest {
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetectorImpl(mockContext, mockSettingsStore),
+            specialUrlDetector = SpecialUrlDetectorImpl(mockPackageManager, mockSettingsStore),
             faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,

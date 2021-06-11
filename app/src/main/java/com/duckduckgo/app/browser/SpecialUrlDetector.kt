@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -45,7 +44,7 @@ interface SpecialUrlDetector {
 }
 
 class SpecialUrlDetectorImpl(
-    private val context: Context,
+    private val packageManager: PackageManager,
     private val settingsDataStore: SettingsDataStore
 ) : SpecialUrlDetector {
 
@@ -102,7 +101,7 @@ class SpecialUrlDetectorImpl(
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
         val browsableIntent = Intent.parseUri(uriString, URI_FLAG)
         browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
-        return context.packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
+        return packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
     }
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {

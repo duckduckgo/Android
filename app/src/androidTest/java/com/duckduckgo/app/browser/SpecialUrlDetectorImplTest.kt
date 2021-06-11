@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
@@ -44,9 +43,6 @@ class SpecialUrlDetectorImplTest {
     lateinit var testee: SpecialUrlDetector
 
     @Mock
-    lateinit var mockContext: Context
-
-    @Mock
     lateinit var mockPackageManager: PackageManager
 
     @Mock
@@ -55,8 +51,7 @@ class SpecialUrlDetectorImplTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = SpecialUrlDetectorImpl(mockContext, mockSettingsDataStore)
-        whenever(mockContext.packageManager).thenReturn(mockPackageManager)
+        testee = SpecialUrlDetectorImpl(mockPackageManager, mockSettingsDataStore)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
     }
