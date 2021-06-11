@@ -146,6 +146,7 @@ class DeviceShieldTrackerActivity : AppCompatActivity(R.layout.activity_device_s
         menu.findItem(R.id.diagnosticsScreen).isVisible = BuildConfig.DEBUG
         menu.findItem(R.id.dataScreen).isVisible = BuildConfig.DEBUG
         menu.findItem(R.id.debugLogging).isVisible = BuildConfig.DEBUG
+        menu.findItem(R.id.customDnsServer).isVisible = BuildConfig.DEBUG
         return true
     }
 
