@@ -53,6 +53,8 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -156,7 +158,8 @@ class BrowserTabViewModel(
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val appLinksHandler: AppLinksHandler
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -1754,11 +1757,27 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
-    override fun appLinkClicked(appLink: AppLink) {
+    override fun handleAppLink(appLink: AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean {
+        return appLinksHandler.handleAppLink(isRedirect, isForMainFrame) { appLinkClicked(appLink) }
+    }
+
+    override fun resetAppLinkState() {
+        appLinksHandler.reset()
+    }
+
+    fun enterAppLinkBrowserState() {
+        appLinksHandler.enterBrowserState()
+    }
+
+    fun appLinkClicked(appLink: AppLink) {
         command.value = HandleAppLink(appLink, getUrlHeaders())
     }
 
-    override fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
+    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
+        return appLinksHandler.handleNonHttpAppLink(isRedirect) { nonHttpAppLinkClicked(nonHttpAppLink) }
+    }
+
+    fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         command.value = HandleNonHttpAppLink(appLink, getUrlHeaders())
     }
 
@@ -1992,12 +2011,13 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
-    private val appCoroutineScope: Provider<CoroutineScope>
+    private val appCoroutineScope: Provider<CoroutineScope>,
+    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
                 else -> null
             }
         }

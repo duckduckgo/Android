@@ -26,7 +26,6 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -60,8 +59,7 @@ class BrowserWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val emailInjector: EmailInjector,
-    val appLinksHandler: AppLinksHandler
+    private val emailInjector: EmailInjector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -113,11 +111,17 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.url}")
-                    return appLinksHandler.handleAppLink(isRedirect, isForMainFrame) { launchExternalApp(urlType) }
+                    webViewClientListener?.let { listener ->
+                        return listener.handleAppLink(urlType, isRedirect, isForMainFrame)
+                    }
+                    false
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.url}")
-                    return appLinksHandler.handleNonHttpAppLink(isRedirect) { launchExternalApp(urlType) }
+                    webViewClientListener?.let { listener ->
+                        return listener.handleNonHttpAppLink(urlType, isRedirect)
+                    }
+                    true
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
@@ -148,14 +152,6 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.NonHttpAppLink) {
-        webViewClientListener?.nonHttpAppLinkClicked(urlType)
-    }
-
-    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.AppLink) {
-        webViewClientListener?.appLinkClicked(urlType)
-    }
-
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         try {
@@ -174,7 +170,7 @@ class BrowserWebViewClient(
             emailInjector.resetInjectedJsFlag()
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            appLinksHandler.reset()
+            webViewClientListener?.resetAppLinkState()
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)

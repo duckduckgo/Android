@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
@@ -48,6 +49,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.FireButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -113,15 +115,11 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.nhaarman.mockitokotlin2.*
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.firstValue
-import com.nhaarman.mockitokotlin2.lastValue
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import dagger.Lazy
 import io.reactivex.Observable
@@ -149,6 +147,9 @@ import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.mockito.Mockito.never
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
@@ -268,6 +269,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockContext: Context
 
+    @Mock
+    private lateinit var mockAppLinksHandler: AppLinksHandler
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -276,6 +280,9 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
+
+    @Captor
+    private lateinit var appLinkCaptor: ArgumentCaptor<() -> Unit>
 
     private lateinit var db: AppDatabase
 
@@ -379,7 +386,8 @@ class BrowserTabViewModelTest {
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
-            appCoroutineScope = TestCoroutineScope()
+            appCoroutineScope = TestCoroutineScope(),
+            appLinksHandler = mockAppLinksHandler
         )
 
         testee.loadData("abc", null, false)
@@ -3202,10 +3210,33 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenAppLinkClickedThenAppLinkCommandSent() {
-        testee.appLinkClicked(SpecialUrlDetector.UrlType.AppLink(url = "https://example.com"))
-
+    fun whenHandleAppLinkCalledThenHandleAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(url = "")
+        testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
+        verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
         assertCommandIssued<Command.HandleAppLink>()
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("", Intent(), "")
+        testee.handleNonHttpAppLink(urlType, false)
+        verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
+    fun whenResetAppLinkStateCalledThenResetAppLinkState() {
+        testee.resetAppLinkState()
+        verify(mockAppLinksHandler).reset()
+    }
+
+    @Test
+    fun whenEnterAppLinkBrowserStateCalledThenEnterBrowserState() {
+        testee.enterAppLinkBrowserState()
+        verify(mockAppLinksHandler).enterBrowserState()
     }
 
     private suspend fun givenFireButtonPulsing() {

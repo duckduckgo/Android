@@ -928,11 +928,11 @@ class BrowserTabFragment :
                 .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setPositiveButton(R.string.yes) { _, _ ->
                     onClick()
-                    webViewClient.appLinksHandler.reset()
+                    viewModel.resetAppLinkState()
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
                     webView?.loadUrl(url, headers)
-                    webViewClient.appLinksHandler.enterBrowserState()
+                    viewModel.enterAppLinkBrowserState()
                 }
                 .show()
         }

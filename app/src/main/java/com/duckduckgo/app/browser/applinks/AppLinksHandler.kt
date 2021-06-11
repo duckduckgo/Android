@@ -19,11 +19,18 @@ package com.duckduckgo.app.browser.applinks
 import android.os.Build
 import javax.inject.Inject
 
-class AppLinksHandler @Inject constructor() {
+interface AppLinksHandler {
+    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean
+    fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
+    fun enterBrowserState()
+    fun reset()
+}
+
+class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var appLinkOpenedInBrowser = false
 
-    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean {
+    override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || isRedirect && appLinkOpenedInBrowser || !isForMainFrame) {
             return false
         }
@@ -31,19 +38,19 @@ class AppLinksHandler @Inject constructor() {
         return true
     }
 
-    fun handleNonHttpAppLink(isRedirect: Boolean, launchAppLink: () -> Unit): Boolean {
+    override fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser) {
             return true
         }
-        launchAppLink()
+        launchNonHttpAppLink()
         return true
     }
 
-    fun enterBrowserState() {
+    override fun enterBrowserState() {
         appLinkOpenedInBrowser = true
     }
 
-    fun reset() {
+    override fun reset() {
         appLinkOpenedInBrowser = false
     }
 }
