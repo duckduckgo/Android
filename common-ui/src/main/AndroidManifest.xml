@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <declare-styleable name="SettingsOptionWithSubtitle">
-        <attr name="title" format="string" />
-        <attr name="subtitle" format="string" />
-    </declare-styleable>
-</resources>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.duckduckgo.mobile.android">
+
+</manifest>
