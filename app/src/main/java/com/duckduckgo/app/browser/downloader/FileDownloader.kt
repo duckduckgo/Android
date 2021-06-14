@@ -53,13 +53,14 @@ interface FileDownloader {
 
 class AndroidFileDownloader @Inject constructor(
     private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloader: NetworkFileDownloader
+    private val networkFileDownloader: NetworkFileDownloader,
+    private val fileService: DownloadFileService
 ) : FileDownloader {
 
     @WorkerThread
     override fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
         when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
+            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback, fileService)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)
             else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
         }

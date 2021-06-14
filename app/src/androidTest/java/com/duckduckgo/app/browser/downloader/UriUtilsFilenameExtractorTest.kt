@@ -175,6 +175,26 @@ class UriUtilsFilenameExtractorTest {
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
+    @Test
+    fun whenTwitterImageUrlThenProperUriIsReturned() {
+        val url = "https://pbs.twimg.com/media/E317JKmWEAYaUuo?format=jpg&name=medium"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertEquals("cat.bin", extracted)
+    }
+
+    @Test
+    fun whenDDGSearchImageUrlThenProperUriIsReturned() {
+        val url = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP._h7s27M_cYLoJ7SzE7XRZQHaEK%26pid%3DApi&f=1"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertEquals("cat.bin", extracted)
+    }
+
+
+
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
@@ -185,12 +205,4 @@ class UriUtilsFilenameExtractorTest {
         )
     }
 
-    @Test
-    fun whenTwitterImageUrlThenProperUriIsReturned() {
-        val url = "https://pbs.twimg.com/media/E317JKmWEAYaUuo?format=jpg&name=medium"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("cat.bin", extracted)
-    }
 }
