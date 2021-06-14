@@ -184,4 +184,13 @@ class UriUtilsFilenameExtractorTest {
             userAgent = "aUserAgent"
         )
     }
+
+    @Test
+    fun whenTwitterImageUrlThenProperUriIsReturned() {
+        val url = "https://pbs.twimg.com/media/E317JKmWEAYaUuo?format=jpg&name=medium"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertEquals("cat.bin", extracted)
+    }
 }
