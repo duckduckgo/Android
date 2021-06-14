@@ -284,7 +284,6 @@ class BrowserTabViewModel(
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
         class HandleAppLink(val appLink: AppLink, val headers: Map<String, String>) : Command()
-        class OpenAppLinkInBrowser(val url: String, val headers: Map<String, String>) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -574,23 +573,17 @@ class BrowserTabViewModel(
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         val type = specialUrlDetector.determineType(trimmedInput)
-        val urlType = specialUrlDetector.determineType(urlToNavigate)
+        if (type is NonHttpAppLink) {
+            nonHttpAppLinkClicked(type)
+        } else {
+            if (shouldClearHistoryOnNewQuery()) {
+                command.value = ResetHistory
+            }
 
-        when {
-            type is NonHttpAppLink -> {
-                nonHttpAppLinkClicked(type)
-            }
-            urlType is AppLink -> {
-                command.value = OpenAppLinkInBrowser(urlToNavigate, getUrlHeaders())
-            }
-            else -> {
-                if (shouldClearHistoryOnNewQuery()) {
-                    command.value = ResetHistory
-                }
+            fireQueryChangedPixel(trimmedInput)
 
-                fireQueryChangedPixel(trimmedInput)
-                command.value = Navigate(urlToNavigate, getUrlHeaders())
-            }
+            openAppLinksInBrowser()
+            command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -1774,7 +1767,7 @@ class BrowserTabViewModel(
         appLinksHandler.reset()
     }
 
-    fun enterAppLinkBrowserState() {
+    fun openAppLinksInBrowser() {
         appLinksHandler.enterBrowserState()
     }
 

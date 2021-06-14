@@ -3240,17 +3240,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnterAppLinkBrowserStateCalledThenEnterBrowserState() {
-        testee.enterAppLinkBrowserState()
-        verify(mockAppLinksHandler).enterBrowserState()
-    }
-
-    @Test
     fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(url = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
-        assertCommandIssued<Command.OpenAppLinkInBrowser>()
+        verify(mockAppLinksHandler).enterBrowserState()
+        assertCommandIssued<Navigate>()
     }
 
     private suspend fun givenFireButtonPulsing() {

@@ -630,9 +630,6 @@ class BrowserTabFragment :
             is Command.HandleAppLink -> {
                 openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.url, it.headers)
             }
-            is Command.OpenAppLinkInBrowser -> {
-                openAppLinkInBrowser(it.url, it.headers)
-            }
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
             }
@@ -932,15 +929,11 @@ class BrowserTabFragment :
                     viewModel.resetAppLinkState()
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
-                    openAppLinkInBrowser(url, headers)
+                    viewModel.openAppLinksInBrowser()
+                    navigate(url, headers)
                 }
                 .show()
         }
-    }
-
-    private fun openAppLinkInBrowser(url: String, headers: Map<String, String>) {
-        webView?.loadUrl(url, headers)
-        viewModel.enterAppLinkBrowserState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
