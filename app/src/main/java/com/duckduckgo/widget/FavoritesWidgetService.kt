@@ -23,7 +23,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -32,7 +31,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import timber.log.Timber
 import javax.inject.Inject
 
-class FavoritesWidgetService: RemoteViewsService() {
+class FavoritesWidgetService : RemoteViewsService() {
 
     companion object {
         const val MAX_ITEMS_EXTRAS = "MAX_ITEMS_EXTRAS"
@@ -42,7 +41,7 @@ class FavoritesWidgetService: RemoteViewsService() {
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
-    class FavoritesWidgetItemFactory(val context: Context, intent: Intent): RemoteViewsFactory {
+    class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
         private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
 
@@ -51,7 +50,8 @@ class FavoritesWidgetService: RemoteViewsService() {
 
         private val appWidgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID)
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
 
         private val domains = mutableListOf<String>()
 
@@ -69,7 +69,7 @@ class FavoritesWidgetService: RemoteViewsService() {
 
         override fun getCount(): Int {
             Timber.i("SearchAndFavoritesWidget - getCount")
-            return maxItems
+            return domains.size
         }
 
         override fun getViewAt(position: Int): RemoteViews {

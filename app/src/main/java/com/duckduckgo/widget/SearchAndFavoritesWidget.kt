@@ -24,18 +24,22 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.RemoteViews
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
 import timber.log.Timber
-
+import javax.inject.Inject
 
 class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     private var layoutId: Int = R.layout.search_favorites_widget_col2
+
+    @Inject
+    lateinit var favoritesDataRepository: FavoritesRepository
 
     companion object {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
@@ -78,6 +82,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.i("SearchAndFavoritesWidget - onReceive")
+        inject(context)
         val instance = AppWidgetManager.getInstance(context)
         val componentName = ComponentName(context, SearchAndFavoritesWidget::class.java)
         instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
@@ -85,31 +90,36 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
+    private fun inject(context: Context) {
+        val application = context.applicationContext as DuckDuckGoApplication
+        application.daggerAppComponent.inject(this)
+    }
+
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) //portrait
-        var maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) //landscape
-        var minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) //landscape
-        var maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) //portrait
+        var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
+        var maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) // landscape
+        var minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) // landscape
+        var maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) // portrait
 
-        if(newOptions != null) {
-            minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) //portrait
-            maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) //landscape
-            minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) //landscape
-            maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) //portrait
+        if (newOptions != null) {
+            minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
+            maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) // landscape
+            minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) // landscape
+            maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) // portrait
         }
 
-        //pixel 2 -> 2x2 -> 214 x 176
-        //nexus 5 -> 2x2 -> 156 x 204
+        // pixel 2 -> 2x2 -> 214 x 176
+        // nexus 5 -> 2x2 -> 156 x 204
 
         val (columns, rows) = getCurrentWidgetSize(minWidth, maxWidth, minHeight, maxHeight)
         Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
 
-        layoutId = when(columns) {
+        layoutId = when (columns) {
             2 -> R.layout.search_favorites_widget_col2
             3 -> R.layout.search_favorites_widget_col3
             4 -> R.layout.search_favorites_widget_col4
-            else -> R.layout.search_favorites_widget_col4
+            else -> R.layout.search_favorites_widget_col2
         }
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
@@ -124,29 +134,34 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         adapterIntent.putExtra(MAX_ITEMS_EXTRAS, columns * rows)
         adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
+        remoteViews.setEmptyView(R.id.favoritesGrid, R.id.emptyGridViewContainer)
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
 
-        if(minWidth <= 110) {
-            remoteViews.setViewVisibility(R.id.searchInputBox, View.GONE)
-        } else {
-            remoteViews.setViewVisibility(R.id.searchInputBox, View.VISIBLE)
-        }
+        val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
+        emptyAdapterIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        emptyAdapterIntent.putExtra(MAX_ITEMS_EXTRAS, columns * rows)
+        emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
     }
 
     private fun getCurrentWidgetSize(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
-        val columns = calculateColumns(minWidth)
-        val rows = calculateRows(maxHeight)
+        var columns = calculateColumns(minWidth)
+        var rows = calculateRows(maxHeight)
+
+        columns = if (columns < 2) 2 else columns
+        columns = if (columns > 4) 4 else columns
 
         return Pair(columns, rows)
     }
 
     private fun calculateColumns(width: Int): Int {
-        val margins = 32
-        val item = 72
-        val divider = 8
+        val margins = 8
+        val item = 64
+        val divider = 4
         var n = 2
         var totalSize = (n * item) + ((n - 1) * divider) + margins
 

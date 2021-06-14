@@ -340,6 +340,10 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
 
+        <service android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
         <receiver android:name="com.duckduckgo.widget.SearchWidget">

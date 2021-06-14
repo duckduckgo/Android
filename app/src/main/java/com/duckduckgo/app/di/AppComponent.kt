@@ -33,6 +33,7 @@ import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.FavoritesWidgetService
+import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchWidget
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
@@ -98,6 +99,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     }
 
     fun inject(searchWidget: SearchWidget)
+
+    fun inject(searchAndFavsWidget: SearchAndFavoritesWidget)
 
     fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
 

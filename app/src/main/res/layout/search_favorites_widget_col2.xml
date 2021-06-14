@@ -19,18 +19,18 @@
     android:id="@+id/widgetContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/search_widget_favorites_background"
     android:orientation="vertical"
     android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:background="@drawable/search_widget_favorites_background">
+    android:paddingBottom="16dp">
 
     <RelativeLayout
         android:id="@+id/widgetSearchBarContainer"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_gravity="top"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/search_widget_background"
         android:elevation="2dp"
         android:orientation="horizontal">
@@ -52,9 +52,10 @@
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/search"
             android:layout_toEndOf="@+id/logo"
-            android:maxLines="1"
             android:ellipsize="end"
+            android:visibility="gone"
             android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
             android:text="@string/searchWidgetTextHint"
             android:textColor="@color/silver"
             android:textSize="14sp" />
@@ -70,11 +71,28 @@
             android:src="@drawable/ic_widget_loupe_silver_24dp" />
     </RelativeLayout>
 
-    <GridView
-        android:id="@+id/favoritesGrid"
-        android:layout_marginTop="24dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:verticalSpacing="24dp"
-        android:numColumns="2"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp">
+
+        <GridView
+            android:id="@+id/emptyfavoritesGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:numColumns="2"
+            android:verticalSpacing="24dp" />
+
+        <GridView
+            android:id="@+id/favoritesGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            android:numColumns="2"
+            android:verticalSpacing="24dp" />
+
+        <include layout="@layout/search_favorites_widget_grid_empty"/>
+    </FrameLayout>
 </LinearLayout>

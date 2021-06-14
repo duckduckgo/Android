@@ -18,8 +18,8 @@
 
 
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialKeyguardLayout="@layout/search_favorites_widget"
-    android:initialLayout="@layout/search_favorites_widget"
+    android:initialKeyguardLayout="@layout/search_favorites_widget_col2"
+    android:initialLayout="@layout/search_favorites_widget_col2"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:configure="com.duckduckgo.app.WidgetThemeConfiguration"

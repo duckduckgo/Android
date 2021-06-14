@@ -34,7 +34,7 @@ interface FavoritesRepository {
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
-    fun favoritesBlockingGet() : List<SavedSite.Favorite>
+    fun favoritesBlockingGet(): List<SavedSite.Favorite>
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
