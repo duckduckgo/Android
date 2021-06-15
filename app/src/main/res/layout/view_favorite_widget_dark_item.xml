@@ -17,33 +17,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/quickAccessFaviconContainer"
-    android:layout_width="64dp"
-    android:layout_height="78dp"
-    android:clipToPadding="false"
-    android:orientation="vertical">
+    style="@style/SearchWidgetFavoriteContainer">
 
     <ImageView
         android:id="@+id/quickAccessFavicon"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:importantForAccessibility="no"
-        android:background="@drawable/search_widget_favorites_item_background"/>
+        style="@style/SearchWidgetFavoriteFavicon"
+        android:background="@drawable/search_widget_favorite_favicon_dark_background"/>
 
     <TextView
         android:id="@+id/quickAccessTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal|bottom"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_marginTop="8dp"
-        tools:text="Super long favorite title" />
+        tools:text="Super long favorite title"
+        style="@style/SearchWidgetFavoriteTitle"
+        android:textColor="@color/white"/>
 
 </FrameLayout>
