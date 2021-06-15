@@ -23,6 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -75,7 +76,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
             val item = if (position < domains.size) domains[position] else null
-            val remoteViews = RemoteViews(context.packageName, R.layout.view_favorite_widget_item)
+            val remoteViews = RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
             remoteViews.setTextViewText(R.id.quickAccessTitle, item)
             item?.let {
                 configureClickListener(remoteViews, item)
@@ -95,7 +96,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getLoadingView(): RemoteViews {
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_item)
+            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
         }
 
         override fun getViewTypeCount(): Int {

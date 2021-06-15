@@ -55,11 +55,11 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_item)
+            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
         }
 
         override fun getLoadingView(): RemoteViews {
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_item)
+            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
         }
 
         override fun getViewTypeCount(): Int {
