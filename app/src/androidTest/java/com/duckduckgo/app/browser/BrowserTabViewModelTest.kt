@@ -3226,7 +3226,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("http://example.com", Intent(), "http://example.com")
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), "http://example.com")
         testee.handleNonHttpAppLink(urlType, false)
         verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
