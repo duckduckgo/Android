@@ -36,6 +36,8 @@ import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.widget.AppWidgetThemePreferences
+import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
@@ -81,4 +83,7 @@ abstract class StoreModule {
     @Binds
     @IntoSet
     abstract fun bindTabsDbSanitizerObserver(tabsDbSanitizer: TabsDbSanitizer): LifecycleObserver
+
+    @Binds
+    abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
 }
