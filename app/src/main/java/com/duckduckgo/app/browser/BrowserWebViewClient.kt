@@ -134,7 +134,7 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
                 throw e
             }
@@ -165,7 +165,7 @@ class BrowserWebViewClient(
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
                 throw e
             }
@@ -184,7 +184,7 @@ class BrowserWebViewClient(
             }
             flushCookies()
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
@@ -192,7 +192,7 @@ class BrowserWebViewClient(
     }
 
     private fun flushCookies() {
-        GlobalScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
         }
     }
@@ -250,7 +250,7 @@ class BrowserWebViewClient(
                 super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
                 throw e
             }

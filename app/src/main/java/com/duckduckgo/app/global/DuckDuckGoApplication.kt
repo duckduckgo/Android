@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -58,7 +59,6 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
@@ -117,6 +117,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
     lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
 
     private var launchedByFireAction: Boolean = false
@@ -168,7 +172,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
         }
@@ -311,7 +315,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initialize()
         }

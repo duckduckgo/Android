@@ -48,7 +48,11 @@ class EmailModule {
     }
 
     @Provides
-    fun providesEmailDataStore(context: Context, pixel: Pixel): EmailDataStore {
-        return EmailEncryptedSharedPreferences(context, pixel)
+    fun providesEmailDataStore(
+        context: Context,
+        pixel: Pixel,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): EmailDataStore {
+        return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope)
     }
 }

@@ -23,9 +23,9 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,7 +42,11 @@ interface EmailDataStore {
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class EmailEncryptedSharedPreferences(private val context: Context, private val pixel: Pixel) : EmailDataStore {
+class EmailEncryptedSharedPreferences(
+    private val context: Context,
+    private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
+) : EmailDataStore {
 
     private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
@@ -83,7 +87,7 @@ class EmailEncryptedSharedPreferences(private val context: Context, private val 
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) remove(KEY_NEXT_ALIAS)
                 else putString(KEY_NEXT_ALIAS, value)
-                GlobalScope.launch {
+                appCoroutineScope.launch {
                     nextAliasSharedFlow.emit(value)
                 }
             }

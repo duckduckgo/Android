@@ -1,4 +1,3 @@
-include ':app-store'
 import de.fayard.refreshVersions.RefreshVersionsSetup
 
 buildscript {

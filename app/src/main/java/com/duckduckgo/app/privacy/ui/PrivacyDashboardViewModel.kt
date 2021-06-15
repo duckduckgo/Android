@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.ui
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -38,7 +39,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchRep
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -48,6 +49,7 @@ class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     networkLeaderboardDao: NetworkLeaderboardDao,
     private val pixel: Pixel,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -176,7 +178,7 @@ class PrivacyDashboardViewModel(
         )
 
         val domain = site?.domain ?: return
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             if (enabled) {
                 userWhitelistDao.delete(domain)
                 pixel.fire(PRIVACY_DASHBOARD_WHITELIST_REMOVE)
@@ -207,12 +209,13 @@ class PrivacyDashboardViewModel(
 class PrivacyDashboardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
-    private val pixel: Provider<Pixel>
+    private val pixel: Provider<Pixel>,
+    private val appCoroutineScope: Provider<CoroutineScope>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), networkLeaderboardDao.get(), pixel.get()) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
                 else -> null
             }
         }

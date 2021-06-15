@@ -23,6 +23,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
@@ -31,7 +32,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -61,7 +62,8 @@ class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : WebViewHttpAuthStore, LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -70,7 +72,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         // to work properly
         if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.P) return
 
-        GlobalScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             databaseCleaner.changeJournalModeToDelete(authDatabaseLocator.getDatabasePath())
         }
     }

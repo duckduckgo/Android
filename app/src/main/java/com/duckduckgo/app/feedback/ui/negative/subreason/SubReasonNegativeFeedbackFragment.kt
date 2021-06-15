@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeDisambiguationSubReasonBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
@@ -30,7 +31,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import com.duckduckgo.app.feedback.ui.negative.displayText
-import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_sub_reason.*
 import timber.log.Timber
 
 class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
@@ -44,13 +44,16 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons)
     }
 
+    private var _binding: ContentFeedbackNegativeDisambiguationSubReasonBinding? = null
+    private val binding get() = _binding!!
+
     private val listener: DisambiguationNegativeFeedbackListener?
         get() = activity as DisambiguationNegativeFeedbackListener
 
     private lateinit var mainReason: MainReason
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.content_feedback_negative_disambiguation_sub_reason, container, false)
+        _binding = ContentFeedbackNegativeDisambiguationSubReasonBinding.inflate(inflater, container, false)
 
         recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
@@ -71,30 +74,35 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
             }
         })
 
-        return rootView
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         activity?.let {
-            recyclerView.layoutManager = LinearLayoutManager(it)
-            recyclerView.adapter = recyclerAdapter
-            recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
+            binding.recyclerView.layoutManager = LinearLayoutManager(it)
+            binding.recyclerView.adapter = recyclerAdapter
+            binding.recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             arguments?.let { args ->
 
                 mainReason = args.getSerializable(MAIN_REASON_EXTRA) as MainReason
                 val display = mainReason.displayText()
 
-                title.text = getString(display!!.titleDisplayResId)
-                subtitle.text = getString(display.subtitleDisplayResId)
+                binding.title.text = getString(display!!.titleDisplayResId)
+                binding.subtitle.text = getString(display.subtitleDisplayResId)
 
                 val subReasons = getDisplayTextForReasonType(mainReason)
                 Timber.i("There are ${subReasons.size} subReasons to show")
                 recyclerAdapter.submitList(subReasons)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun getDisplayTextForReasonType(mainReason: MainReason): List<FeedbackTypeSubReasonDisplay> {

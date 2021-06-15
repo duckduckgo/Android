@@ -135,6 +135,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -373,6 +374,8 @@ class BrowserTabViewModelTest {
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
+            favoritesRepository = mockFavoritesRepository,
+            appCoroutineScope = TestCoroutineScope(),
             favoritesRepository = mockFavoritesRepository
         )
 
