@@ -106,7 +106,7 @@ class SpecialUrlDetectorImpl(
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {
         return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && !(resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0)
+            resolveInfo.filter != null && !(isBrowserInfo(resolveInfo))
         }
     }
     @Throws(URISyntaxException::class)
@@ -118,9 +118,12 @@ class SpecialUrlDetectorImpl(
 
     private fun getExcludedComponents(activities: List<ResolveInfo>): List<ComponentName> {
         return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && (resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0)
+            resolveInfo.filter != null && isBrowserInfo(resolveInfo)
         }.map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
     }
+
+    private fun isBrowserInfo(resolveInfo: ResolveInfo) =
+            resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0
 
     private fun checkForIntent(scheme: String, uriString: String): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
