@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
@@ -106,7 +107,7 @@ class SpecialUrlDetectorImpl(
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {
         return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && !(isBrowserInfo(resolveInfo))
+            resolveInfo.filter != null && !(isBrowserFilter(resolveInfo.filter))
         }
     }
     @Throws(URISyntaxException::class)
@@ -118,12 +119,12 @@ class SpecialUrlDetectorImpl(
 
     private fun getExcludedComponents(activities: List<ResolveInfo>): List<ComponentName> {
         return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && isBrowserInfo(resolveInfo)
+            resolveInfo.filter != null && isBrowserFilter(resolveInfo.filter)
         }.map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
     }
 
-    private fun isBrowserInfo(resolveInfo: ResolveInfo) =
-        resolveInfo.filter.countDataAuthorities() == 0 && resolveInfo.filter.countDataPaths() == 0
+    private fun isBrowserFilter(filter: IntentFilter) =
+        filter.countDataAuthorities() == 0 && filter.countDataPaths() == 0
 
     private fun checkForIntent(scheme: String, uriString: String): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
