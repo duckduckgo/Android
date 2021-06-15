@@ -26,10 +26,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -46,6 +43,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.AnyThread
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -629,8 +627,11 @@ class BrowserTabFragment :
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleExternalAppLink -> {
-                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false, it.headers)
+            is Command.HandleAppLink -> {
+                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString, it.headers)
+            }
+            is Command.HandleNonHttpAppLink -> {
+                openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -801,6 +802,29 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
+    private fun openAppLinkDialog(
+        appIntent: Intent?,
+        excludedComponents: List<ComponentName>?,
+        url: String,
+        headers: Map<String, String> = emptyMap()
+    ) {
+        if (appIntent != null) {
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(appIntent) }
+        } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val title = getString(R.string.openExternalApp)
+            val chooserIntent = getChooserIntent(url, title, excludedComponents)
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(chooserIntent) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
+        val urlIntent = Intent.parseUri(url, URI_NO_FLAG)
+        val chooserIntent = Intent.createChooser(urlIntent, title)
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+        return chooserIntent
+    }
+
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
@@ -888,6 +912,25 @@ class BrowserTabFragment :
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
+                }
+                .show()
+        }
+    }
+
+    private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(context)
+                .setTitle(R.string.appLinkDialogTitle)
+                .setMessage(getString(R.string.confirmOpenExternalApp))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    launchApp()
+                    viewModel.resetAppLinkState()
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+                    viewModel.openAppLinksInBrowser()
+                    navigate(url, headers)
                 }
                 .show()
         }
@@ -1585,6 +1628,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+
+        private const val URI_NO_FLAG = 0
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
