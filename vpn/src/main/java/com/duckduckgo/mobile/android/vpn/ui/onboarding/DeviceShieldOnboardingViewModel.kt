@@ -42,7 +42,7 @@ class DeviceShieldOnboardingViewModel(
             R.string.deviceShieldOnboardingLastPageTwoTitle, R.string.deviceShieldOnboardingLastPageTwoSubTitle
         ),
         OnboardingPage(
-            R.drawable.device_shield_onboarding_page_three_header,
+            R.drawable.ic_ae_sized_flat,
             R.string.deviceShieldOnboardingLastPageThreeTitle, R.string.deviceShieldOnboardingLastPageThreeSubTitle
         )
     )

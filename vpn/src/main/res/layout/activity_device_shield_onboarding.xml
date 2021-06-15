@@ -47,7 +47,7 @@
             android:id="@+id/onboarding_page_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="65dp"
+            android:paddingTop="52dp"
             android:paddingBottom="12dp"
             android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
             android:importantForAccessibility="no"
