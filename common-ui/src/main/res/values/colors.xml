@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2017 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@
     <color name="warGreyTwo">#888888</color>
     <color name="warmerGray">#777777</color>
     <color name="silver">#c0c2c9</color>
+    <color name="silverGray">#E5E5E5</color>
     <color name="paleBrownishGray">#d0d0d0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="brownishGrayTwo">#666666</color>
@@ -76,10 +77,13 @@
     <color name="warmBlue">#3f66d5</color>
     <color name="cornflowerBlue">#678fff</color>
     <color name="cornflowerDark">#5078e9</color>
+    <color name="cornflowerBorder">#3969EF</color>
+    <color name="cornflowerDisabled">#A1BAFF</color>
     <color name="skyBlue">#42bffe</color>
     <color name="carolinaBlue">#94b0ff</color>
 
     <color name="midGreen">#3fa140</color>
+    <color name="lightGreen">#161DB954</color>
 
     <color name="translucentDark">#b000</color>
     <color name="gunmetal">#494d56</color>
@@ -95,4 +99,18 @@
 
     <color name="toolbarBorderColorLight">#26000000</color>
     <color name="toolbarBorderColorDark">#33FFFFFF</color>
+
+    <!-- App Tracker Blocking -->
+    <color name="accentBlue">#678FFF</color>
+    <color name="splitterGray">#E5E5E5</color>
+    <color name="red">#DE5833</color>
+
+    <color name="magenta">#A64FD1</color>
+    <color name="purple">#D4A1EE</color>
+    <color name="green">#6FBF5C</color>
+    <color name="yellow">#FFB652</color>
+    <color name="blue">#1A73E9</color>
+    <color name="grey">#F3F5F9</color>
+    <color name="light_blue">#F2F5F9</color>
+
 </resources>
