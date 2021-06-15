@@ -18,13 +18,22 @@ package com.duckduckgo.app
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.widget.RadioGroup
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.widget.AppWidgetThemePreferences
+import com.duckduckgo.widget.WidgetPreferences
+import javax.inject.Inject
 
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var widgetPrefs: WidgetPreferences
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -45,21 +54,42 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             finish()
         }
 
-        binding.widgetConfigAddWidgetButton.setOnClickListener {
-            val themeSelected = binding.widgetConfigThemeRadioGroup.checkedRadioButtonId
-            when (themeSelected) {
+        binding.widgetConfigThemeRadioGroup.setOnCheckedChangeListener { _, radioId ->
+            when (radioId) {
                 R.id.widgetConfigThemeLight -> {
-                    Toast.makeText(this, "Light", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@WidgetThemeConfiguration, "Light theme", Toast.LENGTH_SHORT).show()
+                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
                 }
                 R.id.widgetConfigThemeDark -> {
-                    Toast.makeText(this, "Dark", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@WidgetThemeConfiguration, "Dark theme", Toast.LENGTH_SHORT).show()
+                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
                 }
             }
-            storeAndSubmitConfiguration()
+        }
+
+        binding.widgetConfigAddWidgetButton.setOnClickListener {
+            val selectedTheme = when (binding.widgetConfigThemeRadioGroup.checkedRadioButtonId) {
+                R.id.widgetConfigThemeLight -> {
+                    "Light"
+                }
+                R.id.widgetConfigThemeDark -> {
+                    "Dark"
+                }
+                else -> "DayNight"
+            }
+            storeAndSubmitConfiguration(appWidgetId, selectedTheme)
+        }
+
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            binding.widgetConfigThemeDark.isChecked = true
+        } else {
+            binding.widgetConfigThemeLight.isChecked = true
         }
     }
 
-    private fun storeAndSubmitConfiguration() {
+    private fun storeAndSubmitConfiguration(widgetId: Int, seletedTheme: String) {
+        widgetPrefs.saveWidgetSelectedTheme(widgetId, seletedTheme)
 
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

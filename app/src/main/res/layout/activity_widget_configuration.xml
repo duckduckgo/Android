@@ -14,41 +14,86 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose Theme"/>
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:orientation="vertical">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/search_favorites_widget_preview"/>
-
-    <RadioGroup
-        android:id="@+id/widgetConfigThemeRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RadioButton
-            android:id="@+id/widgetConfigThemeLight"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Light"/>
-        <RadioButton
-            android:id="@+id/widgetConfigThemeDark"
+            android:textColor="@color/almostBlackDark"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="normal"
+            android:textSize="20sp"
+            android:text="Choose Theme" />
+
+        <ImageView
+            android:id="@+id/widgetConfigPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/search_favorites_widget_preview" />
+
+        <RadioGroup
+            android:id="@+id/widgetConfigThemeRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dark"/>
-    </RadioGroup>
+            android:layout_marginTop="16dp">
 
-    <Button
-        android:id="@+id/widgetConfigAddWidgetButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add widget"/>
-</LinearLayout>
+            <RadioButton
+                android:id="@+id/widgetConfigThemeSystem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:text="System default" />
+
+            <RadioButton
+                android:id="@+id/widgetConfigThemeLight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:checked="true"
+                android:text="Light" />
+
+            <RadioButton
+                android:id="@+id/widgetConfigThemeDark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:text="Dark" />
+        </RadioGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/widgetConfigAddWidgetButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/cornflowerBlue"
+            android:layout_gravity="end"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:letterSpacing="0.0"
+            app:cornerRadius="4dp"
+            android:layout_marginTop="16dp"
+            android:text="Add widget"/>
+    </LinearLayout>
+</FrameLayout>
