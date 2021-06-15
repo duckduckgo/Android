@@ -94,4 +94,8 @@
 
     <color name="toolbarBorderColorLight">#26000000</color>
     <color name="toolbarBorderColorDark">#33FFFFFF</color>
+
+    <!-- widget day/night -->
+    <color name="favoriteTitleTextColor">@color/brownishGrayTwo</color>
+    <color name="favoriteFaviconBackgroundColor">@color/whiteFive</color>
 </resources>
