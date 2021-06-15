@@ -72,7 +72,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchBetaFeatures : Command()
+        object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
         object LaunchLocation : Command()
@@ -160,8 +160,8 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
     }
 
-    fun onBetaFeatureSettingsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchBetaFeatures) }
+    fun onEmailProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
     }
 
     fun onLightThemeToggled(enabled: Boolean) {

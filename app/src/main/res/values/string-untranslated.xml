@@ -44,7 +44,7 @@
     <string name="emailProtectionActivityTitle">Email Protection</string>
     <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
-    <string name="emailProtectionDuckAddressCta">I have a Duck Address</string>
+    <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
     <string name="emailProtectionInviteCodeCta">I have an invite Code</string>
     <string name="emailProtectionWaitlistCta">Join the Waitlist</string>
     <string name="emailProtectionGetStartedCta">Get Started</string>
@@ -68,13 +68,9 @@
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
-    <!-- Beta Features -->
-    <string name="betaFeaturesActivityTitle">Beta Features</string>
-    <string name="betaFeaturesTitle">Beta Features</string>
-    <string name="betaFeaturesSubtitle">Try new features we\'re working on</string>
-    <string name="betaFeaturesDescription">Beta features are experimental so please bear with us!</string>
-    <string name="betaFeaturesEmailProtectionTitle">Email Protection</string>
-    <string name="betaFeaturesEmailProtectionSubtitle">Block email trackers and hide your address</string>
+    <!-- Settings -->
+    <string name="settingsEmailProtectionTitle">Email Protection (Beta)</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and protect your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
@@ -90,7 +86,6 @@
     <string name="favoritesSectionTitle">Favorites</string>
     <string name="bookmarksEmptyHint">No bookmarks added yet</string>
     <string name="favoritesEmptyHint">No favorites added yet</string>
-
 
     <!-- Shortcut -->
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>

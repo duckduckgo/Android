@@ -392,11 +392,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnBetaFeatureSettingsClickedThenEmitCommandLaunchBetaFeatures() = coroutineTestRule.runBlocking {
+    fun whenOnEmailProtectionSettingClickedThenEmitCommandLaunchEmailProtection() = coroutineTestRule.runBlocking {
         testee.commands().test {
-            testee.onBetaFeatureSettingsClicked()
+            testee.onEmailProtectionSettingClicked()
 
-            assertEquals(Command.LaunchBetaFeatures, expectItem())
+            assertEquals(Command.LaunchEmailProtection, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }
