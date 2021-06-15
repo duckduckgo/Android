@@ -3217,7 +3217,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenHandleAppLinkCalledThenHandleAppLink() {
-        val urlType = SpecialUrlDetector.UrlType.AppLink(url = "http://example.com")
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
         verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
@@ -3242,7 +3242,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(url = "http://foo.com"))
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockAppLinksHandler).enterBrowserState()
         assertCommandIssued<Navigate>()

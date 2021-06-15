@@ -116,7 +116,7 @@ class SpecialUrlDetectorImplTest {
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
-            assertEquals("https://example.com", appLinkType.url)
+            assertEquals("https://example.com", appLinkType.uriString)
             assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
             assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
             assertNull(appLinkType.excludedComponents)
@@ -132,7 +132,7 @@ class SpecialUrlDetectorImplTest {
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
-            assertEquals("https://example.com", appLinkType.url)
+            assertEquals("https://example.com", appLinkType.uriString)
             assertEquals(1, appLinkType.excludedComponents!!.size)
             assertEquals(EXAMPLE_BROWSER_PACKAGE, appLinkType.excludedComponents!![0].packageName)
             assertEquals(EXAMPLE_BROWSER_ACTIVITY_NAME, appLinkType.excludedComponents!![0].className)
@@ -225,7 +225,7 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetected() {
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
-        assertEquals("myapp:foo bar", type.url)
+        assertEquals("myapp:foo bar", type.uriString)
     }
 
     @Test

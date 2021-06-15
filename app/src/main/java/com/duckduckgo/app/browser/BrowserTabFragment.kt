@@ -628,7 +628,7 @@ class BrowserTabFragment :
                 }
             }
             is Command.HandleAppLink -> {
-                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.url, it.headers)
+                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString, it.headers)
             }
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)

@@ -268,7 +268,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(url = EXAMPLE_URL)
+            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -281,7 +281,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() = coroutinesTestRule.runBlocking {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(url = EXAMPLE_URL)
+            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
             whenever(webResourceRequest.isRedirect).thenReturn(false)
             whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -294,7 +294,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() = coroutinesTestRule.runBlocking {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink(url = EXAMPLE_URL))
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
             testee.webViewClientListener = null
             assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).handleAppLink(any(), any(), any())

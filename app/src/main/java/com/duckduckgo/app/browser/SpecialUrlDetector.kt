@@ -36,10 +36,10 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val url: String) : UrlType()
-        class NonHttpAppLink(val url: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
+        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String) : UrlType()
+        class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
-        class Unknown(val url: String) : UrlType()
+        class Unknown(val uriString: String) : UrlType()
     }
 }
 
@@ -85,10 +85,10 @@ class SpecialUrlDetectorImpl(
                 if (nonBrowserActivities.isNotEmpty()) {
                     nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
                         val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                        return UrlType.AppLink(appIntent = nonBrowserIntent, url = uriString)
+                        return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
                     }
                     val excludedComponents = getExcludedComponents(activities)
-                    return UrlType.AppLink(excludedComponents = excludedComponents, url = uriString)
+                    return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
                 }
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
@@ -138,7 +138,7 @@ class SpecialUrlDetectorImpl(
         return try {
             val intent = Intent.parseUri(uriString, URI_NO_FLAG)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
-            UrlType.NonHttpAppLink(url = uriString, intent = intent, fallbackUrl = fallbackUrl)
+            UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl)
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
             return UrlType.Unknown(uriString)

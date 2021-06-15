@@ -110,21 +110,21 @@ class BrowserWebViewClient(
                     true
                 }
                 is SpecialUrlDetector.UrlType.AppLink -> {
-                    Timber.i("Found app link for ${urlType.url}")
+                    Timber.i("Found app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
                         return listener.handleAppLink(urlType, isRedirect, isForMainFrame)
                     }
                     false
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
-                    Timber.i("Found non-http app link for ${urlType.url}")
+                    Timber.i("Found non-http app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
                         return listener.handleNonHttpAppLink(urlType, isRedirect)
                     }
                     true
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
-                    Timber.w("Unable to process link type for ${urlType.url}")
+                    Timber.w("Unable to process link type for ${urlType.uriString}")
                     webView.originalUrl?.let {
                         webView.loadUrl(it)
                     }
