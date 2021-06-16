@@ -143,8 +143,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
-    abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
+    abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 }
 
 @Suppress("PropertyName")

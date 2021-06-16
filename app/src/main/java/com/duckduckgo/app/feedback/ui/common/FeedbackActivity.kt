@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityFeedbackBinding
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
@@ -34,10 +35,6 @@ import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedba
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.hideKeyboard
-import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class FeedbackActivity :
@@ -51,9 +48,15 @@ class FeedbackActivity :
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
+    private lateinit var binding: ActivityFeedbackBinding
+
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_feedback)
+        binding = ActivityFeedbackBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()
     }
@@ -164,7 +167,7 @@ class FeedbackActivity :
      * Positive feedback listeners
      */
     override fun userSelectedToRateApp() {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userSelectedToRateApp() }
+        viewModel.userSelectedToRateApp()
     }
 
     override fun userSelectedToGiveFeedback() {
@@ -172,18 +175,18 @@ class FeedbackActivity :
     }
 
     override fun userGavePositiveFeedbackNoDetails() {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userGavePositiveFeedbackNoDetails() }
+        viewModel.userGavePositiveFeedbackNoDetails()
     }
 
     override fun userProvidedPositiveOpenEndedFeedback(feedback: String) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedPositiveOpenEndedFeedback(feedback) }
+        viewModel.userProvidedPositiveOpenEndedFeedback(feedback)
     }
 
     /**
      * Negative feedback listeners
      */
     override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback) }
+        viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
     }
 
     /**
@@ -217,11 +220,11 @@ class FeedbackActivity :
      * Negative feedback, broken site
      */
     override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
-        GlobalScope.launch(Dispatchers.Main) { viewModel.onProvidedBrokenSiteFeedback(feedback, url) }
+        viewModel.onProvidedBrokenSiteFeedback(feedback, url)
     }
 
     private fun hideKeyboard() {
-        toolbar?.hideKeyboard()
+        toolbar.hideKeyboard()
     }
 
     companion object {

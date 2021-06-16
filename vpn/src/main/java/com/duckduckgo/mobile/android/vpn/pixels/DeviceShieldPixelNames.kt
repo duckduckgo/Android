@@ -84,5 +84,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     DS_TRACKER_BLOCKED("m_apptb_tb"),
 
     DS_PRIVACY_REPORT_ARTICLE_SHOWED("m_apptb_pra_s"),
+
+    DS_TUN_INTERFACE_DOWN_DAILY("m_apptb_tun_dd"),
+    DS_TUN_INTERFACE_DOWN("m_apptb_tun_dc"),
     ;
 }

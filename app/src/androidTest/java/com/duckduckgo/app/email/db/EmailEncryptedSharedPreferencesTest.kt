@@ -24,6 +24,7 @@ import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -41,7 +42,7 @@ class EmailEncryptedSharedPreferencesTest {
 
     @Before
     fun before() {
-        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, mockPixel)
+        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, mockPixel, TestCoroutineScope())
     }
 
     @Test

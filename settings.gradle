@@ -1,4 +1,3 @@
-include ':app-store'
 import de.fayard.refreshVersions.RefreshVersionsSetup
 
 buildscript {
@@ -16,6 +15,7 @@ include ':app'
 include ':statistics'
 include ':common'
 include ':common-ui'
+include ':app-store'
 
 rootProject.children.each { subproject ->
 

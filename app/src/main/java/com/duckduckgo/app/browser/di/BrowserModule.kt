@@ -281,8 +281,11 @@ class BrowserModule {
     }
 
     @Provides
-    fun navigationAwareLoginDetector(settingsDataStore: SettingsDataStore): NavigationAwareLoginDetector {
-        return NextPageLoginDetection(settingsDataStore)
+    fun navigationAwareLoginDetector(
+        settingsDataStore: SettingsDataStore,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): NavigationAwareLoginDetector {
+        return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
 
     @Provides

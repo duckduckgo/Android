@@ -177,6 +177,8 @@ interface DeviceShieldPixels {
 
     /** Will fire a pixel on every call */
     fun privacyReportArticleDisplayed()
+
+    fun vpnTunInterfaceIsDown()
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -334,6 +336,11 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun privacyReportArticleDisplayed() {
         firePixel(DeviceShieldPixelNames.DS_PRIVACY_REPORT_ARTICLE_SHOWED)
+    }
+
+    override fun vpnTunInterfaceIsDown() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_TUN_INTERFACE_DOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_TUN_INTERFACE_DOWN)
     }
 
     private fun suddenKill() {

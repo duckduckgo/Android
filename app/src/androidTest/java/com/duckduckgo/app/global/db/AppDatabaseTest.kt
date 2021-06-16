@@ -47,7 +47,6 @@ class AppDatabaseTest {
 
     private val context = mock<Context>()
     private val mockSettingsDataStore = mock<SettingsDataStore>()
-
     private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
 
     @Before

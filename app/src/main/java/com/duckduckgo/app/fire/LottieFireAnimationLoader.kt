@@ -24,7 +24,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface FireAnimationLoader : LifecycleObserver {
@@ -34,13 +34,14 @@ interface FireAnimationLoader : LifecycleObserver {
 class LottieFireAnimationLoader constructor(
     private val context: Context,
     private val settingsDataStore: SettingsDataStore,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val appCoroutineScope: CoroutineScope
 ) : FireAnimationLoader {
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     override fun preloadSelectedAnimation() {
-        GlobalScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch(dispatchers.io()) {
             if (animationEnabled()) {
                 val selectedFireAnimation = settingsDataStore.selectedFireAnimation
                 LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
