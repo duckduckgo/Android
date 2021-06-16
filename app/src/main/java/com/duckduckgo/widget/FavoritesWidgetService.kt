@@ -108,7 +108,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getLoadingView(): RemoteViews {
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
+            return RemoteViews(context.packageName, getItemLayout())
         }
 
         override fun getViewTypeCount(): Int {
