@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetContainer"
+    style="@style/SearchWidgetContainer"
+    android:background="@drawable/search_widget_favorites_light_background">
+
+    <RelativeLayout
+        android:id="@+id/widgetSearchBarContainer"
+        style="@style/SearchWidgetSearchBarContainer"
+        android:background="@drawable/search_widget_background_light">
+
+        <ImageView
+            android:id="@+id/logo"
+            style="@style/SearchWidgetDDGLogo"
+            android:src="@drawable/logo_mini" />
+
+        <TextView
+            android:id="@+id/searchInputBox"
+            style="@style/SearchWidgetInputBox"
+            android:layout_toStartOf="@+id/search"
+            android:layout_toEndOf="@+id/logo"
+            android:text="@string/searchWidgetTextHint"
+            android:textColor="@color/brownishGrayTwo" />
+
+        <ImageView
+            android:id="@+id/search"
+            style="@style/SearchWidgetSearchIcon"
+            android:src="@drawable/ic_widget_loupe_silver_24dp" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp">
+
+        <GridView
+            android:id="@+id/emptyfavoritesGrid"
+            style="@style/SearchWidgetFavoritesGrid"
+            android:numColumns="4" />
+
+        <GridView
+            android:id="@+id/favoritesGrid"
+            style="@style/SearchWidgetFavoritesGrid"
+            android:numColumns="4" />
+
+        <LinearLayout
+            android:id="@+id/emptyGridViewContainer"
+            style="@style/SearchWidgetEmtpyFavoritesHintContainer">
+
+            <TextView
+                android:id="@+id/noFavoritesText"
+                android:textColor="@color/warGreyTwo"
+                android:text="No favorites added yet"
+                style="@style/SearchWidgetEmtpyFavoritesHint" />
+
+            <TextView
+                android:id="@+id/addFavoriteText"
+                android:textColor="@color/cornflowerBlue"
+                android:text="Add favorites"
+                style="@style/SearchWidgetEmtpyFavoritesAction" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

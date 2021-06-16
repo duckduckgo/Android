@@ -75,11 +75,11 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         private fun getItemLayout(): Int {
+            Timber.i("SearchAndFavoritesWidget - empty getItemLayout for $theme")
             return when (theme) {
                 WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
                 WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
-                else -> R.layout.view_favorite_widget_light_item
             }
         }
     }

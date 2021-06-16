@@ -25,10 +25,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
@@ -60,7 +58,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
 
-    private var layoutId: Int = R.layout.search_favorites_widget_col2
+    private var layoutId: Int = R.layout.search_favorites_widget_light_col3
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
@@ -113,6 +111,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
         val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
+        Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
@@ -133,12 +132,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val (columns, rows) = getCurrentWidgetSize(minWidth, maxWidth, minHeight, maxHeight)
         Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
 
-        layoutId = when (columns) {
-            2 -> R.layout.search_favorites_widget_col2
-            3 -> R.layout.search_favorites_widget_col3
-            4 -> R.layout.search_favorites_widget_col4
-            else -> R.layout.search_favorites_widget_col2
-        }
+        layoutId = getLayoutThemed(columns, widgetTheme)
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
@@ -160,13 +154,42 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
 
         val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
-        adapterIntent.putExtras(extras)
+        emptyAdapterIntent.putExtras(extras)
         emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
+    }
+
+    private fun getLayoutThemed(numColumns: Int, theme: WidgetTheme): Int {
+        return when(theme) {
+           WidgetTheme.LIGHT -> {
+               when (numColumns) {
+                   2 -> R.layout.search_favorites_widget_light_col2
+                   3 -> R.layout.search_favorites_widget_light_col3
+                   4 -> R.layout.search_favorites_widget_light_col4
+                   else -> R.layout.search_favorites_widget_light_col2
+               }
+           }
+           WidgetTheme.DARK -> {
+               when (numColumns) {
+                   2 -> R.layout.search_favorites_widget_dark_col2
+                   3 -> R.layout.search_favorites_widget_dark_col3
+                   4 -> R.layout.search_favorites_widget_dark_col4
+                   else -> R.layout.search_favorites_widget_dark_col4
+               }
+           }
+           WidgetTheme.SYSTEM_DEFAULT -> {
+               when (numColumns) {
+                   2 -> R.layout.search_favorites_widget_daynight_col2
+                   3 -> R.layout.search_favorites_widget_daynight_col3
+                   4 -> R.layout.search_favorites_widget_daynight_col4
+                   else -> R.layout.search_favorites_widget_daynight_col2
+               }
+           }
+        }
     }
 
     private fun getCurrentWidgetSize(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
