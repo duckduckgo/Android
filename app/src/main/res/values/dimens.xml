@@ -39,5 +39,6 @@
 
     <dimen name="searchWidgetFavoritesSideMargin">4dp</dimen>
     <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
+    <dimen name="searchWidget4colWidth">280dp</dimen>
 
 </resources>
