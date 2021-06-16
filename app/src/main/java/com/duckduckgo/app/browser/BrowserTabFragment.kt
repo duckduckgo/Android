@@ -129,6 +129,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import timber.log.Timber

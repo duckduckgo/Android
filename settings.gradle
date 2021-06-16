@@ -15,6 +15,7 @@ include ':app'
 include ':statistics'
 include ':common'
 include ':common-ui'
+include ':app-store'
 
 rootProject.children.each { subproject ->
 
