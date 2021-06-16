@@ -92,6 +92,11 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
     private fun storeAndSubmitConfiguration(widgetId: Int, selectedTheme: WidgetTheme) {
         widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
 
+        val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        val widgetsToUpdate = IntArray(1).also { it[0] = widgetId }
+        widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetsToUpdate)
+        sendBroadcast(widgetUpdateIntent)
+
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         setResult(RESULT_OK, resultValue)
