@@ -273,8 +273,4 @@
         <item name="behavior_peekHeight">512dp</item>
     </style>
 
-    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/colorAccent</item>
-    </style>
-
 </resources>
