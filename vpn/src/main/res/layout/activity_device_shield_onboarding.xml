@@ -47,12 +47,12 @@
             android:id="@+id/onboarding_page_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="52dp"
+            android:paddingTop="5dp"
             android:paddingBottom="12dp"
             android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
             android:importantForAccessibility="no"
             android:scaleType="centerCrop"
-            android:src="@drawable/device_shield_onboarding_page_one_header" />
+            app:srcCompat="@drawable/device_shield_onboarding_page_three_header" />
 
     </FrameLayout>
 
