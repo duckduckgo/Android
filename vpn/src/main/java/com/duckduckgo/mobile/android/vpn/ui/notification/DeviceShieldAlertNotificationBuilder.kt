@@ -98,20 +98,19 @@ class DeviceShieldAlertNotificationBuilder {
             notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-
             return buildNotification(context, notificationLayout, false, onNotificationPressedCallback)
         }
 
         private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
-            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_GOOGLE)){
-               return R.drawable.ic_apptb_google
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_GOOGLE)) {
+                return R.drawable.ic_apptb_google
             }
 
-            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_AMAZON)){
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_AMAZON)) {
                 return R.drawable.ic_apptb_amazon
             }
 
-            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_FACEBOOK)){
+            if (deviceShieldNotification.title.contains(TRACKER_COMPANY_FACEBOOK)) {
                 return R.drawable.ic_apptb_facebook
             }
 
@@ -138,7 +137,6 @@ class DeviceShieldAlertNotificationBuilder {
                 .setChannelId(VPN_ALERTS_CHANNEL_ID)
                 .build()
         }
-
 
     }
 

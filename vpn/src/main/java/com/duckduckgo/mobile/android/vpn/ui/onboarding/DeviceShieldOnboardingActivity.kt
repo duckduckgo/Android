@@ -139,7 +139,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         indicators[position].setImageResource(R.drawable.ic_active_dot)
     }
 
-    private fun showAnimationView(animation: Int){
+    private fun showAnimationView(animation: Int) {
         onboardingAnimation.isVisible = true
         onboardingHeader.isVisible = false
 
@@ -148,7 +148,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         onboardingAnimation.playAnimation()
     }
 
-    private fun showHeaderView(image: Int){
+    private fun showHeaderView(image: Int) {
         onboardingAnimation.isVisible = false
         onboardingHeader.isVisible = true
 
