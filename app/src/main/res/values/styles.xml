@@ -465,7 +465,7 @@
     </style>
 
     <style name="SearchWidgetFavoriteContainer">
-        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
         <item name="android:layout_height">78dp</item>
         <item name="android:clipToPadding">false</item>
     </style>

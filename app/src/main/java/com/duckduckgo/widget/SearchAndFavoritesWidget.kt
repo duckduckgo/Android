@@ -25,9 +25,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.view.toDp
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
@@ -126,10 +128,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
             maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) // portrait
         }
 
-        // pixel 2 -> 2x2 -> 214 x 176
-        // nexus 5 -> 2x2 -> 156 x 204
-
-        val (columns, rows) = getCurrentWidgetSize(minWidth, maxWidth, minHeight, maxHeight)
+        val (columns, rows) = getCurrentWidgetSize(context, minWidth, maxWidth, minHeight, maxHeight)
         Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
 
         layoutId = getLayoutThemed(columns, widgetTheme)
@@ -192,19 +191,22 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
     }
 
-    private fun getCurrentWidgetSize(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
-        var columns = calculateColumns(minWidth)
+    private fun getCurrentWidgetSize(context: Context, minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
+        var columns = calculateColumns(context, minWidth)
         var rows = calculateRows(maxHeight)
 
         columns = if (columns < 2) 2 else columns
         columns = if (columns > 4) 4 else columns
 
+        rows = 1.coerceAtLeast(rows)
+        rows = 4.coerceAtMost(rows)
+
         return Pair(columns, rows)
     }
 
-    private fun calculateColumns(width: Int): Int {
-        val margins = 8
-        val item = 64
+    private fun calculateColumns(context:Context, width: Int): Int {
+        val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesSideMargin).toDp()
+        val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
         val divider = 4
         var n = 2
         var totalSize = (n * item) + ((n - 1) * divider) + margins
@@ -236,13 +238,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
 
         return n - 1
-    }
-
-    private fun getCurrentWidgetSizeBasedOnGuidelines(minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
-        val rows = ((maxHeight + 30) / 70)
-        val columns = ((minWidth + 30) / 70)
-
-        return Pair(rows, columns)
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
