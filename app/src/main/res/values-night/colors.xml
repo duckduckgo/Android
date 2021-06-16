@@ -36,6 +36,6 @@
     <color name="favoriteTitleTextColor">@color/white</color>
     <color name="favoriteFaviconBackgroundColor">@color/almostBlackDark</color>
     <color name="searchWidgetBackgroundColor">@color/newBlack</color>
-    <color name="searchWidgetSearchBarBackgroundColor">@color/charcoalGreyTwoSemiTransparent</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/almostBlack</color>
     <color name="searchWidgetSearchBarHintColor">@color/white</color>
 </resources>
