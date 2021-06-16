@@ -466,7 +466,7 @@
 
     <style name="SearchWidgetFavoriteContainer">
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
-        <item name="android:layout_height">78dp</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
         <item name="android:clipToPadding">false</item>
     </style>
 
@@ -501,7 +501,7 @@
 
     <style name="SearchWidgetSearchBarContainer">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:layout_gravity">top</item>
         <item name="android:layout_marginStart">16dp</item>
         <item name="android:layout_marginEnd">16dp</item>
@@ -540,9 +540,9 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_marginStart">4dp</item>
-        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginTop">@dimen/searchWidgetFavoritesTopMargin</item>
         <item name="android:layout_marginEnd">4dp</item>
-        <item name="android:verticalSpacing">24dp</item>
+        <item name="android:verticalSpacing">@dimen/searchWidgetFavoritesVerticalSpacing</item>
         <item name="android:scrollbars">none</item>
     </style>
 

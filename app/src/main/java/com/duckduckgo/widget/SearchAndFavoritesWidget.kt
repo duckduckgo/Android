@@ -193,7 +193,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     private fun getCurrentWidgetSize(context: Context, minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
         var columns = calculateColumns(context, minWidth)
-        var rows = calculateRows(maxHeight)
+        var rows = calculateRows(context, maxHeight)
 
         columns = if (columns < 2) 2 else columns
         columns = if (columns > 4) 4 else columns
@@ -221,11 +221,12 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         return n - 1
     }
 
-    private fun calculateRows(height: Int): Int {
-        val searchBar = 44 + 24
-        val margins = 32
-        val item = 78
-        val divider = 24
+    private fun calculateRows(context:Context, height: Int): Int {
+        val searchBar = context.resources.getDimension(R.dimen.searchWidgetSearchBarHeight).toDp()
+        val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesTopMargin).toDp() +
+                (context.resources.getDimension(R.dimen.searchWidgetPadding).toDp() * 2)
+        val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerHeight).toDp()
+        val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesVerticalSpacing).toDp()
         var n = 1
         var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
 
