@@ -23,12 +23,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import androidx.core.content.ContextCompat
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.widget.WidgetTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,6 +36,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
     companion object {
         const val MAX_ITEMS_EXTRAS = "MAX_ITEMS_EXTRAS"
+        const val THEME_EXTRAS = "THEME_EXTRAS"
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -45,6 +46,8 @@ class FavoritesWidgetService : RemoteViewsService() {
     class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
         private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
+
+        private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
         @Inject
         lateinit var favoritesDataRepository: FavoritesRepository
@@ -76,13 +79,23 @@ class FavoritesWidgetService : RemoteViewsService() {
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
             val item = if (position < domains.size) domains[position] else null
-            val remoteViews = RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
+            val remoteViews = RemoteViews(context.packageName, getItemLayout())
             remoteViews.setTextViewText(R.id.quickAccessTitle, item)
             item?.let {
                 configureClickListener(remoteViews, item)
             }
 
             return remoteViews
+        }
+
+        private fun getItemLayout(): Int {
+            Timber.i("SearchAndFavoritesWidget - getItemLayout for $theme")
+            return when (theme) {
+                WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
+                WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
+                WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
+                else -> R.layout.view_favorite_widget_light_item
+            }
         }
 
         private fun configureClickListener(remoteViews: RemoteViews, item: String) {

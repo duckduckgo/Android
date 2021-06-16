@@ -19,15 +19,13 @@ package com.duckduckgo.app
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import android.widget.RadioGroup
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
+import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
 
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
@@ -70,12 +68,15 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         binding.widgetConfigAddWidgetButton.setOnClickListener {
             val selectedTheme = when (binding.widgetConfigThemeRadioGroup.checkedRadioButtonId) {
                 R.id.widgetConfigThemeLight -> {
-                    "Light"
+                    WidgetTheme.LIGHT
                 }
                 R.id.widgetConfigThemeDark -> {
-                    "Dark"
+                    WidgetTheme.DARK
                 }
-                else -> "DayNight"
+                R.id.widgetConfigThemeSystem -> {
+                    WidgetTheme.SYSTEM_DEFAULT
+                }
+                else -> throw IllegalArgumentException("Unknown Radio button Id")
             }
             storeAndSubmitConfiguration(appWidgetId, selectedTheme)
         }
@@ -88,8 +89,8 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         }
     }
 
-    private fun storeAndSubmitConfiguration(widgetId: Int, seletedTheme: String) {
-        widgetPrefs.saveWidgetSelectedTheme(widgetId, seletedTheme)
+    private fun storeAndSubmitConfiguration(widgetId: Int, selectedTheme: WidgetTheme) {
+        widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
 
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

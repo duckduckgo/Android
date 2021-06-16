@@ -28,23 +28,39 @@ import android.widget.RemoteViews
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
+import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
 import javax.inject.Inject
 
+
+enum class WidgetTheme {
+    LIGHT,
+    DARK,
+    SYSTEM_DEFAULT;
+
+    companion object {
+        fun getThemeFrom(value: String?): WidgetTheme {
+            if (value.isNullOrEmpty()) return LIGHT
+            return runCatching { valueOf(value) }.getOrDefault(LIGHT)
+        }
+    }
+}
+
 class SearchAndFavoritesWidget() : AppWidgetProvider() {
-
-    private var layoutId: Int = R.layout.search_favorites_widget_col2
-
-    @Inject
-    lateinit var favoritesDataRepository: FavoritesRepository
 
     companion object {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
         const val EXTRA_ITEM_URL = "EXTRA_ITEM_URL"
     }
+
+    @Inject
+    lateinit var widgetPrefs: WidgetPreferences
+
+    private var layoutId: Int = R.layout.search_favorites_widget_col2
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
@@ -96,6 +112,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+        val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
+
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
         var maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) // landscape
@@ -129,17 +147,20 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
 
+        val extras = Bundle()
+        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        extras.putString(THEME_EXTRAS, widgetTheme.toString())
+        extras.putInt(MAX_ITEMS_EXTRAS, columns * rows)
+
         val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
-        adapterIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        adapterIntent.putExtra(MAX_ITEMS_EXTRAS, columns * rows)
+        adapterIntent.putExtras(extras)
         adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
         remoteViews.setEmptyView(R.id.favoritesGrid, R.id.emptyGridViewContainer)
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
 
         val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
-        emptyAdapterIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        emptyAdapterIntent.putExtra(MAX_ITEMS_EXTRAS, columns * rows)
+        adapterIntent.putExtras(extras)
         emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
 

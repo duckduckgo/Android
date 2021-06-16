@@ -22,7 +22,7 @@ import androidx.core.content.edit
 import javax.inject.Inject
 
 interface WidgetPreferences {
-    fun widgetTheme(widgetId: Int): String
+    fun widgetTheme(widgetId: Int): WidgetTheme
     fun saveWidgetSelectedTheme(widgetId: Int, theme: String)
 }
 
@@ -31,8 +31,8 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-    override fun widgetTheme(widgetId: Int): String {
-        return preferences.getString(keyForWidgetTheme(widgetId), "light") ?: "light"
+    override fun widgetTheme(widgetId: Int): WidgetTheme {
+        return WidgetTheme.valueOf(preferences.getString(keyForWidgetTheme(widgetId), WidgetTheme.LIGHT.toString()) ?: WidgetTheme.LIGHT.toString())
     }
 
     override fun saveWidgetSelectedTheme(widgetId: Int, theme: String) {

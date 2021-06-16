@@ -37,7 +37,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
         private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
 
-        private val domains = mutableListOf<String>()
+        private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(FavoritesWidgetService.THEME_EXTRAS))
 
         override fun onCreate() {
         }
@@ -55,11 +55,11 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
+            return RemoteViews(context.packageName, getItemLayout())
         }
 
         override fun getLoadingView(): RemoteViews {
-            return RemoteViews(context.packageName, R.layout.view_favorite_widget_daynight_item)
+            return RemoteViews(context.packageName, getItemLayout())
         }
 
         override fun getViewTypeCount(): Int {
@@ -72,6 +72,15 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
         override fun hasStableIds(): Boolean {
             return true
+        }
+
+        private fun getItemLayout(): Int {
+            return when (theme) {
+                WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
+                WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
+                WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
+                else -> R.layout.view_favorite_widget_light_item
+            }
         }
     }
 }
