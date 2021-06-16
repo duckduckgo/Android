@@ -18,12 +18,14 @@ package com.duckduckgo.app.browser.downloader
 
 import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.HEAD
 import retrofit2.http.Url
 
 interface DownloadFileService {
 
-    @GET
-    fun downloadFile(@Url urlString: String): Call<ResponseBody?>?
+    @HEAD
+    fun downloadFile(@Url urlString: String): Call<Void>?
 
 }

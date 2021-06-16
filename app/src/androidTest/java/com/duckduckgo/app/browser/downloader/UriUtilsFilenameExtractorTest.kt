@@ -193,8 +193,6 @@ class UriUtilsFilenameExtractorTest {
         assertEquals("cat.bin", extracted)
     }
 
-
-
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,

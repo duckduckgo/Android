@@ -30,7 +30,8 @@ class FilenameExtractor @Inject constructor(
     private val pixel: Pixel
 ) {
 
-    fun extract(pendingDownload: PendingFileDownload): String {
+
+    fun extract(pendingDownload: PendingFileDownload): FilenameExtractionResult {
         val url = pendingDownload.url
         val mimeType = pendingDownload.mimeType
         val contentDisposition = pendingDownload.contentDisposition
@@ -74,13 +75,13 @@ class FilenameExtractor @Inject constructor(
         return guessedFilename
     }
 
-    private fun bestGuess(guesses: Guesses): String {
+    private fun bestGuess(guesses: Guesses): FilenameExtractionResult {
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
             pixel.fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
-            return guess + DEFAULT_FILE_TYPE
+            return FilenameExtractionResult.Failure(guess)
         }
-        return guess
+        return FilenameExtractionResult.Success(guess)
     }
 
     private fun pathSegments(url: String): List<String> {
@@ -98,6 +99,11 @@ class FilenameExtractor @Inject constructor(
     sealed class GuessQuality {
         object NotGoodEnough : GuessQuality()
         object TriedAllOptions : GuessQuality()
+    }
+
+    sealed class FilenameExtractionResult {
+        data class Success(val filename: String) : FilenameExtractionResult()
+        data class Failure(val bestGuess: String) : FilenameExtractionResult()
     }
 
     data class Guesses(var latestGuess: String, var bestGuess: String? = null)

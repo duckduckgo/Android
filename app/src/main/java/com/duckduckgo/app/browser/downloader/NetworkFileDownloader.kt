@@ -23,67 +23,62 @@ import android.webkit.CookieManager
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import javax.inject.Inject
 
 
-class NetworkFileDownloader @Inject constructor(private val context: Context, private val filenameExtractor: FilenameExtractor) {
+class NetworkFileDownloader @Inject constructor(private val context: Context, private val filenameExtractor: FilenameExtractor, private val fileService: DownloadFileService) {
 
-    fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener, fileService: DownloadFileService) {
+    fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
 
         if (!downloadManagerAvailable()) {
             callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
             return
         }
 
+        when (val extractionResult = filenameExtractor.extract(pendingDownload)) {
+            is FilenameExtractor.FilenameExtractionResult.Success -> downloadFile(pendingDownload, extractionResult.filename, callback)
+            is FilenameExtractor.FilenameExtractionResult.Failure -> tryDownloadFallback(pendingDownload, callback)
+        }
+
+    }
+
+    private fun tryDownloadFallback(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
         val downloadCall = fileService.downloadFile(pendingDownload.url)
-        downloadCall?.enqueue(object : Callback<ResponseBody?> {
-            override fun onResponse(call: Call<ResponseBody?>?, response: Response<ResponseBody?>) {
+        downloadCall?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    Timber.d("We have the body for the file ${response.body()}")
+                    var updatedPendingDownload = pendingDownload.copy()
+                    if (response.headers().get("content-type") != null) {
+                        val mimeType = response.headers().get("content-type")
+                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = mimeType)
+                    }
 
-                    val guessedFileName = if (response.body() != null) {
-                        if (response.body()!!.contentType() != null) {
-                            val mimeType = response.body()!!.contentType()!!.type + "/" + response.body()!!.contentType()!!.subtype
-                            val updatedPendingDownload = pendingDownload.copy(mimeType = mimeType)
-                            filenameExtractor.extract(updatedPendingDownload)
-                        } else {
-                            filenameExtractor.extract(pendingDownload)
+                    if (response.headers().get("content-disposition") != null) {
+                        val contentDisposition = response.headers().get("content-disposition")
+                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = contentDisposition)
+                    }
+
+                    when (val extractionResult = filenameExtractor.extract(updatedPendingDownload)) {
+                        is FilenameExtractor.FilenameExtractionResult.Success -> downloadFile(updatedPendingDownload, extractionResult.filename, callback)
+                        is FilenameExtractor.FilenameExtractionResult.Failure -> {
+                            downloadFile(pendingDownload, extractionResult.bestGuess, callback)
+                            callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
                         }
-                    } else {
-                        filenameExtractor.extract(pendingDownload)
                     }
-
-                    val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
-                        allowScanningByMediaScanner()
-                        addRequestHeader("User-Agent", pendingDownload.userAgent)
-                        addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
-                        setMimeType(pendingDownload.mimeType)
-                        setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
-                        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    }
-                    val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
-                    manager?.enqueue(request)
-                    callback.downloadStartedNetworkFile()
-
                 } else {
                     Timber.d("Connection failed ${response.errorBody()}")
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody?>?, t: Throwable) {
-                Timber.d("Connection failed ${t.localizedMessage}")
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
+                return
             }
         })
-
     }
 
     private fun downloadManagerAvailable(): Boolean {
@@ -95,33 +90,18 @@ class NetworkFileDownloader @Inject constructor(private val context: Context, pr
         }
     }
 
-    private fun saveToDisk(body: ResponseBody, file: File) {
-        try {
-            val inputStream = body.byteStream()
-            val outputStream = FileOutputStream(file)
-            val data = ByteArray(4096)
-            var count: Int
-            var progress = 0
-            val fileSize = body.contentLength()
-
-            Timber.d("File Size $fileSize")
-
-            while (inputStream.read(data).also { count = it } != -1) {
-                outputStream.write(data, 0, count)
-                progress += count
-                val pairs = Pair(progress, fileSize)
-                Timber.d("Progress: " + progress + "/" + fileSize + " >>>> " + progress.toFloat() / fileSize)
-            }
-            outputStream.flush()
-            Timber.d("Download complete")
-            inputStream.close()
-            outputStream.close()
-            return
-        } catch (e: IOException) {
-            Timber.d("Failed to save the file!")
-            return
+    private fun downloadFile(pendingDownload: PendingFileDownload, guessedFileName: String, callback: FileDownloader.FileDownloadListener) {
+        val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
+            allowScanningByMediaScanner()
+            addRequestHeader("User-Agent", pendingDownload.userAgent)
+            addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
+            setMimeType(pendingDownload.mimeType)
+            setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
+            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
-
+        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+        manager?.enqueue(request)
+        callback.downloadStartedNetworkFile()
     }
 
     companion object {
