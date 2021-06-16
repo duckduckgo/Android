@@ -3248,6 +3248,21 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Navigate>()
     }
 
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNullThenResetHistoryCommandSent() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNotNullThenResetHistoryCommandNotSent() {
+        setupNavigation(isBrowsing = true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandNotIssued<Command.ResetHistory>()
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
