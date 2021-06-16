@@ -293,8 +293,8 @@ class BrowserModule {
     fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
 
     @Provides
-    fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader, fileService: DownloadFileService): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, networkFileDownloader, fileService)
+    fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
+        return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
     }
 
     @Provides
