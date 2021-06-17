@@ -40,6 +40,7 @@ interface EmailManager : LifecycleObserver {
     fun getInviteCode(): String
     fun doesCodeAlreadyExist(): Boolean
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
+    fun notifyOnJoinedWaitlist()
 }
 
 class AppEmailManager(
@@ -84,7 +85,7 @@ class AppEmailManager(
 
     override fun waitlistState(): WaitlistState {
         if (emailDataStore.waitlistTimestamp != -1 && emailDataStore.inviteCode == null) {
-            return WaitlistState.JoinedQueue
+            return WaitlistState.JoinedQueue(emailDataStore.sendNotification)
         }
         emailDataStore.inviteCode?.let {
             return WaitlistState.InBeta
@@ -124,6 +125,10 @@ class AppEmailManager(
 
     override fun doesCodeAlreadyExist(): Boolean = emailDataStore.inviteCode != null
 
+    override fun notifyOnJoinedWaitlist() {
+        emailDataStore.sendNotification = true
+    }
+
     private fun consumeAlias(): String? {
         val alias = nextAliasFlow.value
         emailDataStore.clearNextAlias()
@@ -161,7 +166,7 @@ class AppEmailManager(
 
     sealed class WaitlistState {
         object NotJoinedQueue : WaitlistState()
-        object JoinedQueue : WaitlistState()
+        data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
         object InBeta : WaitlistState()
     }
 

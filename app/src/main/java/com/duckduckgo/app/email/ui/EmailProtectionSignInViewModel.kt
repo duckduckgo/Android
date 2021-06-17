@@ -98,10 +98,21 @@ class EmailProtectionSignInViewModel(
         }
     }
 
+    fun onNotifyMeClicked() {
+        viewModelScope.launch {
+            emailManager.notifyOnJoinedWaitlist()
+        }
+    }
+
+    fun onDialogDismissed() {
+        viewModelScope.launch {
+            viewStateFlow.emit(ViewState(emailManager.waitlistState()))
+        }
+    }
+
     private fun joinedWaitlist(timestamp: Int, token: String) {
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
-            viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             commandChannel.send(Command.ShowNotificationDialog)
             workManager.enqueue(waitlistWorkRequestBuilder.waitlistRequestWork(withBigDelay = false))
         }

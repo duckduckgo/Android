@@ -120,7 +120,7 @@ class EmailProtectionSignInViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTimestampIsNullThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
         whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("token", null))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue())
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -131,7 +131,7 @@ class EmailProtectionSignInViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTokenIsNullThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
         whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse(null, 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue())
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -142,7 +142,7 @@ class EmailProtectionSignInViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTokenIsEmptyThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
         whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("", 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue())
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -157,19 +157,6 @@ class EmailProtectionSignInViewModelTest {
         testee.joinTheWaitlist()
 
         verify(mockEmailManager).joinWaitlist(12345, "token")
-    }
-
-    @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitWaitlistState() = coroutineRule.runBlocking {
-        givenJoinWaitlistSuccessful()
-
-        testee.viewState.test {
-            assert(expectItem().waitlistState is NotJoinedQueue)
-
-            testee.joinTheWaitlist()
-
-            assert(expectItem().waitlistState is JoinedQueue)
-        }
     }
 
     @Test
@@ -202,6 +189,26 @@ class EmailProtectionSignInViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnNotifyMeClickedThenNotifyOnJoinedWaitlistCalled() = coroutineRule.runBlocking {
+        testee.onNotifyMeClicked()
+
+        verify(mockEmailManager).notifyOnJoinedWaitlist()
+    }
+
+    @Test
+    fun whenOnDialogDismissedThenEmitWaitlistState() = coroutineRule.runBlocking {
+        givenJoinWaitlistSuccessful()
+
+        testee.viewState.test {
+            assert(expectItem().waitlistState is NotJoinedQueue)
+
+            testee.onDialogDismissed()
+
+            assert(expectItem().waitlistState is JoinedQueue)
+        }
+    }
+
     private fun assertWaitlistWorkerIsEnqueued() {
         val scheduledWorkers = getScheduledWorkers()
         assertFalse(scheduledWorkers.isEmpty())
@@ -209,7 +216,7 @@ class EmailProtectionSignInViewModelTest {
 
     private fun givenJoinWaitlistSuccessful() = coroutineRule.runBlocking {
         whenever(mockEmailService.joinWaitlist()).thenReturn(WaitlistResponse("token", 12345))
-        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(JoinedQueue())
     }
 
     private fun getScheduledWorkers(): List<WorkInfo> {

@@ -46,7 +46,7 @@ class AppWaitlistCodeFetcher(
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun executeWaitlistCodeFetcher() {
         appCoroutineScope.launch {
-            if (emailManager.waitlistState() == JoinedQueue) {
+            if (emailManager.waitlistState() is JoinedQueue) {
                 fetchInviteCode()
             }
         }

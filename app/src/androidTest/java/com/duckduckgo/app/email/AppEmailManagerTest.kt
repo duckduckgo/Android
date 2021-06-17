@@ -189,10 +189,19 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenWaitlistStateIfTimestampExistsAndCodeDoesNotExistThenReturnJoinedQueue() {
+    fun whenWaitlistStateIfTimestampExistsCodeDoesNotExistAndSendNotificationIsTrueThenReturnJoinedQueueWithTrue() {
         whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.sendNotification).thenReturn(true)
 
-        assertEquals(JoinedQueue, testee.waitlistState())
+        assertEquals(JoinedQueue(true), testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampExistsCodeDoesNotExistAndSendNotificationIsFalseThenReturnJoinedQueueWithFalse() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.sendNotification).thenReturn(false)
+
+        assertEquals(JoinedQueue(false), testee.waitlistState())
     }
 
     @Test
@@ -315,6 +324,12 @@ class AppEmailManagerTest {
         givenUserIsInWaitlist()
 
         assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenNotifyOnJoinedWaitlistThenSendNotificationSetToTrue() {
+        testee.notifyOnJoinedWaitlist()
+        verify(mockEmailDataStore).sendNotification = true
     }
 
     private fun givenUserIsInWaitlist() {

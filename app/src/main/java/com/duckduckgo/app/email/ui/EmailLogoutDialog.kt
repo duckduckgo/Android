@@ -17,28 +17,16 @@
 package com.duckduckgo.app.email.ui
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.email.EmailManager
 import com.google.android.material.textview.MaterialTextView
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 
 class EmailLogoutDialog : DialogFragment() {
 
-    @Inject
-    lateinit var emailManager: EmailManager
-
     var onLogout: (() -> Unit) = {}
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val rootView = View.inflate(activity, R.layout.email_dialog_fragment, null)

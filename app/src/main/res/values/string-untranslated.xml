@@ -24,8 +24,8 @@
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
 
     <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Remove Email Protection?</string>
-    <string name="emailSignOutDialogText">Removing Email Protection from this device will not delete your Duck Address.</string>
+    <string name="emailSignOutDialogTitle">Remove Email Protections?</string>
+    <string name="emailSignOutDialogText">Note: Removing Email Protections from this device will not delete your Duck Address.</string>
     <string name="emailSignOutDialogCancel">Cancel</string>
     <string name="emailSignOutDialogDisable">Remove</string>
 
@@ -51,18 +51,19 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Remove email trackers and hide your address without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
-    <string name="emailProtectionDescriptionJoined"><![CDATA[If you asked us to notify you, we\'ll do just that. <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when we\'re ready for you. <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Need a refresher? <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Remove email trackers and hide your address without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Primary Duck Address</string>
+    <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
     <string name="emailProtectionSignOutFooter">
         <![CDATA[Removing Email Protection from this device removes the option to fill in your Primary Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
     </string>
@@ -70,7 +71,7 @@
 
     <!-- Settings -->
     <string name="settingsEmailProtectionTitle">Email Protection (Beta)</string>
-    <string name="settingsEmailProtectionSubtitle">Block email trackers and protect your address</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hides your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>

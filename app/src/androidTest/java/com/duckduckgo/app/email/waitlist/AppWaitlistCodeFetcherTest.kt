@@ -123,17 +123,17 @@ class AppWaitlistCodeFetcherTest {
     }
 
     private fun givenUserIsInTheQueueAndCodeAlreadyExists() = coroutineRule.runBlocking {
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.CodeExisted)
     }
 
     private fun givenUserIsInTheQueueAndCodeReturned() = coroutineRule.runBlocking {
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.Code)
     }
 
     private fun givenUserIsInTheQueueAndNoCodeReturned() = coroutineRule.runBlocking {
-        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue)
+        whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.NoCode)
     }
 
