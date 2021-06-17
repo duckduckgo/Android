@@ -18,9 +18,9 @@
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
     <string name="autofillTooltipUseYourAlias">Use %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
+    <string name="autofillTooltipUseYourAliasDescription">Removes email trackers</string>
     <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
+    <string name="autofillTooltipGenerateAddressDescription">Removes email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
 
     <!-- Email Sign Out Dialog -->
@@ -55,8 +55,8 @@
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when we\'re ready for you. <a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection from DuckDuckGo.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when we\'re ready for you. <a href=""><b>Learn more</b></a> about Email Protection.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
@@ -71,7 +71,7 @@
 
     <!-- Settings -->
     <string name="settingsEmailProtectionTitle">Email Protection (Beta)</string>
-    <string name="settingsEmailProtectionSubtitle">Block email trackers and hides your address</string>
+    <string name="settingsEmailProtectionSubtitle">Removes email trackers and hides your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
