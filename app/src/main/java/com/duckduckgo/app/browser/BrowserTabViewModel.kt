@@ -619,7 +619,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
-        val navigation = webNavigationState ?: return false
+        val navigation = webNavigationState ?: return true
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
