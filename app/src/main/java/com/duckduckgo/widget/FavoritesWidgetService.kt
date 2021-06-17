@@ -125,14 +125,18 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
-            val item = domains[position]
+            val item = if (position >= domains.size) null else domains[position]
             val remoteViews = RemoteViews(context.packageName, getItemLayout())
-            if(item.bitmap != null) {
-                remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap);
+            if(item != null) {
+                if (item.bitmap != null) {
+                    remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap);
+                }
+                remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
+                configureClickListener(remoteViews, item.url)
+            } else {
+                remoteViews.setTextViewText(R.id.quickAccessTitle, "")
+                remoteViews.setImageViewResource(R.id.quickAccessFavicon, R.drawable.search_widget_favorite_favicon_light_background)
             }
-            remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
-
-            configureClickListener(remoteViews, item.url)
 
             return remoteViews
         }
