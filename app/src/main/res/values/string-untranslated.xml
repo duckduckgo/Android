@@ -71,7 +71,7 @@
 
     <!-- Settings -->
     <string name="settingsEmailProtectionTitle">Email Protection (Beta)</string>
-    <string name="settingsEmailProtectionSubtitle">Blocks email trackers and hides your address</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
