@@ -34,6 +34,7 @@
             style="@style/SearchWidgetInputBox"
             android:layout_toStartOf="@+id/search"
             android:layout_toEndOf="@+id/logo"
+            android:visibility="gone"
             android:text="@string/searchWidgetTextHint"
             android:textColor="@color/searchWidgetSearchBarHintColor" />
 
@@ -45,9 +46,7 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/searchWidgetFavoritesSideMargin"
-        android:layout_marginEnd="@dimen/searchWidgetFavoritesSideMargin">
+        android:layout_height="wrap_content">
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
@@ -58,22 +57,5 @@
             android:id="@+id/favoritesGrid"
             style="@style/SearchWidgetFavoritesGrid"
             android:numColumns="2" />
-
-        <LinearLayout
-            android:id="@+id/emptyGridViewContainer"
-            style="@style/SearchWidgetEmtpyFavoritesHintContainer">
-
-            <TextView
-                android:id="@+id/noFavoritesText"
-                android:textColor="@color/warGreyTwo"
-                android:text="No favorites added yet"
-                style="@style/SearchWidgetEmtpyFavoritesHint" />
-
-            <TextView
-                android:id="@+id/addFavoriteText"
-                android:textColor="@color/cornflowerBlue"
-                android:text="Add favorites"
-                style="@style/SearchWidgetEmtpyFavoritesAction" />
-        </LinearLayout>
     </FrameLayout>
 </LinearLayout>
