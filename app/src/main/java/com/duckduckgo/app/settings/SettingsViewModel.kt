@@ -18,7 +18,6 @@ package com.duckduckgo.app.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import android.content.Context
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -38,30 +37,23 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
 class SettingsViewModel(
-    private val deviceShieldPixels: DeviceShieldPixels,
-    private val appContext: Context,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val emailManager: EmailManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel,
-    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
-    private val deviceShieldOnboarding: DeviceShieldOnboarding
+    private val pixel: Pixel
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -144,16 +136,6 @@ class SettingsViewModel(
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun stopPollingDeviceShieldState() {
         deviceShieldStatePollingJob?.cancel()
-    }
-
-    suspend fun getExcludedAppsInfo(): String {
-        val apps = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }
-        return when (apps.size) {
-            0 -> "None"
-            1 -> "${apps.first().name}"
-            2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
-            else -> "${apps.first().name}, ${apps.take(2)[1].name} and more"
-        }
     }
 
     private fun getEmailSetting(): EmailSetting {
@@ -342,21 +324,17 @@ class SettingsViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class SettingsViewModelFactory @Inject constructor(
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
-    private val appContext: Provider<Context>,
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
     private val emailManager: Provider<EmailManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
-    private val pixel: Provider<Pixel>,
-    private val deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
-    private val deviceShieldOnboarding: Provider<DeviceShieldOnboarding>
+    private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(deviceShieldPixels.get(), appContext.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get(), deviceShieldExcludedApps.get(), deviceShieldOnboarding.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
                 else -> null
             }
         }

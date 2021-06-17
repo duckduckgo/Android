@@ -16,10 +16,7 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
-import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
@@ -39,10 +36,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -66,8 +59,6 @@ class SettingsViewModelTest {
 
     private lateinit var testee: SettingsViewModel
 
-    private lateinit var context: Context
-
     @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
@@ -89,34 +80,19 @@ class SettingsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockDeviceShieldExcludedApps: DeviceShieldExcludedApps
-
-    @Mock
-    private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboarding
-
-    @Mock
-    private lateinit var deviceShieldPixels: DeviceShieldPixels
-
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        context = InstrumentationRegistry.getInstrumentation().targetContext
-
         testee = SettingsViewModel(
-            deviceShieldPixels,
-            context,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockEmailManager,
             mockFireAnimationLoader,
-            mockPixel,
-            mockDeviceShieldExcludedApps,
-            mockDeviceShieldOnboarding
+            mockPixel
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -125,7 +101,6 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-        runBlocking { whenever(mockDeviceShieldExcludedApps.getExclusionAppList()).thenReturn(listOf()) }
     }
 
     @Test
@@ -170,76 +145,6 @@ class SettingsViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenStartCalledAndZeroExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExclusionAppList()).thenReturn(listOf())
-        testee.start()
-        assertEquals("None", latestViewState().excludedAppsInfo)
-    }
-
-    @Test
-    fun whenStartCalledAndOneExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
-            .thenReturn(
-                listOf(
-                    VpnExcludedInstalledAppInfo(
-                        name = "foo",
-                        packageName = "foo.com",
-                        type = null
-                    )
-                )
-            )
-        testee.start()
-        assertEquals("foo", latestViewState().excludedAppsInfo)
-    }
-
-    @Test
-    fun whenStartCalledAndTwoExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
-            .thenReturn(
-                listOf(
-                    VpnExcludedInstalledAppInfo(
-                        name = "foo",
-                        packageName = "foo.com",
-                        type = null
-                    ),
-                    VpnExcludedInstalledAppInfo(
-                        name = "bar",
-                        packageName = "bar.com",
-                        type = null
-                    )
-                )
-            )
-        testee.start()
-        assertEquals("foo and bar", latestViewState().excludedAppsInfo)
-    }
-
-    @Test
-    fun whenStartCalledAndThreeOrMoreExcludedAppsThenExcludedAppsInfoIsCorrect() {
-        whenever(mockDeviceShieldExcludedApps.getExclusionAppList())
-            .thenReturn(
-                listOf(
-                    VpnExcludedInstalledAppInfo(
-                        name = "foo",
-                        packageName = "foo.com",
-                        type = null
-                    ),
-                    VpnExcludedInstalledAppInfo(
-                        name = "bar",
-                        packageName = "bar.com",
-                        type = null
-                    ),
-                    VpnExcludedInstalledAppInfo(
-                        name = "baz",
-                        packageName = "baz.com",
-                        type = null
-                    )
-                )
-            )
-        testee.start()
-        assertEquals("foo, bar and more", latestViewState().excludedAppsInfo)
     }
 
     @Test
@@ -290,69 +195,78 @@ class SettingsViewModelTest {
         verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
     }
 
-    @Test
-    fun whenDeviceShieldIsOffThenCommandIsStopDeviceShield() {
-        testee.onDeviceShieldSettingChanged(false)
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenDeviceShieldIsOffAndDidNotShowOnboardingThenCommandIsStopDeviceShield() {
-        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
-
-        testee.onDeviceShieldSettingChanged(false)
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenExcludedAppClickedThenCommandIsLaunchExcludedAppList() {
-        testee.onExcludedAppsClicked()
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchExcludedAppList, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenBetaFeaturesClickedThenCommandIsLaunchBetaFeatures() {
-        testee.onBetaFeatureSettingsClicked()
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchBetaFeatures, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenDeviceShieldIsOnThenCommandIsStopDeviceShield() {
-        testee.onDeviceShieldSettingChanged(true)
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.StartDeviceShield, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenDeviceShieldIsOnAndDidNotShowOnboardingThenCommandIsLaunchDeviceShieldOnboarding() {
-        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
-
-        testee.onDeviceShieldSettingChanged(true)
-        testee.command.blockingObserve()
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchDeviceShieldOnboarding, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenDeviceShieldIsOnThenSendPixel() {
-        testee.onDeviceShieldSettingChanged(true)
-        verify(deviceShieldPixels).enableFromSettings()
-    }
-
-    @Test
-    fun whenDeviceShieldIsOffThenSendPixel() {
-        testee.onDeviceShieldSettingChanged(false)
-        verify(deviceShieldPixels).disableFromSettings()
-    }
+    // Commenting these tests out for now, but they'll come back after the next PFR is completed.
+//    @Test
+//    fun whenDeviceShieldIsOffThenCommandIsStopDeviceShield() {
+//        testee.commands().test {
+//            testee.onLightThemeToggled(false)
+//            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
+//
+//            assertEquals(Command.UpdateTheme, expectItem())
+//
+//            cancelAndConsumeRemainingEvents()
+//        }
+//        testee.onDeviceShieldSettingChanged(false)
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenDeviceShieldIsOffAndDidNotShowOnboardingThenCommandIsStopDeviceShield() {
+//        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
+//
+//        testee.onDeviceShieldSettingChanged(false)
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenExcludedAppClickedThenCommandIsLaunchExcludedAppList() {
+//        testee.onExcludedAppsClicked()
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.LaunchExcludedAppList, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenBetaFeaturesClickedThenCommandIsLaunchBetaFeatures() {
+//        testee.onBetaFeatureSettingsClicked()
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.LaunchBetaFeatures, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenDeviceShieldIsOnThenCommandIsStopDeviceShield() {
+//        testee.onDeviceShieldSettingChanged(true)
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.StartDeviceShield, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenDeviceShieldIsOnAndDidNotShowOnboardingThenCommandIsLaunchDeviceShieldOnboarding() {
+//        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
+//
+//        testee.onDeviceShieldSettingChanged(true)
+//        testee.command.blockingObserve()
+//        verify(commandObserver).onChanged(commandCaptor.capture())
+//        assertEquals(Command.LaunchDeviceShieldOnboarding, commandCaptor.firstValue)
+//    }
+//
+//    @Test
+//    fun whenDeviceShieldIsOnThenSendPixel() {
+//        testee.onDeviceShieldSettingChanged(true)
+//        verify(deviceShieldPixels).enableFromSettings()
+//    }
+//
+//    @Test
+//    fun whenDeviceShieldIsOffThenSendPixel() {
+//        testee.onDeviceShieldSettingChanged(false)
+//        verify(deviceShieldPixels).disableFromSettings()
+//    }
 
     @Test
     fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() = coroutineTestRule.runBlocking {

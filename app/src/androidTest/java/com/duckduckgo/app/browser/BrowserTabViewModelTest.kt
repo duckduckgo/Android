@@ -375,8 +375,7 @@ class BrowserTabViewModelTest {
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
-            appCoroutineScope = TestCoroutineScope(),
-            favoritesRepository = mockFavoritesRepository
+            appCoroutineScope = TestCoroutineScope()
         )
 
         testee.loadData("abc", null, false)
