@@ -20,13 +20,27 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconPersister
+import com.duckduckgo.app.browser.favicon.FaviconSource
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.domain
+import com.duckduckgo.app.global.view.generateDefaultDrawable
+import com.duckduckgo.app.global.view.toDp
+import com.duckduckgo.app.global.view.toPx
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.WidgetTheme
 import timber.log.Timber
@@ -52,12 +66,16 @@ class FavoritesWidgetService : RemoteViewsService() {
         @Inject
         lateinit var favoritesDataRepository: FavoritesRepository
 
+        @Inject
+        lateinit var faviconPersister: FaviconPersister
+
         private val appWidgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
 
-        private val domains = mutableListOf<String>()
+        data class WidgetFavorite(val title: String, val url: String, val bitmap: Bitmap?)
+        private val domains = mutableListOf<WidgetFavorite>()
 
         override fun onCreate() {
             inject(context)
@@ -65,25 +83,56 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         override fun onDataSetChanged() {
             domains.clear()
-            domains.addAll(favoritesDataRepository.favoritesBlockingGet().map { it.title })
+            domains.addAll(favoritesDataRepository.favoritesBlockingGet().map {
+                val faviconFile = faviconPersister.faviconFile(
+                    FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
+                    FileBasedFaviconPersister.NO_SUBFOLDER,
+                    it.url.extractDomain()!!
+                )
+                val bitmap = if(faviconFile != null) {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(faviconFile)
+                        .transform(RoundedCorners(10.toPx()))
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .submit(56.toPx(), 56.toPx())
+                        .get()
+                } else {
+                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
+                }
+
+                WidgetFavorite(it.title, it.url, bitmap)
+            })
         }
 
         override fun onDestroy() {
+            Timber.i("SearchAndFavoritesWidget - onDestroy")
         }
 
         override fun getCount(): Int {
             Timber.i("SearchAndFavoritesWidget - getCount")
-            return domains.size
+            return domains.size.coerceAtMost(maxItems)
+        }
+
+        private fun String.extractDomain(): String? {
+            return if (this.startsWith("http")) {
+                this.toUri().domain()
+            } else {
+                "https://$this".extractDomain()
+            }
         }
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("SearchAndFavoritesWidget - getViewAt")
-            val item = if (position < domains.size) domains[position] else null
+            val item = domains[position]
             val remoteViews = RemoteViews(context.packageName, getItemLayout())
-            remoteViews.setTextViewText(R.id.quickAccessTitle, item)
-            item?.let {
-                configureClickListener(remoteViews, item)
+            if(item.bitmap != null) {
+                remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap);
             }
+            remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
+
+            configureClickListener(remoteViews, item.url)
 
             return remoteViews
         }

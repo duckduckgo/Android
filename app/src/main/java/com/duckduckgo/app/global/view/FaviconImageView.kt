@@ -61,7 +61,7 @@ fun ImageView.loadDefaultFavicon(domain: String) {
     this.setImageDrawable(generateDefaultDrawable(this.context, domain))
 }
 
-private fun generateDefaultDrawable(context: Context, domain: String): Drawable {
+fun generateDefaultDrawable(context: Context, domain: String): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
 
