@@ -1033,7 +1033,7 @@ class BrowserTabFragment :
     private fun createQuickAccessAdapter(onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
-            { viewModel.onQuickAccesItemClicked(it.favorite) },
+            { viewModel.onUserSubmittedQuery(it.favorite.url) },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )

@@ -1945,10 +1945,6 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onQuickAccesItemClicked(it: SavedSite) {
-        command.value = SubmitQuery(it.url)
-    }
-
     fun deleteQuickAccessItem(savedSite: SavedSite) {
         val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io() + NonCancellable) {
