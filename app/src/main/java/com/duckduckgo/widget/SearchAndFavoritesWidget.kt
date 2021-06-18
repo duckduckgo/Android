@@ -96,22 +96,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         super.onRestored(context, oldWidgetIds, newWidgetIds)
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        Timber.i("SearchAndFavoritesWidget - onReceive")
-        inject(context)
-        val instance = AppWidgetManager.getInstance(context)
-        val componentName = ComponentName(context, SearchAndFavoritesWidget::class.java)
-        instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
-
-        super.onReceive(context, intent)
-    }
-
-    private fun inject(context: Context) {
-        val application = context.applicationContext as DuckDuckGoApplication
-        application.daggerAppComponent.inject(this)
-    }
-
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+        initWidgetProvider(context)
         val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
@@ -245,5 +231,16 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun initWidgetProvider(context: Context) {
+        if (!this::widgetPrefs.isInitialized) {
+            inject(context)
+        }
+    }
+
+    private fun inject(context: Context) {
+        val application = context.applicationContext as DuckDuckGoApplication
+        application.daggerAppComponent.inject(this)
     }
 }
