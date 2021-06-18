@@ -63,7 +63,7 @@ class DeviceShieldDailyNotificationFactoryTest {
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
 
-        notification.assertTitleEquals("Device Shield blocked 1 tracker in 1 app, Foo App (past day).")
+        notification.assertTitleEquals("Device Shield blocked 1 tracking attempt in 1 app, Foo App (past day).")
         assertFalse(notification.hidden)
     }
 
@@ -75,7 +75,7 @@ class DeviceShieldDailyNotificationFactoryTest {
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
 
-        notification.assertTitleEquals("Device Shield blocked 2 trackers across 2 apps, including app1 (past day).")
+        notification.assertTitleEquals("Device Shield blocked 2 tracking attempts across 2 apps, including app1 (past day).")
         assertFalse(notification.hidden)
     }
 
@@ -132,7 +132,7 @@ class DeviceShieldDailyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(2)
-        notification.assertTitleEquals("Device Shield blocked the most trackers in app2 and app3 (past day).")
+        notification.assertTitleEquals("Device Shield blocked the most tracking attempts in app2 and app3 (past day).")
         assertFalse(notification.hidden)
     }
 

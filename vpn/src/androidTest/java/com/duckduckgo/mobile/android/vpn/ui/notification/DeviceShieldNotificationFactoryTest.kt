@@ -58,7 +58,7 @@ class DeviceShieldNotificationFactoryTest {
     @Test
     fun createsDeviceShieldEnabledNotification() {
         val notification = factory.createNotificationDeviceShieldEnabled()
-        notification.assertTitleEquals("Device Shield is enabled and blocking trackers across your apps")
+        notification.assertTitleEquals("Device Shield is enabled and blocking tracking attempts across your apps")
         assertFalse(notification.hidden)
     }
 
@@ -67,7 +67,7 @@ class DeviceShieldNotificationFactoryTest {
         val trackers = listOf(aTrackerAndCompany())
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
-        notification.assertTitleEquals("Trackers blocked in 1 app (past hour).")
+        notification.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
         assertFalse(notification.hidden)
     }
 
@@ -79,7 +79,7 @@ class DeviceShieldNotificationFactoryTest {
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
-        notification.assertTitleEquals("Trackers blocked across 2 apps (past hour).")
+        notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
         assertFalse(notification.hidden)
     }
 
@@ -92,7 +92,7 @@ class DeviceShieldNotificationFactoryTest {
             aTrackerAndCompany(appContainingTracker = trackingApp2())
         )
         val notification = factory.createNotificationNewTrackerFound(trackers)
-        notification.assertTitleEquals("Trackers blocked across 2 apps (past hour).")
+        notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
     }
 
     @Test

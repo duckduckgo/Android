@@ -62,7 +62,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain)
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("Device Shield blocked 1 tracker in Foo App (past week).")
+        notification.assertTitleEquals("Device Shield blocked 1 tracking attempt in Foo App (past week).")
         assertFalse(notification.hidden)
     }
 
@@ -73,7 +73,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("Device Shield blocked 2 trackers in app1 and 1 other app (past week).")
+        notification.assertTitleEquals("Device Shield blocked 2 tracking attempts in app1 and 1 other app (past week).")
         assertFalse(notification.hidden)
     }
 
@@ -85,7 +85,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("Device Shield blocked 3 trackers in app1 and 2 other apps (past week).")
+        notification.assertTitleEquals("Device Shield blocked 3 tracking attempts in app1 and 2 other apps (past week).")
         assertFalse(notification.hidden)
     }
 
@@ -100,7 +100,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("Device Shield blocked 6 trackers in app3 and 2 other apps (past week).")
+        notification.assertTitleEquals("Device Shield blocked 6 tracking attempts in app3 and 2 other apps (past week).")
         assertFalse(notification.hidden)
     }
 
