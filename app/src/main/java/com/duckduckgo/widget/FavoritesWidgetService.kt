@@ -31,19 +31,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconPersister
-import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
-import com.duckduckgo.app.global.view.toDp
 import com.duckduckgo.app.global.view.toPx
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.widget.WidgetTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,18 +51,18 @@ class FavoritesWidgetService : RemoteViewsService() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        Timber.i("SearchAndFavoritesWidget - onBind")
+        Timber.i("FavoritesWidgetService - onBind")
         return super.onBind(intent)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        Timber.i("SearchAndFavoritesWidget - onGetViewFactory")
+        Timber.i("FavoritesWidgetService - onGetViewFactory")
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
     class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
-        private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
+        private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
         @Inject
         lateinit var favoritesDataRepository: FavoritesRepository
@@ -95,38 +91,40 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            Timber.i("SearchAndFavoritesWidget - favs onDataSetChanged")
+            Timber.i("FavoritesWidgetService - favs onDataSetChanged")
             domains.clear()
-            domains.addAll(favoritesDataRepository.favoritesBlockingGet().map {
-                val faviconFile = faviconPersister.faviconFile(
-                    FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
-                    FileBasedFaviconPersister.NO_SUBFOLDER,
-                    it.url.extractDomain()!!
-                )
-                val bitmap = if(faviconFile != null) {
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(faviconFile)
-                        .transform(RoundedCorners(10.toPx()))
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
-                        .submit(56.toPx(), 56.toPx())
-                        .get()
-                } else {
-                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
-                }
+            domains.addAll(
+                favoritesDataRepository.favoritesBlockingGet().map {
+                    val faviconFile = faviconPersister.faviconFile(
+                        FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
+                        FileBasedFaviconPersister.NO_SUBFOLDER,
+                        it.url.extractDomain()!!
+                    )
+                    val bitmap = if (faviconFile != null) {
+                        Glide.with(context)
+                            .asBitmap()
+                            .load(faviconFile)
+                            .transform(RoundedCorners(10.toPx()))
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .submit(56.toPx(), 56.toPx())
+                            .get()
+                    } else {
+                        generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
+                    }
 
-                WidgetFavorite(it.title, it.url, bitmap)
-            })
+                    WidgetFavorite(it.title, it.url, bitmap)
+                }
+            )
         }
 
         override fun onDestroy() {
-            Timber.i("SearchAndFavoritesWidget - onDestroy")
+            Timber.i("FavoritesWidgetService - onDestroy")
         }
 
         override fun getCount(): Int {
             val count = domains.size.coerceAtMost(maxItems)
-            Timber.i("SearchAndFavoritesWidget - favs getCount $count")
+            Timber.i("FavoritesWidgetService - favs getCount $count")
             return count
         }
 
@@ -139,12 +137,12 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getViewAt(position: Int): RemoteViews {
-            Timber.i("SearchAndFavoritesWidget - getViewAt")
+            Timber.i("FavoritesWidgetService - getViewAt")
             val item = if (position >= domains.size) null else domains[position]
             val remoteViews = RemoteViews(context.packageName, getItemLayout())
-            if(item != null) {
+            if (item != null) {
                 if (item.bitmap != null) {
-                    remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap);
+                    remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
                 }
                 remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
                 configureClickListener(remoteViews, item.url)
@@ -157,7 +155,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         private fun getItemLayout(): Int {
-            Timber.i("SearchAndFavoritesWidget - fav getItemLayout for $theme")
+            Timber.i("FavoritesWidgetService - fav getItemLayout for $theme")
             return when (theme) {
                 WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item

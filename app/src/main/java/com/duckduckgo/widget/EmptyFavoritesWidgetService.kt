@@ -51,7 +51,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
                 return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
             }
 
-        private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(FavoritesWidgetService.THEME_EXTRAS))
+        private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(FavoritesWidgetService.THEME_EXTRAS))
 
         override fun onCreate() {
             inject(context)
@@ -64,12 +64,12 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getCount(): Int {
-            Timber.i("SearchAndFavoritesWidget - empty getCount $maxItems")
+            Timber.i("EmptyFavoritesWidgetService - empty getCount $maxItems")
             return maxItems
         }
 
         override fun getViewAt(position: Int): RemoteViews {
-            Timber.i("SearchAndFavoritesWidget - getViewAt")
+            Timber.i("EmptyFavoritesWidgetService - getViewAt")
             return RemoteViews(context.packageName, getItemLayout())
         }
 
@@ -90,7 +90,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         private fun getItemLayout(): Int {
-            Timber.i("SearchAndFavoritesWidget - empty getItemLayout for $theme")
+            Timber.i("EmptyFavoritesWidgetService - empty getItemLayout for $theme")
             return when (theme) {
                 WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item

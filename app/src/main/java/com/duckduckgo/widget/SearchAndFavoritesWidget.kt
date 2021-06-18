@@ -19,23 +19,19 @@ package com.duckduckgo.widget
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.view.toDp
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.widget.FavoritesWidgetService.Companion.MAX_ITEMS_EXTRAS
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
 import javax.inject.Inject
-
 
 enum class WidgetTheme {
     LIGHT,
@@ -130,7 +126,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         extras.putString(THEME_EXTRAS, widgetTheme.toString())
-        //extras.putInt(MAX_ITEMS_EXTRAS, columns * rows)
+        // extras.putInt(MAX_ITEMS_EXTRAS, columns * rows)
 
         val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
         adapterIntent.putExtras(extras)
@@ -150,31 +146,31 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun getLayoutThemed(numColumns: Int, theme: WidgetTheme): Int {
-        return when(theme) {
-           WidgetTheme.LIGHT -> {
-               when (numColumns) {
-                   2 -> R.layout.search_favorites_widget_light_col2
-                   3 -> R.layout.search_favorites_widget_light_col3
-                   4 -> R.layout.search_favorites_widget_light_col4
-                   else -> R.layout.search_favorites_widget_light_col2
-               }
-           }
-           WidgetTheme.DARK -> {
-               when (numColumns) {
-                   2 -> R.layout.search_favorites_widget_dark_col2
-                   3 -> R.layout.search_favorites_widget_dark_col3
-                   4 -> R.layout.search_favorites_widget_dark_col4
-                   else -> R.layout.search_favorites_widget_dark_col4
-               }
-           }
-           WidgetTheme.SYSTEM_DEFAULT -> {
-               when (numColumns) {
-                   2 -> R.layout.search_favorites_widget_daynight_col2
-                   3 -> R.layout.search_favorites_widget_daynight_col3
-                   4 -> R.layout.search_favorites_widget_daynight_col4
-                   else -> R.layout.search_favorites_widget_daynight_col2
-               }
-           }
+        return when (theme) {
+            WidgetTheme.LIGHT -> {
+                when (numColumns) {
+                    2 -> R.layout.search_favorites_widget_light_col2
+                    3 -> R.layout.search_favorites_widget_light_col3
+                    4 -> R.layout.search_favorites_widget_light_col4
+                    else -> R.layout.search_favorites_widget_light_col2
+                }
+            }
+            WidgetTheme.DARK -> {
+                when (numColumns) {
+                    2 -> R.layout.search_favorites_widget_dark_col2
+                    3 -> R.layout.search_favorites_widget_dark_col3
+                    4 -> R.layout.search_favorites_widget_dark_col4
+                    else -> R.layout.search_favorites_widget_dark_col4
+                }
+            }
+            WidgetTheme.SYSTEM_DEFAULT -> {
+                when (numColumns) {
+                    2 -> R.layout.search_favorites_widget_daynight_col2
+                    3 -> R.layout.search_favorites_widget_daynight_col3
+                    4 -> R.layout.search_favorites_widget_daynight_col4
+                    else -> R.layout.search_favorites_widget_daynight_col2
+                }
+            }
         }
     }
 
@@ -191,7 +187,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         return Pair(columns, rows)
     }
 
-    private fun calculateColumns(context:Context, width: Int): Int {
+    private fun calculateColumns(context: Context, width: Int): Int {
         val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesSideMargin).toDp()
         val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
         val divider = 4
@@ -208,10 +204,10 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         return n - 1
     }
 
-    private fun calculateRows(context:Context, height: Int): Int {
+    private fun calculateRows(context: Context, height: Int): Int {
         val searchBar = context.resources.getDimension(R.dimen.searchWidgetSearchBarHeight).toDp()
         val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesTopMargin).toDp() +
-                (context.resources.getDimension(R.dimen.searchWidgetPadding).toDp() * 2)
+            (context.resources.getDimension(R.dimen.searchWidgetPadding).toDp() * 2)
         val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerHeight).toDp()
         val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesVerticalSpacing).toDp()
         var n = 1
