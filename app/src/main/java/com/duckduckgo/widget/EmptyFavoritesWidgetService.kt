@@ -16,12 +16,15 @@
 
 package com.duckduckgo.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import timber.log.Timber
+import javax.inject.Inject
 
 class EmptyFavoritesWidgetService : RemoteViewsService() {
 
@@ -35,11 +38,23 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
     class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
-        private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
+        @Inject
+        lateinit var widgetPrefs: WidgetPreferences
+
+        private val appWidgetId = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
+
+        private val maxItems: Int
+            get() {
+                return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
+            }
 
         private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(FavoritesWidgetService.THEME_EXTRAS))
 
         override fun onCreate() {
+            inject(context)
         }
 
         override fun onDataSetChanged() {
@@ -49,7 +64,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getCount(): Int {
-            Timber.i("SearchAndFavoritesWidget - getCount")
+            Timber.i("SearchAndFavoritesWidget - empty getCount $maxItems")
             return maxItems
         }
 
@@ -81,6 +96,11 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
                 WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
             }
+        }
+
+        private fun inject(context: Context) {
+            val application = context.applicationContext as DuckDuckGoApplication
+            application.daggerAppComponent.inject(this)
         }
     }
 }

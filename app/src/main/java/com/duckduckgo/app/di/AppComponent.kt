@@ -32,6 +32,7 @@ import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.widget.EmptyFavoritesWidgetService
 import com.duckduckgo.widget.FavoritesWidgetService
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchWidget
@@ -103,6 +104,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     fun inject(searchAndFavsWidget: SearchAndFavoritesWidget)
 
     fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
+
+    fun inject(favoritesWidgetItemFactory: EmptyFavoritesWidgetService.FavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only only for test
     @Named("api")

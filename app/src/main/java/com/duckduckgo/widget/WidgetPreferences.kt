@@ -24,6 +24,8 @@ import javax.inject.Inject
 interface WidgetPreferences {
     fun widgetTheme(widgetId: Int): WidgetTheme
     fun saveWidgetSelectedTheme(widgetId: Int, theme: String)
+    fun widgetSize(widgetId: Int): Pair<Int, Int>
+    fun storeWidgetSize(widgetId: Int, columns: Int, rows: Int)
 }
 
 class AppWidgetThemePreferences @Inject constructor(private val context: Context): WidgetPreferences {
@@ -41,6 +43,18 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
         }
     }
 
+    override fun widgetSize(widgetId: Int): Pair<Int, Int> {
+        return Pair(preferences.getInt("$SHARED_PREFS_WIDTH_KEY-$widgetId", 2),
+        preferences.getInt("$SHARED_PREFS_HEIGHT_KEY-$widgetId", 2))
+    }
+
+    override fun storeWidgetSize(widgetId: Int, columns: Int, rows: Int) {
+        preferences.edit(true) {
+            putInt("$SHARED_PREFS_WIDTH_KEY-$widgetId", columns)
+            putInt("$SHARED_PREFS_HEIGHT_KEY-$widgetId", rows)
+        }
+    }
+
     private fun keyForWidgetTheme(widgetId: Int): String {
         return "$SHARED_PREFS_THEME_KEY-$widgetId"
     }
@@ -48,5 +62,7 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
     companion object {
         const val FILENAME = "com.duckduckgo.app.widget.theme"
         const val SHARED_PREFS_THEME_KEY = "SelectedTheme"
+        const val SHARED_PREFS_WIDTH_KEY = "Width"
+        const val SHARED_PREFS_HEIGHT_KEY = "Height"
     }
 }

@@ -132,6 +132,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
 
         layoutId = getLayoutThemed(columns, widgetTheme)
+        widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
@@ -143,7 +144,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         extras.putString(THEME_EXTRAS, widgetTheme.toString())
-        extras.putInt(MAX_ITEMS_EXTRAS, columns * rows)
+        //extras.putInt(MAX_ITEMS_EXTRAS, columns * rows)
 
         val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
         adapterIntent.putExtras(extras)

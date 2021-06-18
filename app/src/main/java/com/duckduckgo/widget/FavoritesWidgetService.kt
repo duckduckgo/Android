@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.IBinder
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap
@@ -53,13 +54,17 @@ class FavoritesWidgetService : RemoteViewsService() {
         const val THEME_EXTRAS = "THEME_EXTRAS"
     }
 
+    override fun onBind(intent: Intent?): IBinder? {
+        Timber.i("SearchAndFavoritesWidget - onBind")
+        return super.onBind(intent)
+    }
+
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
+        Timber.i("SearchAndFavoritesWidget - onGetViewFactory")
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
     class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
-
-        private val maxItems = intent.extras?.getInt(MAX_ITEMS_EXTRAS, 2) ?: 2
 
         private val theme =  WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
@@ -69,10 +74,18 @@ class FavoritesWidgetService : RemoteViewsService() {
         @Inject
         lateinit var faviconPersister: FaviconPersister
 
+        @Inject
+        lateinit var widgetPrefs: WidgetPreferences
+
         private val appWidgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
+
+        private val maxItems: Int
+            get() {
+                return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
+            }
 
         data class WidgetFavorite(val title: String, val url: String, val bitmap: Bitmap?)
         private val domains = mutableListOf<WidgetFavorite>()
@@ -82,6 +95,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
+            Timber.i("SearchAndFavoritesWidget - favs onDataSetChanged")
             domains.clear()
             domains.addAll(favoritesDataRepository.favoritesBlockingGet().map {
                 val faviconFile = faviconPersister.faviconFile(
@@ -111,8 +125,9 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getCount(): Int {
-            Timber.i("SearchAndFavoritesWidget - getCount")
-            return domains.size.coerceAtMost(maxItems)
+            val count = domains.size.coerceAtMost(maxItems)
+            Timber.i("SearchAndFavoritesWidget - favs getCount $count")
+            return count
         }
 
         private fun String.extractDomain(): String? {
