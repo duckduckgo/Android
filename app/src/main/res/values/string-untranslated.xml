@@ -39,9 +39,8 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Email Protection</string>
-    <string name="emailProtectionSignOutActivityTitle">Email Protection</string>
-    <string name="emailProtectionActivityTitle">Email Protection</string>
+    <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
     <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
     <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
@@ -65,7 +64,7 @@
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
     <string name="emailProtectionSignOutFooter">
-        <![CDATA[Removing Email Protection from this device removes the option to fill in your Primary Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
