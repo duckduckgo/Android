@@ -2000,19 +2000,6 @@ class BrowserTabFragment :
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
-            /*val brIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-            activity?.sendBroadcast(brIntent)*/
-
-            /*val instance = AppWidgetManager.getInstance(requireContext())
-            val componentName = ComponentName(requireContext(), SearchAndFavoritesWidget::class.java)
-            instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)*/
-
-            val instance = AppWidgetManager.getInstance(requireContext())
-            val componentName = ComponentName(requireContext(), SearchAndFavoritesWidget::class.java)
-            val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-            widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, instance.getAppWidgetIds(componentName))
-            requireActivity().sendBroadcast(widgetUpdateIntent)
-
             if (isHidden) {
                 return
             }
