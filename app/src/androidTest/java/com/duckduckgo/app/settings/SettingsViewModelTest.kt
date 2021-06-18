@@ -187,6 +187,18 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenAppLinksSwitchedOnThenDataStoreIsUpdated() {
+        testee.onAppLinksSettingChanged(true)
+        verify(mockAppSettingsDataStore).appLinksEnabled = true
+    }
+
+    @Test
+    fun whenAppLinksSwitchedOffThenDataStoreIsUpdated() {
+        testee.onAppLinksSettingChanged(false)
+        verify(mockAppSettingsDataStore).appLinksEnabled = false
+    }
+
+    @Test
     fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.userRequestedToSendFeedback()
