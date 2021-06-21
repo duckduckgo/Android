@@ -80,17 +80,6 @@
         android:text="@string/settingsPrivacyProtectionWhitelist"
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
 
-    <com.duckduckgo.app.settings.db.SettingsPillWithSubtitle
-        android:id="@+id/emailSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/whitelist"
-        app:pillDrawable="@drawable/ic_beta_pill"
-        app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
-        app:pillTitle="@string/settingsEmailProtectionTitle" />
-
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/appLinksToggle"
         android:layout_width="0dp"
@@ -99,6 +88,17 @@
         app:toggleSubTitle="@string/settingSubtitleOpenLinksInAssociatedApps"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailSetting" />
+        app:layout_constraintTop_toBottomOf="@id/whitelist" />
+
+    <com.duckduckgo.app.settings.db.SettingsPillWithSubtitle
+        android:id="@+id/emailSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appLinksToggle"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
+        app:pillTitle="@string/settingsEmailProtectionTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
