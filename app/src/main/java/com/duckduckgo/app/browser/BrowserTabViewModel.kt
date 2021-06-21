@@ -277,7 +277,6 @@ class BrowserTabViewModel(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
-        class SubmitQuery(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
@@ -1943,10 +1942,6 @@ class BrowserTabViewModel(
                 }
             )
         }
-    }
-
-    fun onQuickAccesItemClicked(it: SavedSite) {
-        command.value = SubmitQuery(it.url)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
