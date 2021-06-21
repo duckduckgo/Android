@@ -656,7 +656,6 @@ class BrowserTabFragment :
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
-            is Command.SubmitQuery -> submitQuery(it.url)
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
             is Command.InjectEmailAddress -> injectEmailAddress(it.address)
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
