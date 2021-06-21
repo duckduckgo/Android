@@ -69,7 +69,7 @@
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
     <!-- Settings -->
-    <string name="settingsEmailProtectionTitle">Email Protection (Beta)</string>
+    <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
 
     <!-- Precise Location Improvements -->
