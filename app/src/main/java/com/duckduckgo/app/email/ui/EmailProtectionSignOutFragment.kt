@@ -100,7 +100,7 @@ class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtection
     }
 
     private fun configureUiEventHandlers() {
-        binding.signOutButton.setOnClickListener { viewModel.signOut() }
+        binding.signOutButton.setOnClickListener { viewModel.onSignOutButtonClicked() }
     }
 
     private fun executeCommand(command: EmailProtectionSignOutViewModel.Command) {
@@ -113,7 +113,7 @@ class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtection
         activity?.supportFragmentManager?.let {
             val dialog = EmailLogoutDialog.create()
             dialog.show(it, SIGN_OUT_DIALOG_TAG)
-            dialog.onLogout = { viewModel.onEmailLogout() }
+            dialog.onLogout = { viewModel.onEmailLogoutConfirmed() }
         }
     }
 

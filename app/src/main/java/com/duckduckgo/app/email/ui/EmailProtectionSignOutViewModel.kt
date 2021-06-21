@@ -40,13 +40,13 @@ class EmailProtectionSignOutViewModel(
         object SignOut : Command()
     }
 
-    fun signOut() {
+    fun onSignOutButtonClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.SignOut)
         }
     }
 
-    fun onEmailLogout() {
+    fun onEmailLogoutConfirmed() {
         viewModelScope.launch {
             emailManager.signOut()
         }

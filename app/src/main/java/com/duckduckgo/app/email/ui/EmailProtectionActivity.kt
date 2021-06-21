@@ -24,7 +24,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityEmailProtectionBinding
+import com.duckduckgo.app.browser.databinding.ActivityFragmentWithToolbarBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -32,14 +32,14 @@ import kotlinx.coroutines.flow.onEach
 class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private val viewModel: EmailProtectionViewModel by bindViewModel()
-    private lateinit var binding: ActivityEmailProtectionBinding
+    private lateinit var binding: ActivityFragmentWithToolbarBinding
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityEmailProtectionBinding.inflate(layoutInflater)
+        binding = ActivityFragmentWithToolbarBinding.inflate(layoutInflater)
 
         viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
         setContentView(binding.root)

@@ -47,16 +47,16 @@ class EmailProtectionSignOutViewModelTest {
     }
 
     @Test
-    fun whenSignOutThenEmitSignOutCommand() = coroutineRule.runBlocking {
+    fun whenOnSignOutButtonClickedThenEmitSignOutCommand() = coroutineRule.runBlocking {
         testee.commands.test {
-            testee.signOut()
+            testee.onSignOutButtonClicked()
             assertEquals(SignOut, expectItem())
         }
     }
 
     @Test
-    fun whenOnEmailLogoutThenCallSignOut() {
-        testee.onEmailLogout()
+    fun whenOnEmailLogoutConfirmedThenCallSignOut() {
+        testee.onEmailLogoutConfirmed()
         verify(mockEmailManager).signOut()
     }
 }

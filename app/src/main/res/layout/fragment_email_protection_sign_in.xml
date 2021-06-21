@@ -107,9 +107,6 @@
         android:text="@string/emailProtectionFooterDescription"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:textStyle="normal" />
 
 </LinearLayout>

@@ -325,7 +325,7 @@
         <item name="android:textSize">15sp</item>
         <item name="strokeColor">@color/cornflowerBlue</item>
         <item name="rippleColor">?attr/emailButtonRippleColor</item>
-        <item name="android:textColor">?attr/emailSecondaryButtonTextColor</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
     <style name="UnknownTrackerText">

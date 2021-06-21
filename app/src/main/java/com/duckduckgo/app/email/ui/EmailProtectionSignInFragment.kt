@@ -46,6 +46,24 @@ class EmailProtectionSignInFragment : EmailProtectionFragment() {
     private var _binding: FragmentEmailProtectionSignInBinding? = null
     private val binding get() = _binding!!
 
+    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
+        override fun onClick(widget: View) {
+            showNotificationDialog()
+        }
+    }
+
+    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
+        override fun onClick(widget: View) {
+            viewModel.readBlogPost()
+        }
+    }
+
+    private val privacyGuaranteeSpan = object : NonUnderlinedClickableSpan() {
+        override fun onClick(widget: View) {
+            viewModel.readPrivacyGuarantees()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentEmailProtectionSignInBinding.inflate(inflater, container, false)
         return binding.root
@@ -139,24 +157,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment() {
         binding.waitListButton.isEnabled = true
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoin)
         setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, listOf(readBlogSpan))
-    }
-
-    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            showNotificationDialog()
-        }
-    }
-
-    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readBlogPost()
-        }
-    }
-
-    private val privacyGuaranteeSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readPrivacyGuarantees()
-        }
     }
 
     private fun configureClickableLink() {
