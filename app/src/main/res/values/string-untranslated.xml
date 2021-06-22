@@ -44,22 +44,22 @@
     <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
     <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
-    <string name="emailProtectionInviteCodeCta">I have an invite Code</string>
+    <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
     <string name="emailProtectionWaitlistCta">Join the Waitlist</string>
     <string name="emailProtectionGetStartedCta">Get Started</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when we\'re ready for you. <a href=""><b>Learn more</b></a> about Email Protection.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when<br/> Email Protection is ready for you. <a href=""><b>Learn more</b></a>.]]></string>
     <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
@@ -70,7 +70,7 @@
 
     <!-- Settings -->
     <string name="settingsEmailProtectionTitle">Email Protection</string>
-    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address.</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
