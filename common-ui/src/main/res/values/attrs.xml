@@ -72,5 +72,6 @@
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
+    <attr name="savedSiteEditTextUnderlineColor" format="color" />
 
 </resources>

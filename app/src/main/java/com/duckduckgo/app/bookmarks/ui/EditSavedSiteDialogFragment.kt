@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,18 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.browser.databinding.EditSavedSiteBinding
 import com.duckduckgo.app.global.view.showKeyboard
 
 class EditSavedSiteDialogFragment : DialogFragment() {
@@ -36,48 +39,99 @@ class EditSavedSiteDialogFragment : DialogFragment() {
 
     var listener: EditSavedSiteListener? = null
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    private var _binding: EditSavedSiteBinding? = null
+    private val binding get() = _binding!!
 
-        val rootView = View.inflate(activity, R.layout.edit_saved_site, null)
-        val titleInput = rootView.findViewById<EditText>(R.id.titleInput)
-        val urlInput = rootView.findViewById<EditText>(R.id.urlInput)
-
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.savedSiteDialogTitleEdit)
-            .setPositiveButton(R.string.dialogSave) { _, _ ->
-                userAcceptedDialog(titleInput, urlInput)
-            }
-
-        validateBundleArguments()
-
-        populateFields(titleInput, urlInput)
-
-        val alert = alertBuilder.create()
-        showKeyboard(titleInput, alert)
-        return alert
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
     }
 
-    private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
-        when (val savedSite = getSavedSite()) {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.attributes?.windowAnimations = android.R.style.Animation_Dialog
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = EditSavedSiteBinding.inflate(inflater, container, false)
+
+        validateBundleArguments()
+        configureToolbar()
+        populateFields(binding.titleInput, binding.urlInput)
+        showKeyboard(binding.titleInput)
+
+        return binding.root
+    }
+
+    private fun configureToolbar() {
+        val toolbar = binding.savedSiteAppBar.toolbar
+        setToolbarTitle(toolbar)
+        configureUpNavigation(toolbar)
+    }
+
+    private fun setToolbarTitle(toolbar: Toolbar) {
+        if (getSavedSite() is SavedSite.Favorite) {
+            toolbar.title = getString(R.string.favoriteDialogTitleEdit)
+        } else {
+            toolbar.title = getString(R.string.bookmarkDialogTitleEdit)
+        }
+    }
+
+    private fun configureUpNavigation(toolbar: Toolbar) {
+        toolbar.setNavigationIcon(R.drawable.ic_back)
+        toolbar.setNavigationOnClickListener {
+            dismiss()
+        }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        userNavigatedBack(binding.titleInput, binding.urlInput)
+        super.onCancel(dialog)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        userNavigatedBack(binding.titleInput, binding.urlInput)
+        super.onDismiss(dialog)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun userNavigatedBack(titleInput: EditText, urlInput: EditText) {
+        val savedSite = getSavedSite()
+
+        val updatedTitle = validateInput(titleInput.text.toString(), savedSite.title)
+        val updatedUrl = validateInput(urlInput.text.toString(), savedSite.url)
+
+        when (savedSite) {
             is SavedSite.Bookmark -> {
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
+                    savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
             }
             is SavedSite.Favorite -> {
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
+                    savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
             }
         }
-        titleInput.hideKeyboard()
+        hideKeyboard()
     }
 
-    private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
+    private fun validateInput(newValue: String, existingValue: String) =
+        if (newValue.isNotBlank()) newValue else existingValue
+
+    private fun showKeyboard(titleInput: EditText) {
         titleInput.setSelection(titleInput.text.length)
         titleInput.showKeyboard()
-        alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+    }
+
+    private fun hideKeyboard() {
+        requireActivity().window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
     }
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
