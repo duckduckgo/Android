@@ -22,7 +22,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.net.InetAddress
 
-@ExperimentalUnsignedTypes
 class VpnRoutesTest {
 
     @Test
@@ -173,7 +172,7 @@ class VpnRoutesTest {
         val addressBytes = InetAddress.getByName(this).address
 
         for (index in addressBytes.size - 1 downTo 0) {
-            if (addressBytes[index].toUByte().canIncrement()) {
+            if (addressBytes[index].canIncrement()) {
                 addressBytes[index]++
                 break
             } else {
@@ -194,8 +193,9 @@ class VpnRoutesTest {
         )
     }
 
-    private fun UByte.canIncrement(): Boolean {
-        return this < 255u
+    private fun Byte.canIncrement(): Boolean {
+        val uByte = this.toInt() and 0xFF
+        return uByte < 255
     }
 
 }
