@@ -268,7 +268,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(4000)
+            setMtu(16_000)
             configureMeteredConnection()
 
             if (vpnPreferences.isCustomDnsServerSet()) {
@@ -522,6 +522,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private val INCLUDED_APPS_FOR_TESTING = listOf(
         "com.duckduckgo.networkrequestor",
+        "com.cdrussell.networkrequestor",
         "meteor.test.and.grade.internet.connection.speed",
         "org.zwanoo.android.speedtest",
         "com.netflix.Speedtest",

@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.increaseOrWraparound
@@ -28,7 +29,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
@@ -46,8 +46,9 @@ import xyz.hexene.localvpn.TCB
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
+import java.nio.channels.SelectionKey.OP_READ
+import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
-import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
 class TcpDeviceToNetwork(
@@ -77,8 +78,6 @@ class TcpDeviceToNetwork(
      */
     fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
-        val startTime = System.nanoTime()
-        // measurePacketConsumptionTimes(startTime)
 
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.tcpHeader.destinationPort
@@ -96,72 +95,11 @@ class TcpDeviceToNetwork(
         packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
 
         val tcb = TCB.getTCB(connectionKey)
-        // Timber.i("Device to network packet; got new response buffer and checked for TCB. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
 
         if (tcb == null) {
             processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
-
-            // Timber.i("Processed device-to-network packet. New connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
-            // Timber.i("Processed device-to-network packet. Existing connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
-        }
-
-        //        if (responseBuffer.position() == 0) {
-        //            ByteBufferPool.release(responseBuffer)
-        //        }
-        ByteBufferPool.release(payloadBuffer)
-    }
-
-    private fun measurePacketConsumptionTimes(startTimeNano: Long) {
-        val diff = startTimeNano - lastTimePacketConsumed
-
-        if (lastTimePacketConsumed == 0L) {
-            lastTimePacketConsumed = startTimeNano
-        } else {
-            totalPacketsConsumed++
-            totalTimeToConsumePacket += diff
-
-            if (TimeUnit.NANOSECONDS.toSeconds(diff) >= 1) {
-                lastTimePacketConsumed = 0L
-                totalPacketsConsumed = 0
-                totalTimeToConsumePacket = 0
-            } else {
-                lastTimePacketConsumed = startTimeNano
-                if (totalPacketsConsumed % 500 == 0) {
-                    Timber.i(
-                        "Packets consumed: %d. Average time to consume: %dns",
-                        totalPacketsConsumed,
-                        totalTimeToConsumePacket / totalPacketsConsumed
-                    )
-                }
-            }
-        }
-    }
-
-    private fun measurePacketProcessingTimes(startTimeNano: Long) {
-        val diff = startTimeNano - lastTimeProcessPacketEntered
-
-        if (lastTimeProcessPacketEntered == 0L) {
-            lastTimeProcessPacketEntered = startTimeNano
-        } else {
-            totalPacketsProcessed++
-            totalTimeToProcessPackets += diff
-
-            if (TimeUnit.NANOSECONDS.toSeconds(diff) >= 1) {
-                lastTimeProcessPacketEntered = 0L
-                totalPacketsProcessed = 0
-                totalTimeToProcessPackets = 0
-            } else {
-                lastTimeProcessPacketEntered = startTimeNano
-                if (totalPacketsProcessed % 500 == 0) {
-                    Timber.i(
-                        "Packets processed: %d. Average time to consume: %dns",
-                        totalPacketsProcessed,
-                        totalTimeToProcessPackets / totalPacketsProcessed
-                    )
-                }
-            }
         }
     }
 
@@ -279,7 +217,6 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacket(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
-        val entryTime = System.nanoTime()
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) {
@@ -304,7 +241,7 @@ class TcpDeviceToNetwork(
                     "Registering for OP_READ. Took: %d",
                     measureNanoTime {
                         selector.wakeup()
-                        tcb.selectionKey.interestOps(SelectionKey.OP_READ)
+                        tcb.selectionKey.interestOps(OP_READ)
                         tcb.waitingForNetworkData = true
                     }
                 )
@@ -318,7 +255,11 @@ class TcpDeviceToNetwork(
                 }
                 tcb.acknowledgementNumberToClient = ackNumber
 
-                socketWriter.writeToSocket(PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber))
+                selector.wakeup()
+                tcb.channel.register(selector, OP_WRITE, tcb)
+
+                val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
+                socketWriter.addToWriteQueue(writeData, false)
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
@@ -327,8 +268,6 @@ class TcpDeviceToNetwork(
                 return
             }
         }
-        measurePacketProcessingTimes(entryTime)
-        queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 
     private fun determineIfTracker(tcb: TCB, packet: Packet, requestingApp: OriginatingApp, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {

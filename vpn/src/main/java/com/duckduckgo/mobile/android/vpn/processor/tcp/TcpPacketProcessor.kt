@@ -60,7 +60,7 @@ class TcpPacketProcessor(
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
-    private val tcpSocketWriter = TcpSocketWriter(selector)
+    private val tcpSocketWriter = TcpSocketWriter(selector, queues)
     private val tcpNetworkToDevice = TcpNetworkToDevice(
         queues = queues,
         selector = selector,

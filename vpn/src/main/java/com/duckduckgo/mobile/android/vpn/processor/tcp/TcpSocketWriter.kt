@@ -16,60 +16,105 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
+import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
-import java.nio.channels.SelectionKey
+import xyz.hexene.localvpn.TCB
+import java.nio.ByteBuffer
+import java.nio.channels.SelectionKey.OP_READ
+import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
+import java.util.*
 
 interface SocketWriter {
-    fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean
+    fun writeToSocket(tcb: TCB)
+    fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean)
 }
 
-class TcpSocketWriter(private val selector: Selector) : SocketWriter {
+class TcpSocketWriter(private val selector: Selector, private val queues: VpnQueues) : SocketWriter {
 
-    @Synchronized
-    override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
-        Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
-        val payloadBuffer = writeData.payloadBuffer
-        val payloadSize = writeData.payloadSize
-        val socket = writeData.socket
-        val connectionParams = writeData.connectionParams
-        val tcb = writeData.tcb
+    // TODO we need to clear this queue out of socket channels sometime
+    private val writeQueue = mutableMapOf<TCB, Deque<PendingWriteData>>()
 
-        val bytesWritten = socket.write(payloadBuffer)
-        val write = if (payloadBuffer.remaining() > 0) {
-            Timber.e("Hey hey, hey. now what? %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
-
-//            selector.wakeup()
-//            socket.register(selector,
-//                SelectionKey.OP_WRITE,
-//                TcpPacketProcessor.PendingWriteData(ByteBuffer.wrap(remainingData), socket, payloadSize, tcb, connectionParams)
-//            )
-            false
-        } else {
-            selector.wakeup()
-            socket.register(selector, SelectionKey.OP_READ, tcb)
-
-            tcb.acknowledgementNumberToClient = writeData.ackNumber
-            tcb.acknowledgementNumberToServer = writeData.seqNumber
-
-            // tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
-            // tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
-            val seqToClient = tcb.sequenceNumberToClient
-            val ackToServer = tcb.acknowledgementNumberToServer
-            val seqAckDiff = seqToClient - ackToServer
-            Timber.i("${writeData.tcb.ipAndPort} - seqToClient=$seqToClient, ackToClient=${tcb.acknowledgementNumberToClient}, ackToServer=$ackToServer, diff=$seqAckDiff")
-            tcb.referencePacket.updateTcpBuffer(
-                connectionParams.responseBuffer,
-                Packet.TCPHeader.ACK.toByte(),
-                tcb.sequenceNumberToClient,
-                tcb.acknowledgementNumberToClient,
-                0
-            )
-            true
-        }
-
-        return write
+    override fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean) {
+        val queue = pendingWriteData.tcb.writeQueue()
+        if (skipQueue) queue.addFirst(pendingWriteData) else queue.add(pendingWriteData)
+        Timber.v("Added to write queue. Size is now ${queue.size} for ${getLogLabel(pendingWriteData.tcb)}")
     }
 
+    private fun getLogLabel(tcb: TCB) =
+        "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
+
+    @Synchronized
+    private fun TCB.writeQueue(): Deque<PendingWriteData> {
+        val existingQueue = writeQueue[this]
+        if (existingQueue != null) return existingQueue
+
+        val newQueue = LinkedList<PendingWriteData>()
+        writeQueue[this] = newQueue
+        return newQueue
+    }
+
+    @Synchronized
+    override fun writeToSocket(tcb: TCB) {
+        val writeQueue = tcb.writeQueue()
+
+        do {
+            val writeData = writeQueue.pollFirst() ?: break
+            Timber.v("Writing data to socket ${tcb.ipAndPort}: ${writeData.payloadSize} bytes. ack=${writeData.ackNumber}, seq=${writeData.seqNumber}")
+
+            val payloadBuffer = writeData.payloadBuffer
+            val payloadSize = writeData.payloadSize
+            val socket = writeData.socket
+            val connectionParams = writeData.connectionParams
+
+            val bytesWritten = socket.write(payloadBuffer)
+
+            if (payloadBuffer.remaining() == 0) {
+                Timber.i("Fully wrote $payloadSize bytes for ${getLogLabel(tcb)}")
+                fullyWritten(tcb, writeData, connectionParams)
+            } else {
+                Timber.w("Partial write. ${payloadBuffer.remaining()} bytes remaining to be written for ${getLogLabel(tcb)}")
+                partiallyWritten(writeData, bytesWritten, payloadBuffer, payloadSize)
+            }
+
+        } while (writeQueue.isNotEmpty())
+
+        Timber.i("Nothing more to write, switching to read mode")
+
+        selector.wakeup()
+        tcb.channel.register(selector, OP_READ, tcb)
+    }
+
+    private fun partiallyWritten(writeData: PendingWriteData, bytesWritten: Int, payloadBuffer: ByteBuffer, payloadSize: Int) {
+        Timber.e("Hey hey, hey. now what? %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
+
+        addToWriteQueue(writeData, skipQueue = true)
+
+        selector.wakeup()
+        writeData.socket.register(selector, OP_WRITE or OP_READ, writeData.tcb)
+    }
+
+    private fun fullyWritten(tcb: TCB, writeData: PendingWriteData, connectionParams: TcpConnectionParams) {
+        tcb.acknowledgementNumberToClient = writeData.ackNumber
+        tcb.acknowledgementNumberToServer = writeData.seqNumber
+
+        val seqToClient = tcb.sequenceNumberToClient
+        val ackToServer = tcb.acknowledgementNumberToServer
+        val seqAckDiff = seqToClient - ackToServer
+        Timber.i("${writeData.tcb.ipAndPort} - seqToClient=$seqToClient, ackToClient=${tcb.acknowledgementNumberToClient}, ackToServer=$ackToServer, diff=$seqAckDiff")
+
+        val responseBuffer = connectionParams.responseBuffer
+
+        tcb.referencePacket.updateTcpBuffer(
+            responseBuffer,
+            Packet.TCPHeader.ACK.toByte(),
+            tcb.sequenceNumberToClient,
+            tcb.acknowledgementNumberToClient,
+            0
+        )
+        queues.networkToDevice.offer(responseBuffer)
+    }
 }

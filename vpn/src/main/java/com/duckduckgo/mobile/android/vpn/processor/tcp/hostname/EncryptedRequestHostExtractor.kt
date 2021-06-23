@@ -84,8 +84,6 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         var index = extensionStartIndex
 
         while (extensionBytesSearched < extensionsLength && index < packet.size) {
-            Timber.i("Extensions length: %d, current index = %d, packet size=%d", extensionsLength, index, packet.size)
-
             val extensionType = addHigherLowerOrderBytes(HigherOrderByte(packet[index]), LowerOrderByte(packet[index + 1]))
             index += 2
 

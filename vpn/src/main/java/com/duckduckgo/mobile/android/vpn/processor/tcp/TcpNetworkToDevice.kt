@@ -78,15 +78,9 @@ class TcpNetworkToDevice(
                     Timber.v("Got next network-to-device packet [isConnectable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
                     processConnect(key)
                 } else if (key.isValid && key.isWritable) {
-
-                    val partialWriteData = key.attachment() as TcpPacketProcessor.PendingWriteData
-                    Timber.w("Now is the chance to write some more!")
-
-                    val fullyWritten = tcpSocketWriter.writeToSocket(partialWriteData)
-                    Timber.i("Fully written this time? %s", fullyWritten)
-                    if (fullyWritten) {
-                        key.interestOps(SelectionKey.OP_READ)
-                    }
+                    val tcb = key.attachment() as TCB
+                    Timber.v("Now is the chance to write to the socket ${tcb.ipAndPort}")
+                    tcpSocketWriter.writeToSocket(tcb)
                 }
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
@@ -107,6 +101,7 @@ class TcpNetworkToDevice(
             val channel = key.channel() as SocketChannel
             try {
                 val readBytes = channel.read(receiveBuffer)
+                Timber.d("Read $readBytes bytes from ${tcb.ipAndPort} bound for ${tcb.requestingAppName}/${tcb.requestingAppPackage}")
 
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key)
