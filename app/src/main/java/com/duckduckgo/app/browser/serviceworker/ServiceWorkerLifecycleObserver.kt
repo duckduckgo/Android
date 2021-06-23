@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,9 +36,13 @@ class ServiceWorkerLifecycleObserver @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun setServiceWorkerClient() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ServiceWorkerController.getInstance().setServiceWorkerClient(
-                BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)
-            )
+            try {
+                ServiceWorkerController.getInstance().setServiceWorkerClient(
+                    BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)
+                )
+            } catch (e: Exception) {
+                Timber.w(e.localizedMessage)
+            }
         }
     }
 }
