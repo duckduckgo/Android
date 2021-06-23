@@ -91,7 +91,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment() {
             it.isEnabled = false
             viewModel.joinTheWaitlist()
         }
-        binding.getStartedButton.setOnClickListener { viewModel.haveAnInviteCode() }
+        binding.getStartedButton.setOnClickListener { viewModel.getStarted() }
     }
 
     private fun render(signInViewState: EmailProtectionSignInViewModel.ViewState) {

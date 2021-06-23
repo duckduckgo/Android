@@ -35,6 +35,7 @@ import com.duckduckgo.app.email.api.WaitlistStatusResponse
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.LOGIN_URL
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.*
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.ADDRESS_BLOG_POST
+import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.GET_STARTED_URL
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.PRIVACY_GUARANTEE
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.SIGN_UP_URL
 import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
@@ -97,6 +98,18 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.haveAnInviteCode()
+            assertEquals(OpenUrl(url = expectedURL), expectItem())
+        }
+    }
+
+    @Test
+    fun whenGetStartedThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
+        val inviteCode = "abcde"
+        whenever(mockEmailManager.getInviteCode()).thenReturn(inviteCode)
+        val expectedURL = "$GET_STARTED_URL$inviteCode"
+
+        testee.commands.test {
+            testee.getStarted()
             assertEquals(OpenUrl(url = expectedURL), expectItem())
         }
     }

@@ -68,6 +68,12 @@ class EmailProtectionSignInViewModel(
         }
     }
 
+    fun getStarted() {
+        viewModelScope.launch {
+            commandChannel.send(Command.OpenUrl(url = "$GET_STARTED_URL${emailManager.getInviteCode()}"))
+        }
+    }
+
     fun joinTheWaitlist() {
         viewModelScope.launch {
             runCatching {
@@ -121,7 +127,8 @@ class EmailProtectionSignInViewModel(
     companion object {
         const val PRIVACY_GUARANTEE = "https://quack.duckduckgo.com/email/privacy-guarantees"
         const val ADDRESS_BLOG_POST = "https://quack.duckduckgo.com/email/learn-more"
-        const val SIGN_UP_URL = "https://quack.duckduckgo.com/email/start?inviteCode="
+        const val GET_STARTED_URL = "https://quack.duckduckgo.com/email/start?inviteCode="
+        const val SIGN_UP_URL = "https://quack.duckduckgo.com/email/signup?inviteCode="
         const val LOGIN_URL = "https://quack.duckduckgo.com/email/login"
     }
 
