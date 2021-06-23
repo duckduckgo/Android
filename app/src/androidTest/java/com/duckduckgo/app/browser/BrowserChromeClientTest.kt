@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -187,6 +188,28 @@ class BrowserChromeClientTest {
         assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
         verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
         verify(mockFilePathCallback).onReceiveValue(null)
+    }
+
+    @Test
+    fun whenOnPermissionRequestIfProtectedMediaIdIsRequestedThenPermissionIsGranted() {
+        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        val mockPermission: PermissionRequest = mock()
+        whenever(mockPermission.resources).thenReturn(permissions)
+
+        testee.onPermissionRequest(mockPermission)
+
+        verify(mockPermission).grant(permissions)
+    }
+
+    @Test
+    fun whenOnPermissionRequestIfProtectedMediaIdIsNotRequestedThenNoPermissionsAreGranted() {
+        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val mockPermission: PermissionRequest = mock()
+        whenever(mockPermission.resources).thenReturn(permissions)
+
+        testee.onPermissionRequest(mockPermission)
+
+        verify(mockPermission).grant(arrayOf())
     }
 
     private val mockMsg = Message().apply {
