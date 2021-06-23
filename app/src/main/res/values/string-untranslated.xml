@@ -41,7 +41,7 @@
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
     <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[We never store your emails. <b><a href="">Learn more</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription"><![CDATA[We do not save your emails. <b><a href="">Learn more</a></b>.]]></string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
     <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
     <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
