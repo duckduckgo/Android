@@ -64,7 +64,7 @@
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
     <string name="emailProtectionSignOutFooter">
-        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us as <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us at <a href="mailto:support@duck.com">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
