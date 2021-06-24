@@ -37,7 +37,6 @@
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="savedSiteDialogTitleHint">Title</string>
     <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
     <string name="bookmarksSectionTitle">Bookmarks</string>
     <string name="favoritesSectionTitle">Favorites</string>
     <string name="bookmarksEmptyHint">No bookmarks added yet</string>
@@ -52,7 +51,9 @@
     <string name="settingSubtitleOpenLinksInAssociatedApps">Disable to prevent links from automatically opening in other installed apps.</string>
     <string name="appLinkDialogTitle">Open in another app?</string>
 
-    <!-- Bookmarks -->
+    <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
+    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
+    <string name="locationLabel">Location</string>
 
 </resources>

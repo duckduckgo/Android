@@ -75,6 +75,7 @@ class EditSavedSiteDialogFragment : DialogFragment() {
             toolbar.title = getString(R.string.favoriteDialogTitleEdit)
         } else {
             toolbar.title = getString(R.string.bookmarkDialogTitleEdit)
+            binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
     }
 
