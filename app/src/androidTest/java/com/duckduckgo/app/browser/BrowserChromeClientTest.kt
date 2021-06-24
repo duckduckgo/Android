@@ -27,8 +27,10 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.drm.DrmRequestManager
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.nhaarman.mockitokotlin2.*
@@ -56,7 +58,7 @@ class BrowserChromeClientTest {
     @Before
     fun setup() {
         mockUncaughtExceptionRepository = mock()
-        testee = BrowserChromeClient(mockUncaughtExceptionRepository, TestCoroutineScope())
+        testee = BrowserChromeClient(mockUncaughtExceptionRepository, DrmRequestManager(), TestCoroutineScope())
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
@@ -191,25 +193,27 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenOnPermissionRequestIfProtectedMediaIdIsRequestedThenPermissionIsGranted() {
+    fun whenOnPermissionRequestIfDomainIsInAllowedListThenPermissionIsGranted() {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
+        whenever(mockPermission.origin).thenReturn("https://www.spotify.com".toUri())
 
         testee.onPermissionRequest(mockPermission)
 
-        verify(mockPermission).grant(permissions)
+        verify(mockPermission).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
     }
 
     @Test
-    fun whenOnPermissionRequestIfProtectedMediaIdIsNotRequestedThenNoPermissionsAreGranted() {
-        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+    fun whenOnPermissionRequestIfDomainIsNotInAllowedListThenPermissionIsNotGranted() {
+        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
+        whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
 
         testee.onPermissionRequest(mockPermission)
 
-        verify(mockPermission).grant(arrayOf())
+        verify(mockPermission, never()).grant(any())
     }
 
     private val mockMsg = Message().apply {
