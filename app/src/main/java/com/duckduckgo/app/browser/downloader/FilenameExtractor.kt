@@ -30,7 +30,6 @@ class FilenameExtractor @Inject constructor(
     private val pixel: Pixel
 ) {
 
-
     fun extract(pendingDownload: PendingFileDownload): FilenameExtractionResult {
         val url = pendingDownload.url
         val mimeType = pendingDownload.mimeType
