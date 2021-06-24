@@ -76,6 +76,7 @@ sealed class DownloadFailReason {
     object UnsupportedUrlType : DownloadFailReason()
     object Other : DownloadFailReason()
     object DataUriParseException : DownloadFailReason()
+    object ConnectionRefused : DownloadFailReason()
 
     companion object {
         val DOWNLOAD_MANAGER_SETTINGS_URI: Uri = Uri.parse("package:com.android.providers.downloads")

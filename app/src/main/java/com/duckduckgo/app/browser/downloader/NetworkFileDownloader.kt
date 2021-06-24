@@ -39,38 +39,29 @@ class NetworkFileDownloader @Inject constructor(private val context: Context, pr
             return
         }
 
-        when (val extractionResult = filenameExtractor.extract(pendingDownload)) {
-            is FilenameExtractor.FilenameExtractionResult.Success -> downloadFile(pendingDownload, extractionResult.filename, callback)
-            is FilenameExtractor.FilenameExtractionResult.Failure -> tryDownloadFallback(pendingDownload, callback)
-        }
-
-    }
-
-    private fun tryDownloadFallback(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
-        val downloadCall = fileService.downloadFile(pendingDownload.url)
-        downloadCall?.enqueue(object : Callback<Void> {
+        fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     var updatedPendingDownload = pendingDownload.copy()
+
                     if (response.headers().get("content-type") != null) {
-                        val mimeType = response.headers().get("content-type")
-                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = mimeType)
+                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = response.headers().get("content-type"))
                     }
 
+                    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
                     if (response.headers().get("content-disposition") != null) {
-                        val contentDisposition = response.headers().get("content-disposition")
-                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = contentDisposition)
+                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = response.headers().get("content-disposition"))
                     }
 
                     when (val extractionResult = filenameExtractor.extract(updatedPendingDownload)) {
-                        is FilenameExtractor.FilenameExtractionResult.Success -> downloadFile(updatedPendingDownload, extractionResult.filename, callback)
-                        is FilenameExtractor.FilenameExtractionResult.Failure -> {
-                            downloadFile(pendingDownload, extractionResult.bestGuess, callback)
-                            callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
+                        is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(updatedPendingDownload, extractionResult.filename, callback)
+                        is FilenameExtractor.FilenameExtractionResult.Guess -> {
+                            downloadFile(updatedPendingDownload, extractionResult.bestGuess, callback)
                         }
                     }
                 } else {
                     Timber.d("Connection failed ${response.errorBody()}")
+                    callback.downloadFailed("Connection failed", DownloadFailReason.ConnectionRefused)
                 }
             }
 
@@ -79,6 +70,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context, pr
                 return
             }
         })
+
     }
 
     private fun downloadManagerAvailable(): Boolean {

@@ -79,9 +79,9 @@ class FilenameExtractor @Inject constructor(
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
             pixel.fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
-            return FilenameExtractionResult.Failure(guess)
+            return FilenameExtractionResult.Guess(guess)
         }
-        return FilenameExtractionResult.Success(guess)
+        return FilenameExtractionResult.Extracted(guess)
     }
 
     private fun pathSegments(url: String): List<String> {
@@ -102,8 +102,8 @@ class FilenameExtractor @Inject constructor(
     }
 
     sealed class FilenameExtractionResult {
-        data class Success(val filename: String) : FilenameExtractionResult()
-        data class Failure(val bestGuess: String) : FilenameExtractionResult()
+        data class Extracted(val filename: String) : FilenameExtractionResult()
+        data class Guess(val bestGuess: String) : FilenameExtractionResult()
     }
 
     data class Guesses(var latestGuess: String, var bestGuess: String? = null)
