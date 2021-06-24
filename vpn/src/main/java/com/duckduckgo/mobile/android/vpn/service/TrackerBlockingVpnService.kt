@@ -17,10 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.ActivityManager
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.app.Service
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,6 +25,7 @@ import android.net.VpnService
 import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
@@ -45,9 +43,7 @@ import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
-import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
+import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -107,6 +103,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
+    @Inject
+    lateinit var deviceShieldReminderNotificationScheduler: DeviceShieldReminderNotificationScheduler
+
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -138,14 +137,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private var tickerJob: Job? = null
-
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister, originatingAppPackageIdentifier, appNameResolver)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppPackageIdentifier, appNameResolver, this)
+        tcpPacketProcessor =
+            TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppPackageIdentifier, appNameResolver, this)
 
         newAppBroadcastReceiver.register()
 
@@ -191,12 +189,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Timber.i("VPN log: Starting VPN")
         notifyVpnStart()
 
-        tickerJob?.cancel()
         queues.clearAll()
 
         establishVpnInterface()
-        schedulerReminderAlarm()
-        hideReminderNotification()
+
+        deviceShieldReminderNotificationScheduler.onVPNStarted()
 
         tunInterface?.let { vpnInterface ->
             executorService?.shutdownNow()
@@ -224,35 +221,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 .buildTrackersBlockedNotification(this, deviceShieldNotification, ongoingNotificationPressedHandler)
             notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
         }
-    }
-
-    private fun hideReminderNotification() {
-        notificationManager.cancel(VPN_REMINDER_NOTIFICATION_ID)
-    }
-
-    private fun schedulerReminderAlarm() {
-        val receiver = ComponentName(this, VpnReminderReceiver::class.java)
-
-        packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
-
-        val alarmIntent = Intent(this, VpnReminderReceiver::class.java).let { intent ->
-            intent.action = ACTION_VPN_REMINDER
-            PendingIntent.getBroadcast(this, 0, intent, 0)
-        }
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-
-        alarmManager?.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            FIVE_HOURS,
-            alarmIntent
-        )
-
     }
 
     private suspend fun establishVpnInterface() {
@@ -324,9 +292,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun stopVpn(reason: VpnStopReason) {
         Timber.i("VPN log: Stopping VPN")
         notifyVpnStopped()
-        schedulerReminderAlarm()
 
-        tickerJob?.cancel()
+        when (reason) {
+            is VpnStopReason.SelfStop -> deviceShieldReminderNotificationScheduler.onVPNManuallyStopped()
+            else -> deviceShieldReminderNotificationScheduler.onVPNUndesiredStop()
+        }
+
         queues.clearAll()
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
@@ -346,7 +317,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */ }
+            VpnStopReason.SelfStop -> { /* noop */
+            }
             VpnStopReason.Error -> deviceShieldPixels.startError()
             VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
         }

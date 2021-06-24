@@ -20,12 +20,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.*
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
-import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
@@ -44,6 +41,9 @@ class VpnReminderReceiver : BroadcastReceiver() {
     @Inject
     lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
 
+    @Inject
+    lateinit var reminderManager: VpnReminderReceiverManager
+
     override fun onReceive(context: Context, intent: Intent) {
         AndroidInjection.inject(this, context)
 
@@ -53,21 +53,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
             Timber.v("Checking if VPN is running")
 
             goAsync(pendingResult) {
-                val manager = NotificationManagerCompat.from(context)
-                if (TrackerBlockingVpnService.isServiceRunning(context)) {
-                    Timber.v("Vpn is already running, nothing to show")
-                } else {
-                    Timber.v("Vpn is not running, showing reminder notification")
-                    val notification = if (wasReminderNotificationShown(context)) {
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
-                    } else {
-                        notificationWasShown(context)
-                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
-                    }
-
-                    deviceShieldPixels.didShowReminderNotification()
-                    manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
-                }
+                reminderManager.showReminderNotificationIfVpnDisabled(context)
             }
         }
 

@@ -43,7 +43,7 @@ class DeviceShieldAlertNotificationBuilder {
 
         private fun registerAlertChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_HIGH)
+                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_DEFAULT)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -54,11 +54,8 @@ class DeviceShieldAlertNotificationBuilder {
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
-            registerAlertChannel(context)
-
             val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                // need to use fully qualified class name since it is in a different module
-                addNextIntentWithParentStack(Intent(context, Class.forName("com.duckduckgo.app.beta.BetaFeaturesActivity")))
+                addNextIntent(DeviceShieldTrackerActivity.intent(context))
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
@@ -72,8 +69,7 @@ class DeviceShieldAlertNotificationBuilder {
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(onNotificationTapPendingIntent)
                 .setCustomContentView(notificationLayout)
-                .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.DEFAULT_ALL)
                 .setSilent(silent)
                 .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .addAction(

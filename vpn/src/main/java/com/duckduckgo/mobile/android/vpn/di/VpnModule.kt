@@ -107,4 +107,5 @@ class VpnModule {
     ): VpnTrackerDetector {
         return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
     }
+
 }
