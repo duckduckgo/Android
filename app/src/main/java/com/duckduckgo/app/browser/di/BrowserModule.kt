@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.di
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
@@ -175,7 +176,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(): SpecialUrlDetector = SpecialUrlDetectorImpl()
+    fun specialUrlDetector(packageManager: PackageManager, settingsDataStore: SettingsDataStore): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, settingsDataStore)
 
     @Provides
     @Singleton

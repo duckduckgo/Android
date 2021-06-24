@@ -80,12 +80,17 @@ class SettingsActivity :
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
+    private val appLinksToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAppLinksSettingChanged(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         setupToolbar(toolbar)
 
         configureUiEventHandlers()
+        configureAppLinksToggle()
         observeViewModel()
     }
 
@@ -112,6 +117,14 @@ class SettingsActivity :
         emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
     }
 
+    private fun configureAppLinksToggle() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            appLinksToggle.setOnCheckedChangeListener(appLinksToggleListener)
+        } else {
+            appLinksToggle.visibility = View.GONE
+        }
+    }
+
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
@@ -126,6 +139,7 @@ class SettingsActivity :
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     setEmailSetting(it.emailSetting)
+                    appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
                 }
             }.launchIn(lifecycleScope)
 
