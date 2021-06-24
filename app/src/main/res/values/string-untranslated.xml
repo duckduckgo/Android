@@ -45,7 +45,7 @@
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
     <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
     <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
-    <string name="emailProtectionWaitlistCta">Join the Waitlist</string>
+    <string name="emailProtectionWaitlistCta">Join the Private Waitlist</string>
     <string name="emailProtectionGetStartedCta">Get Started</string>
 
     <!-- Screen 1-->
