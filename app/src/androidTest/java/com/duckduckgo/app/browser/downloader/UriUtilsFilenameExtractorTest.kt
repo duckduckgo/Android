@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UriUtilsFilenameExtractorTest {
@@ -34,8 +35,12 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.jpg"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
     }
 
     @Test
@@ -43,8 +48,12 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
     }
 
     @Test
@@ -52,8 +61,12 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff?cb=123"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
     }
 
     @Test
@@ -61,17 +74,25 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff?cb=123.com"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
     }
 
     @Test
     fun whenUrlContainsFilenameButContentDispositionSaysOtherwiseThenExtractFromContentDisposition() {
         val url = "https://example.com/filename.jpg"
         val mimeType: String? = null
-        val contentDisposition: String = "Content-Disposition: attachment; filename=fromDisposition.jpg"
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("fromDisposition.jpg", extracted)
+        val contentDisposition = "Content-Disposition: attachment; filename=fromDisposition.jpg"
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("fromDisposition.jpg", extractionResult.filename)
     }
 
     @Test
@@ -79,8 +100,13 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("realFilename.bin", extractionResult.filename)
     }
 
     @Test
@@ -88,8 +114,12 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/foo/bar/files"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("foo.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
+        assertEquals("foo", extractionResult.bestGuess)
     }
 
     @Test
@@ -97,8 +127,13 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin/"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("realFilename.bin", extractionResult.filename)
     }
 
     @Test
@@ -106,17 +141,27 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin/foo/bar"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("realFilename.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("realFilename.bin", extractionResult.filename)
     }
 
     @Test
-    fun whenUrlIsEmptyStringAndNoOtherDataProvidedThenDefaultNameAndBinFiletypeReturned() {
+    fun whenUrlIsEmptyStringAndNoOtherDataProvidedThenDefaultNameFiletypeReturned() {
         val url = ""
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("downloadfile.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
+
+        assertEquals("downloadfile", extractionResult.bestGuess)
     }
 
     @Test
@@ -125,8 +170,13 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("downloadfile.jpeg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
+
+        assertEquals("downloadfile.jpeg", extractionResult.bestGuess)
     }
 
     @Test
@@ -135,8 +185,13 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("downloadfile.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("downloadfile.jpg", extractionResult.filename)
     }
 
     @Test
@@ -144,8 +199,13 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType: String? = null
         val contentDisposition = "Content-Disposition: attachment; filename=fromDisposition.jpg"
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("fromDisposition.jpg", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("fromDisposition.jpg", extractionResult.filename)
     }
 
     @Test
@@ -153,17 +213,27 @@ class UriUtilsFilenameExtractorTest {
         val url = "http://example.com"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("example.com", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("example.com", extractionResult.filename)
     }
 
     @Test
-    fun whenNoFilenameAndPathSegmentsThenPathNameBinFileIsReturned() {
+    fun whenNoFilenameAndPathSegmentsThenPathNameFileIsReturned() {
         val url = "http://example.com/cat/600/400"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("cat.bin", extracted)
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
+
+        assertEquals("cat", extractionResult.bestGuess)
     }
 
     @Test
@@ -171,26 +241,10 @@ class UriUtilsFilenameExtractorTest {
         val url = "http://example.com/cat/600/400"
         val mimeType: String? = null
         val contentDisposition: String? = null
+
         testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
-    }
-
-    @Test
-    fun whenTwitterImageUrlThenProperUriIsReturned() {
-        val url = "https://pbs.twimg.com/media/E317JKmWEAYaUuo?format=jpg&name=medium"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("cat.bin", extracted)
-    }
-
-    @Test
-    fun whenDDGSearchImageUrlThenProperUriIsReturned() {
-        val url = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP._h7s27M_cYLoJ7SzE7XRZQHaEK%26pid%3DApi&f=1"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("cat.bin", extracted)
     }
 
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
