@@ -28,6 +28,7 @@ import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFor
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -50,7 +51,7 @@ class WhitelistViewModelTest {
     private val mockCommandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
 
-    private val testee by lazy { WhitelistViewModel(mockDao, coroutineRule.testDispatcherProvider) }
+    private val testee by lazy { WhitelistViewModel(mockDao, TestCoroutineScope(), coroutineRule.testDispatcherProvider) }
 
     @Before
     fun before() = coroutineRule.runBlocking {

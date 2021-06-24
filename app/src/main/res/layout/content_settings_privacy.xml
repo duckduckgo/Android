@@ -89,4 +89,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/whitelist" />
 
+    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+        android:id="@+id/appLinksToggle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:toggleTitle="@string/settingTitleOpenLinksInAssociatedApps"
+        app:toggleSubTitle="@string/settingSubtitleOpenLinksInAssociatedApps"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emailSetting" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

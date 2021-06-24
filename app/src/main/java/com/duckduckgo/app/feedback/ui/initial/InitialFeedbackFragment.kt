@@ -22,17 +22,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import kotlinx.android.synthetic.main.content_feedback.*
 import javax.inject.Inject
 
 class InitialFeedbackFragment : FeedbackFragment() {
-
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
 
     interface InitialFeedbackListener {
         fun userSelectedPositiveFeedback()
@@ -40,25 +37,37 @@ class InitialFeedbackFragment : FeedbackFragment() {
         fun userCancelled()
     }
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    private var _binding: ContentFeedbackBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel by bindViewModel<InitialFeedbackFragmentViewModel>()
 
     private val listener: InitialFeedbackListener?
         get() = activity as InitialFeedbackListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.content_feedback, container, false)
+        _binding = ContentFeedbackBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         if (settingsDataStore.theme == DuckDuckGoTheme.LIGHT) {
-            positiveFeedbackButton.setImageResource(R.drawable.button_happy_light_theme)
-            negativeFeedbackButton.setImageResource(R.drawable.button_sad_light_theme)
+            binding.positiveFeedbackButton.setImageResource(R.drawable.button_happy_light_theme)
+            binding.negativeFeedbackButton.setImageResource(R.drawable.button_sad_light_theme)
         } else {
-            positiveFeedbackButton.setImageResource(R.drawable.button_happy_dark_theme)
-            negativeFeedbackButton.setImageResource(R.drawable.button_sad_dark_theme)
+            binding.positiveFeedbackButton.setImageResource(R.drawable.button_happy_dark_theme)
+            binding.negativeFeedbackButton.setImageResource(R.drawable.button_sad_dark_theme)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun configureViewModelObservers() {
@@ -75,8 +84,8 @@ class InitialFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureListeners() {
-        positiveFeedbackButton.setOnClickListener { viewModel.onPositiveFeedback() }
-        negativeFeedbackButton.setOnClickListener { viewModel.onNegativeFeedback() }
+        binding.positiveFeedbackButton.setOnClickListener { viewModel.onPositiveFeedback() }
+        binding.negativeFeedbackButton.setOnClickListener { viewModel.onNegativeFeedback() }
     }
 
     companion object {

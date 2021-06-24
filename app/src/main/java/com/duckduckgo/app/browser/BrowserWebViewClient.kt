@@ -68,9 +68,10 @@ class BrowserWebViewClient(
     /**
      * This is the new method of url overriding available from API 24 onwards
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame)
+        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
     }
 
     /**
@@ -79,13 +80,13 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, true)
+        return shouldOverride(view, url, isForMainFrame = true, isRedirect = false)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean, isRedirect: Boolean): Boolean {
 
         Timber.v("shouldOverride $url")
         try {
@@ -108,13 +109,22 @@ class BrowserWebViewClient(
                     webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
                     true
                 }
-                is SpecialUrlDetector.UrlType.IntentType -> {
-                    Timber.i("Found intent type link for $urlType.url")
-                    launchExternalApp(urlType)
+                is SpecialUrlDetector.UrlType.AppLink -> {
+                    Timber.i("Found app link for ${urlType.uriString}")
+                    webViewClientListener?.let { listener ->
+                        return listener.handleAppLink(urlType, isRedirect, isForMainFrame)
+                    }
+                    false
+                }
+                is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
+                    Timber.i("Found non-http app link for ${urlType.uriString}")
+                    webViewClientListener?.let { listener ->
+                        return listener.handleNonHttpAppLink(urlType, isRedirect)
+                    }
                     true
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
-                    Timber.w("Unable to process link type for ${urlType.url}")
+                    Timber.w("Unable to process link type for ${urlType.uriString}")
                     webView.originalUrl?.let {
                         webView.loadUrl(it)
                     }
@@ -134,16 +144,12 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
                 throw e
             }
             return false
         }
-    }
-
-    private fun launchExternalApp(urlType: SpecialUrlDetector.UrlType.IntentType) {
-        webViewClientListener?.externalAppLinkClicked(urlType)
     }
 
     @UiThread
@@ -164,8 +170,9 @@ class BrowserWebViewClient(
             emailInjector.resetInjectedJsFlag()
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+            webViewClientListener?.resetAppLinkState()
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
                 throw e
             }
@@ -184,7 +191,7 @@ class BrowserWebViewClient(
             }
             flushCookies()
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
@@ -192,7 +199,7 @@ class BrowserWebViewClient(
     }
 
     private fun flushCookies() {
-        GlobalScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager.flush()
         }
     }
@@ -250,7 +257,7 @@ class BrowserWebViewClient(
                 super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
                 throw e
             }

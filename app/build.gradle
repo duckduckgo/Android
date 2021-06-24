@@ -41,6 +41,9 @@ android {
             }
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -122,6 +125,7 @@ android {
 dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
+    implementation project(path: ':common-ui')
     implementation project(path: ':di')
 
     implementation AndroidX.legacy.supportV4
@@ -164,6 +168,7 @@ dependencies {
     implementation AndroidX.fragmentKtx
 
     // ViewModel and LiveData
+    implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
@@ -213,6 +218,7 @@ dependencies {
     androidTestImplementation Testing.mockito.kotlin
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    androidTestImplementation 'app.cash.turbine:turbine:_'
 }
 
 tasks.register('fastlaneVersionCode') {

@@ -36,6 +36,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -58,8 +59,13 @@ class SystemComponentsModule {
         AppIconModifier(context, appShortcutCreator)
 
     @Provides
-    fun animatorLoader(context: Context, settingsDataStore: SettingsDataStore, dispatcherProvider: DispatcherProvider): FireAnimationLoader {
-        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider)
+    fun animatorLoader(
+        context: Context,
+        settingsDataStore: SettingsDataStore,
+        dispatcherProvider: DispatcherProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): FireAnimationLoader {
+        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider, appCoroutineScope)
     }
 }
 
