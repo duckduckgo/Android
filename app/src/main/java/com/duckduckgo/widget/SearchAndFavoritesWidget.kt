@@ -25,6 +25,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.view.toDp
@@ -122,6 +123,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
 
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context))
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -226,6 +228,12 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromWidget(context)
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun buildOnboardingPendingIntent(context: Context): PendingIntent {
+        val intent = BrowserActivity.intent(context, newSearch = true)
+        intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 

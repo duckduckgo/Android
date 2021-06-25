@@ -59,7 +59,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar_mockup.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -156,6 +159,19 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
+        addOrReplaceNewTab(fragment, tabId)
+        currentTab = fragment
+        return fragment
+    }
+
+    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
+        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
+        addOrReplaceNewTab(fragment, tabId)
+        currentTab = fragment
+        return fragment
+    }
+
+    private fun addOrReplaceNewTab(fragment: BrowserTabFragment, tabId: String) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -165,8 +181,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
         transaction.commit()
-        currentTab = fragment
-        return fragment
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -225,6 +239,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         if (intent.getBooleanExtra(NOTIFY_DATA_CLEARED_EXTRA, false)) {
             Timber.i("Should notify data cleared")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
+        }
+
+        if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
+            launch {
+                val tabId = viewModel.onNewTabRequested()
+                openFavoritesOnboardingNewTab(tabId)
+            }
+            return
         }
 
         if (launchNewSearch(intent)) {
@@ -407,6 +429,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             return intent
         }
 
+        const val FAVORITES_ONBOARDING_EXTRA = "FAVORITES_ONBOARDING_EXTRA"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"

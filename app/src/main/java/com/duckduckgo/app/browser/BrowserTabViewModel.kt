@@ -330,6 +330,7 @@ class BrowserTabViewModel(
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
+    var favoritesOnboarding = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -434,9 +435,10 @@ class BrowserTabViewModel(
         }.launchIn(viewModelScope)
     }
 
-    fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
+    fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean, favoritesOnboarding: Boolean) {
         this.tabId = tabId
         this.skipHome = skipHome
+        this.favoritesOnboarding = favoritesOnboarding
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
