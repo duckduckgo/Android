@@ -184,8 +184,8 @@ class BrowserTabViewModel(
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
-        val fireButton: FireButton = FireButton.Visible(),
-        val showMenuButton: Boolean = true,
+        val fireButton: HighlightableButton = HighlightableButton.Visible(),
+        val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val canAddFavorite: Boolean = false,
@@ -202,9 +202,9 @@ class BrowserTabViewModel(
         val isEmailSignedIn: Boolean = false
     )
 
-    sealed class FireButton {
-        data class Visible(val pulseAnimation: Boolean = false) : FireButton()
-        object Gone : FireButton()
+    sealed class HighlightableButton {
+        data class Visible(val pulseAnimation: Boolean = false) : HighlightableButton()
+        object Gone : HighlightableButton()
 
         fun playPulseAnimation(): Boolean {
             return when (this) {
@@ -377,8 +377,8 @@ class BrowserTabViewModel(
     @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
-        if (currentBrowserViewState().fireButton is FireButton.Visible) {
-            browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        if (currentBrowserViewState().fireButton is HighlightableButton.Visible) {
+            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(pulseAnimation = shouldShowAnimation))
         }
 
         if (shouldShowAnimation) {
@@ -1304,11 +1304,15 @@ class BrowserTabViewModel(
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
-                FireButton.Visible(pulseAnimation = showPulseAnimation.value ?: false)
+                HighlightableButton.Visible(pulseAnimation = showPulseAnimation.value ?: false)
             } else {
-                FireButton.Gone
+                HighlightableButton.Gone
             },
-            showMenuButton = showControls,
+            showMenuButton = if (showControls) {
+                HighlightableButton.Visible()
+            } else {
+                HighlightableButton.Gone
+            },
             showClearButton = showClearButton,
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
         )

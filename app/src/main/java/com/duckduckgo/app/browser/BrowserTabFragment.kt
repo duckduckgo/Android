@@ -1670,13 +1670,21 @@ class BrowserTabFragment :
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.fireButton is FireButton.Visible
-            menuButton?.isVisible = viewState.showMenuButton
+            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
+            menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
+
+            val targetView = if (viewState.showMenuButton.playPulseAnimation()) {
+                browserMenuImageView
+            } else if (viewState.fireButton.playPulseAnimation()) {
+                fireIconImageView
+            } else {
+                null
+            }
 
             // omnibar only scrollable when browser showing and the fire button is not promoted
-            if (viewState.fireButton.playPulseAnimation()) {
+            if (targetView != null) {
                 omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-                playPulseAnimation()
+                playPulseAnimation(targetView)
             } else {
                 if (viewState.browserShowing) {
                     omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
@@ -1685,9 +1693,9 @@ class BrowserTabFragment :
             }
         }
 
-        private fun playPulseAnimation() {
+        private fun playPulseAnimation(targetView: View) {
             toolbarContainer.doOnLayout {
-                pulseAnimation.playOn(fireIconImageView)
+                pulseAnimation.playOn(targetView)
             }
         }
 
