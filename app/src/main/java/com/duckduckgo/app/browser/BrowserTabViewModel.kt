@@ -581,7 +581,7 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            openAppLinksInBrowser()
+            appLinksHandler.enterBrowserState()
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
@@ -1766,8 +1766,9 @@ class BrowserTabViewModel(
         appLinksHandler.reset()
     }
 
-    fun openAppLinksInBrowser() {
+    fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {
         appLinksHandler.enterBrowserState()
+        command.value = Navigate(url, headers)
     }
 
     fun appLinkClicked(appLink: AppLink) {
