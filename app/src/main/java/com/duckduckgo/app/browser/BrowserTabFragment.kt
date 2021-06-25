@@ -413,6 +413,11 @@ class BrowserTabFragment :
         super.onPause()
     }
 
+    override fun onStop() {
+        alertDialog?.dismiss()
+        super.onStop()
+    }
+
     private fun dismissAuthenticationDialog() {
         if (isAdded) {
             val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment
@@ -917,22 +922,21 @@ class BrowserTabFragment :
     }
 
     private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
-        val isShowing = alertDialog?.isShowing
+        alertDialog?.dismiss()
 
-        if (isShowing != true) {
-            alertDialog = AlertDialog.Builder(context)
-                .setTitle(R.string.appLinkDialogTitle)
-                .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    launchApp()
-                    viewModel.resetAppLinkState()
-                }
-                .setNegativeButton(R.string.no) { _, _ ->
-                    viewModel.openAppLinksInBrowser()
-                    navigate(url, headers)
-                }
-                .show()
-        }
+        alertDialog = AlertDialog.Builder(context)
+            .setTitle(R.string.appLinkDialogTitle)
+            .setMessage(getString(R.string.confirmOpenExternalApp))
+            .setPositiveButton(R.string.yes) { dialog, _ ->
+                launchApp()
+                viewModel.resetAppLinkState()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.no) { dialog, _ ->
+                viewModel.navigateToAppLinkInBrowser(url, headers)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
