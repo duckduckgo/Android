@@ -1775,6 +1775,7 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
             }
             browserMenu.setOnClickListener {
+                viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
             }

@@ -163,7 +163,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, favoritesOnboarding: Boolean = false, locale: Locale = Locale.getDefault()): Cta? {
         surveyCta(locale)?.let {
             return it
         }
@@ -172,7 +172,12 @@ class CtaViewModel @Inject constructor(
             if (isBrowserShowing) {
                 getBrowserCta(site)
             } else {
-                getHomeCta()
+                Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
+                if (favoritesOnboarding) {
+                    DaxBubbleCta.DaxFavoritesOnboardingCta(onboardingStore, appInstallStore)
+                } else {
+                    getHomeCta()
+                }
             }
         }
     }

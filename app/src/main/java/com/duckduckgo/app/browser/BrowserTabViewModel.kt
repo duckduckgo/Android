@@ -330,7 +330,6 @@ class BrowserTabViewModel(
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
-    var favoritesOnboarding = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -341,6 +340,17 @@ class BrowserTabViewModel(
     val title: String?
         get() = site?.title
 
+    private var showFavoritesOnboarding = false
+        set(value) {
+            if (value != field) {
+                if (value) {
+                    browserViewState.observeForever(favoritesOnboardingObserver)
+                } else {
+                    browserViewState.removeObserver(favoritesOnboardingObserver)
+                }
+            }
+            field = value
+        }
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
@@ -365,6 +375,14 @@ class BrowserTabViewModel(
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
+    }
+
+    private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
+        val shouldShowAnimation = state.browserShowing
+        val menuButton = currentBrowserViewState().showMenuButton
+        if (menuButton is HighlightableButton.Visible && menuButton.pulseAnimation != shouldShowAnimation) {
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
     }
 
     private val fireproofDialogEventObserver = Observer<Event> { event ->
@@ -436,9 +454,10 @@ class BrowserTabViewModel(
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean, favoritesOnboarding: Boolean) {
+        Timber.i("favoritesOnboarding loadData $initialUrl, $skipHome, $favoritesOnboarding")
         this.tabId = tabId
         this.skipHome = skipHome
-        this.favoritesOnboarding = favoritesOnboarding
+        this.showFavoritesOnboarding = favoritesOnboarding
         siteLiveData = tabRepository.retrieveSiteData(tabId)
         site = siteLiveData.value
 
@@ -500,6 +519,7 @@ class BrowserTabViewModel(
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
+        browserViewState.removeObserver(favoritesOnboardingObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
@@ -1669,6 +1689,12 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onBrowserMenuClicked() {
+        Timber.i("favoritesOnboarding onBrowserMenuClicked")
+        this.showFavoritesOnboarding = false
+        browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(pulseAnimation = false))
+    }
+
     fun userRequestedOpeningNewTab() {
         command.value = GenerateWebViewPreviewImage
         command.value = LaunchNewTab
@@ -1693,9 +1719,10 @@ class BrowserTabViewModel(
     }
 
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
+        Timber.i("favoritesOnboarding: - refreshCta $showFavoritesOnboarding")
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, locale)
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, showFavoritesOnboarding, locale)
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             return cta
