@@ -255,6 +255,17 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore
     )
+
+    class DaxFavoritesOnboardingCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+        CtaId.DAX_FAVORITES_ONBOARDING,
+        R.string.daxFavoritesOnboardingCtaText,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_FAVORITES_ONBOARDING_CTA,
+        onboardingStore,
+        appInstallStore
+    )
 }
 
 sealed class DaxFireDialogCta(
