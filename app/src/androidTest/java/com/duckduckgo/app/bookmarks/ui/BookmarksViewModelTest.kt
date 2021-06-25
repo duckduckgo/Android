@@ -25,7 +25,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.service.BookmarksManager
+import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
@@ -64,14 +64,14 @@ class BookmarksViewModelTest {
     private val bookmarksDao: BookmarksDao = mock()
     private val favoritesRepository: FavoritesRepository = mock()
     private val faviconManager: FaviconManager = mock()
-    private val bookmarksManager: BookmarksManager = mock()
+    private val savedSitesManager: SavedSitesManager = mock()
 
     private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com")
     private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
     private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarksDao, faviconManager, bookmarksManager, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarksDao, faviconManager, savedSitesManager, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model

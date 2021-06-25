@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.service
 import android.content.ContentResolver
 import android.net.Uri
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
@@ -26,36 +27,40 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-interface BookmarksExporter {
-    suspend fun export(uri: Uri): ExportBookmarksResult
+interface SavedSitesExporter {
+    suspend fun export(uri: Uri): ExportSavedSitesResult
 }
 
-sealed class ExportBookmarksResult {
-    object Success : ExportBookmarksResult()
-    data class Error(val exception: Exception) : ExportBookmarksResult()
-    object NoBookmarksExported : ExportBookmarksResult()
+sealed class ExportSavedSitesResult {
+    object Success : ExportSavedSitesResult()
+    data class Error(val exception: Exception) : ExportSavedSitesResult()
+    object NoSavedSitesExported : ExportSavedSitesResult()
 }
 
-class RealBookmarksExporter(
+class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
-    private val bookmarksParser: BookmarksParser,
+    private val favoritesDao: FavoritesDao,
+    private val savedSitesParser: SavedSitesParser,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
-) : BookmarksExporter {
+) : SavedSitesExporter {
 
-    override suspend fun export(uri: Uri): ExportBookmarksResult {
+    override suspend fun export(uri: Uri): ExportSavedSitesResult {
         val bookmarks = withContext(dispatcher.io()) {
             bookmarksDao.getBookmarksSync()
         }
+        val favorites = withContext(dispatcher.io()) {
+            favoritesDao.favoritesSync()
+        }
 
-        val html = bookmarksParser.generateHtml(bookmarks)
+        val html = savedSitesParser.generateHtml(bookmarks, favorites)
         return storeHtml(uri, html)
     }
 
-    private fun storeHtml(uri: Uri, content: String): ExportBookmarksResult {
+    private fun storeHtml(uri: Uri, content: String): ExportSavedSitesResult {
         return try {
             if (content.isEmpty()) {
-                return ExportBookmarksResult.NoBookmarksExported
+                return ExportSavedSitesResult.NoSavedSitesExported
             }
             val file = contentResolver.openFileDescriptor(uri, "w")
             if (file != null) {
@@ -63,14 +68,14 @@ class RealBookmarksExporter(
                 fileOutputStream.write(content.toByteArray())
                 fileOutputStream.close()
                 file.close()
-                ExportBookmarksResult.Success
+                ExportSavedSitesResult.Success
             } else {
-                ExportBookmarksResult.NoBookmarksExported
+                ExportSavedSitesResult.NoSavedSitesExported
             }
         } catch (e: FileNotFoundException) {
-            ExportBookmarksResult.Error(e)
+            ExportSavedSitesResult.Error(e)
         } catch (e: IOException) {
-            ExportBookmarksResult.Error(e)
+            ExportSavedSitesResult.Error(e)
         }
     }
 

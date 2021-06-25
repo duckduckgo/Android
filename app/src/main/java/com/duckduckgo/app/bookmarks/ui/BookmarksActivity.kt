@@ -25,8 +25,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
-import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
+import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
+import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
@@ -79,7 +79,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 if (resultCode == RESULT_OK) {
                     val selectedFile = data?.data
                     if (selectedFile != null) {
-                        viewModel.exportBookmarks(selectedFile)
+                        viewModel.exportSavedSites(selectedFile)
                     }
                 }
             }
@@ -112,37 +112,38 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
                     is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
                     is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
-                    is BookmarksViewModel.Command.ImportedBookmarks -> showImportedBookmarks(it.importBookmarksResult)
-                    is BookmarksViewModel.Command.ExportedBookmarks -> showExportedBookmarks(it.exportBookmarksResult)
+                    is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
+                    is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
                 }
             }
         )
     }
 
-    private fun showImportedBookmarks(result: ImportBookmarksResult) {
+    private fun showImportedSavedSites(result: ImportSavedSitesResult) {
         when (result) {
-            is ImportBookmarksResult.Error -> {
+            is ImportSavedSitesResult.Error -> {
                 showMessage(getString(R.string.importBookmarksError))
             }
-            is ImportBookmarksResult.Success -> {
-                if (result.bookmarks.isEmpty()) {
+            is ImportSavedSitesResult.Success -> {
+                if (result.savedSites.isEmpty()) {
                     showMessage(getString(R.string.importBookmarksEmpty))
                 } else {
-                    showMessage(getString(R.string.importBookmarksSuccess, result.bookmarks.size))
+                    // do we want different messages based on having imported favorites or bookmarks only or both?
+                    showMessage(getString(R.string.importBookmarksSuccess, result.savedSites.size))
                 }
             }
         }
     }
 
-    private fun showExportedBookmarks(result: ExportBookmarksResult) {
+    private fun showExportedSavedSites(result: ExportSavedSitesResult) {
         when (result) {
-            is ExportBookmarksResult.Error -> {
+            is ExportSavedSitesResult.Error -> {
                 showMessage(getString(R.string.exportBookmarksError))
             }
-            ExportBookmarksResult.NoBookmarksExported -> {
+            ExportSavedSitesResult.NoSavedSitesExported -> {
                 showMessage(getString(R.string.exportBookmarksEmpty))
             }
-            ExportBookmarksResult.Success -> {
+            ExportSavedSitesResult.Success -> {
                 showMessage(getString(R.string.exportBookmarksSuccess))
             }
         }
