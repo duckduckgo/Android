@@ -55,22 +55,22 @@ class SavedSitesParserTest {
 
         val result = parser.generateHtml(listOf(bookmark), listOf(favorite))
         val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-                "<!--This is an automatically generated file.\n" +
-                "It will be read and overwritten.\n" +
-                "Do Not Edit! -->\n" +
-                "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-                "<Title>Bookmarks</Title>\n" +
-                "<H1>Bookmarks</H1>\n" +
-                "<DL><p>\n" +
-                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo Bookmarks</H3>\n" +
-                "    <DL><p>\n" +
-                "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
-                "    </DL><p>\n" +
-                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo Favorites</H3>\n" +
-                "    <DL><p>\n" +
-                "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
-                "    </DL><p>\n" +
-                "</DL><p>\n"
+            "<!--This is an automatically generated file.\n" +
+            "It will be read and overwritten.\n" +
+            "Do Not Edit! -->\n" +
+            "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
+            "<Title>Bookmarks</Title>\n" +
+            "<H1>Bookmarks</H1>\n" +
+            "<DL><p>\n" +
+            "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo Bookmarks</H3>\n" +
+            "    <DL><p>\n" +
+            "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
+            "    </DL><p>\n" +
+            "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo Favorites</H3>\n" +
+            "    <DL><p>\n" +
+            "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
+            "    </DL><p>\n" +
+            "</DL><p>\n"
 
         assertEquals(expectedHtml, result)
     }
@@ -176,13 +176,13 @@ class SavedSitesParserTest {
         fileItems.forEach {
             if (it.select("H3").isNotEmpty()) {
                 val folderItem = it.select("H3")
-                if (inFolder){
+                if (inFolder) {
                     // we get here when a folder has been read and a new one starts
                     // bookmarkFolders.add(bookmarkFolder)
                 }
 
                 val folderName = folderItem.text()
-                if (folderName == "DuckDuckGo Favorites"){
+                if (folderName == "DuckDuckGo Favorites") {
                     inFavorite = true
                     inFolder = false
                 } else {
@@ -197,7 +197,7 @@ class SavedSitesParserTest {
                 if (linkItem.isNotEmpty()) {
                     val link = linkItem.attr("href")
                     val title = linkItem.text()
-                    if (inFavorite){
+                    if (inFavorite) {
                         savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
                         favorites++
                     } else {

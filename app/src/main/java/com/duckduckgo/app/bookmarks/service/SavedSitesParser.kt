@@ -28,6 +28,11 @@ interface SavedSitesParser {
 
 class RealSavedSitesParser : SavedSitesParser {
 
+    companion object {
+        const val FAVORITES_FOLDER = "DuckDuckGo Favorites"
+        const val BOOKSMARKS_FOLDER = "DuckDuckGo Bookmarks"
+    }
+
     override fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<FavoriteEntity>): String {
         if (bookmarks.isEmpty() && favorites.isEmpty()) {
             return ""
@@ -53,7 +58,7 @@ class RealSavedSitesParser : SavedSitesParser {
             return ""
         }
         return buildString {
-            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo Bookmarks</H3>")
+            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">$BOOKSMARKS_FOLDER</H3>")
             appendLine("    <DL><p>")
             bookmarks.forEach { entity ->
                 appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
@@ -67,7 +72,7 @@ class RealSavedSitesParser : SavedSitesParser {
             return ""
         }
         return buildString {
-            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo Favorites</H3>")
+            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">$FAVORITES_FOLDER</H3>")
             appendLine("    <DL><p>")
             favorites.forEach { entity ->
                 appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
@@ -88,13 +93,13 @@ class RealSavedSitesParser : SavedSitesParser {
         fileItems.forEach {
             if (it.select("H3").isNotEmpty()) {
                 val folderItem = it.select("H3")
-                if (inFolder){
+                if (inFolder) {
                     // we get here when a folder has been read and a new one starts
                     // bookmarkFolders.add(bookmarkFolder)
                 }
 
                 val folderName = folderItem.text()
-                if (folderName == "DuckDuckGo Favorites"){
+                if (folderName == FAVORITES_FOLDER) {
                     inFavorite = true
                     inFolder = false
                 } else {
@@ -109,7 +114,7 @@ class RealSavedSitesParser : SavedSitesParser {
                 if (linkItem.isNotEmpty()) {
                     val link = linkItem.attr("href")
                     val title = linkItem.text()
-                    if (inFavorite){
+                    if (inFavorite) {
                         savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
                         favorites++
                     } else {
