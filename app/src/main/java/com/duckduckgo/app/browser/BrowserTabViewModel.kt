@@ -203,7 +203,7 @@ class BrowserTabViewModel(
     )
 
     sealed class HighlightableButton {
-        data class Visible(val enabled: Boolean = true, val highlighted: Boolean = false) : HighlightableButton() {}
+        data class Visible(val enabled: Boolean = true, val highlighted: Boolean = false) : HighlightableButton()
         object Gone : HighlightableButton()
 
         fun isHighlighted(): Boolean {
