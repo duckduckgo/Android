@@ -1,5 +1,14 @@
 # DuckDuckGo Android
 
+DuckDuckGo is first android search engine, which is safest built ever.
+
+It's provide all the missing feature of other search engines.
+1. It doesn't tracks you.
+2. Get unbiased results, outside the Filter Bubble
+3. It's search results aren’t loaded up with ads.
+
+Last but not least,'ITS TOO BIG AND TOO SAMPLE'.e., "BIGGYSIMPLE"
+
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## We are hiring!
