@@ -188,7 +188,7 @@ class BrowserTabViewModel(
         val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
-        val canAddFavorite: Boolean = false,
+        val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
@@ -203,12 +203,19 @@ class BrowserTabViewModel(
     )
 
     sealed class HighlightableButton {
-        data class Visible(val pulseAnimation: Boolean = false) : HighlightableButton()
+        data class Visible(val enabled: Boolean = true, val highlighted: Boolean = false) : HighlightableButton() {}
         object Gone : HighlightableButton()
 
-        fun playPulseAnimation(): Boolean {
+        fun isHighlighted(): Boolean {
             return when (this) {
-                is Visible -> this.pulseAnimation
+                is Visible -> this.highlighted
+                is Gone -> false
+            }
+        }
+
+        fun isEnabled(): Boolean {
+            return when (this) {
+                is Visible -> this.enabled
                 is Gone -> false
             }
         }
@@ -380,8 +387,8 @@ class BrowserTabViewModel(
     private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
         val shouldShowAnimation = state.browserShowing
         val menuButton = currentBrowserViewState().showMenuButton
-        if (menuButton is HighlightableButton.Visible && menuButton.pulseAnimation != shouldShowAnimation) {
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(pulseAnimation = shouldShowAnimation))
+        if (menuButton is HighlightableButton.Visible && menuButton.highlighted != shouldShowAnimation) {
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
         }
     }
 
@@ -396,7 +403,7 @@ class BrowserTabViewModel(
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is HighlightableButton.Visible) {
-            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(pulseAnimation = shouldShowAnimation))
+            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
         }
 
         if (shouldShowAnimation) {
@@ -866,12 +873,17 @@ class BrowserTabViewModel(
         val domain = site?.domain
         val canWhitelist = domain != null
         val canFireproofSite = domain != null
+        val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
+            HighlightableButton.Visible(enabled = true)
+        } else {
+            currentBrowserViewState.addFavorite
+        }
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
-            canAddFavorite = true,
+            addFavorite = addFavorite,
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
@@ -978,7 +990,7 @@ class BrowserTabViewModel(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canAddBookmarks = false,
-            canAddFavorite = false,
+            addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
@@ -1324,7 +1336,7 @@ class BrowserTabViewModel(
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
-                HighlightableButton.Visible(pulseAnimation = showPulseAnimation.value ?: false)
+                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
             } else {
                 HighlightableButton.Gone
             },
@@ -1691,8 +1703,20 @@ class BrowserTabViewModel(
 
     fun onBrowserMenuClicked() {
         Timber.i("favoritesOnboarding onBrowserMenuClicked")
-        this.showFavoritesOnboarding = false
-        browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(pulseAnimation = false))
+        val menuHighlighted = currentBrowserViewState().showMenuButton.isHighlighted()
+        if (menuHighlighted) {
+            this.showFavoritesOnboarding = false
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = false), addFavorite = HighlightableButton.Visible(highlighted = true))
+        }
+    }
+
+    fun onBrowserMenuClosed() {
+        Timber.i("favoritesOnboarding onBrowserMenuClosed")
+        if (currentBrowserViewState().addFavorite.isHighlighted()) {
+            browserViewState.value = currentBrowserViewState().copy(
+                addFavorite = HighlightableButton.Visible(highlighted = false)
+            )
+        }
     }
 
     fun userRequestedOpeningNewTab() {

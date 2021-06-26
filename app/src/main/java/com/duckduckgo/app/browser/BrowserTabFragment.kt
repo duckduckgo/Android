@@ -1673,9 +1673,9 @@ class BrowserTabFragment :
             fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
-            val targetView = if (viewState.showMenuButton.playPulseAnimation()) {
+            val targetView = if (viewState.showMenuButton.isHighlighted()) {
                 browserMenuImageView
-            } else if (viewState.fireButton.playPulseAnimation()) {
+            } else if (viewState.fireButton.isHighlighted()) {
                 fireIconImageView
             } else {
                 null
@@ -1782,7 +1782,9 @@ class BrowserTabFragment :
         }
 
         private fun launchTopAnchoredPopupMenu() {
-            popupMenu.show(rootView, toolbar)
+            popupMenu.show(rootView, toolbar) {
+                viewModel.onBrowserMenuClosed()
+            }
             pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
         }
 
@@ -2010,7 +2012,12 @@ class BrowserTabFragment :
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
-                addFavoritePopupMenuItem?.isEnabled = viewState.canAddFavorite
+                addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
+                if (viewState.addFavorite.isHighlighted()) {
+                    addFavoritePopupMenuItem.text = "👋 ${getString(R.string.addFavoriteMenuTitle)}"
+                } else {
+                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitle)
+                }
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage

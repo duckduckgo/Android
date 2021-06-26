@@ -510,21 +510,21 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
         loadUrl("www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canAddBookmarks)
-        assertTrue(browserViewState().canAddFavorite)
+        assertTrue(browserViewState().addFavorite)
     }
 
     @Test
     fun whenBrowsingAndNoUrlThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl(null, isBrowserShowing = true)
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite)
     }
 
     @Test
     fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl("www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite)
     }
 
     @Test
@@ -2237,7 +2237,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite)
     }
 
     @Test
@@ -2295,7 +2295,7 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canAddBookmarks)
-        assertTrue(browserViewState().canAddFavorite)
+        assertTrue(browserViewState().addFavorite)
     }
 
     @Test
