@@ -123,7 +123,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
 
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
-        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context))
+        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -230,10 +230,10 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    private fun buildOnboardingPendingIntent(context: Context): PendingIntent {
+    private fun buildOnboardingPendingIntent(context: Context, appWidgetId: Int): PendingIntent {
         val intent = BrowserActivity.intent(context, newSearch = true)
         intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getActivity(context, appWidgetId, intent, 0)
     }
 
     private fun initWidgetProvider(context: Context) {
