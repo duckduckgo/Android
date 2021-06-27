@@ -189,11 +189,6 @@ class FavoritesWidgetService : RemoteViewsService() {
             return true
         }
 
-        private fun buildPendingIntent(context: Context): PendingIntent {
-            val intent = SystemSearchActivity.fromWidget(context)
-            return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-
         private fun inject(context: Context) {
             val application = context.applicationContext as DuckDuckGoApplication
             application.daggerAppComponent.inject(this)
