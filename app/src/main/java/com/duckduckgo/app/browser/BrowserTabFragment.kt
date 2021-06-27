@@ -26,10 +26,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.Settings
 import android.text.Editable
 import android.view.*
@@ -46,6 +43,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.AnyThread
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -415,6 +413,11 @@ class BrowserTabFragment :
         super.onPause()
     }
 
+    override fun onStop() {
+        alertDialog?.dismiss()
+        super.onStop()
+    }
+
     private fun dismissAuthenticationDialog() {
         if (isAdded) {
             val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment
@@ -629,8 +632,11 @@ class BrowserTabFragment :
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleExternalAppLink -> {
-                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false, it.headers)
+            is Command.HandleAppLink -> {
+                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString, it.headers)
+            }
+            is Command.HandleNonHttpAppLink -> {
+                openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -655,7 +661,6 @@ class BrowserTabFragment :
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
-            is Command.SubmitQuery -> submitQuery(it.url)
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
             is Command.InjectEmailAddress -> injectEmailAddress(it.address)
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
@@ -801,6 +806,29 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
+    private fun openAppLinkDialog(
+        appIntent: Intent?,
+        excludedComponents: List<ComponentName>?,
+        url: String,
+        headers: Map<String, String> = emptyMap()
+    ) {
+        if (appIntent != null) {
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(appIntent) }
+        } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val title = getString(R.string.openExternalApp)
+            val chooserIntent = getChooserIntent(url, title, excludedComponents)
+            launchAppLinkDialog(requireContext(), url, headers) { startActivity(chooserIntent) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
+        val urlIntent = Intent.parseUri(url, URI_NO_FLAG)
+        val chooserIntent = Intent.createChooser(urlIntent, title)
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
+        return chooserIntent
+    }
+
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
@@ -891,6 +919,24 @@ class BrowserTabFragment :
                 }
                 .show()
         }
+    }
+
+    private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
+        alertDialog?.dismiss()
+
+        alertDialog = AlertDialog.Builder(context)
+            .setTitle(R.string.appLinkDialogTitle)
+            .setMessage(getString(R.string.confirmOpenExternalApp))
+            .setPositiveButton(R.string.yes) { dialog, _ ->
+                launchApp()
+                viewModel.resetAppLinkState()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.no) { dialog, _ ->
+                viewModel.navigateToAppLinkInBrowser(url, headers)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -990,7 +1036,7 @@ class BrowserTabFragment :
     private fun createQuickAccessAdapter(onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
-            { viewModel.onQuickAccesItemClicked(it.favorite) },
+            { viewModel.onUserSubmittedQuery(it.favorite.url) },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )
@@ -1585,6 +1631,8 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
+
+        private const val URI_NO_FLAG = 0
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
