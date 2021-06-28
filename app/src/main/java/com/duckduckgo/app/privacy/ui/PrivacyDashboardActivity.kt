@@ -110,6 +110,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             return
         }
         val toggle = viewState.toggleEnabled ?: true
+        val privacyProtectionEnabled = viewState.privacyProtectionEnabled
         privacyBanner.setImageResource(viewState.afterGrade.banner(toggle))
         domain.text = viewState.domain
         heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, toggle).html(this)
@@ -119,7 +120,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         networksText.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
-        renderToggle(toggle)
+        renderToggle(toggle, privacyProtectionEnabled)
         renderTrackerNetworkLeaderboard(viewState)
         updateActivityResult(viewState.shouldReloadPage)
     }
@@ -153,10 +154,11 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         trackerNetworkLeaderboardNotReady.show()
     }
 
-    private fun renderToggle(enabled: Boolean) {
+    private fun renderToggle(enabled: Boolean, privacyProtectionEnabled: Boolean) {
         val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGray
         privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         privacyToggle.isChecked = enabled
+        privacyToggle.isEnabled = privacyProtectionEnabled
     }
 
     private fun processCommand(command: Command) {
