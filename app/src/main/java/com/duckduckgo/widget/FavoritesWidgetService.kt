@@ -16,7 +16,6 @@
 
 package com.duckduckgo.widget
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
@@ -39,7 +38,6 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
 import com.duckduckgo.app.global.view.toPx
-import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import timber.log.Timber
 import javax.inject.Inject
 
