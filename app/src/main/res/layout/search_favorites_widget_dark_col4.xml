@@ -22,7 +22,7 @@
 
     <RelativeLayout
         android:id="@+id/widgetSearchBarContainer"
-        style="@style/SearchWidgetSearchBarContainer"
+        style="@style/SearchWithFavoritesWidgetSearchBarContainer"
         android:background="@drawable/search_widget_background">
 
         <ImageView

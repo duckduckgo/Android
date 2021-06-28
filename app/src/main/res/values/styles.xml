@@ -490,10 +490,19 @@
     <style name="SearchWidgetSearchBarContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <style name="SearchWithFavoritesWidgetSearchBarContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
+        <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">top</item>
         <item name="android:layout_marginStart">16dp</item>
         <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:orientation">horizontal</item>
     </style>
 
     <style name="SearchWidgetDDGLogo">
@@ -512,7 +521,7 @@
         <item name="android:ellipsize">end</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:maxLines">1</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="SearchWidgetSearchIcon">

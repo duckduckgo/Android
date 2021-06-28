@@ -42,7 +42,7 @@
     <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
     <dimen name="searchWidgetFavoriteItemContainerHeight">78dp</dimen>
     <dimen name="searchWidget4colWidth">280dp</dimen>
-    <dimen name="searchWidgetSearchBarHeight">44dp</dimen>
+    <dimen name="searchWidgetSearchBarHeight">46dp</dimen>
     <dimen name="searchWidgetFavoritesTopMargin">20dp</dimen>
     <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
 

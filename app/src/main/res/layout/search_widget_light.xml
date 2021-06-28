@@ -16,46 +16,26 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:id="@+id/widgetContainer"
-    android:layout_width="match_parent"
-    android:layout_height="44dp"
-    android:layout_gravity="center"
-    android:layout_margin="5dp"
-    android:elevation="2dp"
-    android:background="@drawable/search_widget_background_light"
-    android:orientation="horizontal">
+    style="@style/SearchWidgetSearchBarContainer"
+    android:background="@drawable/search_widget_background_light">
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        style="@style/SearchWidgetDDGLogo"
         android:src="@drawable/logo_mini" />
 
     <TextView
         android:id="@+id/searchInputBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        style="@style/SearchWidgetInputBox"
         android:layout_toStartOf="@+id/search"
         android:layout_toEndOf="@+id/logo"
-        android:fontFamily="sans-serif-medium"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/warGreyTwo"
-        android:textSize="14sp" />
+        android:textColor="@color/brownishGrayTwo" />
 
     <ImageView
         android:id="@+id/search"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
+        style="@style/SearchWidgetSearchIcon"
+        android:src="@drawable/ic_widget_loupe_black_24dp" />
 
 </RelativeLayout>
