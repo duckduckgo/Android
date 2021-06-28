@@ -76,7 +76,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "network_logo_"): Int? {
+        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")
                 .replace(".", "")

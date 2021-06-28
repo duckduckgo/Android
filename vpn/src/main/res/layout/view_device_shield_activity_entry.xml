@@ -40,7 +40,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/network_logo_google_llc" />
+            app:srcCompat="@drawable/tracking_network_logo_google_llc" />
 
         <LinearLayout
             android:layout_width="0dp"
