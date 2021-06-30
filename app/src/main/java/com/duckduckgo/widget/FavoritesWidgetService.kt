@@ -89,31 +89,31 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            Timber.i("FavoritesWidgetService - favs onDataSetChanged")
-            domains.clear()
-            domains.addAll(
-                favoritesDataRepository.favoritesBlockingGet().map {
-                    val faviconFile = faviconPersister.faviconFile(
-                        FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
-                        FileBasedFaviconPersister.NO_SUBFOLDER,
-                        it.url.extractDomain()!!
-                    )
-                    val bitmap = if (faviconFile != null) {
-                        Glide.with(context)
-                            .asBitmap()
-                            .load(faviconFile)
-                            .transform(RoundedCorners(10.toPx()))
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true)
-                            .submit(56.toPx(), 56.toPx())
-                            .get()
-                    } else {
-                        generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
-                    }
-
-                    WidgetFavorite(it.title, it.url, bitmap)
+            Timber.i("FavoritesWidgetService - favs onDataSetChanged $this")
+            val newList = favoritesDataRepository.favoritesBlockingGet().map {
+                val faviconFile = faviconPersister.faviconFile(
+                    FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
+                    FileBasedFaviconPersister.NO_SUBFOLDER,
+                    it.url.extractDomain()!!
+                )
+                val bitmap = if (faviconFile != null) {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(faviconFile)
+                        .transform(RoundedCorners(10.toPx()))
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .submit(56.toPx(), 56.toPx())
+                        .get()
+                } else {
+                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
                 }
-            )
+
+                WidgetFavorite(it.title, it.url, bitmap)
+            }
+            domains.clear()
+            domains.addAll(newList)
+            Timber.i("FavoritesWidgetService - favs onDataSetChanged finished $this")
         }
 
         override fun onDestroy() {
@@ -122,7 +122,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         override fun getCount(): Int {
             val count = domains.size.coerceAtMost(maxItems)
-            Timber.i("FavoritesWidgetService - favs getCount $count")
+            Timber.i("FavoritesWidgetService - favs getCount $count $this")
             return count
         }
 
