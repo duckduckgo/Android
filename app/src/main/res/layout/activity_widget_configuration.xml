@@ -57,6 +57,7 @@
                 android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
+                android:visibility="gone"
                 android:textSize="16sp"
                 android:text="System default" />
 

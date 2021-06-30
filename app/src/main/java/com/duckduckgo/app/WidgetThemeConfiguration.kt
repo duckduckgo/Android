@@ -19,7 +19,9 @@ package com.duckduckgo.app
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
@@ -52,14 +54,26 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             finish()
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.widgetConfigThemeSystem.visibility = View.VISIBLE
+        } else {
+            binding.widgetConfigThemeSystem.visibility = View.GONE
+        }
+
         binding.widgetConfigThemeRadioGroup.setOnCheckedChangeListener { _, radioId ->
             when (radioId) {
+                R.id.widgetConfigThemeSystem -> {
+                    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                    if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
+                    } else {
+                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
+                    }
+                }
                 R.id.widgetConfigThemeLight -> {
-                    Toast.makeText(this@WidgetThemeConfiguration, "Light theme", Toast.LENGTH_SHORT).show()
                     binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
                 }
                 R.id.widgetConfigThemeDark -> {
-                    Toast.makeText(this@WidgetThemeConfiguration, "Dark theme", Toast.LENGTH_SHORT).show()
                     binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
                 }
             }
