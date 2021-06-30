@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -49,7 +50,7 @@ class PrivacyReportViewModel(
         PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked)
     }
 
-    fun pollDeviceShieldState() {
+    private fun pollDeviceShieldState() {
 
         viewModelScope.launch {
             while (isActive) {
@@ -63,7 +64,8 @@ class PrivacyReportViewModel(
         }
     }
 
-    private fun getReport(): Flow<PrivacyReportView.TrackersBlocked> {
+    @VisibleForTesting
+    fun getReport(): Flow<PrivacyReportView.TrackersBlocked> {
         return repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
             if (trackers.isEmpty()) {
                 PrivacyReportView.TrackersBlocked("", 0, 0)

@@ -21,15 +21,18 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
+import app.cash.turbine.test
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.runBlocking
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nhaarman.mockitokotlin2.mock
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -39,21 +42,21 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
+import kotlin.time.ExperimentalTime
 
+@ExperimentalCoroutinesApi
+@ExperimentalTime
 class PrivacyReportViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = VpnCoroutineTestRule()
-
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
+    private val deviceShieldPixels = mock<DeviceShieldPixels>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -69,7 +72,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, vpnPreferences, context)
+        testee = PrivacyReportViewModel(repository, vpnPreferences, deviceShieldPixels, context)
     }
 
     private fun prepareDb() {
@@ -88,32 +91,38 @@ class PrivacyReportViewModelTest {
     @Test
     fun whenTrackersBlockedThenReportHasTrackers() = runBlocking {
 
-        trackerFoundYesterday("dax.com")
-        trackerFoundYesterday("dax.com")
-        trackerFoundYesterday("dax.com")
+        trackerFound("dax.com")
+        trackerFound("dax.com")
+        trackerFound("dax.com")
 
-        testee.getReport().observeForever {
-            val trackersBlockedObserved = it.totalTrackers
-            val totalCompaniesObserved = it.totalCompanies
-            val companiesBlockedObserved = it.companiesBlocked
-            assertEquals(3, trackersBlockedObserved)
-            assertEquals(1, totalCompaniesObserved)
+        testee.getReport().test {
+            val result = expectItem()
+            assertEquals(3, result.trackers)
+            cancelAndConsumeRemainingEvents()
         }
+    }
 
+    @Test
+    fun whenTrackersBlockedOutsideTimeWindowThenReturnEmpty() = runBlocking {
+
+        trackerFoundYesterday("dax.com")
+        trackerFoundYesterday("dax.com")
+        trackerFoundYesterday("dax.com")
+
+        testee.getReport().test {
+            val result = expectItem()
+            assertEquals(0, result.trackers)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
     fun whenNoTrackersBlockedThenReportIsEmpty() = runBlocking {
-
-        testee.getReport().observeForever {
-            val trackersBlockedObserved = it.totalTrackers
-            val totalCompaniesObserved = it.totalCompanies
-            val companiesBlockedObserved = it.companiesBlocked
-            assertEquals(0, trackersBlockedObserved)
-            assertEquals(0, totalCompaniesObserved)
-            assertEquals(true, companiesBlockedObserved.isEmpty())
+        testee.getReport().test {
+            val result = expectItem()
+            assertEquals(0, result.trackers)
+            cancelAndConsumeRemainingEvents()
         }
-
     }
 
     private fun trackerFoundYesterday(trackerDomain: String = "example.com") {
