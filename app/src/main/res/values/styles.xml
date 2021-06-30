@@ -483,8 +483,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">@dimen/searchWidgetPadding</item>
+        <item name="android:paddingBottom">@dimen/searchWidgetPadding</item>
     </style>
 
     <style name="SearchWidgetSearchBarContainer">
@@ -501,8 +501,8 @@
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">top</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginStart">@dimen/searchWidgetSearchBarSideMargin</item>
+        <item name="android:layout_marginEnd">@dimen/searchWidgetSearchBarSideMargin</item>
     </style>
 
     <style name="SearchWidgetDDGLogo">

@@ -17,7 +17,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widgetContainer"
     style="@style/SearchWidgetContainer"
-    android:layout_width="@dimen/searchWidget4colWidth"
     android:background="@drawable/search_widget_favorites_daynight_background">
 
     <RelativeLayout
