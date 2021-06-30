@@ -197,7 +197,7 @@ class BrowserChromeClientTest {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
-        whenever(mockPermission.origin).thenReturn("https://www.spotify.com".toUri())
+        whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
 
         testee.onPermissionRequest(mockPermission)
 
