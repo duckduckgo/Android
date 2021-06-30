@@ -108,7 +108,7 @@
     <string name="appRestartsTitle">App restarts</string>
 
     <!-- Device Shield Privacy Report -->
-    <string name="deviceShieldEnabledTooltip">We\'re blocking companies from tracking you in other apps</string>
+    <string name="deviceShieldEnabledTooltip">Device Shield is enabled aWe\'re blocking companies from tracking you in other apps</string>
     <string name="deviceShieldDisabledTooltip">We\'ll block companies from tracking you as you browse</string>
     <string name="privacyReportPrivacylink">How do trackers profile you?</string>
     <string name="privacyReportToolbarTitle">Privacy Report</string>
@@ -150,6 +150,10 @@
     <string name="deviceShieldFAQCta">Device Shield FAQ</string>
 
     <!-- New Tab Integration -->
+    <string name="deviceShieldNewTabSuffix">" (past hour)."</string>
+    <string name="deviceShieldNewTabDisabled"><b>Device Shield disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
+    <string name="deviceShieldNewTabEnabled"><b>Device Shield is enabled</b> and blocking tracking attempts across your apps.</string>
+
     <string name="deviceShieldMenuItemTitle">Device Shield</string>
     <string name="deviceShieldDisabledHeader">Web trackers blocked</string>
     <string name="deviceShieldDisabledSubheader">Enable Device Shield for a summary</string>

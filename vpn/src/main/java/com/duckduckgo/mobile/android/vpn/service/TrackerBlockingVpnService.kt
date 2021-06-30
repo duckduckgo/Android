@@ -103,9 +103,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
-    @Inject
-    lateinit var deviceShieldReminderNotificationScheduler: DeviceShieldReminderNotificationScheduler
-
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -143,7 +140,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister, originatingAppPackageIdentifier, appNameResolver)
         tcpPacketProcessor =
-            TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppPackageIdentifier, appNameResolver, this)
+            TcpPacketProcessor(
+                queues,
+                this,
+                trackerDetector,
+                packetPersister,
+                localAddressDetector,
+                originatingAppPackageIdentifier,
+                appNameResolver,
+                this
+            )
 
         newAppBroadcastReceiver.register()
 
@@ -192,8 +198,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         queues.clearAll()
 
         establishVpnInterface()
-
-        deviceShieldReminderNotificationScheduler.onVPNStarted()
 
         tunInterface?.let { vpnInterface ->
             executorService?.shutdownNow()
@@ -293,11 +297,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Timber.i("VPN log: Stopping VPN")
         notifyVpnStopped()
 
-        when (reason) {
-            is VpnStopReason.SelfStop -> deviceShieldReminderNotificationScheduler.onVPNManuallyStopped()
-            else -> deviceShieldReminderNotificationScheduler.onVPNUndesiredStop()
-        }
-
         queues.clearAll()
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
@@ -317,8 +316,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */
-            }
+            VpnStopReason.SelfStop -> { /* noop */ }
             VpnStopReason.Error -> deviceShieldPixels.startError()
             VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
@@ -369,7 +367,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 updateNotificationForNewTrackerFound(it)
             }
         }
-
     }
 
     private fun timeSinceLastRunningTimeSave(): Long {
@@ -472,7 +469,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
-
     }
 
     override fun createDatagramChannel(): DatagramChannel {

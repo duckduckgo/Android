@@ -536,6 +536,14 @@
         <item name="android:selectable">false</item>
     </style>
 
+    <style name="DeviceShield.NewTab"/>
+    <style name="DeviceShield.NewTab.TextStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
     <style name="SavedSiteSectionTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

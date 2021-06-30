@@ -27,14 +27,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dummy.ui.VpnPreferences
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface VpnReminderReceiverManager {
     fun showReminderNotificationIfVpnDisabled(context: Context)
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@Singleton
 class AndroidVpnReminderReceiverManager @Inject constructor(val deviceShieldPixels: DeviceShieldPixels, val notificationManager: NotificationManagerCompat) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {

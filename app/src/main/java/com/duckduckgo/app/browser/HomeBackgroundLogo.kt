@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.View
 import android.view.animation.AccelerateInterpolator
-import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import timber.log.Timber
 
@@ -57,7 +57,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
 
     private fun fadeLogoOut() {
         Timber.v("hideLogo")
-        ddgLogoView.hide()
+        ddgLogoView.gone()
     }
 
     companion object {

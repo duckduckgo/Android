@@ -2112,17 +2112,20 @@ class BrowserTabFragment :
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
                 homeBackgroundLogo.showLogo()
-                quickAccessRecyclerView.gone()
+                fragmentDeviceShieldContainer.show()
+                deviceShieldFragmentContainer.show()
             } else {
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
-                quickAccessRecyclerView.show()
+                fragmentDeviceShieldContainer.show()
+                deviceShieldFragmentContainer.show()
+
             }
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            quickAccessRecyclerView.gone()
+            deviceShieldFragmentContainer.gone()
         }
 
         private fun hideDaxCta() {

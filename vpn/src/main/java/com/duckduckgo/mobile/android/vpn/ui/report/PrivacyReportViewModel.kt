@@ -17,18 +17,19 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.content.Context
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
+import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dummy.ui.VpnPreferences
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,41 +37,51 @@ import javax.inject.Inject
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnPreferences: VpnPreferences,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val applicationContext: Context,
 ) : ViewModel(), LifecycleObserver {
 
-    private var vpnUpdateJob: Job? = null
-    private val _vpnRunning = MutableLiveData<Boolean>()
+    private val vpnRunningState = MutableStateFlow(
+        PrivacyReportView.RunningState(isRunning = true, hasValueChanged = false)
+    )
 
-    val vpnRunning: LiveData<Boolean>
-        get() = _vpnRunning
+    val viewStateFlow = vpnRunningState.combine(getReport()) { runningState, trackersBlocked ->
+        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked)
+    }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun pollDeviceShieldState() {
-        vpnUpdateJob?.cancel()
-        vpnUpdateJob = viewModelScope.launch {
+
+        viewModelScope.launch {
             while (isActive) {
-                _vpnRunning.value = TrackerBlockingVpnService.isServiceRunning(applicationContext)
+                val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
+                val oldValue = vpnRunningState.value
+                val hasValueChanged = oldValue.isRunning != isRunning
+                vpnRunningState.emit(PrivacyReportView.RunningState(isRunning, hasValueChanged))
+
                 delay(1_000)
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun stopPollingDeviceShieldState() {
-        vpnUpdateJob?.cancel()
+    private fun getReport(): Flow<PrivacyReportView.TrackersBlocked> {
+        return repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
+            if (trackers.isEmpty()) {
+                PrivacyReportView.TrackersBlocked("", 0, 0)
+            } else {
+                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
+                val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
+                val latestApp = perApp.first().first.appDisplayName
+
+                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
+            }
+
+        }.onStart {
+            pollDeviceShieldState()
+        }
     }
 
-    fun getReport(): LiveData<PrivacyReportView.State.TrackersBlocked> {
-        return repository.getVpnTrackers({ dateOfLastWeek() }).map { trackers ->
-            val trackerCompanies: MutableList<PrivacyReportView.CompanyTrackers> = mutableListOf()
-            val perCompany = trackers.groupBy { it.trackerCompanyId }
-            val totalCompanies = perCompany.size
-            perCompany.values.forEach {
-                trackerCompanies.add(PrivacyReportView.CompanyTrackers.group(it))
-            }
-            PrivacyReportView.State.TrackersBlocked(totalCompanies, trackers.size, trackerCompanies)
-        }.asLiveData()
+    fun onDeviceShieldEnabled() {
+        deviceShieldPixels.enableFromNewTab()
     }
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
@@ -79,17 +90,9 @@ class PrivacyReportViewModel(
     fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
 
     object PrivacyReportView {
-        sealed class State {
-            data class TrackersBlocked(val totalCompanies: Int, val totalTrackers: Int, val companiesBlocked: List<CompanyTrackers>) : State()
-        }
-        data class CompanyTrackers(val companyName: String, val totalTrackers: Int, val lastTracker: VpnTracker) {
-            companion object {
-                fun group(trackers: List<VpnTracker>): CompanyTrackers {
-                    val lastTracker = trackers.first()
-                    return CompanyTrackers(lastTracker.company, trackers.size, lastTracker)
-                }
-            }
-        }
+        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked)
+        data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
+        data class TrackersBlocked(val latestApp: String, val otherAppsSize: Int, val trackers: Int)
     }
 }
 
@@ -97,12 +100,20 @@ class PrivacyReportViewModel(
 class PrivacyReportViewModelFactory @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnPreferences: VpnPreferences,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val context: Context
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyReportViewModel::class.java) -> (PrivacyReportViewModel(appTrackerBlockingStatsRepository, vpnPreferences, context) as T)
+                isAssignableFrom(PrivacyReportViewModel::class.java) -> (
+                    PrivacyReportViewModel(
+                        appTrackerBlockingStatsRepository,
+                        vpnPreferences,
+                        deviceShieldPixels,
+                        context
+                    ) as T
+                    )
                 else -> null
             }
         }

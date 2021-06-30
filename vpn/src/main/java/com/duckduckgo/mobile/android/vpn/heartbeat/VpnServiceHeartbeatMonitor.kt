@@ -32,33 +32,11 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.AndroidInjection
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-
-@Module
-@ContributesTo(AppObjectGraph::class)
-class VpnServiceHeartbeatMonitorModule {
-    @Provides
-    @IntoSet
-    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): LifecycleObserver {
-        return VpnServiceHeartbeatMonitor(workManager)
-    }
-
-    @Provides
-    @IntoSet
-    fun provideVpnServiceHeartbeatMonitorWorkerInjectorPlugin(
-        deviceShieldPixels: DeviceShieldPixels,
-        vpnDatabase: VpnDatabase
-    ): WorkerInjectorPlugin {
-        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(deviceShieldPixels, vpnDatabase)
-    }
-}
 
 class VpnServiceHeartbeatMonitor(
     private val workManager: WorkManager
@@ -115,7 +93,8 @@ class VpnServiceHeartbeatMonitor(
     }
 }
 
-class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
+@ContributesMultibinding(AppObjectGraph::class)
+class VpnReminderNotificationWorkerInjectorPlugin @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {

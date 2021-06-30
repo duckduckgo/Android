@@ -20,33 +20,52 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
+import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@VpnScope
+@ContributesMultibinding(VpnObjectGraph::class)
 class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat
-) {
+) : VpnServiceCallbacks {
 
-    fun onVPNStarted() {
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
         scheduleUndesiredStopReminderAlarm()
         cancelReminderForTomorrow()
         hideReminderNotification()
     }
 
-    fun onVPNManuallyStopped() {
+    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+        when (vpnStopReason) {
+            is VpnStopReason.SelfStop -> onVPNManuallyStopped()
+            else -> onVPNUndesiredStop()
+        }
+    }
+
+    private fun onVPNManuallyStopped() {
         showImmediateReminderNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
     }
 
-    fun onVPNUndesiredStop() {
+    private fun onVPNUndesiredStop() {
         scheduleUndesiredStopReminderAlarm()
     }
 
@@ -57,7 +76,11 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
             .build()
 
-        workManager.enqueueUniquePeriodicWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
+        workManager.enqueueUniquePeriodicWork(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
 
         val receiver = ComponentName(context, VpnReminderReceiver::class.java)
 
@@ -66,7 +89,6 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         )
-
     }
 
     private fun cancelUndesiredStopReminderAlarm() {
@@ -104,5 +126,4 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
 
         workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
     }
-
 }

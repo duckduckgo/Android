@@ -30,59 +30,62 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:foreground="@android:color/transparent">
 
-        <include layout="@layout/include_quick_access_items"
-            app:layout_constraintTop_toTopOf="parent"
+        <LinearLayout
+            android:id="@+id/deviceShieldFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <ImageView
-            android:id="@+id/ddgLogo"
-            android:layout_width="0dp"
-            android:alpha="0"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:src="@drawable/logo_full"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="180dp"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="180dp"
-            android:visibility="gone"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragmentDeviceShieldContainer"
+                android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/ddgLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center"
+                android:maxHeight="180dp"
+                android:maxWidth="180dp"
+                android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+                android:alpha="0"
+                android:visibility="gone"
+                android:contentDescription="@string/duckDuckGoLogoDescription"
+                android:src="@drawable/logo_full" />
+
+            <include layout="@layout/include_quick_access_items" />
+
+        </LinearLayout>
 
         <include
             layout="@layout/include_dax_dialog_cta"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp"
-            android:visibility="gone"/>
+            app:layout_constraintWidth_max="600dp" />
 
         <LinearLayout
             android:id="@+id/ctaContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
             android:elevation="12dp"
+            android:orientation="vertical"
             android:outlineProvider="paddedBounds"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_device_shield_container"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"  />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -16,39 +16,27 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.report
 
-import android.app.Activity
-import android.content.Intent
-import android.net.VpnService
+import android.app.ActivityOptions
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.postDelayed
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
+import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import nl.dionsegijn.konfetti.KonfettiView
-import nl.dionsegijn.konfetti.models.Shape
-import nl.dionsegijn.konfetti.models.Size
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
-import timber.log.Timber
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class DeviceShieldFragment : Fragment() {
@@ -62,14 +50,9 @@ class DeviceShieldFragment : Fragment() {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
+    private lateinit var deviceShieldCtaLayout: View
     private lateinit var deviceShieldCtaHeaderTextView: TextView
-    private lateinit var deviceShieldCtaSubHeaderTextView: TextView
-    private lateinit var deviceShieldInfoLayout: View
-
-    private lateinit var deviceShieldDisabledLayout: View
-    private lateinit var deviceShieldEnableCTA: Button
-
-    private lateinit var viewKonfetti: KonfettiView
+    private lateinit var deviceShieldCtaImageView: ImageView
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
@@ -78,20 +61,21 @@ class DeviceShieldFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         AndroidSupportInjection.inject(this)
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
+
         configureViewReferences(view)
-        bindListeners(view)
         observeViewModel()
         return view
     }
 
     private fun configureViewReferences(view: View) {
+        deviceShieldCtaLayout = view.findViewById(R.id.deviceShieldCtaLayout)
         deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
-        deviceShieldCtaSubHeaderTextView = view.findViewById(R.id.deviceShieldCtaSubheader)
-        deviceShieldInfoLayout = view.findViewById(R.id.deviceShieldInfoLayout)
-        deviceShieldEnableCTA = view.findViewById(R.id.privacyReportToggleButton)
-        deviceShieldDisabledLayout = view.findViewById(R.id.deviceShieldDisabledCardView)
-
-        viewKonfetti = view.findViewById(R.id.deviceShieldKonfetti)
+        deviceShieldCtaImageView = view.findViewById(R.id.deviceShieldCtaImage)
+        deviceShieldCtaLayout.setOnClickListener {
+            viewModel.onDeviceShieldEnabled()
+            val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity()).toBundle()
+            startActivity(DeviceShieldTrackerActivity.intent(requireActivity()), options)
+        }
     }
 
     override fun onResume() {
@@ -108,159 +92,48 @@ class DeviceShieldFragment : Fragment() {
         }
     }
 
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
-            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboarding(resultCode)
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun handleVpnPermissionResult(resultCode: Int) {
-        when (resultCode) {
-            Activity.RESULT_CANCELED -> {
-                Timber.i("User cancelled and refused VPN permission")
-            }
-            Activity.RESULT_OK -> {
-                Timber.i("User granted VPN permission")
-                startVpn()
-            }
-        }
-    }
-
-    private fun handleDeviceShieldOnboarding(resultCode: Int) {
-        when (resultCode) {
-            Activity.RESULT_OK -> {
-                Timber.i("User enabled VPN during onboarding")
-                startActivity(DeviceShieldTrackerActivity.intent(requireActivity()))
-            }
-            else -> {
-                Timber.i("User cancelled onboarding and refused VPN permission")
-            }
-        }
-    }
-
     private fun observeViewModel() {
-        viewModel.vpnRunning.observe(this) {
-            renderVpnEnabledState(it)
-        }
-        viewModel.getReport().observe(this) {
-            renderTrackersBlocked(it.totalTrackers, it.companiesBlocked)
-        }
-        lifecycle.addObserver(viewModel)
+        viewModel.viewStateFlow
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState ->
+                renderViewState(viewState)
+            }.launchIn(lifecycleScope)
     }
 
-    private fun bindListeners(view: View) {
-        deviceShieldInfoLayout.setOnClickListener {
-            startActivity(DeviceShieldTrackerActivity.intent(requireActivity())).also {
-                deviceShieldPixels.didPressNewTabSummary()
-            }
-        }
-        deviceShieldEnableCTA.setOnClickListener {
-            deviceShieldPixels.enableFromNewTab()
-            enableDeviceShield()
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun enableDeviceShield() {
-        val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(requireActivity())
-        if (deviceShieldOnboardingIntent == null) {
-            startVpnIfAllowed()
-        } else {
-            startActivityForResult(deviceShieldOnboardingIntent, REQUEST_DEVICE_SHIELD_ONBOARDING)
-        }
-    }
-
-    private fun startVpnIfAllowed() {
-        when (val permissionStatus = checkVpnPermission()) {
-            is VpnPermissionStatus.Granted -> startVpn()
-            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
-        }
-    }
-
-    private fun checkVpnPermission(): VpnPermissionStatus {
-        val intent = VpnService.prepare(requireActivity())
-        return if (intent == null) {
-            VpnPermissionStatus.Granted
-        } else {
-            VpnPermissionStatus.Denied(intent)
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun obtainVpnRequestPermission(intent: Intent) {
-        startActivityForResult(intent, RC_REQUEST_VPN_PERMISSION)
-    }
-
-    private fun startVpn() {
-        Snackbar.make(deviceShieldInfoLayout, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_SHORT).show()
-        TrackerBlockingVpnService.startService(requireActivity())
-        launchKonfetti()
-    }
-
-    private fun launchKonfetti() {
-
-        val magenta = ResourcesCompat.getColor(getResources(), R.color.magenta, null)
-        val blue = ResourcesCompat.getColor(getResources(), R.color.accentBlue, null)
-        val purple = ResourcesCompat.getColor(getResources(), R.color.purple, null)
-        val green = ResourcesCompat.getColor(getResources(), R.color.green, null)
-        val yellow = ResourcesCompat.getColor(getResources(), R.color.yellow, null)
-
-        val displayWidth = resources.displayMetrics.widthPixels
-
-        viewKonfetti.build()
-            .addColors(magenta, blue, purple, green, yellow)
-            .setDirection(0.0, 359.0)
-            .setSpeed(1f, 5f)
-            .setFadeOutEnabled(true)
-            .setTimeToLive(2000L)
-            .addShapes(Shape.Rectangle(1f))
-            .addSizes(Size(8))
-            .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
-            .streamFor(50, 4000L)
-    }
-
-    private fun renderTrackersBlocked(totalTrackers: Int, companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>) {
-        if (companiesBlocked.isEmpty()) {
-            deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldEnabledTooltip)
-            deviceShieldCtaSubHeaderTextView.isVisible = false
-        } else {
-            deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, totalTrackers, totalTrackers)
-            val lastTracker = companiesBlocked.first().lastTracker
-            val timestamp = LocalDateTime.parse(lastTracker.timestamp)
-            val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
-            val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-            deviceShieldCtaSubHeaderTextView.isVisible = true
-            deviceShieldCtaSubHeaderTextView.text =
-                getString(R.string.deviceShieldLastTrackerBlocked, lastTracker.company, timeRunning.shortFormat())
-        }
-    }
-
-    private fun renderVpnEnabledState(running: Boolean) {
-        deviceShieldDisabledLayout.isVisible = !running
-
-        if (!deviceShieldCtaSubHeaderTextView.isVisible) {
-            if (running) {
-                deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldEnabledTooltip)
+    private fun renderViewState(
+        state: PrivacyReportViewModel.PrivacyReportView.ViewState
+    ) {
+        if (state.isRunning) {
+            if (state.trackersBlocked.trackers > 0) {
+                renderTrackersBlockedWhenEnabled(state.trackersBlocked)
             } else {
-                deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
+                deviceShieldCtaHeaderTextView.setText(R.string.deviceShieldNewTabEnabled)
+                deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
             }
+        } else {
+            deviceShieldCtaHeaderTextView.setText(R.string.deviceShieldNewTabDisabled)
+            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
         }
-
     }
 
-    private sealed class VpnPermissionStatus {
-        object Granted : VpnPermissionStatus()
-        data class Denied(val intent: Intent) : VpnPermissionStatus()
+    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
+        val latestAppString = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
+        val prefix = resources.getString(R.string.deviceShieldWeeklyCompanyTrackersBlockedNotificationPrefix)
+        val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackerBlocked.trackers, trackerBlocked.trackers)
+        val optionalOtherAppsString = if (trackerBlocked.otherAppsSize == 0) "" else resources.getQuantityString(
+            R.plurals.deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps, trackerBlocked.otherAppsSize, trackerBlocked.otherAppsSize
+        )
+        val pastWeekSuffix = resources.getString(R.string.deviceShieldNewTabSuffix)
+
+        val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+
+        deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
+            listOf(
+                totalTrackers,
+                latestAppString,
+                optionalOtherAppsString
+            )
+        )
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
     }
-
-    companion object {
-
-        private const val RC_REQUEST_VPN_PERMISSION = 100
-        private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 101
-
-    }
-
 }
