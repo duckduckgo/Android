@@ -68,7 +68,7 @@ class PrivacyDashboardViewModel(
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean,
-        val privacyProtectionEnabled: Boolean
+        val isSiteOnTempAllowedList: Boolean
     )
 
     sealed class Command {
@@ -144,21 +144,17 @@ class PrivacyDashboardViewModel(
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
             shouldReloadPage = false,
-            privacyProtectionEnabled = true
+            isSiteOnTempAllowedList = false
         )
     }
 
     private suspend fun updateSite(site: Site) {
         val grades = site.calculateGrades()
         val domain = site.domain ?: ""
-        val isInUserWhitelist = withContext(dispatchers.io()) {
-            userWhitelistDao.contains(domain)
-        }
+        val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
         val isInTemporaryWhitelist = withContext(dispatchers.io()) {
             temporaryTrackingWhitelistDao.contains(domain)
         }
-
-        val toggleEnabled = !(isInTemporaryWhitelist || isInUserWhitelist)
 
         withContext(dispatchers.main()) {
             viewState.value = viewState.value?.copy(
@@ -170,7 +166,7 @@ class PrivacyDashboardViewModel(
                 allTrackersBlocked = site.allTrackersBlocked,
                 toggleEnabled = toggleEnabled,
                 practices = site.privacyPractices.summary,
-                privacyProtectionEnabled = !isInTemporaryWhitelist
+                isSiteOnTempAllowedList = isInTemporaryWhitelist
             )
         }
     }

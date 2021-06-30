@@ -28,6 +28,7 @@ import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
@@ -69,19 +70,19 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     private fun setupObservers() {
         viewModel.viewState.observe(
             this,
-            Observer {
+            {
                 it?.let { render(it) }
             }
         )
         viewModel.command.observe(
             this,
-            Observer {
+            {
                 it?.let { processCommand(it) }
             }
         )
         repository.retrieveSiteData(intent.tabId!!).observe(
             this,
-            Observer<Site> {
+            {
                 viewModel.onSiteChanged(it)
             }
         )
@@ -110,17 +111,18 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             return
         }
         val toggle = viewState.toggleEnabled ?: true
-        val privacyProtectionEnabled = viewState.privacyProtectionEnabled
+        val isSiteIntTempAllowedList = viewState.isSiteOnTempAllowedList
+        val isPrivacyOn = toggle && !isSiteIntTempAllowedList
         privacyBanner.setImageResource(viewState.afterGrade.banner(toggle))
         domain.text = viewState.domain
-        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, toggle).html(this)
+        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, isPrivacyOn).html(this)
         httpsIcon.setImageResource(viewState.httpsStatus.icon())
         httpsText.text = viewState.httpsStatus.text(this)
         networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
         networksText.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
-        renderToggle(toggle, privacyProtectionEnabled)
+        renderToggle(toggle, isSiteIntTempAllowedList)
         renderTrackerNetworkLeaderboard(viewState)
         updateActivityResult(viewState.shouldReloadPage)
     }
@@ -154,11 +156,17 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         trackerNetworkLeaderboardNotReady.show()
     }
 
-    private fun renderToggle(enabled: Boolean, privacyProtectionEnabled: Boolean) {
-        val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGray
+    private fun renderToggle(enabled: Boolean, isSiteIntTempAllowedList: Boolean) {
+        val backgroundColor = if (enabled && !isSiteIntTempAllowedList) R.color.midGreen else R.color.warmerGray
         privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         privacyToggle.isChecked = enabled
-        privacyToggle.isEnabled = privacyProtectionEnabled
+        if (isSiteIntTempAllowedList) {
+            privacyToggle.gone()
+            privacyToggleText.text = getString(R.string.privacyProtectionToggleDisabled)
+        } else {
+            privacyToggle.show()
+            privacyToggleText.text = getString(R.string.privacyProtectionToggle)
+        }
     }
 
     private fun processCommand(command: Command) {
