@@ -170,7 +170,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun scrollToShowCurrentTab() {
         val index = tabsAdapter.adapterPositionForTab(selectedTabId)
-        tabsRecycler.scrollToPosition(index)
+        tabsRecycler.post { tabsRecycler.scrollToPosition(index) }
     }
 
     private fun processCommand(command: Command?) {
