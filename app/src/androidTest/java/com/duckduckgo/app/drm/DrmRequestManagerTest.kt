@@ -32,7 +32,7 @@ class DrmRequestManagerTest {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
-        whenever(mockPermission.origin).thenReturn("https://www.spotify.com".toUri())
+        whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
 
         val value = testee.drmPermissionsForRequest(mockPermission)
 
@@ -45,7 +45,7 @@ class DrmRequestManagerTest {
         val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
-        whenever(mockPermission.origin).thenReturn("https://www.spotify.com".toUri())
+        whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
 
         val value = testee.drmPermissionsForRequest(mockPermission)
 
@@ -57,7 +57,7 @@ class DrmRequestManagerTest {
         val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
-        whenever(mockPermission.origin).thenReturn("https://www.spotify.com".toUri())
+        whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
 
         val value = testee.drmPermissionsForRequest(mockPermission)
 

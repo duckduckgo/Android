@@ -40,7 +40,7 @@ class DrmRequestManager @Inject constructor() {
 
     companion object {
         val domainsThatAllowDrm = listOf(
-            "spotify.com",
+            "open.spotify.com",
             "netflix.com"
         )
     }
