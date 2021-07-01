@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
+import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -71,6 +72,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var binding: ActivitySystemSearchBinding
+    private lateinit var quickAccessItemsBinding: IncludeQuickAccessItemsBinding
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
@@ -78,9 +80,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private val systemSearchOnboarding
         get() = binding.includeSystemSearchOnboarding
-
-    private val includeQuickAccessItems
-        get() = binding.includeQuickAccessItems
 
     private val omnibarTextInput
         get() = binding.omnibarTextInput
@@ -96,6 +95,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         binding = ActivitySystemSearchBinding.inflate(layoutInflater)
+        quickAccessItemsBinding = IncludeQuickAccessItemsBinding.bind(binding.root)
         setContentView(binding.root)
         configureObservers()
         configureOnboarding()
@@ -186,7 +186,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureQuickAccessGrid() {
-        val quickAccessRecyclerView = includeQuickAccessItems.quickAccessRecyclerView
+        val quickAccessRecyclerView = quickAccessItemsBinding.quickAccessRecyclerView
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
@@ -282,7 +282,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
         quickAccessAdapter.submitList(it.favorites)
-        includeQuickAccessItems.quickAccessRecyclerView.visibility = View.VISIBLE
+        quickAccessItemsBinding.quickAccessRecyclerView.visibility = View.VISIBLE
     }
 
     private fun processCommand(command: SystemSearchViewModel.Command) {

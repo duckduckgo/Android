@@ -116,9 +116,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include
-        android:id="@+id/include_quick_access_items"
-        layout="@layout/include_quick_access_items"/>
+    <include layout="@layout/include_quick_access_items"/>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/results"
