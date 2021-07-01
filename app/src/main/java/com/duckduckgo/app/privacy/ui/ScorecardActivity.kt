@@ -22,10 +22,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show

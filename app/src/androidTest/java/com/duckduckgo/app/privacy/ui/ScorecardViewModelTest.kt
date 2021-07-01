@@ -27,6 +27,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -51,9 +52,10 @@ class ScorecardViewModelTest {
 
     private var viewStateObserver: Observer<ScorecardViewModel.ViewState> = mock()
     private var userWhitelistDao: UserWhitelistDao = mock()
+    private var temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao = mock()
 
     private val testee: ScorecardViewModel by lazy {
-        val model = ScorecardViewModel(userWhitelistDao, coroutineRule.testDispatcherProvider)
+        val model = ScorecardViewModel(userWhitelistDao, temporaryTrackingWhitelistDao, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model
     }
