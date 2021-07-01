@@ -67,8 +67,6 @@ android {
 
 ext {
     workManager = "2.5.0-beta01"
-    threetenabp = "1.3.0"
-    threetenbp = "1.4.5"
     firebase = "26.0.0"
 }
 
@@ -112,8 +110,8 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
-    testImplementation "org.threeten:threetenbp:$threetenabp"
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
 
     implementation JakeWharton.timber
 

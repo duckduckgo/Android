@@ -21,11 +21,6 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-ext {
-    threetenabp = "1.3.0"
-    threetenbp = "1.4.5"
-}
-
 dependencies {
 
     implementation Kotlin.stdlib.jdk7
@@ -33,12 +28,12 @@ dependencies {
     implementation KotlinX.coroutines.android
     implementation AndroidX.room.runtime
 
-    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.5.0'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
-    testImplementation "org.threeten:threetenbp:$threetenabp"
+    testImplementation "org.threeten:threetenbp:_"
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

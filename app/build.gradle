@@ -133,8 +133,6 @@ android {
 }
 
 ext {
-    workManager = "2.5.0-beta01"
-    threetenabp = "1.2.4"
     firebase = "26.0.0"
 }
 
@@ -181,7 +179,7 @@ dependencies {
     implementation JakeWharton.timber
 
     // ThreeTenABP
-    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
@@ -213,7 +211,7 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:$workManager"
+    implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 

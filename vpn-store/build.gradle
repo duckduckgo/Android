@@ -22,18 +22,13 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-ext {
-    threetenabp = "1.3.0"
-    threetenbp = "1.4.5"
-}
-
 dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 
-    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
-    testImplementation "org.threeten:threetenbp:$threetenabp"
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
 
 //    compileOnly "com.google.dagger:dagger:$dagger"
 
