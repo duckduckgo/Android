@@ -68,7 +68,7 @@ class PrivacyDashboardViewModel(
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean,
-        val isSiteOnTempAllowedList: Boolean
+        val isSiteInTempAllowedList: Boolean
     )
 
     sealed class Command {
@@ -144,7 +144,7 @@ class PrivacyDashboardViewModel(
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
             shouldReloadPage = false,
-            isSiteOnTempAllowedList = false
+            isSiteInTempAllowedList = false
         )
     }
 
@@ -166,7 +166,7 @@ class PrivacyDashboardViewModel(
                 allTrackersBlocked = site.allTrackersBlocked,
                 toggleEnabled = toggleEnabled,
                 practices = site.privacyPractices.summary,
-                isSiteOnTempAllowedList = isInTemporaryWhitelist
+                isSiteInTempAllowedList = isInTemporaryWhitelist
             )
         }
     }

@@ -111,5 +111,6 @@
     <color name="blue">#1A73E9</color>
     <color name="grey">#F3F5F9</color>
     <color name="light_blue">#F2F5F9</color>
+    <color name="yellow_10">#FFF2BF</color>
 
 </resources>

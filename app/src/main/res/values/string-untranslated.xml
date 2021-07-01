@@ -53,5 +53,5 @@
     <string name="appLinkDialogTitle">Open in another app?</string>
 
     <!-- Privacy Protection Dashboard -->
-    <string name="privacyProtectionToggleDisabled">Protections are temporarily disabled due to this site being broken.</string>
+    <string name="privacyProtectionTemporarilyDisabled">Privacy Protection is temporarily disabled due to breakage of site</string>
 </resources>

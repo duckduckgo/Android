@@ -54,7 +54,8 @@ class ScorecardViewModel(
         val practices: PrivacyPractices.Summary,
         val privacyOn: Boolean,
         val showIsMemberOfMajorNetwork: Boolean,
-        val showEnhancedGrade: Boolean
+        val showEnhancedGrade: Boolean,
+        val isSiteInTempAllowedList: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -85,7 +86,8 @@ class ScorecardViewModel(
             practices = UNKNOWN,
             privacyOn = true,
             showIsMemberOfMajorNetwork = false,
-            showEnhancedGrade = false
+            showEnhancedGrade = false,
+            isSiteInTempAllowedList = false
         )
     }
 
@@ -110,7 +112,8 @@ class ScorecardViewModel(
                 practices = site.privacyPractices.summary,
                 privacyOn = !isWhitelisted && !isSiteInTempList,
                 showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-                showEnhancedGrade = grade != improvedGrade
+                showEnhancedGrade = grade != improvedGrade,
+                isSiteInTempAllowedList = isSiteInTempList
             )
         }
     }
