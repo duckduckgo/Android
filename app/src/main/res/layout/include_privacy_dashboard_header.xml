@@ -17,6 +17,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/privacyHeader"
     android:layout_width="match_parent"
     android:layout_height="212dp"
     android:background="@color/subtleGray"
