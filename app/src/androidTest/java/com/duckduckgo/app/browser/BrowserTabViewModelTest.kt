@@ -350,6 +350,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockTemporaryTrackingWhitelistDao.contains(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
@@ -3255,6 +3256,20 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery("nytimes.com")
         assertCommandNotIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenIsWhitelistedIsTrue() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertTrue(browserViewState().isWhitelisted)
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenPrivacyOnIsFalse() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().privacyOn)
     }
 
     private suspend fun givenFireButtonPulsing() {

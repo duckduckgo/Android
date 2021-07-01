@@ -82,7 +82,8 @@ class ScorecardViewModelTest {
         assertTrue(viewState.allTrackersBlocked)
         assertFalse(viewState.showIsMemberOfMajorNetwork)
         assertFalse(viewState.showEnhancedGrade)
-        assertEquals(PrivacyPractices.Summary.UNKNOWN, testee.viewState.value!!.practices)
+        assertEquals(PrivacyPractices.Summary.UNKNOWN, viewState.practices)
+        assertFalse(viewState.isSiteInTempAllowedList)
     }
 
     @Test
@@ -163,6 +164,41 @@ class ScorecardViewModelTest {
         val site = site(allTrackersBlocked = true, trackerCount = 0)
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.showEnhancedGrade)
+    }
+
+    @Test
+    fun whenOnSiteChangedAndSiteIsInTempAllowListThenReturnTrue() {
+        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
+        testee.onSiteChanged(site)
+        assertTrue(testee.viewState.value!!.isSiteInTempAllowedList)
+    }
+
+    @Test
+    fun whenOnSiteChangedAndSiteIsInUserAllowListThenPrivacyOnIsFalse() {
+        whenever(userWhitelistDao.contains(any())).thenReturn(true)
+        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(false)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
+        testee.onSiteChanged(site)
+        assertFalse(testee.viewState.value!!.privacyOn)
+    }
+
+    @Test
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListButIsInTempListThenPrivacyOnIsFalse() {
+        whenever(userWhitelistDao.contains(any())).thenReturn(false)
+        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
+        testee.onSiteChanged(site)
+        assertFalse(testee.viewState.value!!.privacyOn)
+    }
+
+    @Test
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInTempListThenPrivacyOnIsTrue() {
+        whenever(userWhitelistDao.contains(any())).thenReturn(false)
+        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(false)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
+        testee.onSiteChanged(site)
+        assertTrue(testee.viewState.value!!.privacyOn)
     }
 
     private fun site(

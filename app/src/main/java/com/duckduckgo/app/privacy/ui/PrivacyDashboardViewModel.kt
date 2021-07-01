@@ -152,7 +152,7 @@ class PrivacyDashboardViewModel(
         val grades = site.calculateGrades()
         val domain = site.domain ?: ""
         val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
-        val isInTemporaryWhitelist = withContext(dispatchers.io()) {
+        val isInTemporaryAllowlist = withContext(dispatchers.io()) {
             temporaryTrackingWhitelistDao.contains(domain)
         }
 
@@ -166,7 +166,7 @@ class PrivacyDashboardViewModel(
                 allTrackersBlocked = site.allTrackersBlocked,
                 toggleEnabled = toggleEnabled,
                 practices = site.privacyPractices.summary,
-                isSiteInTempAllowedList = isInTemporaryWhitelist
+                isSiteInTempAllowedList = isInTemporaryAllowlist
             )
         }
     }
