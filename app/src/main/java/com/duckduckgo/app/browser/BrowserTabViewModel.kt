@@ -277,7 +277,6 @@ class BrowserTabViewModel(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
-        class SubmitQuery(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
@@ -582,7 +581,7 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            openAppLinksInBrowser()
+            appLinksHandler.enterBrowserState()
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
@@ -1767,8 +1766,9 @@ class BrowserTabViewModel(
         appLinksHandler.reset()
     }
 
-    fun openAppLinksInBrowser() {
+    fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {
         appLinksHandler.enterBrowserState()
+        command.value = Navigate(url, headers)
     }
 
     fun appLinkClicked(appLink: AppLink) {
@@ -1943,10 +1943,6 @@ class BrowserTabViewModel(
                 }
             )
         }
-    }
-
-    fun onQuickAccesItemClicked(it: SavedSite) {
-        command.value = SubmitQuery(it.url)
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {

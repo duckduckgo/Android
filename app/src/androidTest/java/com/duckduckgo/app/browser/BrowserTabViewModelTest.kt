@@ -571,17 +571,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessItemClickedThenSubmitNewQuery() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
-
-        testee.onQuickAccesItemClicked(savedSite)
-
-        assertCommandIssued<Command.SubmitQuery> {
-            assertEquals("http://example.com", this.url)
-        }
-    }
-
-    @Test
     fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
 
