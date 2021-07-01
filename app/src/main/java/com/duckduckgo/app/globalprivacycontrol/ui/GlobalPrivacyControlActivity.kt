@@ -88,7 +88,8 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState.observe(
-            this, { viewState ->
+            this,
+            { viewState ->
                 viewState?.let {
                     binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
                 }
@@ -96,7 +97,8 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
         )
 
         viewModel.command.observe(
-            this, { command ->
+            this,
+            { command ->
                 command?.let {
                     when (it) {
                         is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)

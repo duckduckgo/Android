@@ -395,10 +395,11 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         // Delaying this code to avoid race condition when fragment and activity recreated
         Handler().postDelayed(
             {
-                if(this::toolbarMockupBinding.isInitialized) {
+                if (this::toolbarMockupBinding.isInitialized) {
                     toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
-            }, 300
+            },
+            300
         )
     }
 

@@ -47,7 +47,6 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFireproofWebsitesBinding.inflate(layoutInflater)
