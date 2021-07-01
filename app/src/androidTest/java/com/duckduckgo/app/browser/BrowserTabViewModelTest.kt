@@ -909,15 +909,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesAndPrivacyIsOnAndSiteIsInTempAllowListAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
-        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = true)
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
     fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
         setBrowserShowing(true)
         testee.progressChanged(100)
@@ -3279,6 +3270,13 @@ class BrowserTabViewModelTest {
         whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().privacyOn)
+    }
+
+    @Test
+    fun whenLoadUrlAndSiteIsInTempAllowListThenDoNotChangePrivacyGrade() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        loadUrl("https://example.com")
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     private suspend fun givenFireButtonPulsing() {

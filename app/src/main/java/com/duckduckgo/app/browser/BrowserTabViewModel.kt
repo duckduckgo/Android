@@ -996,7 +996,7 @@ class BrowserTabViewModel(
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
-        val showLoadingGrade = (progress.privacyOn && !currentBrowserViewState().isWhitelisted) || isLoading
+        val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
 
         if (newProgress == 100) {
@@ -1241,7 +1241,10 @@ class BrowserTabViewModel(
 
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
+                val isWhiteListed: Boolean = site?.domain?.let { isWhitelisted(it) } ?: false
+                if (!isWhiteListed) {
+                    privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
+                }
             }
 
             withContext(dispatchers.io()) {
