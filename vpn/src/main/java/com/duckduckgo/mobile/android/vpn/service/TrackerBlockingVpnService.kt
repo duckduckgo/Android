@@ -28,7 +28,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
-import com.duckduckgo.mobile.android.vpn.apps.NewAppBroadcastReceiver
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -98,9 +97,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var appNameResolver: AppNameResolver
 
     @Inject
-    lateinit var newAppBroadcastReceiver: NewAppBroadcastReceiver
-
-    @Inject
     lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
     private val queues = VpnQueues()
@@ -150,8 +146,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 appNameResolver,
                 this
             )
-
-        newAppBroadcastReceiver.register()
 
         Timber.e("VPN log onCreate")
     }
@@ -456,12 +450,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        suspend fun restartVpnService(context: Context) {
+        suspend fun restartVpnService(context: Context) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
+                Timber.v("VPN log: stopping service")
                 stopService(applicationContext)
-                // notifications have a hard time if we do enable/disable cycle back to back
-                delay(100)
+                // wait for the service to stop and then restart it
+                while (isServiceRunning(applicationContext)) {
+                    delay(500)
+                    Timber.v("VPN log: waiting for service to stop...")
+                }
+                Timber.v("VPN log: re-starting service")
                 startService(applicationContext)
             }
         }

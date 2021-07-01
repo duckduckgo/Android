@@ -21,7 +21,6 @@ import android.os.Process
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -58,13 +57,11 @@ class VpnServiceHeartbeatImpl @Inject constructor(
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.v("onVpnStarted called")
         job?.cancel()
-        coroutineScope.launch {
-            if (isRunning.compareAndSet(false, true)) {
-                isRunning.set(TrackerBlockingVpnService.isServiceRunning(context))
-                while (isRunning.get()) {
-                    storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
-                    delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))
-                }
+        job = coroutineScope.launch {
+            isRunning.set(true)
+            while (isRunning.get()) {
+                storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
+                delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))
             }
         }
     }

@@ -22,17 +22,31 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+@ContributesMultibinding(
+    scope = VpnObjectGraph::class,
+    boundType = VpnServiceCallbacks::class
+)
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
     private val appCategoryDetector: AppCategoryDetector,
-    private val appTrackerRepository: AppTrackerRepository
-) : BroadcastReceiver() {
+    private val appTrackerRepository: AppTrackerRepository,
+    private val dispatcherProvider: DispatcherProvider
+) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
     override fun onReceive(context: Context, intent: Intent) {
@@ -55,7 +69,9 @@ class NewAppBroadcastReceiver @Inject constructor(
         }
     }
 
-    fun register() {
+    private fun register() {
+        kotlin.runCatching { applicationContext.unregisterReceiver(this) }
+
         IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
@@ -64,12 +80,26 @@ class NewAppBroadcastReceiver @Inject constructor(
         }
     }
 
+    private fun unregister() {
+        kotlin.runCatching { applicationContext.unregisterReceiver(this) }
+    }
+
     private fun isGame(packageName: String): Boolean {
         return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game
     }
 
     @WorkerThread
-    private fun isInExclusionList(packageName: String): Boolean {
-        return appTrackerRepository.getAppExclusionList().contains(packageName)
+    private suspend fun isInExclusionList(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext appTrackerRepository.getAppExclusionList().contains(packageName)
+    }
+
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        Timber.v("New app receiver started")
+        register()
+    }
+
+    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+        Timber.v("New app receiver stopped")
+        unregister()
     }
 }

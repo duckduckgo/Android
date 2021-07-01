@@ -24,13 +24,11 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.NetworkInterface
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @VpnScope
@@ -39,11 +37,18 @@ class VpnConnectionMonitor @Inject constructor(
     private val context: Context,
     private val deviceShieldPixels: DeviceShieldPixels
 ) : VpnServiceCallbacks {
+
+    private var job: Job? = null
+    private val isRunning = AtomicBoolean(false)
+
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
-            while (isActive) {
+        job?.cancel()
+        job = coroutineScope.launch {
+            isRunning.set(true)
+            Timber.v("TUN monitor: STARTED")
+            while (isRunning.get()) {
                 if (!isTunInterfaceUp()) {
-                    Timber.e("TUN interface seems to be down!...restarting VPN")
+                    Timber.e("TUN monitor: interface seems to be down!...restarting VPN")
                     deviceShieldPixels.vpnTunInterfaceIsDown()
                     TrackerBlockingVpnService.restartVpnService(context)
                 }
@@ -53,14 +58,21 @@ class VpnConnectionMonitor @Inject constructor(
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
-        // noop
+        when (vpnStopReason) {
+            VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("TUN monitor: VPN stopped due to error or revoked")
+            VpnStopReason.SelfStop -> {
+                Timber.v("TUN monitor: STOPPED")
+                job?.cancel()
+                isRunning.set(false)
+            }
+        }
     }
 
     private fun isTunInterfaceUp(): Boolean {
         try {
             for (networkInterface in NetworkInterface.getNetworkInterfaces()) {
                 if (networkInterface.isUp && networkInterface.name.contains("tun")) {
-                    Timber.d("${networkInterface.name} interface is UP")
+                    Timber.d("TUN monitor: ${networkInterface.name} interface is UP")
                     return true
                 }
             }
