@@ -996,7 +996,7 @@ class BrowserTabViewModel(
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
-        val showLoadingGrade = progress.privacyOn || isLoading
+        val showLoadingGrade = (progress.privacyOn && !currentBrowserViewState().isWhitelisted) || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
 
         if (newProgress == 100) {

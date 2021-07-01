@@ -114,6 +114,13 @@ class TemporaryTrackingWhitelistDaoTest {
         Assert.assertFalse(dao.contains(domain))
     }
 
+    @Test
+    fun whenElementAddedAndSubdomainCheckedThenContainsIsTrue() {
+        val entity = createEntity("test.com")
+        dao.insertAll(listOf(entity))
+        assertTrue(dao.contains("subdomain.test.com"))
+    }
+
     private fun createEntity(domain: String): TemporaryTrackingWhitelistedDomain {
         return TemporaryTrackingWhitelistedDomain(domain)
     }

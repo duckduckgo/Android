@@ -909,6 +909,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProgressChangesAndPrivacyIsOnAndSiteIsInTempAllowListAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = true)
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
     fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
         setBrowserShowing(true)
         testee.progressChanged(100)
