@@ -74,13 +74,6 @@ class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
         }
     }
 
-    private fun configureUpNavigation(toolbar: Toolbar) {
-        toolbar.setNavigationIcon(R.drawable.ic_back)
-        toolbar.setNavigationOnClickListener {
-            dismiss()
-        }
-    }
-
     override fun onBackNavigation() {
         val savedSite = getSavedSite()
 

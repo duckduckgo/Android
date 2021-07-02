@@ -21,6 +21,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.showKeyboard
@@ -50,6 +51,13 @@ abstract class FullscreenDialogFragment : DialogFragment() {
         onBackNavigation()
         hideKeyboard()
         super.onDismiss(dialog)
+    }
+
+    protected fun configureUpNavigation(toolbar: Toolbar) {
+        toolbar.setNavigationIcon(R.drawable.ic_back)
+        toolbar.setNavigationOnClickListener {
+            dismiss()
+        }
     }
 
     protected fun showKeyboard(inputEditText: EditText) {
