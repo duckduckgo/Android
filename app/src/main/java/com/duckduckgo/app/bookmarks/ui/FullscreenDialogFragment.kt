@@ -27,7 +27,7 @@ import com.duckduckgo.app.global.view.showKeyboard
 
 abstract class FullscreenDialogFragment : DialogFragment() {
 
-    abstract fun userNavigatedBack()
+    abstract fun onBackNavigation()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,13 +41,13 @@ abstract class FullscreenDialogFragment : DialogFragment() {
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        userNavigatedBack()
+        onBackNavigation()
         hideKeyboard()
         super.onCancel(dialog)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        userNavigatedBack()
+        onBackNavigation()
         hideKeyboard()
         super.onDismiss(dialog)
     }

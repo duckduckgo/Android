@@ -81,7 +81,7 @@ class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
         }
     }
 
-    override fun userNavigatedBack() {
+    override fun onBackNavigation() {
         val savedSite = getSavedSite()
 
         val updatedTitle = validateInput(binding.titleInput.text.toString(), savedSite.title)
