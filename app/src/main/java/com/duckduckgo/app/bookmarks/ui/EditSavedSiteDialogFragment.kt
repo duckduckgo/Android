@@ -16,23 +16,18 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.EditSavedSiteBinding
-import com.duckduckgo.app.global.view.showKeyboard
 
-class EditSavedSiteDialogFragment : DialogFragment() {
+class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onSavedSiteEdited(savedSite: SavedSite)
@@ -42,17 +37,6 @@ class EditSavedSiteDialogFragment : DialogFragment() {
 
     private var _binding: EditSavedSiteBinding? = null
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.attributes?.windowAnimations = android.R.style.Animation_Dialog
-        return dialog
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = EditSavedSiteBinding.inflate(inflater, container, false)
@@ -97,14 +81,24 @@ class EditSavedSiteDialogFragment : DialogFragment() {
         }
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        userNavigatedBack(binding.titleInput, binding.urlInput)
-        super.onCancel(dialog)
-    }
+    override fun userNavigatedBack() {
+        val savedSite = getSavedSite()
 
-    override fun onDismiss(dialog: DialogInterface) {
-        userNavigatedBack(binding.titleInput, binding.urlInput)
-        super.onDismiss(dialog)
+        val updatedTitle = validateInput(binding.titleInput.text.toString(), savedSite.title)
+        val updatedUrl = validateInput(binding.urlInput.text.toString(), savedSite.url)
+
+        when (savedSite) {
+            is SavedSite.Bookmark -> {
+                listener?.onSavedSiteEdited(
+                        savedSite.copy(title = updatedTitle, url = updatedUrl)
+                )
+            }
+            is SavedSite.Favorite -> {
+                listener?.onSavedSiteEdited(
+                        savedSite.copy(title = updatedTitle, url = updatedUrl)
+                )
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -112,39 +106,8 @@ class EditSavedSiteDialogFragment : DialogFragment() {
         _binding = null
     }
 
-    private fun userNavigatedBack(titleInput: EditText, urlInput: EditText) {
-        val savedSite = getSavedSite()
-
-        val updatedTitle = validateInput(titleInput.text.toString(), savedSite.title)
-        val updatedUrl = validateInput(urlInput.text.toString(), savedSite.url)
-
-        when (savedSite) {
-            is SavedSite.Bookmark -> {
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl)
-                )
-            }
-            is SavedSite.Favorite -> {
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl)
-                )
-            }
-        }
-        hideKeyboard()
-    }
-
     private fun validateInput(newValue: String, existingValue: String) =
         if (newValue.isNotBlank()) newValue else existingValue
-
-    private fun showKeyboard(titleInput: EditText) {
-        titleInput.setSelection(titleInput.text.length)
-        titleInput.showKeyboard()
-        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-    }
-
-    private fun hideKeyboard() {
-        requireActivity().window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-    }
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
         titleInput.setText(getExistingTitle())
