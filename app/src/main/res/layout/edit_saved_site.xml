@@ -81,16 +81,21 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:visibility="gone"
+        android:paddingHorizontal="3dp"
         app:layout_constraintTop_toBottomOf="@id/savedSiteUrlInputContainer">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/locationInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:background="@null"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:hint="@string/locationLabel"
             android:text="@string/bookmarksSectionTitle"
-            android:backgroundTint="@android:color/transparent"
             android:textColor="?attr/normalTextColor" />
 
     </com.google.android.material.textfield.TextInputLayout>

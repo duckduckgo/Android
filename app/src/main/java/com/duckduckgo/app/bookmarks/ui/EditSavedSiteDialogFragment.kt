@@ -27,6 +27,7 @@ import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.EditSavedSiteBinding
 import com.duckduckgo.app.global.view.showKeyboard
@@ -57,15 +58,25 @@ class EditSavedSiteDialogFragment : DialogFragment() {
         _binding = EditSavedSiteBinding.inflate(inflater, container, false)
 
         validateBundleArguments()
-        configureToolbar()
+        configureToolbar(binding.savedSiteAppBar.toolbar)
         populateFields(binding.titleInput, binding.urlInput)
+
+        binding.locationInfo.setOnClickListener {
+            selectBookmarkFolderLocation()
+        }
+
         showKeyboard(binding.titleInput)
 
         return binding.root
     }
 
-    private fun configureToolbar() {
-        val toolbar = binding.savedSiteAppBar.toolbar
+    fun selectBookmarkFolderLocation() {
+        context?.let {
+            startActivity(BookmarkFoldersActivity.intent(it))
+        }
+    }
+
+    private fun configureToolbar(toolbar: Toolbar) {
         setToolbarTitle(toolbar)
         configureUpNavigation(toolbar)
     }

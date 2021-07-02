@@ -323,6 +323,10 @@
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
             android:label="@string/globalPrivacyControlActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
+            android:label="@string/folderLocationTitle"
+            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"

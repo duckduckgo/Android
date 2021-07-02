@@ -55,5 +55,7 @@
     <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
     <string name="favoriteDialogTitleEdit">Edit Favorite</string>
     <string name="locationLabel">Location</string>
+    <string name="folderLocationTitle">Select Location</string>
+    <string name="addFolder">Add Folder</string>
 
 </resources>
