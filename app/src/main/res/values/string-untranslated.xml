@@ -15,6 +15,11 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+    <!-- Developer settings -->
+    <string name="settingsDeveloperSettings">Developer Settings</string>
+    <string name="devSettingsActivityTitle">Developer Settings</string>
+
     <!-- Email Autofill -->
     <string name="settingsEmailAutofill">Email Autofill</string>
     <string name="settingsEmailAutofillEnabledFor">Enabled for %1$s</string>

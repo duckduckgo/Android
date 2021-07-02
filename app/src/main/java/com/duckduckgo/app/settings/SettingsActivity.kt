@@ -31,6 +31,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.dev.DevSettingsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -110,6 +111,8 @@ class SettingsActivity :
         automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
         emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
+        version.setOnClickListener { viewModel.enableDevSettings() }
+        devSettings.setOnClickListener { viewModel.launchDeveloperSettings() }
     }
 
     private fun observeViewModel() {
@@ -126,6 +129,7 @@ class SettingsActivity :
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     setEmailSetting(it.emailSetting)
+                    updateDevSettingsVisibility(it.devSettingsEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -133,6 +137,14 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateDevSettingsVisibility(devSettingsEnabled: Boolean) {
+        if (devSettingsEnabled) {
+            devSettings.show()
+        } else {
+            devSettings.gone()
+        }
     }
 
     private fun setEmailSetting(emailData: EmailSetting) {
@@ -201,10 +213,23 @@ class SettingsActivity :
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.LaunchEmailDialog -> launchEmailDialog()
+            is Command.LaunchDeveloperSettings -> launchDeveloperSettings()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
+            is Command.TapsToEnableDevSettings -> tapsLeft(it.taps)
             null -> TODO()
         }
+    }
+
+    private fun launchDeveloperSettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(DevSettingsActivity.intent(this), options)
+    }
+
+    var toast: Toast? = null
+    private fun tapsLeft(taps: Int) {
+        toast?.cancel()
+        toast = Toast.makeText(this, "$taps away to enable Developer Settings", Toast.LENGTH_SHORT).apply { show() }
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {

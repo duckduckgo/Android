@@ -65,7 +65,8 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff
+        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
+        val devSettingsEnabled: Boolean = false
     )
 
     sealed class EmailSetting {
@@ -89,8 +90,10 @@ class SettingsViewModel @Inject constructor(
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
         object LaunchEmailDialog : Command()
+        object LaunchDeveloperSettings : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
+        data class TapsToEnableDevSettings(val taps: Int) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -122,7 +125,8 @@ class SettingsViewModel @Inject constructor(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-                    emailSetting = getEmailSetting()
+                    emailSetting = getEmailSetting(),
+                    devSettingsEnabled = settingsDataStore.devSettingsEnabled
                 )
             )
         }
@@ -305,6 +309,27 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
+    }
+
+    fun enableDevSettings() {
+        if (!settingsDataStore.devSettingsEnabled) {
+            devCount++
+            if (devCount in 3 until TAPS) {
+                viewModelScope.launch { command.send(Command.TapsToEnableDevSettings(TAPS - devCount)) }
+            } else if (devCount >= TAPS) {
+                settingsDataStore.devSettingsEnabled = true
+                viewModelScope.launch { viewState.emit(currentViewState().copy(devSettingsEnabled = true)) }
+            }
+        }
+    }
+
+    fun launchDeveloperSettings() {
+        viewModelScope.launch { command.send(Command.LaunchDeveloperSettings) }
+    }
+
+    var devCount = 0
+    companion object {
+        const val TAPS = 5
     }
 }
 
