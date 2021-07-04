@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
 import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
@@ -185,6 +186,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
                 startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
             }
+            R.id.action_add_folder -> {
+                val dialog = AddBookmarkFolderDialogFragment.instance(0)
+                dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
+                dialog.listener = viewModel
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -231,6 +237,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         // Fragment Tags
         private const val EDIT_BOOKMARK_FRAGMENT_TAG = "EDIT_BOOKMARK"
+        private const val ADD_BOOKMARK_FOLDER_FRAGMENT_TAG = "ADD_BOOKMARK_FOLDER_FRAGMENT_TAG"
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112

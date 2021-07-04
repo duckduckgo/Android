@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
 import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
@@ -29,6 +30,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -48,7 +50,7 @@ class BookmarksViewModel(
     private val faviconManager: FaviconManager,
     private val bookmarksManager: BookmarksManager,
     private val dispatcherProvider: DispatcherProvider
-) : EditSavedSiteListener, ViewModel() {
+) : EditSavedSiteListener, AddBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -189,6 +191,9 @@ class BookmarksViewModel(
 
     private fun onFavoritesChanged(favorites: List<Favorite>) {
         viewState.value = viewState.value?.copy(favorites = favorites)
+    }
+
+    override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
     }
 }
 
