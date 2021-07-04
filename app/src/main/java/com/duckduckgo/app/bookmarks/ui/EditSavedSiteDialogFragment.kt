@@ -17,17 +17,12 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
-import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.EditSavedSiteBinding
 
-class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
+class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onSavedSiteEdited(savedSite: SavedSite)
@@ -35,43 +30,25 @@ class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
 
     var listener: EditSavedSiteListener? = null
 
-    private var _binding: EditSavedSiteBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = EditSavedSiteBinding.inflate(inflater, container, false)
-
+    override fun configureUI() {
         validateBundleArguments()
-        configureToolbar(binding.savedSiteAppBar.toolbar)
-        populateFields(binding.titleInput, binding.urlInput)
 
-        binding.locationInfo.setOnClickListener {
-            selectBookmarkFolderLocation()
-        }
-
-        showKeyboard(binding.titleInput)
-
-        return binding.root
-    }
-
-    fun selectBookmarkFolderLocation() {
-        context?.let {
-            startActivity(BookmarkFoldersActivity.intent(it))
-        }
-    }
-
-    private fun configureToolbar(toolbar: Toolbar) {
-        setToolbarTitle(toolbar)
-        configureUpNavigation(toolbar)
-    }
-
-    private fun setToolbarTitle(toolbar: Toolbar) {
         if (getSavedSite() is SavedSite.Favorite) {
-            toolbar.title = getString(R.string.favoriteDialogTitleEdit)
+            setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
-            toolbar.title = getString(R.string.bookmarkDialogTitleEdit)
+            setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
+
+        populateFields(binding.titleInput, binding.urlInput)
+    }
+
+    private fun validateInput(newValue: String, existingValue: String) =
+            if (newValue.isNotBlank()) newValue else existingValue
+
+    private fun populateFields(titleInput: EditText, urlInput: EditText) {
+        titleInput.setText(getExistingTitle())
+        urlInput.setText(getExistingUrl())
     }
 
     override fun onBackNavigation() {
@@ -92,19 +69,6 @@ class EditSavedSiteDialogFragment : FullscreenDialogFragment() {
                 )
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun validateInput(newValue: String, existingValue: String) =
-        if (newValue.isNotBlank()) newValue else existingValue
-
-    private fun populateFields(titleInput: EditText, urlInput: EditText) {
-        titleInput.setText(getExistingTitle())
-        urlInput.setText(getExistingUrl())
     }
 
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite

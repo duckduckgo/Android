@@ -19,20 +19,41 @@ package com.duckduckgo.app.bookmarks.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.showKeyboard
 
-abstract class FullscreenDialogFragment : DialogFragment() {
+abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onBackNavigation()
+    abstract fun configureUI()
+
+    private var _binding: DialogFragmentSavedSiteBinding? = null
+    protected val binding get() = _binding!!
+
+    var launcher = registerForActivityResult(StartActivityForResult()) {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
+        configureClickListeners()
+        configureUI()
+        showKeyboard(binding.titleInput)
+        return binding.root
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -41,26 +62,44 @@ abstract class FullscreenDialogFragment : DialogFragment() {
         return dialog
     }
 
-    override fun onCancel(dialog: DialogInterface) {
+    override fun onCancel(dialogInterface: DialogInterface) {
         onBackNavigation()
         hideKeyboard()
-        super.onCancel(dialog)
+        super.onCancel(dialogInterface)
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
+    override fun onDismiss(dialogInterface: DialogInterface) {
         onBackNavigation()
         hideKeyboard()
-        super.onDismiss(dialog)
+        super.onDismiss(dialogInterface)
     }
 
-    protected fun configureUpNavigation(toolbar: Toolbar) {
+    override fun onPause() {
+        super.onPause()
+        dialog?.window?.setWindowAnimations(android.R.style.Animation)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun configureUpNavigation(toolbar: Toolbar) {
         toolbar.setNavigationIcon(R.drawable.ic_back)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }
     }
 
-    protected fun showKeyboard(inputEditText: EditText) {
+    private fun configureClickListeners() {
+        binding.savedSiteLocation.setOnClickListener {
+            context?.let {
+                launcher.launch(BookmarkFoldersActivity.intent(it))
+            }
+        }
+    }
+
+    private fun showKeyboard(inputEditText: EditText) {
         inputEditText.setSelection(inputEditText.text.length)
         inputEditText.showKeyboard()
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
@@ -70,5 +109,11 @@ abstract class FullscreenDialogFragment : DialogFragment() {
         activity?.let {
             it.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         }
+    }
+
+    protected fun setToolbarTitle(title: String) {
+        val toolbar = binding.savedSiteAppBar.toolbar
+        toolbar.title = title
+        configureUpNavigation(toolbar)
     }
 }
