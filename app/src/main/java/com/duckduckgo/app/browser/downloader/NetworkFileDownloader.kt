@@ -29,7 +29,11 @@ import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
-class NetworkFileDownloader @Inject constructor(private val context: Context, private val filenameExtractor: FilenameExtractor, private val fileService: DownloadFileService) {
+class NetworkFileDownloader @Inject constructor(
+    private val context: Context,
+    private val filenameExtractor: FilenameExtractor,
+    private val fileService: DownloadFileService
+) {
 
     fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
 
@@ -43,13 +47,15 @@ class NetworkFileDownloader @Inject constructor(private val context: Context, pr
                 if (response.isSuccessful) {
                     var updatedPendingDownload = pendingDownload.copy()
 
-                    if (response.headers().get("content-type") != null) {
-                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = response.headers().get("content-type"))
+                    val contentType = response.headers().get("content-type")
+                    val contentDisposition = response.headers().get("content-disposition")
+
+                    if (contentType != null) {
+                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = contentType)
                     }
 
-                    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-                    if (response.headers().get("content-disposition") != null) {
-                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = response.headers().get("content-disposition"))
+                    if (contentDisposition != null) {
+                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = contentDisposition)
                     }
 
                     when (val extractionResult = filenameExtractor.extract(updatedPendingDownload)) {
