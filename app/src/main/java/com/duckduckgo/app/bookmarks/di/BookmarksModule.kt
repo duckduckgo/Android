@@ -48,10 +48,10 @@ class BookmarksModule {
     fun savedSitesImporter(
         context: Context,
         bookmarksDao: BookmarksDao,
-        favoritesDao: FavoritesDao,
+        favoritesRepository: FavoritesRepository,
         savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
-        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesDao, savedSitesParser)
+        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, savedSitesParser)
     }
 
     @Provides
@@ -66,10 +66,10 @@ class BookmarksModule {
         context: Context,
         savedSitesParser: SavedSitesParser,
         bookmarksDao: BookmarksDao,
-        favoritesDao: FavoritesDao,
+        favoritesRepository: FavoritesRepository,
         dispatcherProvider: DispatcherProvider
     ): SavedSitesExporter {
-        return RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesDao, savedSitesParser, dispatcherProvider)
+        return RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, savedSitesParser, dispatcherProvider)
     }
 
     @Provides

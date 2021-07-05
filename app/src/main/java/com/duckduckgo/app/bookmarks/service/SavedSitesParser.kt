@@ -17,12 +17,11 @@
 package com.duckduckgo.app.bookmarks.service
 
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import org.jsoup.nodes.Document
 
 interface SavedSitesParser {
-    fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<FavoriteEntity>): String
+    fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<SavedSite.Favorite>): String
     fun parseHtml(document: Document): List<SavedSite>
 }
 
@@ -33,7 +32,7 @@ class RealSavedSitesParser : SavedSitesParser {
         const val BOOKSMARKS_FOLDER = "DuckDuckGo Bookmarks"
     }
 
-    override fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<FavoriteEntity>): String {
+    override fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<SavedSite.Favorite>): String {
         if (bookmarks.isEmpty() && favorites.isEmpty()) {
             return ""
         }
@@ -67,7 +66,7 @@ class RealSavedSitesParser : SavedSitesParser {
         }
     }
 
-    private fun addFavorites(favorites: List<FavoriteEntity>): String {
+    private fun addFavorites(favorites: List<SavedSite.Favorite>): String {
         if (favorites.isEmpty()) {
             return ""
         }

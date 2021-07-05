@@ -51,7 +51,7 @@ class SavedSitesParserTest {
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
-        val favorite = FavoriteEntity(id = 1, title = "example", url = "www.example.com", 0)
+        val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
 
         val result = parser.generateHtml(listOf(bookmark), listOf(favorite))
         val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +

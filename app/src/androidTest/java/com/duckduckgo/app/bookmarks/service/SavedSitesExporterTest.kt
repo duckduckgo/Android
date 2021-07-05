@@ -25,7 +25,12 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -34,6 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
+import dagger.Lazy
 
 class SavedSitesExporterTest {
 
@@ -47,7 +53,9 @@ class SavedSitesExporterTest {
 
     private lateinit var db: AppDatabase
     private lateinit var bookmarksDao: BookmarksDao
-    private lateinit var favoritesDao: FavoritesDao
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
+    private lateinit var favoritesRepository: FavoritesRepository
     private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
@@ -59,9 +67,9 @@ class SavedSitesExporterTest {
             .allowMainThreadQueries()
             .build()
         bookmarksDao = db.bookmarksDao()
-        favoritesDao = db.favoritesDao()
+        favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesDao, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, RealSavedSitesParser())
     }
 
     @After
@@ -104,8 +112,8 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeFavoritesExistThenExportingSucceeds() = runBlocking {
-        val favorite = FavoriteEntity(id = 1, title = "example", url = "www.example.com", position = 0)
-        favoritesDao.insert(favorite)
+        val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", position = 0)
+        favoritesRepository.insert(favorite)
 
         val testFile = File(filesDir, "test_favorites.html")
         val localUri = Uri.fromFile(testFile)
