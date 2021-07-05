@@ -174,7 +174,7 @@ class CtaViewModel @Inject constructor(
             } else {
                 Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
                 if (favoritesOnboarding) {
-                    DaxBubbleCta.DaxFavoritesOnboardingCta(onboardingStore, appInstallStore)
+                    BubbleCta.DaxFavoritesOnboardingCta()
                 } else {
                     getHomeCta()
                 }

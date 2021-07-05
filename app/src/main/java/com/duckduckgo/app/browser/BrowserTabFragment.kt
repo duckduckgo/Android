@@ -1003,7 +1003,7 @@ class BrowserTabFragment :
 
     private fun configureOmnibarQuickAccessGrid() {
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
-        omnibarQuickAccessAdapter = createQuickAccessAdapter { viewHolder ->
+        omnibarQuickAccessAdapter = createQuickAccessAdapter(originHomeTab = false) { viewHolder ->
             quickAccessSuggestionsRecyclerView.enableAnimation()
             omnibarQuickAccessItemTouchHelper.startDrag(viewHolder)
         }
@@ -1014,7 +1014,7 @@ class BrowserTabFragment :
 
     private fun configureHomeTabQuickAccessGrid() {
         configureQuickAccessGridLayout(quickAccessRecyclerView)
-        quickAccessAdapter = createQuickAccessAdapter { viewHolder ->
+        quickAccessAdapter = createQuickAccessAdapter(originHomeTab = true) { viewHolder ->
             quickAccessRecyclerView.enableAnimation()
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
@@ -1039,10 +1039,14 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createQuickAccessAdapter(onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
+    private fun createQuickAccessAdapter(originHomeTab: Boolean, onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
+        val favOriginPixel = if(originHomeTab) AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED else AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
-            { viewModel.onUserSubmittedQuery(it.favorite.url) },
+            {
+                pixel.fire(favOriginPixel)
+                viewModel.onUserSubmittedQuery(it.favorite.url)
+            },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )
@@ -1748,9 +1752,7 @@ class BrowserTabFragment :
                     }
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
-                    launch {
-                        viewModel.onAddFavoriteMenuClicked()
-                    }
+                    viewModel.onAddFavoriteMenuClicked()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
@@ -2097,6 +2099,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
+                is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
         }
@@ -2119,6 +2122,14 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            configuration.showCta(daxCtaContainer)
+            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            viewModel.onCtaShown()
+        }
+
+        private fun showBubleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)

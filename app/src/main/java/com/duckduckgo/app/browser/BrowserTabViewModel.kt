@@ -104,6 +104,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1375,18 +1376,26 @@ class BrowserTabViewModel(
         }
     }
 
-    suspend fun onAddFavoriteMenuClicked() {
+    fun onAddFavoriteMenuClicked() {
         val url = url ?: return
         val title = title ?: ""
 
-        withContext(dispatchers.io()) {
-            if (url.isNotBlank()) {
-                faviconManager.persistCachedFavicon(tabId, url)
-                favoritesRepository.insert(title = title, url = url)
-            } else null
-        }?.let {
-            withContext(dispatchers.main()) {
-                command.value = ShowSavedSiteAddedConfirmation(it)
+        val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
+        pixel.fire(
+            AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
+            mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString())
+        )
+
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                if (url.isNotBlank()) {
+                    faviconManager.persistCachedFavicon(tabId, url)
+                    favoritesRepository.insert(title = title, url = url)
+                } else null
+            }?.let {
+                withContext(dispatchers.main()) {
+                    command.value = ShowSavedSiteAddedConfirmation(it)
+                }
             }
         }
     }
@@ -1711,11 +1720,13 @@ class BrowserTabViewModel(
     }
 
     fun onBrowserMenuClosed() {
-        Timber.i("favoritesOnboarding onBrowserMenuClosed")
-        if (currentBrowserViewState().addFavorite.isHighlighted()) {
-            browserViewState.value = currentBrowserViewState().copy(
-                addFavorite = HighlightableButton.Visible(highlighted = false)
-            )
+        viewModelScope.launch {
+            Timber.i("favoritesOnboarding onBrowserMenuClosed")
+            if (currentBrowserViewState().addFavorite.isHighlighted()) {
+                browserViewState.value = currentBrowserViewState().copy(
+                    addFavorite = HighlightableButton.Visible(highlighted = false)
+                )
+            }
         }
     }
 

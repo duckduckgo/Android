@@ -26,6 +26,8 @@ import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
@@ -34,6 +36,9 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -101,11 +106,13 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         } else {
             binding.widgetConfigThemeLight.isChecked = true
         }
+
+        pixel.fire(AppPixelName.FAVORITE_WIDGET_CONFIGURATION_SHOWN)
     }
 
     private fun storeAndSubmitConfiguration(widgetId: Int, selectedTheme: WidgetTheme) {
         widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
-
+        pixelSelectedTheme(selectedTheme)
         val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
         val widgetsToUpdate = IntArray(1).also { it[0] = widgetId }
         widgetUpdateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetsToUpdate)
@@ -115,5 +122,13 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         setResult(RESULT_OK, resultValue)
         finish()
+    }
+
+    private fun pixelSelectedTheme(selectedTheme: WidgetTheme) {
+        when (selectedTheme) {
+            WidgetTheme.LIGHT -> pixel.fire(AppPixelName.FAVORITES_WIDGETS_LIGHT)
+            WidgetTheme.DARK -> pixel.fire(AppPixelName.FAVORITES_WIDGETS_DARK)
+            WidgetTheme.SYSTEM_DEFAULT -> pixel.fire(AppPixelName.FAVORITES_WIDGETS_SYSTEM)
+        }
     }
 }

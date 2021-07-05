@@ -165,6 +165,7 @@ class FavoritesWidgetService : RemoteViewsService() {
             val bundle = Bundle()
             bundle.putString(Intent.EXTRA_TEXT, item)
             bundle.putBoolean(BrowserActivity.NEW_SEARCH_EXTRA, false)
+            bundle.putBoolean(BrowserActivity.LAUNCH_FROM_FAVORITES_WIDGET, true)
             bundle.putBoolean(BrowserActivity.NOTIFY_DATA_CLEARED_EXTRA, false)
             val intent = Intent()
             intent.putExtras(bundle)

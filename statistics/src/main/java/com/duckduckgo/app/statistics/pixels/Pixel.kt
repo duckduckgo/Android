@@ -69,6 +69,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FAVORITE_MENU_ITEM_STATE = "fmi"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
         const val BOOKMARK_COUNT = "bco"
@@ -82,7 +83,6 @@ interface Pixel {
         const val DEFAULT_BROWSER_EXTERNAL = "e"
         const val DAX_INITIAL_CTA = "i"
         const val DAX_END_CTA = "e"
-        const val DAX_FAVORITES_ONBOARDING_CTA = "fo"
         const val DAX_SERP_CTA = "s"
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
@@ -93,7 +93,6 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
-
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

@@ -165,6 +165,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
+        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
         val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
@@ -262,6 +263,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
+                if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
+                    pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
+                }
                 launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 return
             }
@@ -434,6 +438,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
+        const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

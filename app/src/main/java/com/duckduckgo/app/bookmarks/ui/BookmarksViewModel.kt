@@ -33,6 +33,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
@@ -47,6 +49,7 @@ class BookmarksViewModel(
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
     private val bookmarksManager: BookmarksManager,
+    private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider
 ) : EditSavedSiteListener, ViewModel() {
 
@@ -107,6 +110,9 @@ class BookmarksViewModel(
     }
 
     fun onSelected(savedSite: SavedSite) {
+        if(savedSite is Favorite) {
+            pixel.fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
+        }
         command.value = OpenSavedSite(savedSite)
     }
 
@@ -198,6 +204,7 @@ class BookmarksViewModelFactory @Inject constructor(
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val bookmarksManager: Provider<BookmarksManager>,
+    private val pixel: Provider<Pixel>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -209,6 +216,7 @@ class BookmarksViewModelFactory @Inject constructor(
                         dao.get(),
                         faviconManager.get(),
                         bookmarksManager.get(),
+                        pixel.get(),
                         dispatcherProvider.get()
                     ) as T
                     )
