@@ -179,6 +179,24 @@ interface DeviceShieldPixels {
     fun privacyReportArticleDisplayed()
 
     fun vpnTunInterfaceIsDown()
+
+    /** Will fire when the process has gone to the expendable list */
+    fun vpnProcessExpendableLow(payload: Map<String, String>)
+
+    /** Will fire when the process is in the middle expendable list */
+    fun vpnProcessExpendableModerate(payload: Map<String, String>)
+
+    /** Will fire when the process is near to be killed is no memory is found */
+    fun vpnProcessExpendableComplete(payload: Map<String, String>)
+
+    /** Will fire when the system is running moderately low on memory */
+    fun vpnMemoryRunningModerate(payload: Map<String, String>)
+
+    /** Will fire when the system is running low on memory */
+    fun vpnMemoryRunningLow(payload: Map<String, String>)
+
+    /** Will fire when the system is running extremely low on memory */
+    fun vpnMemoryRunningCritical(payload: Map<String, String>)
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -343,12 +361,36 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.DS_TUN_INTERFACE_DOWN)
     }
 
+    override fun vpnProcessExpendableLow(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_LOW, payload)
+    }
+
+    override fun vpnProcessExpendableModerate(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_MODERATE, payload)
+    }
+
+    override fun vpnProcessExpendableComplete(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_COMPLETE, payload)
+    }
+
+    override fun vpnMemoryRunningLow(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_LOW, payload)
+    }
+
+    override fun vpnMemoryRunningModerate(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_MODERATE, payload)
+    }
+
+    override fun vpnMemoryRunningCritical(payload: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL, payload)
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.DS_KILLED)
     }
 
-    private fun firePixel(p: DeviceShieldPixelNames) {
-        pixel.fire(p)
+    private fun firePixel(p: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+        pixel.fire(p, payload)
     }
 
     private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames) {

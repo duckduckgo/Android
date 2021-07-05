@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
+import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
@@ -29,6 +30,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetecto
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -44,23 +48,27 @@ import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
 import kotlin.math.pow
 
-class TcpPacketProcessor(
+class TcpPacketProcessor @AssistedInject constructor(
     queues: VpnQueues,
-    networkChannelCreator: NetworkChannelCreator,
+    @Assisted networkChannelCreator: NetworkChannelCreator,
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
     localAddressDetector: LocalIpAddressDetector,
     originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     appNameResolver: AppNameResolver,
-    private val vpnCoroutineScope: CoroutineScope
+    @TcpNetworkSelector selector: Selector,
+    tcpSocketWriter: TcpSocketWriter,
+    @Assisted private val vpnCoroutineScope: CoroutineScope
 ) : Runnable {
 
-    val selector: Selector = Selector.open()
+    @AssistedFactory
+    interface Factory {
+        fun build(networkChannelCreator: NetworkChannelCreator, coroutineScope: CoroutineScope): TcpPacketProcessor
+    }
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
-    private val tcpSocketWriter = TcpSocketWriter(selector, queues)
     private val tcpNetworkToDevice = TcpNetworkToDevice(
         queues = queues,
         selector = selector,

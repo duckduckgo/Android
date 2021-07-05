@@ -87,5 +87,12 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     DS_TUN_INTERFACE_DOWN_DAILY("m_apptb_tun_dd"),
     DS_TUN_INTERFACE_DOWN("m_apptb_tun_dc"),
+
+    VPN_PROCESS_EXPENDABLE_LOW("m_apptb_pe_l"),
+    VPN_PROCESS_EXPENDABLE_MODERATE("m_apptb_pe_m"),
+    VPN_PROCESS_EXPENDABLE_COMPLETE("m_apptb_pe_c"),
+    VPN_PROCESS_MEMORY_LOW("m_apptb_m_l"),
+    VPN_PROCESS_MEMORY_MODERATE("m_apptb_m_m"),
+    VPN_PROCESS_MEMORY_CRITICAL("m_apptb_m_c"),
     ;
 }

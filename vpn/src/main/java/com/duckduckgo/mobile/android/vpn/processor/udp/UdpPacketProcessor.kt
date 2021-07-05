@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
-import android.util.LruCache
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
@@ -28,6 +27,9 @@ import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -40,27 +42,24 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class UdpPacketProcessor(
+class UdpPacketProcessor @AssistedInject constructor(
     private val queues: VpnQueues,
-    private val networkChannelCreator: NetworkChannelCreator,
+    @Assisted private val networkChannelCreator: NetworkChannelCreator,
     private val packetPersister: PacketPersister,
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
-    private val appNameResolver: AppNameResolver
+    private val appNameResolver: AppNameResolver,
+    private val channelCache: UdpChannelCache
 ) : Runnable {
+
+    @AssistedFactory
+    interface Factory {
+        fun build(networkChannelCreator: NetworkChannelCreator): UdpPacketProcessor
+    }
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
     val selector: Selector = Selector.open()
-
-    private val channelCache = object : LruCache<String, ChannelDetails>(500) {
-        override fun entryRemoved(evicted: Boolean, key: String?, oldValue: ChannelDetails?, newValue: ChannelDetails?) {
-            Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
-            if (evicted) {
-                oldValue?.datagramChannel?.close()
-            }
-        }
-    }
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
@@ -225,7 +224,7 @@ class UdpPacketProcessor(
         return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
 
-    private data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
+    data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE

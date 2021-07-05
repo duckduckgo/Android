@@ -28,19 +28,15 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import dagger.android.AndroidInjection
@@ -58,12 +54,6 @@ import javax.inject.Inject
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     @Inject
-    lateinit var packetPersister: PacketPersister
-
-    @Inject
-    lateinit var trackerDetector: VpnTrackerDetector
-
-    @Inject
     lateinit var vpnDatabase: VpnDatabase
 
     @Inject
@@ -71,12 +61,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
-
-    @Inject
-    lateinit var localAddressDetector: LocalIpAddressDetector
-
-    @Inject
-    lateinit var originatingAppPackageIdentifier: OriginatingAppPackageIdentifierStrategy
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -94,20 +78,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
 
     @Inject
-    lateinit var appNameResolver: AppNameResolver
-
-    @Inject
     lateinit var vpnServiceCallbacksPluginPoint: PluginPoint<VpnServiceCallbacks>
 
-    private val queues = VpnQueues()
+    @Inject
+    lateinit var memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>
+
+    @Inject
+    lateinit var queues: VpnQueues
 
     private var tunInterface: ParcelFileDescriptor? = null
 
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
+    @Inject
+    lateinit var udpPacketProcessorFactory: UdpPacketProcessor.Factory
     lateinit var udpPacketProcessor: UdpPacketProcessor
 
-    lateinit var tcpPacketProcessor: TcpPacketProcessor
+    @Inject
+    lateinit var tcpPacketProcessorFactory: TcpPacketProcessor.Factory
+    private lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
 
     private var newTrackerObserverJob: Job? = null
@@ -134,18 +123,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister, originatingAppPackageIdentifier, appNameResolver)
-        tcpPacketProcessor =
-            TcpPacketProcessor(
-                queues,
-                this,
-                trackerDetector,
-                packetPersister,
-                localAddressDetector,
-                originatingAppPackageIdentifier,
-                appNameResolver,
-                this
-            )
+        udpPacketProcessor = udpPacketProcessorFactory.build(this)
+        tcpPacketProcessor = tcpPacketProcessorFactory.build(this, this)
 
         Timber.e("VPN log onCreate")
     }
@@ -334,6 +313,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     // https://developer.android.com/reference/android/app/Service.html#onTrimMemory(int)
     override fun onTrimMemory(level: Int) {
         Timber.e("VPN log onTrimMemory level $level called")
+
+        // Collect memory data info from memory collectors
+        val memoryData = mutableMapOf<String, String>()
+        memoryCollectorPluginPoint.getPlugins().forEach { memoryData.putAll(it.collectMemoryMetrics()) }
+
+        if (memoryData.isEmpty()) {
+            Timber.v("VPN log nothing to send from memory collectors")
+            return
+        }
+
+        when (level) {
+            TRIM_MEMORY_BACKGROUND -> deviceShieldPixels.vpnProcessExpendableLow(memoryData)
+            TRIM_MEMORY_MODERATE -> deviceShieldPixels.vpnProcessExpendableModerate(memoryData)
+            TRIM_MEMORY_COMPLETE -> deviceShieldPixels.vpnProcessExpendableComplete(memoryData)
+            TRIM_MEMORY_RUNNING_MODERATE -> deviceShieldPixels.vpnMemoryRunningModerate(memoryData)
+            TRIM_MEMORY_RUNNING_LOW -> deviceShieldPixels.vpnMemoryRunningLow(memoryData)
+            TRIM_MEMORY_RUNNING_CRITICAL -> deviceShieldPixels.vpnMemoryRunningCritical(memoryData)
+            else -> null /* noop */
+        }
     }
 
     private fun notifyVpnStart() {
@@ -504,7 +502,8 @@ interface NetworkChannelCreator {
     fun createSocketChannel(): SocketChannel
 }
 
-class VpnQueues {
+@VpnScope
+class VpnQueues @Inject constructor() {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
 

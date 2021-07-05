@@ -3,7 +3,7 @@
 buildscript {
     ext.kotlin_version = '1.4.30'
     ext.spotless = "5.7.0"
-    ext.anvil_version = "2.2.0"
+    ext.anvil_version = "2.2.2"
 
     // vtodo VPN
     ext.google_services = "4.3.4"

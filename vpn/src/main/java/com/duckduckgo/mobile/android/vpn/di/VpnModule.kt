@@ -33,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
+import java.nio.channels.Selector
 import javax.inject.Named
 
 @Module
@@ -108,4 +109,10 @@ class VpnModule {
         return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
     }
 
+    @VpnScope
+    @Provides
+    @TcpNetworkSelector
+    fun provideTcpNetworkSelector(): Selector {
+        return Selector.open()
+    }
 }

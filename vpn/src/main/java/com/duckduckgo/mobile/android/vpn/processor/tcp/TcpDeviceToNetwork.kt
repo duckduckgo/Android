@@ -54,7 +54,7 @@ import kotlin.system.measureNanoTime
 class TcpDeviceToNetwork(
     private val queues: VpnQueues,
     private val selector: Selector,
-    private val socketWriter: SocketWriter,
+    private val socketWriter: TcpSocketWriter,
     private val connectionInitializer: ConnectionInitializer,
     private val trackerDetector: VpnTrackerDetector,
     private val packetPersister: PacketPersister,
@@ -63,14 +63,6 @@ class TcpDeviceToNetwork(
     private val appNameResolver: AppNameResolver,
     private val vpnCoroutineScope: CoroutineScope
 ) {
-
-    var lastTimePacketConsumed = 0L
-    var totalPacketsConsumed = 0
-    var totalTimeToConsumePacket = 0L
-
-    var lastTimeProcessPacketEntered = 0L
-    var totalPacketsProcessed = 0
-    var totalTimeToProcessPackets = 0L
 
     /**
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.

@@ -16,9 +16,18 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
+import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
+import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -27,13 +36,22 @@ import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
 import java.util.*
+import javax.inject.Inject
 
-interface SocketWriter {
+interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
     fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean)
 }
 
-class TcpSocketWriter(private val selector: Selector, private val queues: VpnQueues) : SocketWriter {
+@VpnScope
+@ContributesBinding(
+    scope = VpnObjectGraph::class,
+    boundType = TcpSocketWriter::class
+)
+class RealTcpSocketWriter @Inject constructor(
+    @TcpNetworkSelector private val selector: Selector,
+    private val queues: VpnQueues
+) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
     // TODO we need to clear this queue out of socket channels sometime
     private val writeQueue = mutableMapOf<TCB, Deque<PendingWriteData>>()
@@ -117,4 +135,20 @@ class TcpSocketWriter(private val selector: Selector, private val queues: VpnQue
         )
         queues.networkToDevice.offer(responseBuffer)
     }
+
+    override fun collectMemoryMetrics(): Map<String, String> {
+        Timber.v("Collecting TCP socket write queue")
+
+        return mutableMapOf<String, String>().apply {
+            this["tcpWriteQueueSize"] = writeQueue.size.toString()
+        }
+    }
+}
+
+@Module
+@ContributesTo(VpnObjectGraph::class)
+abstract class TcpSocketWriterModule {
+    @Binds
+    @IntoSet
+    abstract fun bindTcpSocketWriterMemoryCollector(tcpSocketWriter: TcpSocketWriter): VpnMemoryCollectorPlugin
 }
