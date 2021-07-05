@@ -71,7 +71,8 @@ class TrackerDetectorClientTypeTest {
     @Test
     fun whenUrlMatchesInBlockingAndWhitelistedClientThenEvaluateReturnsNull() {
         val url = Url.BLOCKED_AND_WHITELISTED
-        assertNull(testee.evaluate(url, documentUrl))
+        val expected = TrackingEvent(documentUrl, url, null, null, false, null)
+        assertEquals(expected, testee.evaluate(url, documentUrl))
     }
 
     @Test

@@ -45,11 +45,6 @@ class TrackerDetectorImpl(
 
     override fun evaluate(url: String, documentUrl: String): TrackingEvent? {
 
-        if (whitelisted(url, documentUrl)) {
-            Timber.v("$documentUrl resource $url is whitelisted")
-            return null
-        }
-
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
@@ -63,7 +58,9 @@ class TrackerDetectorImpl(
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
-            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl), result.surrogate)
+            val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || whitelisted(url, documentUrl)
+            val isBlocked = !isDocumentInAllowedList
+            return TrackingEvent(documentUrl, url, result.categories, entity, isBlocked, result.surrogate)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
