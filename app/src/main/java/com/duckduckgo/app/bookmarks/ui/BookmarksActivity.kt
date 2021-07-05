@@ -128,7 +128,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 if (result.savedSites.isEmpty()) {
                     showMessage(getString(R.string.importBookmarksEmpty))
                 } else {
-                    // do we want different messages based on having imported favorites or bookmarks only or both?
                     showMessage(getString(R.string.importBookmarksSuccess, result.savedSites.size))
                 }
             }

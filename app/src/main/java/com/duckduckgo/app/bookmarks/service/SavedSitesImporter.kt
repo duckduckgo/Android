@@ -4,8 +4,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import org.jsoup.Jsoup
 
@@ -37,7 +36,7 @@ sealed class ImportSavedSitesResult {
 class RealSavedSitesImporter(
     private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
-    private val favoritesDao: FavoritesDao,
+    private val favoritesRepository: FavoritesRepository,
     private val savedSitesParser: SavedSitesParser
 ) : SavedSitesImporter {
 
@@ -54,7 +53,7 @@ class RealSavedSitesImporter(
 
             savedSites.forEach {
                 when (it) {
-                    is SavedSite.Favorite -> favoritesDao.insert(FavoriteEntity(title = it.title, url = it.url, position = it.position))
+                    is SavedSite.Favorite -> favoritesRepository.insert(it)
                     is SavedSite.Bookmark -> bookmarksDao.insert(BookmarkEntity(title = it.title, url = it.url))
                 }
             }
