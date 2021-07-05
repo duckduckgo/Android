@@ -57,5 +57,6 @@
     <string name="locationLabel">Location</string>
     <string name="folderLocationTitle">Select Location</string>
     <string name="addFolder">Add Folder</string>
+    <string name="editFolder">Edit Folder</string>
 
 </resources>
