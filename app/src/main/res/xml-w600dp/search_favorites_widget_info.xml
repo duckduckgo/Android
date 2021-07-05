@@ -20,7 +20,7 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/search_favorites_widget_light_col4"
     android:initialLayout="@layout/search_favorites_widget_light_col4"
-    android:minWidth="250dp"
+    android:minWidth="314dp"
     android:minHeight="110dp"
     android:configure="com.duckduckgo.app.WidgetThemeConfiguration"
     android:minResizeHeight="110dp"
