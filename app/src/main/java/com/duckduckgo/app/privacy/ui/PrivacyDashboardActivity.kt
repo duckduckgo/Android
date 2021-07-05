@@ -22,12 +22,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
@@ -69,19 +68,19 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     private fun setupObservers() {
         viewModel.viewState.observe(
             this,
-            Observer {
+            {
                 it?.let { render(it) }
             }
         )
         viewModel.command.observe(
             this,
-            Observer {
+            {
                 it?.let { processCommand(it) }
             }
         )
         repository.retrieveSiteData(intent.tabId!!).observe(
             this,
-            Observer<Site> {
+            {
                 viewModel.onSiteChanged(it)
             }
         )
@@ -112,25 +111,43 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         val toggle = viewState.toggleEnabled ?: true
         privacyBanner.setImageResource(viewState.afterGrade.banner(toggle))
         domain.text = viewState.domain
-        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, toggle).html(this)
+        renderHeading(viewState, toggle)
         httpsIcon.setImageResource(viewState.httpsStatus.icon())
         httpsText.text = viewState.httpsStatus.text(this)
         networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
         networksText.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
-        renderToggle(toggle)
+        renderToggle(toggle, viewState.isSiteInTempAllowedList)
         renderTrackerNetworkLeaderboard(viewState)
+        renderButtonContainer(viewState.isSiteInTempAllowedList)
         updateActivityResult(viewState.shouldReloadPage)
     }
 
-    private fun renderTrackerNetworkLeaderboard(viewState: ViewState) {
+    private fun renderButtonContainer(isSiteIntTempAllowedList: Boolean) {
+        if (isSiteIntTempAllowedList) {
+            buttonContainer.gone()
+        } else {
+            buttonContainer.show()
+        }
+    }
 
+    private fun renderHeading(viewState: ViewState, isPrivacyOn: Boolean) {
+        if (viewState.isSiteInTempAllowedList) {
+            heading.gone()
+            protectionsTemporarilyDisabled.show()
+        } else {
+            protectionsTemporarilyDisabled.gone()
+            heading.show()
+            heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, isPrivacyOn).html(this)
+        }
+    }
+
+    private fun renderTrackerNetworkLeaderboard(viewState: ViewState) {
         if (!viewState.shouldShowTrackerNetworkLeaderboard) {
             hideTrackerNetworkLeaderboard()
             return
         }
-
         trackerNetworkPill1.render(viewState.trackerNetworkEntries.elementAtOrNull(0), viewState.sitesVisited)
         trackerNetworkPill2.render(viewState.trackerNetworkEntries.elementAtOrNull(1), viewState.sitesVisited)
         trackerNetworkPill3.render(viewState.trackerNetworkEntries.elementAtOrNull(2), viewState.sitesVisited)
@@ -153,10 +170,11 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         trackerNetworkLeaderboardNotReady.show()
     }
 
-    private fun renderToggle(enabled: Boolean) {
+    private fun renderToggle(enabled: Boolean, isSiteIntTempAllowedList: Boolean) {
         val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGray
         privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
-        privacyToggle.isChecked = enabled
+        privacyToggle.isChecked = enabled && !isSiteIntTempAllowedList
+        privacyToggle.isEnabled = !isSiteIntTempAllowedList
     }
 
     private fun processCommand(command: Command) {

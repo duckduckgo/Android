@@ -108,6 +108,7 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -133,6 +134,7 @@ class BrowserTabViewModel(
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
+    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val favoritesRepository: FavoritesRepository,
@@ -899,7 +901,9 @@ class BrowserTabViewModel(
     }
 
     private suspend fun isWhitelisted(domain: String): Boolean {
-        return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        return withContext(dispatchers.io()) {
+            userWhitelistDao.contains(domain) || temporaryTrackingWhitelistDao.contains(domain)
+        }
     }
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
@@ -1237,7 +1241,10 @@ class BrowserTabViewModel(
 
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
+                val isWhiteListed: Boolean = site?.domain?.let { isWhitelisted(it) } ?: false
+                if (!isWhiteListed) {
+                    privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
+                }
             }
 
             withContext(dispatchers.io()) {
@@ -1984,6 +1991,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val siteFactory: Provider<SiteFactory>,
     private val tabRepository: Provider<TabRepository>,
     private val userWhitelistDao: Provider<UserWhitelistDao>,
+    private val temporaryTrackingWhitelistDao: Provider<TemporaryTrackingWhitelistDao>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
     private val bookmarksDao: Provider<BookmarksDao>,
     private val favoritesRepository: Provider<FavoritesRepository>,
@@ -2015,7 +2023,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), notificationDao.get(), variantManager.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
                 else -> null
             }
         }
