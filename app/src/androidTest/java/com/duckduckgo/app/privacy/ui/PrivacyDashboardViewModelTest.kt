@@ -35,6 +35,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchMan
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -56,6 +57,7 @@ class PrivacyDashboardViewModelTest {
 
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var mockUserWhitelistDao: UserWhitelistDao = mock()
+    private var mockTemporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao = mock()
     private var networkLeaderboardDao: NetworkLeaderboardDao = mock()
     private var networkLeaderboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
     private var sitesVisitedLiveData: LiveData<Int> = mock()
@@ -66,7 +68,7 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockTemporaryTrackingWhitelistDao, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -101,7 +103,8 @@ class PrivacyDashboardViewModelTest {
         assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
         assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
         assertTrue(viewState.allTrackersBlocked)
-        assertEquals(UNKNOWN, testee.viewState.value!!.practices)
+        assertEquals(UNKNOWN, viewState.practices)
+        assertFalse(viewState.isSiteInTempAllowedList)
     }
 
     @Test
@@ -233,6 +236,14 @@ class PrivacyDashboardViewModelTest {
         verify(mockPixel).fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is LaunchReportBrokenSite)
+    }
+
+    @Test
+    fun whenOnSiteChangedAndSiteIsInTempAllowListThenReturnTrue() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
+        testee.onSiteChanged(site)
+        assertTrue(testee.viewState.value!!.isSiteInTempAllowedList)
     }
 
     private fun givenSiteWithPrivacyOn() {
