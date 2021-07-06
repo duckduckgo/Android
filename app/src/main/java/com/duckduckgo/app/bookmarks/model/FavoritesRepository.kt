@@ -29,6 +29,7 @@ import java.io.Serializable
 interface FavoritesRepository {
     fun favoritesCountByDomain(domain: String): Int
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
+    fun favoritesSync(): List<SavedSite.Favorite>
     fun insert(title: String, url: String): SavedSite.Favorite
     fun insert(favorite: SavedSite.Favorite)
     fun update(favorite: SavedSite.Favorite)
@@ -66,6 +67,8 @@ class FavoritesDataRepository(
 
     override fun favoritesObservable() =
         favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
+
+    override fun favoritesSync() = favoritesDao.favoritesSync().mapToSavedSites()
 
     override fun insert(title: String, url: String): SavedSite.Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url

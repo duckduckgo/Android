@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.service
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -26,12 +27,11 @@ import com.nhaarman.mockitokotlin2.whenever
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class RealBookmarksManagerTest {
+class SavedSitesManagerTest {
 
     @get:Rule
     @Suppress("unused")
@@ -41,21 +41,21 @@ class RealBookmarksManagerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private var importer: BookmarksImporter = mock()
-    private var exporter: BookmarksExporter = mock()
+    private var importer: SavedSitesImporter = mock()
+    private var exporter: SavedSitesExporter = mock()
     private var pixel: Pixel = mock()
-    private lateinit var testee: RealBookmarksManager
+    private lateinit var testee: RealSavedSitesManager
 
     @Before
     fun before() {
-        testee = RealBookmarksManager(importer, exporter, pixel)
+        testee = RealSavedSitesManager(importer, exporter, pixel)
     }
 
     @Test
     fun whenBookmarksImportSucceedsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
         val importedBookmarks = listOf(aBookmark())
-        whenever(importer.import(someUri)).thenReturn(ImportBookmarksResult.Success(importedBookmarks))
+        whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedBookmarks))
 
         testee.import(someUri)
 
@@ -63,9 +63,20 @@ class RealBookmarksManagerTest {
     }
 
     @Test
-    fun whenBookmarksImportFailsThenPixelIsSent() = runBlocking {
+    fun whenFavoritesImportSucceedsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
-        whenever(importer.import(someUri)).thenReturn(ImportBookmarksResult.Error(Exception()))
+        val importedFavorites = listOf(aFavorite())
+        whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedFavorites))
+
+        testee.import(someUri)
+
+        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedFavorites.size.toString()))
+    }
+
+    @Test
+    fun whenSavedSitesImportFailsThenPixelIsSent() = runBlocking {
+        val someUri = Uri.parse("")
+        whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Error(Exception()))
 
         testee.import(someUri)
 
@@ -73,9 +84,9 @@ class RealBookmarksManagerTest {
     }
 
     @Test
-    fun whenBookmarksExportSucceedsThenPixelIsSent() = runBlocking {
+    fun whenSavedSitesExportSucceedsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
-        whenever(exporter.export(someUri)).thenReturn(ExportBookmarksResult.Success)
+        whenever(exporter.export(someUri)).thenReturn(ExportSavedSitesResult.Success)
 
         testee.export(someUri)
 
@@ -83,17 +94,20 @@ class RealBookmarksManagerTest {
     }
 
     @Test
-    fun whenBookmarksExportFailsThenPixelIsSent() = runBlocking {
+    fun whenSavedSitesExportFailsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
-        whenever(exporter.export(someUri)).thenReturn(ExportBookmarksResult.Error(Exception()))
+        whenever(exporter.export(someUri)).thenReturn(ExportSavedSitesResult.Error(Exception()))
 
         testee.export(someUri)
 
         verify(pixel).fire(AppPixelName.BOOKMARK_EXPORT_ERROR)
     }
 
-    private fun aBookmark(): Bookmark {
-        return Bookmark("title", "url")
+    private fun aBookmark(): SavedSite.Bookmark {
+        return SavedSite.Bookmark(0, "title", "url")
     }
 
+    private fun aFavorite(): SavedSite.Favorite {
+        return SavedSite.Favorite(0, "title", "url", 0)
+    }
 }
