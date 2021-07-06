@@ -41,6 +41,7 @@ import javax.inject.Inject
 interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
     fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean)
+    fun removeFromWriteQueue(tcb: TCB)
 }
 
 @VpnScope
@@ -53,17 +54,20 @@ class RealTcpSocketWriter @Inject constructor(
     private val queues: VpnQueues
 ) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
-    // TODO we need to clear this queue out of socket channels sometime
     private val writeQueue = mutableMapOf<TCB, Deque<PendingWriteData>>()
 
     override fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean) {
         val queue = pendingWriteData.tcb.writeQueue()
         if (skipQueue) queue.addFirst(pendingWriteData) else queue.add(pendingWriteData)
-        Timber.v("Added to write queue. Size is now ${queue.size} for ${getLogLabel(pendingWriteData.tcb)}")
+        Timber.v("Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue", queue.size, getLogLabel(pendingWriteData.tcb), writeQueue.keys.size)
     }
 
-    private fun getLogLabel(tcb: TCB) =
-        "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
+    override fun removeFromWriteQueue(tcb: TCB) {
+        writeQueue.remove(tcb)
+        Timber.v("Removed from write queue: there are %d TCB instances in the write queue", writeQueue.keys.size)
+    }
+
+    private fun getLogLabel(tcb: TCB) = "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
 
     @Synchronized
     private fun TCB.writeQueue(): Deque<PendingWriteData> {
@@ -107,7 +111,7 @@ class RealTcpSocketWriter @Inject constructor(
     }
 
     private fun partiallyWritten(writeData: PendingWriteData, bytesWritten: Int, payloadBuffer: ByteBuffer, payloadSize: Int) {
-        Timber.e("Hey hey, hey. now what? %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
+        Timber.e("Partially written data. %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
 
         addToWriteQueue(writeData, skipQueue = true)
 
@@ -139,9 +143,20 @@ class RealTcpSocketWriter @Inject constructor(
     override fun collectMemoryMetrics(): Map<String, String> {
         Timber.v("Collecting TCP socket write queue")
 
+        val writeQueueSize = writeQueue.size
+
+        // take this opportunity to remove any TCBs which were evicted from the TCB cache and haven't been cleaned up yet
+        removeEvictedTCBs()
+
         return mutableMapOf<String, String>().apply {
-            this["tcpWriteQueueSize"] = writeQueue.size.toString()
+            this["tcpWriteQueueSize"] = writeQueueSize.toString()
         }
+    }
+
+    private fun removeEvictedTCBs() {
+        val removalList = writeQueue.keys.filter { it.connectionEvicted }
+        removalList.forEach { writeQueue.remove(it) }
+        Timber.v("Cleaned up evicted TCBs. Removed %d", removalList.size)
     }
 }
 

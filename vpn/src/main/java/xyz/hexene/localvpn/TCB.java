@@ -45,6 +45,8 @@ public class TCB {
     public String requestingAppPackage = null;
     public String requestingAppName = null;
 
+    public Boolean connectionEvicted = false;
+
     @Nullable public String hostName = null;
 
     // TCP has more states, but we need only these
@@ -69,16 +71,16 @@ public class TCB {
     public SelectionKey selectionKey;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
-    public static LRUCache<String, TCB> tcbCache =
+    public static final LRUCache<String, TCB> tcbCache =
             new LRUCache<>(
                     MAX_CACHE_SIZE,
-                    new LRUCache.CleanupCallback<String, TCB>() {
-                        @Override
-                        public void cleanup(Map.Entry<String, TCB> eldest) {
-                            Timber.w("Closing old TCB: %s", eldest.getKey());
-                            eldest.getValue().closeChannel();
-                        }
-                    });
+                    (LRUCache.CleanupCallback<String, TCB>)
+                            eldest -> {
+                                TCB evicted = eldest.getValue();
+                                evicted.connectionEvicted = true;
+                                Timber.w("Closing old TCB: %s", eldest.getKey());
+                                evicted.closeChannel();
+                            });
 
     public static TCB getTCB(String ipAndPort) {
         synchronized (tcbCache) {
@@ -90,6 +92,7 @@ public class TCB {
         synchronized (tcbCache) {
             tcbCache.put(ipAndPort, tcb);
         }
+        Timber.v("TCB cache size has now reached %d entries", tcbCache.size());
     }
 
     public TCB(

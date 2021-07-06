@@ -48,6 +48,7 @@ class TcpNetworkToDevice(
     private val selector: Selector,
     private val tcpSocketWriter: TcpSocketWriter,
     private val packetPersister: PacketPersister,
+    private val tcbCloser: TCBCloser,
     private val vpnCoroutineScope: CoroutineScope
 ) {
 
@@ -171,7 +172,8 @@ class TcpNetworkToDevice(
         packet.updateTcpBuffer(buffer, (RST or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
         tcb.sequenceNumberToClient++
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
-        TCB.closeTCB(tcb)
+
+        tcbCloser.closeConnection(tcb)
     }
 
     private fun processConnect(key: SelectionKey) {
@@ -202,7 +204,8 @@ class TcpNetworkToDevice(
             packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
 
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
-            TCB.closeTCB(tcb)
+
+            tcbCloser.closeConnection(tcb)
         }
     }
 

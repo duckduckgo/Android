@@ -63,11 +63,13 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
 
         val inPacketLength = vpnInput.read(bufferToNetwork)
         if (inPacketLength == 0) {
+            ByteBufferPool.release(bufferToNetwork)
             return
         }
 
         if (bufferToNetwork[0] == 0.toByte()) {
             Timber.i("Control message; ignore this")
+            ByteBufferPool.release(bufferToNetwork)
             return
         }
 
@@ -78,7 +80,6 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
         } else if (packet.isTCP) {
             queues.tcpDeviceToNetwork.offer(packet)
         }
-        return
     }
 
     private fun byteBuffer(): ByteBuffer {

@@ -344,7 +344,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
             // update running time regularly with specified intervals
             while (isActive) {
-                delay(1_000)
+                delay(30_000)
                 writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
             }
         }
@@ -388,8 +388,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         const val VPN_REMINDER_NOTIFICATION_ID = 999
         const val VPN_FOREGROUND_SERVICE_ID = 200
-
-        const val FIVE_HOURS = 18000000L
 
         private fun serviceIntent(context: Context): Intent {
             return Intent(context, TrackerBlockingVpnService::class.java)
@@ -514,8 +512,7 @@ class VpnQueues @Inject constructor() {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
 
-    val networkToDevice: BlockingDeque<ByteBuffer> = LinkedBlockingDeque<ByteBuffer>()
-    // val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue()
+    val networkToDevice: BlockingDeque<ByteBuffer> = LinkedBlockingDeque()
 
     fun clearAll() {
         tcpDeviceToNetwork.clear()

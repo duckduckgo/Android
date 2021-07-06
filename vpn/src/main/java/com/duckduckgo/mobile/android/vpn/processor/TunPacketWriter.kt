@@ -51,8 +51,8 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
     }
 
     private fun executeWriteLoop(vpnOutput: FileChannel) {
+        val bufferFromNetwork = queues.networkToDevice.take() ?: return
         try {
-            val bufferFromNetwork = queues.networkToDevice.take() ?: return
             bufferFromNetwork.flip()
 
             while (bufferFromNetwork.hasRemaining()) {
@@ -63,10 +63,10 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
                     Timber.v("Wrote %d bytes to TUN", bytesWrittenToVpn)
                 }
             }
-
-            ByteBufferPool.release(bufferFromNetwork)
         } catch (e: IOException) {
             Timber.w(e, "Failed writing to the TUN")
+        } finally {
+            ByteBufferPool.release(bufferFromNetwork)
         }
     }
 

@@ -57,6 +57,7 @@ class TcpPacketProcessor @AssistedInject constructor(
     originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     appNameResolver: AppNameResolver,
     @TcpNetworkSelector selector: Selector,
+    private val tcbCloser: TCBCloser,
     tcpSocketWriter: TcpSocketWriter,
     @Assisted private val vpnCoroutineScope: CoroutineScope
 ) : Runnable {
@@ -74,6 +75,7 @@ class TcpPacketProcessor @AssistedInject constructor(
         selector = selector,
         tcpSocketWriter = tcpSocketWriter,
         packetPersister = packetPersister,
+        tcbCloser = tcbCloser,
         vpnCoroutineScope = vpnCoroutineScope
     )
     private val tcpDeviceToNetwork =
@@ -87,6 +89,7 @@ class TcpPacketProcessor @AssistedInject constructor(
             localAddressDetector = localAddressDetector,
             originatingAppPackageResolver = originatingAppPackageResolver,
             appNameResolver = appNameResolver,
+            tcbCloser = tcbCloser,
             vpnCoroutineScope = vpnCoroutineScope
         )
 
@@ -239,38 +242,6 @@ class TcpPacketProcessor @AssistedInject constructor(
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
             }
-        }
-
-        @Synchronized
-        fun TCB.sendResetPacket(queues: VpnQueues, packet: Packet, payloadSize: Int) {
-            val buffer = ByteBufferPool.acquire()
-
-            var responseAck = acknowledgementNumberToClient + payloadSize
-            val responseSeq = acknowledgementNumberToServer
-
-            if (packet.tcpHeader.isFIN) {
-                responseAck = increaseOrWraparound(responseAck, 1)
-            }
-
-            synchronized(this) {
-                Timber.i(
-                    "%s - Sending RST, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
-                    ipAndPort,
-                    responseSeq, responseAck,
-                    sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
-                )
-
-                this.referencePacket.updateTcpBuffer(buffer, (RST or ACK).toByte(), responseSeq, responseAck, 0)
-            }
-            queues.networkToDevice.offerFirst(buffer)
-            TCB.closeTCB(this)
-        }
-
-        @Synchronized
-        fun TCB.closeConnection(buffer: ByteBuffer) {
-            Timber.v("Closing TCB connection $ipAndPort")
-            ByteBufferPool.release(buffer)
-            TCB.closeTCB(this)
         }
 
         fun TCB.logAckSeqDetails(): String {

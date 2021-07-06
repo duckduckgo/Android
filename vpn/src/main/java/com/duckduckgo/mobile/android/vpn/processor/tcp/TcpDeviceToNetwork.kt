@@ -21,11 +21,9 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.increaseOrWraparound
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendAck
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendResetPacket
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
@@ -61,6 +59,7 @@ class TcpDeviceToNetwork(
     private val localAddressDetector: LocalIpAddressDetector,
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     private val appNameResolver: AppNameResolver,
+    private val tcbCloser: TCBCloser,
     private val vpnCoroutineScope: CoroutineScope
 ) {
 
@@ -164,11 +163,12 @@ class TcpDeviceToNetwork(
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
                 SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
                 SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
-                CloseConnection -> tcb.closeConnection(responseBuffer)
+                CloseConnection -> closeConnection(tcb, responseBuffer)
+                SendReset -> tcbCloser.sendResetPacket(tcb, queues, packet, packet.tcpPayloadSize(true))
                 DelayedCloseConnection -> {
                     vpnCoroutineScope.launch {
                         delay(3_000)
-                        tcb.closeConnection(responseBuffer)
+                        closeConnection(tcb, responseBuffer)
                     }
                 }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -176,6 +176,11 @@ class TcpDeviceToNetwork(
             }
 
         }
+    }
+
+    private fun closeConnection(tcb: TCB, responseBuffer: ByteBuffer) {
+        tcbCloser.closeConnection(tcb)
+        ByteBufferPool.release(responseBuffer)
     }
 
     private fun openConnection(params: TcpConnectionParams) {
@@ -223,7 +228,7 @@ class TcpDeviceToNetwork(
 
             if (requestType is RequestTrackerType.Tracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
-                tcb.sendResetPacket(queues, packet, payloadSize)
+                tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
                 return
             }
 
@@ -256,13 +261,19 @@ class TcpDeviceToNetwork(
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
                 Timber.w(e, "Network write error for ${tcb.ipAndPort}. Wrote $bytesWritten; $bytesUnwritten unwritten")
-                tcb.sendResetPacket(queues, packet, bytesWritten)
+                tcbCloser.sendResetPacket(tcb, queues, packet, bytesWritten)
                 return
             }
         }
     }
 
-    private fun determineIfTracker(tcb: TCB, packet: Packet, requestingApp: OriginatingApp, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
+    private fun determineIfTracker(
+        tcb: TCB,
+        packet: Packet,
+        requestingApp: OriginatingApp,
+        payloadBuffer: ByteBuffer,
+        isLocalAddress: Boolean
+    ): RequestTrackerType {
         if (tcb.trackerTypeDetermined) {
             return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
                 tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
