@@ -61,7 +61,14 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, filenameExtractor.extract(pendingDownload)) else null
+        file = if (!pendingDownload.isDataUrl) {
+            when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
+                is FilenameExtractor.FilenameExtractionResult.Guess -> null
+                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(pendingDownload.directory, filenameExtraction.filename)
+            }
+        } else {
+            null
+        }
     }
 
     private fun setupViews(view: View) {
