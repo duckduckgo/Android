@@ -101,7 +101,7 @@ android {
     lintOptions {
         abortOnError false
     }
-    testOptions {
+     testOptions {
         unitTests.returnDefaultValues = true
 
         if (USE_ORCHESTRATOR) {

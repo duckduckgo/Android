@@ -63,7 +63,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             .map { if (it.isEmpty()) listOf(TrackerFeedItem.TrackerEmptyFeed) else it }
             .onStart {
                 startTickerRefresher()
-                emit(listOf(TrackerFeedItem.TrackerEmptyFeed))
+                emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
+                delay(2000)
             }
     }
 

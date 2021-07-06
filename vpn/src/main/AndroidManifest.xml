@@ -51,7 +51,7 @@
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:theme="@style/Theme.AndroidVpn"
+            android:theme="@style/Theme.AndroidVpn.Trackers"
             android:label="@string/deviceShieldActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             />
@@ -62,6 +62,12 @@
             android:label="@string/deviceShieldMostRecentActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
+
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity"
+            android:label="@string/deviceShieldExclusionListActivityTitle"
+            android:theme="@style/Theme.AndroidVpn"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"/>
 
         <service
             android:name=".service.TrackerBlockingVpnService"

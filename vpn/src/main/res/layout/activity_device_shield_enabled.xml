@@ -86,7 +86,7 @@
 
             <Button
                 android:id="@+id/onboarding_enabled_activity_cta"
-                style="@style/DeviceShieldOnboardingCta"
+                style="@style/DeviceShieldTransparentRoundedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"

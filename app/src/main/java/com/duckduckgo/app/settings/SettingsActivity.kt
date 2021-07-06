@@ -30,7 +30,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.beta.BetaFeaturesActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
@@ -52,12 +51,16 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsActivity :
@@ -116,7 +119,7 @@ class SettingsActivity :
         automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
         emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
-        betaFeaturesSetting.setOnClickListener { viewModel.onBetaFeatureSettingsClicked() }
+        deviceShieldSetting.setOnClickListener { viewModel.onDeviceShieldSettingClicked() }
     }
 
     private fun configureAppLinksToggle() {
@@ -142,6 +145,7 @@ class SettingsActivity :
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     setEmailSetting(it.emailSetting)
                     appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
+                    updateDeviceShieldSettings(it.deviceShieldEnabled, it.deviceShieldOnboardingShown)
                 }
             }.launchIn(lifecycleScope)
 
@@ -214,7 +218,8 @@ class SettingsActivity :
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is Command.LaunchBetaFeatures -> launchBetaFeaturesScreen()
+            is Command.LaunchDeviceShieldReport -> launchDeviceShieldReport()
+            is Command.LaunchDeviceShieldOnboarding -> launchDeviceShieldOnboarding()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.LaunchEmailDialog -> launchEmailDialog()
@@ -230,6 +235,18 @@ class SettingsActivity :
             setAsDefaultBrowserSetting.visibility = View.VISIBLE
         } else {
             setAsDefaultBrowserSetting.visibility = View.GONE
+        }
+    }
+
+    private fun updateDeviceShieldSettings(deviceShieldEnabled: Boolean, deviceShieldOnboardingShown: Boolean) {
+        if (!deviceShieldOnboardingShown) {
+            deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldNeverEnabled))
+        } else {
+            if (deviceShieldEnabled) {
+                deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldEnabled))
+            } else {
+                deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldDisabled))
+            }
         }
     }
 
@@ -276,9 +293,14 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
-    private fun launchBetaFeaturesScreen() {
+    private fun launchDeviceShieldReport() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BetaFeaturesActivity.intent(this), options)
+        startActivity(DeviceShieldTrackerActivity.intent(this), options)
+    }
+
+    private fun launchDeviceShieldOnboarding() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivityForResult(DeviceShieldOnboardingActivity.intent(this), REQUEST_DEVICE_SHIELD_ONBOARDING, options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -297,6 +319,7 @@ class SettingsActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
+            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboardingResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -304,6 +327,15 @@ class SettingsActivity :
     private fun handleFeedbackResult(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
             Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun handleDeviceShieldOnboardingResult(resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            Timber.i("VPN enabled during device shield onboarding")
+            startActivity(DeviceShieldEnabledActivity.intent(this))
+        } else {
+            Timber.i("VPN NOT enabled during device shield onboarding")
         }
     }
 

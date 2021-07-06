@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity
 import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.ActivityObjectGraph

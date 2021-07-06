@@ -18,6 +18,8 @@
 
     <attr name="daxLogoTextColor" format="color" />
     <attr name="normalTextColor" format="color" />
+    <attr name="secondaryTextColor" format="color" />
+    <attr name="headerDescriptionColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
@@ -71,6 +73,5 @@
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
-    <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
 
 </resources>

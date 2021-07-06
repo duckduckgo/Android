@@ -2052,7 +2052,7 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
-                    showCta(viewState.cta, viewState.favorites)
+                    showCta(viewState)
                 } else {
                     hideHomeCta()
                     hideDaxCta()
@@ -2061,11 +2061,11 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-            when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta -> showDaxCta(configuration)
-                is DialogCta -> showDaxDialogCta(configuration)
+        private fun showCta(viewState: CtaViewState) {
+            when (viewState.cta) {
+                is HomePanelCta -> showHomeCta(viewState.cta, viewState.favorites)
+                is DaxBubbleCta -> showDaxCta(viewState.cta)
+                is DialogCta -> showDaxDialogCta(viewState.cta)
             }
         }
 
@@ -2098,7 +2098,10 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeCta(configuration: HomePanelCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showHomeCta(
+            configuration: HomePanelCta,
+            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+        ) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
@@ -2112,20 +2115,17 @@ class BrowserTabFragment :
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
                 homeBackgroundLogo.showLogo()
-                fragmentDeviceShieldContainer.show()
-                deviceShieldFragmentContainer.show()
             } else {
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
-                fragmentDeviceShieldContainer.show()
-                deviceShieldFragmentContainer.show()
-
             }
+
+            newTabQuickAcessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            deviceShieldFragmentContainer.gone()
+            newTabQuickAcessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {

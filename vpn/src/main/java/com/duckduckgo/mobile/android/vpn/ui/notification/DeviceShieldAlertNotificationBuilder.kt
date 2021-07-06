@@ -55,7 +55,7 @@ class DeviceShieldAlertNotificationBuilder {
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
             val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntent(DeviceShieldTrackerActivity.intent(context))
+                addNextIntentWithParentStack(Intent(context, Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")))
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 

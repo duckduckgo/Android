@@ -51,7 +51,7 @@
 
             <TextView
                 android:id="@+id/activity_message"
-                style="@style/DeviceShield.PrivacyReport.PastWeekCounters"
+                style="@style/DeviceShield.PrivacyReport.TrackerEntry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="10 trackers blocked in Uber app" />
@@ -68,11 +68,9 @@
 
             <TextView
                 android:id="@+id/activity_time_since"
-                style="@style/DeviceShield.PrivacyReport.PastWeekCounters"
+                style="@style/DeviceShield.PrivacyReport.Time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/warmerGray"
-                android:textSize="14sp"
                 tools:text="2m ago" />
         </LinearLayout>
 

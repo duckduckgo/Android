@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,13 +44,14 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     private var config: ActivityFeedConfig = defaultConfig
 
+    private var feedListener: DeviceShieldActivityFeedListener? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-
         trackerFeedAdapter.showTimeWindowHeadings(config.showTimeWindowHeadings)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
@@ -57,10 +59,24 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         }
 
         addRepeatingJob(Lifecycle.State.CREATED) {
-            activityFeedViewModel.getMostRecentTrackers(DeviceShieldActivityFeedViewModel.TimeWindow(config.timeWindow.toLong(), config.timeWindowUnits))
+            activityFeedViewModel.getMostRecentTrackers(
+                DeviceShieldActivityFeedViewModel.TimeWindow(
+                    config.timeWindow.toLong(),
+                    config.timeWindowUnits
+                )
+            )
                 .collect {
+                    feedListener?.onTrackerListShowed(it.size)
                     trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows))
                 }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is DeviceShieldActivityFeedListener) {
+            feedListener = context
         }
     }
 
@@ -71,7 +87,8 @@ class DeviceShieldActivityFeedFragment : Fragment() {
             maxRows = Int.MAX_VALUE,
             timeWindow = 5,
             timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true
+            showTimeWindowHeadings = true,
+            minRowsForAllActivity = 6
         )
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
@@ -85,8 +102,14 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         val maxRows: Int,
         val timeWindow: Int,
         val timeWindowUnits: TimeUnit,
-        val showTimeWindowHeadings: Boolean
+        val showTimeWindowHeadings: Boolean,
+        val minRowsForAllActivity: Int
     ) {
         fun unboundedRows(): Boolean = maxRows == Int.MAX_VALUE
     }
+
+    interface DeviceShieldActivityFeedListener {
+        fun onTrackerListShowed(totalTrackers: Int)
+    }
+
 }

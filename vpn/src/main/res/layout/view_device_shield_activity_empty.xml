@@ -16,17 +16,34 @@
   ~ limitations under the License.
   -->
 
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_empty_view"
-    style="@style/DeviceShield.PrivacyReport.Toggle"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:gravity="center"
-    android:textSize="16sp"
-    android:text="@string/deviceShieldActivityEmptyListMessage"
-    android:visibility="visible"
-    android:textColor="@color/warmerGray"
-    android:background="?colorPrimary"
-    />
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="24dp">
 
+    <ImageView
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_apptb_default" />
+
+    <TextView
+        android:layout_marginTop="16dp"
+        style="@style/DeviceShieldOnboardingHeaderStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/deviceShieldActivityEmptyListTitle" />
+
+    <TextView
+        style="@style/DeviceShieldOnboardingTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        android:text="@string/deviceShieldActivityEmptyListMessage" />
+
+</LinearLayout>

@@ -1,28 +1,22 @@
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M11,0C4.9249,0 0,4.9249 0,11C0,17.0751 4.9249,22 11,22C17.0751,22 22,17.0751 22,11C22,8.0826 20.8411,5.2847 18.7782,3.2218C16.7153,1.1589 13.9174,0 11,0ZM3.9759,4.7711L9.1684,4.7711L3.9759,17.2289L3.9759,4.7711ZM12.1451,17.2289L11.1537,14.7241L8.7258,14.7241L11.0027,9.3619L14.3133,17.2289L12.1451,17.2289ZM18.0373,17.2289L12.8342,4.7711L18.0373,4.7711L18.0373,17.2289Z"
-      android:strokeWidth="1"
-      android:fillColor="@color/grayishTwo"
-      android:fillType="nonZero"
-      android:strokeColor="#00000000"/>
+      android:pathData="M12,24C18.6274,24 24,18.6274 24,12C24,5.3726 18.6274,0 12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24Z"
+      android:fillColor="#ffffff"
+      android:fillType="evenOdd"/>
+  <group>
+    <clip-path
+        android:pathData="M12,24C18.6274,24 24,18.6274 24,12C24,5.3726 18.6274,0 12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24Z"
+        android:fillType="evenOdd"/>
+    <path
+        android:pathData="M12,25C19.1797,25 25,19.1797 25,12H23C23,18.0751 18.0751,23 12,23V25ZM25,12C25,4.8203 19.1797,-1 12,-1V1C18.0751,1 23,5.9249 23,12H25ZM12,-1C4.8203,-1 -1,4.8203 -1,12H1C1,5.9249 5.9249,1 12,1V-1ZM-1,12C-1,19.1797 4.8203,25 12,25V23C5.9249,23 1,18.0751 1,12H-1Z"
+        android:fillColor="#E5E5E5"/>
+  </group>
+  <path
+      android:pathData="M18.7604,6.0528V18L13.7527,6.0528H18.7604ZM5.2395,6.0528V18L10.2473,6.0528H5.2395ZM9.818,15.5663L11.9642,10.4155L15.1834,17.9987H13.1088L12.1072,15.5663H9.818Z"
+      android:fillColor="#FF0000"
+      android:fillType="evenOdd"/>
 </vector>

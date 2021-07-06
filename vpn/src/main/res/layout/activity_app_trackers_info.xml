@@ -60,17 +60,6 @@
                 android:paddingEnd="35dp"
                 android:text="@string/trackerProfilingInfoFirstParagraph" />
 
-            <TextView
-                android:id="@+id/trackerProfilingInfoHyperlink"
-                style="@style/DeviceShieldOnboardingFAQTextStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:paddingStart="35dp"
-                android:paddingEnd="35dp"
-                android:text="@string/trackerProfilingInfoHyperlink"
-                android:textColor="@color/cornflowerBlue" />
-
             <ImageView
                 android:layout_marginTop="60dp"
                 android:layout_marginBottom="60dp"

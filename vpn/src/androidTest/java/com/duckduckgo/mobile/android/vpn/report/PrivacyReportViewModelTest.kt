@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.runBlocking
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.mock
@@ -57,6 +58,7 @@ class PrivacyReportViewModelTest {
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
+    private val onboardingStore = mock<DeviceShieldOnboardingStore>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -72,7 +74,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, vpnPreferences, deviceShieldPixels, context)
+        testee = PrivacyReportViewModel(repository, deviceShieldPixels, onboardingStore, context)
     }
 
     private fun prepareDb() {

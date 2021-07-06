@@ -31,7 +31,7 @@
         android:foreground="@android:color/transparent">
 
         <LinearLayout
-            android:id="@+id/deviceShieldFragmentContainer"
+            android:id="@+id/newTabQuickAcessItemsLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -43,7 +43,6 @@
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragmentDeviceShieldContainer"
                 android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

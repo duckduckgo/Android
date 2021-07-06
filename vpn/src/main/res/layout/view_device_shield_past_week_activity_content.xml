@@ -29,10 +29,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="@color/warmerGray"
-        android:paddingBottom="8dp"
+        android:paddingBottom="4dp"
         android:textAllCaps="true"
         android:textSize="12sp"
-        android:text="Blocked"
+        android:text="@string/deviceShieldActivityPastWeekBlocked"
         tools:text="Blocked"
         />
 
@@ -44,7 +44,6 @@
         android:layout_gravity="center"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium"
-        android:textColor="@color/almostBlackDark"
         tools:text="31,306"
         />
 
@@ -55,9 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="14sp"
-        android:text="Trackers"
+        android:text="@string/deviceShieldActivityPastWeekAcross"
         android:textAllCaps="false"
-        android:textColor="@color/almostBlackDark"
         tools:text="Trackers"
         />
 

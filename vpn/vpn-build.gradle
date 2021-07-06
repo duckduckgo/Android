@@ -99,6 +99,9 @@ dependencies {
     // Lottie
     implementation "com.airbnb.android:lottie:_"
 
+    // Shimmer
+    implementation "com.facebook.shimmer:shimmer:_"
+
     // Dagger
     compileOnly "org.glassfish:javax.annotation:10.0-b28"
     implementation Google.dagger

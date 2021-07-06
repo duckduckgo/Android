@@ -36,12 +36,12 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
+import com.facebook.shimmer.ShimmerFrameLayout
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class TrackerFeedAdapter @Inject constructor(
-    private val timeDiffFormatter: TimeDiffFormatter,
-    private val context: Context
+    private val timeDiffFormatter: TimeDiffFormatter
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
@@ -51,12 +51,13 @@ class TrackerFeedAdapter @Inject constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData)
-            is TrackerEmptyFeedViewHolder -> holder.bind(context.getString(R.string.deviceShieldActivityEmptyListMessage))
+            is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
+            LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
             EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder.create(parent)
             DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent)
             else -> TrackerFeedHeaderViewHolder.create(parent, timeDiffFormatter)
@@ -67,6 +68,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     override fun getItemViewType(position: Int): Int {
         return when (trackerFeedItems[position]) {
+            is TrackerFeedItem.TrackerLoadingSkeleton -> LOADING_STATE_TYPE
             is TrackerFeedItem.TrackerEmptyFeed -> EMPTY_STATE_TYPE
             is TrackerFeedItem.TrackerFeedData -> DATA_STATE_TYPE
             is TrackerFeedItem.TrackerFeedItemHeader -> HEADER_TYPE
@@ -95,17 +97,29 @@ class TrackerFeedAdapter @Inject constructor(
         this.showHeadings = showHeadings
     }
 
-    private class TrackerEmptyFeedViewHolder(val view: TextView) : RecyclerView.ViewHolder(view) {
+    private class TrackerEmptyFeedViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         companion object {
             fun create(parent: ViewGroup): TrackerEmptyFeedViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                val view: TextView = inflater.inflate(R.layout.view_device_shield_activity_empty, parent, false) as TextView
+                val view = inflater.inflate(R.layout.view_device_shield_activity_empty, parent, false)
                 return TrackerEmptyFeedViewHolder(view)
             }
         }
+    }
 
-        fun bind(text: String) {
-            view.text = text
+    private class TrackerSkeletonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        companion object {
+            fun create(parent: ViewGroup): TrackerSkeletonViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                val view = inflater.inflate(R.layout.view_device_shield_activity_skeleton_entry, parent, false)
+                return TrackerSkeletonViewHolder(view)
+            }
+        }
+
+        var shimmerLayout: ShimmerFrameLayout = view.findViewById(R.id.shimmerFrameLayout)
+
+        fun bind() {
+            shimmerLayout.startShimmer()
         }
     }
 
@@ -196,8 +210,9 @@ class TrackerFeedAdapter @Inject constructor(
     }
 
     companion object {
-        private const val EMPTY_STATE_TYPE = 0
-        private const val DATA_STATE_TYPE = 1
-        private const val HEADER_TYPE = 2
+        private const val LOADING_STATE_TYPE = 0
+        private const val EMPTY_STATE_TYPE = 1
+        private const val DATA_STATE_TYPE = 2
+        private const val HEADER_TYPE = 3
     }
 }

@@ -137,17 +137,28 @@
         <item quantity="other">In the past week, we blocked %d trackers from %s in other apps</item>
     </plurals>
 
+    <!-- Settings -->
+    <string name="settingsDeviceShieldTitle">Device Shield</string>
+    <string name="settingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
+    <string name="settingsDeviceShieldEnabled">Enabled</string>
+    <string name="settingsDeviceShieldDisabled">Disabled</string>
+
     <!-- Device Shield Onboarding -->
     <string name="deviceShieldOnboardingLogoDescription">Enable Device Shield</string>
     <string name="deviceShieldOnboardingLastPageOneTitle">One easy step for better app privacy</string>
-    <string name="deviceShieldOnboardingLatsPageOneSubtitle">In 2021, we found that <b>70% of popular apps</b> allow other companies to track your personal information, even when you’re sleeping.\n\n<b>See which of your apps</b> do this and <b>take back control</b> with Device Shield.</string>
-    <string name="deviceShieldOnboardingLastPageTwoTitle">What is Device Shield?</string>
-    <string name="deviceShieldOnboardingLastPageTwoSubTitle">Device Shield <b>prevents most companies from collecting your data</b> through apps they don’t own.\n\nWorking in the background, it helps <b>protect you night and day.</b></string>
-    <string name="deviceShieldOnboardingLastPageThreeTitle">Who sees your data?</string>
-    <string name="deviceShieldOnboardingLastPageThreeSubTitle"><b>Device Shield is free</b>, and you can enjoy all your apps as you normally would.\n\nDevice Shield uses a VPN connection differently than a standard VPN. <b>It never sends data off your device to DuckDuckGo.</b></string>
-    <string name="deviceShieldOnboardingDescription">Device Shield uses a virtual private network (VPN) permission to block many hidden trackers in other apps you’ve installed.\n\nUnlike a regular VPN, Device Shield doesn’t send any personal information from your device to DuckDuckGo.</string>
+    <string name="deviceShieldOnboardingLatsPageOneSubtitle">In 2021, we found that <b>70% of popular apps</b> allow other companies to track your personal information, even when you’re sleeping.\n\n<b>See which of your apps are on this list</b> and <b>take back control</b> with Device Shield.</string>
+    <string name="deviceShieldOnboardingLastPageTwoTitle">What Device Shield does</string>
+    <string name="deviceShieldOnboardingLastPageTwoSubTitle">Device Shield <b>blocks app trackers from other companies</b>, like when Facebook attempts to track you in a banking app.\n\n<b>It\'s free</b>, and you can enjoy your apps as your normally would. Working in the background, it helps <b>protect you night and day.</b></string>
+    <string name="deviceShieldOnboardingLastPageThreeTitle">Device Shield is not a VPN</string>
+    <string name="deviceShieldOnboardingLastPageThreeSubTitle">However, your device will recognize it as one. This is because Device Shield uses a local ’’VPN connection’’ to work. \n\nDevice Shield is different <b>because it never sends your data to a server.</b></string>
     <string name="deviceShieldOnboardingCta">Ask My Permission</string>
     <string name="deviceShieldFAQCta">Device Shield FAQ</string>
+
+    <!--  Device Shield Enabled Activity -->
+    <string name="deviceShieldEnabledTitle">Hooray! You’re all set up.</string>
+    <string name="deviceShieldEnabledMessage">Device Shield shows a <b>real-time summary</b> of which apps allow other companies to track you.</string>
+    <string name="deviceShieldEnabledActivityCTA">View Device Shield</string>
+    <string name="deviceShieldEnabledSettings">You can access Device Shield in <annotation type="settings_link">Settings.</annotation></string>
 
     <!-- New Tab Integration -->
     <string name="deviceShieldNewTabSuffix">" (past hour)."</string>
@@ -172,19 +183,7 @@
         <item quantity="other">in %1$s and %2$d other apps</item>
     </plurals>
 
-    <!-- Beta Features -->
-    <string name="betaFeaturesActivityTitle">Beta Features</string>
-    <string name="betaFeaturesTitle">Beta Features</string>
-    <string name="betaFeaturesSubtitle">Try new features we’re working on</string>
-    <string name="betaFeaturesDescription">For a limited time, you can try new features before we release them. Beta features are experimental and may affect device performance.</string>
-    <string name="betaFeaturesEnableDeviceShield">Enable Device Shield</string>
-    <string name="deviceShieldExcludedAppsSubtitle">Apps excluded so they work normally</string>
-
-    <!--  Beta Features - Device Shield  -->
-    <string name="deviceShield">Device Shield</string>
-    <string name="deviceShieldPrivacyReport">Device Shield Activity</string>
-    <string name="deviceShieldPrivacyReportSubtitle">View a summary of trackers blocked</string>
-    <string name="deviceShieldBlockTrackers">Block trackers in apps on your device</string>
+    <!-- Exclusion List -->
     <string name="deviceShieldExcludedApps">Excluded Apps</string>
     <string name="deviceShieldExclusionListActivityTitle">Excluded Apps</string>
     <string name="deviceShieldExcludedAppsFeature">Device Shield doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
@@ -193,15 +192,15 @@
     <string name="trackerProfilingActivityTitle">About App Trackers</string>
     <string name="trackerProfilingInfoTitle">What are app trackers?</string>
     <string name="trackerProfilingInfoFirstParagraph">You’ve probably heard about companies like Google and Facebook tracking you behind the scenes on third-party websites. But did you know they also track your personal information through apps on your device?\n\nIn 2021, DuckDuckGo found that <b>over 70% of 100 of the top apps on Android contain trackers from major companies like Facebook, Google, and Amazon.</b> Over 70% of those same apps send personal data to at least one of these companies, even when you’re not using your device.\n\n<b>Trackers in apps may have access to a lot more information</b> than their website tracker cousins, such as your location down to which floor of a building you\'re on, how often you play games while at work, and when and how long you sleep each day. <b>Even if you haven’t given apps explicit permission to collect data, they can still take it without your knowledge.</b>\n\nTracking networks like Facebook and Google use these little pieces of information <b>to build a digital profile about you.</b> With it, tracking networks can manipulate what you see online and allow advertisers to bid on access to you based on your data.\n\nTrackers in apps is a BIG problem for privacy. <b>But DuckDuckGo has a solution that can help.</b>\n\nWhen enabled in the DuckDuckGo Privacy Browser app, Device Shield blocks many trackers in other apps, not just the trackers we find on websites when you browse. <b>These dual layers of protection reduce what companies know about you overall</b>, so you can use your apps with more peace of mind, knowing you’re more protected.</string>
-    <string name="trackerProfilingInfoHyperlink">Learn more about Device Shield</string>
 
     <!--  Device Shield Activity -->
     <string name="deviceShieldActivityPastWeek">Past Week</string>
-    <string name="deviceShieldActivityTitle">Device Shield Activity</string>
+    <string name="deviceShieldActivityTitle">Device Shield</string>
     <string name="deviceShieldMostRecentActivityTitle">All Recent Activity</string>
-    <string name="deviceShieldActivityMostRecent">Most Recent</string>
+    <string name="deviceShieldActivityRecentActivity">Recent Activity</string>
     <string name="deviceShieldActivityCtaShowAll">View All Recent Activity</string>
-    <string name="deviceShieldActivityCtaFAQ">What are app trackers?</string>
+    <string name="deviceShieldActivityAppTrackersFAQ">What Are App Trackers?</string>
+    <string name="deviceShieldActivityBetaInstructions">Beta Instructions</string>
     <string name="deviceShieldActivityTrackersBlocked">%d tracking attempts blocked in <![CDATA[<b>%s</b>]]> app</string>
     <string name="deviceShieldActivityTrackersCountOne">from %1$s</string>
     <string name="deviceShieldActivityTrackersCountTwo">from %1$s and 1 other</string>
@@ -209,7 +208,8 @@
     <string name="deviceShieldActivityToday">Today</string>
     <string name="deviceShieldActivityYesterday">Yesterday</string>
     <string name="deviceShieldActivityDaysAgo">%d days ago</string>
-    <string name="deviceShieldActivityEmptyListMessage">No Activity Yet</string>
+    <string name="deviceShieldActivityEmptyListTitle">No new activity</string>
+    <string name="deviceShieldActivityEmptyListMessage">Keep using your device. Tracking attempts that Device Shield blocks appear here.</string>
     <string name="deviceShieldActivityPastWeekDefault">-</string>
     <string name="deviceShieldActivityPastWeekBlocked">Blocked</string>
     <string name="deviceShieldActivityPastWeekAcross">Across</string>
@@ -221,21 +221,17 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-
-    <!--  Device Shield Enabled Activity -->
-    <string name="deviceShieldEnabledTitle">Hooray! You’re all set up.</string>
-    <string name="deviceShieldEnabledMessage">Device Shield Activity shows a <b>real-time summary</b> of which apps allow other companies to track you.</string>
-    <string name="deviceShieldEnabledActivityCTA">View Device Shield Activity</string>
-    <string name="deviceShieldEnabledSettings">Manage Device Shield and view excluded apps in <annotation type="settings_link">Settings.</annotation></string>
+    <string name="deviceShieldActivityEnabledLabel">You\'re a beta tester. Notice a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="deviceShieldActivityDisabledLabel"><b>Device Shield is disabled</b>\nDid Device Shield cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
 
     <!--  Device Shield FAQ -->
     <string name="deviceShieldFAQActivityTitle">Device Shield FAQ</string>
     <string name="deviceShieldFAQFirstHeader">What trackers does Device Shield block?</string>
-    <string name="deviceShieldFAQFirstText">Device Shield <b>blocks known trackers</b> that it identifies <b>from third-party companies, or those different from the company that owns each app.</b> For example, if Facebook owns the app, Device Shield doesn’t block its trackers, but would block trackers from Google or Amazon. We’re always on the lookout for other trackers for Device Shield to block.\n\nSome apps and known trackers might be excluded automatically based on whether they’d work properly with Device Shield enabled. </string>
+    <string name="deviceShieldFAQFirstText">Device Shield <b>blocks known trackers</b> that it identifies <b>from third-party companies, or those different from the company that owns each app.</b> For example, if Facebook owns the app, Device Shield doesn’t block its trackers, but would block trackers from Google or Amazon. We’re always on the lookout for other trackers for Device Shield to block.\n\nSome apps and known trackers might be excluded automatically based on whether they’d work properly with Device Shield enabled.</string>
     <string name="deviceShieldFAQSecondHeader">Why does Device Shield use a VPN connection?</string>
     <string name="deviceShieldFAQSecondText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for Device Shield to work.</b>\n\nThis permission, which works only on your device, allows Device Shield to monitor network traffic <b>so that it can block known trackers.</b></string>
     <string name="deviceShieldFAQThirdHeader">How is Device Shield different from a VPN?</string>
-    <string name="deviceShieldFAQThirdText">A traditional VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. <b>However, this allows the VPN company to see your network traffic.</b>\n\n<b>Device Shield is different.</b> Instead of sending your data to a VPN server, <b>Device Shield works only on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever Device Shield recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
+    <string name="deviceShieldFAQThirdText">A VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. However, this allows the VPN company to see your network traffic.\n\n<b>Device Shield is different.</b> Instead of sending your data to a VPN server, <b>Device Shield works only on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever Device Shield recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
     <string name="deviceShieldFAQFourthHeader">Is my data private?</string>
     <string name="deviceShieldFAQFourthText">Device Shield works only on your device and doesn’t send your data off your device to DuckDuckGo. <b>We don’t collect or store any data from your apps.</b></string>
 

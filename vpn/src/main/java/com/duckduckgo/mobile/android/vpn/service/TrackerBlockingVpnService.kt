@@ -43,6 +43,8 @@ import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.Response
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -411,7 +413,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         // So for us it's still valid because we don't need to know third party services, just ours.
         @Suppress("DEPRECATION")
         fun isServiceRunning(context: Context): Boolean {
-            val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            val manager = kotlin.runCatching {
+                context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            }.getOrElse {
+                return false
+            }
+
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (TrackerBlockingVpnService::class.java.name == service.service.className) {
                     return true

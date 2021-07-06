@@ -29,6 +29,8 @@ import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
@@ -103,6 +105,11 @@ class DeviceShieldFragment : Fragment() {
     private fun renderViewState(
         state: PrivacyReportViewModel.PrivacyReportView.ViewState
     ) {
+        if (state.onboardingComplete) {
+            this.view?.show()
+        } else {
+            this.view?.gone()
+        }
         if (state.isRunning) {
             if (state.trackersBlocked.trackers > 0) {
                 renderTrackersBlockedWhenEnabled(state.trackersBlocked)

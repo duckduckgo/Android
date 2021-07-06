@@ -68,7 +68,6 @@
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
         <item name="savedSiteSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
@@ -150,7 +149,6 @@
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
-        <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
         <item name="savedSiteSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
@@ -244,12 +242,16 @@
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
 
-    <style name="Theme.AndroidVpn" parent="Theme.AppCompat.Light">
+    <style name="Theme.AndroidVpn" parent="Theme.MaterialComponents.Light.Bridge">
         <item name="colorPrimary">@color/whiteFive</item>
         <item name="colorPrimaryDark">@color/whiteFive</item>
         <item name="colorAccent">@color/warmBlue</item>
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="normalTextColor">@color/almostBlackDark</item>
+        <item name="secondaryTextColor">@color/brownishGrayTwo</item>
+        <item name="settingsMinorTextColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="Theme.AndroidVpn.NoActionBar">
@@ -259,6 +261,10 @@
 
     <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
         <item name="android:statusBarColor">@color/grey</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.Trackers">
+        <item name="colorAccent">@color/cornflowerGreen</item>
     </style>
 
     <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />

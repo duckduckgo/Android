@@ -110,6 +110,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <ImageButton
         android:id="@+id/onboarding_next_cta"
         style="@style/OnboardingButtonCircleCta"
@@ -127,7 +128,7 @@
         android:id="@+id/onboarding_cta_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
         android:orientation="vertical"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
@@ -138,7 +139,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/onboarding_switch_layout"
-            style="@style/DeviceShieldOnboardingCta"
+            style="@style/DeviceShield.Button.Blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -175,12 +176,10 @@
 
         <Button
             android:id="@+id/onboarding_faq_cta"
-            style="@style/DeviceShieldOnboardingCta"
+            style="@style/DeviceShield.Button.Transparent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@drawable/onboarding_faq_device_shield_cta_bg"
-            android:src="@drawable/ic_baseline_arrow_forward_24"
             android:text="@string/deviceShieldFAQCta"
             android:textColor="@color/cornflowerBlue" />
 

@@ -382,8 +382,6 @@ class BrowserTabViewModelTest {
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
-            notificationDao = mockNotificationDao,
-            variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,

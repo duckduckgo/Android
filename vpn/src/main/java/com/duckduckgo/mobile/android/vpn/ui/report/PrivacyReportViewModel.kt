@@ -27,18 +27,22 @@ import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val vpnPreferences: VpnPreferences,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val applicationContext: Context,
 ) : ViewModel(), LifecycleObserver {
 
@@ -47,11 +51,10 @@ class PrivacyReportViewModel(
     )
 
     val viewStateFlow = vpnRunningState.combine(getReport()) { runningState, trackersBlocked ->
-        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked)
+        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked, deviceShieldOnboarding.hasOnboardingBeenShown())
     }
 
-    private fun pollDeviceShieldState() {
-
+    fun pollDeviceShieldState() {
         viewModelScope.launch {
             while (isActive) {
                 val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
@@ -86,13 +89,8 @@ class PrivacyReportViewModel(
         deviceShieldPixels.enableFromNewTab()
     }
 
-    fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
-    fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
-    fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
-    fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
-
     object PrivacyReportView {
-        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked)
+        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked, val onboardingComplete: Boolean)
         data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
         data class TrackersBlocked(val latestApp: String, val otherAppsSize: Int, val trackers: Int)
     }
@@ -101,8 +99,8 @@ class PrivacyReportViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class PrivacyReportViewModelFactory @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-    private val vpnPreferences: VpnPreferences,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val context: Context
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -111,8 +109,8 @@ class PrivacyReportViewModelFactory @Inject constructor(
                 isAssignableFrom(PrivacyReportViewModel::class.java) -> (
                     PrivacyReportViewModel(
                         appTrackerBlockingStatsRepository,
-                        vpnPreferences,
                         deviceShieldPixels,
+                        deviceShieldOnboardingStore,
                         context
                     ) as T
                     )

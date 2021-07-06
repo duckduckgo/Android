@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.*
@@ -37,6 +38,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -48,12 +51,14 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class SettingsViewModel(
+    private val appContext: Context,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val emailManager: EmailManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val deviceShieldOnboarding: DeviceShieldOnboardingStore
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -70,7 +75,9 @@ class SettingsViewModel(
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
         val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
-        val appLinksEnabled: Boolean = true
+        val appLinksEnabled: Boolean = true,
+        val deviceShieldEnabled: Boolean = false,
+        val deviceShieldOnboardingShown: Boolean = false
     )
 
     sealed class EmailSetting {
@@ -92,7 +99,8 @@ class SettingsViewModel(
         object LaunchAppIcon : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         object LaunchGlobalPrivacyControl : Command()
-        object LaunchBetaFeatures : Command()
+        object LaunchDeviceShieldReport : Command()
+        object LaunchDeviceShieldOnboarding : Command()
         object UpdateTheme : Command()
         object LaunchEmailDialog : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
@@ -129,9 +137,23 @@ class SettingsViewModel(
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
                     emailSetting = getEmailSetting(),
-                    appLinksEnabled = settingsDataStore.appLinksEnabled
+                    appLinksEnabled = settingsDataStore.appLinksEnabled,
+                    deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+                    deviceShieldOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
                 )
             )
+
+            viewModelScope.launch {
+                while (isActive) {
+                    val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                    if (currentViewState().deviceShieldEnabled != isDeviceShieldEnabled) {
+                        viewState.value = currentViewState().copy(
+                            deviceShieldEnabled = isDeviceShieldEnabled
+                        )
+                    }
+                    delay(1_000)
+                }
+            }
         }
     }
 
@@ -200,8 +222,12 @@ class SettingsViewModel(
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
     }
 
-    fun onBetaFeatureSettingsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchBetaFeatures) }
+    fun onDeviceShieldSettingClicked() {
+        if (viewState.value.deviceShieldOnboardingShown) {
+            viewModelScope.launch { command.send(Command.LaunchDeviceShieldReport) }
+        } else {
+            viewModelScope.launch { command.send(Command.LaunchDeviceShieldOnboarding) }
+        }
     }
 
     fun onEmailLogout() {
@@ -332,17 +358,30 @@ class SettingsViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class SettingsViewModelFactory @Inject constructor(
+    private val context: Provider<Context>,
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
     private val emailManager: Provider<EmailManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
-    private val pixel: Provider<Pixel>
+    private val pixel: Provider<Pixel>,
+    private val deviceShieldOnboarding: Provider<DeviceShieldOnboardingStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (
+                    SettingsViewModel(
+                        context.get(),
+                        settingsDataStore.get(),
+                        defaultWebBrowserCapability.get(),
+                        variantManager.get(),
+                        emailManager.get(),
+                        fireAnimationLoader.get(),
+                        pixel.get(),
+                        deviceShieldOnboarding.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

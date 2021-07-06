@@ -24,6 +24,8 @@
     <TextView
         android:id="@+id/settingsGeneralTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingGeneral"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,6 +34,8 @@
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/lightThemeToggle"
         style="@style/SettingsSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsLightTheme"
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"

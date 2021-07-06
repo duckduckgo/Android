@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="34dp"
+    android:height="16dp"
+    android:viewportWidth="34"
+    android:viewportHeight="16">
+    <path
+        android:pathData="M2.5,0L31.5,0A2,2 0,0 1,33.5 2L33.5,14A2,2 0,0 1,31.5 16L2.5,16A2,2 0,0 1,0.5 14L0.5,2A2,2 0,0 1,2.5 0z"
+        android:fillColor="#FDD20A"/>
+    <path
+        android:pathData="M5.4131,11.5V4.3906H7.9033C8.766,4.3906 9.4202,4.5566 9.8662,4.8887C10.3122,5.2175 10.5352,5.7009 10.5352,6.3389C10.5352,6.6872 10.4456,6.9948 10.2666,7.2617C10.0876,7.5254 9.8385,7.7191 9.5195,7.8428C9.8841,7.9339 10.1706,8.1178 10.3789,8.3945C10.5905,8.6712 10.6963,9.0098 10.6963,9.4102C10.6963,10.0938 10.4782,10.6113 10.042,10.9629C9.6058,11.3145 8.984,11.4935 8.1768,11.5H5.4131ZM6.8779,8.4043V10.3232H8.1328C8.4779,10.3232 8.7464,10.2419 8.9385,10.0791C9.1338,9.9131 9.2315,9.6852 9.2315,9.3955C9.2315,8.7445 8.8945,8.4141 8.2207,8.4043H6.8779ZM6.8779,7.3691H7.9619C8.7008,7.3561 9.0703,7.0615 9.0703,6.4854C9.0703,6.1631 8.9759,5.932 8.7871,5.792C8.6016,5.6488 8.307,5.5771 7.9033,5.5771H6.8779V7.3691ZM16.0771,8.419H13.2646V10.3232H16.5654V11.5H11.7998V4.3906H16.5557V5.5771H13.2646V7.2715H16.0771V8.419ZM22.874,5.5771H20.6963V11.5H19.2314V5.5771H17.083V4.3906H22.874V5.5771ZM27.1416,10.0352H24.5732L24.085,11.5H22.5273L25.1738,4.3906H26.5312L29.1924,11.5H27.6348L27.1416,10.0352ZM24.9688,8.8486H26.7461L25.8525,6.1875L24.9688,8.8486Z"
+        android:fillColor="#222222"/>
+</vector>

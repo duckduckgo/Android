@@ -23,35 +23,37 @@
     <TextView
         android:id="@+id/settingsPrivacyTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingPrivacy"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/globalPrivacyControlSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:subtitle="test test test"
-        app:title="@string/globalPrivacyControlSetting"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
+        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle"
+        app:subtitle="test test test"
+        app:title="@string/globalPrivacyControlSetting" />
 
     <TextView
         android:id="@+id/fireproofWebsites"
         style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsFireproofWebsites"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/globalPrivacyControlSetting" />
 
     <TextView
         android:id="@+id/locationPermissions"
         style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsPreciseLocation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fireproofWebsites" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
@@ -75,38 +77,39 @@
     <TextView
         android:id="@+id/whitelist"
         style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsPrivacyProtectionWhitelist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/settingsEmailAutofill"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/whitelist" />
+        app:layout_constraintTop_toBottomOf="@id/whitelist"
+        app:title="@string/settingsEmailAutofill" />
 
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/appLinksToggle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:toggleTitle="@string/settingTitleOpenLinksInAssociatedApps"
-        app:toggleSubTitle="@string/settingSubtitleOpenLinksInAssociatedApps"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailSetting" />
+        app:layout_constraintTop_toBottomOf="@id/emailSetting"
+        app:toggleSubTitle="@string/settingSubtitleOpenLinksInAssociatedApps"
+        app:toggleTitle="@string/settingTitleOpenLinksInAssociatedApps" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/betaFeaturesSetting"
+    <com.duckduckgo.app.settings.db.SettingsPillWithSubtitle
+        android:id="@+id/deviceShieldSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="@string/betaFeaturesTitle"
-        app:subtitle="@string/betaFeaturesSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appLinksToggle" />
+        app:layout_constraintTop_toBottomOf="@id/appLinksToggle"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/settingsDeviceShieldDisabled"
+        app:pillTitle="@string/settingsDeviceShieldTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

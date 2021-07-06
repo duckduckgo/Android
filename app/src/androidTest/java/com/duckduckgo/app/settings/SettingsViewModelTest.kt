@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -36,6 +37,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -77,6 +79,12 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockEmailManager: EmailManager
 
+    @Mock
+    lateinit var mockContext: Context
+
+    @Mock
+    private lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -87,12 +95,14 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         testee = SettingsViewModel(
+            mockContext,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockEmailManager,
             mockFireAnimationLoader,
-            mockPixel
+            mockPixel,
+            deviceShieldOnboardingStore
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -549,6 +559,34 @@ class SettingsViewModelTest {
             testee.onAutomaticallyClearWhenClicked()
 
             assertEquals(Command.ShowClearWhenDialog(APP_EXIT_ONLY), expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeviceShieldOnboardingHasNotBeenShownThenClickingOnDeviceShieldOpensDeviceShieldOnboarding() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+
+            whenever(deviceShieldOnboardingStore.hasOnboardingBeenShown()).thenReturn(false)
+
+            testee.onDeviceShieldSettingClicked()
+
+            assertEquals(Command.LaunchDeviceShieldOnboarding, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeviceShieldOnboardingHasBeenShownThenClickingOnDeviceShieldOpensDeviceShieldTracker() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+
+            whenever(deviceShieldOnboardingStore.hasOnboardingBeenShown()).thenReturn(true)
+
+            testee.onDeviceShieldSettingClicked()
+
+            assertEquals(Command.LaunchDeviceShieldReport, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }

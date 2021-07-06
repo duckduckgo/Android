@@ -31,6 +31,8 @@ sealed class TrackerFeedItem(open val id: Int) {
 
     object TrackerEmptyFeed : TrackerFeedItem(0)
 
+    object TrackerLoadingSkeleton : TrackerFeedItem(0)
+
     data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
 }
 
