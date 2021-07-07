@@ -53,7 +53,7 @@
             <RadioButton
                 android:id="@+id/widgetConfigThemeSystem"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
@@ -64,7 +64,7 @@
             <RadioButton
                 android:id="@+id/widgetConfigThemeLight"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
@@ -75,7 +75,7 @@
             <RadioButton
                 android:id="@+id/widgetConfigThemeDark"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:textColor="@color/almostBlackDark"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
@@ -83,17 +83,19 @@
                 android:text="Dark" />
         </RadioGroup>
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/widgetConfigAddWidgetButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:backgroundTint="@color/cornflowerBlue"
+            android:layout_height="36dp"
+            android:background="@drawable/button_contained_bg"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             android:layout_gravity="end"
             android:textAllCaps="true"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
             android:textColor="@color/white"
             android:letterSpacing="0.0"
-            app:cornerRadius="4dp"
             android:layout_marginTop="16dp"
             android:text="Add widget"/>
     </LinearLayout>
