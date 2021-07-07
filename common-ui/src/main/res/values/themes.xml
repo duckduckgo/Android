@@ -99,6 +99,7 @@
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
+        <item name="quickAccessItemTitleTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -190,6 +191,7 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+        <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
