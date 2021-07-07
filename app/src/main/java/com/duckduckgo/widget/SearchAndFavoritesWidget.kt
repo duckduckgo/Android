@@ -21,6 +21,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.RemoteViews
@@ -176,7 +177,13 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun getCurrentWidgetSize(context: Context, minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
-        var columns = calculateColumns(context, minWidth)
+        val orientation = context.resources.configuration.orientation
+        val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            maxWidth
+        } else {
+            minWidth
+        }
+        var columns = calculateColumns(context, width)
         var rows = calculateRows(context, maxHeight)
 
         columns = if (columns < 2) 2 else columns
