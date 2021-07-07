@@ -43,8 +43,6 @@ import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.Response
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer

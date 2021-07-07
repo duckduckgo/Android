@@ -50,6 +50,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         scheduleUndesiredStopReminderAlarm()
         cancelReminderForTomorrow()
         hideReminderNotification()
+        enableReminderReceiver()
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
@@ -81,27 +82,10 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )
-
-        val receiver = ComponentName(context, VpnReminderReceiver::class.java)
-
-        context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
     }
 
     private fun cancelUndesiredStopReminderAlarm() {
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
-
-        // this alarm is only intended for the cases where the VPN turned itself off and not because the user wanted to
-        val receiver = ComponentName(context, VpnReminderReceiver::class.java)
-
-        context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        )
     }
 
     private fun cancelReminderForTomorrow() {
@@ -125,5 +109,16 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
             .build()
 
         workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
+    }
+
+    //
+    private fun enableReminderReceiver() {
+        val receiver = ComponentName(context, VpnReminderReceiver::class.java)
+
+        context.packageManager.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP
+        )
     }
 }

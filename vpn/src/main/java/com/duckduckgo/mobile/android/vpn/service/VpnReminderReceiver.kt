@@ -19,13 +19,10 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
 import dagger.android.AndroidInjection
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -49,13 +46,6 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
         Timber.i("VpnReminderReceiver onReceive ${intent.action}")
         val pendingResult = goAsync()
-        if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == TrackerBlockingVpnService.ACTION_VPN_REMINDER) {
-            Timber.v("Checking if VPN is running")
-
-            goAsync(pendingResult) {
-                reminderManager.showReminderNotificationIfVpnDisabled(context)
-            }
-        }
 
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
@@ -64,18 +54,6 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 TrackerBlockingVpnService.startService(context)
             }
         }
-    }
-
-    private fun wasReminderNotificationShown(context: Context): Boolean {
-        return prefs(context).getBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
-    }
-
-    private fun notificationWasShown(context: Context) {
-        prefs(context).edit { putBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
-    }
-
-    private fun prefs(context: Context): SharedPreferences {
-        return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
     }
 
 }
