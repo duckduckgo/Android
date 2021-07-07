@@ -32,7 +32,6 @@ import com.duckduckgo.app.global.baseHost
 import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
 import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
 import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
-import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(
@@ -43,13 +42,11 @@ class BookmarksAdapter(
 ) : ListAdapter<BookmarksAdapter.BookmarksItemTypes, BookmarkScreenViewHolders>(BookmarksDiffCallback()) {
 
     companion object {
-        const val BOOKMARK_SECTION_TITLE_TYPE = 0
-        const val EMPTY_STATE_TYPE = 1
-        const val BOOKMARK_TYPE = 2
+        const val EMPTY_STATE_TYPE = 0
+        const val BOOKMARK_TYPE = 1
     }
 
     interface BookmarksItemTypes
-    object Header : BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
 
@@ -60,7 +57,7 @@ class BookmarksAdapter(
         }
 
     private fun generateNewList(value: List<BookmarksItemTypes>): List<BookmarksItemTypes> {
-        return listOf(Header) + (if (value.isEmpty()) listOf(EmptyHint) else value)
+        return if (value.isEmpty()) listOf(EmptyHint) else value
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkScreenViewHolders {
@@ -69,10 +66,6 @@ class BookmarksAdapter(
             BOOKMARK_TYPE -> {
                 val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
                 return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
-            }
-            BOOKMARK_SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_section_title, parent, false)
-                return BookmarkScreenViewHolders.SectionTitle(view)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_saved_site_empty_hint, parent, false)
@@ -89,9 +82,6 @@ class BookmarksAdapter(
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
                 holder.update((bookmarkItems[position] as BookmarkItem).bookmark)
             }
-            is BookmarkScreenViewHolders.SectionTitle -> {
-                holder.bind()
-            }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()
             }
@@ -100,7 +90,6 @@ class BookmarksAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (bookmarkItems[position]) {
-            is Header -> BOOKMARK_SECTION_TITLE_TYPE
             is EmptyHint -> EMPTY_STATE_TYPE
             else -> BOOKMARK_TYPE
 
@@ -109,12 +98,6 @@ class BookmarksAdapter(
 }
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    class SectionTitle(itemView: View) : BookmarkScreenViewHolders(itemView) {
-        fun bind() {
-            itemView.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
-        }
-    }
 
     class EmptyHint(itemView: View) : BookmarkScreenViewHolders(itemView) {
         fun bind() {
