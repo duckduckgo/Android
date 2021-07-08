@@ -16,22 +16,22 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.referral.PlayStoreAppReferrerStateListener
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
-class StoreReferralModule {
-
-    @Provides
-    fun appInstallationReferrerParser(): AppInstallationReferrerParser {
-        return QueryParamReferrerParser()
-    }
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [StoreReferralModule::class]
+)
+class PlayStoreReferralModule {
 
     @Provides
     @Singleton
@@ -44,10 +44,4 @@ class StoreReferralModule {
     fun providedReferrerAtbInitializerListener(
         playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
     ): AtbInitializerListener = playStoreAppReferrerStateListener
-
-    @Provides
-    @Singleton
-    fun appReferrerDataStore(context: Context): AppReferrerDataStore {
-        return AppReferenceSharePreferences(context)
-    }
 }
