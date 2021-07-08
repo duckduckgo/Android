@@ -35,6 +35,7 @@ interface FavoritesRepository {
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
     fun favoritesBlockingGet(): List<SavedSite.Favorite>
+    fun userHasFavorites(): Boolean
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -98,6 +99,10 @@ class FavoritesDataRepository(
 
     override fun favoritesBlockingGet(): List<SavedSite.Favorite> {
         return favoritesDao.favoritesSync().mapToSavedSites()
+    }
+
+    override fun userHasFavorites(): Boolean {
+        return favoritesDao.userHasFavorites()
     }
 
     override suspend fun delete(favorite: SavedSite.Favorite) {
