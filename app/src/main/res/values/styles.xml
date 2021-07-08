@@ -534,12 +534,11 @@
     <style name="SearchWidgetFavoritesGrid">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_marginStart">4dp</item>
         <item name="android:layout_marginTop">@dimen/searchWidgetFavoritesTopMargin</item>
-        <item name="android:layout_marginEnd">4dp</item>
         <item name="android:verticalSpacing">@dimen/searchWidgetFavoritesVerticalSpacing</item>
-        <item name="android:horizontalSpacing">4dp</item>
+        <item name="android:horizontalSpacing">@dimen/searchWidgetFavoritesHorizontalSpacing</item>
         <item name="android:scrollbars">none</item>
+        <item name="android:listSelector">#00000000</item>
     </style>
 
     <style name="SearchWidgetEmtpyFavoritesHintContainer">

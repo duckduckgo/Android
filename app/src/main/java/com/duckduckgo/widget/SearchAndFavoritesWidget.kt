@@ -198,15 +198,15 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     private fun calculateColumns(context: Context, width: Int): Int {
         val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesSideMargin).toDp()
         val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
-        val divider = 4
+        val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesHorizontalSpacing).toDp()
         var n = 2
-        var totalSize = (n * item) + ((n - 1) * divider) + margins
+        var totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
 
         Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
 
         while (totalSize < width) {
             ++n
-            totalSize = (n * item) + ((n - 1) * divider) + margins
+            totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
             Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
         }
         return n - 1
