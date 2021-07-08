@@ -73,4 +73,7 @@
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
 
+    <attr name="textAppearanceButton1" format="reference" />
+    <attr name="textAppearanceButton2" format="reference" />
+
 </resources>

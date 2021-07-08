@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
@@ -254,6 +254,63 @@
 
     <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <!-- The platform theme layer allows us to account for API specific attributes.
+Using resource qualifiers, we can specify a different platform theme for different versions of Android. -->
+    <style name="Platform.Theme.DuckDuckGo" parent="Platform.V27.Theme.DuckDuckGo" />
+
+    <!--  Our base theme, Base.Theme.DuckDuckGo,
+    is where we override or define default styles for views and text appearance attributes. -->
+    <style name="Base.Theme.DuckDuckGo" parent="Platform.Theme.DuckDuckGo">
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">?android:attr/colorBackground</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorSurface</item>
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">?attr/colorControlHighlight</item>
+
+        <item name="bottomSheetDialogTheme">@style/Widget.DuckDuckGo.BottomSheetDialog</item>
+        <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
+        <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.Snackbar</item>
+    </style>
+
+    <!-- The app theme will mostly contain values for colour attributes -->
+    <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
+        <!--Material color attributes (light theme) -->
+        <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
+        <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
+        <!--selection controls.-->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorSecondary">@color/green_200</item>
+        <item name="colorSecondaryVariant">@color/green_500</item>
+        <!--colorBackground appears behind scrollable content and is used for the default window-->
+        <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
+        <!--and menus. colorError is used to indicate an error state for components such as-->
+        <!--text fields.-->
+        <item name="android:colorBackground">@color/white_50</item>
+        <item name="colorSurface">@color/white_50</item>
+        <item name="colorError">@color/red_600</item>
+        <!--"On" colors define how text, icons and strokes are colored in relation to the surface-->
+        <!--on which they appear.-->
+        <item name="colorOnPrimary">@color/white_50</item>
+        <item name="colorOnSecondary">@color/black_900</item>
+        <item name="colorOnBackground">@color/black_900</item>
+        <item name="colorOnSurface">@color/black_900</item>
+        <item name="colorOnError">@color/white_50</item>
+
+        <!--Material type attributes-->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.DuckDuckGo.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.DuckDuckGo.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.DuckDuckGo.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.DuckDuckGo.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.DuckDuckGo.Headline5</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.DuckDuckGo.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.DuckDuckGo.Body2</item>
+        <item name="textAppearanceButton">@style/TextAppearance.DuckDuckGo.Button1</item>
+        <item name="textAppearanceButton1">@style/TextAppearance.DuckDuckGo.Button1</item>
+        <item name="textAppearanceButton2">@style/TextAppearance.DuckDuckGo.Button2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.DuckDuckGo.Caption</item>
     </style>
 
 </resources>
