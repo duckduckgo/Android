@@ -16,17 +16,20 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.httpsupgrade.store.EmptyHttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.store.FDroidHttpsEmbeddedDataPersister
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 class HttpsPersisterModule {
 
     @Provides
     fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
-        return FDroidHttpsEmbeddedDataPersister()
+        return EmptyHttpsEmbeddedDataPersister()
     }
 
 }

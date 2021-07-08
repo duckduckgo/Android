@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.store
+package com.duckduckgo.app.di
 
-import timber.log.Timber
+import com.duckduckgo.app.statistics.config.DefaultStatisticsLibraryConfig
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
-interface HttpsEmbeddedDataPersister {
-
-    fun shouldPersistEmbeddedData(): Boolean
-
-    fun persistEmbeddedData()
-
-}
-
-class EmptyHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
-
-    override fun shouldPersistEmbeddedData(): Boolean {
-        Timber.d("Ignoring, empty persister does not use embedded data")
-        return false
-    }
-
-    override fun persistEmbeddedData() {
-        Timber.d("Ignoring, empty persister does not use embedded data")
-    }
+@Module
+@ContributesTo(AppObjectGraph::class)
+class StatisticsLibraryConfigModule {
+    @Provides
+    @Singleton
+    fun provideStatisticsLibraryConfig(): StatisticsLibraryConfig = DefaultStatisticsLibraryConfig()
 }

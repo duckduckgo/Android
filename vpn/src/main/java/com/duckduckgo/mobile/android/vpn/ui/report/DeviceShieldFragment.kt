@@ -74,7 +74,6 @@ class DeviceShieldFragment : Fragment() {
         deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
         deviceShieldCtaImageView = view.findViewById(R.id.deviceShieldCtaImage)
         deviceShieldCtaLayout.setOnClickListener {
-            viewModel.onDeviceShieldEnabled()
             val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity()).toBundle()
             startActivity(DeviceShieldTrackerActivity.intent(requireActivity()), options)
         }

@@ -60,6 +60,22 @@ data class VpnRunningStats(
     val timeRunningMillis: Long
 )
 
+enum class VpnServiceState {
+    ENABLED, DISABLED, INVALID
+}
+
+@Entity(tableName = "vpn_service_state_stats")
+data class VpnServiceStateStats(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val timestamp: String = DatabaseDateFormatter.timestamp(),
+    val state: VpnServiceState
+)
+
+data class BucketizedVpnServiceStateStats(
+    val day: String,
+    @Embedded val vpnServiceStateStats: VpnServiceStateStats
+)
+
 @Entity(tableName = "vpn_preferences")
 data class VpnPreferences(
     @PrimaryKey val preference: String,

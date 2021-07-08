@@ -85,10 +85,6 @@ class PrivacyReportViewModel(
         }
     }
 
-    fun onDeviceShieldEnabled() {
-        deviceShieldPixels.enableFromNewTab()
-    }
-
     object PrivacyReportView {
         data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked, val onboardingComplete: Boolean)
         data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)

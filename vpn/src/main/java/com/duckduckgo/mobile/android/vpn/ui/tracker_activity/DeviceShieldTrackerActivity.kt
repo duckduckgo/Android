@@ -106,7 +106,7 @@ class DeviceShieldTrackerActivity :
         showDeviceShieldActivity()
         observeViewModel()
 
-        deviceShieldPixels.didShowPrivacyReport()
+        deviceShieldPixels.didShowSummaryTrackerActivity()
     }
 
     private fun bindViews() {
@@ -221,6 +221,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchMostRecentActivity() {
+        deviceShieldPixels.didShowDetailedTrackerActivity()
         startActivity(DeviceShieldMostRecentActivity.intent(this))
     }
 

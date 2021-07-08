@@ -84,9 +84,9 @@ class DeviceShieldTrackerActivityViewModel(
     internal fun onDeviceShieldSettingChanged(enabled: Boolean) {
 
         if (enabled) {
-            deviceShieldPixels.enableFromSettings()
+            deviceShieldPixels.enableFromSummaryTrackerActivity()
         } else {
-            deviceShieldPixels.disableFromSettings()
+            deviceShieldPixels.disableFromSummaryTrackerActivity()
         }
 
         viewModelScope.launch {

@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.store
+package com.duckduckgo.mobile.android.vpn.dao
 
-import timber.log.Timber
+import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnServiceStateStats
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 
-interface HttpsEmbeddedDataPersister {
+@Dao
+interface VpnServiceStateStatsDao {
 
-    fun shouldPersistEmbeddedData(): Boolean
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(stat: VpnServiceStateStats)
 
-    fun persistEmbeddedData()
-
-}
-
-class EmptyHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
-
-    override fun shouldPersistEmbeddedData(): Boolean {
-        Timber.d("Ignoring, empty persister does not use embedded data")
-        return false
-    }
-
-    override fun persistEmbeddedData() {
-        Timber.d("Ignoring, empty persister does not use embedded data")
-    }
+    @Query("SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")
+    fun getServiceStateStatsSince(startTime: String): List<BucketizedVpnServiceStateStats>
 }

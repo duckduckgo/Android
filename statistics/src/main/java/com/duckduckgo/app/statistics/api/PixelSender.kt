@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -40,10 +41,15 @@ class RxPixelSender constructor(
     private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val deviceInfo: DeviceInfo
+    private val deviceInfo: DeviceInfo,
+    private val statisticsLibraryConfig: StatisticsLibraryConfig?
 ) : PixelSender {
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val shouldFirePixelsAsDev: Int? by lazy {
+        if (statisticsLibraryConfig?.shouldFirePixelsAsDev() == true) 1 else null
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
@@ -81,7 +87,7 @@ class RxPixelSender constructor(
     }
 
     override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
+        return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters, devMode = shouldFirePixelsAsDev)
     }
 
     override fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
@@ -103,7 +109,8 @@ class RxPixelSender constructor(
                 getDeviceFactor(),
                 this.atb,
                 this.additionalQueryParams,
-                this.encodedQueryParams
+                this.encodedQueryParams,
+                devMode = shouldFirePixelsAsDev
             )
         }
     }

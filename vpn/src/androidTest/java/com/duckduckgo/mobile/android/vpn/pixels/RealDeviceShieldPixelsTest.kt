@@ -99,12 +99,12 @@ class RealDeviceShieldPixelsTest {
 
     @Test
     fun whenEnableFromSettingsThenFireUniqueDailyAndCountPixels() {
-        deviceShieldPixels.enableFromSettings()
-        deviceShieldPixels.enableFromSettings()
+        deviceShieldPixels.enableFromOnboarding()
+        deviceShieldPixels.enableFromOnboarding()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS)
+        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -121,22 +121,12 @@ class RealDeviceShieldPixelsTest {
 
     @Test
     fun whenEnableFromPrivacyReportThenFireUniqueDailyAndCountPixels() {
-        deviceShieldPixels.enableFromPrivacyReport()
-        deviceShieldPixels.enableFromPrivacyReport()
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT)
-        verifyNoMoreInteractions(pixel)
-    }
-
-    @Test
-    fun whenDisableFromSettingsThenFireDailyAndCountPixels() {
-        deviceShieldPixels.disableFromSettings()
-        deviceShieldPixels.disableFromSettings()
-
-        verify(pixel).fire(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS)
+        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -242,13 +232,24 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenDidShowPrivacyReportThenFireUniqueDailyAndCountPixels() {
-        deviceShieldPixels.didShowPrivacyReport()
-        deviceShieldPixels.didShowPrivacyReport()
+    fun whenDidShowSummaryTrackerActivityThenFireUniqueDailyAndCountPixels() {
+        deviceShieldPixels.didShowSummaryTrackerActivity()
+        deviceShieldPixels.didShowSummaryTrackerActivity()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT)
+        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY)
+        verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenDidShowDetailedTrackerActivityThenFireUniqueDailyAndCountPixels() {
+        deviceShieldPixels.didShowDetailedTrackerActivity()
+        deviceShieldPixels.didShowDetailedTrackerActivity()
+
+        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY)
         verifyNoMoreInteractions(pixel)
     }
 

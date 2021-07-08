@@ -38,6 +38,20 @@ interface DeviceShieldPixels {
     fun deviceShieldEnabledOnSearch()
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun deviceShieldDisabledOnSearch()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun deviceShieldEnabledOnAppLaunch()
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun deviceShieldDisabledOnAppLaunch()
+
     /**
      * This fun will fire two pixels
      * unique -> fire only once ever no matter how many times we call this fun
@@ -47,13 +61,11 @@ interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun reportDisabled()
 
-    /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun enableFromNewTab()
+    /** This pixel will be unique on a given day, no matter how many times we call this fun */
+    fun reportLastDayEnableCount(count: Int)
+    /** This pixel will be unique on a given day, no matter how many times we call this fun */
+    fun reportLastDayDisableCount(count: Int)
+
     /**
      * This fun will fire three pixels
      * unique -> fire only once ever no matter how many times we call this fun
@@ -67,7 +79,7 @@ interface DeviceShieldPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun enableFromSettings()
+    fun enableFromOnboarding()
     /**
      * This fun will fire three pixels
      * unique -> fire only once ever no matter how many times we call this fun
@@ -82,20 +94,16 @@ interface DeviceShieldPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun enableFromPrivacyReport()
+    fun enableFromSummaryTrackerActivity()
 
     /**
      * This fun will fire two pixels
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun disableFromSettings()
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
     fun disableFromQuickSettingsTile()
+
+    fun disableFromSummaryTrackerActivity()
 
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun didShowDailyNotification(variant: Int)
@@ -143,7 +151,14 @@ interface DeviceShieldPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun didShowPrivacyReport()
+    fun didShowSummaryTrackerActivity()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun didShowDetailedTrackerActivity()
 
     /**
      * This fun will fire two pixels
@@ -221,6 +236,16 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_UPON_SEARCH_DAILY)
     }
 
+    override fun deviceShieldEnabledOnAppLaunch() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_UPON_APP_LAUNCH_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_ENABLE_UPON_APP_LAUNCH)
+    }
+
+    override fun deviceShieldDisabledOnAppLaunch() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_UPON_APP_LAUNCH_DAILY)
+        firePixel(DeviceShieldPixelNames.DS_DISABLE_UPON_APP_LAUNCH)
+    }
+
     override fun reportEnabled() {
         tryToFireUniquePixel(DeviceShieldPixelNames.DS_ENABLE_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_DAILY)
@@ -230,10 +255,12 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_DAILY)
     }
 
-    override fun enableFromNewTab() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_NEW_TAB)
+    override fun reportLastDayEnableCount(count: Int) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_LAST_DAY_ENABLE_COUNT_DAILY, mapOf("count" to count.toString()))
+    }
+
+    override fun reportLastDayDisableCount(count: Int) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DS_LAST_DAY_DISABLE_COUNT_DAILY, mapOf("count" to count.toString()))
     }
 
     override fun enableFromReminderNotification() {
@@ -242,10 +269,10 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION)
     }
 
-    override fun enableFromSettings() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS)
+    override fun enableFromOnboarding() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING)
     }
 
     override fun enableFromQuickSettingsTile() {
@@ -254,20 +281,20 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE)
     }
 
-    override fun enableFromPrivacyReport() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_PRIVACY_REPORT)
-    }
-
-    override fun disableFromSettings() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_DAILY)
-        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS)
+    override fun enableFromSummaryTrackerActivity() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE, tag = FIRST_ENABLE_ENTRY_POINT_TAG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
     }
 
     override fun disableFromQuickSettingsTile() {
         tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE_DAILY)
         firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE)
+    }
+
+    override fun disableFromSummaryTrackerActivity() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
     }
 
     override fun didShowDailyNotification(variant: Int) {
@@ -320,10 +347,16 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.DID_PRESS_NEW_TAB_SUMMARY)
     }
 
-    override fun didShowPrivacyReport() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT_DAILY)
-        firePixel(DeviceShieldPixelNames.DID_SHOW_PRIVACY_REPORT)
+    override fun didShowSummaryTrackerActivity() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_SHOW_SUMMARY_TRACKER_ACTIVITY)
+    }
+
+    override fun didShowDetailedTrackerActivity() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY)
     }
 
     override fun startError() {
@@ -362,26 +395,32 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_LOW_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_LOW, payload)
     }
 
     override fun vpnProcessExpendableModerate(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_MODERATE_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_MODERATE, payload)
     }
 
     override fun vpnProcessExpendableComplete(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_COMPLETE_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_COMPLETE, payload)
     }
 
     override fun vpnMemoryRunningLow(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_LOW_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_LOW, payload)
     }
 
     override fun vpnMemoryRunningModerate(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_MODERATE_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_MODERATE, payload)
     }
 
     override fun vpnMemoryRunningCritical(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL_DAILY, payload)
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL, payload)
     }
 
@@ -393,17 +432,17 @@ class RealDeviceShieldPixels @Inject constructor(
         pixel.fire(p, payload)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames) {
-        tryToFireDailyPixel(pixel.pixelName)
+    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+        tryToFireDailyPixel(pixel.pixelName, payload)
     }
 
-    private fun tryToFireDailyPixel(pixelName: String) {
+    private fun tryToFireDailyPixel(pixelName: String, payload: Map<String, String> = emptyMap()) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            this.pixel.fire(pixelName).also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            this.pixel.fire(pixelName, payload).also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
         }
     }
 

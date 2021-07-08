@@ -37,11 +37,12 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 12,
+    exportSchema = true, version = 15,
     entities = [
         VpnState::class,
         VpnTracker::class,
         VpnRunningStats::class,
+        VpnServiceStateStats::class,
         VpnDataStats::class,
         VpnPreferences::class,
         HeartBeatEntity::class,
@@ -69,6 +70,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
+    abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
 
     companion object {
 
@@ -179,6 +181,22 @@ object VpnTypeConverters {
     @JvmStatic
     fun fromStringList(value: List<String>): String {
         return stringListAdapter.toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toVpnServiceState(state: String): VpnServiceState {
+        return try {
+            VpnServiceState.valueOf(state)
+        } catch (t: Throwable) {
+            VpnServiceState.INVALID
+        }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromVpnServiceState(vpnServiceState: VpnServiceState): String {
+        return vpnServiceState.name
     }
 }
 

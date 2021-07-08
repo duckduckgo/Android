@@ -222,7 +222,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private fun startVpn() {
         TrackerBlockingVpnService.startService(this)
-        viewModel.onDeviceShieldEnabled(true)
+        viewModel.onDeviceShieldEnabled()
         setResult(RESULT_OK)
         finish()
     }

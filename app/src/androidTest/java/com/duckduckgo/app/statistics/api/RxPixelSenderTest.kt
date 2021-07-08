@@ -73,7 +73,7 @@ class RxPixelSenderTest {
             .build()
         pendingPixelDao = db.pixelDao()
 
-        testee = RxPixelSender(api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
+        testee = RxPixelSender(api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo, null)
     }
 
     @After

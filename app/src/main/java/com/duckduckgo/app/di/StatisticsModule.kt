@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -77,9 +78,11 @@ class StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         variantManager: VariantManager,
         deviceInfo: DeviceInfo,
-        pendingPixelDao: PendingPixelDao
-    ): PixelSender =
-        RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo)
+        pendingPixelDao: PendingPixelDao,
+        statisticsLibraryConfig: StatisticsLibraryConfig
+    ): PixelSender {
+        return RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo, statisticsLibraryConfig)
+    }
 
     @Provides
     @Singleton

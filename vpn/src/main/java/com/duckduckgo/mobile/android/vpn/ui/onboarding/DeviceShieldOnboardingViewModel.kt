@@ -55,17 +55,9 @@ class DeviceShieldOnboardingViewModel(
         deviceShieldOnboardingStore.onboardingDidNotShow()
     }
 
-    fun onDeviceShieldEnabled(enabled: Boolean) {
-        Timber.i("Device Shield, is now enabled: $enabled")
-
-        // TODO: This is only needed if we need pixels for this, it wasn't discussed but my guess is we need them
-        // if needed, then we have to create a deviceShieldPixels.enableFromOnboarding()
-        if (enabled) {
-            deviceShieldPixels.enableFromSettings()
-        } else {
-            deviceShieldPixels.disableFromSettings()
-        }
-
+    fun onDeviceShieldEnabled() {
+        Timber.i("Device Shield, is now enabled")
+        deviceShieldPixels.enableFromOnboarding()
     }
 
 }

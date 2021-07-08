@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.httpsupgrade.store
+package com.duckduckgo.app.statistics.config
 
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import timber.log.Timber
+import com.duckduckgo.app.statistics.BuildConfig
 
-class FDroidHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
+/**
+ * If you want to configure the statistics library, have your app extend this listener
+ * and implement the different methods.
+ * The library will check through the application context.
+ */
+interface StatisticsLibraryConfig {
+    fun shouldFirePixelsAsDev(): Boolean
+}
 
-    override fun shouldPersistEmbeddedData(): Boolean {
-        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
-        return false
-    }
-
-    override fun persistEmbeddedData() {
-        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
+class DefaultStatisticsLibraryConfig : StatisticsLibraryConfig {
+    override fun shouldFirePixelsAsDev(): Boolean {
+        return BuildConfig.DEBUG
     }
 }

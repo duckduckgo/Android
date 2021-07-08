@@ -38,6 +38,11 @@ class VpnStatisticsRequester(
 
     override fun initializeAtb() {
         deviceShieldPixels.deviceShieldInstalled()
+        if (TrackerBlockingVpnService.isServiceRunning(context)) {
+            deviceShieldPixels.deviceShieldEnabledOnAppLaunch()
+        } else {
+            deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
+        }
     }
 
     override fun refreshSearchRetentionAtb() {
