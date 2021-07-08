@@ -16,11 +16,11 @@
 
 package com.duckduckgo.widget
 
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import timber.log.Timber
@@ -33,48 +33,38 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return FavoritesWidgetItemFactory(this.applicationContext, intent)
+        return EmptyFavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
-    class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
+    class EmptyFavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
 
         @Inject
-        lateinit var widgetPrefs: WidgetPreferences
+        lateinit var favoritesDataRepository: FavoritesRepository
 
-        private val appWidgetId = intent.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        )
-
-        private val maxItems: Int
-            get() {
-                return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
-            }
-
-        private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(FavoritesWidgetService.THEME_EXTRAS))
+        private var count = 0
 
         override fun onCreate() {
             inject(context)
         }
 
         override fun onDataSetChanged() {
+            count = if (favoritesDataRepository.userHasFavorites()) 1 else 0
         }
 
         override fun onDestroy() {
         }
 
         override fun getCount(): Int {
-            Timber.i("EmptyFavoritesWidgetService - empty getCount $maxItems")
-            return maxItems
+            return count
         }
 
         override fun getViewAt(position: Int): RemoteViews {
             Timber.i("EmptyFavoritesWidgetService - getViewAt")
-            return RemoteViews(context.packageName, getItemLayout())
+            return RemoteViews(context.packageName, R.layout.empty_view)
         }
 
         override fun getLoadingView(): RemoteViews {
-            return RemoteViews(context.packageName, getItemLayout())
+            return RemoteViews(context.packageName, R.layout.empty_view)
         }
 
         override fun getViewTypeCount(): Int {
@@ -87,15 +77,6 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
 
         override fun hasStableIds(): Boolean {
             return true
-        }
-
-        private fun getItemLayout(): Int {
-            Timber.i("EmptyFavoritesWidgetService - empty getItemLayout for $theme")
-            return when (theme) {
-                WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
-                WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
-                WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
-            }
         }
 
         private fun inject(context: Context) {

@@ -134,12 +134,12 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         adapterIntent.putExtras(extras)
         adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
-        remoteViews.setEmptyView(R.id.favoritesGrid, R.id.emptyGridViewContainer)
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
 
         val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
         emptyAdapterIntent.putExtras(extras)
         emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        remoteViews.setEmptyView(R.id.emptyfavoritesGrid, R.id.emptyGridViewContainer)
         remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
@@ -152,25 +152,19 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
             WidgetTheme.LIGHT -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_light_col2
-                    3 -> R.layout.search_favorites_widget_light_col3
-                    4 -> R.layout.search_favorites_widget_light_col4
-                    else -> R.layout.search_favorites_widget_light_col2
+                    else -> R.layout.search_favorites_widget_light_auto
                 }
             }
             WidgetTheme.DARK -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_dark_col2
-                    3 -> R.layout.search_favorites_widget_dark_col3
-                    4 -> R.layout.search_favorites_widget_dark_col4
-                    else -> R.layout.search_favorites_widget_dark_col4
+                    else -> R.layout.search_favorites_widget_dark_auto
                 }
             }
             WidgetTheme.SYSTEM_DEFAULT -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_daynight_col2
-                    3 -> R.layout.search_favorites_widget_daynight_col3
-                    4 -> R.layout.search_favorites_widget_daynight_col4
-                    else -> R.layout.search_favorites_widget_daynight_col2
+                    else -> R.layout.search_favorites_widget_daynight_auto
                 }
             }
         }
@@ -187,7 +181,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         var rows = calculateRows(context, maxHeight)
 
         columns = if (columns < 2) 2 else columns
-        columns = if (columns > 4) 4 else columns
 
         rows = 1.coerceAtLeast(rows)
         rows = 4.coerceAtMost(rows)

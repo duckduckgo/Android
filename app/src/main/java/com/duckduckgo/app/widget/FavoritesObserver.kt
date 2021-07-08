@@ -44,6 +44,7 @@ class FavoritesObserver @Inject constructor(
         GlobalScope.launch {
             favoritesRepository.favorites().collect {
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
+                instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
             }
         }
     }

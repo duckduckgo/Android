@@ -105,7 +105,7 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
 
-    fun inject(favoritesWidgetItemFactory: EmptyFavoritesWidgetService.FavoritesWidgetItemFactory)
+    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetService.EmptyFavoritesWidgetItemFactory)
 
     // accessor to Retrofit instance for test only only for test
     @Named("api")
