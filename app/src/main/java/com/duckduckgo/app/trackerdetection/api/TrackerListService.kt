@@ -24,6 +24,9 @@ interface TrackerListService {
     @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json")
     fun tds(): Call<TdsJson>
 
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds-next.json")
+    fun nextTds(): Call<TdsJson>
+
     @GET("/contentblocking/trackers-unprotected-temporary.txt")
     fun temporaryWhitelist(): Call<String>
 

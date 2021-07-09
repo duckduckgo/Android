@@ -19,13 +19,15 @@ package com.duckduckgo.app.global.api
 import android.content.Context
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.dev.db.DevSettingsDataStore
 import com.duckduckgo.app.global.AppUrl
 import okhttp3.Interceptor
 import okhttp3.Response
 
 class ApiRequestInterceptor(
     context: Context,
-    private val userAgentProvider: UserAgentProvider
+    private val userAgentProvider: UserAgentProvider,
+    private val devSettingsDataStore: DevSettingsDataStore
 ) : Interceptor {
 
     private val userAgent: String by lazy {
@@ -41,6 +43,15 @@ class ApiRequestInterceptor(
             request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent())
         } else {
             request.addHeader(Header.USER_AGENT, userAgent)
+        }
+
+        if (url.toString().contains("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/")) {
+            val tds = if (devSettingsDataStore.nextTdsEnabled) {
+                "next-tds.json"
+            } else {
+                "tds.json"
+            }
+            request.url("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/$tds")
         }
 
         return chain.proceed(request.build())

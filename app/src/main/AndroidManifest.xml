@@ -331,6 +331,10 @@
             android:name="com.duckduckgo.app.email.ui.EmailWebViewActivity"
             android:label="@string/emailProtectionWebViewActivityTitle"
             android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.DevSettingsActivity"
+            android:label="@string/devSettingsActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

@@ -15,6 +15,11 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+
+    <!-- Developer settings -->
+    <string name="settingsDeveloperSettings">Developer Settings</string>
+    <string name="devSettingsActivityTitle">Developer Settings</string>
+
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
     <string name="autofillTooltipUseYourAlias">Use %1$s</string>

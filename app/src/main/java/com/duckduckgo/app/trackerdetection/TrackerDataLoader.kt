@@ -24,6 +24,7 @@ import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.squareup.moshi.Moshi
+import io.reactivex.Completable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,6 +40,18 @@ class TrackerDataLoader @Inject constructor(
     private val appDatabase: AppDatabase,
     private val moshi: Moshi
 ) {
+
+    fun deleteAllData(): Completable {
+        Timber.d("MARCOS delete all data")
+        return Completable.fromAction {
+            appDatabase.runInTransaction {
+                tdsMetadataDao.deleteAll()
+                tdsEntityDao.deleteAll()
+                tdsDomainEntityDao.deleteAll()
+                tdsTrackerDao.deleteAll()
+            }
+        }
+    }
 
     fun loadData() {
         Timber.d("Loading tracker data")

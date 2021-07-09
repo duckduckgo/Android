@@ -22,6 +22,7 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.dev.db.DevSettingsDataStore
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -107,9 +108,10 @@ class NetworkModule {
     @Provides
     fun apiRequestInterceptor(
         context: Context,
-        userAgentProvider: UserAgentProvider
+        userAgentProvider: UserAgentProvider,
+        devSettingsDataStore: DevSettingsDataStore
     ): ApiRequestInterceptor {
-        return ApiRequestInterceptor(context, userAgentProvider)
+        return ApiRequestInterceptor(context, userAgentProvider, devSettingsDataStore)
     }
 
     @Provides

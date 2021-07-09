@@ -32,4 +32,7 @@ abstract class TdsMetadataDao {
     open fun tdsDownloadSuccessful(tdsMetadata: TdsMetadata) {
         insert(tdsMetadata)
     }
+
+    @Query("delete from tdsMetadata")
+    abstract fun deleteAll()
 }
