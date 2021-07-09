@@ -37,4 +37,15 @@
     <dimen name="changeAppIconSize">75dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
 
+
+    <!-- Theme defaults -->
+    <dimen name="keyline_0">2dp</dimen>
+    <dimen name="keyline_1">4dp</dimen>
+    <dimen name="keyline_2">8dp</dimen>
+    <dimen name="keyline_4">16dp</dimen>
+    <dimen name="keyline_5">24dp</dimen>
+
+    <dimen name="component_label_horizontal_margin">@dimen/keyline_4</dimen>
+    <dimen name="elevation_default_top_app_bar">4dp</dimen>
+
 </resources>

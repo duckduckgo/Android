@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-}
+package com.duckduckgo.mobile.android.themepreview.ui.component
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-
-    implementation Kotlin.stdlib.jdk7
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
+enum class Component {
+  BUTTON,
+  FAB,
+  CARD,
+  TOP_APP_BAR,
+  CHIP,
+  DRAWER,
+  TEXT_FIELD,
+  BOTTOM_NAVIGATION,
+  SWITCH,
+  RADIO_BUTTON,
+  CHECKBOX,
+  BOTTOM_APP_BAR,
+  TABS,
+  SNACKBAR,
+  DIALOG,
+  BOTTOM_SHEET,
+  IMAGE
 }

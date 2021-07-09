@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget"/>
     <style name="Widget.DuckDuckGo"/>
@@ -34,7 +34,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Snackbar" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
 

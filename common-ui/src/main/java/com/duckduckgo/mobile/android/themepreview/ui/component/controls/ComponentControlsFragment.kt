@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-}
+package com.duckduckgo.mobile.android.themepreview.ui.component.controls
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.mobile.android.themepreview.ui.component.Component
+import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-dependencies {
-
-    implementation Kotlin.stdlib.jdk7
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
+class ComponentControlsFragment : ComponentFragment() {
+    override fun getComponents(): List<Component> {
+        return listOf(Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX)
+    }
 }
