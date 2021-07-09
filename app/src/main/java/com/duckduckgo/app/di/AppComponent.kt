@@ -74,11 +74,9 @@ import javax.inject.Singleton
         AppUsageModule::class,
         FileModule::class,
         UncaughtExceptionModule::class,
-        StoreReferralModule::class,
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
-        HttpsPersisterModule::class,
         EmailModule::class
     ]
 )
