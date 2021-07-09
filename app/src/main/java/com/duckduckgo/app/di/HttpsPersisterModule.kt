@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.httpsupgrade.store
+package com.duckduckgo.app.di
 
+import com.duckduckgo.app.httpsupgrade.store.EmptyHttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import timber.log.Timber
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 
-class FDroidHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
+@Module
+@ContributesTo(AppObjectGraph::class)
+class HttpsPersisterModule {
 
-    override fun shouldPersistEmbeddedData(): Boolean {
-        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
-        return false
+    @Provides
+    fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
+        return EmptyHttpsEmbeddedDataPersister()
     }
 
-    override fun persistEmbeddedData() {
-        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
-    }
 }
