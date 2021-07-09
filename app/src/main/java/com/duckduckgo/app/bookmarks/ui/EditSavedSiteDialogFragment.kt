@@ -44,7 +44,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     }
 
     private fun validateInput(newValue: String, existingValue: String) =
-            if (newValue.isNotBlank()) newValue else existingValue
+        if (newValue.isNotBlank()) newValue else existingValue
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
         titleInput.setText(getExistingTitle())
@@ -60,12 +60,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         when (savedSite) {
             is SavedSite.Bookmark -> {
                 listener?.onSavedSiteEdited(
-                        savedSite.copy(title = updatedTitle, url = updatedUrl)
+                    savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
             }
             is SavedSite.Favorite -> {
                 listener?.onSavedSiteEdited(
-                        savedSite.copy(title = updatedTitle, url = updatedUrl)
+                    savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
             }
         }

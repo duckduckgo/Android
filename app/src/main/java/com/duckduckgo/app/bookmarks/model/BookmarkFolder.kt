@@ -17,7 +17,7 @@
 package com.duckduckgo.app.bookmarks.model
 
 data class BookmarkFolder(
-        val id: Long = 0,
-        val name: String,
-        val parentId: Long
+    val id: Long = 0,
+    val name: String,
+    val parentId: Long
 )
