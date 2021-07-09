@@ -91,7 +91,7 @@ android {
     variantFilter { variant ->
         def names = variant.flavors*.name
         if ((names.contains("fdroid") || names.contains("internal")) && variant.buildType.name == "debug") {
-            // We only need release version for F-Droid and internal builds
+            // We don't need fdroidDebug and internalDebug build types
             setIgnore(true)
         }
     }

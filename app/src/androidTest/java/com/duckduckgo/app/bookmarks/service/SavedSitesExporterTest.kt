@@ -23,7 +23,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -32,8 +37,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
+import dagger.Lazy
 
-class RealBookmarksExporterTest {
+class SavedSitesExporterTest {
 
     @get:Rule
     @Suppress("unused")
@@ -44,8 +50,11 @@ class RealBookmarksExporterTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: BookmarksDao
-    private lateinit var exporter: RealBookmarksExporter
+    private lateinit var bookmarksDao: BookmarksDao
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
+    private lateinit var favoritesRepository: FavoritesRepository
+    private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
 
@@ -55,9 +64,10 @@ class RealBookmarksExporterTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        dao = db.bookmarksDao()
+        bookmarksDao = db.bookmarksDao()
+        favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
         filesDir = context.filesDir
-        exporter = RealBookmarksExporter(context.contentResolver, dao, RealBookmarksParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, RealSavedSitesParser())
     }
 
     @After
@@ -68,7 +78,7 @@ class RealBookmarksExporterTest {
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
-        dao.insert(bookmark)
+        bookmarksDao.insert(bookmark)
 
         val testFile = File(filesDir, "test_bookmarks.html")
         val localUri = Uri.fromFile(testFile)
@@ -76,26 +86,40 @@ class RealBookmarksExporterTest {
         val result = exporter.export(localUri)
         testFile.delete()
 
-        assertTrue(result is ExportBookmarksResult.Success)
+        assertTrue(result is ExportSavedSitesResult.Success)
     }
 
     @Test
-    fun whenFileDSomeBookmarksExistThenExportingSucceeds() = runBlocking {
+    fun whenFileDoesNotExistThenExportingFails() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
-        dao.insert(bookmark)
+        bookmarksDao.insert(bookmark)
 
         val localUri = Uri.parse("uridoesnotexist")
 
         val result = exporter.export(localUri)
 
-        assertTrue(result is ExportBookmarksResult.Error)
+        assertTrue(result is ExportSavedSitesResult.Error)
     }
 
     @Test
-    fun whenNoBookmarksExistThenNoBookmarksAreExported() = runBlocking {
+    fun whenNoSavedSitesExistThenNothingIsExported() = runBlocking {
         val localUri = Uri.parse("whatever")
         val result = exporter.export(localUri)
-        assertTrue(result is ExportBookmarksResult.NoBookmarksExported)
+        assertTrue(result is ExportSavedSitesResult.NoSavedSitesExported)
+    }
+
+    @Test
+    fun whenSomeFavoritesExistThenExportingSucceeds() = runBlocking {
+        val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", position = 0)
+        favoritesRepository.insert(favorite)
+
+        val testFile = File(filesDir, "test_favorites.html")
+        val localUri = Uri.fromFile(testFile)
+
+        val result = exporter.export(localUri)
+        testFile.delete()
+
+        assertTrue(result is ExportSavedSitesResult.Success)
     }
 
 }
