@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 ~ Copyright (C) 2019 The Android Open Source Project
 ~
 ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,36 +15,36 @@
 -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:clipToPadding="false"
-  android:paddingTop="@dimen/keyline_5"
-  android:paddingBottom="@dimen/keyline_5"
-  android:paddingStart="@dimen/keyline_4"
-  android:paddingEnd="@dimen/keyline_4">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
-      android:id="@+id/label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/top_app_bar_label_title"
-      app:linkUrl="https://material.io/design/components/app-bars-top.html"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/top_app_bar_label_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:linkUrl="https://material.io/design/components/app-bars-top.html" />
 
     <com.google.android.material.appbar.MaterialToolbar
-      style="?attr/toolbarStyle"
+        android:id="@+id/toolbar"
+        style="?attr/toolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
         android:translationZ="@dimen/elevation_default_top_app_bar"
-      android:id="@+id/toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/keyline_4"
-      app:menu="@menu/top_app_bar_menu"
-      app:navigationIcon="@drawable/ic_back_24"
-      app:title="@string/text_headline"
-      app:layout_constraintTop_toBottomOf="@+id/label"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label"
+        app:menu="@menu/top_app_bar_menu"
+        app:navigationIcon="@drawable/ic_back_24"
+        app:title="@string/text_headline" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
