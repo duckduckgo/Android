@@ -21,13 +21,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemBookmarkFolderBinding
 import com.duckduckgo.app.global.view.toPx
 
 class BookmarkFolderStructureAdapter(
+    private val viewModel: BookmarkFoldersViewModel,
     viewWidth: Int
-) : ListAdapter<Pair<Int, BookmarkFolder>, FolderViewHolder>(BookmarkFolderStructureDiffCallback()) {
+) : ListAdapter<BookmarkFolderItem, FolderViewHolder>(BookmarkFolderStructureDiffCallback()) {
 
     companion object {
         const val VERTICAL_PADDING_DP = 8
@@ -43,7 +45,7 @@ class BookmarkFolderStructureAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         val binding = ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return FolderViewHolder(binding, paddingIncrementPx, maxPadding, verticalPaddingPx)
+        return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) {
@@ -53,14 +55,28 @@ class BookmarkFolderStructureAdapter(
 
 class FolderViewHolder(
     private val binding: ItemBookmarkFolderBinding,
+    private val viewModel: BookmarkFoldersViewModel,
     private val paddingIncrement: Int,
     private val maxPadding: Int,
     private val verticalPadding: Int
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: Pair<Int, BookmarkFolder>) {
-        binding.name.text = item.second.name
-        setPadding(item.first)
+    fun bind(item: BookmarkFolderItem) {
+        binding.name.text = item.bookmarkFolder.name
+        setPadding(item.depth)
+
+        if (item.isSelected) {
+            viewModel.lastPosition = bindingAdapterPosition
+            binding.icon.setImageResource(R.drawable.ic_check)
+            binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
+        } else {
+            binding.icon.setImageResource(R.drawable.ic_folder)
+            binding.iconContainer.setBackgroundResource(R.drawable.subtle_favicon_background)
+        }
+
+        itemView.setOnClickListener {
+            viewModel.onItemSelected(bindingAdapterPosition, item.bookmarkFolder)
+        }
     }
 
     private fun setPadding(depth: Int) {
@@ -72,12 +88,12 @@ class FolderViewHolder(
     }
 }
 
-class BookmarkFolderStructureDiffCallback : DiffUtil.ItemCallback<Pair<Int, BookmarkFolder>>() {
-    override fun areItemsTheSame(oldItem: Pair<Int, BookmarkFolder>, newItem: Pair<Int, BookmarkFolder>): Boolean {
-        return oldItem == newItem
+class BookmarkFolderStructureDiffCallback : DiffUtil.ItemCallback<BookmarkFolderItem>() {
+    override fun areItemsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
+        return oldItem.bookmarkFolder.id == newItem.bookmarkFolder.id
     }
 
-    override fun areContentsTheSame(oldItem: Pair<Int, BookmarkFolder>, newItem: Pair<Int, BookmarkFolder>): Boolean {
+    override fun areContentsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
         return oldItem == newItem
     }
 }
