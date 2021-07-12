@@ -18,10 +18,25 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.R
 
 class DeviceShieldMostRecentActivity : AppCompatActivity(R.layout.activity_device_shield_all_tracer_activity) {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onBackPressed() {
+        finish()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 
     companion object {
         fun intent(context: Context): Intent {
