@@ -38,4 +38,5 @@
     <color name="searchWidgetBackgroundColor">@color/newBlack</color>
     <color name="searchWidgetSearchBarBackgroundColor">@color/almostBlack</color>
     <color name="searchWidgetSearchBarHintColor">@color/white</color>
+    <color name="searchWidgetSearchBarLoupeColor">@color/white</color>
 </resources>
