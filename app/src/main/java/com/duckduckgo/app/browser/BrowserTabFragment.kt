@@ -58,6 +58,8 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.*
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.*
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -99,6 +101,7 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
@@ -107,6 +110,7 @@ import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -220,6 +224,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
     @AppCoroutineScope
@@ -1144,6 +1151,7 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
+                configureDarkThemeSupport(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -1171,6 +1179,25 @@ class BrowserTabFragment :
 
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    private fun configureDarkThemeSupport(webSettings: WebSettings) {
+        if (settingsDataStore.theme == DuckDuckGoTheme.DARK) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
+            ) {
+                WebSettingsCompat.setForceDark(webSettings, WebSettingsCompat.FORCE_DARK_ON)
+                WebSettingsCompat.setForceDarkStrategy(
+                    webSettings,
+                    WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
+                )
+            }
+        } else {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(webSettings, WebSettingsCompat.FORCE_DARK_OFF)
+            }
         }
     }
 
