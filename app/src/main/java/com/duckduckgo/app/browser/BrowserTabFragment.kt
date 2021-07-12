@@ -1188,7 +1188,9 @@ class BrowserTabFragment :
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
             ) {
+                // requires WebView v76
                 WebSettingsCompat.setForceDark(webSettings, WebSettingsCompat.FORCE_DARK_ON)
+                // requires WebView v83
                 WebSettingsCompat.setForceDarkStrategy(
                     webSettings,
                     WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
