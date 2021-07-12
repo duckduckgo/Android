@@ -117,14 +117,14 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val topOffender = getTopOffender(trackers)
             val numberApps = getNumberOfAppsContainingTopOffender(trackers, topOffender).size
 
-            val prefix = resources.getString(R.string.deviceShieldDailyTopCompanyNotificationPrefix, topOffender.company)
+            val prefix = resources.getString(R.string.deviceShieldDailyTopCompanyNotificationPrefix, topOffender.companyDisplayName)
             val numAppsText = resources.getQuantityString(R.plurals.deviceShieldNotificationNumberOfApps, numberApps, numberApps)
             val pastDaySuffix = resources.getString(R.string.deviceShieldNotificationPastDaySuffix)
             val seeMoreSuffix = resources.getString(R.string.deviceShieldNotificationSeeMoreSuffix)
             val fullString = "$prefix$numAppsText $pastDaySuffix $seeMoreSuffix"
 
             Timber.i("createDailyTopTrackerCompanyNotification: $fullString")
-            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.company, seeMoreSuffix)))
+            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.companyDisplayName, seeMoreSuffix)))
         }
 
         private fun createDailyNotificationTopAppsContainingTrackers(apps: List<Pair<TrackingApp, List<VpnTracker>>>): DeviceShieldNotification {
@@ -156,7 +156,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val timesBlocked = filteredForLatestTrackerCompany.size
             val appsContainingLatestTracker = filteredForLatestTrackerCompany.groupBy { it.trackingApp }
 
-            val prefix = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany.company)
+            val prefix = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotification, lastCompany.companyDisplayName)
             val numberOfTimesString = resources.getQuantityString(R.plurals.deviceShieldNumberTimes, timesBlocked, timesBlocked)
             val latestAppString = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotificationInApp, latestApp)
             val otherApps = (appsContainingLatestTracker.size - 1).coerceAtLeast(0)
@@ -170,7 +170,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
             Timber.i("createDailyLastCompanyAttemptNotification. [$textToStyle]")
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.company)))
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.companyDisplayName)))
         }
 
         private fun getTopOffender(trackers: List<VpnTracker>): VpnTracker {
@@ -236,7 +236,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                     topOffender = it
                 }
             }
-            val company = topOffender.first().company
+            val company = topOffender.first().companyDisplayName
             val appsContainingTrackerEntity = getNumberOfAppsContainingTopOffender(trackers, topOffender.first())
             val prefixString = resources.getString(R.string.deviceShieldWeeklyCompanyTeaserNotificationPrefix, company)
             val numberOfApps = appsContainingTrackerEntity.size

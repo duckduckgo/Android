@@ -76,8 +76,8 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
         Timber.i("Debug receiver DeviceShieldNotificationsDebugReceiver registered")
 
         DeviceShieldNotificationsDebugReceiver(context) { intent ->
-            val weekly = intent.getStringExtra("weekly")?.toInt()
-            val daily = intent.getStringExtra("daily")?.toInt()
+            val weekly = kotlin.runCatching { intent.getStringExtra("weekly")?.toInt() }.getOrNull()
+            val daily = kotlin.runCatching { intent.getStringExtra("daily")?.toInt() }.getOrNull()
 
             GlobalScope.launch(Dispatchers.IO) {
                 val notification = if (weekly != null) {
