@@ -34,7 +34,7 @@ class AppWidgetThemePreferences @Inject constructor(private val context: Context
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override fun widgetTheme(widgetId: Int): WidgetTheme {
-        return WidgetTheme.valueOf(preferences.getString(keyForWidgetTheme(widgetId), WidgetTheme.LIGHT.toString()) ?: WidgetTheme.LIGHT.toString())
+        return WidgetTheme.valueOf(preferences.getString(keyForWidgetTheme(widgetId), WidgetTheme.SYSTEM_DEFAULT.toString()) ?: WidgetTheme.SYSTEM_DEFAULT.toString())
     }
 
     override fun saveWidgetSelectedTheme(widgetId: Int, theme: String) {

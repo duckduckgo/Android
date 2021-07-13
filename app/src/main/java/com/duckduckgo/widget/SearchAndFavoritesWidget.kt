@@ -42,8 +42,8 @@ enum class WidgetTheme {
 
     companion object {
         fun getThemeFrom(value: String?): WidgetTheme {
-            if (value.isNullOrEmpty()) return LIGHT
-            return runCatching { valueOf(value) }.getOrDefault(LIGHT)
+            if (value.isNullOrEmpty()) return SYSTEM_DEFAULT
+            return runCatching { valueOf(value) }.getOrDefault(SYSTEM_DEFAULT)
         }
     }
 }
@@ -58,7 +58,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
 
-    private var layoutId: Int = R.layout.search_favorites_widget_light_auto
+    private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
