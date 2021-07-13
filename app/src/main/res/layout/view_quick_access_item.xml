@@ -40,8 +40,8 @@
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="@dimen/savedSiteGridItemFavicon"
+            android:layout_height="@dimen/savedSiteGridItemFavicon"
             android:importantForAccessibility="no"/>
 
     </com.google.android.material.card.MaterialCardView>

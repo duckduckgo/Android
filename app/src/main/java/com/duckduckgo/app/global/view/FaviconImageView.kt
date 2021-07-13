@@ -68,6 +68,9 @@ fun generateDefaultDrawable(context: Context, domain: String): Drawable {
         private val letter
             get() = baseHost.firstOrNull()?.toString()?.toUpperCase(Locale.getDefault()) ?: ""
 
+        private val faviconDefaultRadius = context.resources.getDimension(R.dimen.savedSiteGridItemRadiusFavicon)
+        private val faviconDefaultSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon)
+
         private val palette = listOf(
             "#94B3AF",
             "#727998",
@@ -102,7 +105,8 @@ fun generateDefaultDrawable(context: Context, domain: String): Drawable {
             textPaint.textSize = (bounds.width() / 2).toFloat()
             val textWidth: Float = textPaint.measureText(letter) * 0.5f
             val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
-            canvas.drawRoundRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), 10f, 10f, backgroundPaint)
+            val radius = (bounds.width() * faviconDefaultRadius) / faviconDefaultSize
+            canvas.drawRoundRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), radius, radius, backgroundPaint)
             canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
         }
 

@@ -77,6 +77,8 @@ class FavoritesWidgetService : RemoteViewsService() {
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
 
+        private val faviconItemSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon).toInt()
+
         private val maxItems: Int
             get() {
                 return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
@@ -104,10 +106,10 @@ class FavoritesWidgetService : RemoteViewsService() {
                         .transform(RoundedCorners(10.toPx()))
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
-                        .submit(56.toPx(), 56.toPx())
+                        .submit(faviconItemSize, faviconItemSize)
                         .get()
                 } else {
-                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(56.toPx(), 56.toPx())
+                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(faviconItemSize, faviconItemSize)
                 }
 
                 WidgetFavorite(it.title, it.url, bitmap)
