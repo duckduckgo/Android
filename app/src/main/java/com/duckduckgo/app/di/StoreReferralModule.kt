@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,28 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.referral.FDroidReferrerStateListener
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 class StoreReferralModule {
-
-    @Provides
-    fun appInstallationReferrerParser(): AppInstallationReferrerParser {
-        return QueryParamReferrerParser()
-    }
 
     @Provides
     @Singleton
     fun appInstallationReferrerStateListener(
-        referrerStateListener: FDroidReferrerStateListener
+        referrerStateListener: EmptyReferrerStateListener
     ): AppInstallationReferrerStateListener = referrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        referrerStateListener: FDroidReferrerStateListener
+        referrerStateListener: EmptyReferrerStateListener
     ): AtbInitializerListener = referrerStateListener
-
-    @Provides
-    @Singleton
-    fun appReferrerDataStore(context: Context): AppReferrerDataStore {
-        return AppReferenceSharePreferences(context)
-    }
 }
