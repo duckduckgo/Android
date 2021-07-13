@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.dev
+package com.duckduckgo.app.dev.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.dev.db.DevSettingsDataStore
+import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin

@@ -332,7 +332,7 @@
             android:label="@string/emailProtectionWebViewActivityTitle"
             android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
         <activity
-            android:name="com.duckduckgo.app.dev.DevSettingsActivity"
+            android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"
             android:label="@string/devSettingsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <service

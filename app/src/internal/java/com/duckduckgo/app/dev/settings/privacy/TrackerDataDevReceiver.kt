@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.dev.privacy
+package com.duckduckgo.app.dev.settings.privacy
 
 import android.content.BroadcastReceiver
 import android.content.Context

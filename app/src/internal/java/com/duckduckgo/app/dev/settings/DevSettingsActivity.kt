@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.dev
+package com.duckduckgo.app.dev.settings
 
 import android.app.Activity
 import android.content.Context
@@ -28,9 +28,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.dev.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.android.synthetic.dev.activity_dev_settings.*
+import kotlinx.android.synthetic.internal.activity_dev_settings.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

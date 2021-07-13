@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.dev.DevSettingsActivity
+import com.duckduckgo.app.dev.settings.DevSettingsActivity
 import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.di.scopes.AppObjectGraph
 
