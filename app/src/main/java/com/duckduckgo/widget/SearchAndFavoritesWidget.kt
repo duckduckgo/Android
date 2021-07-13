@@ -100,20 +100,20 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        var minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
-        var maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) // landscape
-        var minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) // landscape
-        var maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) // portrait
+        var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+        var landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+        var portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
 
         if (newOptions != null) {
-            minWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) // portrait
-            maxWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH) // landscape
-            minHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) // landscape
-            maxHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) // portrait
+            portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+            landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+            landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+            portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
         }
 
-        val (columns, rows) = getCurrentWidgetSize(context, minWidth, maxWidth, minHeight, maxHeight)
-        Timber.i("SearchAndFavoritesWidget $minWidth x $maxHeight -> $columns x $rows")
+        val (columns, rows) = getCurrentWidgetSize(context, portraitWidth, landsWidth, landsHeight, portraitHeight)
+        Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
 
         layoutId = getLayoutThemed(columns, widgetTheme)
         widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
@@ -170,15 +170,22 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
     }
 
-    private fun getCurrentWidgetSize(context: Context, minWidth: Int, maxWidth: Int, minHeight: Int, maxHeight: Int): Pair<Int, Int> {
+    private fun getCurrentWidgetSize(context: Context, portraitWidth: Int, landsWidth: Int, landsHeight: Int, portraitHeight: Int): Pair<Int, Int> {
         val orientation = context.resources.configuration.orientation
         val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            maxWidth
+            landsWidth
         } else {
-            minWidth
+            portraitWidth
         }
+
+        val height = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            landsHeight
+        } else {
+            portraitHeight
+        }
+
         var columns = calculateColumns(context, width)
-        var rows = calculateRows(context, maxHeight)
+        var rows = calculateRows(context, height)
 
         columns = if (columns < 2) 2 else columns
 
