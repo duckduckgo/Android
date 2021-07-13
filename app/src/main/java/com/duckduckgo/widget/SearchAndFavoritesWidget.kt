@@ -58,7 +58,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
 
-    private var layoutId: Int = R.layout.search_favorites_widget_light_col3
+    private var layoutId: Int = R.layout.search_favorites_widget_light_auto
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
