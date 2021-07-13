@@ -56,10 +56,17 @@
             app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacy" />
 
         <include
+            android:id="@+id/settingsSectionOtherBottomDivider"
             layout="@layout/content_settings_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
+
+        <include
+            layout="@layout/content_settings_internal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionOtherBottomDivider" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
