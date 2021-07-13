@@ -864,6 +864,7 @@ class BrowserTabFragment :
                 }
             }
         }
+        viewModel.resetAppLinkState()
     }
 
     private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {

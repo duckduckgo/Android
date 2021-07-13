@@ -19,6 +19,10 @@ package com.duckduckgo.app.referral
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface AppReferrerDataStore {
     var referrerCheckedPreviously: Boolean
@@ -26,7 +30,9 @@ interface AppReferrerDataStore {
     var installedFromEuAuction: Boolean
 }
 
-class AppReferenceSharePreferences(private val context: Context) : AppReferrerDataStore {
+@ContributesBinding(AppObjectGraph::class)
+@Singleton
+class AppReferenceSharePreferences @Inject constructor(private val context: Context) : AppReferrerDataStore {
     override var campaignSuffix: String?
         get() = preferences.getString(KEY_CAMPAIGN_SUFFIX, null)
         set(value) = preferences.edit(true) { putString(KEY_CAMPAIGN_SUFFIX, value) }

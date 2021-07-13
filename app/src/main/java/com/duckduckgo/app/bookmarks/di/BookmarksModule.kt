@@ -18,14 +18,14 @@ package com.duckduckgo.app.bookmarks.di
 
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.BookmarksManager
-import com.duckduckgo.app.bookmarks.service.BookmarksExporter
-import com.duckduckgo.app.bookmarks.service.BookmarksImporter
-import com.duckduckgo.app.bookmarks.service.BookmarksParser
-import com.duckduckgo.app.bookmarks.service.RealBookmarksManager
-import com.duckduckgo.app.bookmarks.service.RealBookmarksExporter
-import com.duckduckgo.app.bookmarks.service.RealBookmarksImporter
-import com.duckduckgo.app.bookmarks.service.RealBookmarksParser
+import com.duckduckgo.app.bookmarks.service.SavedSitesManager
+import com.duckduckgo.app.bookmarks.service.SavedSitesExporter
+import com.duckduckgo.app.bookmarks.service.SavedSitesImporter
+import com.duckduckgo.app.bookmarks.service.SavedSitesParser
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesManager
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesExporter
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesImporter
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
@@ -45,39 +45,41 @@ class BookmarksModule {
 
     @Provides
     @Singleton
-    fun bookmarksImporter(
+    fun savedSitesImporter(
         context: Context,
         bookmarksDao: BookmarksDao,
-        bookmarksParser: BookmarksParser,
-    ): BookmarksImporter {
-        return RealBookmarksImporter(context.contentResolver, bookmarksDao, bookmarksParser)
+        favoritesRepository: FavoritesRepository,
+        savedSitesParser: SavedSitesParser,
+    ): SavedSitesImporter {
+        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, savedSitesParser)
     }
 
     @Provides
     @Singleton
-    fun bookmarksParser(): BookmarksParser {
-        return RealBookmarksParser()
+    fun savedSitesParser(): SavedSitesParser {
+        return RealSavedSitesParser()
     }
 
     @Provides
     @Singleton
-    fun bookmarksExporter(
+    fun savedSitesExporter(
         context: Context,
-        bookmarksParser: BookmarksParser,
+        savedSitesParser: SavedSitesParser,
         bookmarksDao: BookmarksDao,
+        favoritesRepository: FavoritesRepository,
         dispatcherProvider: DispatcherProvider
-    ): BookmarksExporter {
-        return RealBookmarksExporter(context.contentResolver, bookmarksDao, bookmarksParser, dispatcherProvider)
+    ): SavedSitesExporter {
+        return RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, savedSitesParser, dispatcherProvider)
     }
 
     @Provides
     @Singleton
     fun bookmarkManager(
-        bookmarksImporter: BookmarksImporter,
-        bookmarksExporter: BookmarksExporter,
+        savedSitesImporter: SavedSitesImporter,
+        savedSitesExporter: SavedSitesExporter,
         pixel: Pixel
-    ): BookmarksManager {
-        return RealBookmarksManager(bookmarksImporter, bookmarksExporter, pixel)
+    ): SavedSitesManager {
+        return RealSavedSitesManager(savedSitesImporter, savedSitesExporter, pixel)
     }
 
     @Provides

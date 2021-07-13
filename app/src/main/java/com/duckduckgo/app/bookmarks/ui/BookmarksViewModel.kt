@@ -21,9 +21,9 @@ import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.service.ExportBookmarksResult
-import com.duckduckgo.app.bookmarks.service.ImportBookmarksResult
-import com.duckduckgo.app.bookmarks.service.BookmarksManager
+import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
+import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
+import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
@@ -48,7 +48,7 @@ class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
-    private val bookmarksManager: BookmarksManager,
+    private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider
 ) : EditSavedSiteListener, ViewModel() {
@@ -63,8 +63,8 @@ class BookmarksViewModel(
         class OpenSavedSite(val savedSite: SavedSite) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
-        data class ImportedBookmarks(val importBookmarksResult: ImportBookmarksResult) : Command()
-        data class ExportedBookmarks(val exportBookmarksResult: ExportBookmarksResult) : Command()
+        data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
+        data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
     }
 
     companion object {
@@ -158,18 +158,18 @@ class BookmarksViewModel(
 
     fun importBookmarks(uri: Uri) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val result = bookmarksManager.import(uri)
+            val result = savedSitesManager.import(uri)
             withContext(dispatcherProvider.main()) {
-                command.value = ImportedBookmarks(result)
+                command.value = ImportedSavedSites(result)
             }
         }
     }
 
-    fun exportBookmarks(selectedFile: Uri) {
+    fun exportSavedSites(selectedFile: Uri) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val result = bookmarksManager.export(selectedFile)
+            val result = savedSitesManager.export(selectedFile)
             withContext(dispatcherProvider.main()) {
-                command.value = ExportedBookmarks(result)
+                command.value = ExportedSavedSites(result)
             }
         }
     }
@@ -203,7 +203,7 @@ class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val dao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
-    private val bookmarksManager: Provider<BookmarksManager>,
+    private val savedSitesManager: Provider<SavedSitesManager>,
     private val pixel: Provider<Pixel>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
@@ -215,7 +215,7 @@ class BookmarksViewModelFactory @Inject constructor(
                         favoritesRepository.get(),
                         dao.get(),
                         faviconManager.get(),
-                        bookmarksManager.get(),
+                        savedSitesManager.get(),
                         pixel.get(),
                         dispatcherProvider.get()
                     ) as T
