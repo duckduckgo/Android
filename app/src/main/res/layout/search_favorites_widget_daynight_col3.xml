@@ -40,7 +40,7 @@
         <ImageView
             android:id="@+id/search"
             style="@style/SearchWidgetSearchIcon"
-            android:src="@drawable/ic_widget_loupe_white_25dp" />
+            android:src="@drawable/ic_widget_loupe_daynight" />
     </RelativeLayout>
 
     <FrameLayout
