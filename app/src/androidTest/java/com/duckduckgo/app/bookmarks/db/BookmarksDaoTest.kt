@@ -58,31 +58,31 @@ class BookmarksDaoTest {
 
     @Test
     fun whenBookmarkDeleteThenItIsNoLongerInTheList() {
-        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         dao.delete(bookmark)
-        val list = dao.getBookmarks().blockingObserve()
+        val list = dao.getBookmarks(0).blockingObserve()
         assertTrue(list!!.isEmpty())
     }
 
     @Test
     fun whenBookmarkAddedThenItIsInList() {
-        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
-        val list = dao.getBookmarks().blockingObserve()
+        val list = dao.getBookmarks(0).blockingObserve()
         assertEquals(listOf(bookmark), list)
     }
 
     @Test
     fun whenInInitialStateThenTheBookmarksAreEmpty() {
-        val list = dao.getBookmarks().blockingObserve()
+        val list = dao.getBookmarks(0).blockingObserve()
         assertNotNull(list)
         assertTrue(list!!.isEmpty())
     }
 
     @Test
     fun whenBookmarksExistThenReturnTrue() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         assertTrue(dao.hasBookmarks())
     }
@@ -94,7 +94,7 @@ class BookmarksDaoTest {
 
     @Test
     fun whenBookmarksCountByUrlAndNoBookmarksMatchThenReturnZero() {
-        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         val count = dao.bookmarksCountByUrl("test")
         assertEquals(0, count)
@@ -103,7 +103,7 @@ class BookmarksDaoTest {
     @Test
     fun whenBookmarksCountByUrlAndBookmarksMatchThenReturnCount() {
         val query = "%example%"
-        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         val count = dao.bookmarksCountByUrl(query)
         assertEquals(1, count)
