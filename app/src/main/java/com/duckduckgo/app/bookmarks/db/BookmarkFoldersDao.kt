@@ -25,8 +25,8 @@ interface BookmarkFoldersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmarkFolder: BookmarkFolderEntity): Long
 
-    @Query("select * from bookmark_folders")
-    fun getBookmarkFolders(): LiveData<List<BookmarkFolderEntity>>
+    @Query("select * from bookmark_folders where parentId = :parentId")
+    fun getBookmarkFolders(parentId: Long): LiveData<List<BookmarkFolderEntity>>
 
     @Query("select * from bookmark_folders")
     fun getBookmarkFoldersSync(): List<BookmarkFolderEntity>
