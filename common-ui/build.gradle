@@ -24,7 +24,11 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 
+    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+
+    implementation "androidx.core:core-ktx:_"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 }

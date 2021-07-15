@@ -77,8 +77,12 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
 
     override var theme: DuckDuckGoTheme?
         get() {
-            val themeName = preferences.getString(KEY_THEME, null) ?: return null
-            return DuckDuckGoTheme.valueOf(themeName)
+            val themeName = preferences.getString(KEY_THEME, null)
+            return if (themeName == null) {
+                DuckDuckGoTheme.LIGHT
+            } else {
+                DuckDuckGoTheme.valueOf(themeName)
+            }
         }
         set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
 

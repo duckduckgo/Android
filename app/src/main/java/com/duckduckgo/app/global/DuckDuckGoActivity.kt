@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.mobile.android.ui.applyTheme
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -51,7 +52,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
      */
     fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme()
+        themeChangeReceiver = applyTheme(settingsDataStore.theme)
         super.onCreate(savedInstanceState)
     }
 
