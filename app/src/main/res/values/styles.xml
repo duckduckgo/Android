@@ -484,6 +484,7 @@
         <item name="android:orientation">vertical</item>
         <item name="android:paddingTop">@dimen/searchWidgetPadding</item>
         <item name="android:paddingBottom">@dimen/searchWidgetPadding</item>
+        <item name="android:elevation">2dp</item>
     </style>
 
     <style name="SearchWidgetSearchBarContainer">
@@ -554,7 +555,6 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">14sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
@@ -563,6 +563,7 @@
     <style name="SearchWidgetEmtpyFavoritesAction">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">15sp</item>
         <item name="android:maxLines">1</item>
