@@ -26,13 +26,13 @@
     <item
         android:id="@+id/appExitHistory"
         android:icon="@drawable/ic_baseline_history_24"
-        android:title="@string/appExitsReasonsTitle"
+        android:title="@string/atp_AppExitsReasonsTitle"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/vpnRestarts"
         android:icon="@drawable/ic_baseline_history_24"
-        android:title="@string/appRestartsTitle"
+        android:title="@string/atp_AppRestartsTitle"
         app:showAsAction="never" />
 
 </menu>

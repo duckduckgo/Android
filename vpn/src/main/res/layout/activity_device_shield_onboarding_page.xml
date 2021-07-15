@@ -55,7 +55,7 @@
                 android:layout_height="match_parent"
                 android:paddingTop="5dp"
                 android:paddingBottom="12dp"
-                android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+                android:contentDescription="@string/atp_OnboardingLogoDescription"
                 android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/device_shield_onboarding_page_three_header" />
@@ -104,7 +104,7 @@
             android:layout_marginTop="20dp"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
-            android:text="@string/deviceShieldOnboardingLastPageOneTitle"
+            android:text="@string/atp_OnboardingLastPageOneTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header" />
@@ -117,7 +117,7 @@
             android:layout_marginTop="24dp"
             android:paddingStart="40dp"
             android:paddingEnd="40dp"
-            android:text="@string/deviceShieldOnboardingLatsPageOneSubtitle"
+            android:text="@string/atp_OnboardingLatsPageOneSubtitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />

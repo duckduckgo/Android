@@ -113,23 +113,23 @@ class DeviceShieldFragment : Fragment() {
             if (state.trackersBlocked.trackers > 0) {
                 renderTrackersBlockedWhenEnabled(state.trackersBlocked)
             } else {
-                deviceShieldCtaHeaderTextView.setText(R.string.deviceShieldNewTabEnabled)
+                deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
                 deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
             }
         } else {
-            deviceShieldCtaHeaderTextView.setText(R.string.deviceShieldNewTabDisabled)
+            deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
             deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
         }
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
-        val latestAppString = resources.getString(R.string.deviceShieldDailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
-        val prefix = resources.getString(R.string.deviceShieldWeeklyCompanyTrackersBlockedNotificationPrefix)
-        val totalTrackers = resources.getQuantityString(R.plurals.deviceShieldTrackers, trackerBlocked.trackers, trackerBlocked.trackers)
+        val latestAppString = resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
+        val prefix = resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationPrefix)
+        val totalTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, trackerBlocked.trackers, trackerBlocked.trackers)
         val optionalOtherAppsString = if (trackerBlocked.otherAppsSize == 0) "" else resources.getQuantityString(
-            R.plurals.deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps, trackerBlocked.otherAppsSize, trackerBlocked.otherAppsSize
+            R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps, trackerBlocked.otherAppsSize, trackerBlocked.otherAppsSize
         )
-        val pastWeekSuffix = resources.getString(R.string.deviceShieldNewTabSuffix)
+        val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
 
         val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
 

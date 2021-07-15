@@ -30,7 +30,7 @@
         android:layout_weight="1"
         android:layout_gravity="center"
         android:layout_marginEnd="24dp"
-        tools:text="Device Shield has blocked 1136 trackers so far. Tap to view your full Privacy Report" />
+        tools:text="App Tracking Protection has blocked 1136 trackers so far. Tap to view your full Privacy Report" />
 
     <ImageView
         android:id="@+id/deviceShieldNotificationStatusIcon"

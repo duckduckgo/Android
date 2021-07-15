@@ -163,7 +163,7 @@ class TrackerFeedAdapter @Inject constructor(
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
-                                R.string.deviceShieldActivityTrackersBlocked, item.trackersTotalCount, item.trackingApp.appDisplayName
+                                R.string.atp_ActivityTrackersBlocked, item.trackersTotalCount, item.trackingApp.appDisplayName
                             ),
                             FROM_HTML_MODE_COMPACT
                         )
@@ -188,9 +188,9 @@ class TrackerFeedAdapter @Inject constructor(
 
         private fun List<TrackerInfo>.asInfoMessage(): String {
             return when (size) {
-                1 -> context.getString(R.string.deviceShieldActivityTrackersCountOne, first().companyDisplayName)
-                2 -> context.getString(R.string.deviceShieldActivityTrackersCountTwo, first().companyDisplayName)
-                else -> context.getString(R.string.deviceShieldActivityTrackersCountMany, first().companyDisplayName, size - 1)
+                1 -> context.getString(R.string.atp_ActivityTrackersCountOne, first().companyDisplayName)
+                2 -> context.getString(R.string.atp_ActivityTrackersCountTwo, first().companyDisplayName)
+                else -> context.getString(R.string.atp_ActivityTrackersCountMany, first().companyDisplayName, size - 1)
             }
         }
     }

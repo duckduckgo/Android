@@ -35,7 +35,7 @@
         style="@style/DeviceShieldOnboardingHeaderStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/deviceShieldActivityEmptyListTitle" />
+        android:text="@string/atp_ActivityEmptyListTitle" />
 
     <TextView
         style="@style/DeviceShieldOnboardingTextStyle"
@@ -44,6 +44,6 @@
         android:layout_marginTop="12dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
-        android:text="@string/deviceShieldActivityEmptyListMessage" />
+        android:text="@string/atp_ActivityEmptyListMessage" />
 
 </LinearLayout>

@@ -240,12 +240,12 @@ class SettingsActivity :
 
     private fun updateDeviceShieldSettings(deviceShieldEnabled: Boolean, deviceShieldOnboardingShown: Boolean) {
         if (!deviceShieldOnboardingShown) {
-            deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldNeverEnabled))
+            deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
         } else {
             if (deviceShieldEnabled) {
-                deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldEnabled))
+                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
             } else {
-                deviceShieldSetting.setSubtitle(getString(R.string.settingsDeviceShieldDisabled))
+                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
             }
         }
     }
@@ -332,10 +332,10 @@ class SettingsActivity :
 
     private fun handleDeviceShieldOnboardingResult(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
-            Timber.i("VPN enabled during device shield onboarding")
+            Timber.i("VPN enabled during App Tracking Protection onboarding")
             startActivity(DeviceShieldEnabledActivity.intent(this))
         } else {
-            Timber.i("VPN NOT enabled during device shield onboarding")
+            Timber.i("VPN NOT enabled during App Tracking Protection onboarding")
         }
     }
 

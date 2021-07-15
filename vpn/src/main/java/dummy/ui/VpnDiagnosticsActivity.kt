@@ -91,13 +91,13 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
 
             withContext(Dispatchers.Main) {
                 networkAddresses.text = addresses
-                meteredConnectionText.text = getString(R.string.meteredConnection, networkInfo.metered.toString())
-                vpnActiveText.text = getString(R.string.vpnConnectionStatus, networkInfo.vpn.toString())
-                networkAvailable.text = getString(R.string.networkAvailable, networkInfo.connectedToInternet.toString())
+                meteredConnectionText.text = getString(R.string.atp_MeteredConnection, networkInfo.metered.toString())
+                vpnActiveText.text = getString(R.string.atp_ConnectionStatus, networkInfo.vpn.toString())
+                networkAvailable.text = getString(R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString())
                 runningTime.text = runningTimeFormatted
                 appTrackersTextView.text = "App $appTrackersBlockedFormatted"
                 webTrackersTextView.text = "Web $webTrackersBlockedFormatted"
-                dnsServersText.text = getString(R.string.dnsServers, dnsInfo)
+                dnsServersText.text = getString(R.string.atp_DnsServers, dnsInfo)
             }
         }
 
@@ -293,7 +293,7 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                 val history = retrieveHistoricalCrashInfo()
 
                 AlertDialog.Builder(this)
-                    .setTitle(R.string.appExitsReasonsTitle)
+                    .setTitle(R.string.atp_AppExitsReasonsTitle)
                     .setMessage(history.toString())
                     .setPositiveButton("OK") { _, _ -> }
                     .setNeutralButton("Share") { _, _ ->
@@ -311,7 +311,7 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                 val restarts = retrieveRestartsHistoryInfo()
 
                 AlertDialog.Builder(this)
-                    .setTitle(R.string.appRestartsTitle)
+                    .setTitle(R.string.atp_AppRestartsTitle)
                     .setMessage(restarts.toString())
                     .setPositiveButton("OK") { _, _ -> }
                     .setNegativeButton("Clean") { _, _ ->

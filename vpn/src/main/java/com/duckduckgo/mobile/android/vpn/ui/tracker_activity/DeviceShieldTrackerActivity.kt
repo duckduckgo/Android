@@ -246,10 +246,10 @@ class DeviceShieldTrackerActivity :
     private fun updateCounts(trackerCountInfo: DeviceShieldTrackerActivityViewModel.TrackerCountInfo) {
         trackerBlockedCountView.count = trackerCountInfo.stringTrackerCount()
         trackerBlockedCountView.footer =
-            resources.getQuantityString(R.plurals.deviceShieldActivityPastWeekTrackerCount, trackerCountInfo.trackers.value)
+            resources.getQuantityString(R.plurals.atp_ActivityPastWeekTrackerCount, trackerCountInfo.trackers.value)
 
         trackingAppsCountView.count = trackerCountInfo.stringAppsCount()
-        trackingAppsCountView.footer = resources.getQuantityString(R.plurals.deviceShieldActivityPastWeekAppCount, trackerCountInfo.apps.value)
+        trackingAppsCountView.footer = resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
     private fun updateRunningState(state: RunningState) {
@@ -257,14 +257,14 @@ class DeviceShieldTrackerActivity :
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(getText(R.string.deviceShieldActivityEnabledLabel))
+                text = addClickableLink(getText(R.string.atp_ActivityEnabledLabel))
                 movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(getText(R.string.deviceShieldActivityDisabledLabel))
+                text = addClickableLink(getText(R.string.atp_ActivityDisabledLabel))
                 movementMethod = LinkMovementMethod.getInstance()
             }
         }

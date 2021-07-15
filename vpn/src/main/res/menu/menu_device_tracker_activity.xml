@@ -19,12 +19,12 @@
 
     <item
         android:id="@+id/diagnosticsScreen"
-        android:title="@string/diagnosticsMenuLabel"
+        android:title="@string/atp_DiagnosticsMenuLabel"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/dataScreen"
-        android:title="@string/dataMenuLabel"
+        android:title="@string/atp_DataMenuLabel"
         app:showAsAction="never" />
 
     <item
@@ -43,7 +43,7 @@
 
     <item
         android:id="@+id/deviceShieldSwitch"
-        android:title="@string/deviceShieldEnable"
+        android:title="@string/atp_Enable"
         app:showAsAction="always"
         app:actionLayout="@layout/menu_item_device_tracker_switch"/>
 

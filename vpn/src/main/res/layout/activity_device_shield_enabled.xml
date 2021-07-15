@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
                 android:background="@color/light_blue"
-                android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+                android:contentDescription="@string/atp_OnboardingLogoDescription"
                 android:paddingTop="80dp"
                 android:paddingBottom="12dp"
                 android:importantForAccessibility="no"
@@ -70,7 +70,7 @@
                 android:layout_marginTop="20dp"
                 android:paddingStart="40dp"
                 android:paddingEnd="40dp"
-                android:text="@string/deviceShieldEnabledTitle"
+                android:text="@string/atp_EnabledTitle"
                 android:textAlignment="center" />
 
             <TextView
@@ -81,7 +81,7 @@
                 android:layout_marginTop="20dp"
                 android:paddingStart="40dp"
                 android:paddingEnd="40dp"
-                android:text="@string/deviceShieldEnabledMessage"
+                android:text="@string/atp_EnabledMessage"
                 android:textAlignment="center" />
 
             <Button
@@ -92,7 +92,7 @@
                 android:layout_marginStart="50dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="60dp"
-                android:text="@string/deviceShieldEnabledActivityCTA" />
+                android:text="@string/atp_EnabledActivityCTA" />
 
             <TextView
                 android:id="@+id/onboarding_enabled_settings_text"
@@ -102,7 +102,7 @@
                 android:layout_marginTop="30dp"
                 android:paddingStart="40dp"
                 android:paddingEnd="40dp"
-                android:text="@string/deviceShieldEnabledSettings"
+                android:text="@string/atp_EnabledSettings"
                 android:textAlignment="center" />
 
         </LinearLayout>
