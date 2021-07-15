@@ -28,6 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.mobile.android.ui.applyTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -37,7 +38,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    lateinit var themingDataStore: ThemingDataStore
 
     private var themeChangeReceiver: BroadcastReceiver? = null
 
@@ -52,7 +53,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
      */
     fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
         if (daggerInject) daggerInject()
-        themeChangeReceiver = applyTheme(settingsDataStore.theme)
+        themeChangeReceiver = applyTheme(themingDataStore.theme)
         super.onCreate(savedInstanceState)
     }
 
