@@ -73,7 +73,7 @@
             <TextView
                 android:id="@+id/addFavoriteText"
                 android:textColor="@color/cornflowerBlue"
-                android:text="Add favorites"
+                android:text="Add Favorites"
                 style="@style/SearchWidgetEmtpyFavoritesAction" />
         </LinearLayout>
     </FrameLayout>
