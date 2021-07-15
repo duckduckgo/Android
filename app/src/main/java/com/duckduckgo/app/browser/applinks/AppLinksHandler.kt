@@ -23,12 +23,14 @@ interface AppLinksHandler {
     fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean
     fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
     fun enterBrowserState()
+    fun userEnteredBrowserState()
     fun reset()
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var appLinkOpenedInBrowser = false
+    var userEnteredLink = false
 
     override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || isRedirect && appLinkOpenedInBrowser || !isForMainFrame) {
@@ -39,7 +41,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
     }
 
     override fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser && !userEnteredLink) {
             return true
         }
         launchNonHttpAppLink()
@@ -50,7 +52,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         appLinkOpenedInBrowser = true
     }
 
+    override fun userEnteredBrowserState() {
+        userEnteredLink = true
+        enterBrowserState()
+    }
+
     override fun reset() {
         appLinkOpenedInBrowser = false
+        userEnteredLink = false
     }
 }

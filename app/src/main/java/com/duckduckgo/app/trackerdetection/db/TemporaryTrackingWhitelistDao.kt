@@ -47,4 +47,7 @@ abstract class TemporaryTrackingWhitelistDao {
 
     @Query("delete from temporary_tracking_whitelist")
     abstract fun deleteAll()
+
+    @Query("select count(1) > 0 from temporary_tracking_whitelist where :domain LIKE '%'||domain||'%'")
+    abstract fun contains(domain: String): Boolean
 }

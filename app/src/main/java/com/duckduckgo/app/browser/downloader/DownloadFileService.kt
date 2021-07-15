@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.browser.downloader
 
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.store.FDroidHttpsEmbeddedDataPersister
-import dagger.Module
-import dagger.Provides
+import retrofit2.Call
+import retrofit2.http.HEAD
+import retrofit2.http.Url
 
-@Module
-class HttpsPersisterModule {
+interface DownloadFileService {
 
-    @Provides
-    fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
-        return FDroidHttpsEmbeddedDataPersister()
-    }
+    @HEAD
+    fun getFileDetails(@Url urlString: String): Call<Void>?
 
 }
