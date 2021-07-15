@@ -90,8 +90,8 @@ android {
     }
     variantFilter { variant ->
         def names = variant.flavors*.name
-        if ((names.contains("fdroid") || names.contains("internal")) && variant.buildType.name == "debug") {
-            // We don't need fdroidDebug and internalDebug build types
+        if (names.contains("fdroid") && variant.buildType.name == "debug") {
+            // We don't need fdroidDebug build type
             setIgnore(true)
         }
     }
@@ -234,6 +234,10 @@ dependencies {
 
     // HTML
     implementation 'org.jsoup:jsoup:_'
+
+    // Flipper
+    internalImplementation "com.facebook.flipper:flipper:_"
+    internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
     testImplementation "junit:junit:_"

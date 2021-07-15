@@ -28,6 +28,7 @@ import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.statistics.VariantManager
@@ -72,10 +73,14 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
+        pixelInterceptorPlugins: PluginPoint<PixelInterceptorPlugin>,
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
+            .apply {
+                pixelInterceptorPlugins.getPlugins().forEach { addInterceptor(it.getInterceptor()) }
+            }
             .build()
     }
 
