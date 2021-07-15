@@ -125,11 +125,11 @@ class EmailProtectionSignInViewModel(
     }
 
     companion object {
-        const val PRIVACY_GUARANTEE = "https://quack.duckduckgo.com/email/privacy-guarantees"
-        const val ADDRESS_BLOG_POST = "https://quack.duckduckgo.com/email/learn-more"
-        const val GET_STARTED_URL = "https://quack.duckduckgo.com/email/start?inviteCode="
-        const val SIGN_UP_URL = "https://quack.duckduckgo.com/email/signup?inviteCode="
-        const val LOGIN_URL = "https://quack.duckduckgo.com/email/login"
+        const val PRIVACY_GUARANTEE = "https://duckduckgo.com/email/privacy-guarantees"
+        const val ADDRESS_BLOG_POST = "https://duckduckgo.com/email/learn-more"
+        const val GET_STARTED_URL = "https://duckduckgo.com/email/start?inviteCode="
+        const val SIGN_UP_URL = "https://duckduckgo.com/email/signup?inviteCode="
+        const val LOGIN_URL = "https://duckduckgo.com/email/login"
     }
 
 }
