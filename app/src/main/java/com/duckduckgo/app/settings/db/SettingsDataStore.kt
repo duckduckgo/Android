@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
-    var theme: DuckDuckGoTheme?
+    var theme: DuckDuckGoTheme
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
@@ -75,7 +75,7 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
             }
         }
 
-    override var theme: DuckDuckGoTheme?
+    override var theme: DuckDuckGoTheme
         get() {
             val themeName = preferences.getString(KEY_THEME, null)
             return if (themeName == null) {
