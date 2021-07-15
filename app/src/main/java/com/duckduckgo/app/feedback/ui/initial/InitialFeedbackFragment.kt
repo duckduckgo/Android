@@ -25,8 +25,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import javax.inject.Inject
 
 class InitialFeedbackFragment : FeedbackFragment() {
