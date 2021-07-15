@@ -94,6 +94,7 @@ class DeviceShieldEnabledNotificationBuilder {
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnShowDashboardPendingIntent)
                 .setCustomContentView(notificationLayout)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)

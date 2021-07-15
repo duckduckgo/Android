@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
+            android:visibility="gone"
             android:text="@string/deviceShieldActivityEnabledLabel" />
 
         <TextView
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
+            android:visibility="gone"
             android:text="@string/deviceShieldActivityDisabledLabel" />
 
         <TextView

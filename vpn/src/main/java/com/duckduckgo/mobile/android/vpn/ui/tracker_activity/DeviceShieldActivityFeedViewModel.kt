@@ -64,7 +64,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             .onStart {
                 startTickerRefresher()
                 emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
-                delay(2000)
             }
     }
 
