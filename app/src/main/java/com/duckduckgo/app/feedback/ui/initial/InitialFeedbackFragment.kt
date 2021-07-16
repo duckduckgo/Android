@@ -25,8 +25,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
-import com.duckduckgo.app.global.DuckDuckGoTheme
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import javax.inject.Inject
 
 class InitialFeedbackFragment : FeedbackFragment() {
@@ -38,7 +38,7 @@ class InitialFeedbackFragment : FeedbackFragment() {
     }
 
     @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    lateinit var themingDataStore: ThemingDataStore
 
     private var _binding: ContentFeedbackBinding? = null
     private val binding get() = _binding!!
@@ -56,7 +56,7 @@ class InitialFeedbackFragment : FeedbackFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if (settingsDataStore.theme == DuckDuckGoTheme.LIGHT) {
+        if (themingDataStore.theme == DuckDuckGoTheme.LIGHT) {
             binding.positiveFeedbackButton.setImageResource(R.drawable.button_happy_light_theme)
             binding.negativeFeedbackButton.setImageResource(R.drawable.button_sad_light_theme)
         } else {
