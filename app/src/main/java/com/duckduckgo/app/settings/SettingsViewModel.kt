@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -46,6 +47,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class SettingsViewModel @Inject constructor(
+    private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
@@ -105,7 +107,7 @@ class SettingsViewModel @Inject constructor(
     fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
-        val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
+        val isLightTheme = themingDataStore.theme == DuckDuckGoTheme.LIGHT
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
@@ -197,7 +199,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
-        settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
+        themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
             command.send(Command.UpdateTheme)
@@ -318,6 +320,7 @@ class SettingsViewModel @Inject constructor(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class SettingsViewModelFactory @Inject constructor(
+    private val themingDataStore: Provider<ThemingDataStore>,
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
@@ -328,7 +331,7 @@ class SettingsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
                 else -> null
             }
         }

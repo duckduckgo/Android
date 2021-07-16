@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -61,6 +62,9 @@ class SettingsViewModelTest {
     private lateinit var testee: SettingsViewModel
 
     private lateinit var context: Context
+
+    @Mock
+    private lateinit var mockThemeSettingsDataStore: ThemingDataStore
 
     @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
@@ -89,7 +93,7 @@ class SettingsViewModelTest {
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockEmailManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockEmailManager, mockFireAnimationLoader, mockPixel)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
@@ -147,7 +151,7 @@ class SettingsViewModelTest {
     fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onLightThemeToggled(true)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
 
             assertEquals(Command.UpdateTheme, expectItem())
 
@@ -165,7 +169,7 @@ class SettingsViewModelTest {
     fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onLightThemeToggled(false)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
+            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
             assertEquals(Command.UpdateTheme, expectItem())
 
