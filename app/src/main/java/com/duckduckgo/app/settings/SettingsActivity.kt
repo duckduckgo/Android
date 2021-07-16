@@ -31,20 +31,18 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
-import com.duckduckgo.app.settings.SettingsViewModel.EmailSetting
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -122,7 +120,7 @@ class SettingsActivity :
         automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
         automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
-        emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
+        emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
     }
 
     private fun configureInternalFeatures() {
@@ -159,7 +157,6 @@ class SettingsActivity :
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
-                    setEmailSetting(it.emailSetting)
                     appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
                 }
             }.launchIn(lifecycleScope)
@@ -168,18 +165,6 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
-    }
-
-    private fun setEmailSetting(emailData: EmailSetting) {
-        when (emailData) {
-            is EmailSetting.EmailSettingOff -> {
-                emailSetting.gone()
-            }
-            is EmailSetting.EmailSettingOn -> {
-                emailSetting.show()
-                emailSetting.setSubtitle(getString(R.string.settingsEmailAutofillEnabledFor, emailData.emailAddress))
-            }
-        }
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -207,12 +192,6 @@ class SettingsActivity :
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun launchEmailDialog() {
-        val dialog = SettingsEmailLogoutDialog.create()
-        dialog.show(supportFragmentManager, EMAIL_DIALOG_TAG)
-        dialog.onLogout = { viewModel.onEmailLogout() }
-    }
-
     private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
         val dialog = SettingsAutomaticallyClearWhatFragment.create(option)
         dialog.show(supportFragmentManager, CLEAR_WHAT_DIALOG_TAG)
@@ -234,8 +213,8 @@ class SettingsActivity :
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
+            is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
-            is Command.LaunchEmailDialog -> launchEmailDialog()
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             null -> TODO()
@@ -294,6 +273,11 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
+    private fun launchEmailProtectionScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(EmailProtectionActivity.intent(this), options)
+    }
+
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
         viewModel.onAutomaticallyWhatOptionSelected(clearWhatSetting)
     }
@@ -344,7 +328,6 @@ class SettingsActivity :
         private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
-        private const val EMAIL_DIALOG_TAG = "EMAIL_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
 

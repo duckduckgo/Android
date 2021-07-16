@@ -17,9 +17,10 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.app.settings.SettingsEmailLogoutDialog
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.app.email.ui.EmailProtectionSignOutFragment
 import com.duckduckgo.di.scopes.AppObjectGraph
+
+import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -33,21 +34,21 @@ import dagger.multibindings.IntoMap
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface SettingsEmailLogoutDialogComponent : AndroidInjector<SettingsEmailLogoutDialog> {
+interface EmailProtectionSignOutFragmentComponent : AndroidInjector<EmailProtectionSignOutFragment> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<SettingsEmailLogoutDialog>
+    interface Factory : AndroidInjector.Factory<EmailProtectionSignOutFragment>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface SettingsEmailLogoutDialogComponentProvider {
-    fun provideSettingsEmailLogoutDialogComponentFactory(): SettingsEmailLogoutDialogComponent.Factory
+interface EmailProtectionSignOutFragmentComponentProvider {
+    fun provideEmailProtectionSignOutFragmentComponentFactory(): EmailProtectionSignOutFragmentComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class SettingsEmailLogoutDialogBindingModule {
+abstract class EmailProtectionSignOutFragmentBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(SettingsEmailLogoutDialog::class)
-    abstract fun bindSettingsEmailLogoutDialogComponentFactory(factory: SettingsEmailLogoutDialogComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(EmailProtectionSignOutFragment::class)
+    abstract fun bindEmailProtectionSignOutFragmentComponentFactory(factory: EmailProtectionSignOutFragmentComponent.Factory): AndroidInjector.Factory<*>
 }

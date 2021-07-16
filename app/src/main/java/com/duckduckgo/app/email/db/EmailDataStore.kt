@@ -28,7 +28,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.security.GeneralSecurityException
@@ -37,6 +36,10 @@ interface EmailDataStore {
     var emailToken: String?
     var nextAlias: String?
     var emailUsername: String?
+    var inviteCode: String?
+    var waitlistTimestamp: Int
+    var waitlistToken: String?
+    var sendNotification: Boolean
     fun nextAliasFlow(): StateFlow<String?>
 }
 
@@ -50,7 +53,7 @@ class EmailEncryptedSharedPreferences(
 
     private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
     private val nextAliasSharedFlow: MutableStateFlow<String?> = MutableStateFlow(nextAlias)
-    override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow.asStateFlow()
+    override fun nextAliasFlow(): StateFlow<String?> = nextAliasSharedFlow
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
@@ -102,10 +105,48 @@ class EmailEncryptedSharedPreferences(
             }
         }
 
+    override var waitlistTimestamp: Int
+        get() = encryptedPreferences?.getInt(KEY_WAITLIST_TIMESTAMP, -1) ?: -1
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putInt(KEY_WAITLIST_TIMESTAMP, value)
+            }
+        }
+
+    override var waitlistToken: String?
+        get() = encryptedPreferences?.getString(KEY_WAITLIST_TOKEN, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_WAITLIST_TOKEN)
+                else putString(KEY_WAITLIST_TOKEN, value)
+            }
+        }
+
+    override var inviteCode: String?
+        get() = encryptedPreferences?.getString(KEY_INVITE_CODE, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_INVITE_CODE)
+                else putString(KEY_INVITE_CODE, value)
+            }
+        }
+
+    override var sendNotification: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_SEND_NOTIFICATION, false) ?: false
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_SEND_NOTIFICATION, value)
+            }
+        }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
         const val KEY_EMAIL_TOKEN = "KEY_EMAIL_TOKEN"
         const val KEY_EMAIL_USERNAME = "KEY_EMAIL_USERNAME"
         const val KEY_NEXT_ALIAS = "KEY_NEXT_ALIAS"
+        const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
+        const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
+        const val KEY_INVITE_CODE = "KEY_INVITE_CODE"
+        const val KEY_SEND_NOTIFICATION = "KEY_SEND_NOTIFICATION"
     }
 }

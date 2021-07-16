@@ -21,7 +21,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -51,7 +50,6 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val emailManager: EmailManager,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel
 ) : ViewModel() {
@@ -67,14 +65,8 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
         val appLinksEnabled: Boolean = true
     )
-
-    sealed class EmailSetting {
-        object EmailSettingOff : EmailSetting()
-        data class EmailSettingOn(val emailAddress: String) : EmailSetting()
-    }
 
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
@@ -83,6 +75,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
+        object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
         object LaunchLocation : Command()
@@ -91,7 +84,6 @@ class SettingsViewModel @Inject constructor(
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
-        object LaunchEmailDialog : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
     }
@@ -125,23 +117,9 @@ class SettingsViewModel @Inject constructor(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-                    emailSetting = getEmailSetting(),
                     appLinksEnabled = settingsDataStore.appLinksEnabled
                 )
             )
-        }
-    }
-
-    private fun getEmailSetting(): EmailSetting {
-        val emailAddress = emailManager.getEmailAddress()
-
-        return if (emailManager.isSignedIn()) {
-            when (emailAddress) {
-                null -> EmailSetting.EmailSettingOff
-                else -> EmailSetting.EmailSettingOn(emailAddress)
-            }
-        } else {
-            EmailSetting.EmailSettingOff
         }
     }
 
@@ -151,12 +129,6 @@ class SettingsViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
-    }
-
-    fun onEmailSettingClicked() {
-        if (getEmailSetting() is EmailSetting.EmailSettingOn) {
-            viewModelScope.launch { command.send(Command.LaunchEmailDialog) }
-        }
     }
 
     fun userRequestedToSendFeedback() {
@@ -192,9 +164,8 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
     }
 
-    fun onEmailLogout() {
-        emailManager.signOut()
-        viewModelScope.launch { viewState.emit(currentViewState().copy(emailSetting = EmailSetting.EmailSettingOff)) }
+    fun onEmailProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
@@ -324,14 +295,13 @@ class SettingsViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
-    private val emailManager: Provider<EmailManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
     private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), emailManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
                 else -> null
             }
         }
