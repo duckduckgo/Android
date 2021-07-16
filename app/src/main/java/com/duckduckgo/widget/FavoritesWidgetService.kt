@@ -93,7 +93,7 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         override fun onDataSetChanged() {
             Timber.i("FavoritesWidgetService - favs onDataSetChanged $this")
-            val newList = favoritesDataRepository.favoritesBlockingGet().take(maxItems).map {
+            val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
                 val faviconFile = faviconPersister.faviconFile(
                     FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
                     FileBasedFaviconPersister.NO_SUBFOLDER,
