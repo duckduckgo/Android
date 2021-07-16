@@ -42,7 +42,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -100,6 +100,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private var executorService: ExecutorService? = null
 
     private var newTrackerObserverJob: Job? = null
+    private var notificationTickerJob: Job? = null
+    private var notificationTickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var timeRunningTrackerJob: Job? = null
 
     private var lastSavedTimestamp = 0L
@@ -355,8 +357,23 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         )
 
         newTrackerObserverJob = launch {
-            repository.getVpnTrackers({ dateOfLastHour() }).collectLatest {
-                updateNotificationForNewTrackerFound(it)
+            repository.getVpnTrackers({ dateOfLastHour() })
+                .combine(notificationTickerChannel.asStateFlow()) { trackers, _ -> trackers }
+                .onStart { startNewTrackerNotificationRefreshTicker() }
+                .collectLatest {
+                    updateNotificationForNewTrackerFound(it)
+                }
+        }
+    }
+
+    private fun startNewTrackerNotificationRefreshTicker() {
+        // this ticker ensures the ongoing notification information is not stale if we haven't
+        // blocked trackers for a while
+        notificationTickerJob?.cancel()
+        notificationTickerJob = launch {
+            while (isActive) {
+                notificationTickerChannel.emit(System.currentTimeMillis())
+                delay(TimeUnit.HOURS.toMillis(1))
             }
         }
     }
@@ -369,6 +386,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun notifyVpnStopped() {
         timeRunningTrackerJob?.cancel()
         newTrackerObserverJob?.cancel()
+        notificationTickerJob?.cancel()
         launch { writeRunningTimeToDatabase(timeSinceLastRunningTimeSave()) }
     }
 

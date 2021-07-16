@@ -56,7 +56,7 @@
         app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Device Shield is enabled and blocking tracking attempts across your apps" />
+        tools:text="App Tracking Protection is enabled and blocking tracking attempts across your apps" />
 
     <View
         android:id="@+id/deviceShieldCtaSplitter"

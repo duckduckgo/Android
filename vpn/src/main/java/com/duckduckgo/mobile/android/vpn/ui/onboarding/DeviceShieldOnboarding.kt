@@ -31,7 +31,7 @@ import javax.inject.Named
 
 interface DeviceShieldOnboarding {
     /**
-     * @return null if the Device Shield onboarding has been shown already. Intent otherwise
+     * @return null if the App Tracking Protection onboarding has been shown already. Intent otherwise
      */
     fun prepare(context: Context): Intent?
 }

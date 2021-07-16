@@ -58,7 +58,7 @@ class DeviceShieldNotificationFactoryTest {
     @Test
     fun createsDeviceShieldEnabledNotification() {
         val notification = factory.createNotificationDeviceShieldEnabled()
-        notification.assertTitleEquals("Device Shield is enabled and blocking tracking attempts across your apps")
+        notification.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
         assertFalse(notification.hidden)
     }
 

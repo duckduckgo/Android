@@ -35,15 +35,15 @@ class DeviceShieldOnboardingViewModel(
     val pages = listOf(
         OnboardingPage(
             R.raw.device_shield_tracker_count,
-            R.string.deviceShieldOnboardingLastPageOneTitle, R.string.deviceShieldOnboardingLatsPageOneSubtitle
+            R.string.atp_OnboardingLastPageOneTitle, R.string.atp_OnboardingLatsPageOneSubtitle
         ),
         OnboardingPage(
             R.raw.device_shield_tracking_apps,
-            R.string.deviceShieldOnboardingLastPageTwoTitle, R.string.deviceShieldOnboardingLastPageTwoSubTitle
+            R.string.atp_OnboardingLastPageTwoTitle, R.string.atp_OnboardingLastPageTwoSubTitle
         ),
         OnboardingPage(
             R.drawable.device_shield_onboarding_page_three_header,
-            R.string.deviceShieldOnboardingLastPageThreeTitle, R.string.deviceShieldOnboardingLastPageThreeSubTitle
+            R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
         )
     )
 
@@ -56,7 +56,7 @@ class DeviceShieldOnboardingViewModel(
     }
 
     fun onDeviceShieldEnabled() {
-        Timber.i("Device Shield, is now enabled")
+        Timber.i("App Tracking Protection, is now enabled")
         deviceShieldPixels.enableFromOnboarding()
     }
 

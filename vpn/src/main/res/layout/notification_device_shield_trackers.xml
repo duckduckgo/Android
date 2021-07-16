@@ -33,7 +33,7 @@
             style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="@string/privacyReportEnabledTooltip" />
+            tools:text="@string/atp_PrivacyReportEnabledTooltip" />
 
         <TextView
             android:id="@+id/deviceShieldNotificationMessage"

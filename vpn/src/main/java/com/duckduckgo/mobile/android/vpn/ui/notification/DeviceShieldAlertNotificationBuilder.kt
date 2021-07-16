@@ -43,7 +43,7 @@ class DeviceShieldAlertNotificationBuilder {
 
         private fun registerAlertChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "App Tracking Protection Alerts", NotificationManager.IMPORTANCE_DEFAULT)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -75,7 +75,7 @@ class DeviceShieldAlertNotificationBuilder {
                 .addAction(
                     NotificationCompat.Action(
                         R.drawable.ic_vpn_notification_24,
-                        context.getString(R.string.deviceShieldEnable),
+                        context.getString(R.string.atp_Enable),
                         restartVpnIntent
                     )
                 )

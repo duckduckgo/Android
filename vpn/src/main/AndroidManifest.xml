@@ -10,7 +10,7 @@
         <activity
             android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
-            android:label="@string/title_activity_vpn_controller"
+            android:label="@string/atp_name"
             android:process=":vpn"
             android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar">
@@ -38,34 +38,34 @@
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo"
             android:theme="@style/Theme.AndroidVpn"
-            android:label="@string/trackerProfilingActivityTitle"
+            android:label="@string/atp_ProfilingActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
             android:theme="@style/Theme.AndroidVpn"
-            android:label="@string/deviceShieldFAQActivityTitle"
+            android:label="@string/atp_FAQActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:theme="@style/Theme.AndroidVpn.Trackers"
-            android:label="@string/deviceShieldActivityTitle"
+            android:label="@string/atp_ActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldMostRecentActivity"
             android:theme="@style/Theme.AndroidVpn"
-            android:label="@string/deviceShieldMostRecentActivityTitle"
+            android:label="@string/atp_MostRecentActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity"
-            android:label="@string/deviceShieldExclusionListActivityTitle"
+            android:label="@string/atp_ExclusionListActivityTitle"
             android:theme="@style/Theme.AndroidVpn"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"/>
 
@@ -81,7 +81,7 @@
         <service
             android:name=".service.DeviceShieldTileService"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:label="@string/device_shield_tile_label"
+            android:label="@string/atp_name"
             android:icon="@drawable/ic_device_shield_tile"
             >
             <intent-filter>

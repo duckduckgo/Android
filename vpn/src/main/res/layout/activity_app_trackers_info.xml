@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
                 android:background="@color/white"
-                android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
+                android:contentDescription="@string/atp_OnboardingLogoDescription"
                 android:src="@drawable/device_shield_trackers_info_header"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="35dp"
                 android:paddingEnd="35dp"
-                android:text="@string/trackerProfilingInfoTitle"/>
+                android:text="@string/atp_ProfilingInfoTitle"/>
 
             <TextView
                 android:id="@+id/trackerProfilingInfoFirstContent"
@@ -58,7 +58,7 @@
                 android:layout_marginTop="24dp"
                 android:paddingStart="35dp"
                 android:paddingEnd="35dp"
-                android:text="@string/trackerProfilingInfoFirstParagraph" />
+                android:text="@string/atp_ProfilingInfoFirstParagraph" />
 
             <ImageView
                 android:layout_marginTop="60dp"

@@ -38,8 +38,8 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
         val diff = (endDate.time - startDate.time).run { TimeUnit.DAYS.convert(this, TimeUnit.MILLISECONDS) }
 
         return when (diff) {
-            0L -> context.getString(R.string.deviceShieldActivityToday)
-            1L -> context.getString(R.string.deviceShieldActivityYesterday)
+            0L -> context.getString(R.string.atp_ActivityToday)
+            1L -> context.getString(R.string.atp_ActivityYesterday)
             else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(startDate)
         }
     }
@@ -55,7 +55,7 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
 
         return when (timeDifferenceDate) {
             0L, 1L -> TimePassed.fromMilliseconds(timeDifferenceMillis).shortFormat()
-            else -> context.getString(R.string.deviceShieldActivityDaysAgo, timeDifferenceDate)
+            else -> context.getString(R.string.atp_ActivityDaysAgo, timeDifferenceDate)
         }
     }
 

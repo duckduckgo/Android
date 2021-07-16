@@ -109,7 +109,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appLinksToggle"
         app:pillDrawable="@drawable/ic_beta_pill"
-        app:pillSubtitle="@string/settingsDeviceShieldDisabled"
-        app:pillTitle="@string/settingsDeviceShieldTitle" />
+        app:pillSubtitle="@string/atp_SettingsDeviceShieldDisabled"
+        app:pillTitle="@string/atp_SettingsTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

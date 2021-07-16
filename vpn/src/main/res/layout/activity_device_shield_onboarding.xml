@@ -24,82 +24,15 @@
     android:background="@color/white"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
-    <FrameLayout
-        android:id="@+id/onboarding_page_header"
-        android:layout_width="0dp"
-        android:layout_height="260dp"
-        android:background="@color/light_blue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/onboarding_page_animation"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="40dp"
-            android:importantForAccessibility="no"
-            android:scaleType="centerCrop"
-            app:lottie_imageAssetsFolder="images"
-            app:lottie_loop="true" />
-
-        <ImageView
-            android:id="@+id/onboarding_page_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="5dp"
-            android:paddingBottom="12dp"
-            android:contentDescription="@string/deviceShieldOnboardingLogoDescription"
-            android:importantForAccessibility="no"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/device_shield_onboarding_page_three_header" />
-
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/onboarding_active_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="28dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header">
-
-        <ImageView
-            android:id="@+id/onboarding_active_indicator_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_inactive_dot" />
-
-        <ImageView
-            android:id="@+id/onboarding_active_indicator_two"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:src="@drawable/ic_inactive_dot" />
-
-        <ImageView
-            android:id="@+id/onboarding_active_indicator_three"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_inactive_dot" />
-
-    </LinearLayout>
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingTop="20dp"
         android:paddingBottom="40dp"
         app:layout_constraintBottom_toTopOf="@+id/onboarding_next_cta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/onboarding_active_indicator" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/onboarding_close"
@@ -109,7 +42,6 @@
         android:src="@drawable/ic_baseline_close_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <ImageButton
         android:id="@+id/onboarding_next_cta"
@@ -150,7 +82,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="@string/deviceShieldEnable"
+                android:text="@string/atp_Enable"
                 android:textAlignment="viewStart"
                 android:textColor="@color/white"
                 android:textSize="15sp"
@@ -180,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/deviceShieldFAQCta"
+            android:text="@string/atp_FAQCta"
             android:textColor="@color/cornflowerBlue" />
 
     </LinearLayout>

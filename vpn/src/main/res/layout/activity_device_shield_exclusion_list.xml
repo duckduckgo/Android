@@ -30,7 +30,7 @@
         android:layout_marginBottom="@dimen/settingsItemHorizontalPadding"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
-        android:text="@string/deviceShieldExcludedAppsFeature"
+        android:text="@string/atp_ExcludedAppsFeature"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal" />

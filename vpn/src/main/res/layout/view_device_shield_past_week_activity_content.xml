@@ -32,7 +32,7 @@
         android:paddingBottom="4dp"
         android:textAllCaps="true"
         android:textSize="12sp"
-        android:text="@string/deviceShieldActivityPastWeekBlocked"
+        android:text="@string/atp_ActivityPastWeekBlocked"
         tools:text="Blocked"
         />
 
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="14sp"
-        android:text="@string/deviceShieldActivityPastWeekAcross"
+        android:text="@string/atp_ActivityPastWeekAcross"
         android:textAllCaps="false"
         tools:text="Trackers"
         />

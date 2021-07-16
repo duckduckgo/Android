@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQHeaderStyle"
             android:layout_marginTop="32dp"
-            android:text="@string/deviceShieldFAQFirstHeader"
+            android:text="@string/atp_FAQFirstHeader"
             android:paddingStart="35dp"
             android:paddingEnd="35dp" />
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQTextStyle"
             android:layout_marginTop="24dp"
-            android:text="@string/deviceShieldFAQFirstText"
+            android:text="@string/atp_FAQFirstText"
             android:paddingStart="35dp"
             android:paddingEnd="35dp"/>
 
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQHeaderStyle"
             android:layout_marginTop="32dp"
-            android:text="@string/deviceShieldFAQSecondHeader"
+            android:text="@string/atp_FAQSecondHeader"
             android:paddingStart="35dp"
             android:paddingEnd="35dp" />
 
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQTextStyle"
             android:layout_marginTop="24dp"
-            android:text="@string/deviceShieldFAQSecondText"
+            android:text="@string/atp_FAQSecondText"
             android:paddingStart="35dp"
             android:paddingEnd="35dp"/>
 
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQHeaderStyle"
             android:layout_marginTop="32dp"
-            android:text="@string/deviceShieldFAQThirdHeader"
+            android:text="@string/atp_FAQThirdHeader"
             android:paddingStart="35dp"
             android:paddingEnd="35dp" />
 
@@ -81,7 +81,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQTextStyle"
             android:layout_marginTop="24dp"
-            android:text="@string/deviceShieldFAQThirdText"
+            android:text="@string/atp_FAQThirdText"
             android:paddingStart="35dp"
             android:paddingEnd="35dp"/>
 
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQHeaderStyle"
             android:layout_marginTop="32dp"
-            android:text="@string/deviceShieldFAQFourthHeader"
+            android:text="@string/atp_FAQFourthHeader"
             android:paddingStart="35dp"
             android:paddingEnd="35dp" />
 
@@ -99,7 +99,25 @@
             android:layout_height="wrap_content"
             style="@style/DeviceShieldOnboardingFAQTextStyle"
             android:layout_marginTop="24dp"
-            android:text="@string/deviceShieldFAQFourthText"
+            android:text="@string/atp_FAQFourthText"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+            android:layout_marginTop="32dp"
+            android:text="@string/atp_FAQFifthHeader"
+            android:paddingStart="35dp"
+            android:paddingEnd="35dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/DeviceShieldOnboardingFAQTextStyle"
+            android:layout_marginTop="24dp"
+            android:text="@string/atp_FAQFifthText"
             android:paddingStart="35dp"
             android:paddingEnd="35dp"/>
 

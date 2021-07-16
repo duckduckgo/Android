@@ -15,13 +15,10 @@
   -->
 
 <resources>
-    <string name="deviceShieldAppName">Device Shield</string>
-    <string name="title_activity_vpn_controller">Device Shield - Stats</string>
-    <string name="device_shield_tile_label">Device Shield</string>
-    <string name="vpnNotificationTitle">App Tracker Protection Active</string>
-    <string name="vpnReminderNotificationTitle">App Tracker Protection is not enabled</string>
-    <string name="vpnReminderNotificationText">Please, tap on this notification and enable it now</string>
+    <string name="atp_name">App Tracking Protection</string>
     <string name="refresh">Refresh</string>
+
+    <!-- Diagnostics -->
     <string name="vpnTimeRunning">Time running: %s</string>
     <string name="vpnTrackerCompaniesBlockedToday">Tracker companies blocked today: %d</string>
     <string name="vpnTrackerCompaniesBlockedThisWeek">Tracker companies blocked this week: %d</string>
@@ -31,208 +28,162 @@
     <string name="vpnTrackersNone">"No trackers blocked yet"</string>
     <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
     <string name="vpnDataTransferred">"%s\n%s packets"</string>
-    <string name="vpnReportIssueLabel">Report Issue</string>
 
-    <!-- Device Shield Ongoing Notification -->
-    <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking tracking attempts across your apps"</string>
-    <string name="deviceShieldOnNoTrackersNotificationHeader">"Scanning for tracking activity… beep… boop"</string>
-    <string name="deviceShieldOnNoTrackersNotificationMessage">"No tracking attempts blocked in apps"</string>
-    <string name="deviceShieldOnNotificationPrefix">Tracking attempts blocked</string>
-    <plurals name="deviceShieldOnNotificationTrackers">
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Report Issue</string>
+    <string name="atp_OnInitialNotification">"App Tracking Protection is enabled and blocking tracking attempts across your apps"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Scanning for tracking activity… beep… boop"</string>
+    <string name="atp_OnNoTrackersNotificationMessage">"No tracking attempts blocked in apps"</string>
+    <string name="atp_OnNotificationPrefix">Tracking attempts blocked</string>
+    <plurals name="atp_OnNotificationTrackers">
         <item quantity="one">%d tracker blocked</item>
         <item quantity="other">%d trackers blocked</item>
     </plurals>
-    <string name="deviceShieldOnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
-    <string name="deviceShieldDisabledNotification">Device Shield disabled. Tap to continue blocking tracking attempts across your apps.</string>
-    <string name="deviceShieldDisabledNotificationAction">"Enable Device Shield"</string>
+    <string name="atp_OnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
+    <string name="atp_DisabledNotification">App Tracking Protection disabled. Tap to continue blocking tracking attempts.</string>
+    <string name="atp_DisabledNotificationAction">"Enable App Tracking Protection"</string>
 
-    <!-- Device Shield Daily Notification -->
-    <string name="deviceShieldDailyTrackersNotificationPrefix">Device Shield blocked</string>
-    <plurals name="deviceShieldTrackers">
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationPrefix">App Tracking Protection blocked</string>
+    <plurals name="atp_TrackingAttempts">
         <item quantity="one">%d tracking attempt</item>
         <item quantity="other">%d tracking attempts</item>
     </plurals>
-    <plurals name="deviceShieldDailyTrackersNotificationSuffixNumApps">
+    <plurals name="atp_DailyTrackersNotificationSuffixNumApps">
         <item quantity="one">in 1 app, %2$s</item>
         <item quantity="other">across %1$d apps, including %2$s</item>
     </plurals>
 
-    <string name="deviceShieldDailyNotificationPastDaySuffix">(past day).</string>
+    <string name="atp_DailyNotificationPastDaySuffix">(past day).</string>
 
-    <string name="deviceShieldDailyTopCompanyNotificationPrefix">%s tried to track you</string>
-    <plurals name="deviceShieldNotificationNumberOfApps">
+    <string name="atp_DailyTopCompanyNotificationPrefix">%s tried to track you</string>
+    <plurals name="atp_NotificationNumberOfApps">
         <item quantity="one">" in %d app"</item>
         <item quantity="other">" across %d apps"</item>
     </plurals>
-    <string name="deviceShieldNotificationPastDaySuffix">(past day).</string>
-    <string name="deviceShieldNotificationSeeMoreSuffix">See More</string>
-    <string name="deviceShieldDailyCompanyBlockedNotificationPrefix">Device Shield blocked the most tracking attempts in %s</string>
-    <string name="deviceShieldDailyCompanyBlockedNotificationOptionalSecondApp">and %s</string>
+    <string name="atp_NotificationPastDaySuffix">(past day).</string>
+    <string name="atp_NotificationSeeMoreSuffix">See More</string>
+    <string name="atp_DailyCompanyBlockedNotificationPrefix">App Tracking Protection blocked the most tracking attempts in %s</string>
+    <string name="atp_DailyCompanyBlockedNotificationOptionalSecondApp">and %s</string>
 
-    <plurals name="deviceShieldNumberTimes">
+    <plurals name="atp_NumberTimes">
         <item quantity="one">%d time</item>
         <item quantity="other">%d times</item>
     </plurals>
 
-    <string name="deviceShieldDailyLastCompanyBlockedNotification">Device Shield blocked %s</string>
-    <string name="deviceShieldDailyLastCompanyBlockedNotificationInApp">in %s</string>
-    <plurals name="deviceShieldDailyLastCompanyBlockedNotificationOptionalOtherApps">
+    <string name="atp_DailyLastCompanyBlockedNotification">App Tracking Protection blocked %s</string>
+    <string name="atp_DailyLastCompanyBlockedNotificationInApp">in %s</string>
+    <plurals name="atp_DailyLastCompanyBlockedNotificationOptionalOtherApps">
         <item quantity="one">" and 1 other app"</item>
         <item quantity="other">" and %d other apps"</item>
     </plurals>
 
-    <!-- Device Shield Weekly Notification -->
-    <string name="deviceShieldEnable">Enable Device Shield</string>
-    <string name="deviceShieldWeeklyCompanyTrackersBlockedNotification">"Device Shield blocked %s and %s (past week)"</string>
-    <string name="deviceShieldWeeklyCompanyTrackersBlockedNotificationPrefix">"Device Shield blocked"</string>
-    <plurals name="deviceShieldDailyCompany">
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_Enable">Enable App Tracking Protection</string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotification">"App Tracking Protection blocked %s and %s (past week)"</string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationPrefix">"App Tracking Protection blocked"</string>
+    <plurals name="atp_DailyCompany">
         <item quantity="one">%d company</item>
         <item quantity="other">%d companies</item>
     </plurals>
-    <string name="deviceShieldWeeklyCompanyTeaserNotificationPrefix">Device Shield blocked %s"</string>
-    <plurals name="deviceShieldWeeklyCompanyTeaserNotificationIncludingApp">
+    <string name="atp_WeeklyCompanyTeaserNotificationPrefix">App Tracking Protection blocked %s"</string>
+    <plurals name="atp_WeeklyCompanyTeaserNotificationIncludingApp">
         <item quantity="one">", %s"</item>
         <item quantity="other">", including %s"</item>
     </plurals>
-    <string name="deviceShieldWeeklyCompanyTeaserNotificationSuffix">" (past week)."</string>
+    <string name="atp_WeeklyCompanyTeaserNotificationSuffix">" (past week)."</string>
 
     <!-- Debug Screens -->
-    <string name="vpnReportFeedback">Send feedback</string>
-    <string name="diagnosticsMenuLabel">Diagnostics</string>
-    <string name="dataMenuLabel">Data Stats</string>
-    <string name="meteredConnection">"Metered: %s"</string>
-    <string name="vpnConnectionStatus">"VPN connected: %s"</string>
-    <string name="networkAvailable">"Connected to internet: %s"</string>
-    <string name="dnsServers">"DNS servers: %s"</string>
-    <string name="appExitsReasonsTitle">App exit reasons</string>
-    <string name="appRestartsTitle">App restarts</string>
+    <string name="atp_DiagnosticsMenuLabel">Diagnostics</string>
+    <string name="atp_DataMenuLabel">Data Stats</string>
+    <string name="atp_MeteredConnection">"Metered: %s"</string>
+    <string name="atp_ConnectionStatus">"VPN connected: %s"</string>
+    <string name="atp_NetworkAvailable">"Connected to internet: %s"</string>
+    <string name="atp_DnsServers">"DNS servers: %s"</string>
+    <string name="atp_AppExitsReasonsTitle">App exit reasons</string>
+    <string name="atp_AppRestartsTitle">App restarts</string>
 
-    <!-- Device Shield Privacy Report -->
-    <string name="deviceShieldEnabledTooltip">Device Shield is enabled aWe\'re blocking companies from tracking you in other apps</string>
-    <string name="deviceShieldDisabledTooltip">We\'ll block companies from tracking you as you browse</string>
-    <string name="privacyReportPrivacylink">How do trackers profile you?</string>
-    <string name="privacyReportToolbarTitle">Privacy Report</string>
-    <string name="privacyReportEnabledTooltip">Device Shield is enabled and blocking trackers across your whole device</string>
-    <string name="privacyReportDisabledTooltip">Enable Device Shield for a summary</string>
-    <string name="privacyReportDeviceShieldEnableLabel">Enable Device Shield</string>
-    <string name="privacyReportDeviceShieldEnableMessage">With your permission, we can block trackers in other apps, too</string>
-    <string name="privacyReportEnable">Enable</string>
-    <string name="privacyReportAppTrackerTime">%s in an app</string>
-    <string name="privacyReportWebsiteTrackerTime">%s on a website</string>
-
-    <string name="privacyReportCompanyBlocked">blocked</string>
-
-    <plurals name="privacyReportCompaniesBlocked">
-        <item quantity="one">%d company</item>
-        <item quantity="other">%d companies</item>
-    </plurals>
-
-    <plurals name="privacyReportCompanyTimesBlocked">
-        <item quantity="one">%d time</item>
-        <item quantity="other">%d times</item>
-    </plurals>
-
-    <plurals name="privacyReportTrackersBlocked">
-        <item quantity="one">In the past week, we blocked %d tracker from %s in other apps</item>
-        <item quantity="other">In the past week, we blocked %d trackers from %s in other apps</item>
-    </plurals>
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection is enabled and blocking trackers across your whole device</string>
 
     <!-- Settings -->
-    <string name="settingsDeviceShieldTitle">Device Shield</string>
-    <string name="settingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
-    <string name="settingsDeviceShieldEnabled">Enabled</string>
-    <string name="settingsDeviceShieldDisabled">Disabled</string>
+    <string name="atp_SettingsTitle">App Tracking Protection</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
-    <!-- Device Shield Onboarding -->
-    <string name="deviceShieldOnboardingLogoDescription">Enable Device Shield</string>
-    <string name="deviceShieldOnboardingLastPageOneTitle">One easy step for better app privacy</string>
-    <string name="deviceShieldOnboardingLatsPageOneSubtitle">In 2021, we found that <b>70% of popular apps</b> allow other companies to track your personal information, even when you’re sleeping.\n\n<b>See which of your apps are on this list</b> and <b>take back control</b> with Device Shield.</string>
-    <string name="deviceShieldOnboardingLastPageTwoTitle">What Device Shield does</string>
-    <string name="deviceShieldOnboardingLastPageTwoSubTitle">Device Shield <b>blocks app trackers from other companies</b>, like when Facebook attempts to track you in a banking app.\n\n<b>It\'s free</b>, and you can enjoy your apps as your normally would. Working in the background, it helps <b>protect you night and day.</b></string>
-    <string name="deviceShieldOnboardingLastPageThreeTitle">Device Shield is not a VPN</string>
-    <string name="deviceShieldOnboardingLastPageThreeSubTitle">However, your device will recognize it as one. This is because Device Shield uses a local ’’VPN connection’’ to work. \n\nDevice Shield is different <b>because it never sends your data to a server.</b></string>
-    <string name="deviceShieldOnboardingCta">Ask My Permission</string>
-    <string name="deviceShieldFAQCta">Device Shield FAQ</string>
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Enable App Tracking Protection</string>
+    <string name="atp_OnboardingLastPageOneTitle">One easy step for better app privacy</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle">In 2021, we found that <b>70% of popular apps</b> allow other companies to track your personal information, even when you’re sleeping.\n\n<b>See which of your apps are on this list and take back control now.</b></string>
+    <string name="atp_OnboardingLastPageTwoTitle">How does it work?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>blocks app trackers from other companies</b>, like when Facebook attempts to track you in a banking app.\n\n<b>It\'s free</b>, and you can enjoy your apps as your normally would. Working in the background, it helps <b>protect you night and day.</b></string>
+    <string name="atp_OnboardingLastPageThreeTitle">Who sees your data?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local ’’VPN connection’’ to work. \n\n<b>App Tracking Protection is different. It never sends your data to a server.</b></string>
+    <string name="atp_FAQCta">App Tracking Protection FAQ</string>
 
-    <!--  Device Shield Enabled Activity -->
-    <string name="deviceShieldEnabledTitle">Hooray! You’re all set up.</string>
-    <string name="deviceShieldEnabledMessage">Device Shield shows a <b>real-time summary</b> of which apps allow other companies to track you.</string>
-    <string name="deviceShieldEnabledActivityCTA">View Device Shield</string>
-    <string name="deviceShieldEnabledSettings">You can access Device Shield in <annotation type="settings_link">Settings.</annotation></string>
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Hooray! You’re all set up.</string>
+    <string name="atp_EnabledMessage">App Tracking Protection shows a <b>real-time summary</b> of which apps allow other companies to track you.</string>
+    <string name="atp_EnabledActivityCTA">View App Tracking Protection</string>
+    <string name="atp_EnabledSettings">You can access App Tracking Protection in <annotation type="settings_link">Settings.</annotation></string>
 
     <!-- New Tab Integration -->
-    <string name="deviceShieldNewTabSuffix">" (past hour)."</string>
-    <string name="deviceShieldNewTabDisabled"><b>Device Shield disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
-    <string name="deviceShieldNewTabEnabled"><b>Device Shield is enabled</b> and blocking tracking attempts across your apps.</string>
-
-    <string name="deviceShieldMenuItemTitle">Device Shield</string>
-    <string name="deviceShieldDisabledHeader">Web trackers blocked</string>
-    <string name="deviceShieldDisabledSubheader">Enable Device Shield for a summary</string>
-    <string name="deviceShieldDisabledSwitchSubheader">Block trackers in other apps</string>
-    <string name="deviceShieldEnabledSnackbar">Success! 🎉 You\’ve enabled Device Shield. Manage this feature in Settings.</string>
-    <string name="deviceShieldLastTrackerBlocked">%s blocked %s</string>
-
-    <plurals name="deviceShieldCtaTrackersBlocked">
-        <item quantity="one">%d tracker blocked</item>
-        <item quantity="other">%d trackers blocked</item>
-    </plurals>
-
-    <plurals name="deviceShieldCtaTrackersBlockedOtherApps">
-        <item quantity="one">in %1$s</item>
-        <item quantity="two">in %1$s and 1 other app</item>
-        <item quantity="other">in %1$s and %2$d other apps</item>
-    </plurals>
+    <string name="atp_NewTabSuffix">" (past hour)."</string>
+    <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
+    <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
-    <string name="deviceShieldExcludedApps">Excluded Apps</string>
-    <string name="deviceShieldExclusionListActivityTitle">Excluded Apps</string>
-    <string name="deviceShieldExcludedAppsFeature">Device Shield doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
+    <string name="atp_ExcludedApps">Excluded Apps</string>
+    <string name="atp_ExclusionListActivityTitle">Excluded Apps</string>
+    <string name="atp_ExcludedAppsFeature">App Tracking Protection doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
 
     <!--  Tracker Profiling Info -->
-    <string name="trackerProfilingActivityTitle">About App Trackers</string>
-    <string name="trackerProfilingInfoTitle">What are app trackers?</string>
-    <string name="trackerProfilingInfoFirstParagraph">You’ve probably heard about companies like Google and Facebook tracking you behind the scenes on third-party websites. But did you know they also track your personal information through apps on your device?\n\nIn 2021, DuckDuckGo found that <b>over 70% of 100 of the top apps on Android contain trackers from major companies like Facebook, Google, and Amazon.</b> Over 70% of those same apps send personal data to at least one of these companies, even when you’re not using your device.\n\n<b>Trackers in apps may have access to a lot more information</b> than their website tracker cousins, such as your location down to which floor of a building you\'re on, how often you play games while at work, and when and how long you sleep each day. <b>Even if you haven’t given apps explicit permission to collect data, they can still take it without your knowledge.</b>\n\nTracking networks like Facebook and Google use these little pieces of information <b>to build a digital profile about you.</b> With it, tracking networks can manipulate what you see online and allow advertisers to bid on access to you based on your data.\n\nTrackers in apps is a BIG problem for privacy. <b>But DuckDuckGo has a solution that can help.</b>\n\nWhen enabled in the DuckDuckGo Privacy Browser app, Device Shield blocks many trackers in other apps, not just the trackers we find on websites when you browse. <b>These dual layers of protection reduce what companies know about you overall</b>, so you can use your apps with more peace of mind, knowing you’re more protected.</string>
+    <string name="atp_ProfilingActivityTitle">About App Trackers</string>
+    <string name="atp_ProfilingInfoTitle">What are app trackers?</string>
+    <string name="atp_ProfilingInfoFirstParagraph">You’ve probably heard about companies like Google and Facebook tracking you behind the scenes on third-party websites. But did you know they also track your personal information through apps on your device?\n\nIn 2021, DuckDuckGo found that <b>over 70% of 100 of the top apps on Android contain trackers from major companies like Facebook, Google, and Amazon.</b> Over 70% of those same apps send personal data to at least one of these companies, even when you’re not using your device.\n\n<b>Trackers in apps may have access to a lot more information</b> than their website tracker cousins, such as your location down to which floor of a building you\'re on, how often you play games while at work, and when and how long you sleep each day. <b>Even if you haven’t given apps explicit permission to collect data, they can still take it without your knowledge.</b>\n\nTracking networks like Facebook and Google use these little pieces of information <b>to build a digital profile about you.</b> With it, tracking networks can manipulate what you see online and allow advertisers to bid on access to you based on your data.\n\nTrackers in apps is a BIG problem for privacy. <b>But DuckDuckGo has a solution that can help.</b>\n\nWhen enabled in the DuckDuckGo Privacy Browser app, App Tracking Protection blocks many trackers in other apps, not just the trackers we find on websites when you browse. <b>These dual layers of protection reduce what companies know about you overall</b>, so you can use your apps with more peace of mind, knowing you’re more protected.</string>
 
-    <!--  Device Shield Activity -->
-    <string name="deviceShieldActivityPastWeek">Past Week</string>
-    <string name="deviceShieldActivityTitle">Device Shield</string>
-    <string name="deviceShieldMostRecentActivityTitle">All Recent Activity</string>
-    <string name="deviceShieldActivityRecentActivity">Recent Activity</string>
-    <string name="deviceShieldActivityCtaShowAll">View All Recent Activity</string>
-    <string name="deviceShieldActivityAppTrackersFAQ">What Are App Trackers?</string>
-    <string name="deviceShieldActivityBetaInstructions">Beta Instructions</string>
-    <string name="deviceShieldActivityTrackersBlocked">%d tracking attempts blocked in <![CDATA[<b>%s</b>]]> app</string>
-    <string name="deviceShieldActivityTrackersCountOne">from %1$s</string>
-    <string name="deviceShieldActivityTrackersCountTwo">from %1$s and 1 other</string>
-    <string name="deviceShieldActivityTrackersCountMany">from %1$s and %2$d others</string>
-    <string name="deviceShieldActivityToday">Today</string>
-    <string name="deviceShieldActivityYesterday">Yesterday</string>
-    <string name="deviceShieldActivityDaysAgo">%d days ago</string>
-    <string name="deviceShieldActivityEmptyListTitle">No new activity</string>
-    <string name="deviceShieldActivityEmptyListMessage">Keep using your device. Tracking attempts that Device Shield blocks appear here.</string>
-    <string name="deviceShieldActivityPastWeekDefault">-</string>
-    <string name="deviceShieldActivityPastWeekBlocked">Blocked</string>
-    <string name="deviceShieldActivityPastWeekAcross">Across</string>
-    <plurals name="deviceShieldActivityPastWeekTrackerCount">
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">Past Week</string>
+    <string name="atp_ActivityTitle">App Tracking Protection</string>
+    <string name="atp_MostRecentActivityTitle">All Recent Activity</string>
+    <string name="atp_ActivityRecentActivity">Recent Activity</string>
+    <string name="atp_ActivityCtaShowAll">View All Recent Activity</string>
+    <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
+    <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
+    <string name="atp_ActivityTrackersBlocked">%d tracking attempts blocked in <![CDATA[<b>%s</b>]]> app</string>
+    <string name="atp_ActivityTrackersCountOne">from %1$s</string>
+    <string name="atp_ActivityTrackersCountTwo">from %1$s and 1 other</string>
+    <string name="atp_ActivityTrackersCountMany">from %1$s and %2$d others</string>
+    <string name="atp_ActivityToday">Today</string>
+    <string name="atp_ActivityYesterday">Yesterday</string>
+    <string name="atp_ActivityDaysAgo">%d days ago</string>
+    <string name="atp_ActivityEmptyListTitle">No new activity</string>
+    <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
+    <string name="atp_ActivityPastWeekBlocked">Blocked</string>
+    <string name="atp_ActivityPastWeekAcross">Across</string>
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Tracking attempt</item>
         <item quantity="other">Tracking attempts</item>
     </plurals>
-    <plurals name="deviceShieldActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="deviceShieldActivityEnabledLabel">You\'re a beta tester. Notice a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
-    <string name="deviceShieldActivityDisabledLabel"><b>Device Shield is disabled</b>\nDid Device Shield cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityEnabledLabel">You\'re a beta tester. Notice a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
 
-    <!--  Device Shield FAQ -->
-    <string name="deviceShieldFAQActivityTitle">Device Shield FAQ</string>
-    <string name="deviceShieldFAQFirstHeader">What trackers does Device Shield block?</string>
-    <string name="deviceShieldFAQFirstText">Device Shield <b>blocks known trackers</b> that it identifies <b>from third-party companies, or those different from the company that owns each app.</b> For example, if Facebook owns the app, Device Shield doesn’t block its trackers, but would block trackers from Google or Amazon. We’re always on the lookout for other trackers for Device Shield to block.\n\nSome apps and known trackers might be excluded automatically based on whether they’d work properly with Device Shield enabled.</string>
-    <string name="deviceShieldFAQSecondHeader">Why does Device Shield use a VPN connection?</string>
-    <string name="deviceShieldFAQSecondText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for Device Shield to work.</b>\n\nThis permission, which works only on your device, allows Device Shield to monitor network traffic <b>so that it can block known trackers.</b></string>
-    <string name="deviceShieldFAQThirdHeader">How is Device Shield different from a VPN?</string>
-    <string name="deviceShieldFAQThirdText">A VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. However, this allows the VPN company to see your network traffic.\n\n<b>Device Shield is different.</b> Instead of sending your data to a VPN server, <b>Device Shield works only on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever Device Shield recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
-    <string name="deviceShieldFAQFourthHeader">Is my data private?</string>
-    <string name="deviceShieldFAQFourthText">Device Shield works only on your device and doesn’t send your data off your device to DuckDuckGo. <b>We don’t collect or store any data from your apps.</b></string>
+    <!--  App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">FAQ</string>
+    <string name="atp_FAQFirstHeader">What trackers does App Tracking Protection block?</string>
+    <string name="atp_FAQFirstText"><b>App Tracking Protection blocks known trackers that it identifies from third-party companies, or those different from the company that owns each app.</b> For example, if Facebook owns the app, App Tracking Protection doesn’t block its trackers, but would block trackers from Google or Amazon. We’re always on the lookout for other trackers for App Tracking Protection to block.\n\nSome apps and known trackers might be excluded automatically based on whether they’d work properly with App Tracking Protection enabled.</string>
+    <string name="atp_FAQSecondHeader">Does App Tracking Protection block trackers in all my apps?</string>
+    <string name="atp_FAQSecondText">App Tracking Protection excludes some apps so they work as expected. The App Exceptions list includes apps with known issues that occur when App Tracking Protection is enabled. These exclusions are mostly temporary as we continue to improve App Tracking Protection.\n\nApp Tracking Protection also excludes browsers, search apps, and other apps that frequently load websites so that site content appears as expected.</string>
+    <string name="atp_FAQThirdHeader">Why does App Tracking Protection use a VPN connection?</string>
+    <string name="atp_FAQThirdText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for App Tracking Protection to work.</b>\n\nThis permission, which works only on your device, allows App Tracking Protection to monitor network traffic <b>so that it can block known trackers.</b></string>
+    <string name="atp_FAQFourthHeader">How is App Tracking Protection different from a VPN?</string>
+    <string name="atp_FAQFourthText">A VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. However, this allows the VPN company to see your network traffic.\n\n<b>App Tracking Protection is different.</b> Instead of sending your data to a VPN server, <b>App Tracking Protection works only on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever App Tracking Protection recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
+    <string name="atp_FAQFifthHeader">Is my data private?</string>
+    <string name="atp_FAQFifthText">App Tracking Protection works only on your device and doesn’t send your data off your device to DuckDuckGo. <b>We don’t collect or store any data from your apps.</b></string>
 
 </resources>

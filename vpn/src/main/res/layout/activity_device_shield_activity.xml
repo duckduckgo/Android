@@ -34,7 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
-            android:text="@string/deviceShieldActivityEnabledLabel" />
+            android:visibility="gone"
+            android:text="@string/atp_ActivityEnabledLabel" />
 
         <TextView
             android:id="@+id/deviceShieldTrackerLabelDisabled"
@@ -43,7 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
-            android:text="@string/deviceShieldActivityDisabledLabel" />
+            android:visibility="gone"
+            android:text="@string/atp_ActivityDisabledLabel" />
 
         <TextView
             android:id="@+id/past_week_activity"
@@ -51,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="0dp"
-            android:text="@string/deviceShieldActivityPastWeek" />
+            android:text="@string/atp_ActivityPastWeek" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,7 +66,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/deviceShieldActivityPastWeekBlocked" />
+                android:text="@string/atp_ActivityPastWeekBlocked" />
 
             <View
                 android:id="@+id/vertical_divider"
@@ -79,7 +81,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/deviceShieldActivityPastWeekAcross" />
+                android:text="@string/atp_ActivityPastWeekAcross" />
 
         </LinearLayout>
 
@@ -95,7 +97,7 @@
             style="@style/SettingsSectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/deviceShieldActivityRecentActivity"
+            android:text="@string/atp_ActivityRecentActivity"
             android:textSize="14sp" />
 
         <androidx.fragment.app.FragmentContainerView
@@ -113,7 +115,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:visibility="gone"
-            android:text="@string/deviceShieldActivityCtaShowAll" />
+            android:text="@string/atp_ActivityCtaShowAll" />
 
         <View
             android:layout_width="match_parent"
@@ -129,7 +131,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/deviceShieldActivityAppTrackersFAQ" />
+            android:text="@string/atp_ActivityAppTrackersFAQ" />
 
         <Button
             android:id="@+id/cta_tracker_faq"
@@ -139,7 +141,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/deviceShieldFAQCta" />
+            android:text="@string/atp_FAQCta" />
 
         <Button
             android:id="@+id/cta_excluded_apps"
@@ -149,7 +151,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/deviceShieldExcludedApps" />
+            android:text="@string/atp_ExcludedApps" />
 
         <Button
             android:id="@+id/cta_beta_instructions"
@@ -160,7 +162,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            android:text="@string/deviceShieldActivityBetaInstructions" />
+            android:text="@string/atp_ActivityBetaInstructions" />
 
     </LinearLayout>
 </ScrollView>

@@ -30,14 +30,81 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <FrameLayout
+            android:id="@+id/onboarding_page_header"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:background="@color/light_blue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/onboarding_page_animation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="40dp"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                app:lottie_imageAssetsFolder="images"
+                app:lottie_loop="true" />
+
+            <ImageView
+                android:id="@+id/onboarding_page_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="5dp"
+                android:paddingBottom="12dp"
+                android:contentDescription="@string/atp_OnboardingLogoDescription"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/device_shield_onboarding_page_three_header" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/onboarding_active_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header">
+
+            <ImageView
+                android:id="@+id/onboarding_active_indicator_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_inactive_dot" />
+
+            <ImageView
+                android:id="@+id/onboarding_active_indicator_two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:src="@drawable/ic_inactive_dot" />
+
+            <ImageView
+                android:id="@+id/onboarding_active_indicator_three"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_inactive_dot" />
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/onboarding_page_title"
             style="@style/DeviceShieldOnboardingHeaderStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
-            android:text="@string/deviceShieldOnboardingLastPageOneTitle"
+            android:text="@string/atp_OnboardingLastPageOneTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header" />
@@ -50,7 +117,7 @@
             android:layout_marginTop="24dp"
             android:paddingStart="40dp"
             android:paddingEnd="40dp"
-            android:text="@string/deviceShieldOnboardingLatsPageOneSubtitle"
+            android:text="@string/atp_OnboardingLatsPageOneSubtitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />

@@ -65,7 +65,7 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
         }
 
         settingsCta = findViewById(R.id.onboarding_enabled_settings_text)
-        val fullText = getText(R.string.deviceShieldEnabledSettings) as SpannedString
+        val fullText = getText(R.string.atp_EnabledSettings) as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
         val clickableSpan = object : ClickableSpan() {
