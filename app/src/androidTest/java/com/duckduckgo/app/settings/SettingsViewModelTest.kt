@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
@@ -37,6 +36,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
@@ -60,6 +61,9 @@ class SettingsViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var testee: SettingsViewModel
+
+    @Mock
+    private lateinit var mockThemeSettingsDataStore: ThemingDataStore
 
     @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
@@ -96,6 +100,7 @@ class SettingsViewModelTest {
 
         testee = SettingsViewModel(
             mockContext,
+            mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
             mockVariantManager,
@@ -161,7 +166,7 @@ class SettingsViewModelTest {
     fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onLightThemeToggled(true)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
 
             assertEquals(Command.UpdateTheme, expectItem())
 
@@ -179,7 +184,7 @@ class SettingsViewModelTest {
     fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onLightThemeToggled(false)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
+            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
             assertEquals(Command.UpdateTheme, expectItem())
 
@@ -204,79 +209,6 @@ class SettingsViewModelTest {
         testee.onAutocompleteSettingChanged(false)
         verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
     }
-
-    // Commenting these tests out for now, but they'll come back after the next PFR is completed.
-//    @Test
-//    fun whenDeviceShieldIsOffThenCommandIsStopDeviceShield() {
-//        testee.commands().test {
-//            testee.onLightThemeToggled(false)
-//            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
-//
-//            assertEquals(Command.UpdateTheme, expectItem())
-//
-//            cancelAndConsumeRemainingEvents()
-//        }
-//        testee.onDeviceShieldSettingChanged(false)
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenDeviceShieldIsOffAndDidNotShowOnboardingThenCommandIsStopDeviceShield() {
-//        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
-//
-//        testee.onDeviceShieldSettingChanged(false)
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenExcludedAppClickedThenCommandIsLaunchExcludedAppList() {
-//        testee.onExcludedAppsClicked()
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.LaunchExcludedAppList, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenBetaFeaturesClickedThenCommandIsLaunchBetaFeatures() {
-//        testee.onBetaFeatureSettingsClicked()
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.LaunchBetaFeatures, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenDeviceShieldIsOnThenCommandIsStopDeviceShield() {
-//        testee.onDeviceShieldSettingChanged(true)
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.StartDeviceShield, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenDeviceShieldIsOnAndDidNotShowOnboardingThenCommandIsLaunchDeviceShieldOnboarding() {
-//        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
-//
-//        testee.onDeviceShieldSettingChanged(true)
-//        testee.command.blockingObserve()
-//        verify(commandObserver).onChanged(commandCaptor.capture())
-//        assertEquals(Command.LaunchDeviceShieldOnboarding, commandCaptor.firstValue)
-//    }
-//
-//    @Test
-//    fun whenDeviceShieldIsOnThenSendPixel() {
-//        testee.onDeviceShieldSettingChanged(true)
-//        verify(deviceShieldPixels).enableFromSettings()
-//    }
-//
-//    @Test
-//    fun whenDeviceShieldIsOffThenSendPixel() {
-//        testee.onDeviceShieldSettingChanged(false)
-//        verify(deviceShieldPixels).disableFromSettings()
-//    }
 
     @Test
     fun whenAppLinksSwitchedOnThenDataStoreIsUpdated() {

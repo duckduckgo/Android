@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
-}
+package com.duckduckgo.mobile.android.ui.store
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 
-dependencies {
+interface ThemingDataStore {
 
-    implementation project(path: ':di')
+    var theme: DuckDuckGoTheme
 
-    implementation Google.dagger
-
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-
-    implementation "androidx.core:core-ktx:_"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 }

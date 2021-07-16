@@ -60,7 +60,6 @@ import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsActivity :

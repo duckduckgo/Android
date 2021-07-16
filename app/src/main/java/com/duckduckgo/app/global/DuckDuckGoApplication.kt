@@ -36,7 +36,6 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.*
-import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -162,7 +161,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             }
         }
 
-        initializeTheme(settingsDataStore)
         loadTrackerData()
         scheduleOfflinePixels()
 
