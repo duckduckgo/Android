@@ -25,12 +25,10 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
-    var theme: DuckDuckGoTheme
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
@@ -74,17 +72,6 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
                 else putString(KEY_BACKGROUND_JOB_ID, value)
             }
         }
-
-    override var theme: DuckDuckGoTheme
-        get() {
-            val themeName = preferences.getString(KEY_THEME, null)
-            return if (themeName == null) {
-                DuckDuckGoTheme.LIGHT
-            } else {
-                DuckDuckGoTheme.valueOf(themeName)
-            }
-        }
-        set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
 
     override var hideTips: Boolean
         get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
