@@ -1004,7 +1004,7 @@ class BrowserTabFragment :
 
     private fun configureOmnibarQuickAccessGrid() {
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
-        omnibarQuickAccessAdapter = createQuickAccessAdapter(originHomeTab = false) { viewHolder ->
+        omnibarQuickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED) { viewHolder ->
             quickAccessSuggestionsRecyclerView.enableAnimation()
             omnibarQuickAccessItemTouchHelper.startDrag(viewHolder)
         }
@@ -1015,7 +1015,7 @@ class BrowserTabFragment :
 
     private fun configureHomeTabQuickAccessGrid() {
         configureQuickAccessGridLayout(quickAccessRecyclerView)
-        quickAccessAdapter = createQuickAccessAdapter(originHomeTab = true) { viewHolder ->
+        quickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED) { viewHolder ->
             quickAccessRecyclerView.enableAnimation()
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
@@ -1040,12 +1040,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createQuickAccessAdapter(originHomeTab: Boolean, onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
-        val favOriginPixel = if(originHomeTab) AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED else AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED
+    private fun createQuickAccessAdapter(originPixel: AppPixelName, onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
             {
-                pixel.fire(favOriginPixel)
+                pixel.fire(originPixel)
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
