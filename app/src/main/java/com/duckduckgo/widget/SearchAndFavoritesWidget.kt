@@ -74,8 +74,12 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
-    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
-        Timber.i("SearchAndFavoritesWidget - onDeleted")
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        initWidgetProvider(context)
+        appWidgetIds.forEach {
+            Timber.i("SearchAndFavoritesWidget - onDeleted $it")
+            widgetPrefs.removeWidgetSettings(it)
+        }
         super.onDeleted(context, appWidgetIds)
     }
 
