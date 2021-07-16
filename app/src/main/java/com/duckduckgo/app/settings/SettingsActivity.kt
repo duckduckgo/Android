@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
@@ -50,13 +51,16 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import kotlinx.android.synthetic.main.content_settings_general.*
+import kotlinx.android.synthetic.main.content_settings_internal.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsActivity :
@@ -67,6 +71,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var internalFeaturePlugins: PluginPoint<InternalFeaturePlugin>
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
@@ -90,6 +97,7 @@ class SettingsActivity :
         setupToolbar(toolbar)
 
         configureUiEventHandlers()
+        configureInternalFeatures()
         configureAppLinksToggle()
         observeViewModel()
     }
@@ -115,6 +123,19 @@ class SettingsActivity :
         automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
         emailSetting.setOnClickListener { viewModel.onEmailSettingClicked() }
+    }
+
+    private fun configureInternalFeatures() {
+        settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
+        internalFeaturePlugins.getPlugins().forEach { feature ->
+            Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
+            val view = SettingsOptionWithSubtitle(this).apply {
+                setTitle(feature.internalFeatureTitle())
+                this.setSubtitle(feature.internalFeatureSubtitle())
+            }
+            settingsInternalFeaturesContainer.addView(view)
+            view.setOnClickListener { feature.onInternalFeatureClicked(this) }
+        }
     }
 
     private fun configureAppLinksToggle() {
