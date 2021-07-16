@@ -2020,7 +2020,7 @@ class BrowserTabFragment :
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
                 if (viewState.addFavorite.isHighlighted()) {
-                    addFavoritePopupMenuItem.text = "👋 ${getString(R.string.addFavoriteMenuTitle)}"
+                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitleHighlighted)
                 } else {
                     addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitle)
                 }

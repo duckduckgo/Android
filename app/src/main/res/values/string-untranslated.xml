@@ -33,6 +33,7 @@
 
     <!-- Favorites -->
     <string name="addFavoriteMenuTitle">Add Favorite</string>
+    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="savedSiteDialogTitleHint">Title</string>
