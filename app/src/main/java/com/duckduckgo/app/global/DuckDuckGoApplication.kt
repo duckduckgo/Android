@@ -30,7 +30,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -136,7 +135,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
         }
 
-        initializeTheme(settingsDataStore)
         loadTrackerData()
         scheduleOfflinePixels()
 

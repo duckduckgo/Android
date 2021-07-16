@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
@@ -51,6 +50,7 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*

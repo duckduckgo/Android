@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.mobile.android.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -22,11 +22,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
+import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
-import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGED
+import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 
 enum class DuckDuckGoTheme {
     DARK,
@@ -34,12 +34,6 @@ enum class DuckDuckGoTheme {
 }
 
 object Theming {
-
-    fun initializeTheme(settingsDataStore: SettingsDataStore) {
-        if (settingsDataStore.theme == null) {
-            settingsDataStore.theme = DuckDuckGoTheme.LIGHT
-        }
-    }
 
     fun getThemedDrawable(context: Context, drawableId: Int, theme: DuckDuckGoTheme): Drawable {
         val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
@@ -57,13 +51,22 @@ object Theming {
     }
 }
 
-fun DuckDuckGoActivity.applyTheme(): BroadcastReceiver? {
-    val themeId = THEME_MAP[Pair(manifestThemeId(), settingsDataStore.theme)] ?: return null
+private fun AppCompatActivity.manifestThemeId(): Int {
+    return try {
+        packageManager.getActivityInfo(componentName, 0).themeResource
+    } catch (exception: Exception) {
+        R.style.AppTheme
+    }
+}
+
+fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
+    val themeId = THEME_MAP[Pair(manifestThemeId(), theme)] ?: return null
     setTheme(themeId)
     return registerForThemeChangeBroadcast()
 }
 
-private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {
+// Move this to LiveData/Flow and use appDelegate for night/day theming
+private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -74,15 +77,8 @@ private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastRecei
     return receiver
 }
 
-fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
+fun AppCompatActivity.sendThemeChangedBroadcast() {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
 
-private fun DuckDuckGoActivity.manifestThemeId(): Int {
-    return try {
-        packageManager.getActivityInfo(componentName, 0).themeResource
-    } catch (exception: Exception) {
-        R.style.AppTheme
-    }
-}
