@@ -54,6 +54,7 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -67,6 +68,9 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
     lateinit var clearPersonalDataAction: ClearDataAction

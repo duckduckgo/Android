@@ -323,6 +323,14 @@
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
             android:label="@string/globalPrivacyControlActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.email.ui.EmailProtectionActivity"
+            android:label="@string/emailProtectionActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.email.ui.EmailWebViewActivity"
+            android:label="@string/emailProtectionWebViewActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
 
         <activity
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
