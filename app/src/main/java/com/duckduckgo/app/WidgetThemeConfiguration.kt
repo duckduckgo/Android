@@ -61,8 +61,15 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             binding.widgetConfigThemeSystem.visibility = View.VISIBLE
+            binding.widgetConfigThemeSystem.isChecked = true
         } else {
             binding.widgetConfigThemeSystem.visibility = View.GONE
+            val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                binding.widgetConfigThemeDark.isChecked = true
+            } else {
+                binding.widgetConfigThemeLight.isChecked = true
+            }
         }
 
         binding.widgetConfigThemeRadioGroup.setOnCheckedChangeListener { _, radioId ->
@@ -98,13 +105,6 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
                 else -> throw IllegalArgumentException("Unknown Radio button Id")
             }
             storeAndSubmitConfiguration(appWidgetId, selectedTheme)
-        }
-
-        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-            binding.widgetConfigThemeDark.isChecked = true
-        } else {
-            binding.widgetConfigThemeLight.isChecked = true
         }
 
         pixel.fire(AppPixelName.FAVORITE_WIDGET_CONFIGURATION_SHOWN)
