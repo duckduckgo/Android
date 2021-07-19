@@ -27,6 +27,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -142,6 +143,13 @@ class BookmarksViewModelTest {
         verify(commandObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is BookmarksViewModel.Command.OpenSavedSite)
+    }
+
+    @Test
+    fun whenFavoriteSelectedThenPixelSent() {
+        testee.onSelected(favorite)
+
+        verify(pixel).fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
     }
 
     @Test

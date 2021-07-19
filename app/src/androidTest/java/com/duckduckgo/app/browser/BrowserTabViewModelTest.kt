@@ -1601,6 +1601,45 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFavoritesOnboardingAndSiteLoadedThenHighglightMenuButton() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.showMenuButton?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserOpensOptionsMenuThenHighglightAddFavoriteOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClicked()
+
+        assertEquals(true, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenMenuButtonNotHighlighted() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClosed()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenLoadingNewSiteDoesNotHighlightMenuOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        testee.onBrowserMenuClicked()
+        testee.onBrowserMenuClosed()
+
+        testee.determineShowBrowser()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
     fun whenRecoveringFromProcessGoneThenShowErrorWithAction() {
         testee.recoverFromRenderProcessGone()
         assertCommandIssued<Command.ShowErrorWithAction>()
