@@ -62,4 +62,14 @@
     <string name="addFolder">Add Folder</string>
     <string name="editFolder">Edit Folder</string>
 
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">Are you sure you want to delete %s and %d item?</item>
+        <item quantity="other">Are you sure you want to delete %s and %d items?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
 </resources>
