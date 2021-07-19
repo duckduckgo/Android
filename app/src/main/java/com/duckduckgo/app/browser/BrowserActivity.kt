@@ -265,11 +265,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 Timber.d("Shortcut opened with url $sharedText")
                 launch { viewModel.onOpenShortcut(sharedText) }
+            } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
+                Timber.d("Favorite clicked from widget $sharedText")
+                launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
+                return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
-                    pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
-                }
                 launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 return
             }
