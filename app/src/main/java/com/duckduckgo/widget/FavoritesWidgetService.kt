@@ -22,7 +22,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.IBinder
-import android.widget.FrameLayout
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap

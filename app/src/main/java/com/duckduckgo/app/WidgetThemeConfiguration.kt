@@ -22,7 +22,6 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity

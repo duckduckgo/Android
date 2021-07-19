@@ -110,7 +110,7 @@ class BookmarksViewModel(
     }
 
     fun onSelected(savedSite: SavedSite) {
-        if(savedSite is Favorite) {
+        if (savedSite is Favorite) {
             pixel.fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
         command.value = OpenSavedSite(savedSite)
