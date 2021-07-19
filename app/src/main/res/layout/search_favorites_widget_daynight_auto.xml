@@ -67,13 +67,13 @@
             <TextView
                 android:id="@+id/noFavoritesText"
                 android:textColor="@color/warGreyTwo"
-                android:text="No favorites added yet"
+                android:text="@string/searchWidgetEmtpyFavoritesHint"
                 style="@style/SearchWidgetEmtpyFavoritesHint" />
 
             <TextView
                 android:id="@+id/addFavoriteText"
                 android:textColor="@color/cornflowerBlue"
-                android:text="Add Favorites"
+                android:text="@string/searchWidgetEmtpyFavoritesCta"
                 style="@style/SearchWidgetEmtpyFavoritesAction" />
         </LinearLayout>
     </FrameLayout>

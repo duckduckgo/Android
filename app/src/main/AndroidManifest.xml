@@ -334,7 +334,7 @@
 
         <activity
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
-            android:label="Widget Configuration"
+            android:label="@string/widgetConfigurationActivityTitle"
             android:theme="@style/AppTheme.Transparent">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

@@ -410,7 +410,6 @@
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: Every time you browse with me, a creepy ad loses its wings. 👍]]></string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \"⋯\" icon and select Add Favorite.]]></string>
     <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>

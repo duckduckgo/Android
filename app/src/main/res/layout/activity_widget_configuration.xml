@@ -34,7 +34,7 @@
             android:fontFamily="sans-serif-medium"
             android:textStyle="normal"
             android:textSize="20sp"
-            android:text="Choose Theme" />
+            android:text="@string/widgetConfigurationTitleText" />
 
         <ImageView
             android:id="@+id/widgetConfigPreview"
@@ -59,7 +59,7 @@
                 android:textStyle="normal"
                 android:visibility="gone"
                 android:textSize="16sp"
-                android:text="System default" />
+                android:text="@string/widgetConfigurationSystemThemeOption" />
 
             <RadioButton
                 android:id="@+id/widgetConfigThemeLight"
@@ -70,7 +70,7 @@
                 android:textStyle="normal"
                 android:textSize="16sp"
                 android:checked="true"
-                android:text="Light" />
+                android:text="@string/widgetConfigurationLightThemeOption" />
 
             <RadioButton
                 android:id="@+id/widgetConfigThemeDark"
@@ -80,7 +80,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
                 android:textSize="16sp"
-                android:text="Dark" />
+                android:text="@string/widgetConfigurationDarkThemeOption" />
         </RadioGroup>
 
         <Button
@@ -97,6 +97,6 @@
             android:textColor="@color/white"
             android:letterSpacing="0.0"
             android:layout_marginTop="16dp"
-            android:text="Add widget"/>
+            android:text="@string/widgetConfigurationAddWidgetOption"/>
     </LinearLayout>
 </FrameLayout>

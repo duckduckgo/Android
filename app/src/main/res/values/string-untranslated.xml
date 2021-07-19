@@ -77,7 +77,6 @@
 
     <!-- Favorites -->
     <string name="addFavoriteMenuTitle">Add Favorite</string>
-    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="savedSiteDialogTitleHint">Title</string>
@@ -87,6 +86,18 @@
     <string name="favoritesSectionTitle">Favorites</string>
     <string name="bookmarksEmptyHint">No bookmarks added yet</string>
     <string name="favoritesEmptyHint">No favorites added yet</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
+    <string name="widgetConfigurationTitleText">Choose Theme</string>
+    <string name="widgetConfigurationSystemThemeOption">System default</string>
+    <string name="widgetConfigurationLightThemeOption">Light</string>
+    <string name="widgetConfigurationDarkThemeOption">Dark</string>
+    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \"⋯\" icon and select Add Favorite.]]></string>
+    <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
 
     <!-- Shortcut -->
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
