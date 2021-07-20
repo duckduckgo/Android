@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 
 @Dao
 interface BookmarkFoldersDao {
@@ -25,15 +26,18 @@ interface BookmarkFoldersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmarkFolder: BookmarkFolderEntity): Long
 
-    @Query("select * from bookmark_folders where parentId = :parentId")
-    fun getBookmarkFolders(parentId: Long): LiveData<List<BookmarkFolderEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(bookmarkFolders: List<BookmarkFolderEntity>)
 
     @Query("select * from bookmark_folders")
-    fun getBookmarkFoldersSync(): List<BookmarkFolderEntity>
+    fun getBookmarkFolders(): List<BookmarkFolderEntity>
 
-    @Delete
-    fun delete(bookmarkFolder: BookmarkFolderEntity)
+    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
+    fun getBookmarkFoldersByParentId(parentId: Long): LiveData<List<BookmarkFolder>>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkFolder: BookmarkFolderEntity)
+
+    @Delete
+    fun delete(bookmarkFolderEntities: List<BookmarkFolderEntity>)
 }

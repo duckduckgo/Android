@@ -26,17 +26,26 @@ interface BookmarksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmark: BookmarkEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(bookmark: List<BookmarkEntity>)
+
     @Query("select * from bookmarks where parentId = :parentId")
     fun getBookmarks(parentId: Long): LiveData<List<BookmarkEntity>>
 
     @Query("select * from bookmarks")
     fun getBookmarksSync(): List<BookmarkEntity>
 
+    @Query("select * from bookmarks where parentId in (:parentIds)")
+    fun getBookmarksByParentIds(parentIds: List<Long>): List<BookmarkEntity>
+
     @Query("select count(*) from bookmarks WHERE url LIKE :url")
     fun bookmarksCountByUrl(url: String): Int
 
     @Delete
     fun delete(bookmark: BookmarkEntity)
+
+    @Delete
+    fun delete(bookmarkEntities: List<BookmarkEntity>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkEntity: BookmarkEntity)
