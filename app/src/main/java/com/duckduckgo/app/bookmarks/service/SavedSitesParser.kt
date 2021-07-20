@@ -117,7 +117,7 @@ class RealSavedSitesParser : SavedSitesParser {
                         savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link))
+                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
                     }
                 }
             }

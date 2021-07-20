@@ -49,7 +49,7 @@ class SavedSitesParserTest {
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", 0)
         val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
 
         val result = parser.generateHtml(listOf(bookmark), listOf(favorite))
@@ -200,7 +200,7 @@ class SavedSitesParserTest {
                         savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link))
+                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
                     }
                 }
             }
