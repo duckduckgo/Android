@@ -25,14 +25,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoTheme
-import com.duckduckgo.app.global.Theming
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.Theming
 import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 import java.util.*

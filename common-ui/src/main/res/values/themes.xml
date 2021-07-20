@@ -100,6 +100,8 @@
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
+        <item name="emailButtonRippleColor">@color/white</item>
+
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
     </style>
 
@@ -183,6 +185,8 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+
+        <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
     </style>

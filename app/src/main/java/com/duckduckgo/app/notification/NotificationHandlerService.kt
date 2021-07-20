@@ -24,12 +24,14 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
@@ -73,6 +75,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
+            WAITLIST_CODE -> onWaitlistCodeReceived(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -80,6 +83,15 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             clearNotification(notificationId)
             closeNotificationPanel()
         }
+    }
+
+    private fun onWaitlistCodeReceived(pixelSuffix: String) {
+        Timber.i("Email waitlist code received launched!")
+        val intent = EmailProtectionActivity.intent(context)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onWebsiteNotification(intent: Intent, pixelSuffix: String) {
@@ -135,6 +147,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
         const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
+        const val WAITLIST_CODE = "com.duckduckgo.notification.email.waitlist.code"
     }
 
     companion object {

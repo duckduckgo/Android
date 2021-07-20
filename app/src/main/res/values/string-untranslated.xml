@@ -16,10 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Email Autofill -->
-    <string name="settingsEmailAutofill">Email Autofill</string>
-    <string name="settingsEmailAutofillEnabledFor">Enabled for %1$s</string>
-    <string name="autofillSettingCancel">Cancel</string>
-    <string name="autofillSettingDisable">Disable</string>
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
     <string name="autofillTooltipUseYourAlias">Use %1$s</string>
     <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
@@ -27,6 +23,54 @@
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
 
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Remove Email Protections?</string>
+    <string name="emailSignOutDialogText">Note: Removing Email Protections from this device will not delete your Duck Address.</string>
+    <string name="emailSignOutDialogCancel">Cancel</string>
+    <string name="emailSignOutDialogDisable">Remove</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Email waitlist</string>
+    <string name="waitlistNotificationTitle">Your Email Protection Invitation is Here!</string>
+    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it\'s your turn to try our Email Protection feature. Tap to view your invitation.</string>
+
+    <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
+    <string name="waitlistNotificationDialogNoThanks">NO THANKS</string>
+    <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[We do not save your emails. <b><a href="">Learn more</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
+    <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
+    <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
+    <string name="emailProtectionWaitlistCta">Join the Private Waitlist</string>
+    <string name="emailProtectionGetStartedCta">Get Started</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when<br/> Email Protection is ready for you. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us at <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
+
+    <!-- Settings -->
+    <string name="settingsEmailProtectionTitle">Email Protection</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address.</string>
 
     <!-- Precise Location Improvements -->
     <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
@@ -41,7 +85,6 @@
     <string name="favoritesSectionTitle">Favorites</string>
     <string name="bookmarksEmptyHint">No bookmarks added yet</string>
     <string name="favoritesEmptyHint">No favorites added yet</string>
-
 
     <!-- Shortcut -->
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
