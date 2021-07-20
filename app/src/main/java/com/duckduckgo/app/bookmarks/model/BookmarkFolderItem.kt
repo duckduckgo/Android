@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.model
 
-data class BookmarkFolderItem (
+data class BookmarkFolderItem(
     val depth: Int,
     val bookmarkFolder: BookmarkFolder,
     val isSelected: Boolean

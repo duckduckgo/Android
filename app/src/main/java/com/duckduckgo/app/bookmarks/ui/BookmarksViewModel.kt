@@ -192,7 +192,7 @@ class BookmarksViewModel(
     }
 
     private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
-        viewState.value = viewState.value?.let{ viewState ->
+        viewState.value = viewState.value?.let { viewState ->
             viewState.copy(
                 bookmarks = bookmarks,
                 enableSearch = bookmarks.size + viewState.bookmarkFolders.size > MIN_ITEMS_FOR_SEARCH
@@ -258,16 +258,18 @@ class BookmarksViewModel(
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             val branchToDelete = bookmarkFoldersRepository.getBookmarkFolderBranch(bookmarkFolder)
 
-            viewState.postValue(viewState.value?.copy(
-                branchToDelete = branchToDelete
-            ))
+            viewState.postValue(
+                viewState.value?.copy(
+                    branchToDelete = branchToDelete
+                )
+            )
 
             bookmarkFoldersRepository.deleteFolderBranch(branchToDelete)
         }
     }
 
     private fun onBookmarkFoldersChanged(bookmarkFolders: List<BookmarkFolder>) {
-        viewState.value = viewState.value?.let{ viewState ->
+        viewState.value = viewState.value?.let { viewState ->
             viewState.copy(
                 bookmarkFolders = bookmarkFolders,
                 enableSearch = bookmarkFolders.size + viewState.bookmarks.size > MIN_ITEMS_FOR_SEARCH
@@ -286,28 +288,28 @@ class BookmarksViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarksViewModelFactory @Inject constructor(
-        private val favoritesRepository: Provider<FavoritesRepository>,
-        private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
-        private val bookmarksDao: Provider<BookmarksDao>,
-        private val bookmarkFoldersDao: Provider<BookmarkFoldersDao>,
-        private val faviconManager: Provider<FaviconManager>,
-        private val savedSitesManager: Provider<SavedSitesManager>,
-        private val dispatcherProvider: Provider<DispatcherProvider>
+    private val favoritesRepository: Provider<FavoritesRepository>,
+    private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
+    private val bookmarksDao: Provider<BookmarksDao>,
+    private val bookmarkFoldersDao: Provider<BookmarkFoldersDao>,
+    private val faviconManager: Provider<FaviconManager>,
+    private val savedSitesManager: Provider<SavedSitesManager>,
+    private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(BookmarksViewModel::class.java) -> (
-                        BookmarksViewModel(
-                                favoritesRepository.get(),
-                                bookmarkFoldersRepository.get(),
-                                bookmarksDao.get(),
-                                bookmarkFoldersDao.get(),
-                                faviconManager.get(),
-                                savedSitesManager.get(),
-                                dispatcherProvider.get()
-                        ) as T
-                        )
+                    BookmarksViewModel(
+                        favoritesRepository.get(),
+                        bookmarkFoldersRepository.get(),
+                        bookmarksDao.get(),
+                        bookmarkFoldersDao.get(),
+                        faviconManager.get(),
+                        savedSitesManager.get(),
+                        dispatcherProvider.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

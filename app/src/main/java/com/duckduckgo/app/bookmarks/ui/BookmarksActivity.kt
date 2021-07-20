@@ -80,11 +80,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun getParentFolderName() =
-            intent.extras?.getString(KEY_BOOKMARK_FOLDER_NAME)
-                    ?: getString(R.string.bookmarksActivityTitle)
+        intent.extras?.getString(KEY_BOOKMARK_FOLDER_NAME)
+            ?: getString(R.string.bookmarksActivityTitle)
 
     private fun getParentFolderId() = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID)
-            ?: ROOT_FOLDER_ID
+        ?: ROOT_FOLDER_ID
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -147,10 +147,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                     is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
                     is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
-                    is BookmarksViewModel.Command.OpenBookmarkFolder ->  openBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
                     is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.DeleteBookmarkFolder ->  deleteBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder ->  confirmDeleteBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
                 }
             }
         )
@@ -266,9 +266,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
-                bookmarkRootView,
-                message,
-                Snackbar.LENGTH_LONG
+            bookmarkRootView,
+            message,
+            Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insertRecentlyDeletedBookmarksAndFolders()
         }.show()

@@ -53,8 +53,8 @@ class BookmarkFoldersDataRepository(
 
     private fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder> {
         val parentGroupings = getBookmarkFolders()
-                .sortedWith(compareBy({ it.parentId }, { it.id }))
-                .groupBy { it.parentId }
+            .sortedWith(compareBy({ it.parentId }, { it.id }))
+            .groupBy { it.parentId }
 
         return getSubFolders(bookmarkFolder, parentGroupings)
     }

@@ -36,12 +36,12 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
     var listener: DeleteBookmarkFolderListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-            AlertDialog.Builder(requireContext())
-                    .setMessage(getMessageString())
-                    .setTitle(R.string.delete)
-                    .setPositiveButton(R.string.delete) { _,_ -> listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder)}
-                    .setNegativeButton(R.string.cancel) { _,_ -> }
-                    .create()
+        AlertDialog.Builder(requireContext())
+            .setMessage(getMessageString())
+            .setTitle(R.string.delete)
+            .setPositiveButton(R.string.delete) { _, _ -> listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder) }
+            .setNegativeButton(R.string.cancel) { _, _ -> }
+            .create()
 
     fun getMessageString(): SpannableString {
         val bookmarkFolder = arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder

@@ -32,9 +32,9 @@ import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
 import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 
 class BookmarkFoldersAdapter(
-        private val layoutInflater: LayoutInflater,
-        private val viewModel: BookmarksViewModel,
-        private val parentId: Long
+    private val layoutInflater: LayoutInflater,
+    private val viewModel: BookmarksViewModel,
+    private val parentId: Long
 ) : ListAdapter<BookmarkFoldersAdapter.BookmarkFoldersItemTypes, BookmarkFolderScreenViewHolders>(BookmarkFoldersDiffCallback()) {
 
     companion object {
