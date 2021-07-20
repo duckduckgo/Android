@@ -23,7 +23,6 @@ import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -57,7 +56,6 @@ class SettingsViewModel(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val emailManager: EmailManager,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore
@@ -76,16 +74,10 @@ class SettingsViewModel(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val emailSetting: EmailSetting = EmailSetting.EmailSettingOff,
         val appLinksEnabled: Boolean = true,
         val deviceShieldEnabled: Boolean = false,
         val deviceShieldOnboardingShown: Boolean = false
     )
-
-    sealed class EmailSetting {
-        object EmailSettingOff : EmailSetting()
-        data class EmailSettingOn(val emailAddress: String) : EmailSetting()
-    }
 
     data class AutomaticallyClearData(
         val clearWhatOption: ClearWhatOption,
@@ -94,6 +86,7 @@ class SettingsViewModel(
     )
 
     sealed class Command {
+        object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
         object LaunchLocation : Command()
@@ -104,7 +97,6 @@ class SettingsViewModel(
         object LaunchDeviceShieldReport : Command()
         object LaunchDeviceShieldOnboarding : Command()
         object UpdateTheme : Command()
-        object LaunchEmailDialog : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
     }
@@ -138,7 +130,6 @@ class SettingsViewModel(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
-                    emailSetting = getEmailSetting(),
                     appLinksEnabled = settingsDataStore.appLinksEnabled,
                     deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
                     deviceShieldOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
@@ -164,31 +155,12 @@ class SettingsViewModel(
         deviceShieldStatePollingJob?.cancel()
     }
 
-    private fun getEmailSetting(): EmailSetting {
-        val emailAddress = emailManager.getEmailAddress()
-
-        return if (emailManager.isSignedIn()) {
-            when (emailAddress) {
-                null -> EmailSetting.EmailSettingOff
-                else -> EmailSetting.EmailSettingOn(emailAddress)
-            }
-        } else {
-            EmailSetting.EmailSettingOff
-        }
-    }
-
     fun viewState(): StateFlow<ViewState> {
         return viewState
     }
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
-    }
-
-    fun onEmailSettingClicked() {
-        if (getEmailSetting() is EmailSetting.EmailSettingOn) {
-            viewModelScope.launch { command.send(Command.LaunchEmailDialog) }
-        }
     }
 
     fun userRequestedToSendFeedback() {
@@ -224,17 +196,16 @@ class SettingsViewModel(
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
     }
 
+    fun onEmailProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
+    }
+
     fun onDeviceShieldSettingClicked() {
         if (viewState.value.deviceShieldOnboardingShown) {
             viewModelScope.launch { command.send(Command.LaunchDeviceShieldReport) }
         } else {
             viewModelScope.launch { command.send(Command.LaunchDeviceShieldOnboarding) }
         }
-    }
-
-    fun onEmailLogout() {
-        emailManager.signOut()
-        viewModelScope.launch { viewState.emit(currentViewState().copy(emailSetting = EmailSetting.EmailSettingOff)) }
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
@@ -365,7 +336,6 @@ class SettingsViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
-    private val emailManager: Provider<EmailManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
     private val pixel: Provider<Pixel>,
     private val deviceShieldOnboarding: Provider<DeviceShieldOnboardingStore>
@@ -380,7 +350,6 @@ class SettingsViewModelFactory @Inject constructor(
                         settingsDataStore.get(),
                         defaultWebBrowserCapability.get(),
                         variantManager.get(),
-                        emailManager.get(),
                         fireAnimationLoader.get(),
                         pixel.get(),
                         deviceShieldOnboarding.get()
