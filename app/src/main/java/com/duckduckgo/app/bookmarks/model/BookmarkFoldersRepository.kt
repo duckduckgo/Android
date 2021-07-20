@@ -38,7 +38,7 @@ class BookmarkFoldersDataRepository(
     }
 
     override suspend fun update(bookmarkFolder: BookmarkFolder) {
-        bookmarkFoldersDao.update(BookmarkFolderEntity(name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
+        bookmarkFoldersDao.update(BookmarkFolderEntity(id = bookmarkFolder.id, name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
     }
 
     override suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch {
