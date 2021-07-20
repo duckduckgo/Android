@@ -22,12 +22,15 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -62,16 +65,18 @@ class BookmarksViewModelTest {
     private val liveData = MutableLiveData<List<BookmarkEntity>>()
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val bookmarksDao: BookmarksDao = mock()
+    private val bookmarkFoldersDao: BookmarkFoldersDao = mock()
     private val favoritesRepository: FavoritesRepository = mock()
+    private val bookmarkFoldersRepository: BookmarkFoldersRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
 
-    private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com")
+    private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com", parentId = 0)
     private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
-    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url)
+    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarksDao, faviconManager, savedSitesManager, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, bookmarkFoldersDao, faviconManager, savedSitesManager, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -80,7 +85,7 @@ class BookmarksViewModelTest {
     @Before
     fun before() = coroutineRule.runBlocking {
         liveData.value = emptyList()
-        whenever(bookmarksDao.getBookmarks()).thenReturn(liveData)
+        whenever(bookmarksDao.getBookmarks(any())).thenReturn(liveData)
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
     }
 

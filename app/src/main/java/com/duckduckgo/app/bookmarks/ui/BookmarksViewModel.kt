@@ -19,18 +19,19 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
-import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfirmationFragment.DeleteBookmarkFolderListener
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -46,41 +47,49 @@ import javax.inject.Provider
 
 class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
-    val dao: BookmarksDao,
+    private val bookmarkFoldersRepository: BookmarkFoldersRepository,
+    private val bookmarksDao: BookmarksDao,
+    private val bookmarkFoldersDao: BookmarkFoldersDao,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val dispatcherProvider: DispatcherProvider
-) : EditSavedSiteListener, AddBookmarkFolderListener, ViewModel() {
+) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
         val bookmarks: List<Bookmark> = emptyList(),
-        val favorites: List<Favorite> = emptyList()
+        val favorites: List<Favorite> = emptyList(),
+        val bookmarkFolders: List<BookmarkFolder> = emptyList(),
+        val branchToDelete: BookmarkFolderBranch = BookmarkFolderBranch(emptyList(), emptyList())
     )
 
     sealed class Command {
         class OpenSavedSite(val savedSite: SavedSite) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
+        class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
+        class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
+        class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
+        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
     }
 
     companion object {
-        private const val MIN_BOOKMARKS_FOR_SEARCH = 3
+        private const val MIN_ITEMS_FOR_SEARCH = 3
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<Bookmark>> = dao.getBookmarks().map { bookmarks ->
-        bookmarks.map { Bookmark(it.id, it.title ?: "", it.url) }
-    }
+    private var bookmarks: LiveData<List<Bookmark>> = MutableLiveData()
+    private var bookmarkFolders: LiveData<List<BookmarkFolder>> = MutableLiveData()
+
     private val bookmarksObserver = Observer<List<Bookmark>> { onBookmarksChanged(it!!) }
+    private val bookmarkFoldersObserver = Observer<List<BookmarkFolder>> { onBookmarkFoldersChanged(it!!) }
 
     init {
         viewState.value = ViewState()
-        bookmarks.observeForever(bookmarksObserver)
         viewModelScope.launch {
             favoritesRepository.favorites().collect {
                 onFavoritesChanged(it)
@@ -90,7 +99,7 @@ class BookmarksViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        bookmarks.removeObserver(bookmarksObserver)
+        removeObservers()
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
@@ -126,7 +135,7 @@ class BookmarksViewModel(
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
                     faviconManager.deletePersistedFavicon(savedSite.url)
-                    dao.delete(BookmarkEntity(savedSite.id, savedSite.title, savedSite.url))
+                    bookmarksDao.delete(BookmarkEntity(savedSite.id, savedSite.title, savedSite.url, savedSite.parentId))
                 }
             }
             is Favorite -> {
@@ -141,7 +150,7 @@ class BookmarksViewModel(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    dao.insert(BookmarkEntity(title = savedSite.title, url = savedSite.url))
+                    bookmarksDao.insert(BookmarkEntity(title = savedSite.title, url = savedSite.url, parentId = savedSite.parentId))
                 }
             }
             is Favorite -> {
@@ -172,7 +181,7 @@ class BookmarksViewModel(
 
     private suspend fun editBookmark(bookmark: Bookmark) {
         withContext(dispatcherProvider.io()) {
-            dao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
         }
     }
 
@@ -183,40 +192,122 @@ class BookmarksViewModel(
     }
 
     private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
-        viewState.value = viewState.value?.copy(
-            bookmarks = bookmarks,
-            enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
-        )
+        viewState.value = viewState.value?.let{ viewState ->
+            viewState.copy(
+                bookmarks = bookmarks,
+                enableSearch = bookmarks.size + viewState.bookmarkFolders.size > MIN_ITEMS_FOR_SEARCH
+            )
+        }
     }
 
     private fun onFavoritesChanged(favorites: List<Favorite>) {
         viewState.value = viewState.value?.copy(favorites = favorites)
     }
 
+    fun onBookmarkFolderSelected(bookmarkFolder: BookmarkFolder) {
+        command.value = OpenBookmarkFolder(bookmarkFolder)
+    }
+
+    fun fetchBookmarksAndFolders(parentId: Long) {
+        bookmarks = bookmarksDao.getBookmarks(parentId).map { bookmarks ->
+            bookmarks.map { Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
+        }
+
+        bookmarkFolders = bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)
+
+        removeObservers()
+        addObservers()
+    }
+
+    private fun addObservers() {
+        bookmarks.observeForever(bookmarksObserver)
+        bookmarkFolders.observeForever(bookmarkFoldersObserver)
+    }
+
+    private fun removeObservers() {
+        bookmarks.removeObserver(bookmarksObserver)
+        bookmarkFolders.removeObserver(bookmarkFoldersObserver)
+    }
+
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            bookmarkFoldersRepository.insert(bookmarkFolder)
+        }
+    }
+
+    fun onEditBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
+        command.value = ShowEditBookmarkFolder(bookmarkFolder)
+    }
+
+    override fun onBookmarkFolderUpdated(bookmarkFolder: BookmarkFolder) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            bookmarkFoldersRepository.update(bookmarkFolder)
+        }
+    }
+
+    override fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
+        deleteFolder(bookmarkFolder)
+        command.value = ConfirmDeleteBookmarkFolder(bookmarkFolder)
+    }
+
+    fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
+        command.value = DeleteBookmarkFolder(bookmarkFolder)
+    }
+
+    private fun deleteFolder(bookmarkFolder: BookmarkFolder) {
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+            val branchToDelete = bookmarkFoldersRepository.getBookmarkFolderBranch(bookmarkFolder)
+
+            viewState.postValue(viewState.value?.copy(
+                branchToDelete = branchToDelete
+            ))
+
+            bookmarkFoldersRepository.deleteFolderBranch(branchToDelete)
+        }
+    }
+
+    private fun onBookmarkFoldersChanged(bookmarkFolders: List<BookmarkFolder>) {
+        viewState.value = viewState.value?.let{ viewState ->
+            viewState.copy(
+                bookmarkFolders = bookmarkFolders,
+                enableSearch = bookmarkFolders.size + viewState.bookmarks.size > MIN_ITEMS_FOR_SEARCH
+            )
+        }
+    }
+
+    fun insertRecentlyDeletedBookmarksAndFolders() {
+        viewState.value?.let { viewState ->
+            viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+                bookmarkFoldersRepository.insertFolderBranch(viewState.branchToDelete)
+            }
+        }
     }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarksViewModelFactory @Inject constructor(
-    private val favoritesRepository: Provider<FavoritesRepository>,
-    private val dao: Provider<BookmarksDao>,
-    private val faviconManager: Provider<FaviconManager>,
-    private val savedSitesManager: Provider<SavedSitesManager>,
-    private val dispatcherProvider: Provider<DispatcherProvider>
+        private val favoritesRepository: Provider<FavoritesRepository>,
+        private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
+        private val bookmarksDao: Provider<BookmarksDao>,
+        private val bookmarkFoldersDao: Provider<BookmarkFoldersDao>,
+        private val faviconManager: Provider<FaviconManager>,
+        private val savedSitesManager: Provider<SavedSitesManager>,
+        private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(BookmarksViewModel::class.java) -> (
-                    BookmarksViewModel(
-                        favoritesRepository.get(),
-                        dao.get(),
-                        faviconManager.get(),
-                        savedSitesManager.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
+                        BookmarksViewModel(
+                                favoritesRepository.get(),
+                                bookmarkFoldersRepository.get(),
+                                bookmarksDao.get(),
+                                bookmarkFoldersDao.get(),
+                                faviconManager.get(),
+                                savedSitesManager.get(),
+                                dispatcherProvider.get()
+                        ) as T
+                        )
                 else -> null
             }
         }
