@@ -17,16 +17,21 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.appcompat.widget.SearchView
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 
 class BookmarksEntityQueryListener(
-    val bookmarks: List<SavedSite.Bookmark>?,
-    val adapter: BookmarksAdapter
+    private val bookmarks: List<SavedSite.Bookmark>?,
+    private val bookmarksAdapter: BookmarksAdapter,
+    private val bookmarkFolders: List<BookmarkFolder>?,
+    private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
-        if (bookmarks != null) {
-            adapter.bookmarkItems = filter(newText, bookmarks)
+        if (bookmarks != null && bookmarkFolders != null) {
+            bookmarksAdapter.bookmarkItems = filterBookmarks(newText, bookmarks)
+            bookmarkFoldersAdapter.bookmarkFolderItems = filterBookmarkFolders(newText, bookmarkFolders)
         }
         return true
     }
@@ -35,11 +40,19 @@ class BookmarksEntityQueryListener(
         return false
     }
 
-    private fun filter(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
+    private fun filterBookmarks(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
         val lowercaseQuery = query.toLowerCase()
         return bookmarks.filter {
             val lowercaseTitle = it.title.toLowerCase()
             lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
         }.map { BookmarksAdapter.BookmarkItem(it) }
+    }
+
+    private fun filterBookmarkFolders(query: String, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
+        val lowercaseQuery = query.toLowerCase()
+        return bookmarkFolders.filter {
+            val lowercaseTitle = it.name.toLowerCase()
+            lowercaseTitle.contains(lowercaseQuery)
+        }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
     }
 }
