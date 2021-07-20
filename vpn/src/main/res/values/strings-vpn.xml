@@ -135,8 +135,14 @@
 
     <!-- Exclusion List -->
     <string name="atp_ExcludedApps">Excluded Apps</string>
-    <string name="atp_ExclusionListActivityTitle">Excluded Apps</string>
-    <string name="atp_ExcludedAppsFeature">App Tracking Protection doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
+    <string name="atp_ExclusionListActivityTitle">App Exceptions</string>
+    <string name="atp_ExcludedAppsFeature">App Tracking Protection helps stop companies from tracking you, except in apps they own. For example, Facebook can track you in Facebook app, but App Tracking Protection helps block them in the Nextdoor app\n\nApp Tracking Protection excludes some apps so they work as expected.</string>
+    <string name="atp_ExcludedAppsKnownIssuesLabel">App Tracking Protection excludes apps with known issues so that they work properly. This is mostly temporary as we continue to improve App Tracking Protection.</string>
+    <string name="atp_ExcludedOtherAppsLabel">To block website trackers, consider opening links within the DuckDuckGo app instead.</string>
+    <string name="atp_ExcludedAppsKnownIssuesHeader">Apps with known issues (%s)</string>
+    <string name="atp_ExcludedOtherAppsHeader">Other apps (%s)</string>
+    <string name="atp_ExcludedAppsReport">Report Problem with Another app</string>
+    <string name="atp_ExcludedAppEntry">%s app</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">About App Trackers</string>
@@ -172,6 +178,9 @@
     </plurals>
     <string name="atp_ActivityEnabledLabel">You\'re a beta tester. Notice a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityAppTrackersExcludedAppsPrefix">%s app exceptions \n</string>
+    <string name="atp_ActivityAppTrackersExcludedApps">This is mostly temporary during beta to ensure your apps your work properly.\n</string>
+    <string name="atp_ActivityAppTrackersExcludedSuffix">View App Exceptions</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>

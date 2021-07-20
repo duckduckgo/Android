@@ -25,8 +25,8 @@ import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.download_confirmation.view.*

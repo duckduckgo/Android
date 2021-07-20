@@ -16,6 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -24,8 +25,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
         android:layout_marginBottom="@dimen/settingsItemHorizontalPadding"
         android:fontFamily="sans-serif"
@@ -75,17 +76,92 @@
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <ScrollView
+        android:id="@+id/exclusionListAppsContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_weight="1">
 
         <LinearLayout
-            android:id="@+id/deviceShieldExclusionAppListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/splitterGray" />
+
+            <TextView
+                android:id="@+id/exclusionListAppsWithIssuesHeader"
+                style="@style/SettingsSectionTitle"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:background="?selectableItemBackground"
+                app:drawableEndCompat="@drawable/ic_collapse"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_ExcludedAppsKnownIssuesHeader" />
+
+            <TextView
+                android:id="@+id/exclusionListAppsWithIssuesLabel"
+                style="@style/DeviceShield.PrivacyReport.Label.Blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:padding="16dp"
+                android:text="@string/atp_ExcludedAppsKnownIssuesLabel" />
+
+            <LinearLayout
+                android:id="@+id/exclusionListAppsWithIssuesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <Button
+                android:id="@+id/exclusionListAppsWithIssuesReport"
+                style="@style/DeviceShield.Button.Transparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/atp_ExcludedAppsReport" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/splitterGray" />
+
+            <TextView
+                android:id="@+id/exclusionListOtherAppsHeader"
+                style="@style/SettingsSectionTitle"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:background="?selectableItemBackground"
+                app:drawableEndCompat="@drawable/ic_expand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_ExcludedOtherAppsHeader" />
+
+            <TextView
+                android:id="@+id/exclusionListOtherAppsLabel"
+                style="@style/DeviceShield.PrivacyReport.Label.Blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:padding="16dp"
+                android:visibility="gone"
+                android:text="@string/atp_ExcludedOtherAppsLabel" />
+
+            <LinearLayout
+                android:id="@+id/exclusionListOtherAppsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+        </LinearLayout>
+
     </ScrollView>
 
 </LinearLayout>

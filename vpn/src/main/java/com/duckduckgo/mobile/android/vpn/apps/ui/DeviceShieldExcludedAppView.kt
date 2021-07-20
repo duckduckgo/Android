@@ -26,6 +26,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import kotlinx.android.synthetic.main.view_device_shield_excluded_app_entry.view.*
 
 class DeviceShieldExcludedAppView @JvmOverloads constructor(
@@ -57,22 +58,21 @@ class DeviceShieldExcludedAppView @JvmOverloads constructor(
 
     var appName: String
         get() = root.deviceShieldAppEntryName.toString()
-        set(value) { root.deviceShieldAppEntryName.text = value }
-
-    var appType: String?
-        get() = root.deviceShieldAppEntryType.toString()
         set(value) {
-            root.deviceShieldAppEntryType.text = value
-            root.deviceShieldAppEntryType.visibility = if (value == null) GONE else VISIBLE
+            root.deviceShieldAppEntryName.text = String.format(resources.getString(R.string.atp_ExcludedAppEntry), value).applyBoldSpanTo(listOf(value))
         }
 
     var appIcon: Drawable?
         get() = root.deviceShieldAppEntryIcon.drawable
-        set(value) { root.deviceShieldAppEntryIcon.setImageDrawable(value) }
+        set(value) {
+            root.deviceShieldAppEntryIcon.setImageDrawable(value)
+        }
 
     var isShieldEnabled: Boolean
         get() = root.deviceShieldAppEntryShieldEnabled.isChecked
-        set(value) { root.deviceShieldAppEntryShieldEnabled.isChecked = value }
+        set(value) {
+            root.deviceShieldAppEntryShieldEnabled.isChecked = value
+        }
 
     interface ShieldListener {
         fun onAppShieldChanged(view: View, enabled: Boolean)

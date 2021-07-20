@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.mobile.android.ui.view
 
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -22,3 +22,8 @@ import androidx.annotation.DrawableRes
 fun TextView.leftDrawable(@DrawableRes id: Int = 0) {
     this.setCompoundDrawablesWithIntrinsicBounds(id, 0, 0, 0)
 }
+
+fun TextView.rightDrawable(@DrawableRes id: Int = 0) {
+    this.setCompoundDrawablesWithIntrinsicBounds(0, 0, id, 0)
+}
+

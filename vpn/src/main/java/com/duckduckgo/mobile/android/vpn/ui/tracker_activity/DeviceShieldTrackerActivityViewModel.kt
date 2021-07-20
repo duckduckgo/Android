@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -41,12 +42,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Provider
 
 class DeviceShieldTrackerActivityViewModel(
     private val applicationContext: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -54,7 +57,7 @@ class DeviceShieldTrackerActivityViewModel(
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     internal val vpnRunningState = MutableStateFlow(
-        RunningState(isRunning = true, hasValueChanged = false)
+        RunningState(isRunning = true, hasValueChanged = false, 0)
     )
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
@@ -70,11 +73,13 @@ class DeviceShieldTrackerActivityViewModel(
 
     private fun pollDeviceShieldState() {
         viewModelScope.launch {
+            val excludedAppsCount = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }.size
+
             while (isActive) {
                 val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
                 val oldValue = vpnRunningState.value
                 val hasValueChanged = oldValue.isRunning != isRunning
-                vpnRunningState.emit(RunningState(isRunning, hasValueChanged))
+                vpnRunningState.emit(RunningState(isRunning, hasValueChanged, excludedAppsCount))
 
                 delay(1_000)
             }
@@ -151,22 +156,24 @@ class DeviceShieldTrackerActivityViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class PastWeekTrackerActivityViewModelFactory @Inject constructor(
-    private val applicationContext: Context,
-    private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnPreferences: VpnPreferences,
-    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val applicationContext: Provider<Context>,
+    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
+    private val vpnPreferences: Provider<VpnPreferences>,
+    private val appTrackerBlockingStatsRepository: Provider<AppTrackerBlockingStatsRepository>,
+    private val deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>,
+    private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(DeviceShieldTrackerActivityViewModel::class.java) -> (
                     DeviceShieldTrackerActivityViewModel(
-                        applicationContext,
-                        deviceShieldPixels,
-                        vpnPreferences,
-                        appTrackerBlockingStatsRepository,
-                        dispatcherProvider
+                        applicationContext.get(),
+                        deviceShieldPixels.get(),
+                        vpnPreferences.get(),
+                        appTrackerBlockingStatsRepository.get(),
+                        deviceShieldExcludedApps.get(),
+                        dispatcherProvider.get()
                     ) as T
                     )
                 else -> null
@@ -175,6 +182,10 @@ class PastWeekTrackerActivityViewModelFactory @Inject constructor(
     }
 }
 
-internal data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
+internal data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean, val excludedAppsCount: Int) {
+    fun stringExcludedAppsCount(): String {
+        return String.format(Locale.US, "%,d", excludedAppsCount)
+    }
+}
 internal inline class TrackerCount(val value: Int)
 internal inline class TrackingAppCount(val value: Int)

@@ -20,11 +20,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
     android:paddingStart="16dp"
+    android:paddingTop="8dp"
     android:paddingEnd="16dp"
-    >
+    android:paddingBottom="8dp"
+    android:gravity="center">
 
     <FrameLayout
         android:id="@+id/deviceShieldAppEntryIconContainer"
@@ -33,8 +33,7 @@
         android:background="@drawable/subtle_favicon_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/deviceShieldAppEntryIcon"
@@ -45,43 +44,21 @@
             android:src="@drawable/ic_globe_gray_16dp" />
     </FrameLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/deviceShieldAppEntryName"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="16dp"
-        >
-
-        <TextView
-            android:id="@+id/deviceShieldAppEntryName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            tools:text="Facebook" />
-
-        <TextView
-            android:id="@+id/deviceShieldAppEntryType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textColor="?attr/secondaryTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:text="Facebook" />
-
-    </LinearLayout>
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:orientation="vertical"
+        android:singleLine="true"
+        android:textColor="@color/almostBlackDark"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        tools:text="Facebook" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
@@ -90,7 +67,6 @@
         android:layout_gravity="center"
         android:button="@null"
         android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-        android:theme="@style/PopUpMenuSwitchTheme"
-        />
+        android:theme="@style/PopUpMenuSwitchTheme" />
 
 </LinearLayout>

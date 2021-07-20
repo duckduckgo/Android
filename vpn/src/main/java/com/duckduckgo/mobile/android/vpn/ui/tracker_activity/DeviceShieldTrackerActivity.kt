@@ -18,15 +18,15 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.ResultReceiver
+import android.text.*
 import android.text.Annotation
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.SpannedString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
@@ -80,6 +80,7 @@ class DeviceShieldTrackerActivity :
     private lateinit var ctaTrackerFaq: View
     private lateinit var deviceShieldEnabledLabel: TextView
     private lateinit var deviceShieldDisabledLabel: TextView
+    private lateinit var excludedAppsLabel: TextView
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
@@ -115,14 +116,11 @@ class DeviceShieldTrackerActivity :
         ctaTrackerFaq = findViewById(R.id.cta_tracker_faq)
         deviceShieldEnabledLabel = findViewById(R.id.deviceShieldTrackerLabelEnabled)
         deviceShieldDisabledLabel = findViewById(R.id.deviceShieldTrackerLabelDisabled)
+        excludedAppsLabel = findViewById(R.id.cta_excluded_apps)
         ctaShowAll = findViewById(R.id.cta_show_all)
 
         findViewById<Button>(R.id.cta_tracker_faq).setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
-        }
-
-        findViewById<Button>(R.id.cta_excluded_apps).setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
         }
 
         findViewById<Button>(R.id.cta_beta_instructions).setOnClickListener {
@@ -253,34 +251,51 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun updateRunningState(state: RunningState) {
+        val excludedAppsPrefix = String.format(getString(R.string.atp_ActivityAppTrackersExcludedAppsPrefix), state.excludedAppsCount)
+        val excludedAppsSuffix = getString(R.string.atp_ActivityAppTrackersExcludedSuffix)
+        val textToStyle =
+            excludedAppsPrefix + getString(R.string.atp_ActivityAppTrackersExcludedApps) + excludedAppsSuffix
+
+        val spannable = SpannableStringBuilder(textToStyle)
+        val prefixIndex = textToStyle.indexOf(excludedAppsPrefix)
+        spannable.setSpan(StyleSpan(Typeface.BOLD), prefixIndex, prefixIndex + excludedAppsPrefix.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+
+        val suffixIndex = textToStyle.indexOf(excludedAppsSuffix)
+        spannable.setSpan(UnderlineSpan(), suffixIndex, suffixIndex + excludedAppsSuffix.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+
+        excludedAppsLabel.text = spannable
+        excludedAppsLabel.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
+
         if (state.isRunning) {
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(getText(R.string.atp_ActivityEnabledLabel))
+                text = addClickableLink(REPORT_ISSUES_ANNOTATION, getText(R.string.atp_ActivityEnabledLabel)) { launchFeedback() }
                 movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(getText(R.string.atp_ActivityDisabledLabel))
+                text = addClickableLink(REPORT_ISSUES_ANNOTATION, getText(R.string.atp_ActivityDisabledLabel)) { launchFeedback() }
                 movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
 
-    private fun addClickableLink(text: CharSequence): SpannableString {
+    private fun addClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                launchFeedback()
+                onClick()
             }
         }
 
-        annotations?.find { it.value == "report_issues_link" }?.let {
+        annotations?.find { it.value == annotation }?.let {
             spannableString.apply {
                 setSpan(
                     clickableSpan,
@@ -377,6 +392,9 @@ class DeviceShieldTrackerActivity :
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
 
+        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        private const val EXCLUDED_APPS_ANNOTATION = "view_exceptions_link"
+
         fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
@@ -385,5 +403,4 @@ class DeviceShieldTrackerActivity :
     }
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
-
 }

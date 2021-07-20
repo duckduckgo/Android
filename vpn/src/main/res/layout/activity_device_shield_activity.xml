@@ -123,13 +123,24 @@
             android:layout_height="1dp"
             android:background="@color/splitterGray" />
 
+        <TextView
+            android:id="@+id/cta_excluded_apps"
+            style="@style/DeviceShield.PrivacyReport.Label.Blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:padding="16dp"
+            android:text="@string/atp_ActivityAppTrackersExcludedApps" />
+
         <Button
             android:id="@+id/cta_what_are_app_trackers"
             style="@style/DeviceShield.Button.Transparent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/atp_ActivityAppTrackersFAQ" />
 
@@ -143,15 +154,6 @@
             android:layout_marginEnd="16dp"
             android:text="@string/atp_FAQCta" />
 
-        <Button
-            android:id="@+id/cta_excluded_apps"
-            style="@style/DeviceShield.Button.Transparent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/atp_ExcludedApps" />
 
         <Button
             android:id="@+id/cta_beta_instructions"
