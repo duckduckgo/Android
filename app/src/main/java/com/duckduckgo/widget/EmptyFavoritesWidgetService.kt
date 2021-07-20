@@ -23,7 +23,6 @@ import android.widget.RemoteViewsService
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import timber.log.Timber
 import javax.inject.Inject
 
 class EmptyFavoritesWidgetService : RemoteViewsService() {
@@ -59,7 +58,6 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getViewAt(position: Int): RemoteViews {
-            Timber.i("EmptyFavoritesWidgetService - getViewAt")
             return RemoteViews(context.packageName, R.layout.empty_view)
         }
 

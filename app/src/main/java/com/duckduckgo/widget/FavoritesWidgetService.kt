@@ -21,24 +21,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.IBinder
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.favicon.FaviconPersister
-import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
-import com.duckduckgo.app.global.view.toPx
-import timber.log.Timber
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class FavoritesWidgetService : RemoteViewsService() {
@@ -48,13 +42,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         const val THEME_EXTRAS = "THEME_EXTRAS"
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        Timber.i("FavoritesWidgetService - onBind")
-        return super.onBind(intent)
-    }
-
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        Timber.i("FavoritesWidgetService - onGetViewFactory")
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
@@ -66,7 +54,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         lateinit var favoritesDataRepository: FavoritesRepository
 
         @Inject
-        lateinit var faviconPersister: FaviconPersister
+        lateinit var faviconManager: FaviconManager
 
         @Inject
         lateinit var widgetPrefs: WidgetPreferences
@@ -77,6 +65,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         )
 
         private val faviconItemSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon).toInt()
+        private val faviconItemRadius = context.resources.getDimension(R.dimen.savedSiteGridItemRadiusFavicon).toInt()
 
         private val maxItems: Int
             get() {
@@ -91,41 +80,22 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            Timber.i("FavoritesWidgetService - favs onDataSetChanged $this")
             val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
-                val faviconFile = faviconPersister.faviconFile(
-                    FileBasedFaviconPersister.FAVICON_PERSISTED_DIR,
-                    FileBasedFaviconPersister.NO_SUBFOLDER,
-                    it.url.extractDomain()!!
-                )
-                val bitmap = if (faviconFile != null) {
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(faviconFile)
-                        .transform(RoundedCorners(10.toPx()))
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
-                        .submit(faviconItemSize, faviconItemSize)
-                        .get()
-                } else {
-                    generateDefaultDrawable(context, it.url.extractDomain()!!).toBitmap(faviconItemSize, faviconItemSize)
+                val bitmap = runBlocking {
+                    faviconManager.loadFromDiskWithParams(url = it.url, radius = faviconItemRadius, width = faviconItemSize, height = faviconItemSize)
+                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
                 }
-
                 WidgetFavorite(it.title, it.url, bitmap)
             }
             domains.clear()
             domains.addAll(newList)
-            Timber.i("FavoritesWidgetService - favs onDataSetChanged finished $this")
         }
 
         override fun onDestroy() {
-            Timber.i("FavoritesWidgetService - onDestroy")
         }
 
         override fun getCount(): Int {
-            val count = maxItems
-            Timber.i("FavoritesWidgetService - favs getCount $count $this")
-            return count
+            return maxItems
         }
 
         private fun String.extractDomain(): String? {
@@ -137,7 +107,6 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun getViewAt(position: Int): RemoteViews {
-            Timber.i("FavoritesWidgetService - getViewAt")
             val item = if (position >= domains.size) null else domains[position]
             val remoteViews = RemoteViews(context.packageName, getItemLayout())
             if (item != null) {
@@ -155,7 +124,6 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         private fun getItemLayout(): Int {
-            Timber.i("FavoritesWidgetService - fav getItemLayout for $theme")
             return when (theme) {
                 WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item

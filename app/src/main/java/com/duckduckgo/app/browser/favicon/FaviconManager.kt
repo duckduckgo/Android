@@ -41,6 +41,7 @@ interface FaviconManager {
     suspend fun persistCachedFavicon(tabId: String, url: String)
     suspend fun loadToViewFromLocalOrFallback(tabId: String? = null, url: String, view: ImageView)
     suspend fun loadFromDisk(tabId: String?, url: String): Bitmap?
+    suspend fun loadFromDiskWithParams(tabId: String? = null, url: String, radius: Int, width: Int, height: Int): Bitmap?
     suspend fun deletePersistedFavicon(url: String)
     suspend fun deleteOldTempFavicon(tabId: String, path: String?)
     suspend fun deleteAllTemp()
@@ -108,6 +109,22 @@ class DuckDuckGoFaviconManager constructor(
 
         return if (cachedFavicon != null) {
             faviconDownloader.getFaviconFromDisk(cachedFavicon)
+        } else null
+    }
+
+    override suspend fun loadFromDiskWithParams(tabId: String?, url: String, radius: Int, width: Int, height: Int): Bitmap? {
+        val domain = url.extractDomain() ?: return null
+
+        var cachedFavicon: File? = null
+        if (tabId != null) {
+            cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
+        }
+        if (cachedFavicon == null) {
+            cachedFavicon = faviconPersister.faviconFile(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+        }
+
+        return if (cachedFavicon != null) {
+            faviconDownloader.getFaviconFromDisk(cachedFavicon, radius, width, height)
         } else null
     }
 
