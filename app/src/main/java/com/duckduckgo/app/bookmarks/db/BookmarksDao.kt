@@ -27,7 +27,7 @@ interface BookmarksDao {
     fun insert(bookmark: BookmarkEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(bookmark: List<BookmarkEntity>)
+    fun insert(bookmarks: List<BookmarkEntity>)
 
     @Query("select * from bookmarks where parentId = :parentId")
     fun getBookmarks(parentId: Long): LiveData<List<BookmarkEntity>>
