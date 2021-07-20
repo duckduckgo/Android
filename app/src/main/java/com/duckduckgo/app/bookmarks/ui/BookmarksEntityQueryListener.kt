@@ -30,8 +30,9 @@ class BookmarksEntityQueryListener(
 
     override fun onQueryTextChange(newText: String): Boolean {
         if (bookmarks != null && bookmarkFolders != null) {
-            bookmarksAdapter.bookmarkItems = filterBookmarks(newText, bookmarks)
-            bookmarkFoldersAdapter.bookmarkFolderItems = filterBookmarkFolders(newText, bookmarkFolders)
+            val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
+            bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
+            bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
         }
         return true
     }

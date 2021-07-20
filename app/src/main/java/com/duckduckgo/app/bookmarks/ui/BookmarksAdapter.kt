@@ -50,13 +50,15 @@ class BookmarksAdapter(
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
 
-    var bookmarkItems: List<BookmarksItemTypes> = emptyList()
-        set(value) {
-            field = generateNewList(value)
-            submitList(field)
-        }
+    fun setItems(bookmarkItems: List<BookmarkItem>, showEmptyHint: Boolean) {
+        val generatedList = generateNewList(bookmarkItems, showEmptyHint)
+        submitList(generatedList)
+    }
 
-    private fun generateNewList(value: List<BookmarksItemTypes>): List<BookmarksItemTypes> {
+    private fun generateNewList(value: List<BookmarksItemTypes>, showEmptyHint: Boolean): List<BookmarksItemTypes> {
+        if (!showEmptyHint) {
+            return value
+        }
         return if (value.isEmpty()) listOf(EmptyHint) else value
     }
 
@@ -75,12 +77,10 @@ class BookmarksAdapter(
         }
     }
 
-    override fun getItemCount(): Int = bookmarkItems.size
-
     override fun onBindViewHolder(holder: BookmarkScreenViewHolders, position: Int) {
         when (holder) {
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                holder.update((bookmarkItems[position] as BookmarkItem).bookmark)
+                holder.update((getItem(position) as BookmarkItem).bookmark)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()
@@ -89,10 +89,9 @@ class BookmarksAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (bookmarkItems[position]) {
+        return when (getItem(position)) {
             is EmptyHint -> EMPTY_STATE_TYPE
             else -> BOOKMARK_TYPE
-
         }
     }
 }

@@ -131,7 +131,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     if (parentId == ROOT_FOLDER_ID) {
                         favoritesAdapter.favoriteItems = state.favorites.map { FavoritesAdapter.FavoriteItem(it) }
                     }
-                    bookmarksAdapter.bookmarkItems = state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }
+                    bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
                     bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
                     invalidateOptionsMenu()
                 }
