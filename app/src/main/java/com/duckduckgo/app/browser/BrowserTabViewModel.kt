@@ -1335,9 +1335,9 @@ class BrowserTabViewModel(
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
             }
-            val bookmarkEntity = BookmarkEntity(title = title, url = url)
+            val bookmarkEntity = BookmarkEntity(title = title, url = url, parentId = 0)
             val id = bookmarksDao.insert(bookmarkEntity)
-            SavedSite.Bookmark(id, title, url)
+            SavedSite.Bookmark(id, title, url, 0)
         }
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
@@ -1444,7 +1444,7 @@ class BrowserTabViewModel(
 
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
-            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
         }
     }
 

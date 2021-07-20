@@ -535,8 +535,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com"))
-        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com", 0))
+        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
     }
 
     @Test
@@ -551,7 +551,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
@@ -1485,7 +1485,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
-        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
+        whenever(mockBookmarksDao.insert(any<BookmarkEntity>())).thenReturn(1)
 
         testee.onBookmarkAddRequested()
 
