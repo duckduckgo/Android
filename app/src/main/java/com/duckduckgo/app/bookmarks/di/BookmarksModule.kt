@@ -17,6 +17,7 @@
 package com.duckduckgo.app.bookmarks.di
 
 import android.content.Context
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.bookmarks.service.SavedSitesExporter
@@ -29,9 +30,12 @@ import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersDataRepository
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -86,5 +90,11 @@ class BookmarksModule {
     @Singleton
     fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
+    }
+
+    @Provides
+    @Singleton
+    fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarkFoldersRepository {
+        return BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }
 }
