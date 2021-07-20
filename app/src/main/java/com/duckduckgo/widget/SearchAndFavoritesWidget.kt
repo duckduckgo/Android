@@ -52,7 +52,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     companion object {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
-        const val EXTRA_ITEM_URL = "EXTRA_ITEM_URL"
     }
 
     @Inject
@@ -77,25 +76,9 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         initWidgetProvider(context)
         appWidgetIds.forEach {
-            Timber.i("SearchAndFavoritesWidget - onDeleted $it")
             widgetPrefs.removeWidgetSettings(it)
         }
         super.onDeleted(context, appWidgetIds)
-    }
-
-    override fun onEnabled(context: Context?) {
-        Timber.i("SearchAndFavoritesWidget - onEnabled")
-        super.onEnabled(context)
-    }
-
-    override fun onDisabled(context: Context?) {
-        Timber.i("SearchAndFavoritesWidget - onDisabled")
-        super.onDisabled(context)
-    }
-
-    override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
-        Timber.i("SearchAndFavoritesWidget - onRestored")
-        super.onRestored(context, oldWidgetIds, newWidgetIds)
     }
 
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
@@ -207,7 +190,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         var totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
 
         Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
-
         while (totalSize < width) {
             ++n
             totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
@@ -226,7 +208,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
 
         Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
-
         while (totalSize < height) {
             ++n
             totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
