@@ -45,15 +45,16 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
 
     fun getMessageString(): SpannableString {
         val bookmarkFolder = arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder
-        val string = SpannableString(resources.getQuantityString(R.plurals.bookmarkFolderDeleteDialogMessage, bookmarkFolder.numItems, bookmarkFolder.name, bookmarkFolder.numItems))
-        string.setSpan(StyleSpan(Typeface.BOLD), MESSAGE_LENGTH, MESSAGE_LENGTH + bookmarkFolder.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
+        val message = getString(R.string.bookmarkFolderDeleteDialogMessage)
+        val string = SpannableString(resources.getQuantityString(R.plurals.bookmarkFolderDeleteDialogMessage, totalItems, message, bookmarkFolder.name, totalItems))
+        string.setSpan(StyleSpan(Typeface.BOLD), message.length, message.length + bookmarkFolder.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return string
     }
 
     companion object {
 
         private const val BOOKMARK_FOLDER_KEY = "BOOKMARK_FOLDER_KEY"
-        private const val MESSAGE_LENGTH = 32
 
         fun instance(bookmarkFolder: BookmarkFolder): DeleteBookmarkFolderConfirmationFragment {
             val fragment = DeleteBookmarkFolderConfirmationFragment()

@@ -61,10 +61,11 @@
     <string name="folderLocationTitle">Select Location</string>
     <string name="addFolder">Add Folder</string>
     <string name="editFolder">Edit Folder</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">Are you sure you want to delete %s and %d item?</item>
-        <item quantity="other">Are you sure you want to delete %s and %d items?</item>
+        <item quantity="one">%s%s and %d item?</item>
+        <item quantity="other">%s%s and %d items?</item>
     </plurals>
 
     <plurals name="bookmarkFolderItems">
