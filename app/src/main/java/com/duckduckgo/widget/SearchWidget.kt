@@ -79,14 +79,12 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-        var landscapeWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
 
         if (newOptions != null) {
             portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-            landscapeWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
         }
 
-        val shouldShowHint = shouldShowSearchBarHint(portraitWidth, landscapeWidth)
+        val shouldShowHint = shouldShowSearchBarHint(portraitWidth)
 
         val views = RemoteViews(context.packageName, layoutId)
         views.setViewVisibility(R.id.searchInputBox, if (shouldShowHint) View.VISIBLE else View.INVISIBLE)
@@ -94,7 +92,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
-    private fun shouldShowSearchBarHint(portraitWidth: Int, landscapeWidth: Int): Boolean {
+    private fun shouldShowSearchBarHint(portraitWidth: Int): Boolean {
         return portraitWidth > SEARCH_BAR_MIN_HINT_WIDTH_SIZE
     }
 
