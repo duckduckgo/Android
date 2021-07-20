@@ -54,7 +54,7 @@ class RealSavedSitesImporter(
             savedSites.forEach {
                 when (it) {
                     is SavedSite.Favorite -> favoritesRepository.insert(it)
-                    is SavedSite.Bookmark -> bookmarksDao.insert(BookmarkEntity(title = it.title, url = it.url))
+                    is SavedSite.Bookmark -> bookmarksDao.insert(BookmarkEntity(title = it.title, url = it.url, parentId = it.parentId))
                 }
             }
 
