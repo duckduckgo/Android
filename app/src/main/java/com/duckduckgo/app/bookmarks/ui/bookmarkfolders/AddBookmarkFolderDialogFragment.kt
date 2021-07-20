@@ -41,19 +41,23 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     }
 
     override fun onBackNavigation() {
-        val name = binding.titleInput.text.toString()
-        if (name.isNotBlank()) {
-            listener?.onBookmarkFolderAdded(BookmarkFolder(0, name, 0))
+        arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
+            val name = binding.titleInput.text.toString()
+            if (name.isNotBlank()) {
+                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it))
+            }
         }
     }
 
     companion object {
-        private const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
+        const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
+        const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
 
-        fun instance(parentFolderId: Long): AddBookmarkFolderDialogFragment {
+        fun instance(parentFolderId: Long, parentFolderName: String): AddBookmarkFolderDialogFragment {
             val dialogFragment = AddBookmarkFolderDialogFragment()
             val bundle = Bundle()
-            bundle.putSerializable(KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putLong(KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putString(KEY_PARENT_FOLDER_NAME, parentFolderName)
             dialogFragment.arguments = bundle
             return dialogFragment
         }
