@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -39,11 +41,14 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         observeViewModel()
         setupAdapter()
 
-        viewModel.fetchBookmarkFolders(getString(R.string.bookmarksSectionTitle))
+        viewModel.fetchBookmarkFolders(
+            intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+            getString(R.string.bookmarksSectionTitle)
+        )
     }
 
     private fun setupAdapter() {
-        adapter = BookmarkFolderStructureAdapter(resources.displayMetrics.widthPixels)
+        adapter = BookmarkFolderStructureAdapter(viewModel, resources.displayMetrics.widthPixels)
         binding.bookmarkFolderStructure.adapter = adapter
     }
 
@@ -52,15 +57,36 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             this,
             { viewState ->
                 viewState?.let {
-                    adapter.submitList(it)
+                    adapter.submitList(it.folderStructure)
+                    setSelectedFolderResult(it.selectedBookmarkFolder)
                 }
             }
         )
     }
 
+    private fun setSelectedFolderResult(bookmarkFolder: BookmarkFolder?) {
+        bookmarkFolder?.let {
+            val result = Intent()
+            result.putExtra(KEY_BOOKMARK_FOLDER_ID, it.id)
+            result.putExtra(KEY_BOOKMARK_FOLDER_NAME, it.name)
+            setResult(Activity.RESULT_OK, result)
+        }
+    }
+
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, BookmarkFoldersActivity::class.java)
+        const val KEY_BOOKMARK_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
+        const val KEY_BOOKMARK_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
+        const val KEY_CURRENT_FOLDER_ID = "KEY_CURRENT_FOLDER_ID"
+
+        fun intent(context: Context, parentFolderId: Long, currentFolderId: Long? = null): Intent {
+            val intent = Intent(context, BookmarkFoldersActivity::class.java)
+            val bundle = Bundle()
+            bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)
+            currentFolderId?.let {
+                bundle.putLong(KEY_CURRENT_FOLDER_ID, it)
+            }
+            intent.putExtras(bundle)
+            return intent
         }
     }
 }
