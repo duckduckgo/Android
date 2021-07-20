@@ -127,12 +127,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
         viewModel.viewState.observe(
             this,
             { viewState ->
-                viewState?.let {
+                viewState?.let { state ->
                     if (parentId == ROOT_FOLDER_ID) {
-                        favoritesAdapter.favoriteItems = it.favorites.map { FavoritesAdapter.FavoriteItem(it) }
+                        favoritesAdapter.favoriteItems = state.favorites.map { FavoritesAdapter.FavoriteItem(it) }
                     }
-                    bookmarksAdapter.bookmarkItems = it.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }
-                    bookmarkFoldersAdapter.bookmarkFolderItems = it.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+                    bookmarksAdapter.bookmarkItems = state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }
+                    bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
                     invalidateOptionsMenu()
                 }
             }

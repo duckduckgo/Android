@@ -92,7 +92,6 @@ class BookmarkFoldersAdapter(
         return when (bookmarkFolderItems[position]) {
             is Header -> BOOKMARK_FOLDERS_SECTION_TITLE_TYPE
             else -> BOOKMARK_FOLDER_TYPE
-
         }
     }
 }
