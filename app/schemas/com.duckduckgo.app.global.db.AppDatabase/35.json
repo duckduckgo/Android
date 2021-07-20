@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 35,
-    "identityHash": "7e459183134182e23524e089ee6e638f",
+    "identityHash": "433ba60832a739906c3421bd6eb30694",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -400,7 +400,7 @@
       },
       {
         "tableName": "bookmarks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `url` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `url` TEXT NOT NULL, `parentId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -418,6 +418,12 @@
             "fieldPath": "url",
             "columnName": "url",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -476,6 +482,38 @@
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `${TABLE_NAME}` (`title`, `url`)"
           }
         ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "bookmark_folders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `parentId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
         "foreignKeys": []
       },
       {
@@ -908,7 +946,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e459183134182e23524e089ee6e638f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '433ba60832a739906c3421bd6eb30694')"
     ]
   }
 }
