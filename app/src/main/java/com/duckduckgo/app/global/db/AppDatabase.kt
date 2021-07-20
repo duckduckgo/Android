@@ -22,10 +22,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
@@ -67,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 35,
+    exportSchema = true, version = 36,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -82,6 +79,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TabSelectionEntity::class,
         BookmarkEntity::class,
         FavoriteEntity::class,
+        BookmarkFolderEntity::class,
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
@@ -127,6 +125,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun favoritesDao(): FavoritesDao
+    abstract fun bookmarkFoldersDao(): BookmarkFoldersDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
@@ -427,9 +426,16 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmark_folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)")
+            database.execSQL("ALTER TABLE `bookmarks` ADD COLUMN `parentId` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
-            MIGRATION_29_TO_30.migrate(database)
+//            MIGRATION_29_TO_30.migrate(database)
         }
     }
 
@@ -474,7 +480,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_31_TO_32,
             MIGRATION_32_TO_33,
             MIGRATION_33_TO_34,
-            MIGRATION_34_TO_35
+            MIGRATION_34_TO_35,
+            MIGRATION_35_TO_36
         )
 
     @Deprecated(
