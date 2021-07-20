@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,8 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.showKeyboard
@@ -40,7 +43,22 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
 
-    var launcher = registerForActivityResult(StartActivityForResult()) {
+    var launcher = registerForActivityResult(StartActivityForResult()) { result ->
+        result.data?.let { data ->
+            storeFolderIdFromIntent(data)
+            populateFolderNameFromIntent(data)
+        }
+    }
+
+    private fun populateFolderNameFromIntent(data: Intent) {
+        data.getStringExtra(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
+            binding.savedSiteLocation.setText(name)
+        }
+    }
+
+    private fun storeFolderIdFromIntent(data: Intent) {
+        val parentId = data.getLongExtra(KEY_BOOKMARK_FOLDER_ID, 0)
+        arguments?.putLong(KEY_BOOKMARK_FOLDER_ID, parentId)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +69,9 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
+        arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
+            binding.savedSiteLocation.setText(name)
+        }
         configureUI()
         showKeyboard(binding.titleInput)
         return binding.root
@@ -93,8 +114,10 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private fun configureClickListeners() {
         binding.savedSiteLocation.setOnClickListener {
-            context?.let {
-                launcher.launch(BookmarkFoldersActivity.intent(it))
+            context?.let { context ->
+                arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
+                    launcher.launch(BookmarkFoldersActivity.intent(context, it, 7))
+                }
             }
         }
     }
