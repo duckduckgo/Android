@@ -441,7 +441,7 @@ class MigrationsProvider(val context: Context) {
      */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, `parentId` INTEGER NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)")
             database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url, parentId) SELECT * FROM `bookmarks`")
             database.execSQL("DROP TABLE `bookmarks`")
             database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
