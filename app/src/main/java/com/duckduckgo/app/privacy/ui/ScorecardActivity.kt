@@ -102,7 +102,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
             } else {
                 protectionsTemporarilyDisabled.gone()
                 heading.show()
-                heading.text = upgradeRenderer.heading(this@ScorecardActivity, viewState.beforeGrade, viewState.afterGrade, viewState.privacyOn).html(this)
+                heading.text = upgradeRenderer.heading(this@ScorecardActivity, viewState.beforeGrade, viewState.afterGrade, viewState.privacyOn).html(this@ScorecardActivity)
             }
         }
     }
