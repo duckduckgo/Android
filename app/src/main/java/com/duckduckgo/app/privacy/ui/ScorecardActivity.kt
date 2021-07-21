@@ -22,11 +22,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
@@ -60,14 +60,14 @@ class ScorecardActivity : DuckDuckGoActivity() {
 
         viewModel.viewState.observe(
             this,
-            Observer<ScorecardViewModel.ViewState> {
+            {
                 it?.let { render(it) }
             }
         )
 
         repository.retrieveSiteData(intent.tabId!!).observe(
             this,
-            Observer<Site> {
+            {
                 viewModel.onSiteChanged(it)
             }
         )
@@ -76,10 +76,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
     private fun render(viewState: ScorecardViewModel.ViewState) {
         with(privacyScorecard) {
             val context = this@ScorecardActivity
-            privacyScorecardHeader.privacyBanner.setImageResource(viewState.afterGrade.banner(viewState.privacyOn))
-            privacyScorecardHeader.domain.text = viewState.domain
-            privacyScorecardHeader.heading.text =
-                upgradeRenderer.heading(context, viewState.beforeGrade, viewState.afterGrade, viewState.privacyOn).html(context)
+            renderHeading(viewState)
             https.text = viewState.httpsStatus.text(context)
             https.setDrawableEnd(viewState.httpsStatus.successFailureIcon())
             practices.text = viewState.practices.text(context)
@@ -92,6 +89,21 @@ class ScorecardActivity : DuckDuckGoActivity() {
             majorNetworks.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.majorNetworkCount))
             showIsMemberOfMajorNetwork(viewState.showIsMemberOfMajorNetwork)
             showEnhancedGrade(viewState.showEnhancedGrade)
+        }
+    }
+
+    private fun renderHeading(viewState: ScorecardViewModel.ViewState) {
+        with(privacyScorecardHeader) {
+            privacyBanner.setImageResource(viewState.afterGrade.banner(viewState.privacyOn))
+            domain.text = viewState.domain
+            if (viewState.isSiteInTempAllowedList) {
+                heading.gone()
+                protectionsTemporarilyDisabled.show()
+            } else {
+                protectionsTemporarilyDisabled.gone()
+                heading.show()
+                heading.text = upgradeRenderer.heading(this@ScorecardActivity, viewState.beforeGrade, viewState.afterGrade, viewState.privacyOn).html(this)
+            }
         }
     }
 

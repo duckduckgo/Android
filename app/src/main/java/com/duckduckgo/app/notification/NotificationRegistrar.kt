@@ -51,6 +51,7 @@ class NotificationRegistrar @Inject constructor(
         const val PrivacyProtection = 101
         const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
+        const val EmailWaitlist = 106 // 105 was used for the UOA notification
     }
 
     object ChannelType {
@@ -69,12 +70,18 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
+        val EMAIL_WAITLIST = Channel(
+            "com.duckduckgo.email",
+            R.string.notificationChannelEmailWaitlist,
+            NotificationManagerCompat.IMPORTANCE_HIGH
+        )
     }
 
     private val channels = listOf(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
-        ChannelType.TUTORIALS
+        ChannelType.TUTORIALS,
+        ChannelType.EMAIL_WAITLIST
     )
 
     fun registerApp() {

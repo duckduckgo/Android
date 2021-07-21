@@ -16,10 +16,24 @@
 
 package com.duckduckgo.app.httpsupgrade.store
 
+import timber.log.Timber
+
 interface HttpsEmbeddedDataPersister {
 
     fun shouldPersistEmbeddedData(): Boolean
 
     fun persistEmbeddedData()
 
+}
+
+class EmptyHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
+
+    override fun shouldPersistEmbeddedData(): Boolean {
+        Timber.d("Ignoring, empty persister does not use embedded data")
+        return false
+    }
+
+    override fun persistEmbeddedData() {
+        Timber.d("Ignoring, empty persister does not use embedded data")
+    }
 }

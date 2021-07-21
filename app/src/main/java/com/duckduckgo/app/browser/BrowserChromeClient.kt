@@ -21,11 +21,13 @@ import android.net.Uri
 import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.drm.DrmRequestManager
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +37,7 @@ import javax.inject.Inject
 
 class BrowserChromeClient @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val drmRequestManager: DrmRequestManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : WebChromeClient() {
 
@@ -136,6 +139,13 @@ class BrowserChromeClient @Inject constructor(
             return true
         }
         return false
+    }
+
+    override fun onPermissionRequest(request: PermissionRequest) {
+        val permissions = drmRequestManager.drmPermissionsForRequest(request)
+        if (permissions.isNotEmpty()) {
+            request.grant(permissions)
+        }
     }
 
     override fun onCloseWindow(window: WebView?) {

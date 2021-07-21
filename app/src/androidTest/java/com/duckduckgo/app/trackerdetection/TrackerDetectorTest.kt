@@ -20,6 +20,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
+import com.duckduckgo.app.trackerdetection.Client.ClientName.TEMPORARY_WHITELIST
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -115,6 +116,15 @@ class TrackerDetectorTest {
     }
 
     @Test
+    fun whenSiteIsInTempAllowListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        trackerDetector.addClient(tempListClient())
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate() {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
@@ -152,6 +162,13 @@ class TrackerDetectorTest {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(false))
+        return client
+    }
+
+    private fun tempListClient(): Client {
+        val client: Client = mock()
+        whenever(client.name).thenReturn(TEMPORARY_WHITELIST)
+        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(true))
         return client
     }
 

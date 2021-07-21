@@ -30,6 +30,9 @@ interface FavoritesDao {
     @Query("select * from favorites order by position")
     fun favorites(): Flow<List<FavoriteEntity>>
 
+    @Query("select * from favorites order by position")
+    fun favoritesSync(): List<FavoriteEntity>
+
     @Query("select count(*) from favorites WHERE url LIKE :domain")
     fun favoritesCountByUrl(domain: String): Int
 

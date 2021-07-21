@@ -111,6 +111,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -241,6 +242,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
+    private lateinit var mockTemporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao
+
+    @Mock
     private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
 
     @Mock
@@ -346,6 +350,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockTemporaryTrackingWhitelistDao.contains(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
@@ -385,7 +390,8 @@ class BrowserTabViewModelTest {
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestCoroutineScope(),
-            appLinksHandler = mockAppLinksHandler
+            appLinksHandler = mockAppLinksHandler,
+            temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao
         )
 
         testee.loadData("abc", null, false)
@@ -3233,7 +3239,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
-        verify(mockAppLinksHandler).enterBrowserState()
+        verify(mockAppLinksHandler).userEnteredBrowserState()
         assertCommandIssued<Navigate>()
     }
 
@@ -3250,6 +3256,27 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery("nytimes.com")
         assertCommandNotIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenIsWhitelistedIsTrue() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertTrue(browserViewState().isWhitelisted)
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenPrivacyOnIsFalse() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().privacyOn)
+    }
+
+    @Test
+    fun whenLoadUrlAndSiteIsInTempAllowListThenDoNotChangePrivacyGrade() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        loadUrl("https://example.com")
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     private suspend fun givenFireButtonPulsing() {

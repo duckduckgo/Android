@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -91,6 +92,33 @@ class TemporaryTrackingWhitelistDaoTest {
         dao.insertAll(listOf(entity))
         dao.deleteAll()
         assertEquals(0, dao.count())
+    }
+
+    @Test
+    fun whenElementAddedThenContainsIsTrue() {
+        val entity = createEntity(domain)
+        dao.insertAll(listOf(entity))
+        assertTrue(dao.contains(domain))
+    }
+
+    @Test
+    fun wheElementDeletedThenContainsIsFalse() {
+        val entity = createEntity(domain)
+        dao.insertAll(listOf(entity))
+        dao.deleteAll()
+        Assert.assertFalse(dao.contains(domain))
+    }
+
+    @Test
+    fun whenElementDoesNotExistThenContainsIsFalse() {
+        Assert.assertFalse(dao.contains(domain))
+    }
+
+    @Test
+    fun whenElementAddedAndSubdomainCheckedThenContainsIsTrue() {
+        val entity = createEntity("test.com")
+        dao.insertAll(listOf(entity))
+        assertTrue(dao.contains("subdomain.test.com"))
     }
 
     private fun createEntity(domain: String): TemporaryTrackingWhitelistedDomain {

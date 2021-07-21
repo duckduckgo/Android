@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/privacyHeader"
     android:layout_width="match_parent"
-    android:layout_height="212dp"
+    android:layout_height="wrap_content"
     android:background="@color/subtleGray"
     tools:showIn="@layout/content_privacy_dashboard">
 
@@ -31,6 +31,7 @@
         android:paddingTop="20dp"
         android:paddingBottom="12dp"
         android:src="@drawable/privacygrade_banner_unknown"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
@@ -53,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="14dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
         android:letterSpacing="0.14"
@@ -64,6 +65,29 @@
         android:textAlignment="gravity"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/domain" />
+
+    <TextView
+        android:id="@+id/protectionsTemporarilyDisabled"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:paddingEnd="19dp"
+        android:paddingStart="19dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:visibility="visible"
+        android:text="@string/privacyProtectionTemporarilyDisabled"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+
+        android:background="@color/yellow_10"
+        android:textAlignment="gravity"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/domain" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
