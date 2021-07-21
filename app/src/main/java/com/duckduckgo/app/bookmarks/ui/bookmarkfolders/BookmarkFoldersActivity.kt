@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import timber.log.Timber
 
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
@@ -41,10 +42,21 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         observeViewModel()
         setupAdapter()
 
-        viewModel.fetchBookmarkFolders(
-            intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-            getString(R.string.bookmarksSectionTitle)
-        )
+        var currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER)
+
+        if (currentFolder == null) {
+            viewModel.fetchBookmarkFolders(
+                    intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+                    getString(R.string.bookmarksSectionTitle),
+                    null
+            )
+        } else {
+            viewModel.fetchBookmarkFolders(
+                    intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+                    getString(R.string.bookmarksSectionTitle),
+                    currentFolder as BookmarkFolder
+            )
+        }
     }
 
     private fun setupAdapter() {
@@ -76,14 +88,14 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
     companion object {
         const val KEY_BOOKMARK_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
         const val KEY_BOOKMARK_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
-        const val KEY_CURRENT_FOLDER_ID = "KEY_CURRENT_FOLDER_ID"
+        const val KEY_CURRENT_FOLDER = "KEY_CURRENT_FOLDER"
 
-        fun intent(context: Context, parentFolderId: Long, currentFolderId: Long? = null): Intent {
+        fun intent(context: Context, parentFolderId: Long, currentFolder: BookmarkFolder? = null): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()
             bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)
-            currentFolderId?.let {
-                bundle.putLong(KEY_CURRENT_FOLDER_ID, it)
+            currentFolder?.let {
+                bundle.putSerializable(KEY_CURRENT_FOLDER, it)
             }
             intent.putExtras(bundle)
             return intent

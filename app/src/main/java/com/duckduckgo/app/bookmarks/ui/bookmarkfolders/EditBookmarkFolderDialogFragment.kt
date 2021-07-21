@@ -32,7 +32,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     override fun configureUI() {
         setToolbarTitle(getString(R.string.editFolder))
-        arguments?.getSerializable(KEY_BOOKMARK_FOLDER)?.let {
+        arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
             binding.titleInput.setText((it as BookmarkFolder).name)
         }
         configureFieldVisibility()
@@ -47,7 +47,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text.toString()
             if (name.isNotBlank()) {
-                val bookmarkFolder = arguments?.getSerializable(KEY_BOOKMARK_FOLDER) as BookmarkFolder
+                val bookmarkFolder = arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder
                 listener?.onBookmarkFolderUpdated(bookmarkFolder.copy(name = name, parentId = it))
             }
         }
@@ -56,14 +56,13 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     companion object {
         const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
         const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
-        const val KEY_BOOKMARK_FOLDER = "KEY_BOOKMARK_FOLDER"
 
         fun instance(parentFolderId: Long, parentFolderName: String, bookmarkFolder: BookmarkFolder): EditBookmarkFolderDialogFragment {
             val dialogFragment = EditBookmarkFolderDialogFragment()
             val bundle = Bundle()
             bundle.putLong(KEY_PARENT_FOLDER_ID, parentFolderId)
             bundle.putString(KEY_PARENT_FOLDER_NAME, parentFolderName)
-            bundle.putSerializable(KEY_BOOKMARK_FOLDER, bookmarkFolder)
+            bundle.putSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER, bookmarkFolder)
             dialogFragment.arguments = bundle
             return dialogFragment
         }

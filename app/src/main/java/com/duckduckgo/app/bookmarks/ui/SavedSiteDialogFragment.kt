@@ -28,9 +28,11 @@ import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.showKeyboard
@@ -116,7 +118,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         binding.savedSiteLocation.setOnClickListener {
             context?.let { context ->
                 arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
-                    launcher.launch(BookmarkFoldersActivity.intent(context, it, 7))
+                    if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder))
+                    } else {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it))
+                    }
                 }
             }
         }

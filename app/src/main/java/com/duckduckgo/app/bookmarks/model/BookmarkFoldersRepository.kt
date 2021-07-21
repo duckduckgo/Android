@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 interface BookmarkFoldersRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder)
     suspend fun update(bookmarkFolder: BookmarkFolder)
+    suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
@@ -51,7 +52,7 @@ class BookmarkFoldersDataRepository(
         return BookmarkFolderBranch(bookmarkEntities = bookmarkEntities, bookmarkFolderEntities = bookmarkFolderEntities)
     }
 
-    private fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder> {
+    override suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder> {
         val parentGroupings = getBookmarkFolders()
             .sortedWith(compareBy({ it.parentId }, { it.id }))
             .groupBy { it.parentId }

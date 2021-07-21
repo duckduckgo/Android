@@ -55,9 +55,16 @@ class BookmarkFoldersViewModel(
         }
     }
 
-    fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String) {
+    fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            var folderStructure = buildFolderStructure(getBookmarkFolders(), selectedFolderId)
+            var bookmarkFolders = getBookmarkFolders()
+
+            currentFolder?.let {
+                val bookmarkFolderBranch = bookmarkFoldersRepository.getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
+                bookmarkFolders = bookmarkFolders.minus(bookmarkFolderBranch)
+            }
+
+            var folderStructure = buildFolderStructure(bookmarkFolders, selectedFolderId)
             folderStructure = addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
             onFolderStructureCreated(folderStructure)
         }
