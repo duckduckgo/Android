@@ -433,9 +433,18 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (url) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
-//            MIGRATION_29_TO_30.migrate(database)
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, `parentId` INTEGER NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)")
+            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url, parentId) SELECT * FROM `bookmarks`")
+            database.execSQL("DROP TABLE `bookmarks`")
+            database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
         }
     }
 
