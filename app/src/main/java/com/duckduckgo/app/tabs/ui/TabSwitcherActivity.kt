@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -55,6 +56,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
     lateinit var clearPersonalDataAction: ClearDataAction

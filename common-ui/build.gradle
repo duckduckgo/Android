@@ -17,14 +17,22 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 
+    implementation project(path: ':di')
+
+    implementation Google.dagger
+
+    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
+
+    implementation "androidx.core:core-ktx:_"
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 }
