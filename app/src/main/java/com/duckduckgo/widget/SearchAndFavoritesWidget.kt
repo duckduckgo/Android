@@ -59,6 +59,11 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
+    override fun onReceive(context: Context, intent: Intent?) {
+        inject(context)
+        super.onReceive(context, intent)
+    }
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
         appWidgetIds.forEach { id ->
@@ -74,7 +79,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        initWidgetProvider(context)
         appWidgetIds.forEach {
             widgetPrefs.removeWidgetSettings(it)
         }
@@ -82,7 +86,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
-        initWidgetProvider(context)
         val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
@@ -226,12 +229,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val intent = BrowserActivity.intent(context, newSearch = true)
         intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
         return PendingIntent.getActivity(context, appWidgetId, intent, 0)
-    }
-
-    private fun initWidgetProvider(context: Context) {
-        if (!this::widgetPrefs.isInitialized) {
-            inject(context)
-        }
     }
 
     private fun inject(context: Context) {
