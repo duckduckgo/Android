@@ -430,7 +430,7 @@ class MigrationsProvider(val context: Context) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `bookmark_folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)")
             database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)")
-            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url, parentId) SELECT * FROM `bookmarks`")
+            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
             database.execSQL("DROP TABLE `bookmarks`")
             database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
         }
