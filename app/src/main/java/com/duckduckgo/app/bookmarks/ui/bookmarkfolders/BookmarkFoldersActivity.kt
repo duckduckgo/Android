@@ -24,7 +24,6 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import timber.log.Timber
 
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
@@ -46,15 +45,15 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
         if (currentFolder == null) {
             viewModel.fetchBookmarkFolders(
-                    intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-                    getString(R.string.bookmarksSectionTitle),
-                    null
+                intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+                getString(R.string.bookmarksSectionTitle),
+                null
             )
         } else {
             viewModel.fetchBookmarkFolders(
-                    intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-                    getString(R.string.bookmarksSectionTitle),
-                    currentFolder as BookmarkFolder
+                intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+                getString(R.string.bookmarksSectionTitle),
+                currentFolder as BookmarkFolder
             )
         }
     }
