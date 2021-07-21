@@ -218,7 +218,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
-        val intent = SystemSearchActivity.fromWidget(context)
+        val intent = SystemSearchActivity.fromFavWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
