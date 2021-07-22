@@ -14,14 +14,35 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_app_icons" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/changeAppIconPadding"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/appIconsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
