@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -79,6 +80,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -88,7 +92,7 @@ class SettingsViewModelTest {
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel, mockEmailManager)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
@@ -113,6 +117,7 @@ class SettingsViewModelTest {
             assertTrue(value.autoCompleteSuggestionsEnabled)
             assertFalse(value.showDefaultBrowserSetting)
             assertFalse(value.isAppDefaultBrowser)
+            assertTrue(value.emailEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -137,6 +142,32 @@ class SettingsViewModelTest {
             val value = expectItem()
             val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
             assertTrue(value.version.startsWith(expectedStartString))
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledAndEmailShouldBeDisabledThenEmailEnabledIsFalse() = coroutineTestRule.runBlocking {
+        whenever(mockEmailManager.isEmailFeatureEnabled()).thenReturn(false)
+        testee.start()
+        testee.viewState().test {
+
+            val value = expectItem()
+            assertFalse(value.emailEnabled)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledAndEmailShouldBeEnabledThenEmailEnabledIsTrue() = coroutineTestRule.runBlocking {
+        whenever(mockEmailManager.isEmailFeatureEnabled()).thenReturn(true)
+        testee.start()
+        testee.viewState().test {
+
+            val value = expectItem()
+            assertTrue(value.emailEnabled)
 
             cancelAndConsumeRemainingEvents()
         }

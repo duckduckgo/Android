@@ -36,8 +36,10 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
@@ -158,6 +160,7 @@ class SettingsActivity :
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
+                    updateEmailSettingVisibility(it.emailEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -174,6 +177,10 @@ class SettingsActivity :
             getString(R.string.disabled)
         }
         globalPrivacyControlSetting.setSubtitle(stateText)
+    }
+
+    private fun updateEmailSettingVisibility(enabled: Boolean) {
+        if (enabled) emailSetting.show() else emailSetting.gone()
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
