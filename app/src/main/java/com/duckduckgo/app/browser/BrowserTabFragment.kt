@@ -101,7 +101,6 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
@@ -110,7 +109,6 @@ import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -120,6 +118,8 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -226,7 +226,7 @@ class BrowserTabFragment :
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    lateinit var themingDataStore: ThemingDataStore
 
     @Inject
     @AppCoroutineScope
@@ -1184,7 +1184,7 @@ class BrowserTabFragment :
 
     @SuppressLint("RequiresFeature")
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        if (settingsDataStore.theme == DuckDuckGoTheme.DARK) {
+        if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
             ) {
