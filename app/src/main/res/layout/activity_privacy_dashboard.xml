@@ -20,8 +20,12 @@
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_privacy_dashboard" />
+    <include
+        android:id="@+id/contentPrivacyDashboard"
+        layout="@layout/content_privacy_dashboard" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

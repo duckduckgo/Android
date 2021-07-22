@@ -49,7 +49,9 @@
 
         <include layout="@layout/include_add_widget_instruction_steps" />
 
-        <include layout="@layout/include_add_widget_instruction_buttons" />
+        <include
+            android:id="@+id/includeAddWidgetInstructionButtons"
+            layout="@layout/include_add_widget_instruction_buttons" />
 
     </LinearLayout>
 

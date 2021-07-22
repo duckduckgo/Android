@@ -3155,19 +3155,21 @@ class BrowserTabViewModelTest {
     @Test
     fun whenConsumeAliasThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test
     fun whenCancelAutofillTooltipThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.cancelAutofillTooltip()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test
@@ -3184,10 +3186,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUseAddressThenPixelSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.useAddress()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test
