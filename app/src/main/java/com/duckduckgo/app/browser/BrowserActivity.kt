@@ -60,6 +60,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -110,7 +111,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var renderer: BrowserStateRenderer
 
-    private lateinit var binding: ActivityBrowserBinding
+    private val binding: ActivityBrowserBinding by viewBinding()
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
@@ -127,7 +128,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
-        binding = ActivityBrowserBinding.inflate(layoutInflater)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
         viewModel.viewState.observe(

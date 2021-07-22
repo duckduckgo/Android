@@ -23,12 +23,14 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
+    private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityAboutDuckDuckGoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 

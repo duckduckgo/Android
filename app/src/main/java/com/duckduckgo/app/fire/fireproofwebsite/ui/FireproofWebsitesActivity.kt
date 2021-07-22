@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -38,7 +39,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     lateinit var adapter: FireproofWebsiteAdapter
 
-    private lateinit var binding: ActivityFireproofWebsitesBinding
+    private val binding: ActivityFireproofWebsitesBinding by viewBinding()
 
     private var deleteDialog: AlertDialog? = null
 
@@ -49,7 +50,6 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFireproofWebsitesBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         setupFireproofWebsiteRecycler()
