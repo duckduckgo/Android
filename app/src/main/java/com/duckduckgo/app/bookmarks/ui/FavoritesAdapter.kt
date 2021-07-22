@@ -148,7 +148,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             )
 
             itemView.title.text = favorite.title
-            itemView.url.text = parseDisplayUrl(favorite.url)
+            itemView.subtitle.text = parseDisplayUrl(favorite.url)
             loadFavicon(favorite.url)
 
             itemView.overflowMenu.setOnClickListener {

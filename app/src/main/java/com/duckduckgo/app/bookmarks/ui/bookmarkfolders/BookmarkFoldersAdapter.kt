@@ -119,9 +119,11 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
             itemView.title.text = bookmarkFolder.name
 
             val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
-            itemView.url.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+            itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
 
-            itemView.favicon.setImageResource(R.drawable.ic_folder)
+            itemView.icon.visibility = View.VISIBLE
+            itemView.favicon.visibility = View.GONE
+            itemView.icon.setImageResource(R.drawable.ic_folder)
 
             itemView.overflowMenu.setOnClickListener {
                 showOverFlowMenu(itemView.overflowMenu, bookmarkFolder)

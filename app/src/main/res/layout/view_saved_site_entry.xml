@@ -27,7 +27,7 @@
     android:focusable="true">
 
     <FrameLayout
-        android:id="@+id/favicon_container"
+        android:id="@+id/iconContainer"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/subtle_favicon_background"
@@ -37,9 +37,17 @@
 
         <ImageView
             android:id="@+id/favicon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="center"
+            android:importantForAccessibility="no"/>
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
             android:importantForAccessibility="no"/>
     </FrameLayout>
 
@@ -55,14 +63,14 @@
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="end"
-        app:layout_constraintBottom_toTopOf="@+id/url"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toEndOf="@id/favicon_container"
+        app:layout_constraintStart_toEndOf="@id/iconContainer"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Bookmark" />
 
     <TextView
-        android:id="@+id/url"
+        android:id="@+id/subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"

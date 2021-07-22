@@ -119,7 +119,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             )
 
             itemView.title.text = bookmark.title
-            itemView.url.text = parseDisplayUrl(bookmark.url)
+            itemView.subtitle.text = parseDisplayUrl(bookmark.url)
             loadFavicon(bookmark.url)
 
             itemView.overflowMenu.setOnClickListener {
