@@ -28,12 +28,10 @@ interface EmailInjector {
     fun injectEmailAutofillJs(webView: WebView, url: String?)
     fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit)
     fun injectAddressInEmailField(webView: WebView, alias: String?)
-    fun resetInjectedJsFlag()
 }
 
 class EmailInjectorJs(private val emailManager: EmailManager, private val urlDetector: DuckDuckGoUrlDetector) : EmailInjector {
     private val javaScriptInjector = JavaScriptInjector()
-    private var hasJsBeenInjected = false
 
     override fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit) {
         webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
@@ -41,8 +39,7 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
 
     @UiThread
     override fun injectEmailAutofillJs(webView: WebView, url: String?) {
-        if (!hasJsBeenInjected && (isDuckDuckGoUrl(url) || emailManager.isSignedIn())) {
-            hasJsBeenInjected = true
+        if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
             webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
         }
     }
@@ -50,10 +47,6 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
     @UiThread
     override fun injectAddressInEmailField(webView: WebView, alias: String?) {
         webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
-    }
-
-    override fun resetInjectedJsFlag() {
-        hasJsBeenInjected = false
     }
 
     private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoDomain(url))

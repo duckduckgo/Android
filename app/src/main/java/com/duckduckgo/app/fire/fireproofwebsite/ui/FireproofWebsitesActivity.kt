@@ -23,14 +23,12 @@ import android.os.Bundle
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityFireproofWebsitesBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_fireproof_websites.*
-import kotlinx.android.synthetic.main.content_fireproof_websites.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
@@ -39,13 +37,20 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     lateinit var faviconManager: FaviconManager
 
     lateinit var adapter: FireproofWebsiteAdapter
+
+    private lateinit var binding: ActivityFireproofWebsitesBinding
+
     private var deleteDialog: AlertDialog? = null
 
     private val viewModel: FireproofWebsitesViewModel by bindViewModel()
 
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fireproof_websites)
+        binding = ActivityFireproofWebsitesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupToolbar(toolbar)
         setupFireproofWebsiteRecycler()
         observeViewModel()
@@ -53,7 +58,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     private fun setupFireproofWebsiteRecycler() {
         adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
-        recycler.adapter = adapter
+        binding.recycler.adapter = adapter
     }
 
     private fun observeViewModel() {
@@ -82,7 +87,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemovalConfirmation, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
         viewModel.delete(entity)
         Snackbar.make(
-            fireActivityRoot,
+            binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {

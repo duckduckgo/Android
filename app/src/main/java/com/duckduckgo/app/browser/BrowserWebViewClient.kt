@@ -167,7 +167,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            emailInjector.resetInjectedJsFlag()
+            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
             webViewClientListener?.resetAppLinkState()
@@ -184,7 +184,6 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageFinished
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))
                 url?.let { prefetchFavicon(url) }

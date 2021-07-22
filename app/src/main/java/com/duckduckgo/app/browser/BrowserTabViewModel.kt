@@ -1890,19 +1890,19 @@ class BrowserTabViewModel(
     fun consumeAlias() {
         emailManager.getAlias()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS)
+            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
         }
     }
 
     fun useAddress() {
         emailManager.getEmailAddress()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS)
+            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
         }
     }
 
     fun cancelAutofillTooltip() {
-        pixel.enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED)
+        pixel.enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
     }
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
