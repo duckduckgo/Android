@@ -40,6 +40,7 @@ interface EmailDataStore {
     var waitlistTimestamp: Int
     var waitlistToken: String?
     var sendNotification: Boolean
+    var cohort: String?
     fun nextAliasFlow(): StateFlow<String?>
 }
 
@@ -139,6 +140,15 @@ class EmailEncryptedSharedPreferences(
             }
         }
 
+    override var cohort: String?
+        get() = encryptedPreferences?.getString(KEY_COHORT, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_COHORT)
+                else putString(KEY_COHORT, value)
+            }
+        }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
         const val KEY_EMAIL_TOKEN = "KEY_EMAIL_TOKEN"
@@ -148,5 +158,6 @@ class EmailEncryptedSharedPreferences(
         const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
         const val KEY_INVITE_CODE = "KEY_INVITE_CODE"
         const val KEY_SEND_NOTIFICATION = "KEY_SEND_NOTIFICATION"
+        const val KEY_COHORT = "KEY_COHORT"
     }
 }
