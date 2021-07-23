@@ -22,10 +22,9 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.nhaarman.mockitokotlin2.mock
@@ -51,9 +50,11 @@ class SavedSitesExporterTest {
 
     private lateinit var db: AppDatabase
     private lateinit var bookmarksDao: BookmarksDao
+    private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
     private lateinit var favoritesRepository: FavoritesRepository
+    private lateinit var bookmarkFoldersRepository: BookmarkFoldersRepository
     private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
@@ -65,9 +66,11 @@ class SavedSitesExporterTest {
             .allowMainThreadQueries()
             .build()
         bookmarksDao = db.bookmarksDao()
+        bookmarkFoldersDao = db.bookmarkFoldersDao()
         favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
+        bookmarkFoldersRepository = BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, db)
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarkFoldersRepository, RealSavedSitesParser())
     }
 
     @After
@@ -121,5 +124,4 @@ class SavedSitesExporterTest {
 
         assertTrue(result is ExportSavedSitesResult.Success)
     }
-
 }

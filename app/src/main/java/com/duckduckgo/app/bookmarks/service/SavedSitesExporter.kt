@@ -19,7 +19,9 @@ package com.duckduckgo.app.bookmarks.service
 import android.content.ContentResolver
 import android.net.Uri
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
@@ -41,19 +43,27 @@ class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
     private val favoritesRepository: FavoritesRepository,
+    private val bookmarkFoldersRepository: BookmarkFoldersRepository,
     private val savedSitesParser: SavedSitesParser,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : SavedSitesExporter {
 
     override suspend fun export(uri: Uri): ExportSavedSitesResult {
         val bookmarks = withContext(dispatcher.io()) {
-            bookmarksDao.getBookmarksSync()
+            bookmarksDao.getBookmarksSync().map {
+                SavedSite.Bookmark(id = it.id, title = it.title ?: "", url = it.url, parentId = it.parentId)
+            }
         }
+
         val favorites = withContext(dispatcher.io()) {
             favoritesRepository.favoritesSync()
         }
 
-        val html = savedSitesParser.generateHtml(bookmarks, favorites)
+        val folderStructure = withContext(dispatcher.io()) {
+            bookmarkFoldersRepository.getFolderStructure(bookmarks)
+        }
+
+        val html = savedSitesParser.generateHtml(bookmarks, folderStructure, favorites)
         return storeHtml(uri, html)
     }
 

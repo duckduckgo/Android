@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.service
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -49,10 +48,10 @@ class SavedSitesParserTest {
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", 0)
+        val bookmark = SavedSite.Bookmark(id = 1, title = "example", url = "www.example.com", 0)
         val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
 
-        val result = parser.generateHtml(listOf(bookmark), listOf(favorite))
+        val result = parser.generateHtml(listOf(bookmark), emptyList(), listOf(favorite))
         val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
             "<!--This is an automatically generated file.\n" +
             "It will be read and overwritten.\n" +
@@ -76,7 +75,7 @@ class SavedSitesParserTest {
 
     @Test
     fun whenNoSavedSitesExistThenNothingIsGenerated() = runBlocking {
-        val result = parser.generateHtml(emptyList(), emptyList())
+        val result = parser.generateHtml(emptyList(), emptyList(), emptyList())
         val expectedHtml = ""
 
         assertEquals(expectedHtml, result)

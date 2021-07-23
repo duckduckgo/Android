@@ -64,36 +64,14 @@ class BookmarkFoldersViewModel(
                 bookmarkFolders = bookmarkFolders.minus(bookmarkFolderBranch)
             }
 
-            var folderStructure = buildFolderStructure(bookmarkFolders, selectedFolderId)
+            var folderStructure = bookmarkFoldersRepository.getFolderStructure(bookmarkFolders, selectedFolderId)
             folderStructure = addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
             onFolderStructureCreated(folderStructure)
         }
     }
 
     private fun addBookmarksAsRoot(folderStructure: List<BookmarkFolderItem>, rootFolder: String, selectedFolderId: Long) =
-        listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), selectedFolderId == 0L)) + folderStructure
-
-    private fun buildFolderStructure(bookmarkFolders: List<BookmarkFolder>, selectedFolderId: Long): List<BookmarkFolderItem> {
-
-        val parentGroupings = bookmarkFolders
-            .sortedWith(compareBy({ it.parentId }, { it.id }))
-            .groupBy { it.parentId }
-
-        return bookmarkFolders.map { it.parentId }
-            .subtract(bookmarkFolders.map { it.id })
-            .flatMap { parentGroupings[it] ?: emptyList() }
-            .flatMap { getSubFoldersWithDepth(it, parentGroupings, 1, selectedFolderId) }
-    }
-
-    private fun getSubFoldersWithDepth(
-        bookmarkFolder: BookmarkFolder,
-        parentGroupings: Map<Long, List<BookmarkFolder>>,
-        depth: Int,
-        selectedFolderId: Long
-    ): List<BookmarkFolderItem> {
-        return listOf(BookmarkFolderItem(depth, bookmarkFolder, bookmarkFolder.id == selectedFolderId)) + (parentGroupings[bookmarkFolder.id] ?: emptyList())
-            .flatMap { getSubFoldersWithDepth(it, parentGroupings, depth + 1, selectedFolderId) }
-    }
+        listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), isSelected = selectedFolderId == 0L)) + folderStructure
 
     private fun onFolderStructureCreated(folderStructure: List<BookmarkFolderItem>) {
         viewState.postValue(viewState.value?.copy(folderStructure = folderStructure))

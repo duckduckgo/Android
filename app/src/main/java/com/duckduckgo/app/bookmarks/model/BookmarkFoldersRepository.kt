@@ -26,6 +26,8 @@ interface BookmarkFoldersRepository {
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
+    suspend fun getFolderStructure(bookmarkFolders: List<BookmarkFolder>, selectedFolderId: Long): List<BookmarkFolderItem>
+    suspend fun getFolderStructure(bookmarks: List<SavedSite.Bookmark>): List<BookmarkFolderItem>
 }
 
 class BookmarkFoldersDataRepository(
@@ -66,6 +68,12 @@ class BookmarkFoldersDataRepository(
         }
     }
 
+    private fun getBookmarkFolders(): List<BookmarkFolder> {
+        return bookmarkFoldersDao.getBookmarkFolders().map {
+            BookmarkFolder(id = it.id, name = it.name, parentId = it.parentId)
+        }
+    }
+
     override suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch) {
         appDatabase.runInTransaction {
             bookmarksDao.delete(branchToDelete.bookmarkEntities)
@@ -80,9 +88,43 @@ class BookmarkFoldersDataRepository(
         }
     }
 
-    private fun getBookmarkFolders(): List<BookmarkFolder> {
-        return bookmarkFoldersDao.getBookmarkFolders().map {
-            BookmarkFolder(id = it.id, name = it.name, parentId = it.parentId)
-        }
+    override suspend fun getFolderStructure(bookmarkFolders: List<BookmarkFolder>, selectedFolderId: Long): List<BookmarkFolderItem> {
+        return buildFolderStructure(bookmarkFolders = bookmarkFolders, selectedFolderId = selectedFolderId)
+    }
+
+    override suspend fun getFolderStructure(bookmarks: List<SavedSite.Bookmark>): List<BookmarkFolderItem> {
+        return buildFolderStructure(bookmarkFolders = getBookmarkFolders(), bookmarks = bookmarks)
+    }
+
+    private fun buildFolderStructure(
+        bookmarkFolders: List<BookmarkFolder>,
+        selectedFolderId: Long = -1,
+        bookmarks: List<SavedSite.Bookmark> = emptyList()
+    ): List<BookmarkFolderItem> {
+
+        val parentGroupings = bookmarkFolders
+            .sortedWith(compareBy({ it.parentId }, { it.id }))
+            .groupBy { it.parentId }
+
+        return bookmarkFolders.map { it.parentId }
+            .subtract(bookmarkFolders.map { it.id })
+            .flatMap { parentGroupings[it] ?: emptyList() }
+            .flatMap { getSubFoldersWithDepth(it, parentGroupings, 1, selectedFolderId, bookmarks) }
+    }
+
+    private fun getSubFoldersWithDepth(
+        bookmarkFolder: BookmarkFolder,
+        parentGroupings: Map<Long, List<BookmarkFolder>>,
+        depth: Int,
+        selectedFolderId: Long,
+        bookmarks: List<SavedSite.Bookmark>
+    ): List<BookmarkFolderItem> {
+
+        val bookmarkFolders = parentGroupings[bookmarkFolder.id] ?: emptyList()
+        val folderBookmarks = bookmarks.filter { it.parentId == bookmarkFolder.id }
+        val isSelected = bookmarkFolder.id == selectedFolderId
+
+        return listOf(BookmarkFolderItem(depth, bookmarkFolder, folderBookmarks, isSelected)) +
+            (bookmarkFolders).flatMap { getSubFoldersWithDepth(it, parentGroupings, depth + 1, selectedFolderId, bookmarks) }
     }
 }

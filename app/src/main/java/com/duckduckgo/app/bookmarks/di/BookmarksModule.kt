@@ -71,9 +71,10 @@ class BookmarksModule {
         savedSitesParser: SavedSitesParser,
         bookmarksDao: BookmarksDao,
         favoritesRepository: FavoritesRepository,
+        bookmarkFoldersRepository: BookmarkFoldersRepository,
         dispatcherProvider: DispatcherProvider
     ): SavedSitesExporter {
-        return RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, savedSitesParser, dispatcherProvider)
+        return RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarkFoldersRepository, savedSitesParser, dispatcherProvider)
     }
 
     @Provides
