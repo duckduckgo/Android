@@ -98,6 +98,8 @@
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
     <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \"⋯\" icon and select Add Favorite.]]></string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
+    <string name="favoritesWidgetLabel">Favorites Widget</string>
+    <string name="searchWidgetLabel">Search Widget</string>
 
     <!-- Shortcut -->
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
