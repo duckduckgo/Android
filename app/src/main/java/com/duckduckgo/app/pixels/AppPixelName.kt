@@ -77,6 +77,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
+    FAVORITE_SYSTEM_SEARCH_ITEM_PRESSED("m_fav_ss"),
 
     APP_NOTIFICATION_LAUNCH(pixelName = "m_n_l"),
     APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
