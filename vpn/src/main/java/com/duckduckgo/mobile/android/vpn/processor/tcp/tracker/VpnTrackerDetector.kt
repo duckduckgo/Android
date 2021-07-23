@@ -110,6 +110,14 @@ class DomainBasedTrackerDetector(
     }
 
     private fun insertTracker(tracker: AppTracker, requestingApp: AppNameResolver.OriginatingApp) {
+        if (requestingApp.isDdg() || requestingApp.isUnknown()) {
+            // FIXME exclude false positive of DDG app
+            // we don't yet know the reason why the DDG app appears sometimes in the list of of tracking apps
+            // for now we manually exclude while we investigate the root cause
+            Timber.d("Originating app is either DDG or UNKNOWN, skipping db insertion")
+            return
+        }
+
         val vpnTracker = VpnTracker(
             trackerCompanyId = tracker.trackerCompanyId,
             company = tracker.owner.name,

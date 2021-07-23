@@ -20,16 +20,17 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.BuildConfig
+import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,47 +46,60 @@ import javax.inject.Inject
  * where `--es times <N>` is optional and is the number of trackers to be sent
  * where `--es hago <M>` is optional and is the timestamp (hours ago) for the trackers
  */
-class SendTrackerDebugReceiver(
-    context: Context,
-    intentAction: String = "track",
-    private val receiver: (Intent) -> Unit
-) : BroadcastReceiver(), LifecycleObserver {
-
-    init {
-        context.registerReceiver(this, IntentFilter(intentAction))
-    }
-
-    override fun onReceive(context: Context, intent: Intent) {
-        receiver(intent)
-    }
-}
-
-@ContributesMultibinding(AppObjectGraph::class)
-class SendTrackerDebugReceiverRegister @Inject constructor(
+@ContributesMultibinding(
+    scope = VpnObjectGraph::class,
+    boundType = VpnServiceCallbacks::class
+)
+@VpnScope
+class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
-    private val vpnDatabase: VpnDatabase
-) : LifecycleObserver {
+    private val vpnDatabase: VpnDatabase,
+) : BroadcastReceiver(), VpnServiceCallbacks {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun register() {
+        unregister()
         if (!BuildConfig.DEBUG) {
             Timber.i("Will not register SendTrackerDebugReceiver, not in DEBUG mode")
             return
         }
 
         Timber.i("Debug receiver SendTrackerDebugReceiver registered")
+        context.registerReceiver(this, IntentFilter(INTENT_ACTION))
+    }
 
-        SendTrackerDebugReceiver(context) { intent ->
-            GlobalScope.launch(Dispatchers.IO) {
-                val times = intent.getStringExtra("times")?.toInt() ?: 1
-                val hoursAgo = intent.getStringExtra("hago")?.toLong() ?: 0L
-                for (i in 0 until times) {
-                    vpnDatabase.vpnTrackerDao().insert(
-                        dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo)))
-                    )
-                }
+    fun unregister() {
+        kotlin.runCatching { context.unregisterReceiver(this) }
+    }
+
+    fun handleIntent(intent: Intent) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val times = intent.getStringExtra("times")?.toInt() ?: 1
+            val hoursAgo = intent.getStringExtra("hago")?.toLong() ?: 0L
+            for (i in 0 until times) {
+                vpnDatabase.vpnTrackerDao().insert(
+                    dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo)))
+                )
             }
         }
+    }
+
+
+    override fun onReceive(context: Context, intent: Intent) {
+        handleIntent(intent)
+    }
+
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        Timber.v("Send tracker receiver started")
+        register()
+    }
+
+    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+        Timber.v("Send tracker receiver stopped")
+        unregister()
+    }
+
+    companion object {
+        private const val INTENT_ACTION = "track"
     }
 }
 

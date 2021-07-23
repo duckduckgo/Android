@@ -69,14 +69,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
-        // FIXME exclude false positive of DDG app
-        // we don't yet know the reason why the DDG app appears sometimes in the list of of tracking apps
-        // for now we manually exclude while we investigate the root cause
-        val perSessionData = trackerData.filter { !VpnExclusionList.isDdgApp(it.vpnTracker.trackingApp.packageId) }.groupBy { it.bucket }
+        val perSessionData = trackerData.groupBy { it.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
-            val perAppData = sessionTrackers.filter { it.vpnTracker.trackingApp.appDisplayName != OriginatingAppPackageIdentifierStrategy.UNKNOWN }
-                .groupBy { it.vpnTracker.trackingApp.packageId }
+            val perAppData = sessionTrackers.groupBy { it.vpnTracker.trackingApp.packageId }
             var firstInBucket = true
 
             perAppData.values.forEach { appTrackers ->

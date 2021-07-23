@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.content.pm.PackageManager
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import timber.log.Timber
 
 class AppNameResolver(private val packageManager: PackageManager) {
@@ -34,6 +35,14 @@ class AppNameResolver(private val packageManager: PackageManager) {
 
     data class OriginatingApp(val packageId: String, val appName: String) {
         override fun toString(): String = "package=$packageId ($appName)"
+
+        fun isDdg(): Boolean {
+            return VpnExclusionList.isDdgApp(packageId)
+        }
+
+        fun isUnknown(): Boolean {
+            return OriginatingAppPackageIdentifierStrategy.UNKNOWN.equals(appName, ignoreCase = true)
+        }
     }
 
 }

@@ -18,10 +18,12 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType.FirstParty
@@ -34,6 +36,7 @@ import kotlinx.coroutines.launch
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.zone.ZoneRulesProvider
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -129,7 +132,7 @@ class DomainBasedTrackerDetectorTest {
     }
 
     @Test
-    fun whenTrackerDetectedAndFindsMatchingExceptionRuleThenReturnNottracker() {
+    fun whenTrackerDetectedAndFindsMatchingExceptionRuleThenReturnNotTracker() {
         vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerExceptionRules(
             listOf(
                 AppTrackerExceptionRule(rule = "doubleclick.net", listOf("foo.id.com"))
@@ -139,6 +142,38 @@ class DomainBasedTrackerDetectorTest {
         "doubleclick.net".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("foo.id.com", "Foo App"))
         type.assertNotTracker()
+    }
+
+    @Test
+    fun whenTrackerDetectedAndAndUnknownAppThenSkipDbInsertion() {
+        val trackerDomain = "doubleclick.net".also {
+            givenExtractedHostname(it)
+            whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
+        }
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("foo.id.com", "Unknown"))
+        assertEquals(Tracker(trackerDomain), type)
+        assertTrue(vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(noStartDate(), noEndDate()).isEmpty())
+
+    }
+
+    @Test
+    fun whenTrackerDetectedAndAndDDGAppThenSkipDbInsertion() {
+        val trackerDomain = "doubleclick.net".also {
+            givenExtractedHostname(it)
+            whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
+        }
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("com.duckduckgo.mobile.vpn", "DDG App"))
+        assertEquals(Tracker(trackerDomain), type)
+        assertTrue(vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(noStartDate(), noEndDate()).isEmpty())
+
+    }
+
+    fun noStartDate(): String {
+        return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
+    }
+
+    private fun noEndDate(): String {
+        return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
 
     private fun givenExtractedHostname(desiredHostname: String?) {
