@@ -33,7 +33,8 @@ import javax.inject.Singleton
 @Singleton
 class FavoritesObserver @Inject constructor(
     private val context: Context,
-    private val favoritesRepository: FavoritesRepository
+    private val favoritesRepository: FavoritesRepository,
+    private val appCoroutineScope: CoroutineScope
 ) : LifecycleObserver {
 
     private val instance = AppWidgetManager.getInstance(context)
@@ -41,7 +42,7 @@ class FavoritesObserver @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun notifyWidgets() {
-        GlobalScope.launch {
+        appCoroutineScope.launch() {
             favoritesRepository.favorites().collect {
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
