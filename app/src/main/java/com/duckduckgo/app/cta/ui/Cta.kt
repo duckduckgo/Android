@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.AnyRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -280,13 +281,26 @@ sealed class BubbleCta(
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
-    class DaxFavoritesOnboardingCta() : BubbleCta(
+    class DaxFavoritesOnboardingCta : BubbleCta(
         CtaId.DAX_FAVORITES_ONBOARDING,
         R.string.daxFavoritesOnboardingCtaText,
         AppPixelName.FAVORITES_ONBOARDING_CTA_SHOWN,
         null,
         null
-    )
+    ) {
+        override fun showCta(view: View) {
+            super.showCta(view)
+            val accessibilityDelegate: View.AccessibilityDelegate =
+                object : View.AccessibilityDelegate() {
+                    override fun onInitializeAccessibilityNodeInfo(v: View?, info: AccessibilityNodeInfo) {
+                        super.onInitializeAccessibilityNodeInfo(v, info)
+                        info.text = v?.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
+                    }
+                }
+            //Using braille unicode inside textview, override description for accessibility
+            view.dialogTextCta.accessibilityDelegate = accessibilityDelegate
+        }
+    }
 }
 
 sealed class DaxFireDialogCta(
