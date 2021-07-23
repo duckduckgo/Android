@@ -126,7 +126,6 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
                 itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
 
-
             itemView.icon.visibility = View.VISIBLE
             itemView.favicon.visibility = View.GONE
             itemView.icon.setImageResource(R.drawable.ic_folder)
