@@ -21,7 +21,6 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.core.content.ContextCompat.getColor
-import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -31,7 +30,6 @@ import com.duckduckgo.app.global.baseHost
 import okio.ByteString.Companion.encodeUtf8
 import java.io.File
 import java.util.*
-import kotlin.math.absoluteValue
 
 fun ImageView.loadFavicon(file: File, domain: String) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
@@ -68,7 +66,7 @@ fun generateDefaultDrawable(context: Context, domain: String): Drawable {
         private val letter
             get() = baseHost.firstOrNull()?.toString()?.toUpperCase(Locale.getDefault()) ?: ""
 
-        private val faviconDefaultRadius = context.resources.getDimension(R.dimen.savedSiteGridItemRadiusFavicon)
+        private val faviconDefaultCornerRadius = context.resources.getDimension(R.dimen.savedSiteGridItemCornerRadiusFavicon)
         private val faviconDefaultSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon)
 
         private val palette = listOf(
@@ -105,7 +103,7 @@ fun generateDefaultDrawable(context: Context, domain: String): Drawable {
             textPaint.textSize = (bounds.width() / 2).toFloat()
             val textWidth: Float = textPaint.measureText(letter) * 0.5f
             val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
-            val radius = (bounds.width() * faviconDefaultRadius) / faviconDefaultSize
+            val radius = (bounds.width() * faviconDefaultCornerRadius) / faviconDefaultSize
             canvas.drawRoundRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), radius, radius, backgroundPaint)
             canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
         }

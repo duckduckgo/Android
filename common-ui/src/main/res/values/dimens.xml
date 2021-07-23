@@ -38,7 +38,7 @@
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
 
     <dimen name="savedSiteGridItemFavicon">56dp</dimen>
-    <dimen name="savedSiteGridItemRadiusFavicon">10dp</dimen>
+    <dimen name="savedSiteGridItemCornerRadiusFavicon">10dp</dimen>
     <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
     <dimen name="searchWidgetPadding">16dp</dimen>
     <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>

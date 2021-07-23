@@ -62,7 +62,6 @@ class FavoritesDataRepository(
     private val favoritesDao: FavoritesDao,
     private val faviconManager: Lazy<FaviconManager>,
 ) : FavoritesRepository {
-
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
     }

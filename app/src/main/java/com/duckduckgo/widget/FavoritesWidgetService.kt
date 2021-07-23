@@ -65,7 +65,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         )
 
         private val faviconItemSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon).toInt()
-        private val faviconItemRadius = context.resources.getDimension(R.dimen.savedSiteGridItemRadiusFavicon).toInt()
+        private val faviconItemCornerRadius = context.resources.getDimension(R.dimen.savedSiteGridItemCornerRadiusFavicon).toInt()
 
         private val maxItems: Int
             get() {
@@ -82,7 +82,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         override fun onDataSetChanged() {
             val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
                 val bitmap = runBlocking {
-                    faviconManager.loadFromDiskWithParams(url = it.url, radius = faviconItemRadius, width = faviconItemSize, height = faviconItemSize)
+                    faviconManager.loadFromDiskWithParams(url = it.url, cornerRadius = faviconItemCornerRadius, width = faviconItemSize, height = faviconItemSize)
                         ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
