@@ -193,7 +193,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         var columns = calculateColumns(context, width)
         var rows = calculateRows(context, height)
 
-        columns = if (columns < 2) 2 else columns
+        columns = 2.coerceAtLeast(columns)
 
         rows = 1.coerceAtLeast(rows)
         rows = 4.coerceAtMost(rows)
