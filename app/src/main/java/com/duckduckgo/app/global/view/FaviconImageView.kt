@@ -21,6 +21,7 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.core.content.ContextCompat.getColor
+import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -30,6 +31,7 @@ import com.duckduckgo.app.global.baseHost
 import okio.ByteString.Companion.encodeUtf8
 import java.io.File
 import java.util.*
+import kotlin.math.absoluteValue
 
 fun ImageView.loadFavicon(file: File, domain: String) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
