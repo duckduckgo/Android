@@ -179,7 +179,7 @@
     <string name="atp_ActivityEnabledLabel">You\'re a beta tester. Notice a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityAppTrackersExcludedAppsPrefix">%s app exceptions \n</string>
-    <string name="atp_ActivityAppTrackersExcludedApps">This is mostly temporary during beta to ensure your apps your work properly.\n</string>
+    <string name="atp_ActivityAppTrackersExcludedApps">This is mostly temporary during beta to ensure your apps work properly.\n</string>
     <string name="atp_ActivityAppTrackersExcludedSuffix">View App Exceptions</string>
 
     <!--  App Tracking Protection FAQ -->
