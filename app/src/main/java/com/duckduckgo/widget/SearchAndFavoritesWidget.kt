@@ -90,50 +90,16 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
-        val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-        var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-        var landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-        var portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-
-        if (newOptions != null) {
-            portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-            landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-            landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-            portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-        }
-
-        val (columns, rows) = getCurrentWidgetSize(context, portraitWidth, landsWidth, landsHeight, portraitHeight)
-        Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
-
+        val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
         widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
         remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
-
-        val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
-        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
-
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
-        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
-
-        val extras = Bundle()
-        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        extras.putString(THEME_EXTRAS, widgetTheme.toString())
-
-        val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
-        adapterIntent.putExtras(extras)
-        adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
-        remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
-        remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
-
-        val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
-        emptyAdapterIntent.putExtras(extras)
-        emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
-        remoteViews.setEmptyView(R.id.emptyfavoritesGrid, R.id.emptyGridViewContainer)
-        remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
+        configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
+        configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
 
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
@@ -176,7 +142,19 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
     }
 
-    private fun getCurrentWidgetSize(context: Context, portraitWidth: Int, landsWidth: Int, landsHeight: Int, portraitHeight: Int): Pair<Int, Int> {
+    private fun getCurrentWidgetSize(context: Context,appWidgetOptions:  Bundle, newOptions:  Bundle?): Pair<Int, Int> {
+        var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+        var landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+        var portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+
+        if (newOptions != null) {
+            portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+            landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+            landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+            portraitHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        }
+
         val orientation = context.resources.configuration.orientation
         val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             landsWidth
@@ -198,6 +176,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         rows = 1.coerceAtLeast(rows)
         rows = 4.coerceAtMost(rows)
 
+        Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
         return Pair(columns, rows)
     }
 
@@ -234,6 +213,35 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
 
         return n - 1
+    }
+
+    private fun configureFavoritesGridView(context: Context, appWidgetId: Int, remoteViews: RemoteViews, widgetTheme: WidgetTheme) {
+        val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
+        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
+
+        val extras = Bundle()
+        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        extras.putString(THEME_EXTRAS, widgetTheme.toString())
+
+        val adapterIntent = Intent(context, FavoritesWidgetService::class.java)
+        adapterIntent.putExtras(extras)
+        adapterIntent.data = Uri.parse(adapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        remoteViews.setRemoteAdapter(R.id.favoritesGrid, adapterIntent)
+        remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
+    }
+
+    private fun configureEmptyWidgetCta(context: Context, appWidgetId: Int, remoteViews: RemoteViews, widgetTheme: WidgetTheme) {
+        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
+
+        val extras = Bundle()
+        extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        extras.putString(THEME_EXTRAS, widgetTheme.toString())
+
+        val emptyAdapterIntent = Intent(context, EmptyFavoritesWidgetService::class.java)
+        emptyAdapterIntent.putExtras(extras)
+        emptyAdapterIntent.data = Uri.parse(emptyAdapterIntent.toUri(Intent.URI_INTENT_SCHEME))
+        remoteViews.setEmptyView(R.id.emptyfavoritesGrid, R.id.emptyGridViewContainer)
+        remoteViews.setRemoteAdapter(R.id.emptyfavoritesGrid, emptyAdapterIntent)
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
