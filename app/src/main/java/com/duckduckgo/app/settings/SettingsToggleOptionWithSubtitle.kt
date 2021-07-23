@@ -18,20 +18,17 @@ package com.duckduckgo.app.settings
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.CompoundButton
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SettingsToggleOptionWithSubtitleBinding
 import com.duckduckgo.app.global.view.childrenRecursiveSequence
 import com.duckduckgo.app.global.view.quietlySetIsChecked
-import kotlinx.android.synthetic.main.settings_toggle_option_with_subtitle.view.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsToggleOptionWithSubtitle : FrameLayout {
 
-    private val root: View by lazy {
-        LayoutInflater.from(context).inflate(R.layout.settings_toggle_option_with_subtitle, this, true)
-    }
+    private val binding: SettingsToggleOptionWithSubtitleBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
@@ -47,32 +44,32 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         setOnClickListener {
-            root.toggle.performClick()
+            binding.toggle.performClick()
         }
     }
 
     var title: String
-        get() { return root.title.text.toString() }
-        set(value) { root.title.text = value }
+        get() { return binding.title.text.toString() }
+        set(value) { binding.title.text = value }
 
     var subtitle: String
-        get() { return root.subtitle.text.toString() }
-        set(value) { root.subtitle.text = value }
+        get() { return binding.subtitle.text.toString() }
+        set(value) { binding.subtitle.text = value }
 
     var isChecked: Boolean
-        get() { return root.toggle.isChecked }
-        set(value) { root.toggle.isChecked = value }
+        get() { return binding.toggle.isChecked }
+        set(value) { binding.toggle.isChecked = value }
 
     override fun setEnabled(enabled: Boolean) {
-        root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
+        binding.root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
         super.setEnabled(enabled)
     }
 
     fun setOnCheckedChangeListener(listener: CompoundButton.OnCheckedChangeListener) {
-        root.toggle.setOnCheckedChangeListener(listener)
+        binding.toggle.setOnCheckedChangeListener(listener)
     }
 
     fun quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
-        root.toggle.quietlySetIsChecked(newCheckedState, changeListener)
+        binding.toggle.quietlySetIsChecked(newCheckedState, changeListener)
     }
 }
