@@ -251,7 +251,11 @@ class BookmarksViewModel(
     }
 
     fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
-        command.value = DeleteBookmarkFolder(bookmarkFolder)
+        if (bookmarkFolder.numFolders + bookmarkFolder.numBookmarks == 0) {
+            onBookmarkFolderDeleted(bookmarkFolder)
+        } else {
+            command.value = DeleteBookmarkFolder(bookmarkFolder)
+        }
     }
 
     private fun deleteFolder(bookmarkFolder: BookmarkFolder) {

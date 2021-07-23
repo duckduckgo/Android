@@ -119,7 +119,13 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
             itemView.title.text = bookmarkFolder.name
 
             val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
-            itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+
+            if (totalItems == 0) {
+                itemView.subtitle.text = itemView.context.getString(R.string.bookmarkFolderEmpty)
+            } else {
+                itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+            }
+
 
             itemView.icon.visibility = View.VISIBLE
             itemView.favicon.visibility = View.GONE

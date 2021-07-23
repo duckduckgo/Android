@@ -105,6 +105,7 @@
     <string name="addFolder">Add Folder</string>
     <string name="editFolder">Edit Folder</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
+    <string name="bookmarkFolderEmpty">Empty</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%s%s and %d item?</item>
