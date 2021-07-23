@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
@@ -110,6 +111,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
+        remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
+
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
         val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
 
@@ -138,22 +141,35 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun getLayoutThemed(numColumns: Int, theme: WidgetTheme): Int {
+        // numcolumns method is not available for remoteViews. We rely on different xml to use different values on that attribute
         return when (theme) {
             WidgetTheme.LIGHT -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_light_col2
+                    3 -> R.layout.search_favorites_widget_light_col3
+                    4 -> R.layout.search_favorites_widget_light_col4
+                    5 -> R.layout.search_favorites_widget_light_col5
+                    6 -> R.layout.search_favorites_widget_light_col6
                     else -> R.layout.search_favorites_widget_light_auto
                 }
             }
             WidgetTheme.DARK -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_dark_col2
+                    3 -> R.layout.search_favorites_widget_dark_col3
+                    4 -> R.layout.search_favorites_widget_dark_col4
+                    5 -> R.layout.search_favorites_widget_dark_col5
+                    6 -> R.layout.search_favorites_widget_dark_col6
                     else -> R.layout.search_favorites_widget_dark_auto
                 }
             }
             WidgetTheme.SYSTEM_DEFAULT -> {
                 when (numColumns) {
                     2 -> R.layout.search_favorites_widget_daynight_col2
+                    3 -> R.layout.search_favorites_widget_daynight_col3
+                    4 -> R.layout.search_favorites_widget_daynight_col4
+                    5 -> R.layout.search_favorites_widget_daynight_col5
+                    6 -> R.layout.search_favorites_widget_daynight_col6
                     else -> R.layout.search_favorites_widget_daynight_auto
                 }
             }

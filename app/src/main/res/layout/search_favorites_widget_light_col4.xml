@@ -17,10 +17,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widgetContainer"
     style="@style/SearchWidgetContainer"
-    android:background="@drawable/search_widget_favorites_dark_background">
+    android:background="@drawable/search_widget_favorites_light_background">
 
-    <include
-        layout="@layout/search_favorites_widget_search_bar_dark"/>
+    <include layout="@layout/search_favorites_widget_search_bar_light"/>
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -30,14 +29,12 @@
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
-            style="@style/SearchWidgetFavoritesGrid" />
+            style="@style/SearchWidgetFavoritesGrid"/>
 
         <GridView
             android:id="@+id/favoritesGrid"
             style="@style/SearchWidgetFavoritesGrid"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:columnWidth="@dimen/searchWidgetFavoriteItemContainerWidth" />
+            android:numColumns="4"/>
 
         <include layout="@layout/search_favorites_widget_empty_hint"/>
     </FrameLayout>

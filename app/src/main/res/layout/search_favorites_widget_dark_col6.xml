@@ -35,9 +35,7 @@
         <GridView
             android:id="@+id/favoritesGrid"
             style="@style/SearchWidgetFavoritesGrid"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"
-            android:columnWidth="@dimen/searchWidgetFavoriteItemContainerWidth" />
+            android:numColumns="6"/>
 
         <include layout="@layout/search_favorites_widget_empty_hint"/>
     </FrameLayout>

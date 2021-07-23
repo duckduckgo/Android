@@ -19,29 +19,7 @@
     style="@style/SearchWidgetContainer"
     android:background="@drawable/search_widget_favorites_daynight_background">
 
-    <RelativeLayout
-        android:id="@+id/widgetSearchBarContainer"
-        style="@style/SearchWithFavoritesWidgetSearchBarContainer"
-        android:background="@drawable/search_widget_background_daynight">
-
-        <ImageView
-            android:id="@+id/logo"
-            style="@style/SearchWidgetDDGLogo"
-            android:src="@drawable/logo_mini" />
-
-        <TextView
-            android:id="@+id/searchInputBox"
-            style="@style/SearchWidgetInputBox"
-            android:layout_toStartOf="@+id/search"
-            android:layout_toEndOf="@+id/logo"
-            android:text="@string/searchWidgetTextHint"
-            android:textColor="@color/searchWidgetSearchBarHintColor" />
-
-        <ImageView
-            android:id="@+id/search"
-            style="@style/SearchWidgetSearchIcon"
-            android:src="@drawable/ic_widget_loupe_daynight" />
-    </RelativeLayout>
+    <include layout="@layout/search_favorites_widget_search_bar_daynight" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -60,21 +38,6 @@
             android:stretchMode="columnWidth"
             android:columnWidth="@dimen/searchWidgetFavoriteItemContainerWidth" />
 
-        <LinearLayout
-            android:id="@+id/emptyGridViewContainer"
-            style="@style/SearchWidgetEmtpyFavoritesHintContainer">
-
-            <TextView
-                android:id="@+id/noFavoritesText"
-                android:textColor="@color/warGreyTwo"
-                android:text="@string/searchWidgetEmtpyFavoritesHint"
-                style="@style/SearchWidgetEmtpyFavoritesHint" />
-
-            <TextView
-                android:id="@+id/addFavoriteText"
-                android:textColor="@color/cornflowerBlue"
-                android:text="@string/searchWidgetEmtpyFavoritesCta"
-                style="@style/SearchWidgetEmtpyFavoritesAction" />
-        </LinearLayout>
+        <include layout="@layout/search_favorites_widget_empty_hint"/>
     </FrameLayout>
 </LinearLayout>

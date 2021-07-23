@@ -591,6 +591,7 @@
         <item name="android:textSize">14sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/warGreyTwo</item>
     </style>
 
     <style name="SearchWidgetEmtpyFavoritesAction">
@@ -601,6 +602,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
 </resources>
