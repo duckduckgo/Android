@@ -19,6 +19,7 @@ package com.duckduckgo.app.email.ui
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,7 +27,7 @@ import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-abstract class EmailProtectionFragment : Fragment() {
+abstract class EmailProtectionFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId) {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
