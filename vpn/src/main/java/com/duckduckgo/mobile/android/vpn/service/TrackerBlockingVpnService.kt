@@ -205,12 +205,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private suspend fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
+            // Add IPv6 Unique Local Address
+            addAddress("fd00:1:fd00:1:fd00:1:fd00:1", 128)
 
             // Allow IPv6 to go through the VPN
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
             allowFamily(AF_INET6)
 
             VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
+            // Add the route for all Global Unicast Addresses. This is the IPv6 equivalent to
+            // IPv4 public IP addresses. They are addresses that routable in the internet
+            addRoute("2000::", 3)
 
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
