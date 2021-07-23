@@ -106,10 +106,6 @@ class RxBasedPixel @Inject constructor(
     private val pixelSender: PixelSender
 ) : Pixel {
 
-    companion object {
-        const val VPN_PREFIX = "m_vpn_internal_report"
-    }
-
     override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }

@@ -36,6 +36,7 @@ import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 interface TcpSocketWriter {
@@ -54,7 +55,8 @@ class RealTcpSocketWriter @Inject constructor(
     private val queues: VpnQueues
 ) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
-    private val writeQueue = mutableMapOf<TCB, Deque<PendingWriteData>>()
+    // added an initial capacity based on what I observed from the low memory pixels we send
+    private val writeQueue = ConcurrentHashMap<TCB, Deque<PendingWriteData>>(10)
 
     override fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean) {
         val queue = pendingWriteData.tcb.writeQueue()
