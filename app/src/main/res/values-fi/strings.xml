@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
     <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
     <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
+    <string name="addFavoriteMenuTitle">Lisää suosikki</string>
+    <string name="favoriteAddedMessage">Suosikki lisätty</string>
+    <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>
     <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>
 
     <!-- Downloading files -->
@@ -199,14 +218,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
     <string name="bookmarksActivityTitle">Kirjanmerkit</string>
-    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Kirjanmerkki lisätty</string>
-    <string name="bookmarkTitleHint">Kirjanmerkin otsikko</string>
-    <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
-    <string name="bookmarkTitleEdit">Muokkaa kirjanmerkkiä</string>
     <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
     <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %1$s</string>
-    <string name="bookmarkEdited">Kirjanmerkki lisätty</string>
     <string name="bookmarkDeleteConfirmationMessage">Poistettiin &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Vie</string>
     <string name="exportBookmarksEmpty">Sinulla ei ole kirjanmerkkejä, mitään ei viedä.</string>
@@ -217,6 +230,13 @@
     <string name="importBookmarksError">Kirjanmerkkejä ei voitu tuoda, jokin meni vikaan</string>
     <string name="importBookmarksEmpty">Tiedostossa ei ole tuotavia kirjanmerkkejä</string>
     <string name="importBookmarksSuccess">%1$d kirjanmerkkiä tuotu</string>
+    <string name="savedSiteDialogTitleHint">Otsikko</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Muokkaa</string>
+    <string name="bookmarksSectionTitle">Kirjanmerkit</string>
+    <string name="favoritesSectionTitle">Suosikit</string>
+    <string name="bookmarksEmptyHint">Kirjanmerkkejä ei ole vielä lisätty</string>
+    <string name="favoritesEmptyHint">Suosikkeja ei ole vielä lisätty</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Vahvista</string>
@@ -508,6 +528,7 @@
     <string name="preciseLocationSystemDialogDeny">Ehkä myöhemmin</string>
     <string name="preciseLocationSystemDialogNeverAllow">Älä kysy uudelleen tälle sivustolle</string>
     <string name="preciseLocationSiteDialogTitle">Annetaanko palvelulle %1$s lupa nähdä sijaintisi?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Käytämme anonyymiä sijaintia pelkästään tarjotaksemme parempia tuloksia lähempää sijaintiasi. Voit aina muuttaa mieltäsi myöhemmin.</string>
     <string name="preciseLocationSiteDialogSubtitle">Voit hallita yksittäisille sivustoille antamiasi sijaintilupia asetuksista.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Aina</string>
     <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>

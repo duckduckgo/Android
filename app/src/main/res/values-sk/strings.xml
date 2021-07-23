@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Vymazať hľadaný výraz</string>
     <string name="no_compatible_third_party_app_installed">Žiadna kompatibilná aplikácia nie je nainštalovaná</string>
     <string name="addBookmarkMenuTitle">Pridať záložku</string>
+    <string name="addFavoriteMenuTitle">Pridať do obľúbených položiek</string>
+    <string name="favoriteAddedMessage">Obľúbená položka bola pridaná</string>
+    <string name="bookmarkAddedMessage">Záložka je pridaná</string>
     <string name="requestDesktopSiteMenuTitle">Stránka pre stolové počítače</string>
 
     <!-- Downloading files -->
@@ -207,14 +226,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Naozaj chcete odstrániť záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Záložka je pridaná</string>
-    <string name="bookmarkTitleHint">Názov záložky</string>
-    <string name="bookmarkUrlHint">Webová adresa záložky</string>
-    <string name="bookmarkTitleEdit">Upraviť záložku</string>
     <string name="noBookmarks">Zatiaľ neboli pridané žiadne záložky</string>
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %1$s</string>
-    <string name="bookmarkEdited">Záložka je pridaná</string>
     <string name="bookmarkDeleteConfirmationMessage">Vymazané: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportovať</string>
     <string name="exportBookmarksEmpty">Nič sa nevyexportuje, pretože nemáte záložky</string>
@@ -225,6 +238,13 @@
     <string name="importBookmarksError">Nepodarilo sa naimportovať žiadne záložky, pretože došlo k chybe</string>
     <string name="importBookmarksEmpty">Súbor neobsahuje žiadne záložky na importovanie</string>
     <string name="importBookmarksSuccess">Úspešne sa naimportovali záložky (%1$d)</string>
+    <string name="savedSiteDialogTitleHint">Názov</string>
+    <string name="savedSiteDialogUrlHint">URL adresa</string>
+    <string name="savedSiteDialogTitleEdit">Upraviť</string>
+    <string name="bookmarksSectionTitle">Záložky</string>
+    <string name="favoritesSectionTitle">Obľúbené položky</string>
+    <string name="bookmarksEmptyHint">Zatiaľ neboli pridané žiadne záložky</string>
+    <string name="favoritesEmptyHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdiť</string>
@@ -520,6 +540,7 @@
     <string name="preciseLocationSystemDialogDeny">Možno neskôr</string>
     <string name="preciseLocationSystemDialogNeverAllow">Pre túto stránku sa už nepýtajte</string>
     <string name="preciseLocationSiteDialogTitle">Udeliť %1$s povolenie na prístup k polohe?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonymnú polohu používame iba na poskytovanie lepších výsledkov z vášho okolia. Toto nastavenie môžete kedykoľvek zmeniť.</string>
     <string name="preciseLocationSiteDialogSubtitle">Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Iba pre túto reláciu</string>

@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Rensa sökfältet</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installerad</string>
     <string name="addBookmarkMenuTitle">Lägg till bokmärke</string>
+    <string name="addFavoriteMenuTitle">Lägg till favorit</string>
+    <string name="favoriteAddedMessage">Favorit har lagts till</string>
+    <string name="bookmarkAddedMessage">Bokmärke sparat</string>
     <string name="requestDesktopSiteMenuTitle">Webbplats för dator</string>
 
     <!-- Downloading files -->
@@ -199,14 +218,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>
     <string name="bookmarksActivityTitle">Bokmärken</string>
-    <string name="bookmarkDeleteConfirmMessage">Är du säker på att du vill radera bokmärket &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Bokmärket har lagts till</string>
-    <string name="bookmarkTitleHint">Bokmärkesrubrik</string>
-    <string name="bookmarkUrlHint">Bokmärkets URL</string>
-    <string name="bookmarkTitleEdit">Redigera bokmärke</string>
     <string name="noBookmarks">Inga bokmärken har lagts till ännu</string>
     <string name="bookmarkOverflowContentDescription">Fler alternativ för bokmärke %1$s</string>
-    <string name="bookmarkEdited">Bokmärke sparat</string>
     <string name="bookmarkDeleteConfirmationMessage">Borttagen &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportera</string>
     <string name="exportBookmarksEmpty">Du har inga bokmärken, ingenting kommer att exporteras</string>
@@ -217,6 +230,13 @@
     <string name="importBookmarksError">Det gick inte att importera några bokmärken, något gick fel</string>
     <string name="importBookmarksEmpty">Filen har inga bokmärken att importera</string>
     <string name="importBookmarksSuccess">%1$d bokmärken har importerats</string>
+    <string name="savedSiteDialogTitleHint">Rubrik</string>
+    <string name="savedSiteDialogUrlHint">Webbadress</string>
+    <string name="savedSiteDialogTitleEdit">Redigera</string>
+    <string name="bookmarksSectionTitle">Bokmärken</string>
+    <string name="favoritesSectionTitle">Favoriter</string>
+    <string name="bookmarksEmptyHint">Inga bokmärken har lagts till ännu</string>
+    <string name="favoritesEmptyHint">Inga favoriter har lagts till ännu</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekräfta</string>
@@ -508,6 +528,7 @@
     <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
     <string name="preciseLocationSystemDialogNeverAllow">Fråga inte igen för denna webbplats</string>
     <string name="preciseLocationSiteDialogTitle">Bevilja åtkomst till enhetens platsinf\bormation för %1$s?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi använder bara din anonyma plats för att ge dig bättre resultat, närmare dig. Du kan alltid ändra dig senare.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinf\bormation som du har beviljat för enskilda webbplatser.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>

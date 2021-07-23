@@ -33,6 +33,9 @@
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
+    <string name="addFavoriteMenuTitle">Favori Ekle</string>
+    <string name="favoriteAddedMessage">Favori eklendi</string>
+    <string name="bookmarkAddedMessage">Yer imi eklendi</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
 
     <!-- Downloading files -->
@@ -199,14 +202,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Yer İmleri</string>
     <string name="bookmarksActivityTitle">Yer İmleri</string>
-    <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
-    <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
-    <string name="bookmarkTitleHint">Yer imi başlığı</string>
-    <string name="bookmarkUrlHint">Yer imi URL\'si</string>
-    <string name="bookmarkTitleEdit">Yer işaretini düzenle</string>
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
     <string name="bookmarkOverflowContentDescription">%1$s yer imi için diğer seçenekler</string>
-    <string name="bookmarkEdited">Yer imi eklendi</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; silindi</string>
     <string name="exportBookmarksMenu">Dışa Aktar</string>
     <string name="exportBookmarksEmpty">Yer işaretiniz olmadığından hiçbir şey dışa aktarılmayacak</string>
@@ -217,6 +214,13 @@
     <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
     <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
     <string name="importBookmarksSuccess">%1$d yer işareti başarıyla içe aktarıldı</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Düzenle</string>
+    <string name="bookmarksSectionTitle">Yer İmleri</string>
+    <string name="favoritesSectionTitle">Favoriler</string>
+    <string name="bookmarksEmptyHint">Henüz yer işareti eklenmedi</string>
+    <string name="favoritesEmptyHint">Henüz hiç favori eklenmedi</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
@@ -508,6 +512,7 @@
     <string name="preciseLocationSystemDialogDeny">Belki Sonra</string>
     <string name="preciseLocationSystemDialogNeverAllow">Bu Site için Bir Daha Sorma</string>
     <string name="preciseLocationSiteDialogTitle">%1$s için konuma erişim izni verilsin mi?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonim konumunuzu sadece size daha yakın, daha alakalı sonuçlar sunmak için kullanırız. Bu tercihi daha sonra dilediğiniz zaman değiştirebilirsiniz.</string>
     <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Her zaman</string>
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>

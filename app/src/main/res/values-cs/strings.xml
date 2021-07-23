@@ -33,6 +33,9 @@
     <string name="clearButtonContentDescription">Vymazat vyhledávací vstup</string>
     <string name="no_compatible_third_party_app_installed">Nebyla nainstalována žádná kompatibilní aplikace</string>
     <string name="addBookmarkMenuTitle">Přidat záložku</string>
+    <string name="addFavoriteMenuTitle">Přidat oblíbené</string>
+    <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
+    <string name="bookmarkAddedMessage">Záložka přidána</string>
     <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
 
     <!-- Downloading files -->
@@ -207,14 +210,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Opravdu chcete smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Záložka přidána</string>
-    <string name="bookmarkTitleHint">Název záložky</string>
-    <string name="bookmarkUrlHint">URL záložky</string>
-    <string name="bookmarkTitleEdit">Upravit záložku</string>
     <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
     <string name="bookmarkOverflowContentDescription">Další možnosti záložky %1$s</string>
-    <string name="bookmarkEdited">Záložka přidána</string>
     <string name="bookmarkDeleteConfirmationMessage">Odstraněno &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportovat</string>
     <string name="exportBookmarksEmpty">Nemáte záložky, nic nebude exportováno</string>
@@ -225,6 +222,13 @@
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
     <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
+    <string name="savedSiteDialogTitleHint">Název</string>
+    <string name="savedSiteDialogUrlHint">URL adresa</string>
+    <string name="savedSiteDialogTitleEdit">Upravit</string>
+    <string name="bookmarksSectionTitle">Záložky</string>
+    <string name="favoritesSectionTitle">Oblíbené</string>
+    <string name="bookmarksEmptyHint">Zatím nebyly přidány žádné záložky.</string>
+    <string name="favoritesEmptyHint">Zatím nebyly přidány žádné oblíbené položky</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdit</string>
@@ -520,6 +524,7 @@
     <string name="preciseLocationSystemDialogDeny">Možná později</string>
     <string name="preciseLocationSystemDialogNeverAllow">Neptat se znovu u těchto stránek</string>
     <string name="preciseLocationSiteDialogTitle">Udělit %1$s povolení k přístupu k poloze?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vaši anonymní polohu využíváme pouze k dosažení lepších výsledků, blíže k vám. Vždycky si to můžete později rozmyslet.</string>
     <string name="preciseLocationSiteDialogSubtitle">Oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, můžete spravovat v Nastavení.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Pouze pro tuto relaci</string>

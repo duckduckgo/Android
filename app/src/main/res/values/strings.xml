@@ -32,6 +32,9 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
+    <string name="addFavoriteMenuTitle">Add Favorite</string>
+    <string name="favoriteAddedMessage">Favorite added</string>
+    <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
 
     <!-- Downloading files -->
@@ -200,14 +203,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
-    <string name="bookmarkAddedFeedback">Bookmark added</string>
-    <string name="bookmarkTitleHint">Bookmark title</string>
-    <string name="bookmarkUrlHint">Bookmark URL</string>
-    <string name="bookmarkTitleEdit">Edit bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
-    <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
     <string name="exportBookmarksMenu">Export</string>
     <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
@@ -218,6 +215,13 @@
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
     <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Edit</string>
+    <string name="bookmarksSectionTitle">Bookmarks</string>
+    <string name="favoritesSectionTitle">Favorites</string>
+    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
+    <string name="favoritesEmptyHint">No favorites added yet</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
@@ -509,6 +513,7 @@
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for This Site</string>
     <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
     <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Always</string>
     <string name="preciseLocationSiteDialogAllowOnce">Only for This Session</string>

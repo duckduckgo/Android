@@ -33,6 +33,9 @@
     <string name="clearButtonContentDescription">Изчистване на въведеното търсене</string>
     <string name="no_compatible_third_party_app_installed">Няма инсталирано съвместимо приложение</string>
     <string name="addBookmarkMenuTitle">Добави отметка</string>
+    <string name="addFavoriteMenuTitle">Добавяне в любими</string>
+    <string name="favoriteAddedMessage">Добавено в любими</string>
+    <string name="bookmarkAddedMessage">Добавена е отметка</string>
     <string name="requestDesktopSiteMenuTitle">Сайт на работния плот</string>
 
     <!-- Downloading files -->
@@ -199,14 +202,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>
     <string name="bookmarksActivityTitle">Отметки</string>
-    <string name="bookmarkDeleteConfirmMessage">Наистина ли искате да изтриете отметка &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Добавена е отметка</string>
-    <string name="bookmarkTitleHint">Заглавие на отметката</string>
-    <string name="bookmarkUrlHint">URL адрес на отметката</string>
-    <string name="bookmarkTitleEdit">Редактиране на отметка</string>
     <string name="noBookmarks">Все още няма добавени отметки</string>
     <string name="bookmarkOverflowContentDescription">Още опции за отметка %1$s</string>
-    <string name="bookmarkEdited">Добавена е отметка</string>
     <string name="bookmarkDeleteConfirmationMessage">Изтрито &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Експортиране</string>
     <string name="exportBookmarksEmpty">Нямате отметки, няма да бъде експортирано нищо</string>
@@ -217,6 +214,13 @@
     <string name="importBookmarksError">Не успяхме да импортираме отметките, възникна някаква грешка</string>
     <string name="importBookmarksEmpty">Във файла няма отметки за импортиране</string>
     <string name="importBookmarksSuccess">%1$d отметки са импортирани успешно</string>
+    <string name="savedSiteDialogTitleHint">Заглавие</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Редактиране</string>
+    <string name="bookmarksSectionTitle">Отметки</string>
+    <string name="favoritesSectionTitle">Любими</string>
+    <string name="bookmarksEmptyHint">Все още няма добавени отметки</string>
+    <string name="favoritesEmptyHint">Все още няма добавени любими</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Потвърдете</string>
@@ -508,6 +512,7 @@
     <string name="preciseLocationSystemDialogDeny">Може би по-късно</string>
     <string name="preciseLocationSystemDialogNeverAllow">Не питай отново за този сайт</string>
     <string name="preciseLocationSiteDialogTitle">Давате ли разрешение на %1$s за достъп до местоположението?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Използваме анонимното Ви местоположение само за да Ви осигурим по-добри резултати близо до мястото, на което се намирате. Можете винаги да промените решението си по-късно.</string>
     <string name="preciseLocationSiteDialogSubtitle">В Настройки можете да управлявате разрешенията за достъп до местоположението, които сте дали на отделни сайтове.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Винаги</string>
     <string name="preciseLocationSiteDialogAllowOnce">Само за тази сесия</string>

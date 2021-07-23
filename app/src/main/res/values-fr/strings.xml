@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Effacer la recherche</string>
     <string name="no_compatible_third_party_app_installed">Aucune application compatible installée</string>
     <string name="addBookmarkMenuTitle">Ajouter un signet</string>
+    <string name="addFavoriteMenuTitle">Ajouter un favori</string>
+    <string name="favoriteAddedMessage">Favori ajouté</string>
+    <string name="bookmarkAddedMessage">Signet ajouté</string>
     <string name="requestDesktopSiteMenuTitle">Site en version bureau</string>
 
     <!-- Downloading files -->
@@ -199,14 +218,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>
     <string name="bookmarksActivityTitle">Signets</string>
-    <string name="bookmarkDeleteConfirmMessage">Voulez-vous vraiment supprimer le signet &lt;b&gt;%1$s&lt;/b&gt; ?</string>
-    <string name="bookmarkAddedFeedback">Signet ajouté</string>
-    <string name="bookmarkTitleHint">Titre du signet</string>
-    <string name="bookmarkUrlHint">URL du signet</string>
-    <string name="bookmarkTitleEdit">Modifier le signet</string>
     <string name="noBookmarks">Aucun signet ajouté pour le moment</string>
     <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %1$s</string>
-    <string name="bookmarkEdited">Signet ajouté</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
     <string name="exportBookmarksMenu">Exporter</string>
     <string name="exportBookmarksEmpty">Rien ne sera exporté car vous n\'avez pas de signet.</string>
@@ -217,6 +230,13 @@
     <string name="importBookmarksError">Impossible d\'importer les signets. Un problème est survenu.</string>
     <string name="importBookmarksEmpty">Le fichier ne contient aucun signet à importer.</string>
     <string name="importBookmarksSuccess">Importation réussie de %1$d signets.</string>
+    <string name="savedSiteDialogTitleHint">Titre</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Modifier</string>
+    <string name="bookmarksSectionTitle">Signets</string>
+    <string name="favoritesSectionTitle">Favoris</string>
+    <string name="bookmarksEmptyHint">Aucun signet ajouté pour le moment</string>
+    <string name="favoritesEmptyHint">Aucun favori ajouté pour le moment</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmer</string>
@@ -508,6 +528,7 @@
     <string name="preciseLocationSystemDialogDeny">Peut-être plus tard</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne plus demander pour ce site</string>
     <string name="preciseLocationSiteDialogTitle">Autoriser %1$s à accéder à la localisation ?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Nous n\'utilisons votre localisation anonyme que pour vous fournir de meilleurs résultats, plus proches de vous. Vous pouvez modifier ce réglage plus tard.</string>
     <string name="preciseLocationSiteDialogSubtitle">Vous pouvez gérer les autorisations d\'accès à la localisation accordées aux différents sites depuis les paramètres.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Toujours</string>
     <string name="preciseLocationSiteDialogAllowOnce">Seulement pour cette session</string>
