@@ -219,13 +219,6 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenInjectEmailAutofillJsCalled() {
-        testee.onPageFinished(webView, null)
-        verify(emailInjector).injectEmailAutofillJs(webView, null)
-    }
-
-    @UiThreadTest
-    @Test
     fun whenOnPageFinishedCalledThenFlushCookies() {
         testee.onPageFinished(webView, null)
         verify(cookieManager).flush()
@@ -243,9 +236,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenResetInjectedJsFlagCalled() {
+    fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
-        verify(emailInjector).resetInjectedJsFlag()
+        verify(emailInjector).injectEmailAutofillJs(webView, null)
     }
 
     @Test

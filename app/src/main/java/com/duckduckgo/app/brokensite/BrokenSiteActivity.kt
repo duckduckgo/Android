@@ -26,17 +26,25 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.content_broken_sites.*
-import kotlinx.android.synthetic.main.include_toolbar.*
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
+
+    private lateinit var binding: ActivityBrokenSiteBinding
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    private val brokenSites
+        get() = binding.contentBrokenSites
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_broken_site)
+        binding = ActivityBrokenSiteBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         configureListeners()
         configureObservers()
         setupToolbar(toolbar)
@@ -56,7 +64,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private fun configureListeners() {
         val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
 
-        categoriesSelection.setOnClickListener {
+        brokenSites.categoriesSelection.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
                 .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
@@ -73,7 +81,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 .show()
         }
 
-        submitButton.setOnClickListener {
+        brokenSites.submitButton.setOnClickListener {
             val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
             viewModel.onSubmitPressed(webViewVersion)
         }
@@ -109,8 +117,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val category = viewState.categorySelected?.let {
             getString(viewState.categorySelected.category)
         }.orEmpty()
-        categoriesSelection.setText(category)
-        submitButton.isEnabled = viewState.submitAllowed
+        brokenSites.categoriesSelection.setText(category)
+        brokenSites.submitButton.isEnabled = viewState.submitAllowed
     }
 
     companion object {
