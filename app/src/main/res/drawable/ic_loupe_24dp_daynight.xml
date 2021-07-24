@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="25"
-    android:viewportHeight="25">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
         android:fillColor="@color/searchWidgetSearchBarLoupeColor"
-        android:fillType="evenOdd"
-        android:pathData="M14.7736,16.0513C12.1511,17.991 8.4341,17.7728 6.0579,15.3966C3.4413,12.78 3.4413,8.5378 6.0579,5.9213C8.6744,3.3048 12.9166,3.3048 15.5331,5.9213C17.9093,8.2975 18.1275,12.0146 16.1878,14.637L19.6343,18.0836C20.0248,18.4741 20.0248,19.1073 19.6343,19.4978C19.2438,19.8883 18.6106,19.8883 18.2201,19.4978L14.7736,16.0513ZM7.3306,14.1238C5.4171,12.2102 5.4171,9.1077 7.3306,7.1941C9.2442,5.2806 12.3467,5.2806 14.2603,7.1941C16.1739,9.1077 16.1739,12.2102 14.2603,14.1238C12.3467,16.0373 9.2442,16.0373 7.3306,14.1238Z" />
+        android:fillType="nonZero"
+        android:pathData="M14.774,16.051a6.702,6.702 0,0 1,-8.716 -10.13,6.7 6.7,0 0,1 10.13,8.716l3.446,3.447a1,1 0,0 1,-1.414 1.414l-3.446,-3.447zM7.33,14.124a4.9,4.9 0,1 0,6.93 -6.93,4.9 4.9,0 0,0 -6.93,6.93z" />
 </vector>

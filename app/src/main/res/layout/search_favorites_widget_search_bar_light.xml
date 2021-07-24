@@ -35,5 +35,5 @@
     <ImageView
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
-        android:src="@drawable/ic_widget_loupe_light" />
+        android:src="@drawable/ic_loupe_24dp_light" />
 </RelativeLayout>
