@@ -66,9 +66,9 @@ class EmailJavascriptInterfaceTest {
 
     @Test
     fun whenStoreCredentialsThenStoreCredentialsCalledWithCorrectParameters() {
-        testee.storeCredentials("token", "username")
+        testee.storeCredentials("token", "username", "cohort")
 
-        verify(mockEmailManager).storeCredentials("token", "username")
+        verify(mockEmailManager).storeCredentials("token", "username", "cohort")
     }
 
     @Test

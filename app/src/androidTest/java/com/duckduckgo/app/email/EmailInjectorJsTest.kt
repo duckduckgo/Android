@@ -90,35 +90,6 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenInjectEmailAutofillJsTwiceThenDoNotInjectJsCodeTwice() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        val jsToEvaluate = getJsToEvaluate()
-        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
-
-        testee.injectEmailAutofillJs(webView, "https://example.com")
-        testee.injectEmailAutofillJs(webView, "https://example.com")
-
-        verify(webView, times(1)).evaluateJavascript(jsToEvaluate, null)
-    }
-
-    @UiThreadTest
-    @Test
-    @SdkSuppress(minSdkVersion = 24)
-    fun whenResetInjectedFlagCalledBetweenTwoInjectEmailJsCallsThenInjectJsCodeTwice() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        val jsToEvaluate = getJsToEvaluate()
-        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
-
-        testee.injectEmailAutofillJs(webView, "https://example.com")
-        testee.resetInjectedJsFlag()
-        testee.injectEmailAutofillJs(webView, "https://example.com")
-
-        verify(webView, times(2)).evaluateJavascript(jsToEvaluate, null)
-    }
-
-    @UiThreadTest
-    @Test
-    @SdkSuppress(minSdkVersion = 24)
     fun whenInjectAddressThenInjectJsCodeReplacingTheAlias() {
         val address = "address"
         val jsToEvaluate = getAliasJsToEvaluate().replace("%s", address)

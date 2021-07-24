@@ -44,8 +44,8 @@ class EmailJavascriptInterface(
     fun isSignedIn(): String = emailManager.isSignedIn().toString()
 
     @JavascriptInterface
-    fun storeCredentials(token: String, username: String) {
-        emailManager.storeCredentials(token, username)
+    fun storeCredentials(token: String, username: String, cohort: String) {
+        emailManager.storeCredentials(token, username, cohort)
     }
 
     @JavascriptInterface
