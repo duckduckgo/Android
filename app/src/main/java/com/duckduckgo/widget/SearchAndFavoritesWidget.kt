@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.global.view.toDp
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
@@ -57,6 +56,9 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
+
+    @Inject
+    lateinit var gridCalculator: SearchAndFavoritesGridCalculator
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -142,7 +144,7 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
     }
 
-    private fun getCurrentWidgetSize(context: Context,appWidgetOptions:  Bundle, newOptions:  Bundle?): Pair<Int, Int> {
+    private fun getCurrentWidgetSize(context: Context, appWidgetOptions: Bundle, newOptions: Bundle?): Pair<Int, Int> {
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
         var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
         var landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
@@ -156,63 +158,14 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
 
         val orientation = context.resources.configuration.orientation
-        val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            landsWidth
-        } else {
-            portraitWidth
-        }
+        val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) { landsWidth } else { portraitWidth }
+        val height = if (orientation == Configuration.ORIENTATION_LANDSCAPE) { landsHeight } else { portraitHeight }
 
-        val height = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            landsHeight
-        } else {
-            portraitHeight
-        }
-
-        var columns = calculateColumns(context, width)
-        var rows = calculateRows(context, height)
-
-        columns = 2.coerceAtLeast(columns)
-
-        rows = 1.coerceAtLeast(rows)
-        rows = 4.coerceAtMost(rows)
+        var columns = gridCalculator.calculateColumns(context, width)
+        var rows = gridCalculator.calculateRows(context, height)
 
         Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
         return Pair(columns, rows)
-    }
-
-    private fun calculateColumns(context: Context, width: Int): Int {
-        val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesSideMargin).toDp()
-        val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
-        val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesHorizontalSpacing).toDp()
-        var n = 2
-        var totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
-
-        Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
-        while (totalSize < width) {
-            ++n
-            totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
-            Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
-        }
-        return n - 1
-    }
-
-    private fun calculateRows(context: Context, height: Int): Int {
-        val searchBar = context.resources.getDimension(R.dimen.searchWidgetSearchBarHeight).toDp()
-        val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesTopMargin).toDp() +
-            (context.resources.getDimension(R.dimen.searchWidgetPadding).toDp() * 2)
-        val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerHeight).toDp()
-        val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesVerticalSpacing).toDp()
-        var n = 1
-        var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
-
-        Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
-        while (totalSize < height) {
-            ++n
-            totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
-            Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
-        }
-
-        return n - 1
     }
 
     private fun configureFavoritesGridView(context: Context, appWidgetId: Int, remoteViews: RemoteViews, widgetTheme: WidgetTheme) {
