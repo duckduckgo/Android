@@ -297,7 +297,7 @@ sealed class BubbleCta(
                         info.text = v?.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
                     }
                 }
-            //Using braille unicode inside textview, override description for accessibility
+            // Using braille unicode inside textview, override description for accessibility
             view.dialogTextCta.accessibilityDelegate = accessibilityDelegate
         }
     }
