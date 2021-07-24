@@ -87,8 +87,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
             maxRows = Int.MAX_VALUE,
             timeWindow = 5,
             timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true,
-            minRowsForAllActivity = 6
+            showTimeWindowHeadings = true
         )
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
@@ -102,8 +101,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         val maxRows: Int,
         val timeWindow: Int,
         val timeWindowUnits: TimeUnit,
-        val showTimeWindowHeadings: Boolean,
-        val minRowsForAllActivity: Int
+        val showTimeWindowHeadings: Boolean
     ) {
         fun unboundedRows(): Boolean = maxRows == Int.MAX_VALUE
     }

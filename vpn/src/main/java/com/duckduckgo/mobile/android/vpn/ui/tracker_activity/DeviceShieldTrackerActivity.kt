@@ -88,8 +88,7 @@ class DeviceShieldTrackerActivity :
         maxRows = 6,
         timeWindow = 5,
         timeWindowUnits = TimeUnit.DAYS,
-        showTimeWindowHeadings = false,
-        minRowsForAllActivity = 6
+        showTimeWindowHeadings = false
     )
 
     private val deviceShieldToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -137,7 +136,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onTrackerListShowed(totalTrackers: Int) {
-        if (totalTrackers >= feedConfig.minRowsForAllActivity) {
+        if (totalTrackers >= MIN_ROWS_FOR_ALL_ACTIVITY) {
             ctaShowAll.show()
         } else {
             ctaShowAll.gone()
@@ -391,6 +390,7 @@ class DeviceShieldTrackerActivity :
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
+        private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val EXCLUDED_APPS_ANNOTATION = "view_exceptions_link"
