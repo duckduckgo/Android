@@ -36,7 +36,7 @@ class TabSwitcherButton @JvmOverloads constructor(
     var count = 0
         set(value) {
             field = value
-            val text = if (count < 100) "$count" else "~"
+            val text = if (count < 100) "$count" else "${(count.toString().subSequence(0,2))}."
             binding.tabCount.text = text
         }
 
