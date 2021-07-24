@@ -50,6 +50,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -71,7 +72,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
-    private lateinit var binding: ActivitySystemSearchBinding
+    private val binding: ActivitySystemSearchBinding by viewBinding()
     private lateinit var quickAccessItemsBinding: IncludeQuickAccessItemsBinding
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
@@ -94,7 +95,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
-        binding = ActivitySystemSearchBinding.inflate(layoutInflater)
         quickAccessItemsBinding = IncludeQuickAccessItemsBinding.bind(binding.root)
         setContentView(binding.root)
         configureObservers()

@@ -33,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class SurveyActivity : DuckDuckGoActivity() {
@@ -42,7 +43,7 @@ class SurveyActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
-    private lateinit var binding: ActivityUserSurveyBinding
+    private val binding: ActivityUserSurveyBinding by viewBinding()
 
     private val webView
         get() = binding.webView
@@ -50,7 +51,6 @@ class SurveyActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityUserSurveyBinding.inflate(layoutInflater)
         setContentView(binding.root)
         configureListeners()
 

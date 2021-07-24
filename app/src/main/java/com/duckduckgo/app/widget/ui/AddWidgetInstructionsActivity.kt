@@ -24,10 +24,11 @@ import com.duckduckgo.app.browser.databinding.ActivityAddWidgetInstructionsBindi
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
-    private lateinit var binding: ActivityAddWidgetInstructionsBinding
+    private val binding: ActivityAddWidgetInstructionsBinding by viewBinding()
 
     private val viewModel: AddWidgetInstructionsViewModel by bindViewModel()
 
@@ -36,7 +37,6 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddWidgetInstructionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         configureListeners()
         configureCommandObserver()

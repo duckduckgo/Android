@@ -40,12 +40,13 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class WhitelistActivity : DuckDuckGoActivity() {
 
     private lateinit var adapter: WhitelistAdapter
 
-    private lateinit var binding: ActivityWhitelistBinding
+    private val binding: ActivityWhitelistBinding by viewBinding()
 
     private var dialog: AlertDialog? = null
     private val viewModel: WhitelistViewModel by bindViewModel()
@@ -58,7 +59,6 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityWhitelistBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         setupRecycler()
