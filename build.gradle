@@ -1,9 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
-    ext.kotlin_version = '1.4.30'
-    ext.spotless = "5.7.0"
-    ext.anvil_version = "2.2.2"
+    def versionPropsFile = file('versions.properties')
+    Properties versionProps = new Properties()
+
+    if (versionPropsFile.canRead()) {
+        versionProps.load(new FileInputStream(versionPropsFile))
+    }
+
+    ext.kotlin_version = versionProps['version.kotlin']
+    ext.spotless = "5.14.0"
+    ext.anvil_version = "2.3.3"
 
     // vtodo VPN
     ext.google_services = "4.3.4"

@@ -31,6 +31,7 @@ import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
@@ -38,7 +39,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabRepository
 
-    private lateinit var binding: ActivityPrivacyPracticesBinding
+    private val binding: ActivityPrivacyPracticesBinding by viewBinding()
 
     private val practicesAdapter = PrivacyPracticesAdapter()
 
@@ -52,7 +53,6 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrivacyPracticesBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()

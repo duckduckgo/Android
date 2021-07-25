@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
@@ -34,7 +35,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabRepository
 
-    private lateinit var binding: ActivityTrackerNetworksBinding
+    private val binding: ActivityTrackerNetworksBinding by viewBinding()
 
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
@@ -49,7 +50,6 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTrackerNetworksBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()
