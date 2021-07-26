@@ -2820,7 +2820,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", bitmap)
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
     }
 
@@ -2863,7 +2862,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockFaviconManager, never()).storeFavicon(any(), any())
     }
 
