@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
@@ -41,7 +42,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    private lateinit var binding: ActivityLocationPermissionsBinding
+    private val binding: ActivityLocationPermissionsBinding by viewBinding()
     lateinit var adapter: LocationPermissionsAdapter
     private var deleteDialog: AlertDialog? = null
 
@@ -52,7 +53,6 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLocationPermissionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         setupRecyclerView()
