@@ -117,7 +117,7 @@
     <string name="atp_OnboardingLastPageOneTitle">One easy step for better app privacy</string>
     <string name="atp_OnboardingLatsPageOneSubtitle">In 2021, we found that <b>70% of popular apps</b> allow other companies to track your personal information, even when you’re sleeping.\n\n<b>See which of your apps are on this list and take back control now.</b></string>
     <string name="atp_OnboardingLastPageTwoTitle">How does it work?</string>
-    <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>blocks app trackers from other companies</b>, like when Facebook attempts to track you in a banking app.\n\n<b>It\'s free</b>, and you can enjoy your apps as your normally would. Working in the background, it helps <b>protect you night and day.</b></string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>blocks app trackers from other companies</b>, like when Facebook attempts to track you in a banking app.\n\n<b>It\'s free</b>, and you can enjoy your apps as you normally would. Working in the background, it helps <b>protect you night and day.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Who sees your data?</string>
     <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local ’’VPN connection’’ to work. \n\n<b>App Tracking Protection is different. It never sends your data to a server.</b></string>
     <string name="atp_FAQCta">App Tracking Protection FAQ</string>
