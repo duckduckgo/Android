@@ -33,7 +33,7 @@ class RealSavedSitesParser : SavedSitesParser {
     }
 
     override fun generateHtml(bookmarks: List<SavedSite.Bookmark>, bookmarkFolderItems: List<BookmarkFolderItem>, favorites: List<SavedSite.Favorite>): String {
-        if (bookmarkFolderItems.isEmpty() && favorites.isEmpty()) {
+        if (bookmarkFolderItems.isEmpty() && bookmarks.isEmpty() && favorites.isEmpty()) {
             return ""
         }
 

@@ -80,7 +80,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", 0)
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
         val testFile = File(filesDir, "test_bookmarks.html")
@@ -94,7 +94,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenFileDoesNotExistThenExportingFails() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", 0)
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
         val localUri = Uri.parse("uridoesnotexist")
