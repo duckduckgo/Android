@@ -197,7 +197,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             trackerCompanyId = trackerCompanyId,
             domain = domain,
             timestamp = timestamp,
-            companyDisplayName = timestamp,
+            companyDisplayName = company,
             company = company,
             trackingApp = appContainingTracker
         )
@@ -215,7 +215,7 @@ class DeviceShieldDailyNotificationFactoryTest {
             trackerCompanyId = trackerCompanyId,
             domain = domain,
             timestamp = timestamp,
-            companyDisplayName = timestamp,
+            companyDisplayName = trackerCompanyName,
             company = trackerCompanyName,
             trackingApp = appContainingTracker
         )
