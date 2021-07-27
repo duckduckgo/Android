@@ -16,40 +16,27 @@
 
 package com.duckduckgo.app.feedback.ui.negative.brokensite
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeBrokenSiteFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.LayoutScrollingTouchListener
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
+class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
 
     interface BrokenSiteFeedbackListener {
         fun onProvidedBrokenSiteFeedback(feedback: String, url: String?)
         fun userCancelled()
     }
 
-    private var _binding: ContentFeedbackNegativeBrokenSiteFeedbackBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ContentFeedbackNegativeBrokenSiteFeedbackBinding by viewBinding()
 
     private val viewModel by bindViewModel<BrokenSiteNegativeFeedbackViewModel>()
 
     private val listener: BrokenSiteFeedbackListener?
         get() = activity as BrokenSiteFeedbackListener
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = ContentFeedbackNegativeBrokenSiteFeedbackBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(
