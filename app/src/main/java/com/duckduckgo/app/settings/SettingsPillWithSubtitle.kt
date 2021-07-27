@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,54 +16,45 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.duckduckgo.app.settings.db
+package com.duckduckgo.app.settings
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.view.children
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsPillWithSubtitle : LinearLayout {
 
-    private var root: View
-    private var titleView: TextView
-    private var subtitleView: TextView
-    private var pillView: ImageView
+    private val binding: SettingsPillWithSubtitleBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
 
-        root = LayoutInflater.from(context).inflate(R.layout.settings_pill_with_subtitle, this, true)
-        titleView = root.findViewById(R.id.title)
-        subtitleView = root.findViewById(R.id.subtitle)
-        pillView = root.findViewById(R.id.pill)
-
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsOptionWithPill)
-        setTitle(attributes.getString(R.styleable.SettingsOptionWithPill_pillTitle) ?: "")
-        setSubtitle(attributes.getString(R.styleable.SettingsOptionWithPill_pillSubtitle) ?: "")
-        setPill(attributes.getResourceId(R.styleable.SettingsOptionWithPill_pillDrawable, R.drawable.ic_beta_pill))
+        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsPillWithSubtitle)
+        setTitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillTitle) ?: "")
+        setSubtitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillSubtitle) ?: "")
+        setPill(attributes.getResourceId(R.styleable.SettingsPillWithSubtitle_pillDrawable, R.drawable.ic_beta_pill))
         attributes.recycle()
     }
 
     fun setTitle(title: String) {
-        titleView.text = title
+        binding.title.text = title
     }
 
     fun setSubtitle(subtitle: String) {
-        subtitleView.text = subtitle
+        binding.subtitle.text = subtitle
     }
 
     fun setPill(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
-        pillView.setImageDrawable(drawable)
+        binding.pill.setImageDrawable(drawable)
     }
 
     override fun setEnabled(enabled: Boolean) {
