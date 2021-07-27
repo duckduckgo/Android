@@ -50,6 +50,7 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         when (val state = viewState.emailState) {
             is EmailProtectionViewModel.EmailState.SignedIn -> launchEmailProtectionSignOut(state.emailAddress)
             is EmailProtectionViewModel.EmailState.SignedOut -> launchEmailProtectionSignIn()
+            is EmailProtectionViewModel.EmailState.NotSupported -> launchEmailProtectionNotSupported()
         }
     }
 
@@ -60,6 +61,11 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionSignIn() {
         val fragment = EmailProtectionSignInFragment.instance()
+        updateFragment(fragment)
+    }
+
+    private fun launchEmailProtectionNotSupported() {
+        val fragment = EmailProtectionNotSupportedFragment.instance()
         updateFragment(fragment)
     }
 

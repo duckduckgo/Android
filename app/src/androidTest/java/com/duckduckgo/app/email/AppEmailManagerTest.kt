@@ -356,17 +356,17 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenIsEmailFeatureEnabledAndEncryptionCanBeUsedThenReturnTrue() {
+    fun whenIsEmailFeatureSupportedAndEncryptionCanBeUsedThenReturnTrue() {
         whenever(mockEmailDataStore.canUseEncryption()).thenReturn(true)
 
-        assertTrue(testee.isEmailFeatureEnabled())
+        assertTrue(testee.isEmailFeatureSupported())
     }
 
     @Test
-    fun whenIsEmailFeatureEnabledAndEncryptionCannotBeUsedThenReturnFalse() {
+    fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() {
         whenever(mockEmailDataStore.canUseEncryption()).thenReturn(false)
 
-        assertFalse(testee.isEmailFeatureEnabled())
+        assertFalse(testee.isEmailFeatureSupported())
     }
 
     private fun givenUserIsInWaitlist() {
