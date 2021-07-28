@@ -92,7 +92,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/whitelist" />
 
-    <com.duckduckgo.app.settings.db.SettingsPillWithSubtitle
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
         app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
         app:pillTitle="@string/settingsEmailProtectionTitle" />
 
-    <com.duckduckgo.app.settings.db.SettingsPillWithSubtitle
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
             android:id="@+id/deviceShieldSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

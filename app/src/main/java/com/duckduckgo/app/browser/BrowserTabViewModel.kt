@@ -651,7 +651,6 @@ class BrowserTabViewModel(
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl != url) {
-            pixel.enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
             Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
             return
         }
@@ -667,7 +666,6 @@ class BrowserTabViewModel(
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl.toUri().host != visitedUrl.toUri().host) {
-            pixel.enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
             Timber.d("Favicon received for a url $visitedUrl, different than the current one $currentUrl")
             return
         }

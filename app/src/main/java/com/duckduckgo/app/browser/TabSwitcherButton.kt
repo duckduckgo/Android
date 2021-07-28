@@ -20,9 +20,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TabSwitcherButton @JvmOverloads constructor(
     context: Context,
@@ -30,8 +30,7 @@ class TabSwitcherButton @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    private var _binding: ViewTabSwitcherButtonBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ViewTabSwitcherButtonBinding by viewBinding()
 
     var count = 0
         set(value) {
@@ -41,11 +40,6 @@ class TabSwitcherButton @JvmOverloads constructor(
         }
 
     var hasUnread = false
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        _binding = ViewTabSwitcherButtonBinding.inflate(LayoutInflater.from(context), this)
-    }
 
     fun increment(callback: () -> Unit) {
         fadeOutCount {

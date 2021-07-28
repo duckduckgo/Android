@@ -31,9 +31,10 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import com.duckduckgo.app.feedback.ui.negative.displayText
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
-class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
+class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
 
     private lateinit var recyclerAdapter: SubReasonAdapter
 
@@ -44,8 +45,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
         fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons)
     }
 
-    private var _binding: ContentFeedbackNegativeDisambiguationSubReasonBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ContentFeedbackNegativeDisambiguationSubReasonBinding by viewBinding()
 
     private val listener: DisambiguationNegativeFeedbackListener?
         get() = activity as DisambiguationNegativeFeedbackListener
@@ -53,8 +53,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
     private lateinit var mainReason: MainReason
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = ContentFeedbackNegativeDisambiguationSubReasonBinding.inflate(inflater, container, false)
-
         recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
                 when (reason.subReason) {
@@ -98,11 +96,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
                 recyclerAdapter.submitList(subReasons)
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun getDisplayTextForReasonType(mainReason: MainReason): List<FeedbackTypeSubReasonDisplay> {
