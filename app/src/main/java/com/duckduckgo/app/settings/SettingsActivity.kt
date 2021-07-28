@@ -150,7 +150,7 @@ class SettingsActivity :
 
     private fun observeViewModel() {
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
                     version.setSubtitle(it.version)
