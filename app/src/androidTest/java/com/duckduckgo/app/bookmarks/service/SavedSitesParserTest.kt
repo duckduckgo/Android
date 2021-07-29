@@ -19,7 +19,11 @@ package com.duckduckgo.app.bookmarks.service
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.jsoup.Jsoup
@@ -41,9 +45,14 @@ class SavedSitesParserTest {
 
     private lateinit var parser: RealSavedSitesParser
 
+    private var mockBookmarkFoldersRepository: BookmarkFoldersRepository = mock()
+
     @Before
     fun before() {
         parser = RealSavedSitesParser()
+        runBlocking {
+            whenever(mockBookmarkFoldersRepository.insert(any())).thenReturn(0L)
+        }
     }
 
     @Test
@@ -82,21 +91,21 @@ class SavedSitesParserTest {
     }
 
     @Test
-    fun doesNotImportAnythingWhenFileIsNotProperlyFormatted() {
+    fun doesNotImportAnythingWhenFileIsNotProperlyFormatted() = runBlocking {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_invalid.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document)
+        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
 
         Assert.assertTrue(bookmarks.isEmpty())
     }
 
     @Test
-    fun canImportFromFirefox() {
+    fun canImportFromFirefox() = runBlocking {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_firefox.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document)
+        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
 
         assertEquals(7, bookmarks.size)
 
@@ -110,11 +119,11 @@ class SavedSitesParserTest {
     }
 
     @Test
-    fun canImportFromChrome() {
+    fun canImportFromChrome() = runBlocking {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_chrome.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document)
+        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
 
         assertEquals(4, bookmarks.size)
 
@@ -131,11 +140,11 @@ class SavedSitesParserTest {
     }
 
     @Test
-    fun canImportBookmarksFromDDG() {
+    fun canImportBookmarksFromDDG() = runBlocking {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document)
+        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
         assertEquals(8, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
@@ -144,11 +153,11 @@ class SavedSitesParserTest {
     }
 
     @Test
-    fun canImportBookmarksAndFavoritesFromDDG() {
+    fun canImportBookmarksAndFavoritesFromDDG() = runBlocking {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_favorites_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val savedSites = parser.parseHtml(document)
+        val savedSites = parser.parseHtml(document, mockBookmarkFoldersRepository)
 
         val favorites = savedSites.filterIsInstance<SavedSite.Favorite>()
         val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()

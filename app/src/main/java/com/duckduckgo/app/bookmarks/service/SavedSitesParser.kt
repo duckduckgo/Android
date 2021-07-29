@@ -16,13 +16,16 @@
 
 package com.duckduckgo.app.bookmarks.service
 
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
+import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 interface SavedSitesParser {
     fun generateHtml(bookmarks: List<SavedSite.Bookmark>, bookmarkFolderItems: List<BookmarkFolderItem>, favorites: List<SavedSite.Favorite>): String
-    fun parseHtml(document: Document): List<SavedSite>
+    suspend fun parseHtml(document: Document, bookmarkFoldersRepository: BookmarkFoldersRepository): List<SavedSite>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
@@ -111,49 +114,58 @@ class RealSavedSitesParser : SavedSitesParser {
         }
     }
 
-    override fun parseHtml(document: Document): List<SavedSite> {
-        val savedSites = mutableListOf<SavedSite>()
+    override suspend fun parseHtml(
+        document: Document,
+        bookmarkFoldersRepository: BookmarkFoldersRepository
+    ): List<SavedSite> {
+        return parseElement(document, 0, bookmarkFoldersRepository, mutableListOf(), false)
+    }
 
-        var inFolder = false
-        var inFavorite = false
+    private suspend fun parseElement(
+        documentElement: Element,
+        parentId: Long,
+        bookmarkFoldersRepository: BookmarkFoldersRepository,
+        savedSites: MutableList<SavedSite>,
+        inFavorite: Boolean
+    ): List<SavedSite> {
 
         var favorites = 0
-        val fileItems = document.select("DT")
 
-        fileItems.forEach {
-            if (it.select("H3").isNotEmpty()) {
-                val folderItem = it.select("H3")
-                if (inFolder) {
-                    // we get here when a folder has been read and a new one starts
-                    // bookmarkFolders.add(bookmarkFolder)
-                }
+        documentElement.select("DL").first()?.let { itemBlock ->
 
-                val folderName = folderItem.text()
-                if (folderName == FAVORITES_FOLDER) {
-                    inFavorite = true
-                    inFolder = false
-                } else {
-                    inFolder = true
-                    inFavorite = false
-                    // we start a new folder
-                    // bookmarks.clear()
-                    // bookmarkFolder = BookmarkFolder(folderName, bookmarks)
-                }
-            } else {
-                val linkItem = it.select("a")
-                if (linkItem.isNotEmpty()) {
-                    val link = linkItem.attr("href")
-                    val title = linkItem.text()
-                    if (inFavorite) {
-                        savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
-                        favorites++
+            itemBlock.childNodes()
+                .map { it as Element }
+                .filter { it.select("DT").isNotEmpty() }
+                .forEach { element ->
+
+                    val folder = element.select("H3").first()
+
+                    if (folder != null) {
+                        val folderName = folder.text()
+
+                        if (folderName == FAVORITES_FOLDER || folderName == BOOKSMARKS_FOLDER) {
+                            parseElement(element, 0, bookmarkFoldersRepository, savedSites, folderName == FAVORITES_FOLDER)
+                        } else {
+                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId)
+                            val id = bookmarkFoldersRepository.insert(bookmarkFolder)
+                            parseElement(element, id, bookmarkFoldersRepository, savedSites, false)
+                        }
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
+                        val linkItem = element.select("a")
+                        if (linkItem.isNotEmpty()) {
+                            val link = linkItem.attr("href")
+                            val title = linkItem.text()
+                            if (inFavorite) {
+                                savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
+                                favorites++
+                            } else {
+                                val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = parentId)
+                                savedSites.add(bookmark)
+                            }
+                        }
                     }
                 }
-            }
         }
-
         return savedSites
     }
 }

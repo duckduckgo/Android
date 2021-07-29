@@ -20,7 +20,7 @@ import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
 
 interface BookmarkFoldersRepository {
-    suspend fun insert(bookmarkFolder: BookmarkFolder)
+    suspend fun insert(bookmarkFolder: BookmarkFolder): Long
     suspend fun update(bookmarkFolder: BookmarkFolder)
     suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
@@ -36,8 +36,8 @@ class BookmarkFoldersDataRepository(
     private val appDatabase: AppDatabase
 ) : BookmarkFoldersRepository {
 
-    override suspend fun insert(bookmarkFolder: BookmarkFolder) {
-        bookmarkFoldersDao.insert(BookmarkFolderEntity(name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
+    override suspend fun insert(bookmarkFolder: BookmarkFolder): Long {
+        return bookmarkFoldersDao.insert(BookmarkFolderEntity(name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
     }
 
     override suspend fun update(bookmarkFolder: BookmarkFolder) {
