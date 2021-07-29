@@ -31,27 +31,35 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
+import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
+import com.duckduckgo.app.browser.databinding.ViewWhitelistEntryBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
-import kotlinx.android.synthetic.main.activity_whitelist.*
-import kotlinx.android.synthetic.main.edit_whitelist.*
-import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.android.synthetic.main.view_whitelist_entry.view.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class WhitelistActivity : DuckDuckGoActivity() {
 
-    lateinit var adapter: WhitelistAdapter
+    private lateinit var adapter: WhitelistAdapter
+
+    private val binding: ActivityWhitelistBinding by viewBinding()
 
     private var dialog: AlertDialog? = null
     private val viewModel: WhitelistViewModel by bindViewModel()
 
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    private val recycler
+        get() = binding.recycler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_whitelist)
+        setContentView(binding.root)
         setupToolbar(toolbar)
         setupRecycler()
         observeViewModel()
@@ -105,12 +113,12 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun showList() {
         recycler.show()
-        emptyWhitelist.gone()
+        binding.emptyWhitelist.gone()
     }
 
     private fun hideList() {
         recycler.gone()
-        emptyWhitelist.show()
+        binding.emptyWhitelist.show()
     }
 
     private fun processCommand(command: WhitelistViewModel.Command?) {
@@ -123,11 +131,12 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showAddDialog() {
+        val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
         val addDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogAddTitle)
-            setView(R.layout.edit_whitelist)
+            setView(dialogBinding.root)
             setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialog?.textInput?.text.toString()
+                val newText = dialogBinding.textInput.text.toString()
                 viewModel.onEntryAdded(UserWhitelistedDomain(newText))
             }
             setNegativeButton(android.R.string.no) { _, _ -> }
@@ -139,11 +148,12 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showEditDialog(entry: UserWhitelistedDomain) {
+        val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
         val editDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogEditTitle)
-            setView(R.layout.edit_whitelist)
+            setView(dialogBinding.root)
             setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialog?.textInput?.text.toString()
+                val newText = dialogBinding.textInput.text.toString()
                 viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
             }
             setNegativeButton(android.R.string.no) { _, _ -> }
@@ -153,8 +163,8 @@ class WhitelistActivity : DuckDuckGoActivity() {
         dialog = editDialog
         editDialog.show()
 
-        editDialog.textInput.setText(entry.domain)
-        editDialog.textInput.setSelection(entry.domain.length)
+        dialogBinding.textInput.setText(entry.domain)
+        dialogBinding.textInput.setSelection(entry.domain.length)
     }
 
     private fun showDeleteDialog(entry: UserWhitelistedDomain) {
@@ -194,9 +204,8 @@ class WhitelistActivity : DuckDuckGoActivity() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WhitelistViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val view = inflater.inflate(R.layout.view_whitelist_entry, parent, false)
-            return WhitelistViewHolder(view, view.domain, view.overflowMenu)
+            val binding = ViewWhitelistEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return WhitelistViewHolder(binding.root, binding.domain, binding.overflowMenu)
         }
 
         override fun onBindViewHolder(holder: WhitelistViewHolder, position: Int) {

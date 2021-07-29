@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class EmailWebViewActivity : DuckDuckGoActivity() {
@@ -40,7 +41,7 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var emailInjector: EmailInjector
 
-    private lateinit var binding: ActivityEmailWebviewBinding
+    private val binding: ActivityEmailWebviewBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -48,7 +49,6 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityEmailWebviewBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         setupToolbar(toolbar)

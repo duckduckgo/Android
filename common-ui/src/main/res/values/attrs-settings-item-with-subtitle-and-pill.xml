@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <declare-styleable name="SettingsOptionWithPill">
+    <declare-styleable name="SettingsPillWithSubtitle">
         <attr name="pillTitle" format="string" />
         <attr name="pillSubtitle" format="string" />
         <attr name="pillDrawable" format="reference" />

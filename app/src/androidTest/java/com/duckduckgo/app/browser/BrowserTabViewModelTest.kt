@@ -88,7 +88,6 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -101,8 +100,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -221,9 +218,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -249,9 +243,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
-
-    @Mock
-    private lateinit var mockNotificationDao: NotificationDao
 
     @Mock
     private lateinit var mockFileDownloader: FileDownloader
@@ -342,7 +333,6 @@ class BrowserTabViewModelTest {
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
@@ -382,8 +372,6 @@ class BrowserTabViewModelTest {
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
-            notificationDao = mockNotificationDao,
-            variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
@@ -2832,7 +2820,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", bitmap)
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
     }
 
@@ -2875,7 +2862,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockFaviconManager, never()).storeFavicon(any(), any())
     }
 
@@ -3155,19 +3141,21 @@ class BrowserTabViewModelTest {
     @Test
     fun whenConsumeAliasThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test
     fun whenCancelAutofillTooltipThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.cancelAutofillTooltip()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test
@@ -3184,10 +3172,11 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUseAddressThenPixelSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
 
         testee.useAddress()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS)
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
     }
 
     @Test

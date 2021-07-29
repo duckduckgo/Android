@@ -24,7 +24,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.privacy.ui.WhitelistActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <TextView
         android:id="@+id/explanation"

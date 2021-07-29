@@ -31,6 +31,8 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
+import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -58,9 +60,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
-import kotlinx.android.synthetic.main.activity_browser.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar_mockup.*
-import kotlinx.coroutines.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -107,6 +111,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var renderer: BrowserStateRenderer
 
+    private val binding: ActivityBrowserBinding by viewBinding()
+
+    private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
+
     private var openMessageInNewTabJob: Job? = null
 
     @SuppressLint("MissingSuperCall")
@@ -120,7 +128,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
-        setContentView(R.layout.activity_browser)
+        toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
+        setContentView(binding.root)
         viewModel.viewState.observe(
             this,
             Observer {
@@ -390,7 +399,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         // Delaying this code to avoid race condition when fragment and activity recreated
         Handler().postDelayed(
             {
-                appBarLayoutMockup?.visibility = View.GONE
+                if (this::toolbarMockupBinding.isInitialized) {
+                    toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                }
             },
             300
         )
@@ -441,7 +452,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         private fun showWebContent() {
             Timber.d("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
             configureObservers()
-            clearingInProgressView.gone()
+            binding.clearingInProgressView.gone()
 
             if (lastIntent != null) {
                 Timber.i("There was a deferred intent to process; handling now")
@@ -469,7 +480,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     private fun hideWebContent() {
         Timber.d("Hiding web view content")
         removeObservers()
-        clearingInProgressView.show()
+        binding.clearingInProgressView.show()
     }
 
     private fun launchPlayStore() {

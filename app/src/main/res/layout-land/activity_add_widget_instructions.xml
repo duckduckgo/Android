@@ -70,6 +70,7 @@
             app:constraint_referenced_ids="animation, steps" />
 
         <include
+            android:id="@+id/includeAddWidgetInstructionButtons"
             layout="@layout/include_add_widget_instruction_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

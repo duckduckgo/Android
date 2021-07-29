@@ -19,6 +19,7 @@ package com.duckduckgo.app.globalprivacycontrol
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER
@@ -47,6 +48,7 @@ class GlobalPrivacyControlManagerTest {
 
     @UiThreadTest
     @Test
+    @SdkSuppress(minSdkVersion = 24)
     fun whenInjectDoNotSellToDomAndGcpIsEnabledThenInjectToDom() {
         val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -59,6 +61,7 @@ class GlobalPrivacyControlManagerTest {
 
     @UiThreadTest
     @Test
+    @SdkSuppress(minSdkVersion = 24)
     fun whenInjectDoNotSellToDomAndGcpIsNotEnabledThenDoNotInjectToDom() {
         val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))

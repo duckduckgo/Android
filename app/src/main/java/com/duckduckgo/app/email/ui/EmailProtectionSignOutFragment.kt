@@ -18,13 +18,10 @@ package com.duckduckgo.app.email.ui
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.flowWithLifecycle
@@ -32,15 +29,15 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtectionFragment() {
+class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
 
     private val viewModel by bindViewModel<EmailProtectionSignOutViewModel>()
 
-    private var _binding: FragmentEmailProtectionSignOutBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FragmentEmailProtectionSignOutBinding by viewBinding()
 
     private val contactUsSpan = object : NonUnderlinedClickableSpan() {
         override fun onClick(widget: View) {
@@ -48,16 +45,6 @@ class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtection
             intent.data = Uri.parse("mailto:support@duck.com")
             openExternalApp(intent)
         }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentEmailProtectionSignOutBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun configureViewModelObservers() {
