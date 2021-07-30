@@ -26,6 +26,8 @@ import android.webkit.WebView
 import androidx.core.view.NestedScrollingChild
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import kotlinx.android.synthetic.main.include_duckduckgo_browser_webview.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 
 /**
  * WebView subclass which allows the WebView to
@@ -76,6 +78,13 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         }
         val eventY = event.y.toInt()
         event.offsetLocation(0f, nestedOffsetY.toFloat())
+
+        if (contentHeight <= height) {
+            hasGestureFinished = true
+            returnValue = super.onTouchEvent(event)
+            stopNestedScroll()
+            return returnValue
+        }
 
         when (action) {
             MotionEvent.ACTION_UP -> {
