@@ -26,7 +26,7 @@ import com.google.android.material.appbar.AppBarLayout
 class AppBarMarginCollapseBehavior : AppBarLayout.ScrollingViewBehavior {
     constructor() : super()
 
-    constructor(context: Context, attrs: AttributeSet): super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
     override fun onMeasureChild(
         parent: CoordinatorLayout,
@@ -40,8 +40,8 @@ class AppBarMarginCollapseBehavior : AppBarLayout.ScrollingViewBehavior {
         // handling of measured header height and window insets here
 
         val childLpHeight = child.layoutParams.height
-        if (childLpHeight == ViewGroup.LayoutParams.MATCH_PARENT
-            || childLpHeight == ViewGroup.LayoutParams.WRAP_CONTENT
+        if (childLpHeight == ViewGroup.LayoutParams.MATCH_PARENT ||
+            childLpHeight == ViewGroup.LayoutParams.WRAP_CONTENT
         ) {
             // If the menu's height is set to match_parent/wrap_content then measure it
             // with the maximum visible height
