@@ -70,7 +70,7 @@ class SavedSitesExporterTest {
         favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
         bookmarkFoldersRepository = BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, db)
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarkFoldersRepository, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarkFoldersRepository, RealSavedSitesParser())
     }
 
     @After

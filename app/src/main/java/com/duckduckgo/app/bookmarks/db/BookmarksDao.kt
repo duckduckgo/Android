@@ -32,6 +32,9 @@ interface BookmarksDao {
     @Query("select * from bookmarks where parentId = :parentId")
     fun getBookmarks(parentId: Long): LiveData<List<BookmarkEntity>>
 
+    @Query("select * from bookmarks where parentId = :parentId")
+    fun getBookmarksImmediate(parentId: Long): List<BookmarkEntity>
+
     @Query("select * from bookmarks")
     fun getBookmarksSync(): List<BookmarkEntity>
 

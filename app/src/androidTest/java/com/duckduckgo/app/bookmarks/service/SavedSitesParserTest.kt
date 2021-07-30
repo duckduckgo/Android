@@ -20,7 +20,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.FolderTreeItem
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.TreeNode
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -60,7 +62,10 @@ class SavedSitesParserTest {
         val bookmark = SavedSite.Bookmark(id = 1, title = "example", url = "www.example.com", 0)
         val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
 
-        val result = parser.generateHtml(listOf(bookmark), emptyList(), listOf(favorite))
+        val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
+        node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
+
+        val result = parser.generateHtml(node, listOf(favorite))
         val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
             "<!--This is an automatically generated file.\n" +
             "It will be read and overwritten.\n" +
@@ -84,7 +89,9 @@ class SavedSitesParserTest {
 
     @Test
     fun whenNoSavedSitesExistThenNothingIsGenerated() = runBlocking {
-        val result = parser.generateHtml(emptyList(), emptyList(), emptyList())
+        val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
+
+        val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
 
         assertEquals(expectedHtml, result)
