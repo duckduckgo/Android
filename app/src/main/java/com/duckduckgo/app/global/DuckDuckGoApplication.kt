@@ -34,7 +34,6 @@ import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.WorkScheduler
-import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
@@ -57,9 +56,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var androidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
-    lateinit var notificationRegistrar: NotificationRegistrar
 
     @Inject
     lateinit var pixel: Pixel
@@ -125,7 +121,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
         scheduleOfflinePixels()
 
-        notificationRegistrar.registerApp()
         registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
@@ -208,7 +203,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
-        notificationRegistrar.updateStatus()
         appCoroutineScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initialize()
