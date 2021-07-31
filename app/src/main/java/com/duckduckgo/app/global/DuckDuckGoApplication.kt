@@ -42,8 +42,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -60,12 +58,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var androidInjector: DispatchingAndroidInjector<Any>
-
-    @Inject
-    lateinit var trackerDataLoader: TrackerDataLoader
-
-    @Inject
-    lateinit var resourceSurrogateLoader: ResourceSurrogateLoader
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -135,7 +127,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
         }
 
-        loadTrackerData()
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
@@ -167,13 +158,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             return true
         }
         return false
-    }
-
-    private fun loadTrackerData() {
-        applicationCoroutineScope.launch {
-            trackerDataLoader.loadData()
-            resourceSurrogateLoader.loadData()
-        }
     }
 
     private fun configureLogging() {
