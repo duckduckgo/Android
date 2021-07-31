@@ -32,7 +32,6 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
@@ -63,9 +62,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
-
-    @Inject
-    lateinit var workScheduler: WorkScheduler
 
     @Inject
     lateinit var appDataLoader: AppDataLoader
@@ -194,7 +190,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onAppResumed() {
         appCoroutineScope.launch {
-            workScheduler.scheduleWork()
             atbInitializer.initialize()
         }
     }
