@@ -32,7 +32,6 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
@@ -50,7 +49,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleObserver {
 
@@ -59,9 +57,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var httpsUpgrader: HttpsUpgrader
 
     @Inject
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
@@ -123,7 +118,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
         registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
 
-        initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
         appCoroutineScope.launch {
@@ -161,10 +155,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
-    }
-
-    private fun initializeHttpsUpgrader() {
-        thread { httpsUpgrader.reloadData() }
     }
 
     private fun submitUnsentFirePixels() {
