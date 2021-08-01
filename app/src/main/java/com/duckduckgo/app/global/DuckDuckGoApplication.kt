@@ -17,14 +17,11 @@
 package com.duckduckgo.app.global
 
 import android.app.Application
-import android.content.IntentFilter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -76,9 +73,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var atbInitializer: AtbInitializer
 
     @Inject
-    lateinit var shortcutReceiver: ShortcutReceiver
-
-    @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
@@ -111,8 +105,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         }
 
         scheduleOfflinePixels()
-
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
 
         submitUnsentFirePixels()
 
