@@ -40,7 +40,8 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
+        val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+        testee = ShortcutReceiver(context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test

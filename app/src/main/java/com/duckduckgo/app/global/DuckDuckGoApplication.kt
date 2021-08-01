@@ -27,7 +27,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
@@ -59,9 +58,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
-
-    @Inject
-    lateinit var appDataLoader: AppDataLoader
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
@@ -110,7 +106,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
         appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
-            appDataLoader.loadData()
         }
     }
 
