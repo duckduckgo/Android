@@ -31,7 +31,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -54,9 +53,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
-
-    @Inject
-    lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
@@ -95,8 +91,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
                 addObserver(it)
             }
         }
-
-        scheduleOfflinePixels()
 
         submitUnsentFirePixels()
 
@@ -150,10 +144,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
             unsentForgetAllPixelStore.resetCount()
         }
-    }
-
-    private fun scheduleOfflinePixels() {
-        offlinePixelScheduler.scheduleOfflinePixels()
     }
 
     override fun androidInjector(): AndroidInjector<Any> {
