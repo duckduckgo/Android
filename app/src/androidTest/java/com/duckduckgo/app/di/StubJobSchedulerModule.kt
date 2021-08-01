@@ -19,9 +19,6 @@ package com.duckduckgo.app.di
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
-import androidx.work.WorkManager
-import com.duckduckgo.app.job.AndroidJobCleaner
-import com.duckduckgo.app.job.JobCleaner
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -52,11 +49,5 @@ class StubJobSchedulerModule {
             override fun getPendingJob(jobId: Int): JobInfo? = null
 
         }
-    }
-
-    @Singleton
-    @Provides
-    fun providesJobCleaner(workManager: WorkManager): JobCleaner {
-        return AndroidJobCleaner(workManager)
     }
 }

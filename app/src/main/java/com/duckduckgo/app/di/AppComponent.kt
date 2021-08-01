@@ -50,7 +50,6 @@ import javax.inject.Singleton
     scope = AppObjectGraph::class,
     modules = [
         ApplicationModule::class,
-        JobsModule::class,
         WorkerModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
