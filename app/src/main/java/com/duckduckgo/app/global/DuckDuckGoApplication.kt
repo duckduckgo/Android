@@ -31,7 +31,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.AndroidInjector
@@ -64,9 +63,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
-
-    @Inject
-    lateinit var atbInitializer: AtbInitializer
 
     @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
@@ -172,13 +168,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             return
         }
         pixel.fire(APP_LAUNCH)
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onAppResumed() {
-        appCoroutineScope.launch {
-            atbInitializer.initialize()
-        }
     }
 
     companion object {

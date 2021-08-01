@@ -54,7 +54,6 @@ import javax.inject.Singleton
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,
-        StatisticsModule::class,
         StoreModule::class,
         DatabaseModule::class,
         DaoModule::class,
