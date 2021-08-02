@@ -136,12 +136,12 @@
     <!-- Exclusion List -->
     <string name="atp_ExcludedApps">Excluded Apps</string>
     <string name="atp_ExclusionListActivityTitle">App Exceptions</string>
-    <string name="atp_ExcludedAppsFeature">App Tracking Protection helps stop companies from tracking you, except in apps they own. For example, Facebook can track you in Facebook app, but App Tracking Protection helps block them in the Nextdoor app\n\nApp Tracking Protection excludes some apps so they work as expected.</string>
+    <string name="atp_ExcludedAppsFeature">App Tracking Protection helps stop companies from tracking you, except in apps they own. For example, Facebook can track you in the Facebook app, but App Tracking Protection helps block them in the Nextdoor app.\n\nApp Tracking Protection excludes some apps so they work as expected.</string>
     <string name="atp_ExcludedAppsKnownIssuesLabel">App Tracking Protection excludes apps with known issues so that they work properly. This is mostly temporary as we continue to improve App Tracking Protection.</string>
     <string name="atp_ExcludedOtherAppsLabel">To block website trackers, consider opening links within the DuckDuckGo app instead.</string>
     <string name="atp_ExcludedAppsKnownIssuesHeader">Apps with known issues (%s)</string>
     <string name="atp_ExcludedOtherAppsHeader">Other apps (%s)</string>
-    <string name="atp_ExcludedAppsReport">Report Problem with Another app</string>
+    <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
     <string name="atp_ExcludedAppEntry">%s app</string>
 
     <!--  Tracker Profiling Info -->
