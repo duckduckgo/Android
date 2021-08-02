@@ -30,17 +30,6 @@ class EmailJavascriptInterface(
     }
 
     @JavascriptInterface
-    fun getAlias(): String {
-        val nextAlias = emailManager.getAlias()
-
-        return if (nextAlias.isNullOrBlank()) {
-            ""
-        } else {
-            "{\"nextAlias\": \"$nextAlias\"}"
-        }
-    }
-
-    @JavascriptInterface
     fun isSignedIn(): String = emailManager.isSignedIn().toString()
 
     @JavascriptInterface

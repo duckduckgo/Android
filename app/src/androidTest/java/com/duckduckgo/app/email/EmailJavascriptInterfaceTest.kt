@@ -35,29 +35,6 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
-    fun whenGetAliasThenGetAliasCalled() {
-        givenAliasExists()
-
-        testee.getAlias()
-
-        verify(mockEmailManager).getAlias()
-    }
-
-    @Test
-    fun whenGetAliasThenReturnNextAliasWrappedInJsonObject() {
-        givenAliasExists()
-
-        assertEquals("{\"nextAlias\": \"alias\"}", testee.getAlias())
-    }
-
-    @Test
-    fun whenGetAliasIfNextAliasDoesNotExistThenReturnEmpty() {
-        givenAliasDoesNotExist()
-
-        assertEquals("", testee.getAlias())
-    }
-
-    @Test
     fun whenIsSignedInThenIsSignedInCalled() {
         testee.isSignedIn()
 
