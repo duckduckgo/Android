@@ -151,6 +151,11 @@ class BrowserViewModel(
         }
     }
 
+    suspend fun onOpenFavoriteFromWidget(query: String) {
+        pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
+        tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+    }
+
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs.isNullOrEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")

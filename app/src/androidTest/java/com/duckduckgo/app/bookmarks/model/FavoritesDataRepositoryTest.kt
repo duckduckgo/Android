@@ -139,6 +139,14 @@ class FavoritesDataRepositoryTest {
         verify(mockFaviconManager).deletePersistedFavicon(favorite.url)
     }
 
+    @Test
+    fun whenUserHasFavoritesThenReturnTrue() = coroutineRule.runBlocking {
+        val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
+        givenFavorite(favorite)
+
+        assertTrue(repository.userHasFavorites())
+    }
+
     private fun givenFavorite(vararg favorite: Favorite) {
         favorite.forEach {
             favoritesDao.insert(FavoriteEntity(it.id, it.title, it.url, it.position))

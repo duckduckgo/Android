@@ -87,6 +87,21 @@
     <string name="bookmarksEmptyHint">No bookmarks added yet</string>
     <string name="favoritesEmptyHint">No favorites added yet</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
+    <string name="widgetConfigurationTitleText">Choose Theme</string>
+    <string name="widgetConfigurationSystemThemeOption">System default</string>
+    <string name="widgetConfigurationLightThemeOption">Light</string>
+    <string name="widgetConfigurationDarkThemeOption">Dark</string>
+    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \" &#x2807;\" icon and select Add Favorite.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Visit your favorite sites in a flash! Go to a site you love. Then tap the browser menu icon and select Add Favorite.</string>
+    <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
+    <string name="favoritesWidgetLabel">Favorites Widget</string>
+    <string name="searchWidgetLabel">Search Widget</string>
+
     <!-- Shortcut -->
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
 

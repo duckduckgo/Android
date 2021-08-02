@@ -69,6 +69,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FAVORITE_MENU_ITEM_STATE = "fmi"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
         const val BOOKMARK_COUNT = "bco"
@@ -93,7 +94,6 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
-
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

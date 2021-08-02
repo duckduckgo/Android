@@ -491,6 +491,12 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaInHomeTabDuringFavoriteOnboardingThenReturnNull() = runBlockingTest {
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, favoritesOnboarding = true)
+        assertTrue(value is BubbleCta.DaxFavoritesOnboardingCta)
+    }
+
+    @Test
     fun whenUserHidesAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenOnboardingActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)

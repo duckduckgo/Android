@@ -73,5 +73,6 @@
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
+    <attr name="quickAccessItemTitleTextColor" format="color" />
 
 </resources>

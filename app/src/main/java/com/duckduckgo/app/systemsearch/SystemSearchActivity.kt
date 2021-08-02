@@ -122,6 +122,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         when {
             launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
             launchedFromWidget(intent) -> pixel.fire(AppPixelName.APP_WIDGET_LAUNCH)
+            launchedFromSearchWithFavsWidget(intent) -> pixel.fire(AppPixelName.APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH)
             launchedFromNotification(intent) -> pixel.fire(AppPixelName.APP_NOTIFICATION_LAUNCH)
             launchedFromSystemSearchBox(intent) -> pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
         }
@@ -371,6 +372,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
     }
 
+    private fun launchedFromSearchWithFavsWidget(intent: Intent): Boolean {
+        return intent.getBooleanExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, false)
+    }
+
     private fun launchedFromNotification(intent: Intent): Boolean {
         return intent.getBooleanExtra(NOTIFICATION_SEARCH_EXTRA, false)
     }
@@ -378,12 +383,20 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val NOTIFICATION_SEARCH_EXTRA = "NOTIFICATION_SEARCH_EXTRA"
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
+        const val WIDGET_SEARCH_WITH_FAVS_EXTRA = "WIDGET_SEARCH_WITH_FAVS_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         fun fromWidget(context: Context): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, true)
+            intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
+            return intent
+        }
+
+        fun fromFavWidget(context: Context): Intent {
+            val intent = Intent(context, SystemSearchActivity::class.java)
+            intent.putExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, true)
             intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
             return intent
         }

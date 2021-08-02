@@ -37,4 +37,16 @@
     <dimen name="changeAppIconSize">75dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
 
+    <dimen name="savedSiteGridItemFavicon">56dp</dimen>
+    <dimen name="savedSiteGridItemCornerRadiusFavicon">10dp</dimen>
+    <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
+    <dimen name="searchWidgetPadding">16dp</dimen>
+    <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerHeight">78dp</dimen>
+    <dimen name="searchWidgetSearchBarHeight">46dp</dimen>
+    <dimen name="searchWidgetFavoritesTopMargin">16dp</dimen>
+    <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
+    <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
+
 </resources>
