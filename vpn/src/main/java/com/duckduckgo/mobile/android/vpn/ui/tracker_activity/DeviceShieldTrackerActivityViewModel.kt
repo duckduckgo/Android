@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
@@ -54,10 +55,11 @@ class DeviceShieldTrackerActivityViewModel(
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    private val job = ConflatedJob()
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     internal val vpnRunningState = MutableStateFlow(
-        RunningState(isRunning = true, hasValueChanged = false, 0)
+        RunningState(isRunning = true, 0)
     )
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
@@ -72,14 +74,12 @@ class DeviceShieldTrackerActivityViewModel(
     }
 
     private fun pollDeviceShieldState() {
-        viewModelScope.launch {
+        job += viewModelScope.launch {
             val excludedAppsCount = deviceShieldExcludedApps.getExclusionAppList().filterNot { it.isDdgApp }.size
 
             while (isActive) {
                 val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
-                val oldValue = vpnRunningState.value
-                val hasValueChanged = oldValue.isRunning != isRunning
-                vpnRunningState.emit(RunningState(isRunning, hasValueChanged, excludedAppsCount))
+                vpnRunningState.emit(RunningState(isRunning, excludedAppsCount))
 
                 delay(1_000)
             }
@@ -182,7 +182,7 @@ class PastWeekTrackerActivityViewModelFactory @Inject constructor(
     }
 }
 
-internal data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean, val excludedAppsCount: Int) {
+internal data class RunningState(val isRunning: Boolean, val excludedAppsCount: Int) {
     fun stringExcludedAppsCount(): String {
         return String.format(Locale.US, "%,d", excludedAppsCount)
     }
