@@ -36,7 +36,7 @@ class SearchAndFavoritesGridCalculator {
             Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
         }
 
-        return 2.coerceAtLeast(n - 1)
+        return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1)
     }
 
     fun calculateRows(context: Context, height: Int): Int {
@@ -56,8 +56,14 @@ class SearchAndFavoritesGridCalculator {
         }
 
         var rows = n - 1
-        rows = 1.coerceAtLeast(rows)
-        rows = 4.coerceAtMost(rows)
+        rows = WIDGET_ROWS_MIN.coerceAtLeast(rows)
+        rows = WIDGET_ROWS_MAX.coerceAtMost(rows)
         return rows
+    }
+
+    companion object {
+        private const val WIDGET_COLUMNS_MIN = 2
+        private const val WIDGET_ROWS_MAX = 4
+        private const val WIDGET_ROWS_MIN = 1
     }
 }

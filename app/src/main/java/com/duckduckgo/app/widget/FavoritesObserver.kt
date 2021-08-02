@@ -42,7 +42,7 @@ class FavoritesObserver @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun notifyWidgets() {
-        appCoroutineScope.launch() {
+        appCoroutineScope.launch {
             favoritesRepository.favorites().collect {
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
                 instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
