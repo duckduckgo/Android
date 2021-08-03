@@ -113,4 +113,13 @@
     <color name="light_blue">#F2F5F9</color>
     <color name="yellow_10">#FFF2BF</color>
 
+    <!-- Widget colors -->
+    <color name="favoriteTitleTextColor">@color/white</color>
+    <color name="favoriteFaviconBackgroundColor">@color/almostBlackDark</color>
+    <color name="searchWidgetBackgroundColor">@color/newBlack</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/almostBlack</color>
+    <color name="searchWidgetSearchBarHintColor">@color/white</color>
+    <color name="searchWidgetSearchBarLoupeColor">@color/white</color>
+
+
 </resources>
