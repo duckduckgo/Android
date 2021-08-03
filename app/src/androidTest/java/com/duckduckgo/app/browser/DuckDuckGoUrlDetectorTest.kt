@@ -119,22 +119,22 @@ class DuckDuckGoUrlDetectorTest {
     }
 
     @Test
-    fun whenDomainIsNotDuckDuckGoThenReturnFalse() {
-        assertFalse(testee.isDuckDuckGoDomain("https://example.com"))
+    fun whenIsNotDuckDuckGoEmailUrlThenReturnFalse() {
+        assertFalse(testee.isDuckDuckGoEmailUrl("https://example.com"))
     }
 
     @Test
-    fun whenDomainIsDuckDuckGoThenReturnTrue() {
-        assertTrue(testee.isDuckDuckGoDomain("https://duckduckgo.com"))
+    fun whenIsDuckDuckEmailUrlGoThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoEmailUrl("https://duckduckgo.com/email"))
     }
 
     @Test
-    fun whenUrlContainsSubdomainAndIsFromDuckDuckGoDomainThenReturnTrue() {
-        assertTrue(testee.isDuckDuckGoDomain("https://test.duckduckgo.com"))
+    fun whenUrlContainsSubdomainAndIsFromDuckDuckGoEmailUrlThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoEmailUrl("https://test.duckduckgo.com/email"))
     }
 
     @Test
-    fun whenUrlHasNoSchemeAndIsFromDuckDuckGoDomainThenReturnsTrue() {
-        assertTrue(testee.isDuckDuckGoDomain("duckduckgo.com"))
+    fun whenUrlHasNoSchemeAndIsFromDuckDuckGoUrlThenReturnsTrue() {
+        assertTrue(testee.isDuckDuckGoEmailUrl("duckduckgo.com/email"))
     }
 }
