@@ -40,7 +40,7 @@ class EmailJavascriptInterfaceTest {
 
     @Before
     fun setup() {
-        testee = EmailJavascriptInterface(mockEmailManager, { counter++ }, mockWebView, DuckDuckGoUrlDetector(), coroutineRule.testDispatcherProvider)
+        testee = EmailJavascriptInterface(mockEmailManager, mockWebView, DuckDuckGoUrlDetector(), coroutineRule.testDispatcherProvider) { counter++ }
     }
 
     @Test

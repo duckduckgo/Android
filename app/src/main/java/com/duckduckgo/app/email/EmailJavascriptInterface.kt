@@ -24,10 +24,10 @@ import kotlinx.coroutines.runBlocking
 
 class EmailJavascriptInterface(
     private val emailManager: EmailManager,
-    private val showNativeTooltip: () -> Unit,
     private val webView: WebView,
     private val urlDetector: DuckDuckGoUrlDetector,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val showNativeTooltip: () -> Unit
 ) {
 
     private fun isUrlFromDuckDuckGoEmail(): Boolean {

@@ -35,7 +35,7 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
     private val javaScriptInjector = JavaScriptInjector()
 
     override fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit) {
-        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, onTooltipShown, webView, urlDetector, dispatcherProvider), JAVASCRIPT_INTERFACE_NAME)
+        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
