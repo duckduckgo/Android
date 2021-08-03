@@ -26,6 +26,7 @@ class AppUrl {
         const val ABOUT = "https://$HOST/about"
         const val TOSDR = "https://tosdr.org"
         const val PIXEL = "https://improving.duckduckgo.com"
+        const val EMAIL_SEGMENT = "email"
     }
 
     object ParamKey {

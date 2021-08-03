@@ -22,6 +22,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
@@ -30,11 +31,12 @@ import java.io.BufferedReader
 class EmailInjectorJsTest {
 
     private val mockEmailManager: EmailManager = mock()
+    private val mockDispatcherProvider: DispatcherProvider = mock()
     lateinit var testee: EmailInjectorJs
 
     @Before
     fun setup() {
-        testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector())
+        testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider)
     }
 
     @UiThreadTest
@@ -44,7 +46,7 @@ class EmailInjectorJsTest {
         val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
 
-        testee.injectEmailAutofillJs(webView, "https://duckduckgo.com")
+        testee.injectEmailAutofillJs(webView, "https://duckduckgo.com/email")
 
         verify(webView).evaluateJavascript(jsToEvaluate, null)
     }
@@ -56,7 +58,7 @@ class EmailInjectorJsTest {
         val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
 
-        testee.injectEmailAutofillJs(webView, "https://test.duckduckgo.com")
+        testee.injectEmailAutofillJs(webView, "https://test.duckduckgo.com/email")
 
         verify(webView).evaluateJavascript(jsToEvaluate, null)
     }

@@ -24,8 +24,9 @@ import javax.inject.Inject
 
 class DuckDuckGoUrlDetector @Inject constructor() {
 
-    fun isDuckDuckGoDomain(uri: String): Boolean {
-        return uri.toUri().baseHost?.contains(AppUrl.Url.HOST) ?: false
+    fun isDuckDuckGoEmailUrl(url: String): Boolean {
+        val uri = url.toUri()
+        return uri.baseHost?.contains(AppUrl.Url.HOST) == true && uri.pathSegments.contains(AppUrl.Url.EMAIL_SEGMENT)
     }
 
     fun isDuckDuckGoUrl(uri: String): Boolean {

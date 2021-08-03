@@ -16,36 +16,67 @@
 
 package com.duckduckgo.app.email
 
+import android.webkit.WebView
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class EmailJavascriptInterfaceTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val mockEmailManager: EmailManager = mock()
+    private val mockWebView: WebView = mock()
     lateinit var testee: EmailJavascriptInterface
     private var counter = 0
 
     @Before
     fun setup() {
-        testee = EmailJavascriptInterface(mockEmailManager) { counter++ }
+        testee = EmailJavascriptInterface(mockEmailManager, { counter++ }, mockWebView, DuckDuckGoUrlDetector(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenIsSignedInThenIsSignedInCalled() {
+    fun whenIsSignedInAndUrlIsDuckDuckGoEmailThenIsSignedInCalled() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+
         testee.isSignedIn()
 
         verify(mockEmailManager).isSignedIn()
     }
 
     @Test
-    fun whenStoreCredentialsThenStoreCredentialsCalledWithCorrectParameters() {
+    fun whenIsSignedInAndUrlIsNotDuckDuckGoEmailThenIsSignedInNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
+        testee.isSignedIn()
+
+        verify(mockEmailManager, never()).isSignedIn()
+    }
+
+    @Test
+    fun whenStoreCredentialsAndUrlIsDuckDuckGoEmailThenStoreCredentialsCalledWithCorrectParameters() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+
         testee.storeCredentials("token", "username", "cohort")
 
         verify(mockEmailManager).storeCredentials("token", "username", "cohort")
+    }
+
+    @Test
+    fun whenStoreCredentialsAndUrlIsNotDuckDuckGoEmailThenStoreCredentialsNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
+        testee.storeCredentials("token", "username", "cohort")
+
+        verify(mockEmailManager, never()).storeCredentials("token", "username", "cohort")
     }
 
     @Test
@@ -55,11 +86,8 @@ class EmailJavascriptInterfaceTest {
         assertEquals(1, counter)
     }
 
-    private fun givenAliasExists() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-    }
-
-    private fun givenAliasDoesNotExist() {
-        whenever(mockEmailManager.getAlias()).thenReturn("")
+    companion object {
+        const val DUCKDUCKGO_EMAIL_URL = "https://duckduckgo.com/email"
+        const val NON_EMAIL_URL = "https://example.com"
     }
 }
