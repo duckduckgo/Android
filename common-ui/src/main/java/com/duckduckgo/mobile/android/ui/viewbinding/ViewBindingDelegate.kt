@@ -25,20 +25,20 @@ import kotlin.reflect.KProperty
 inline fun <reified T : ViewBinding> ViewGroup.viewBinding() = ViewBindingDelegate(T::class.java, this)
 
 class ViewBindingDelegate<T : ViewBinding>(
-  bindingClass: Class<T>,
-  view: ViewGroup
+    bindingClass: Class<T>,
+    view: ViewGroup
 ) : ReadOnlyProperty<ViewGroup, T> {
-  private val binding: T = try {
-    val inflateMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java, ViewGroup::class.java, Boolean::class.javaPrimitiveType)
-    inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast<T>()
-  } catch (e: NoSuchMethodException) {
-    val inflateMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java, ViewGroup::class.java)
-    inflateMethod.invoke(null, LayoutInflater.from(view.context), view).cast<T>()
-  }
+    private val binding: T = try {
+        val inflateMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java, ViewGroup::class.java, Boolean::class.javaPrimitiveType)
+        inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast<T>()
+    } catch (e: NoSuchMethodException) {
+        val inflateMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java, ViewGroup::class.java)
+        inflateMethod.invoke(null, LayoutInflater.from(view.context), view).cast<T>()
+    }
 
-  override fun getValue(thisRef: ViewGroup, property: KProperty<*>): T {
-    return binding
-  }
+    override fun getValue(thisRef: ViewGroup, property: KProperty<*>): T {
+        return binding
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
