@@ -18,7 +18,7 @@
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
         <!--Material color attributes (dark theme) -->
-        <item name="colorPrimary">@color/cornflowerBlue</item>
+        <item name="colorPrimary">@color/defaultTextColor</item>
         <item name="colorPrimaryVariant">@color/cornflowerDark</item>
         <item name="colorSecondary">@color/cornflowerBlue</item>
         <item name="colorSecondaryVariant">@color/cornflowerDark</item>
