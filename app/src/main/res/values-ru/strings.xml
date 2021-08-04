@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Панель конфиденциальности</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">УРОВЕНЬ ЗАЩИТЫ ПОВЫШЕН С &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Рейтинг конфиденциальности</string>
+    <string name="privacyProtectionTemporarilyDisabled">Мы временно отключили функцию защиты конфиденциальности, так как она мешала работе сайта.</string>
 
     <string name="httpsGood">Зашифрованное соединение</string>
     <string name="httpsMixed">Соединение со смешанным шифрованием</string>
@@ -178,6 +179,8 @@
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
+    <string name="settingsEmailProtectionTitle">Защита электронной почты</string>
+    <string name="settingsEmailProtectionSubtitle">Блокировка почтовых трекеров и скрытие адреса</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -257,6 +260,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добавить на домашний экран</string>
+    <string name="shortcutAddedText">Готово! Мы добавили %1$s на ваш домашний экран.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Помогите нам улучшить приложение!</string>
@@ -570,4 +574,62 @@
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="disabled">Отключено</string>
     <string name="enabled">Включено</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Открывать ссылки в связанных приложениях</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Отключение этой функции не позволит ссылкам автоматически открываться в других приложениях.</string>
+    <string name="appLinkDialogTitle">Открыть в другом приложении?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Новый адрес скопирован в буфер обмена</string>
+    <string name="autofillTooltipUseYourAlias">Использовать %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Блокирует почтовые трекеры</string>
+    <string name="autofillTooltipGenerateAddress">Сгенерировать приватный адрес</string>
+    <string name="autofillTooltipGenerateAddressDescription">Блокирует почтовые трекеры и скрывает ваш адрес</string>
+    <string name="newEmailAliasMenuTitle">Создать адрес на Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Удалить защиту почты?</string>
+    <string name="emailSignOutDialogText">Внимание: снятие почтовой защиты на этом устройстве не ведет к удалению вашего адреса на Duck.</string>
+    <string name="emailSignOutDialogCancel">Отменить</string>
+    <string name="emailSignOutDialogDisable">Удалить</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Очередь на защиту почты</string>
+    <string name="waitlistNotificationTitle">Ваше приглашение воспользоваться защитой почты</string>
+    <string name="waitlistNotificationDescription">Ранее вы встали в очередь и попросили нас оповестить вас о возможности применить функцию защиты почты. Нажмите сюда, чтобы открыть наше приглашение!</string>
+
+    <string name="waitlistNotificationDialogDescription">Хотите получить уведомление, когда настанет ваша очередь?</string>
+    <string name="waitlistNotificationDialogNoThanks">НЕТ, СПАСИБО</string>
+    <string name="waitlistNotificationDialogNotifyMe">ОПОВЕСТИТЬ</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Защита почты (бета)</string>
+    <string name="emailProtectionActivityTitle">Защита почты (бета)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Мы не храним вашу электронную почту. <b><a href=\"\">Подробнее</a></b>...]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">При постановке в очередь произошла ошибка. Пожалуйста, повторите попытку позже.</string>
+    <string name="emailProtectionDuckAddressCta">У меня уже есть адрес на Duck</string>
+    <string name="emailProtectionInviteCodeCta">У меня есть пригласительный код</string>
+    <string name="emailProtectionWaitlistCta">Приглашаем встать в очередь</string>
+    <string name="emailProtectionGetStartedCta">Приступим!</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Надежная защита почты и ничего лишнего.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Оказывается, чтобы избавиться от трекеров и скрыть свой адрес,<br/>вовсе не нужно менять почтовый сервис. <a href=\"\"><b>Подробнее</b></a>...]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Теперь вы в списке!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Мы отправим вам уведомление, когда<br/> защита почты будет доступна и вам. <a href=\"\"><b>Подробнее</b></a>...]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Когда настанет время, ваше приглашение появится здесь. Хотите также <a href=\"\"><b>получить уведомление</b></a>?<br/><a href=\"\"><b>Подробнее</b></a> о защите почты...]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Приглашение</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Оказывается, чтобы избавиться от трекеров и скрыть свой адрес,<br/>вовсе не нужно менять почтовый сервис. <a href=\"\"><b>Подробнее</b></a>...]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Личный адрес на Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Снятие почтовой защиты на данном устройстве лишит вас возможности вносить свой личный адрес на Duck или свежесгенерированный приватный Duck-адрес в поле для электронной почты при посещении сайтов.<br/><br/>Если вы хотите полностью удалить свои Duck-адреса, задать нам вопрос или отправить отзывы и предложения, пишите нам: <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Удалить с этого устройства</string>
 </resources>

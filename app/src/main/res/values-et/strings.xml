@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
+    <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>
 
     <string name="httpsGood">Krüptitud ühendus</string>
     <string name="httpsMixed">Erinevate krüpteeringutega ühendus</string>
@@ -170,6 +171,8 @@
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
+    <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
+    <string name="settingsEmailProtectionSubtitle">Blokeerige e-posti jälgijad ja peitke oma aadress.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -249,6 +252,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisa avalehele</string>
+    <string name="shortcutAddedText">Õnnestus! %1$s lisati teie avaekraanile.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidake meil rakendust täiustada!</string>
@@ -558,4 +562,62 @@
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="disabled">Keelatud</string>
     <string name="enabled">Lubatud</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Ava lingid seotud rakendustes</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Keela, et takistada linkide automaatset avanemist teistes installitud rakendustes.</string>
+    <string name="appLinkDialogTitle">Avada teises rakenduses?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
+    <string name="autofillTooltipUseYourAlias">Kasutage %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokeerib e-posti jälgijad</string>
+    <string name="autofillTooltipGenerateAddress">Looge privaatne aadress</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
+    <string name="newEmailAliasMenuTitle">Looge Ducki aadress</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Kas eemaldada e-posti kaitsed?</string>
+    <string name="emailSignOutDialogText">Märkus. E-posti kaitsete eemaldamine sellest seadmest ei kustuta teie Ducki aadressi.</string>
+    <string name="emailSignOutDialogCancel">Tühista</string>
+    <string name="emailSignOutDialogDisable">Eemaldage</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-posti järjekord</string>
+    <string name="waitlistNotificationTitle">Teie e-posti kaitse kutse on siin!</string>
+    <string name="waitlistNotificationDescription">Liitusite ootenimekirjaga ja palusite meid teavitada, kui on teie kord proovida meie e-posti kaitse funktsiooni. Kutse vaatamiseks puudutage.</string>
+
+    <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
+    <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>
+    <string name="waitlistNotificationDialogNotifyMe">TEAVITAGE MIND</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-posti kaitse (beeta)</string>
+    <string name="emailProtectionActivityTitle">E-posti kaitse (beeta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Me ei salvesta teie e-kirju. <b><a href=\"\">Lisateave</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Ooteloendiga liitumisel tekkis tõrge, proovige hiljem uuesti</string>
+    <string name="emailProtectionDuckAddressCta">Mul on juba Ducki aadress</string>
+    <string name="emailProtectionInviteCodeCta">Mul on kutse kood</string>
+    <string name="emailProtectionWaitlistCta">Liituge privaatse ootenimekirjaga</string>
+    <string name="emailProtectionGetStartedCta">Alustage</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-posti privaatsus, lihtsustatud.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress<br/> ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Olete nimekirjas!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Saadame teile teate, kui<br/> E-posti kaitse on teie jaoks valmis. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Teie kutse kuvatakse siin, kui oleme teie jaoks valmis. Kas soovite <a href=\"\"><b>saada teavitust</b></a> selle saabumise kohta?<br/><a href=\"\"><b>Lisateave</b></a> e-posti kaitse kohta.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Olete kutsutud!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress<br/> ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Isiklik Ducki aadress</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[E-posti kaitse eemaldamine sellest seadmest eemaldab veebis sirvimise ajal võimaluse sisestada oma isiklik Ducki aadress või äsja loodud isiklik Ducki aadress e-posti väljadele.<br/><br/>Oma Ducki aadresside täielikuks kustutamiseks või muude küsimuste või tagasiside saamiseks pöörduge meie poole aadressil <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Eemaldage seadmest</string>
 </resources>

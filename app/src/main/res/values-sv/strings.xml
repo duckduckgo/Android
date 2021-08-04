@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Sekretesspanel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FÖRBÄTTRAD FRÅN &lt;img src=\"%1$d\" /&gt; TILL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Sekretessklass</string>
+    <string name="privacyProtectionTemporarilyDisabled">Vi har tillfälligt inaktiverat integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
 
     <string name="httpsGood">Krypterad anslutning</string>
     <string name="httpsMixed">Blandad krypteringsanslutning</string>
@@ -170,6 +171,8 @@
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
+    <string name="settingsEmailProtectionTitle">E-postskydd</string>
+    <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
@@ -249,6 +252,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lägg till Start</string>
+    <string name="shortcutAddedText">Klart! %1$s har lagts till på din startsida.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hjälp oss förbättra appen!</string>
@@ -558,4 +562,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Inaktiverad</string>
     <string name="enabled">Aktiverad</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Öppna länkar i associerade appar</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Inaktivera för att förhindra att länkar automatiskt öppnas i andra installerade appar.</string>
+    <string name="appLinkDialogTitle">Öppna i en annan app?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Ny adress har kopierats till Urklipp</string>
+    <string name="autofillTooltipUseYourAlias">Använd %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blockerar e-postspårare</string>
+    <string name="autofillTooltipGenerateAddress">Skapa en privat adress</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blockerar e-postspårare och döljer din adress</string>
+    <string name="newEmailAliasMenuTitle">Skapa en Duck-adress</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Ta bort e-postskydd?</string>
+    <string name="emailSignOutDialogText">Obs: Att ta bort e-postskydd från denna enhet kommer inte att ta bort din Duck-adress.</string>
+    <string name="emailSignOutDialogCancel">Avbryt</string>
+    <string name="emailSignOutDialogDisable">Ta bort</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Väntelista för e-post</string>
+    <string name="waitlistNotificationTitle">Din inbjudan till e-postskydd har kommit!</string>
+    <string name="waitlistNotificationDescription">Du ställde dig i väntelistan och bad oss meddela när det har blivit din tur att testa funktionen e-postskydd. Tryck för att visa din inbjudan.</string>
+
+    <string name="waitlistNotificationDialogDescription">Vill du att vi ska skicka ett meddelande när det är din tur?</string>
+    <string name="waitlistNotificationDialogNoThanks">NEJ TACK</string>
+    <string name="waitlistNotificationDialogNotifyMe">MEDDELA MIG</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-postskydd (beta)</string>
+    <string name="emailProtectionActivityTitle">E-postskydd (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Vi sparar inte dina e-postmeddelanden. <b><a href=\"\">Mer information</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Det inträffade ett fel när du gick med i väntelistan. Försök igen senare.</string>
+    <string name="emailProtectionDuckAddressCta">Jag har redan en Duck-adress</string>
+    <string name="emailProtectionInviteCodeCta">Jag har en inbjudningskod</string>
+    <string name="emailProtectionWaitlistCta">Ställ dig i den privata väntelistan</string>
+    <string name="emailProtectionGetStartedCta">Kom igång</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Enklare E-postintegritet.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress<br/>utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Du står på listan!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=\"\"><b>få ett meddelande</b></a> när den kommer?<br/><a href=\"\"><b>Mer information</b></a> om e-postskydd.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Du är inbjuden!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress<br/>utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Personlig Duck-adress</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Om du tar bort e-postskyddet från denna enhet försvinner möjligheten att fylla i din personliga Duck-adress, eller en nyskapad Duck-adress, till e-postfält när du surfar på webben.<br/><br/>Om du vill radera din Duck-adress helt eller om du har andra frågor eller synpunkter ber vi dig kontakta oss på <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Ta bort från enhet</string>
 </resources>

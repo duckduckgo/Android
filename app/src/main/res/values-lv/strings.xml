@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
+    <string name="privacyProtectionTemporarilyDisabled">Mēs īslaicīgi atspējojām privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
 
     <string name="httpsGood">Šifrēts savienojums</string>
     <string name="httpsMixed">Jaukts šifrēšanas savienojums</string>
@@ -174,6 +175,8 @@
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
+    <string name="settingsEmailProtectionTitle">E-pasta aizsardzība</string>
+    <string name="settingsEmailProtectionSubtitle">Bloķēt e-pasta izsekotājus un paslēpt savu adresi.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -253,6 +256,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pievienot sākumam</string>
+    <string name="shortcutAddedText">Izdevās! %1$s ir pievienots tavam sākuma ekrānam.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Palīdzi mums uzlabot lietotni!</string>
@@ -564,4 +568,62 @@
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
     <string name="disabled">Atspējots</string>
     <string name="enabled">Iespējots</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Atvērt saites saistītajās lietotnēs</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Atspējo, lai novērstu saišu automātisku atvēršanu citās instalētajās lietotnēs.</string>
+    <string name="appLinkDialogTitle">Vai atvērt citā lietotnē?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Jaunā adrese tika iekopēta tavā starpliktuvē</string>
+    <string name="autofillTooltipUseYourAlias">Izmantot %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Bloķēt e-pasta izsekotājus</string>
+    <string name="autofillTooltipGenerateAddress">Ģenerēt privātu adresi</string>
+    <string name="autofillTooltipGenerateAddressDescription">Bloķē e-pasta izsekotājus un paslēpj tavu adresi</string>
+    <string name="newEmailAliasMenuTitle">Izveidot Duck adresi</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Vai noņemt e-pasta aizsardzību?</string>
+    <string name="emailSignOutDialogText">Piezīme: noņemot e-pasta aizsardzību no šīs ierīces, tava Duck adrese netiks dzēsta.</string>
+    <string name="emailSignOutDialogCancel">Atcelt</string>
+    <string name="emailSignOutDialogDisable">Noņemt</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-pasta nogaides saraksts</string>
+    <string name="waitlistNotificationTitle">Tavs uzaicinājums izmantot e-pasta aizsardzības funkciju ir šeit!</string>
+    <string name="waitlistNotificationDescription">Tu pievienojies nogaides sarakstam un lūdzi mūs informēt, kad pienāks tava kārta izmēģināt mūsu e-pasta aizsardzības funkciju. Pieskaries, lai skatītu savu uzaicinājumu.</string>
+
+    <string name="waitlistNotificationDialogDescription">Vai vēlies, lai mēs nosūtām tev paziņojumu, kad pienāks tava kārta?</string>
+    <string name="waitlistNotificationDialogNoThanks">NĒ, PALDIES</string>
+    <string name="waitlistNotificationDialogNotifyMe">INFORMĒT MANI</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-pasta aizsardzība (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-pasta aizsardzība (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Mēs nesaglabājam tavas e-pasta vēstules. <b><a href=\"\">Uzzini vairāk</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Radās kļūda, pievienojoties nogaides sarakstam. Lūdzu, mēģini vēlāk vēlreiz.</string>
+    <string name="emailProtectionDuckAddressCta">Man jau ir Duck adrese</string>
+    <string name="emailProtectionInviteCodeCta">Man ir uzaicinājuma kods</string>
+    <string name="emailProtectionWaitlistCta">Pievienojies privātajam nogaides sarakstam</string>
+    <string name="emailProtectionGetStartedCta">Sākt darbu</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-pasta konfidencialitāte, vienkāršota.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/> nemainot e-pasta pakalpojumu sniedzēju. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Tu esi sarakstā!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=\"\"><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=\"\"><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Tu esi uzaicināts(-ta)!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/> nemainot e-pasta pakalpojumu sniedzēju. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Personīgā Duck adrese</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Noņemot e-pasta aizsardzību no šīs ierīces, tīmekļa pārlūkošanas laikā tiek noņemta iespēja e-pasta laukos ievadīt tavu personisko Duck adresi vai tikko ģenerēto privāto Duck adresi.<br/><br/>Lai pilnībā dzēstu savas Duck adreses vai gadījumā, ja tev ir kādi citi jautājumi vai atsauksmes, sazinies ar mums pa e-pastu <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Noņemt no ierīces</string>
 </resources>

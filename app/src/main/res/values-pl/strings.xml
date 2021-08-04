@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ULEPSZONY Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
+    <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
 
     <string name="httpsGood">Połączenie zaszyfrowane</string>
     <string name="httpsMixed">Połączenie częściowo zaszyfrowane</string>
@@ -178,6 +179,8 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Wersja</string>
     <string name="leaveFeedback">Podziel się opinią</string>
+    <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
+    <string name="settingsEmailProtectionSubtitle">Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -257,6 +260,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj do ekranu głównego</string>
+    <string name="shortcutAddedText">Sukces! %1$s został dodany do Twojego ekranu głównego.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomóż nam usprawnić aplikację!</string>
@@ -570,4 +574,62 @@
     <string name="globalPrivacyControlToggle">Globalna Kontrola Prywatności (GPC)</string>
     <string name="disabled">Wyłączone</string>
     <string name="enabled">Włączone</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Otwieraj łącza w powiązanych aplikacjach</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Wyłącz, aby uniemożliwić automatyczne otwieranie łączy w innych zainstalowanych aplikacjach.</string>
+    <string name="appLinkDialogTitle">Otworzyć w innej aplikacji?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Nowy adres skopiowany do schowka</string>
+    <string name="autofillTooltipUseYourAlias">Użyj %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokuje skrypty śledzące pocztę e-mail</string>
+    <string name="autofillTooltipGenerateAddress">Wygeneruj adres prywatny</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokuje skrypty śledzące wiadomości e-mail i ukrywa Twój adres e-mail</string>
+    <string name="newEmailAliasMenuTitle">Utwórz adres Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Usunąć ochronę poczty e-mail?</string>
+    <string name="emailSignOutDialogText">Uwaga: usunięcie ochrony poczty e-mail z tego urządzenia nie spowoduje usunięcia Twojego adresu Duck.</string>
+    <string name="emailSignOutDialogCancel">Anuluj</string>
+    <string name="emailSignOutDialogDisable">Usuń</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Lista oczekujących na ochronę poczty e-mail</string>
+    <string name="waitlistNotificationTitle">Twoje zaproszenie do ochrony poczty e-mail jest gotowe!</string>
+    <string name="waitlistNotificationDescription">Jesteś już na liście oczekujących i powiadomimy Cię, gdy nadejdzie Twoja kolej na wypróbowanie funkcji ochrony poczty e-mail. Dotknij, aby wyświetlić swoje zaproszenie.</string>
+
+    <string name="waitlistNotificationDialogDescription">Czy chcesz, abyśmy wysłali Ci powiadomienie, gdy nadejdzie Twoja kolej?</string>
+    <string name="waitlistNotificationDialogNoThanks">NIE, DZIĘKUJĘ</string>
+    <string name="waitlistNotificationDialogNotifyMe">POWIADOM MNIE</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
+    <string name="emailProtectionActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Nie zapisujemy Twoich wiadomości e-mail. <b><a href=\"\">Dowiedz się więcej</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Wystąpił błąd podczas dołączania do listy oczekujących, spróbuj ponownie później</string>
+    <string name="emailProtectionDuckAddressCta">Mam już adres Duck</string>
+    <string name="emailProtectionInviteCodeCta">Mam kod zaproszenia</string>
+    <string name="emailProtectionWaitlistCta">Dołącz do prywatnej listy oczekujących</string>
+    <string name="emailProtectionGetStartedCta">Rozpocznij</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Uproszczona prywatność poczty e-mail.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres<br/>bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Jesteś na liście!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Wyślemy Ci powiadomienie, gdy<br/> ochrona poczty e-mail będzie gotowa. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Twoje zaproszenie pojawi się tutaj, gdy będzie już gotowe. Chcesz <a href=\"\"><b>otrzymać powiadomienie</b></a>, gdy będzie gotowe?<br/><a href=\"\"><b>Dowiedz się więcej</b></a> o ochronie poczty e-mail.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Masz już zaproszenie!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres<br/>bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Osobisty adres Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Usunięcie ochrony poczty e-mail z tego urządzenia usuwa opcję wpisywania osobistego adresu Duck lub nowo wygenerowanego prywatnego adresu Duck w polach adresu e-mail podczas przeglądania sieci.<br/><br/>Aby całkowicie usunąć swoje adresy Duck bądź przesłać jakiekolwiek pytania lub opinie, skontaktuj się z nami pod adresem <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Usuń z urządzenia</string>
 </resources>

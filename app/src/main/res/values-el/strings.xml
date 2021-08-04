@@ -107,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Πίνακας εργαλείων ιδιωτικότητας</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ΒΕΛΤΙΩΘΗΚΕ ΑΠΟ &lt;img src=\"%1$d\" /&gt; ΣΕ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Βαθμολογία ιδιωτικότητας</string>
+    <string name="privacyProtectionTemporarilyDisabled">Απενεργοποιήσαμε προσωρινά την Προστασία προσωπικών δεδομένων καθώς φαίνεται ότι ρίχνει τον ιστότοπο.</string>
 
     <string name="httpsGood">Κρυπτογραφημένη σύνδεση</string>
     <string name="httpsMixed">Σύνδεση μεικτής κρυπτογράφησης</string>
@@ -170,6 +171,8 @@
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
+    <string name="settingsEmailProtectionTitle">Προστασία email</string>
+    <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -249,6 +252,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Προσθήκη στην αρχική σελίδα</string>
+    <string name="shortcutAddedText">Επιτυχία! Το %1$s έχει προστεθεί στην αρχική οθόνη σας.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Βοηθήστε μας να βελτιώσουμε την εφαρμογή!</string>
@@ -558,4 +562,62 @@
     <string name="globalPrivacyControlToggle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="disabled">Απενεργοποιήθηκε</string>
     <string name="enabled">Ενεργοποιήθηκε</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Ανοίξτε τους συνδέσμους στις σχετικές εφαρμογές</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Απενεργοποιήστε για να αποτρέψετε το αυτόματο άνοιγμα συνδέσμων σε άλλες εγκατεστημένες εφαρμογές.</string>
+    <string name="appLinkDialogTitle">Άνοιγμα σε άλλη εφαρμογή;</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
+    <string name="autofillTooltipUseYourAlias">Χρησιμοποιήστε τη διεύθυνση %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Αποκλείει τις εφαρμογές παρακολούθησης email</string>
+    <string name="autofillTooltipGenerateAddress">Δημιουργία ιδιωτικής διεύθυνσης</string>
+    <string name="autofillTooltipGenerateAddressDescription">Αποκλείει εφαρμογές παρακολούθησης email και αποκρύπτει τη διεύθυνσή σας</string>
+    <string name="newEmailAliasMenuTitle">Δημιουργία Διεύθυνσης Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Αφαίρεση προστασίας email;</string>
+    <string name="emailSignOutDialogText">Σημείωση: Η αφαίρεση της προστασίας email από τη συσκευή αυτή δεν θα διαγράψει τη Διεύθυνση Duck που διαθέτετε.</string>
+    <string name="emailSignOutDialogCancel">Ακύρωση</string>
+    <string name="emailSignOutDialogDisable">Αφαίρεση</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Λίστα αναμονής email</string>
+    <string name="waitlistNotificationTitle">Η πρόσκλησή σας για προστασία των email είναι εδώ!</string>
+    <string name="waitlistNotificationDescription">Εγγραφήκατε στη λίστα αναμονής και μας ζητήσατε να σας ενημερώσουμε για το πότε θα είναι η σειρά σας να δοκιμάσετε τη λειτουργία μας Προστασία email. Πατήστε για να δείτε την πρόσκλησή σας.</string>
+
+    <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>
+    <string name="waitlistNotificationDialogNoThanks">ΟΧΙ, ΕΥΧΑΡΙΣΤΩ</string>
+    <string name="waitlistNotificationDialogNotifyMe">ΝΑ ΕΙΔΟΠΟΙΗΘΩ</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Προστασία Email (Beta)</string>
+    <string name="emailProtectionActivityTitle">Προστασία Email (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Δεν αποθηκεύουμε τα email σας. <b><a href=\"\">Μάθετε περισσότερα</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Προέκυψε σφάλμα κατά την εγγραφή στη Λίστα αναμονής. Ξαναπροσπαθήστε αργότερα.</string>
+    <string name="emailProtectionDuckAddressCta">Διαθέτω ήδη Διεύθυνση Duck</string>
+    <string name="emailProtectionInviteCodeCta">Διαθέτω Κωδικό πρόσκλησης</string>
+    <string name="emailProtectionWaitlistCta">Εγγραφείτε στην Ιδιωτική λίστα αναμονής</string>
+    <string name="emailProtectionGetStartedCta">Ξεκινήστε</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Ιδιωτικότητα email, απλοποιημένη.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας,<br/>χωρίς να αλλάξετε πάροχο email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Είστε στη λίστα!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Θα σας στείλουμε ειδοποίηση όταν<br/> θα είναι έτοιμη για σας η Προστασία email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Η πρόσκλησή σας θα εμφανιστεί εδώ όταν θα είναι έτοιμη για σας. Θέλετε να <a href=\"\"><b>λάβετε ειδοποίηση</b></a> μόλις φτάσει;<br/><a href=\"\"><b>Μάθετε περισσότερα</b></a> σχετικά με την Προστασία email.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Έχετε προσκληθεί!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας,<br/>χωρίς να αλλάξετε πάροχο email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Προσωπική διεύθυνση Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Αφαιρώντας την Προστασία email από τη συσκευή αυτή καταργείται η επιλογή συμπλήρωσης της Προσωπικής διεύθυνσης Duck που διαθέτετε ή μιας Ιδιωτικής διεύθυνσης Duck που δημιουργήθηκε πρόσφατα στα πεδία email καθώς περιηγείστε στο διαδίκτυο.<br/><br/>Για να διαγράψετε εντελώς τις Διευθύνσεις Duck που διαθέτετε ή για οποιεσδήποτε άλλες ερωτήσεις ή σχόλια, επικοινωνήστε μαζί μας στο <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Αφαίρεση από τη συσκευή</string>
 </resources>

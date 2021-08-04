@@ -91,6 +91,7 @@
     <string name="privacyDashboardActivityTitle">Табло за управление на поверителността</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ПОДОБРЕН ОТ &lt;img src=\"%1$d\" /&gt; ДО &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Клас на поверителност</string>
+    <string name="privacyProtectionTemporarilyDisabled">Деактивирахме временно защитата на поверителността, защото изглежда, че пречи на зареждането на този сайт.</string>
 
     <string name="httpsGood">Шифрована връзка</string>
     <string name="httpsMixed">Смесена връзка за шифроване</string>
@@ -154,6 +155,8 @@
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Споделяне на отзив</string>
+    <string name="settingsEmailProtectionTitle">Защита на имейл</string>
+    <string name="settingsEmailProtectionSubtitle">Блокирайте имейл тракерите и скрийте своя адрес.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
@@ -233,6 +236,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Добави към Начало</string>
+    <string name="shortcutAddedText">Готово! %1$s е добавен към началния екран.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Помогнете ни да подобрим приложението!</string>
@@ -542,4 +546,62 @@
     <string name="globalPrivacyControlToggle">Глобален контрол на поверителността (GPC)</string>
     <string name="disabled">Деактивирано</string>
     <string name="enabled">Активирано</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Отваряне на връзките в свързаните приложения</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Деактивирайте, за да предотвратите автоматично отваряне на връзки в други инсталирани приложения.</string>
+    <string name="appLinkDialogTitle">Отваряне в друго приложение?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Новият адрес е копиран в клипборда</string>
+    <string name="autofillTooltipUseYourAlias">Използване на %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Блокира имейл тракери</string>
+    <string name="autofillTooltipGenerateAddress">Генериране на личен адрес</string>
+    <string name="autofillTooltipGenerateAddressDescription">Блокира имейл тракерите и скрива Вашия адрес</string>
+    <string name="newEmailAliasMenuTitle">Създаване на Duck адрес</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Да се премахне ли защитата на имейла?</string>
+    <string name="emailSignOutDialogText">Забележка: При премахване на защитата на имейла от устройството, Вашият Duck адрес няма да бъде изтрит.</string>
+    <string name="emailSignOutDialogCancel">Отмени</string>
+    <string name="emailSignOutDialogDisable">Премахване</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Списък с чакащи за имейл</string>
+    <string name="waitlistNotificationTitle">Вашата покана за защита на имейл пристигна!</string>
+    <string name="waitlistNotificationDescription">Присъединихте се към списъка с чакащи и поискахте да Ви уведомим, когато дойде Вашият ред да включите нашата функция за защита на имейл. Докоснете, за да видите поканата.</string>
+
+    <string name="waitlistNotificationDialogDescription">Искате ли да Ви изпратим известие, когато дойде Вашият ред?</string>
+    <string name="waitlistNotificationDialogNoThanks">НЕ, БЛАГОДАРЯ</string>
+    <string name="waitlistNotificationDialogNotifyMe">УВЕДОМЕТЕ МЕ</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Защита на имейл (Бета версия)</string>
+    <string name="emailProtectionActivityTitle">Защита на имейл (Бета версия)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Ние не запазваме Вашите имейли. <b><a href=\"\">Научете повече</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Възникна грешка при включване в списъка с чакащи, моля, опитайте отново по-късно</string>
+    <string name="emailProtectionDuckAddressCta">Вече имам Duck адрес</string>
+    <string name="emailProtectionInviteCodeCta">Имам код за покана</string>
+    <string name="emailProtectionWaitlistCta">Включване в списък с чакащи за личен адрес</string>
+    <string name="emailProtectionGetStartedCta">Първи стъпки</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Поверителност на имейла с две думи.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Вече сте в списъка!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=\"\"><b>получите известие</b></a>, когато пристигне?<br/><a href=\"\"><b>Научете повече</b></a> за защитата на имейли.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Получихте покана!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Личен Duck адрес</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Когато защитата на имейли бъде премахната от това устройство, ще бъде премахната и опцията за попълване на Вашия личен Duck адрес или генериран нов личен Duck адрес в полетата за имейл при сърфиране в мрежата.<br/><br/>Ако искате да изтриете напълно своите Duck адреси или имате други въпроси или мнения, свържете се с нас на <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Премахване от устройството</string>
 </resources>
