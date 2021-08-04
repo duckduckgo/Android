@@ -841,7 +841,7 @@ class BrowserTabFragment :
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
-        val urlIntent = Intent.parseUri(url, URI_NO_FLAG)
+        val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
         val chooserIntent = Intent.createChooser(urlIntent, title)
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
         return chooserIntent

@@ -28,7 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-// import dagger.android.AndroidInjection
+import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 abstract class DuckDuckGoActivity : AppCompatActivity() {
