@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 
     implementation project(path: ':di')
+    implementation project(path: ':common')
 
     implementation Google.dagger
 
