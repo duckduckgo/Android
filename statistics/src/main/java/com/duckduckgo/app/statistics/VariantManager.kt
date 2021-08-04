@@ -41,6 +41,8 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "gx", weight = 0.1, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "gy", weight = 0.1, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
         )
 
         val REFERRER_VARIANTS = listOf(
