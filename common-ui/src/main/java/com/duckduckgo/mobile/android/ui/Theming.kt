@@ -81,4 +81,3 @@ fun AppCompatActivity.sendThemeChangedBroadcast() {
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     manager.sendBroadcast(Intent(BROADCAST_THEME_CHANGED))
 }
-
