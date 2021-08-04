@@ -71,7 +71,9 @@
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
+    <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
+    <attr name="quickAccessItemTitleTextColor" format="color" />
 
     <attr name="textAppearanceButton1" format="reference" />
     <attr name="textAppearanceButton2" format="reference" />

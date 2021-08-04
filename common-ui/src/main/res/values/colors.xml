@@ -72,6 +72,9 @@
 
     <color name="marketing_red">#CE2929</color>
 
+    <color name="brickOrange">#d03a10</color>
+    <color name="red50">#DE5833</color>
+
     <color name="powderBlue">#50bfff</color>
     <color name="warmBlue">#3f66d5</color>
     <color name="cornflowerBlue">#678fff</color>
@@ -113,14 +116,14 @@
     <color name="light_blue">#F2F5F9</color>
     <color name="yellow_10">#FFF2BF</color>
 
-    <!-- Widget colors -->
-    <color name="favoriteTitleTextColor">@color/white</color>
-    <color name="favoriteFaviconBackgroundColor">@color/almostBlackDark</color>
-    <color name="searchWidgetBackgroundColor">@color/newBlack</color>
-    <color name="searchWidgetSearchBarBackgroundColor">@color/almostBlack</color>
-    <color name="searchWidgetSearchBarHintColor">@color/white</color>
-    <color name="searchWidgetSearchBarLoupeColor">@color/white</color>
-
     <color name="defaultTextColor">@color/white</color>
 
+    <!-- widget day/night -->
+    <color name="favoriteTitleTextColor">@color/brownishGrayTwo</color>
+    <color name="favoriteFaviconBackgroundColor">@color/whiteFive</color>
+    <color name="searchWidgetBackgroundColor">@color/white</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/whiteFour</color>
+    <color name="searchWidgetSearchBarHintColor">@color/brownishGrayTwo</color>
+    <color name="searchWidgetSearchBarLoupeColor">@color/almostBlack</color>
+>>>>>>> develop
 </resources>

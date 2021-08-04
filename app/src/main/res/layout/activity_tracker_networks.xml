@@ -20,8 +20,12 @@
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.privacy.ui.TrackerNetworksActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_tracker_networks" />
+    <include
+        android:id="@+id/contentTrackerNetworks"
+        layout="@layout/content_tracker_networks" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

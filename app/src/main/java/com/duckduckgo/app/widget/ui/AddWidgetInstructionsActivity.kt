@@ -20,28 +20,33 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityAddWidgetInstructionsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
+    private val binding: ActivityAddWidgetInstructionsBinding by viewBinding()
+
     private val viewModel: AddWidgetInstructionsViewModel by bindViewModel()
+
+    private val instructionsButtons
+        get() = binding.includeAddWidgetInstructionButtons
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_widget_instructions)
+        setContentView(binding.root)
         configureListeners()
         configureCommandObserver()
     }
 
     private fun configureListeners() {
-        homeButton.setOnClickListener {
+        instructionsButtons.homeButton.setOnClickListener {
             viewModel.onShowHomePressed()
         }
-        closeButton.setOnClickListener {
+        instructionsButtons.closeButton.setOnClickListener {
             viewModel.onClosePressed()
         }
     }

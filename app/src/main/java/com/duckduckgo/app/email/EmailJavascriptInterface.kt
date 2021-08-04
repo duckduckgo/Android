@@ -17,35 +17,40 @@
 package com.duckduckgo.app.email
 
 import android.webkit.JavascriptInterface
-import timber.log.Timber
+import android.webkit.WebView
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.runBlocking
 
 class EmailJavascriptInterface(
     private val emailManager: EmailManager,
+    private val webView: WebView,
+    private val urlDetector: DuckDuckGoUrlDetector,
+    private val dispatcherProvider: DispatcherProvider,
     private val showNativeTooltip: () -> Unit
 ) {
 
-    @JavascriptInterface
-    fun log(message: String) {
-        Timber.i("EmailInterface $message")
-    }
-
-    @JavascriptInterface
-    fun getAlias(): String {
-        val nextAlias = emailManager.getAlias()
-
-        return if (nextAlias.isNullOrBlank()) {
-            ""
-        } else {
-            "{\"nextAlias\": \"$nextAlias\"}"
+    private fun isUrlFromDuckDuckGoEmail(): Boolean {
+        return runBlocking(dispatcherProvider.main()) {
+            val url = webView.url
+            (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
         }
     }
 
     @JavascriptInterface
-    fun isSignedIn(): String = emailManager.isSignedIn().toString()
+    fun isSignedIn(): String {
+        return if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.isSignedIn().toString()
+        } else {
+            ""
+        }
+    }
 
     @JavascriptInterface
-    fun storeCredentials(token: String, username: String) {
-        emailManager.storeCredentials(token, username)
+    fun storeCredentials(token: String, username: String, cohort: String) {
+        if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.storeCredentials(token, username, cohort)
+        }
     }
 
     @JavascriptInterface

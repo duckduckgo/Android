@@ -20,7 +20,7 @@
     <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserMaybeLater">Belki Sonra</string>
     <string name="defaultBrowserLetsDoIt">Varsayılan tarayıcı olarak ayarla</string>
-    <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla bağlantıları açın.</string>
     <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
     <!-- Browser Activity -->
@@ -29,7 +29,7 @@
     <string name="back">Geri</string>
     <string name="forward">İleri</string>
 
-    <string name="omnibarInputHint">URL\'yi arayın veya bir URL yazın</string>
+    <string name="omnibarInputHint">Ara ya da URL girin</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>

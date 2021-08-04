@@ -173,7 +173,9 @@
                 tools:itemCount="4"
                 tools:listitem="@layout/item_device_app_suggestion" />
 
-            <include layout="@layout/include_system_search_onboarding" />
+            <include
+                android:id="@+id/includeSystemSearchOnboarding"
+                layout="@layout/include_system_search_onboarding" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

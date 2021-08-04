@@ -20,9 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_onboarding.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OnboardingActivity : DuckDuckGoActivity() {
 
@@ -30,9 +30,14 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     private val viewModel: OnboardingViewModel by bindViewModel()
 
+    private val binding: ActivityOnboardingBinding by viewBinding()
+
+    private val viewPager
+        get() = binding.viewPager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding)
+        setContentView(binding.root)
         configurePager()
     }
 

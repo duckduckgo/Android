@@ -25,7 +25,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityFeedbackBinding
+import com.duckduckgo.app.browser.databinding.ActivityFragmentWithToolbarBinding
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.*
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
@@ -35,6 +35,7 @@ import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedba
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
 class FeedbackActivity :
@@ -48,14 +49,13 @@ class FeedbackActivity :
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
-    private lateinit var binding: ActivityFeedbackBinding
+    private val binding: ActivityFragmentWithToolbarBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFeedbackBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()
