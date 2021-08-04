@@ -42,6 +42,7 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
+        <item name="secondaryTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
         <item name="toolbarBgColor">@color/newBlack</item>
@@ -136,6 +137,7 @@
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
+        <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="toolbarIconColor">@color/almostBlackDark</item>
         <item name="toolbarTextColor">@color/almostBlackDark</item>
         <item name="toolbarBgColor">@color/white</item>

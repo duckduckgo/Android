@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import dagger.android.AndroidInjection
+// import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 abstract class DuckDuckGoActivity : AppCompatActivity() {
@@ -57,7 +57,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     }
 
     protected fun daggerInject() {
-        AndroidInjection.inject(this)
+        // AndroidInjection.inject(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -80,7 +80,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     fun setupToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationIcon(R.drawable.ic_back)
+        toolbar.setNavigationIcon(R.drawable.ic_back_24)
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
