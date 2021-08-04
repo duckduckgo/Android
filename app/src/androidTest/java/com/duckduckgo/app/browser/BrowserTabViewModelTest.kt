@@ -44,7 +44,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
-import com.duckduckgo.app.browser.BrowserTabViewModel.FireButton
+import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -88,7 +88,6 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -101,8 +100,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -221,9 +218,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -249,9 +243,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
-
-    @Mock
-    private lateinit var mockNotificationDao: NotificationDao
 
     @Mock
     private lateinit var mockFileDownloader: FileDownloader
@@ -342,7 +333,6 @@ class BrowserTabViewModelTest {
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
@@ -382,8 +372,6 @@ class BrowserTabViewModelTest {
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
-            notificationDao = mockNotificationDao,
-            variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
             globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
@@ -394,7 +382,7 @@ class BrowserTabViewModelTest {
             temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao
         )
 
-        testee.loadData("abc", null, false)
+        testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -516,21 +504,21 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
         loadUrl("www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canAddBookmarks)
-        assertTrue(browserViewState().canAddFavorite)
+        assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
     fun whenBrowsingAndNoUrlThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl(null, isBrowserShowing = true)
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
     fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl("www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -985,31 +973,31 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenFireButtonIsShown() {
-        assertTrue(browserViewState().fireButton is FireButton.Visible)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is FireButton.Visible)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is FireButton.Visible)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is FireButton.Visible)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertTrue(browserViewState().fireButton is FireButton.Gone)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Gone)
     }
 
     @Test
@@ -1043,31 +1031,31 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenMenuButtonIsShown() {
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showMenuButton)
+        assertFalse(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
@@ -1581,23 +1569,62 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", null, false)
+        testee.loadData("id", null, false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", "  ", false)
+        testee.loadData("id", "  ", false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", "https://example.com", false)
+        testee.loadData("id", "https://example.com", false, false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndSiteLoadedThenHighglightMenuButton() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.showMenuButton?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserOpensOptionsMenuThenHighglightAddFavoriteOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClicked()
+
+        assertEquals(true, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenMenuButtonNotHighlighted() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClosed()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenLoadingNewSiteDoesNotHighlightMenuOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        testee.onBrowserMenuClicked()
+        testee.onBrowserMenuClosed()
+
+        testee.determineShowBrowser()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
     }
 
     @Test
@@ -2243,7 +2270,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().canAddBookmarks)
-        assertFalse(browserViewState().canAddFavorite)
+        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -2301,7 +2328,7 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canAddBookmarks)
-        assertTrue(browserViewState().canAddFavorite)
+        assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
@@ -2832,7 +2859,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", bitmap)
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
     }
 
@@ -2875,7 +2901,6 @@ class BrowserTabViewModelTest {
 
         testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
-        verify(mockPixel).enqueueFire(AppPixelName.FAVICON_WRONG_URL_ERROR)
         verify(mockFaviconManager, never()).storeFavicon(any(), any())
     }
 
@@ -3359,7 +3384,7 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false)
+        testee.loadData("TAB_ID", "https://example.com", false, false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
@@ -3377,7 +3402,7 @@ class BrowserTabViewModelTest {
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
-        testee.loadData("TAB_ID", domain, false)
+        testee.loadData("TAB_ID", domain, false, false)
     }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {

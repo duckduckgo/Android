@@ -60,6 +60,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -110,7 +111,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var renderer: BrowserStateRenderer
 
-    private lateinit var binding: ActivityBrowserBinding
+    private val binding: ActivityBrowserBinding by viewBinding()
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
@@ -127,7 +128,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
-        binding = ActivityBrowserBinding.inflate(layoutInflater)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
         viewModel.viewState.observe(
@@ -169,6 +169,20 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
+        addOrReplaceNewTab(fragment, tabId)
+        currentTab = fragment
+        return fragment
+    }
+
+    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
+        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
+        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
+        addOrReplaceNewTab(fragment, tabId)
+        currentTab = fragment
+        return fragment
+    }
+
+    private fun addOrReplaceNewTab(fragment: BrowserTabFragment, tabId: String) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -178,8 +192,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             transaction.add(R.id.fragmentContainer, fragment, tabId)
         }
         transaction.commit()
-        currentTab = fragment
-        return fragment
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -240,6 +252,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
+        if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
+            launch {
+                val tabId = viewModel.onNewTabRequested()
+                openFavoritesOnboardingNewTab(tabId)
+            }
+            return
+        }
+
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
             launch { viewModel.onNewTabRequested() }
@@ -251,6 +271,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 Timber.d("Shortcut opened with url $sharedText")
                 launch { viewModel.onOpenShortcut(sharedText) }
+            } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
+                Timber.d("Favorite clicked from widget $sharedText")
+                launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
+                return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
                 launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
@@ -422,10 +446,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             return intent
         }
 
+        const val FAVORITES_ONBOARDING_EXTRA = "FAVORITES_ONBOARDING_EXTRA"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
+        const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

@@ -28,11 +28,12 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
 
-    private lateinit var binding: ActivityBrokenSiteBinding
+    private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
 
     private val toolbar
@@ -43,7 +44,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityBrokenSiteBinding.inflate(layoutInflater)
         setContentView(binding.root)
         configureListeners()
         configureObservers()
