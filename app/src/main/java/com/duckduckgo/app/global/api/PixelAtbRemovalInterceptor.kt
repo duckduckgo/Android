@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.api
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.pixels.AppPixelName
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -38,9 +39,9 @@ class PixelAtbRemovalInterceptor : Interceptor {
         // list of pixels for which we'll remove the ATB information
         @VisibleForTesting
         val pixels = listOf(
-            "m_e_t_d",
-            "m_e_ua",
-            "m_e_uad"
+            AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
+            AppPixelName.EMAIL_USE_ALIAS.pixelName,
+            AppPixelName.EMAIL_USE_ADDRESS.pixelName
         )
     }
 }
