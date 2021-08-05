@@ -76,12 +76,7 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
 
     private fun startPulseAnimation(view: View) {
         if (!pulseAnimation.isRunning) {
-            val pulse = ObjectAnimator.ofPropertyValuesHolder(
-                view,
-                PropertyValuesHolder.ofFloat("scaleX", 0.95f, 1.9f),
-                PropertyValuesHolder.ofFloat("scaleY", 0.95f, 1.9f),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
-            )
+            val pulse = getPulseObjectAnimator(view)
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
 
@@ -89,6 +84,30 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
                 play(pulse)
                 start()
             }
+        }
+    }
+
+    private fun getPulseObjectAnimator(view: View): ObjectAnimator {
+        val width = view.width
+        val height = view.height
+        return if (width != height) {
+            val maxOf = maxOf(width, height)
+            val minOf = minOf(width, height)
+            val fromScaleSize = (maxOf * ANIM_INITIAL_SCALE) / minOf
+            val toScaleSize = fromScaleSize * 2
+            ObjectAnimator.ofPropertyValuesHolder(
+                view,
+                PropertyValuesHolder.ofFloat("scaleX", fromScaleSize, toScaleSize),
+                PropertyValuesHolder.ofFloat("scaleY", fromScaleSize, toScaleSize),
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
+            )
+        } else {
+            ObjectAnimator.ofPropertyValuesHolder(
+                view,
+                PropertyValuesHolder.ofFloat("scaleX", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
+                PropertyValuesHolder.ofFloat("scaleY", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
+            )
         }
     }
 
@@ -101,5 +120,10 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
+    }
+
+    companion object {
+        private const val ANIM_INITIAL_SCALE = 0.95f
+        private const val ANIM_FINAL_SCALE = ANIM_INITIAL_SCALE * 2
     }
 }

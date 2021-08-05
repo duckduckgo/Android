@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -28,6 +29,7 @@ import javax.inject.Inject
 
 interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
+    suspend fun getFaviconFromDisk(file: File, cornerRadius: Int, width: Int, height: Int): Bitmap?
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
 }
 
@@ -45,6 +47,21 @@ class GlideFaviconDownloader @Inject constructor(
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
                     .submit()
+                    .get()
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getFaviconFromDisk(file: File, cornerRadius: Int, width: Int, height: Int): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
+            return@withContext runCatching {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(file)
+                    .transform(RoundedCorners(cornerRadius))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .submit(width, height)
                     .get()
             }.getOrNull()
         }

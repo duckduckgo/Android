@@ -22,7 +22,7 @@
     android:initialLayout="@layout/search_widget_light"
     android:minWidth="314dp"
     android:minHeight="40dp"
-    android:minResizeWidth="174dp"
+    android:minResizeWidth="110dp"
     android:previewImage="@drawable/search_widget_preview_light"
     android:resizeMode="horizontal"
     android:updatePeriodMillis="86400000"
