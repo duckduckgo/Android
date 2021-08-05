@@ -57,7 +57,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     }
 
     protected fun daggerInject() {
-        // AndroidInjection.inject(this)
+         AndroidInjection.inject(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
