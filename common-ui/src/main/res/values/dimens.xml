@@ -59,4 +59,7 @@
     <dimen name="component_label_horizontal_margin">@dimen/keyline_4</dimen>
     <dimen name="elevation_default_top_app_bar">4dp</dimen>
 
+    <dimen name="toolbarIconSize">24dp</dimen>
+    <dimen name="toolbarIconContainerSize">48dp</dimen>
+
 </resources>

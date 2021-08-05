@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/dialogBgColor"/>
+    <solid android:color="?attr/dialogBgColor" />
     <corners android:radius="8dp" />
+    <padding android:right="16dp" />
 </shape>

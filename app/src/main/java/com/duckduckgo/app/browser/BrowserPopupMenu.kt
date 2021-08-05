@@ -59,7 +59,7 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
 
     companion object {
 
-        private const val margin = 30
+        private const val margin = 16
 
         fun inflate(layoutInflater: LayoutInflater, variant: Variant): View {
             return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
