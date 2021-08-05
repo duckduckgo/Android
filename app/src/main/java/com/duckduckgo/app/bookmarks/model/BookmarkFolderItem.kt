@@ -19,6 +19,5 @@ package com.duckduckgo.app.bookmarks.model
 data class BookmarkFolderItem(
     val depth: Int,
     val bookmarkFolder: BookmarkFolder,
-    val bookmarks: List<SavedSite.Bookmark> = emptyList(),
     val isSelected: Boolean = false
 )

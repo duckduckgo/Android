@@ -64,7 +64,7 @@ class BookmarkFoldersViewModel(
                 bookmarkFolders = bookmarkFolders.minus(bookmarkFolderBranch)
             }
 
-            var folderStructure = bookmarkFoldersRepository.getFolderStructure(bookmarkFolders, selectedFolderId)
+            var folderStructure = bookmarkFoldersRepository.buildFlatStructure(bookmarkFolders, selectedFolderId)
             folderStructure = addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
             onFolderStructureCreated(folderStructure)
         }
