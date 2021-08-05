@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -49,17 +50,22 @@ class AtbInitializer(
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun initialize() {
+    fun initializeOnResume() {
         appCoroutineScope.launch {
-            Timber.v("Initialize ATB")
-            listeners.forEach {
-                withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) {
-                    it.beforeAtbInit()
-                }
-            }
-
-            initializeAtb()
+            initialize()
         }
+    }
+
+    @VisibleForTesting
+    suspend fun initialize() {
+        Timber.v("Initialize ATB")
+        listeners.forEach {
+            withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) {
+                it.beforeAtbInit()
+            }
+        }
+
+        initializeAtb()
     }
 
     private fun initializeAtb() {
