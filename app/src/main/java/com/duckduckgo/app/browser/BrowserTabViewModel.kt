@@ -81,6 +81,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -152,6 +153,7 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val userEventsRepository: UserEventsRepository,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
     private val globalPrivacyControl: GlobalPrivacyControl,
@@ -1031,6 +1033,9 @@ class BrowserTabViewModel(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+            viewModelScope.launch(dispatchers.io()) {
+                url?.let { userEventsRepository.siteVisited(it) }
+            }
         }
     }
 
@@ -2072,6 +2077,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val searchCountDao: Provider<SearchCountDao>,
     private val pixel: Provider<Pixel>,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val userEventsRepository: Provider<UserEventsRepository>,
     private val userEventsStore: Provider<UserEventsStore>,
     private val fileDownloader: Provider<FileDownloader>,
     private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
@@ -2083,7 +2089,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
                 else -> null
             }
         }

@@ -16,8 +16,14 @@
 
 package com.duckduckgo.app.onboarding.di
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.AppUserEventsRepository
+import com.duckduckgo.app.global.events.db.UserEventsRepository
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
@@ -42,5 +48,15 @@ class OnboardingModule {
     @Singleton
     fun onboardingPageBuilder(): OnboardingPageBuilder {
         return OnboardingFragmentPageBuilder()
+    }
+
+    @Provides
+    fun userEventsRepository(
+        userEventsStore: UserEventsStore,
+        userStageStore: UserStageStore,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        dispatcherProvider: DispatcherProvider
+    ): UserEventsRepository {
+        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, dispatcherProvider)
     }
 }

@@ -67,7 +67,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 35,
+    exportSchema = true, version = 36,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -427,6 +427,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `user_events` ADD COLUMN `payload` TEXT ")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
@@ -474,7 +480,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_31_TO_32,
             MIGRATION_32_TO_33,
             MIGRATION_33_TO_34,
-            MIGRATION_34_TO_35
+            MIGRATION_34_TO_35,
+            MIGRATION_35_TO_36
         )
 
     @Deprecated(
