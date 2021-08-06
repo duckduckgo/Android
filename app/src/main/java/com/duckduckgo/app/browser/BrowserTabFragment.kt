@@ -2084,10 +2084,9 @@ class BrowserTabFragment :
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 Timber.i("CTAVIEWSTATE: $viewState")
-                val ctaChanged = viewState.cta != lastSeenCtaViewState?.cta
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
-                if (viewState.cta != null && ctaChanged) {
+                if (viewState.cta != null) {
                     showCta(viewState.cta, viewState.favorites)
                 } else {
                     hideHomeCta()
@@ -2127,9 +2126,10 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.DaxFavoritesCTA) {
                 showHomeBackground(favorites)
                 hideHomeCta()
+                if (bottom_dax_cta.isVisible) return
                 bottom_dax_cta.removeAllViews()
-                val inflatedView = inflate(context, R.layout.include_dax_buble_button_cta, bottom_dax_cta)
-                configuration.showCta(inflatedView)
+                inflate(context, R.layout.include_dax_buble_button_cta, bottom_dax_cta)
+                configuration.showCta(bottom_dax_cta)
                 viewModel.onCtaShown()
             } else {
                 hideHomeBackground()
@@ -2182,6 +2182,7 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             dialogTextCta.cancelAnimation()
             daxCtaContainer.hide()
+            bottom_dax_cta.hide()
         }
 
         private fun hideHomeCta() {
