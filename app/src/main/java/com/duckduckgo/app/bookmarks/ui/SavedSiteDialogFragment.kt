@@ -17,9 +17,9 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,15 +35,20 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.C
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
+import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.showKeyboard
+import kotlinx.android.synthetic.main.include_find_in_page.*
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 
-    abstract fun onBackNavigation()
+    abstract fun onConfirmation()
     abstract fun configureUI()
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
+
+    private var initialTitle: String? = null
+    private var titleChanged = false
 
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
         result.data?.let { data ->
@@ -74,27 +79,39 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
             binding.savedSiteLocation.setText(name)
         }
+        configureToolbar(binding.savedSiteAppBar.toolbar)
         configureUI()
+        initialTitle = binding.titleInput.text.toString()
+        addTextWatchers()
         showKeyboard(binding.titleInput)
         return binding.root
+    }
+
+    private fun addTextWatchers() {
+        binding.titleInput.addTextChangedListener(titleTextWatcher)
+    }
+
+    private fun configureToolbar(toolbar: Toolbar) {
+        toolbar.inflateMenu(R.menu.edit_saved_site_menu)
+        toolbar.setOnMenuItemClickListener(
+            Toolbar.OnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_confirm_changes -> {
+                        onConfirmation()
+                        hideKeyboard()
+                        dismiss()
+                        return@OnMenuItemClickListener true
+                    }
+                }
+                false
+            }
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.window?.attributes?.windowAnimations = android.R.style.Animation_Dialog
         return dialog
-    }
-
-    override fun onCancel(dialogInterface: DialogInterface) {
-        onBackNavigation()
-        hideKeyboard()
-        super.onCancel(dialogInterface)
-    }
-
-    override fun onDismiss(dialogInterface: DialogInterface) {
-        onBackNavigation()
-        hideKeyboard()
-        super.onDismiss(dialogInterface)
     }
 
     override fun onPause() {
@@ -144,5 +161,16 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         val toolbar = binding.savedSiteAppBar.toolbar
         toolbar.title = title
         configureUpNavigation(toolbar)
+    }
+
+    protected fun setConfirmationVisibility(isVisible: Boolean) {
+        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = isVisible || titleChanged
+    }
+
+    private val titleTextWatcher = object : TextChangedWatcher() {
+        override fun afterTextChanged(editable: Editable) {
+            titleChanged = editable.toString() != initialTitle
+            setConfirmationVisibility(titleChanged)
+        }
     }
 }

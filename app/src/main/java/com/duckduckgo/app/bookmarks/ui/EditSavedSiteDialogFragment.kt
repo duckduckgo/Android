@@ -17,11 +17,13 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import android.widget.EditText
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.view.TextChangedWatcher
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
@@ -42,6 +44,8 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         }
 
         populateFields(binding.titleInput, binding.urlInput)
+
+        binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
 
     private fun validateInput(newValue: String, existingValue: String) =
@@ -52,7 +56,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         urlInput.setText(getExistingUrl())
     }
 
-    override fun onBackNavigation() {
+    override fun onConfirmation() {
         val savedSite = getSavedSite()
 
         val updatedTitle = validateInput(binding.titleInput.text.toString(), savedSite.title)
@@ -73,6 +77,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         }
     }
 
+    private val urlTextWatcher = object : TextChangedWatcher() {
+        override fun afterTextChanged(editable: Editable) {
+            setConfirmationVisibility(editable.toString() != getSavedSite().url)
+        }
+    }
+
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
@@ -86,7 +96,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     }
 
     companion object {
-        private const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
+        const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
         fun instance(savedSite: SavedSite, parentFolderId: Long = 0, parentFolderName: String? = null): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()

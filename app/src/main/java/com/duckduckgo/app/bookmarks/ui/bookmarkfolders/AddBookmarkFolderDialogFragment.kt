@@ -40,7 +40,7 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         binding.savedSiteUrlInputContainer.visibility = View.GONE
     }
 
-    override fun onBackNavigation() {
+    override fun onConfirmation() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text.toString()
             if (name.isNotBlank()) {
