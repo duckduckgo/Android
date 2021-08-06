@@ -2098,7 +2098,7 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta -> showDaxCta(configuration)
+                is DaxBubbleCta -> showDaxCta(configuration, favorites)
                 is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
@@ -2121,12 +2121,21 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showDaxCta(configuration: DaxBubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxCtaContainer)
-            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
+        private fun showDaxCta(configuration: DaxBubbleCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+            if (configuration is DaxBubbleCta.DaxFavoritesCTA) {
+                showHomeBackground(favorites)
+                hideHomeCta()
+                bottom_dax_cta.removeAllViews()
+                val inflatedView = inflate(context, R.layout.include_dax_buble_button_cta, bottom_dax_cta)
+                configuration.showCta(inflatedView)
+                viewModel.onCtaShown()
+            } else {
+                hideHomeBackground()
+                hideHomeCta()
+                configuration.showCta(daxCtaContainer)
+                newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+                viewModel.onCtaShown()
+            }
         }
 
         private fun showBubleCta(configuration: BubbleCta) {
