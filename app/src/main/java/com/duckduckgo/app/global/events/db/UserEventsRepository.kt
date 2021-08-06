@@ -23,7 +23,9 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import kotlinx.coroutines.withContext
 
 interface UserEventsRepository {
+    suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
     suspend fun siteVisited(url: String)
+    suspend fun clearVisitedSite()
 }
 
 class AppUserEventsRepository(
@@ -32,6 +34,9 @@ class AppUserEventsRepository(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val dispatcher: DispatcherProvider
 ) : UserEventsRepository {
+    override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {
+        return userEventsStore.getUserEvent(userEventKey)
+    }
 
     override suspend fun siteVisited(url: String) {
         if (url.isEmpty()) return
@@ -43,6 +48,13 @@ class AppUserEventsRepository(
             if (firstVisitedSiteEvent != null) return@withContext
 
             userEventsStore.registerUserEvent(UserEventEntity(id = UserEventKey.FIRST_NON_SERP_VISITED_SITE, payload = url))
+        }
+    }
+
+    override suspend fun clearVisitedSite() {
+        withContext(dispatcher.io()) {
+            val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext
+            userEventsStore.registerUserEvent(firstVisitedSiteEvent.copy(payload = ""))
         }
     }
 }
