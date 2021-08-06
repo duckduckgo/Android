@@ -17,21 +17,21 @@
 package com.duckduckgo.mobile.android.themepreview.ui.component
 
 enum class Component {
-  BUTTON,
-  FAB,
-  CARD,
-  TOP_APP_BAR,
-  CHIP,
-  DRAWER,
-  TEXT_FIELD,
-  BOTTOM_NAVIGATION,
-  SWITCH,
-  RADIO_BUTTON,
-  CHECKBOX,
-  BOTTOM_APP_BAR,
-  TABS,
-  SNACKBAR,
-  DIALOG,
-  BOTTOM_SHEET,
-  IMAGE
+    BUTTON,
+    FAB,
+    CARD,
+    TOP_APP_BAR,
+    CHIP,
+    DRAWER,
+    TEXT_FIELD,
+    BOTTOM_NAVIGATION,
+    SWITCH,
+    RADIO_BUTTON,
+    CHECKBOX,
+    BOTTOM_APP_BAR,
+    TABS,
+    SNACKBAR,
+    DIALOG,
+    BOTTOM_SHEET,
+    IMAGE
 }

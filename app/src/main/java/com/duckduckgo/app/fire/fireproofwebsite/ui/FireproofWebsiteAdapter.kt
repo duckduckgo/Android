@@ -123,9 +123,11 @@ class FireproofWebsiteAdapter(
                 holder.bind(loginDetectionEnabled)
             }
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(
-                fireproofWebsites[getWebsiteItemPosition(
-                    position
-                )]
+                fireproofWebsites[
+                    getWebsiteItemPosition(
+                        position
+                    )
+                ]
             )
         }
     }
@@ -205,7 +207,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity)}
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             }
             popupMenu.show(itemView, anchor)
 

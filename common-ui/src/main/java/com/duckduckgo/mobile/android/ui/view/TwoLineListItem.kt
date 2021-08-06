@@ -78,7 +78,7 @@ class TwoLineListItem : LinearLayout {
      * Sets the item title
      */
     fun setImageVisibility(isVisible: Boolean) {
-        if (isVisible){
+        if (isVisible) {
             binding.imageContainer.show()
         } else {
             binding.imageContainer.gone()

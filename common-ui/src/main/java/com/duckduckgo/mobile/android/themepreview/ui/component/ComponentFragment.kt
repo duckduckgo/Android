@@ -27,24 +27,24 @@ import com.duckduckgo.mobile.android.R
 
 abstract class ComponentFragment : Fragment() {
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_component_list, container, false)
-  }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_component_list, container, false)
+    }
 
-  override fun onViewCreated(view: View, savedInstanceBundle: Bundle?) {
-    super.onViewCreated(view, savedInstanceBundle)
+    override fun onViewCreated(view: View, savedInstanceBundle: Bundle?) {
+        super.onViewCreated(view, savedInstanceBundle)
 
-    val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-    val adapter = ComponentAdapter()
-    recyclerView.layoutManager = LinearLayoutManager(requireContext())
-    recyclerView.adapter = adapter
-    adapter.submitList(getComponents())
-  }
+        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
+        val adapter = ComponentAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+        adapter.submitList(getComponents())
+    }
 
-  abstract fun getComponents(): List<Component>
+    abstract fun getComponents(): List<Component>
 
 }

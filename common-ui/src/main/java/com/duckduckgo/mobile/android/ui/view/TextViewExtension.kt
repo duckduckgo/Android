@@ -26,4 +26,3 @@ fun TextView.leftDrawable(@DrawableRes id: Int = 0) {
 fun TextView.rightDrawable(@DrawableRes id: Int = 0) {
     this.setCompoundDrawablesWithIntrinsicBounds(0, 0, id, 0)
 }
-

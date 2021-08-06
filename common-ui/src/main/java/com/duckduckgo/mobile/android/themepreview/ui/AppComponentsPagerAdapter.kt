@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentButtonsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.controls.ComponentControlsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentNavigationFragment
@@ -33,37 +32,37 @@ import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragme
  * View pager to show all tabbed destinations - Instructions, Theme Summary and Components.
  */
 class AppComponentsPagerAdapter(
-  private val context: Context,
-  fragmentManager: FragmentManager
+    private val context: Context,
+    fragmentManager: FragmentManager
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-  enum class MainFragments(val titleRes: Int) {
-    PALETTE(R.string.tab_title_color_palette),
-    TYPOGRAPHY(R.string.tab_title_typography),
-    NAVIGATION(R.string.tab_title_component_navigation),
-    BUTTONS(R.string.tab_title_component_buttons),
-    CONTROLS(R.string.tab_title_component_controls),
-    SYSTEM(R.string.tab_title_component_system),
-  }
-
-  override fun getCount(): Int = MainFragments.values().size
-
-  private fun getItemType(position: Int): MainFragments {
-    return MainFragments.values()[position]
-  }
-
-  override fun getPageTitle(position: Int): CharSequence? {
-    return context.getString(getItemType(position).titleRes)
-  }
-
-  override fun getItem(position: Int): Fragment {
-    return when (getItemType(position)) {
-      MainFragments.PALETTE -> ColorPaletteFragment()
-      MainFragments.TYPOGRAPHY -> TypographyFragment()
-      MainFragments.NAVIGATION -> ComponentNavigationFragment()
-      MainFragments.BUTTONS -> ComponentButtonsFragment()
-      MainFragments.CONTROLS -> ComponentControlsFragment()
-      MainFragments.SYSTEM -> ComponentSystemFragment()
+    enum class MainFragments(val titleRes: Int) {
+        PALETTE(R.string.tab_title_color_palette),
+        TYPOGRAPHY(R.string.tab_title_typography),
+        NAVIGATION(R.string.tab_title_component_navigation),
+        BUTTONS(R.string.tab_title_component_buttons),
+        CONTROLS(R.string.tab_title_component_controls),
+        SYSTEM(R.string.tab_title_component_system),
     }
-  }
+
+    override fun getCount(): Int = MainFragments.values().size
+
+    private fun getItemType(position: Int): MainFragments {
+        return MainFragments.values()[position]
+    }
+
+    override fun getPageTitle(position: Int): CharSequence? {
+        return context.getString(getItemType(position).titleRes)
+    }
+
+    override fun getItem(position: Int): Fragment {
+        return when (getItemType(position)) {
+            MainFragments.PALETTE -> ColorPaletteFragment()
+            MainFragments.TYPOGRAPHY -> TypographyFragment()
+            MainFragments.NAVIGATION -> ComponentNavigationFragment()
+            MainFragments.BUTTONS -> ComponentButtonsFragment()
+            MainFragments.CONTROLS -> ComponentControlsFragment()
+            MainFragments.SYSTEM -> ComponentSystemFragment()
+        }
+    }
 }

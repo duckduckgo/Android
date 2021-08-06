@@ -242,10 +242,12 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             this.entity = entity
             val website = entity.domain.websiteFromGeoLocationsApiOrigin()
 
-            singleListItem.setContentDescription(itemView.context.getString(
-                R.string.preciseLocationDeleteContentDescription,
-                website
-            ))
+            singleListItem.setContentDescription(
+                itemView.context.getString(
+                    R.string.preciseLocationDeleteContentDescription,
+                    website
+                )
+            )
 
             singleListItem.setTitle(website)
             loadFavicon(entity.domain)

@@ -132,10 +132,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         fun update(bookmark: SavedSite.Bookmark) {
             val twoListItem = itemView as TwoLineListItem
 
-            twoListItem.setContentDescription(itemView.context.getString(
-                R.string.bookmarkOverflowContentDescription,
-                bookmark.title
-            ))
+            twoListItem.setContentDescription(
+                itemView.context.getString(
+                    R.string.bookmarkOverflowContentDescription,
+                    bookmark.title
+                )
+            )
             twoListItem.setTitle(bookmark.title)
             twoListItem.setSubtitle(parseDisplayUrl(bookmark.url))
             loadFavicon(bookmark.url)

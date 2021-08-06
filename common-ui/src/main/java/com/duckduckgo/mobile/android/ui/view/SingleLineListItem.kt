@@ -25,7 +25,6 @@ import android.widget.LinearLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
-import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SingleLineListItem : LinearLayout {
@@ -71,7 +70,7 @@ class SingleLineListItem : LinearLayout {
      * Sets the item title
      */
     fun setImageVisibility(isVisible: Boolean) {
-        if (isVisible){
+        if (isVisible) {
             binding.imageContainer.show()
         } else {
             binding.imageContainer.gone()

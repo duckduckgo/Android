@@ -22,8 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
-import android.widget.ToggleButton
-import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.children
 
 /*

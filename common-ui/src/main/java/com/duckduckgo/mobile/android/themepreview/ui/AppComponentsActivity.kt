@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.themepreview.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -42,12 +44,17 @@ class AppComponentsActivity : AppCompatActivity() {
         viewPager.adapter = adapter
 
         darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
-           if (checked){
-               delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-           } else {
-               delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
-           }
+            if (checked) {
+                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
+            }
         }
     }
 
+    companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, AppComponentsActivity::class.java)
+        }
+    }
 }
