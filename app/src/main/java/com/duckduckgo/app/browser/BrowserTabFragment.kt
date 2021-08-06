@@ -2083,9 +2083,11 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                Timber.i("CTAVIEWSTATE: $viewState")
+                val ctaChanged = viewState.cta != lastSeenCtaViewState?.cta
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
-                if (viewState.cta != null) {
+                if (viewState.cta != null && ctaChanged) {
                     showCta(viewState.cta, viewState.favorites)
                 } else {
                     hideHomeCta()
