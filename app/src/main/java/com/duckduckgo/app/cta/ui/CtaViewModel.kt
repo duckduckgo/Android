@@ -24,6 +24,8 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
@@ -60,6 +62,7 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
+    private val userEventsRepository: UserEventsRepository,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider
 ) {
@@ -196,6 +199,9 @@ class CtaViewModel @Inject constructor(
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
+            canShowDaxFavoritesOnboarding() -> {
+                DaxBubbleCta.DaxFavoritesCTA(onboardingStore, appInstallStore)
+            }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
@@ -243,6 +249,13 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !settingsDataStore.hideTips
+
+    @WorkerThread
+    private suspend fun canShowDaxFavoritesOnboarding(): Boolean = daxOnboardingActive() &&
+            !daxDialogEndShown() &&
+            daxDialogIntroShown() &&
+            !settingsDataStore.hideTips &&
+            userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
