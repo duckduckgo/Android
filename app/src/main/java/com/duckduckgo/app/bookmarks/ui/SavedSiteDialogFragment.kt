@@ -33,6 +33,7 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -49,6 +50,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private var initialTitle: String? = null
     private var titleChanged = false
+    private var initialParentFolderId: Long? = null
+    private var folderChanged = false
 
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
         result.data?.let { data ->
@@ -65,6 +68,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private fun storeFolderIdFromIntent(data: Intent) {
         val parentId = data.getLongExtra(KEY_BOOKMARK_FOLDER_ID, 0)
+        folderChanged = parentId != initialParentFolderId
+        setConfirmationVisibility()
         arguments?.putLong(KEY_BOOKMARK_FOLDER_ID, parentId)
     }
 
@@ -82,6 +87,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureToolbar(binding.savedSiteAppBar.toolbar)
         configureUI()
         initialTitle = binding.titleInput.text.toString()
+        initialParentFolderId = arguments?.getLong(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
         addTextWatchers()
         showKeyboard(binding.titleInput)
         return binding.root
@@ -163,14 +169,14 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureUpNavigation(toolbar)
     }
 
-    protected fun setConfirmationVisibility(isVisible: Boolean) {
-        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = isVisible || titleChanged
+    protected fun setConfirmationVisibility(isVisible: Boolean = false) {
+        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = isVisible || titleChanged || folderChanged
     }
 
     private val titleTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             titleChanged = editable.toString() != initialTitle
-            setConfirmationVisibility(titleChanged)
+            setConfirmationVisibility()
         }
     }
 }
