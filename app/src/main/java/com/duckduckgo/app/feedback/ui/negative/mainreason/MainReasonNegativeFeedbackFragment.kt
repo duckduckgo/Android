@@ -17,9 +17,6 @@
 package com.duckduckgo.app.feedback.ui.negative.mainreason
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
@@ -44,18 +41,14 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     private val listener: MainReasonNegativeFeedbackListener?
         get() = activity as MainReasonNegativeFeedbackListener
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
         recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
                 listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
             }
         })
-
-        return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)

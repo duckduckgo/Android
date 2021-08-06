@@ -32,7 +32,6 @@ interface Pixel {
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
 
-
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
         COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
