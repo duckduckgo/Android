@@ -256,6 +256,26 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore
     )
+
+    class DaxFavoritesCTA(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+        CtaId.DAX_END,
+        R.string.daxFavoritesClearCtaText,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_FAVORITES_CLEAR_CTA,
+        onboardingStore,
+        appInstallStore
+    ) {
+        override fun showCta(view: View) {
+            val daxText = view.context.getString(description)
+            view.show()
+            view.daxCtaContainer.alpha = 1f
+            view.hiddenTextCta.text = daxText.html(view.context)
+            view.primaryCta.text = view.context.getString(R.string.daxFavoritesCtaAddFavorite)
+            view.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+    }
 }
 
 sealed class BubbleCta(
