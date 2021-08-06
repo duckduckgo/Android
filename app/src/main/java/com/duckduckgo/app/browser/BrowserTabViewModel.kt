@@ -1757,6 +1757,15 @@ class BrowserTabViewModel(
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
         ctaViewModel.onCtaShown(cta)
+
+        viewModelScope.launch(dispatchers.io()) {
+            if (cta is DaxBubbleCta.DaxFavoritesCTA) {
+                userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.let {
+                    favoritesRepository.insert("", it)
+                    userEventsRepository.clearVisitedSite()
+                }
+            }
+        }
     }
 
     suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
