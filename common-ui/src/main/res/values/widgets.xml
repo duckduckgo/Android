@@ -23,8 +23,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:background">?selectableItemBackground</item>
     </style>
@@ -33,7 +32,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:background">?selectableItemBackground</item>
     </style>
@@ -56,5 +55,44 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:background">@drawable/popup_menu_bg</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.PopupMenuItem" parent="TextAppearance.DuckDuckGo.Body1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Icon">
+        <item name="android:tint">?attr/browserIconColorSelector</item>
+        <item name="android:layout_width">@dimen/popupMenuItemHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text">
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox">
+        <item name="android:button">@null</item>
+        <item name="android:drawableEnd">?android:attr/listChoiceIndicatorMultiple</item>
+        <item name="android:paddingEnd">@dimen/keyline_2</item>
+    </style>
 
 </resources>

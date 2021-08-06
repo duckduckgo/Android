@@ -18,18 +18,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="13dp"
-    android:paddingBottom="20dp"
     android:background="@drawable/popup_menu_bg">
 
     <TextView
-        android:id="@+id/closeAllTabs"
-        style="@style/BrowserTextMenuItem"
-        android:text="@string/closeAllTabsMenuItem" />
+        android:id="@+id/editSavedSite"
+        style="@style/Widget.DuckDuckGo.PopupMenuItem"
+        android:text="@string/edit" />
 
     <TextView
-        android:id="@+id/settingsPopupMenuItem"
-        style="@style/BrowserTextMenuItem"
-        android:text="@string/settingsMenuItemTitle" />
+        android:id="@+id/deleteSavedSite"
+        style="@style/Widget.DuckDuckGo.PopupMenuItem"
+        android:text="@string/delete" />
 
 </LinearLayout>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.ui
+package com.duckduckgo.mobile.android.ui.menu
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -24,13 +24,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
-import com.duckduckgo.app.browser.R
 
-class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_tabs_menu)) :
+class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = inflate(layoutInflater, resourceId)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
-
-    // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
-    // color.  Adding it however garbles the elevation so we cannot have elevation here.
 
     init {
         if (SDK_INT <= 22) {
@@ -38,7 +34,7 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
             // color.  Adding it however garbles the elevation so we cannot have elevation here.
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
         } else {
-            elevation = 6.toFloat()
+            elevation = ELEVATION
         }
         animationStyle = android.R.style.Animation_Dialog
     }
@@ -54,13 +50,19 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
         val x = MARGIN
-        val y = anchorLocation[1] - 2 * anchorView.height
+        val y = anchorLocation[1] + MARGIN
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
+    }
+
+    fun show(rootView: View, anchorView: View, onDismiss: () -> Unit) {
+        show(rootView, anchorView)
+        setOnDismissListener(onDismiss)
     }
 
     companion object {
 
-        private const val MARGIN = 30
+        private const val MARGIN = 16
+        private const val ELEVATION = 6f
 
         fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
             return layoutInflater.inflate(resourceId, null)

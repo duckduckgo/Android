@@ -17,28 +17,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="14dp"
-    android:paddingBottom="14dp"
-    android:paddingStart="16dp"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    style="@style/Widget.DuckDuckGo.SingleLineListItem"
+    android:id="@+id/item_container">
 
     <FrameLayout
         android:id="@+id/image_container"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:background="@drawable/list_item_image_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/favicon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:id="@+id/image"
+            android:layout_width="@dimen/listItemImageSize"
+            android:layout_height="@dimen/listItemImageSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no"/>
     </FrameLayout>
@@ -53,17 +47,18 @@
         android:maxLines="1"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/image"
+        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
         app:layout_constraintStart_toEndOf="@id/image_container"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark" />
+        tools:text="Title" />
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/overflowMenu"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
         android:paddingStart="14dp"
+        android:paddingEnd="@dimen/toolbarOverflowPadding"
         android:scaleType="center"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"

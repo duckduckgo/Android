@@ -24,6 +24,7 @@
     <declare-styleable name="SingleLineListItem">
         <attr name="singleLineItemTitle" format="string" />
         <attr name="singleLineItemDrawable" format="reference" />
+        <attr name="singleLineItemImageVisible" format="boolean" />
     </declare-styleable>
 
     <!--Two Line Item view-->
@@ -31,5 +32,6 @@
         <attr name="twoLineItemTitle" format="string" />
         <attr name="twoLineItemSubtitle" format="string" />
         <attr name="twoLineItemDrawable" format="reference" />
+        <attr name="twoLineItemImageVisible" format="boolean" />
     </declare-styleable>
 </resources>

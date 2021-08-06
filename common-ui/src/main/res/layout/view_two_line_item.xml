@@ -16,15 +16,14 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.DuckDuckGo.TwoLineListItem"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/item_container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:id="@+id/item_container">
 
     <FrameLayout
         android:id="@+id/image_container"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/listItemImageContainerSize"
+        android:layout_height="@dimen/listItemImageContainerSize"
         android:background="@drawable/list_item_image_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,8 +31,8 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="@dimen/listItemImageSize"
+            android:layout_height="@dimen/listItemImageSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no"/>
     </FrameLayout>
@@ -51,7 +50,7 @@
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
         app:layout_constraintStart_toEndOf="@id/image_container"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark" />
+        tools:text="Title" />
 
     <TextView
         android:id="@+id/subtitle"
@@ -65,7 +64,7 @@
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
         app:layout_constraintStart_toStartOf="@id/title"
         app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="Bookmark" />
+        tools:text="Subtitle" />
 
     <ImageView
         android:id="@+id/overflowMenu"
@@ -73,7 +72,7 @@
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
         android:paddingStart="14dp"
-        android:paddingEnd="10dp"
+        android:paddingEnd="@dimen/toolbarOverflowPadding"
         android:scaleType="center"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"

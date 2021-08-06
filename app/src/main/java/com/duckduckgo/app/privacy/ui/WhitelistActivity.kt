@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -40,6 +39,8 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class WhitelistActivity : DuckDuckGoActivity() {
@@ -204,41 +205,43 @@ class WhitelistActivity : DuckDuckGoActivity() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WhitelistViewHolder {
-            val binding = ViewWhitelistEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return WhitelistViewHolder(binding.root, binding.domain, binding.overflowMenu)
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = ViewWhitelistEntryBinding.inflate(inflater, parent, false)
+            return WhitelistViewHolder(inflater, binding.root)
         }
 
         override fun onBindViewHolder(holder: WhitelistViewHolder, position: Int) {
+            val listItem = holder.itemView as SingleLineListItem
+
             val entry = entries[position]
-            holder.domain.text = entry.domain
+
+            listItem.setTitle(entry.domain)
+            listItem.setClickListener {
+                viewModel.onEditRequested(entry)
+            }
+            listItem.setOverflowClickListener {
+                showOverflowMenu(holder, entry)
+            }
             holder.root.setOnClickListener {
                 viewModel.onEditRequested(entry)
             }
-
-            val overflowContentDescription = holder.overflowMenu.context.getString(R.string.whitelistEntryOverflowContentDescription, entry.domain)
-            holder.overflowMenu.contentDescription = overflowContentDescription
-            holder.overflowMenu.setOnClickListener {
-                showOverflowMenu(holder.overflowMenu, entry)
-            }
         }
 
-        private fun showOverflowMenu(overflowMenu: ImageView, entry: UserWhitelistedDomain) {
-            val popup = PopupMenu(overflowMenu.context, overflowMenu)
-            popup.inflate(R.menu.whitelist_individual_overflow_menu)
-            popup.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.edit -> {
-                        viewModel.onEditRequested(entry)
-                        true
-                    }
-                    R.id.delete -> {
-                        viewModel.onDeleteRequested(entry)
-                        true
-                    }
-                    else -> false
-                }
+        private fun showOverflowMenu(
+            holder: WhitelistViewHolder,
+            entry: UserWhitelistedDomain
+        ) {
+
+            val popupMenu = PopupMenu(
+                holder.layoutInflater,
+                R.layout.popup_window_edit_delete_menu
+            )
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.findViewById(R.id.edit)) { viewModel.onEditRequested(entry) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteRequested(entry) }
             }
-            popup.show()
+            popupMenu.show(holder.itemView, holder.itemView.findViewById(R.id.overflowMenu))
         }
 
         override fun getItemCount(): Int {
@@ -247,8 +250,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     class WhitelistViewHolder(
+        val layoutInflater: LayoutInflater,
         val root: View,
-        val domain: TextView,
-        val overflowMenu: ImageView
     ) : RecyclerView.ViewHolder(root)
 }

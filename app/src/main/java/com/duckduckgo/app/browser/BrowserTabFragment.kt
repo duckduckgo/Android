@@ -132,6 +132,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -249,7 +250,7 @@ class BrowserTabFragment :
 
     private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
 
-    private lateinit var popupMenu: BrowserPopupMenu
+    private lateinit var popupMenu: PopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -1733,7 +1734,7 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
+            popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) {

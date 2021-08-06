@@ -16,6 +16,5 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="?attr/dialogBgColor" />
-    <corners android:radius="8dp" />
-    <padding android:right="16dp" />
+    <corners android:radius="@dimen/keyline_2" />
 </shape>

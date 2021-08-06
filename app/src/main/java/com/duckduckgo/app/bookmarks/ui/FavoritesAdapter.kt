@@ -28,9 +28,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
-import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.deleteSavedSite
-import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.editSavedSite
 import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.savedSiteEmptyHint
 import kotlinx.android.synthetic.main.view_saved_site_section_title.view.savedSiteSectionTitle
 import kotlinx.coroutines.launch
@@ -131,15 +130,16 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
     class FavoriteViewHolder(
         private val layoutInflater: LayoutInflater,
-        private val listItem: TwoLineListItem,
+        itemView: View,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) : FavoritesScreenViewHolders(listItem) {
+    ) : FavoritesScreenViewHolders(itemView) {
 
         lateinit var favorite: Favorite
 
         fun update(favorite: Favorite) {
+            val listItem = itemView as TwoLineListItem
             this.favorite = favorite
 
             listItem.setContentDescription(
@@ -164,7 +164,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = listItem.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
@@ -174,11 +174,11 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun showOverFlowMenu(anchor: View, favorite: Favorite) {
-            val popupMenu = SavedSitePopupMenu(layoutInflater)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editSavedSite) { editFavorite(favorite) }
-                onMenuItemClicked(view.deleteSavedSite) { deleteFavorite(favorite) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editFavorite(favorite) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteFavorite(favorite) }
             }
             popupMenu.show(itemView, anchor)
         }
