@@ -16,25 +16,24 @@
 
 package com.duckduckgo.app.global.events.db
 
-import androidx.work.WorkManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 interface UserEventsRepository {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
     suspend fun siteVisited(url: String)
     suspend fun clearVisitedSite()
+    suspend fun userEvents(): Flow<List<UserEventEntity>>
 }
 
 class AppUserEventsRepository(
     private val userEventsStore: UserEventsStore,
     private val userStageStore: UserStageStore,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val workManager: WorkManager,
-    private val requestBuilder: FavoritesOnboardingWorkRequestBuilder,
     private val dispatcher: DispatcherProvider
 ) : UserEventsRepository {
     override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {
@@ -51,7 +50,6 @@ class AppUserEventsRepository(
             if (firstVisitedSiteEvent != null) return@withContext
 
             userEventsStore.registerUserEvent(UserEventEntity(id = UserEventKey.FIRST_NON_SERP_VISITED_SITE, payload = url))
-            workManager.enqueue(requestBuilder.scheduleWork())
         }
     }
 
@@ -60,5 +58,9 @@ class AppUserEventsRepository(
             val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext
             userEventsStore.registerUserEvent(firstVisitedSiteEvent.copy(payload = ""))
         }
+    }
+
+    override suspend fun userEvents(): Flow<List<UserEventEntity>> {
+        return userEventsStore.userEvents()
     }
 }

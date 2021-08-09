@@ -24,13 +24,13 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class FavoritesOnboardingWorkRequestBuilder @Inject constructor() {
+class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val workManager: WorkManager) {
 
-    fun scheduleWork(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
+    fun scheduleWork() {
+        workManager.enqueue(OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
             .addTag(FAVORITES_ONBOARDING_WORK_TAG)
             .setInitialDelay(1, TimeUnit.DAYS)
-            .build()
+            .build())
     }
 
     companion object {

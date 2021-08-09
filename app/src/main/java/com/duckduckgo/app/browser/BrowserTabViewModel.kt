@@ -1034,7 +1034,9 @@ class BrowserTabViewModel(
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
             viewModelScope.launch(dispatchers.io()) {
-                url?.let { userEventsRepository.siteVisited(it) }
+                url?.let {
+                    userEventsRepository.siteVisited(it)
+                }
             }
         }
     }
