@@ -59,6 +59,14 @@ class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = in
         setOnDismissListener(onDismiss)
     }
 
+    fun showAnchoredToView(rootView: View, anchorView: View) {
+        val anchorLocation = IntArray(2)
+        anchorView.getLocationOnScreen(anchorLocation)
+        val x = anchorLocation[0] + MARGIN
+        val y = anchorLocation[1] + MARGIN
+        showAtLocation(rootView, Gravity.NO_GRAVITY, x, y)
+    }
+
     companion object {
 
         private const val MARGIN = 16

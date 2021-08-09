@@ -140,7 +140,7 @@ class FavoritesQuickAccessAdapter(
             itemView.quickAccessFaviconCard.setOnLongClickListener {
                 itemState = ItemState.LongPress
                 scaleUpFavicon()
-                showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
+                showOverFlowMenu(inflater, it, item)
                 false
             }
             itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
@@ -153,7 +153,7 @@ class FavoritesQuickAccessAdapter(
                 onMenuItemClicked(view.findViewById(R.id.edit)) { onEditClicked(item) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.showAnchoredToView(itemView, anchor)
         }
 
         override fun onDragStarted() {
