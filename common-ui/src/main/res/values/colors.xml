@@ -114,4 +114,11 @@
     <color name="light_blue">#F2F5F9</color>
     <color name="yellow_10">#FFF2BF</color>
 
+    <!-- widget day/night -->
+    <color name="favoriteTitleTextColor">@color/brownishGrayTwo</color>
+    <color name="favoriteFaviconBackgroundColor">@color/whiteFive</color>
+    <color name="searchWidgetBackgroundColor">@color/white</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/whiteFour</color>
+    <color name="searchWidgetSearchBarHintColor">@color/brownishGrayTwo</color>
+    <color name="searchWidgetSearchBarLoupeColor">@color/almostBlack</color>
 </resources>

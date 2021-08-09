@@ -48,12 +48,13 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
         }
     }
 
-    fun show(rootView: View, anchorView: View) {
+    fun show(rootView: View, anchorView: View, onDismiss: () -> Unit) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
         val x = margin
         val y = anchorLocation[1] + margin
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
+        setOnDismissListener(onDismiss)
     }
 
     companion object {

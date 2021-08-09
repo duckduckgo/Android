@@ -21,7 +21,6 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
