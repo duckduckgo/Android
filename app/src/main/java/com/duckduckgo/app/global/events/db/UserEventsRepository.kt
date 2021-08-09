@@ -36,6 +36,7 @@ class AppUserEventsRepository(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val dispatcher: DispatcherProvider
 ) : UserEventsRepository {
+
     override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {
         return userEventsStore.getUserEvent(userEventKey)
     }

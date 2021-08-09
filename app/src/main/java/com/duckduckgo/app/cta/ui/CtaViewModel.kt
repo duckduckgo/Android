@@ -24,6 +24,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -64,6 +65,7 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val userEventsRepository: UserEventsRepository,
     private val tabRepository: TabRepository,
+    private val favoritesOnboardingObserver: FavoritesOnboardingObserver,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -200,7 +202,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
             canShowDaxFavoritesOnboarding() -> {
-                DaxBubbleCta.DaxFavoritesCTA(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)

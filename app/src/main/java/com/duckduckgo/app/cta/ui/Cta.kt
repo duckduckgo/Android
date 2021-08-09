@@ -28,11 +28,15 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -257,7 +261,7 @@ sealed class DaxBubbleCta(
         appInstallStore
     )
 
-    class DaxFavoritesCTA(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+    class DaxFavoritesCTA(val favoritesOnboarding: FavoritesOnboardingObserver, override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_END,
         R.string.daxFavoritesClearCtaText,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -268,7 +272,8 @@ sealed class DaxBubbleCta(
         appInstallStore
     ) {
         override fun showCta(view: View) {
-            val daxText = view.context.getString(description)
+            val ctaText = if (favoritesOnboarding.userClearedDataRecently) R.string.daxFavoritesClearCtaText else R.string.daxFavoritesNewTabCtaText
+            val daxText = view.context.getString(ctaText)
             view.show()
             view.daxCtaContainer.alpha = 1f
             view.hiddenTextCta.text = daxText.html(view.context)

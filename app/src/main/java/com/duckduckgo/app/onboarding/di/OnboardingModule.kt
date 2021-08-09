@@ -53,6 +53,7 @@ class OnboardingModule {
     }
 
     @Provides
+    @Singleton
     fun userEventsRepository(
         userEventsStore: UserEventsStore,
         userStageStore: UserStageStore,
