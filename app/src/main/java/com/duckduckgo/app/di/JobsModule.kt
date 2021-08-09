@@ -18,34 +18,19 @@ package com.duckduckgo.app.di
 
 import android.app.job.JobScheduler
 import android.content.Context
-import androidx.work.WorkManager
-import com.duckduckgo.app.job.AndroidJobCleaner
-import com.duckduckgo.app.job.AndroidWorkScheduler
-import com.duckduckgo.app.job.JobCleaner
-import com.duckduckgo.app.job.WorkScheduler
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 class JobsModule {
 
     @Singleton
     @Provides
     fun providesJobScheduler(context: Context): JobScheduler {
         return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-    }
-
-    @Singleton
-    @Provides
-    fun providesJobCleaner(workManager: WorkManager): JobCleaner {
-        return AndroidJobCleaner(workManager)
-    }
-
-    @Singleton
-    @Provides
-    fun providesWorkScheduler(notificationScheduler: AndroidNotificationScheduler, jobCleaner: JobCleaner): WorkScheduler {
-        return AndroidWorkScheduler(notificationScheduler, jobCleaner)
     }
 }
