@@ -310,6 +310,7 @@ class BrowserTabViewModel(
         class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
         class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         object ChildTabClosed : Command()
+
         class CopyAliasToClipboard(val alias: String) : Command()
         class InjectEmailAddress(val address: String) : Command()
         class ShowEmailTooltip(val address: String) : Command()
@@ -359,6 +360,7 @@ class BrowserTabViewModel(
             }
             field = value
         }
+    private var saveNextVisitedSiteAsFavorite = false
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
@@ -1038,6 +1040,13 @@ class BrowserTabViewModel(
                     userEventsRepository.siteVisited(it)
                 }
             }
+            if (saveNextVisitedSiteAsFavorite) {
+                saveNextVisitedSiteAsFavorite = false
+                url.takeUnless { it.isNullOrEmpty() }?.let {
+                    val title = title ?: ""
+                    saveSiteAsFavorite(url = it, title = title)
+                }
+            }
         }
     }
 
@@ -1394,6 +1403,10 @@ class BrowserTabViewModel(
             mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString())
         )
 
+        saveSiteAsFavorite(url, title)
+    }
+
+    private fun saveSiteAsFavorite(url: String, title: String) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
@@ -1406,6 +1419,12 @@ class BrowserTabViewModel(
                 }
             }
         }
+    }
+
+    fun onAddFavoriteClicked() {
+        ctaViewState.value = currentCtaViewState().copy(cta = null)
+        command.value = ShowKeyboard
+        saveNextVisitedSiteAsFavorite = true
     }
 
     fun onFireproofWebsiteMenuClicked() {

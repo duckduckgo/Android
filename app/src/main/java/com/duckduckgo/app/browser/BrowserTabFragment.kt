@@ -1018,7 +1018,10 @@ class BrowserTabFragment :
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
         quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
-        val concatAdapter = ConcatAdapter(quickAccessAdapter, AddItemAdapter())
+        val addItemAdapter = AddItemAdapter {
+            viewModel.onAddFavoriteClicked()
+        }
+        val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter)
         quickAccessRecyclerView.adapter = concatAdapter
         quickAccessRecyclerView.disableAnimation()
     }

@@ -21,17 +21,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewItemAddItemBinding
 
-class AddItemAdapter : RecyclerView.Adapter<AddItemAdapter.AddItemViewHolder>() {
+class AddItemAdapter(
+    private val onItemSelected: () -> Unit,
+) : RecyclerView.Adapter<AddItemAdapter.AddItemViewHolder>() {
 
-    class AddItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class AddItemViewHolder(val binding: ViewItemAddItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AddItemViewHolder {
-        return AddItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_item_add_item, parent, false))
+        return AddItemViewHolder(ViewItemAddItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: AddItemViewHolder, position: Int) {
-        // noop
+        holder.binding.quickAccessAddItemCard.setOnClickListener { onItemSelected.invoke() }
     }
 
     override fun getItemCount(): Int = 1
