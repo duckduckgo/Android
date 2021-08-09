@@ -18,6 +18,8 @@ package com.duckduckgo.app.surrogates
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -29,11 +31,12 @@ class ResourceSurrogateLoaderTest {
     private lateinit var dataStore: ResourceSurrogateDataStore
     private lateinit var resourceSurrogates: ResourceSurrogates
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
         dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        testee = ResourceSurrogateLoader(resourceSurrogates, dataStore)
+        testee = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
     }
 
     @Test

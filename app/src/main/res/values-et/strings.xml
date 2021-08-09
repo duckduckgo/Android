@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Tühjenda otsingusisend</string>
     <string name="no_compatible_third_party_app_installed">Ühtegi ühilduvat rakendust pole installitud</string>
     <string name="addBookmarkMenuTitle">Lisa järjehoidja</string>
+    <string name="addFavoriteMenuTitle">Lisa lemmik</string>
+    <string name="favoriteAddedMessage">Lemmik lisatud</string>
+    <string name="bookmarkAddedMessage">Järjehoidja lisatud</string>
     <string name="requestDesktopSiteMenuTitle">Töölaua sait</string>
 
     <!-- Downloading files -->
@@ -88,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
+    <string name="privacyProtectionTemporarilyDisabled">Keelasime ajutiselt privaatsuse kaitse, kuna näib, et see kahjustab seda saiti.</string>
 
     <string name="httpsGood">Krüptitud ühendus</string>
     <string name="httpsMixed">Erinevate krüpteeringutega ühendus</string>
@@ -151,6 +171,8 @@
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
+    <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
+    <string name="settingsEmailProtectionSubtitle">Blokeerige e-posti jälgijad ja peitke oma aadress.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -199,14 +221,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
     <string name="bookmarksActivityTitle">Järjehoidjad</string>
-    <string name="bookmarkDeleteConfirmMessage">Kas soovite kindlasti kustutada järjehoidja &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Järjehoidja lisatud</string>
-    <string name="bookmarkTitleHint">Järjehoidja pealkiri</string>
-    <string name="bookmarkUrlHint">Järjehoidja URL</string>
-    <string name="bookmarkTitleEdit">Redigeeri järjehoidjat</string>
     <string name="noBookmarks">Järjehoidjaid pole veel lisatud</string>
     <string name="bookmarkOverflowContentDescription">Veel järjehoidja %1$s valikuid</string>
-    <string name="bookmarkEdited">Järjehoidja lisatud</string>
     <string name="bookmarkDeleteConfirmationMessage">Kustutatud &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Ekspordi</string>
     <string name="exportBookmarksEmpty">Teil pole järjehoidjaid, midagi ei ekspordita</string>
@@ -217,6 +233,13 @@
     <string name="importBookmarksError">Ühtegi järjehoidjat ei saanud importida, midagi läks valesti</string>
     <string name="importBookmarksEmpty">Failil pole järjehoidjaid, mida importida</string>
     <string name="importBookmarksSuccess">%1$d järjehoidjat on edukalt imporditud</string>
+    <string name="savedSiteDialogTitleHint">Pealkiri</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Redigeeri</string>
+    <string name="bookmarksSectionTitle">Järjehoidjad</string>
+    <string name="favoritesSectionTitle">Lemmikud</string>
+    <string name="bookmarksEmptyHint">Järjehoidjaid pole veel lisatud</string>
+    <string name="favoritesEmptyHint">Lemmikuid pole veel lisatud</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Kinnita</string>
@@ -229,6 +252,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisa avalehele</string>
+    <string name="shortcutAddedText">Õnnestus! %1$s lisati teie avaekraanile.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidake meil rakendust täiustada!</string>
@@ -508,6 +532,7 @@
     <string name="preciseLocationSystemDialogDeny">Võib-olla hiljem</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ära küsi enam selle saidi jaoks</string>
     <string name="preciseLocationSiteDialogTitle">Anda %1$s luba asukohale juurdepääsuks?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Kasutame sinu anonüümset asukohta ainult sulle paremate tulemuste pakkumiseks. Hiljem saad alati oma meelt muuta.</string>
     <string name="preciseLocationSiteDialogSubtitle">Saad hallata asukohale juurdepääsu luba, mille sa oled andnud üksikutele saitidele valikus Seaded.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alati</string>
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
@@ -537,4 +562,62 @@
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="disabled">Keelatud</string>
     <string name="enabled">Lubatud</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Ava lingid seotud rakendustes</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Keela, et takistada linkide automaatset avanemist teistes installitud rakendustes.</string>
+    <string name="appLinkDialogTitle">Avada teises rakenduses?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
+    <string name="autofillTooltipUseYourAlias">Kasutage %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokeerib e-posti jälgijad</string>
+    <string name="autofillTooltipGenerateAddress">Looge privaatne aadress</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
+    <string name="newEmailAliasMenuTitle">Looge Ducki aadress</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Kas eemaldada e-posti kaitsed?</string>
+    <string name="emailSignOutDialogText">Märkus. E-posti kaitsete eemaldamine sellest seadmest ei kustuta teie Ducki aadressi.</string>
+    <string name="emailSignOutDialogCancel">Tühista</string>
+    <string name="emailSignOutDialogDisable">Eemaldage</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-posti järjekord</string>
+    <string name="waitlistNotificationTitle">Teie e-posti kaitse kutse on siin!</string>
+    <string name="waitlistNotificationDescription">Liitusite ootenimekirjaga ja palusite meid teavitada, kui on teie kord proovida meie e-posti kaitse funktsiooni. Kutse vaatamiseks puudutage.</string>
+
+    <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
+    <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>
+    <string name="waitlistNotificationDialogNotifyMe">TEAVITAGE MIND</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-posti kaitse (beeta)</string>
+    <string name="emailProtectionActivityTitle">E-posti kaitse (beeta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Me ei salvesta teie e-kirju. <b><a href=\"\">Lisateave</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Ooteloendiga liitumisel tekkis tõrge, proovige hiljem uuesti</string>
+    <string name="emailProtectionDuckAddressCta">Mul on juba Ducki aadress</string>
+    <string name="emailProtectionInviteCodeCta">Mul on kutse kood</string>
+    <string name="emailProtectionWaitlistCta">Liituge privaatse ootenimekirjaga</string>
+    <string name="emailProtectionGetStartedCta">Alustage</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-posti privaatsus, lihtsustatud.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress<br/> ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Olete nimekirjas!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Saadame teile teate, kui<br/> E-posti kaitse on teie jaoks valmis. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Teie kutse kuvatakse siin, kui oleme teie jaoks valmis. Kas soovite <a href=\"\"><b>saada teavitust</b></a> selle saabumise kohta?<br/><a href=\"\"><b>Lisateave</b></a> e-posti kaitse kohta.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Olete kutsutud!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress<br/> ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Isiklik Ducki aadress</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[E-posti kaitse eemaldamine sellest seadmest eemaldab veebis sirvimise ajal võimaluse sisestada oma isiklik Ducki aadress või äsja loodud isiklik Ducki aadress e-posti väljadele.<br/><br/>Oma Ducki aadresside täielikuks kustutamiseks või muude küsimuste või tagasiside saamiseks pöörduge meie poole aadressil <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Eemaldage seadmest</string>
 </resources>

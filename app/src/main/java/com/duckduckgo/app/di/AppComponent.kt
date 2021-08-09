@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.email.di.EmailModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionModule
-import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
@@ -51,12 +50,10 @@ import javax.inject.Singleton
     scope = AppObjectGraph::class,
     modules = [
         ApplicationModule::class,
-        JobsModule::class,
         WorkerModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,
-        StatisticsModule::class,
         StoreModule::class,
         DatabaseModule::class,
         DaoModule::class,
@@ -64,7 +61,6 @@ import javax.inject.Singleton
         SystemComponentsModule::class,
         BrowserModule::class,
         BrowserAutoCompleteModule::class,
-        HttpsUpgraderModule::class,
         ResourceSurrogateModule::class,
         TrackerDetectionModule::class,
         NotificationModule::class,

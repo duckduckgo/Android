@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Počisti vhod iskanja</string>
     <string name="no_compatible_third_party_app_installed">Ni nameščene združljive aplikacije</string>
     <string name="addBookmarkMenuTitle">Dodaj zaznamek</string>
+    <string name="addFavoriteMenuTitle">Dodaj priljubljene</string>
+    <string name="favoriteAddedMessage">Priljubljeni dodan</string>
+    <string name="bookmarkAddedMessage">Zaznamek je dodan</string>
     <string name="requestDesktopSiteMenuTitle">Namizna stran</string>
 
     <!-- Downloading files -->
@@ -88,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Nadzorna plošča zasebnosti</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">IZBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocena zasebnosti</string>
+    <string name="privacyProtectionTemporarilyDisabled">Začasno smo onemogočili zaščito zasebnosti, saj se zdi, da zato pride do napak na tem spletnem mestu.</string>
 
     <string name="httpsGood">Šifrirana povezava</string>
     <string name="httpsMixed">Mešana šifrirna povezava</string>
@@ -159,6 +179,8 @@
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
+    <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
+    <string name="settingsEmailProtectionSubtitle">Blokirajte sledilce e-pošte in skrijte svoj naslov.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -207,14 +229,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zaznamki</string>
     <string name="bookmarksActivityTitle">Zaznamki</string>
-    <string name="bookmarkDeleteConfirmMessage">Ste prepričani, da želite izbrisati zaznamek &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Zaznamek je dodan</string>
-    <string name="bookmarkTitleHint">Naslov zaznamka</string>
-    <string name="bookmarkUrlHint">URL zaznamka</string>
-    <string name="bookmarkTitleEdit">Uredi zaznamek</string>
     <string name="noBookmarks">Zaznamki še niso dodani</string>
     <string name="bookmarkOverflowContentDescription">Več možnosti za zaznamek %1$s</string>
-    <string name="bookmarkEdited">Zaznamek je dodan</string>
     <string name="bookmarkDeleteConfirmationMessage">Izbrisano &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Izvozi</string>
     <string name="exportBookmarksEmpty">Nimate zaznamkov, nič ne bo izvoženo</string>
@@ -225,6 +241,13 @@
     <string name="importBookmarksError">Zaznamkov ni bilo mogoče uvoziti, nekaj je šlo narobe</string>
     <string name="importBookmarksEmpty">Datoteka nima zaznamkov za uvoz</string>
     <string name="importBookmarksSuccess">Uspešno uvoženih %1$d zaznamkov</string>
+    <string name="savedSiteDialogTitleHint">Naslov</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Uredi</string>
+    <string name="bookmarksSectionTitle">Zaznamki</string>
+    <string name="favoritesSectionTitle">Priljubljeni</string>
+    <string name="bookmarksEmptyHint">Zaznamki še niso dodani</string>
+    <string name="favoritesEmptyHint">Priljubljeni še niso dodani</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potrdi</string>
@@ -237,6 +260,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj na začetno stran</string>
+    <string name="shortcutAddedText">Uspeh! %1$s je dodan na vaš začetni zaslon.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomagajte nam izboljšati aplikacijo!</string>
@@ -520,6 +544,7 @@
     <string name="preciseLocationSystemDialogDeny">Mogoče kasneje</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ne vprašaj znova za to spletno mesto</string>
     <string name="preciseLocationSiteDialogTitle">Dovoli %1$s dostop do lokacije?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vašo anonimno lokacijo uporabljamo samo, da vam zagotovimo boljše rezultate v vaši bližini. Pozneje si lahko vedno premislite.</string>
     <string name="preciseLocationSiteDialogSubtitle">Dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, lahko upravljate v nastavitvah.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vedno</string>
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
@@ -549,4 +574,62 @@
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="disabled">Onemogočeno</string>
     <string name="enabled">Omogočeno</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Odpri povezave v povezanih aplikacijah</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Onemogoči, da preprečiš samodejno odpiranje povezav v drugih nameščenih aplikacijah.</string>
+    <string name="appLinkDialogTitle">Želite odpreti v drugi aplikaciji?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Nov naslov je kopiran v odložišče</string>
+    <string name="autofillTooltipUseYourAlias">Uporabite %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokira sledilce e-pošte</string>
+    <string name="autofillTooltipGenerateAddress">Ustvari zasebni naslov</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokira sledilce e-pošte in skrije vaš naslov</string>
+    <string name="newEmailAliasMenuTitle">Ustvari naslov Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Želite odstraniti zaščito e-pošte?</string>
+    <string name="emailSignOutDialogText">Opomba: Če odstranite zaščito e-pošte iz te naprave, s tem ne boste izbrisali naslova Duck.</string>
+    <string name="emailSignOutDialogCancel">Preklic</string>
+    <string name="emailSignOutDialogDisable">Odstrani</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Čakalni seznam e-pošte</string>
+    <string name="waitlistNotificationTitle">Vabilo za zaščito e-pošte je tu!</string>
+    <string name="waitlistNotificationDescription">Pridružili ste se čakalnemu seznamu in prosili, da vas obvestimo, ko boste na vrsti, da preizkusite našo funkcijo zaščite e-pošte. Dotaknite se za ogled vabila.</string>
+
+    <string name="waitlistNotificationDialogDescription">Želite, da vam pošljemo obvestilo, ko ste na vrsti?</string>
+    <string name="waitlistNotificationDialogNoThanks">NE, HVALA</string>
+    <string name="waitlistNotificationDialogNotifyMe">OBVESTI ME</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Zaščita e-pošte (Beta)</string>
+    <string name="emailProtectionActivityTitle">Zaščita e-pošte (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Vaše e-pošte ne shranjujemo. <b><a href=\"\">Več</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Pri dodajanju na čakalni seznam je prišlo do napake. Poskusite znova pozneje.</string>
+    <string name="emailProtectionDuckAddressCta">Naslov Duck že imam</string>
+    <string name="emailProtectionInviteCodeCta">Imam kodo povabila</string>
+    <string name="emailProtectionWaitlistCta">Pridruži se zasebnemu čakalnemu seznamu</string>
+    <string name="emailProtectionGetStartedCta">Začni</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilce e-pošte in skrijte svoj naslov,<br/>brez zamenjave ponudnika e-pošte. <a href=\"\"><b>Več</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=\"\"><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=\"\"><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Povabljeni ste!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilce e-pošte in skrijte svoj naslov,<br/>brez zamenjave ponudnika e-pošte. <a href=\"\"><b>Več</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Osebni naslov Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Odstranitev zaščite e-pošte iz te naprave odstrani možnost, da med brskanjem po spletu v e-poštna polja vpišete svoj osebni naslov Duck ali na novo ustvarjeni zasebni naslov Duck.<br/><br/>Če želite v celoti izbrisati svoje naslove Duck ali za kakršna koli druga vprašanja ali povratne informacije, se obrnite na nas na <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Odstrani iz naprave</string>
 </resources>
