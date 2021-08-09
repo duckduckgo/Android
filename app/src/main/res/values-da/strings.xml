@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,9 @@
     <string name="clearButtonContentDescription">Ryd søgeinput</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installeret</string>
     <string name="addBookmarkMenuTitle">Tilføj bogmærke</string>
+    <string name="addFavoriteMenuTitle">Tilføj til favorit</string>
+    <string name="favoriteAddedMessage">Favorit tilføjet</string>
+    <string name="bookmarkAddedMessage">Bogmærke tilføjet</string>
     <string name="requestDesktopSiteMenuTitle">Stationær computer</string>
 
     <!-- Downloading files -->
@@ -88,6 +107,7 @@
     <string name="privacyDashboardActivityTitle">Privatlivspanel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORSTÆRKET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad af privatliv</string>
+    <string name="privacyProtectionTemporarilyDisabled">Vi har midlertidigt deaktiveret beskyttelse af privatlivets fred, da det ser ud til at ødelægge dette websted.</string>
 
     <string name="httpsGood">Krypteret forbindelse</string>
     <string name="httpsMixed">Blandet krypteringsforbindelse</string>
@@ -151,6 +171,8 @@
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>
+    <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
+    <string name="settingsEmailProtectionSubtitle">Blokér e-mailtrackere og skjul din adresse.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -199,14 +221,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>
     <string name="bookmarksActivityTitle">Bogmærker</string>
-    <string name="bookmarkDeleteConfirmMessage">Er du sikker på, at du vil slette bogmærket &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Bogmærke tilføjet</string>
-    <string name="bookmarkTitleHint">Titel på bogmærke</string>
-    <string name="bookmarkUrlHint">Bogmærkets URL</string>
-    <string name="bookmarkTitleEdit">Rediger bogmærke</string>
     <string name="noBookmarks">Ingen bogmærker tilføjet endnu</string>
     <string name="bookmarkOverflowContentDescription">Flere muligheder for bogmærke %1$s</string>
-    <string name="bookmarkEdited">Bogmærke tilføjet</string>
     <string name="bookmarkDeleteConfirmationMessage">Slettet &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportér</string>
     <string name="exportBookmarksEmpty">Du har ingen bogmærker, intet eksporteres</string>
@@ -217,6 +233,13 @@
     <string name="importBookmarksError">Kunne ikke importere nogen bogmærker, noget gik galt</string>
     <string name="importBookmarksEmpty">Filen har ingen bogmærker at importere</string>
     <string name="importBookmarksSuccess">Importerede %1$d bogmærker</string>
+    <string name="savedSiteDialogTitleHint">Titel</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Rediger</string>
+    <string name="bookmarksSectionTitle">Bogmærker</string>
+    <string name="favoritesSectionTitle">Favoritter</string>
+    <string name="bookmarksEmptyHint">Ingen bogmærker tilføjet endnu</string>
+    <string name="favoritesEmptyHint">Ingen favoritter tilføjet endnu</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bekræft</string>
@@ -229,6 +252,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Føj til startsiden</string>
+    <string name="shortcutAddedText">Det lykkedes! %1$s er blevet føjet til din startskærm.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hjælp os med at forbedre appen!</string>
@@ -508,6 +532,7 @@
     <string name="preciseLocationSystemDialogDeny">Måske senere</string>
     <string name="preciseLocationSystemDialogNeverAllow">Spørg ikke igen for dette websted</string>
     <string name="preciseLocationSiteDialogTitle">Vil du give %1$s tilladelse til at få adgang til placering?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vi bruger kun din anonyme placering til at levere bedre resultater tættere på dig. Du kan altid skifte mening senere.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kan administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder under Indstillinger.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Altid</string>
     <string name="preciseLocationSiteDialogAllowOnce">Kun for denne session</string>
@@ -537,4 +562,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiveret</string>
     <string name="enabled">Aktiveret</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Åbn links i tilknyttede apps</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Deaktiver for at forhindre, at links automatisk åbnes i andre installerede apps.</string>
+    <string name="appLinkDialogTitle">Åbn i en anden app?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Ny adresse kopieret til din udklipsholder</string>
+    <string name="autofillTooltipUseYourAlias">Brug %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokerer e-mailtrackere</string>
+    <string name="autofillTooltipGenerateAddress">Generér en privatadresse</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokerer e-mailtrackere og skjuler din adresse</string>
+    <string name="newEmailAliasMenuTitle">Opret Duck-adresse</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Vil du fjerne e-mailbeskyttelse?</string>
+    <string name="emailSignOutDialogText">Bemærk: Fjernelse af e-mailbeskyttelse fra denne enhed sletter ikke din Duck-adresse.</string>
+    <string name="emailSignOutDialogCancel">Afbestil</string>
+    <string name="emailSignOutDialogDisable">Fjern</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-mailventeliste</string>
+    <string name="waitlistNotificationTitle">Din invitation til e-mailbeskyttelse er her!</string>
+    <string name="waitlistNotificationDescription">Du sluttede dig til ventelisten og bad os om at underrette dig, når det er din tur til at prøve vores e-mailbeskyttelsesfunktion. Tryk for at se din invitation.</string>
+
+    <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
+    <string name="waitlistNotificationDialogNoThanks">Nej tak.</string>
+    <string name="waitlistNotificationDialogNotifyMe">UNDERRET MIG</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-mailbeskyttelse (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-mailbeskyttelse (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Vi gemmer ikke dine e-mails. <b><a href=\"\">Få mere at vide</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Der opstod en fejl, da du sluttede dig til ventelisten. Prøv igen senere</string>
+    <string name="emailProtectionDuckAddressCta">Jeg har allerede en Duck-adresse</string>
+    <string name="emailProtectionInviteCodeCta">Jeg har en invitationskode</string>
+    <string name="emailProtectionWaitlistCta">Slut dig til den private venteliste</string>
+    <string name="emailProtectionGetStartedCta">Kom igang</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Fortrolighed af e-mail, forenklet.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokér e-mailtrackere og skjul din adresse,<br/> uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Du er på listen!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi sender dig en meddelelse, når<br/> e-mailbeskyttelse er klar til dig. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din invitation vises her, når vi er klar til dig. Vil du <a href=\"\"><b>modtage en meddelelse,</b></a> når den ankommer?<br/><a href=\"\"><b>Få mere at vide</b></a> om e-mailbeskyttelse.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Du er inviteret!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokér e-mailtrackere og skjul din adresse,<br/>uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Personlig Duck-adresse</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Fjernelse af e-mailbeskyttelse fra denne enhed fjerner muligheden for at udfylde din personlige Duck-adresse eller en nyoprettet privat Duck-adresse i e-mailfelter, når du surfer på nettet.<br/><br/>For at slette dine Duck-adresser helt eller for andre spørgsmål eller feedback, kontakt os på <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Fjern fra enhed</string>
 </resources>

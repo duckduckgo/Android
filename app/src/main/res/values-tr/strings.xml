@@ -33,6 +33,9 @@
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
+    <string name="addFavoriteMenuTitle">Favori Ekle</string>
+    <string name="favoriteAddedMessage">Favori eklendi</string>
+    <string name="bookmarkAddedMessage">Yer imi eklendi</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
 
     <!-- Downloading files -->
@@ -88,6 +91,7 @@
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
     <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
+    <string name="privacyProtectionTemporarilyDisabled">Bu sitede hatalara neden olduğu için Gizlilik Korumasını geçici olarak devre dışı bıraktık.</string>
 
     <string name="httpsGood">Şifreli Bağlantı</string>
     <string name="httpsMixed">Karma Şifreleme Bağlantısı</string>
@@ -151,6 +155,8 @@
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
+    <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
+    <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyerek adresinizi gizleyin.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -199,14 +205,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Yer İmleri</string>
     <string name="bookmarksActivityTitle">Yer İmleri</string>
-    <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
-    <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
-    <string name="bookmarkTitleHint">Yer imi başlığı</string>
-    <string name="bookmarkUrlHint">Yer imi URL\'si</string>
-    <string name="bookmarkTitleEdit">Yer işaretini düzenle</string>
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
     <string name="bookmarkOverflowContentDescription">%1$s yer imi için diğer seçenekler</string>
-    <string name="bookmarkEdited">Yer imi eklendi</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; silindi</string>
     <string name="exportBookmarksMenu">Dışa Aktar</string>
     <string name="exportBookmarksEmpty">Yer işaretiniz olmadığından hiçbir şey dışa aktarılmayacak</string>
@@ -217,6 +217,13 @@
     <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
     <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
     <string name="importBookmarksSuccess">%1$d yer işareti başarıyla içe aktarıldı</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Düzenle</string>
+    <string name="bookmarksSectionTitle">Yer İmleri</string>
+    <string name="favoritesSectionTitle">Favoriler</string>
+    <string name="bookmarksEmptyHint">Henüz yer işareti eklenmedi</string>
+    <string name="favoritesEmptyHint">Henüz hiç favori eklenmedi</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
@@ -229,6 +236,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Ana Sayfaya Ekle</string>
+    <string name="shortcutAddedText">Başarılı! %1$s ana ekranınıza eklendi.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Uygulamayı geliştirmemize yardımcı olun!</string>
@@ -508,6 +516,7 @@
     <string name="preciseLocationSystemDialogDeny">Belki Sonra</string>
     <string name="preciseLocationSystemDialogNeverAllow">Bu Site için Bir Daha Sorma</string>
     <string name="preciseLocationSiteDialogTitle">%1$s için konuma erişim izni verilsin mi?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonim konumunuzu sadece size daha yakın, daha alakalı sonuçlar sunmak için kullanırız. Bu tercihi daha sonra dilediğiniz zaman değiştirebilirsiniz.</string>
     <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Her zaman</string>
     <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
@@ -537,4 +546,62 @@
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="disabled">Devre Dışı</string>
     <string name="enabled">Etkin</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Bağlantıları İlişkili Uygulamalarda Aç</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Bağlantıların yüklenmiş olan diğer uygulamalarda otomatik olarak açılmasını önlemek için devre dışı bırakın.</string>
+    <string name="appLinkDialogTitle">Başka bir uygulamada açılsın mı?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Yeni adres panoya kopyalandı</string>
+    <string name="autofillTooltipUseYourAlias">%1$s kullan</string>
+    <string name="autofillTooltipUseYourAliasDescription">E-posta izleyicileri engeller</string>
+    <string name="autofillTooltipGenerateAddress">Özel Adres Oluşturun</string>
+    <string name="autofillTooltipGenerateAddressDescription">E-posta izleyicileri engeller ve adresinizi gizler</string>
+    <string name="newEmailAliasMenuTitle">Duck Adresi Oluştur</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">E-posta Korumaları Kaldırılsın mı?</string>
+    <string name="emailSignOutDialogText">Not: E-posta Korumalarının bu cihazdan kaldırılması Duck Adresinizin silinmesine yol açmaz.</string>
+    <string name="emailSignOutDialogCancel">İptal</string>
+    <string name="emailSignOutDialogDisable">Kaldır</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-posta bekleme listesi</string>
+    <string name="waitlistNotificationTitle">E-posta Koruması için Davetlisiniz!</string>
+    <string name="waitlistNotificationDescription">Bekleme listesine katılarak E-posta Koruması özelliğini deneme sırası size geldiğinde sizi bilgilendirmemizi istediniz. Davetiyenizi görüntülemek için dokunun.</string>
+
+    <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
+    <string name="waitlistNotificationDialogNoThanks">HAYIR, TEŞEKKÜRLER</string>
+    <string name="waitlistNotificationDialogNotifyMe">BANA BİLDİR</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-posta Koruması (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-posta Koruması (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[E-postalarınızı kaydetmiyoruz. <b><a href=\"\">Daha fazla bilgi</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Bekleme listesine katılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="emailProtectionDuckAddressCta">Zaten Duck Adresim var</string>
+    <string name="emailProtectionInviteCodeCta">Davet Kodum var</string>
+    <string name="emailProtectionWaitlistCta">Özel Bekleme Listesine Katılın</string>
+    <string name="emailProtectionGetStartedCta">Başlayın</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-posta gizliliğinin basitleştirilmiş hâli.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı<br/>değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Listedesiniz!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=\"\"><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=\"\"><b>daha fazla bilgi edinin</b></a>.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Davetlisiniz!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı<br/>değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Kişisel Duck Adresi</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[E-posta Korumasını bu cihazdan kaldırmak, Web\'de gezinirken Kişisel Duck Adresinizi veya yeni oluşturulan Özel Duck Adresinizi e-posta alanlarına doldurma seçeneğini kaldırır.<br/><br/>Duck Adreslerinizi tamamen silmek veya diğer sorularınız veya geri bildirimleriniz için <a href=\"mailto:support@duck.com\">support@duck.com</a> adresinden bize ulaşın.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Cihazdan Kaldır</string>
 </resources>
