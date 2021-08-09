@@ -63,7 +63,7 @@
             android:visibility="gone"/>
 
         <LinearLayout
-            android:id="@+id/bottom_dax_cta"
+            android:id="@+id/bottomDaxCtaContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

@@ -2128,10 +2128,11 @@ class BrowserTabFragment :
             if (configuration is DaxBubbleCta.DaxFavoritesCTA) {
                 showHomeBackground(favorites)
                 hideHomeCta()
-                if (bottom_dax_cta.isVisible) return
-                bottom_dax_cta.removeAllViews()
-                inflate(context, R.layout.include_dax_buble_button_cta, bottom_dax_cta)
-                configuration.showCta(bottom_dax_cta)
+                if (bottomDaxCtaContainer.isVisible) return
+                bottomDaxCtaContainer.removeAllViews()
+                inflate(context, R.layout.include_dax_buble_button_cta, bottomDaxCtaContainer)
+                configuration.showCta(bottomDaxCtaContainer)
+                bottomDaxCtaContainer.primaryCta.setOnClickListener { viewModel.onAddFavoriteClicked() }
                 viewModel.onCtaShown()
             } else {
                 hideHomeBackground()
@@ -2184,7 +2185,7 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             dialogTextCta.cancelAnimation()
             daxCtaContainer.hide()
-            bottom_dax_cta.hide()
+            bottomDaxCtaContainer.hide()
         }
 
         private fun hideHomeCta() {
