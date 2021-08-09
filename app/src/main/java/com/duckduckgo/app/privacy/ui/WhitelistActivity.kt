@@ -20,26 +20,22 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
 import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
-import com.duckduckgo.app.browser.databinding.ViewWhitelistEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -82,7 +78,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecycler() {
-        adapter = WebsitesAdapter(viewModel, faviconManager)
+        adapter = WebsitesAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
 
         val separator = DividerItemDecoration(this, VERTICAL)
@@ -198,62 +194,4 @@ class WhitelistActivity : DuckDuckGoActivity() {
             return Intent(context, WhitelistActivity::class.java)
         }
     }
-
-    class WhitelistAdapter(private val viewModel: WhitelistViewModel) : Adapter<WhitelistViewHolder>() {
-
-        var entries: List<UserWhitelistedDomain> = emptyList()
-            set(value) {
-                field = value
-                notifyDataSetChanged()
-            }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WhitelistViewHolder {
-            val inflater = LayoutInflater.from(parent.context)
-            val binding = ViewWhitelistEntryBinding.inflate(inflater, parent, false)
-            return WhitelistViewHolder(inflater, binding.root)
-        }
-
-        override fun onBindViewHolder(holder: WhitelistViewHolder, position: Int) {
-            val listItem = holder.itemView as SingleLineListItem
-
-            val entry = entries[position]
-
-            listItem.setTitle(entry.domain)
-            listItem.setClickListener {
-                viewModel.onEditRequested(entry)
-            }
-            listItem.setOverflowClickListener {
-                showOverflowMenu(holder, entry)
-            }
-            holder.root.setOnClickListener {
-                viewModel.onEditRequested(entry)
-            }
-        }
-
-        private fun showOverflowMenu(
-            holder: WhitelistViewHolder,
-            entry: UserWhitelistedDomain
-        ) {
-
-            val popupMenu = PopupMenu(
-                holder.layoutInflater,
-                R.layout.popup_window_edit_delete_menu
-            )
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { viewModel.onEditRequested(entry) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteRequested(entry) }
-            }
-            popupMenu.show(holder.itemView, holder.itemView.findViewById(R.id.overflowMenu))
-        }
-
-        override fun getItemCount(): Int {
-            return entries.size
-        }
-    }
-
-    class WhitelistViewHolder(
-        val layoutInflater: LayoutInflater,
-        val root: View,
-    ) : RecyclerView.ViewHolder(root)
 }

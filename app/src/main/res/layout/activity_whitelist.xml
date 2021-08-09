@@ -28,21 +28,6 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_toolbar" />
 
-    <TextView
-        android:id="@+id/explanation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:maxWidth="200dp"
-        android:text="@string/whitelistExplanation"
-        android:textAlignment="center"
-        android:textColor="?attr/whitelistTextColor"
-        android:textSize="12sp" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
