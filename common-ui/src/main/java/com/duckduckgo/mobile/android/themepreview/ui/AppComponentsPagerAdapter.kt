@@ -39,8 +39,8 @@ class AppComponentsPagerAdapter(
     enum class MainFragments(val titleRes: Int) {
         PALETTE(R.string.tab_title_color_palette),
         TYPOGRAPHY(R.string.tab_title_typography),
-        NAVIGATION(R.string.tab_title_component_navigation),
         BUTTONS(R.string.tab_title_component_buttons),
+        NAVIGATION(R.string.tab_title_component_navigation),
         CONTROLS(R.string.tab_title_component_controls),
         SYSTEM(R.string.tab_title_component_system),
     }

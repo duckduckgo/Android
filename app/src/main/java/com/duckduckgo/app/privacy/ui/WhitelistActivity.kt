@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
 import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
 import com.duckduckgo.app.browser.databinding.ViewWhitelistEntryBinding
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
@@ -40,10 +41,14 @@ import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 
 class WhitelistActivity : DuckDuckGoActivity() {
 
-    private lateinit var adapter: WhitelistAdapter
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
+    private lateinit var adapter: WebsitesAdapter
 
     private val binding: ActivityWhitelistBinding by viewBinding()
 
@@ -77,7 +82,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecycler() {
-        adapter = WhitelistAdapter(viewModel)
+        adapter = WebsitesAdapter(viewModel, faviconManager)
         recycler.adapter = adapter
 
         val separator = DividerItemDecoration(this, VERTICAL)

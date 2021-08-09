@@ -14,4 +14,14 @@
   ~ limitations under the License.
   -->
 
-<View style="@style/FireproofWebsiteGroupDivider" />
+<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/websiteDescription"
+    style="@style/Widget.DuckDuckGo.ListItem.Description"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="12dp"
+    tools:text="Lorem ipsum dolor sit amet" />

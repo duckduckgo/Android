@@ -83,7 +83,7 @@ class FireproofWebsiteAdapter(
                 )
             }
             DIVIDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
+                val view = inflater.inflate(R.layout.view_list_item_divider, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             SECTION_TITLE_TYPE -> {
