@@ -56,7 +56,7 @@ class SendTrackerDebugReceiver @Inject constructor(
     private val vpnDatabase: VpnDatabase,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
-    fun register() {
+    private fun register() {
         unregister()
         if (!BuildConfig.DEBUG) {
             Timber.i("Will not register SendTrackerDebugReceiver, not in DEBUG mode")
@@ -67,7 +67,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         context.registerReceiver(this, IntentFilter(INTENT_ACTION))
     }
 
-    fun unregister() {
+    private fun unregister() {
         kotlin.runCatching { context.unregisterReceiver(this) }
     }
 

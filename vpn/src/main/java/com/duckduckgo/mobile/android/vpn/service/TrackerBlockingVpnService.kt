@@ -24,25 +24,19 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import android.system.OsConstants.AF_INET6
-import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -52,15 +46,6 @@ import java.util.concurrent.*
 import javax.inject.Inject
 
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
-
-    @Inject
-    lateinit var vpnDatabase: VpnDatabase
-
-    @Inject
-    lateinit var repository: AppTrackerBlockingStatsRepository
-
-    @Inject
-    lateinit var notificationManager: NotificationManagerCompat
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -99,13 +84,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
 
-    private var newTrackerObserverJob: Job? = null
-    private var notificationTickerJob: Job? = null
-    private var notificationTickerChannel = MutableStateFlow(System.currentTimeMillis())
-    private var timeRunningTrackerJob: Job? = null
-
-    private var lastSavedTimestamp = 0L
-
     inner class VpnServiceBinder : Binder() {
 
         override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
@@ -143,7 +121,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onDestroy() {
         Timber.e("VPN log onDestroy")
-        notifyVpnStopped()
         super.onDestroy()
     }
 
@@ -154,6 +131,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
+                notifyVpnStart()
                 launch { startVpn() }
                 returnCode = Service.START_REDELIVER_INTENT
             }
@@ -168,7 +146,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private suspend fun startVpn() = withContext(Dispatchers.IO) {
         Timber.i("VPN log: Starting VPN")
-        notifyVpnStart()
 
         queues.clearAll()
 
@@ -190,15 +167,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: starting ${it.javaClass} callback")
             it.onVpnStarted(this)
-        }
-    }
-
-    private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTracker>) {
-        if (trackersBlocked.isNotEmpty()) {
-            val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationNewTrackerFound(trackersBlocked)
-            val notification = DeviceShieldEnabledNotificationBuilder
-                .buildTrackersBlockedNotification(this, deviceShieldNotification, ongoingNotificationPressedHandler)
-            notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
         }
     }
 
@@ -275,7 +243,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun stopVpn(reason: VpnStopReason) {
         Timber.i("VPN log: Stopping VPN")
-        notifyVpnStopped()
 
         queues.clearAll()
         executorService?.shutdownNow()
@@ -342,64 +309,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun notifyVpnStart() {
-        timeRunningTrackerJob?.cancel()
-        timeRunningTrackerJob = launch(Dispatchers.Default) {
-            // write initial time immediately once
-            writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
-
-            // update running time regularly with specified intervals
-            while (isActive) {
-                delay(30_000)
-                writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
-            }
-        }
-
         val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationDeviceShieldEnabled()
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
             DeviceShieldEnabledNotificationBuilder
                 .buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification, ongoingNotificationPressedHandler)
         )
-
-        newTrackerObserverJob = launch {
-            repository.getVpnTrackers({ dateOfLastHour() })
-                .combine(notificationTickerChannel.asStateFlow()) { trackers, _ -> trackers }
-                .onStart { startNewTrackerNotificationRefreshTicker() }
-                .collectLatest {
-                    updateNotificationForNewTrackerFound(it)
-                }
-        }
-    }
-
-    private fun startNewTrackerNotificationRefreshTicker() {
-        // this ticker ensures the ongoing notification information is not stale if we haven't
-        // blocked trackers for a while
-        notificationTickerJob?.cancel()
-        notificationTickerJob = launch {
-            while (isActive) {
-                notificationTickerChannel.emit(System.currentTimeMillis())
-                delay(TimeUnit.HOURS.toMillis(1))
-            }
-        }
-    }
-
-    private fun timeSinceLastRunningTimeSave(): Long {
-        val timeNow = SystemClock.elapsedRealtime()
-        return if (lastSavedTimestamp == 0L) 0 else timeNow - lastSavedTimestamp
-    }
-
-    private fun notifyVpnStopped() {
-        timeRunningTrackerJob?.cancel()
-        newTrackerObserverJob?.cancel()
-        notificationTickerJob?.cancel()
-        launch { writeRunningTimeToDatabase(timeSinceLastRunningTimeSave()) }
-    }
-
-    private fun writeRunningTimeToDatabase(runningTimeSinceLastSaveMillis: Long) {
-        launch(Dispatchers.IO) {
-            vpnDatabase.vpnRunningStatsDao().upsert(runningTimeSinceLastSaveMillis)
-            lastSavedTimestamp = SystemClock.elapsedRealtime()
-        }
     }
 
     companion object {
@@ -452,11 +367,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             if (isServiceRunning(applicationContext)) return
 
             startIntent(applicationContext).run {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    applicationContext.startForegroundService(this)
-                } else {
-                    applicationContext.startService(this)
-                }
+                ContextCompat.startForegroundService(applicationContext, this)
             }
         }
 
@@ -466,11 +377,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             if (!isServiceRunning(applicationContext)) return
 
             stopIntent(applicationContext).run {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    applicationContext.startForegroundService(this)
-                } else {
-                    applicationContext.startService(this)
-                }
+                ContextCompat.startForegroundService(applicationContext, this)
             }
         }
 

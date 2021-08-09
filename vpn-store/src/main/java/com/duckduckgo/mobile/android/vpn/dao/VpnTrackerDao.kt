@@ -31,7 +31,7 @@ interface VpnTrackerDao {
     fun insert(tracker: VpnTracker)
 
     @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
-    fun getLatestTracker(): Flow<VpnTracker>
+    fun getLatestTracker(): Flow<VpnTracker?>
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>

@@ -35,7 +35,8 @@ private class VpnServiceCallbacksPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards VpnServiceCallbacks>
 ) : PluginPoint<VpnServiceCallbacks> {
     override fun getPlugins(): Collection<VpnServiceCallbacks> {
-        return plugins
+        // not that it matters but sorting adds predictability here
+        return plugins.sortedBy { it.javaClass.simpleName }
     }
 }
 

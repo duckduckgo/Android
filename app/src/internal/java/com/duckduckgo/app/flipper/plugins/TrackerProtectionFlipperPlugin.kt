@@ -52,16 +52,18 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
 
         job = vpnTrackerDatabase.getLatestTracker()
             .onEach { tracker ->
-                Timber.v("$id: sending $tracker")
-                FlipperObject.Builder()
-                    .put("id", tracker.trackerId)
-                    .put("timestamp", tracker.timestamp)
-                    .put("domain", tracker.domain)
-                    .put("company", tracker.companyDisplayName)
-                    .put("appId", tracker.trackingApp.packageId)
-                    .put("appName", tracker.trackingApp.appDisplayName)
-                    .build()
-                    .also { newRow(it) }
+                tracker?.let {
+                    Timber.v("$id: sending $tracker")
+                    FlipperObject.Builder()
+                        .put("id", tracker.trackerId)
+                        .put("timestamp", tracker.timestamp)
+                        .put("domain", tracker.domain)
+                        .put("company", tracker.companyDisplayName)
+                        .put("appId", tracker.trackingApp.packageId)
+                        .put("appName", tracker.trackingApp.appDisplayName)
+                        .build()
+                        .also { newRow(it) }
+                }
             }
             .launchIn(appCoroutineScope)
     }
