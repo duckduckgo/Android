@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.events.db
 
-import android.os.SystemClock
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent

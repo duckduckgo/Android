@@ -254,10 +254,10 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxFavoritesOnboarding(): Boolean = daxOnboardingActive() &&
-            !daxDialogEndShown() &&
-            daxDialogIntroShown() &&
-            !settingsDataStore.hideTips &&
-            userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true
+        !daxDialogEndShown() &&
+        daxDialogIntroShown() &&
+        !settingsDataStore.hideTips &&
+        userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&

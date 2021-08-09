@@ -27,10 +27,12 @@ import javax.inject.Inject
 class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val workManager: WorkManager) {
 
     fun scheduleWork() {
-        workManager.enqueue(OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
-            .addTag(FAVORITES_ONBOARDING_WORK_TAG)
-            .setInitialDelay(1, TimeUnit.DAYS)
-            .build())
+        workManager.enqueue(
+            OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
+                .addTag(FAVORITES_ONBOARDING_WORK_TAG)
+                .setInitialDelay(1, TimeUnit.DAYS)
+                .build()
+        )
     }
 
     companion object {
@@ -38,14 +40,14 @@ class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val work
     }
 }
 
-class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams) {
+class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     @Inject
     lateinit var userEvents: UserEventsRepository
 
     override suspend fun doWork(): Result {
         userEvents.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
-            //TODO: check if we need to reset timestamp
+            // TODO: check if we need to reset timestamp
             userEvents.clearVisitedSite()
         }
 
@@ -56,7 +58,7 @@ class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters
 @ContributesMultibinding(AppObjectGraph::class)
 class FavoritesOnboardingWorkerInjectonPlugin @Inject constructor(
     private val userEvents: UserEventsRepository
-): WorkerInjectorPlugin {
+) : WorkerInjectorPlugin {
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is FavoritesOnboardingWorker) {
             worker.userEvents = userEvents

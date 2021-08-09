@@ -17,10 +17,8 @@
 package com.duckduckgo.app.browser.favorites
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewItemAddItemBinding
 
 class AddItemAdapter(
@@ -39,4 +37,3 @@ class AddItemAdapter(
 
     override fun getItemCount(): Int = 1
 }
-

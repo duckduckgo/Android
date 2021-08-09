@@ -16,13 +16,11 @@
 
 package com.duckduckgo.app.onboarding.di
 
-import androidx.work.WorkManager
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.AppUserEventsRepository
-import com.duckduckgo.app.global.events.db.FavoritesOnboardingWorkRequestBuilder
 import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.onboarding.store.UserStageStore

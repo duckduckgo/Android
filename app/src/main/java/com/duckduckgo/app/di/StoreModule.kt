@@ -17,10 +17,8 @@
 package com.duckduckgo.app.di
 
 import androidx.lifecycle.LifecycleObserver
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.*
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
