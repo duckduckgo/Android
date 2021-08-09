@@ -26,39 +26,25 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessAddItemCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/savedSiteGridItemFavicon"
+        android:layout_height="@dimen/savedSiteGridItemFavicon"
         android:layout_gravity="center_horizontal"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        app:cardBackgroundColor="?attr/colorPrimary"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="4dp">
+        app:cardBackgroundColor="#EAEAEA"
+        app:cardCornerRadius="10dp">
 
         <ImageView
             android:id="@+id/quickAccessAddItemIcon"
-            android:layout_width="@dimen/savedSiteGridItemFavicon"
-            android:layout_height="@dimen/savedSiteGridItemFavicon"
-            android:importantForAccessibility="no"/>
+            android:layout_width="@dimen/addSavedSiteGridItemIcon"
+            android:layout_height="@dimen/addSavedSiteGridItemIcon"
+            android:importantForAccessibility="no"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_add"/>
 
     </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:id="@+id/quickAccessAddItemTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="2"
-        android:paddingStart="11dp"
-        android:paddingEnd="11dp"
-        android:paddingTop="8dp"
-        android:textColor="?quickAccessItemTitleTextColor"
-        android:textSize="12sp"
-        tools:text="Super long favorite title" />
 
 </LinearLayout>
