@@ -20,6 +20,7 @@ import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Test
 
@@ -28,11 +29,12 @@ class WorkSchedulerTest {
     private val notificationScheduler: AndroidNotificationScheduler = mock()
     private val jobCleaner: JobCleaner = mock()
 
-    private lateinit var testee: WorkScheduler
+    private lateinit var testee: AndroidWorkScheduler
 
     @Before
     fun before() {
         testee = AndroidWorkScheduler(
+            TestCoroutineScope(),
             notificationScheduler,
             jobCleaner
         )

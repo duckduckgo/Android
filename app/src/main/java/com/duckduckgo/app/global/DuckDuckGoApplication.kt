@@ -19,7 +19,6 @@ package com.duckduckgo.app.global
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Process
 import androidx.lifecycle.Lifecycle
@@ -27,29 +26,17 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.di.component.BookmarksActivityComponent
-import com.duckduckgo.app.fire.*
-import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.job.WorkScheduler
-import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.AtbInitializer
-import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import com.google.firebase.FirebaseApp
@@ -57,60 +44,26 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.threetenabp.AndroidThreeTen
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
-import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
+import org.threeten.bp.zone.ZoneRulesProvider
 import java.io.File
 import java.lang.RuntimeException
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleObserver {
-
-    @Inject
-    lateinit var trackerDataLoader: TrackerDataLoader
-
-    @Inject
-    lateinit var resourceSurrogateLoader: ResourceSurrogateLoader
-
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var notificationRegistrar: NotificationRegistrar
 
     @Inject
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var httpsUpgrader: HttpsUpgrader
-
-    @Inject
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
-
-    @Inject
-    lateinit var offlinePixelScheduler: OfflinePixelScheduler
-
-    @Inject
-    lateinit var workScheduler: WorkScheduler
-
-    @Inject
-    lateinit var appDataLoader: AppDataLoader
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
     @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
-
-    @Inject
-    lateinit var atbInitializer: AtbInitializer
-
-    @Inject
-    lateinit var shortcutReceiver: ShortcutReceiver
 
     @Inject
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
@@ -161,18 +114,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             }
         }
 
-        loadTrackerData()
-        scheduleOfflinePixels()
-
-        notificationRegistrar.registerApp()
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
-
-        initializeHttpsUpgrader()
         submitUnsentFirePixels()
 
         appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
-            appDataLoader.loadData()
         }
     }
 
@@ -208,13 +153,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             return true
         }
         return false
-    }
-
-    private fun loadTrackerData() {
-        applicationCoroutineScope.launch {
-            trackerDataLoader.loadData()
-            resourceSurrogateLoader.loadData()
-        }
     }
 
     private fun configureLogging() {
@@ -268,10 +206,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         return dir
     }
 
-    private fun initializeHttpsUpgrader() {
-        thread { httpsUpgrader.reloadData() }
-    }
-
     private fun submitUnsentFirePixels() {
         val count = unsentForgetAllPixelStore.pendingPixelCountClearData
         Timber.i("Found $count unsent clear data pixels")
@@ -286,10 +220,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             }
             unsentForgetAllPixelStore.resetCount()
         }
-    }
-
-    private fun scheduleOfflinePixels() {
-        offlinePixelScheduler.scheduleOfflinePixels()
     }
 
     private fun initializeDateLibrary() {
@@ -308,15 +238,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             return
         }
         pixel.fire(APP_LAUNCH)
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onAppResumed() {
-        notificationRegistrar.updateStatus()
-        appCoroutineScope.launch {
-            workScheduler.scheduleWork()
-            atbInitializer.initialize()
-        }
     }
 
     companion object {

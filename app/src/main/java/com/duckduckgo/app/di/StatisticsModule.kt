@@ -34,14 +34,18 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.VpnStatisticsRequester
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 class StatisticsModule {
 
     @Provides
@@ -100,13 +104,15 @@ class StatisticsModule {
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
     @Provides
+    @IntoSet
     @Singleton
     fun atbInitializer(
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
-    ): AtbInitializer {
-        return AtbInitializer(statisticsDataStore, statisticsUpdater, listeners)
+    ): LifecycleObserver {
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 
     @Singleton
