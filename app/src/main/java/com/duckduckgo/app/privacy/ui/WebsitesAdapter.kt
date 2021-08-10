@@ -50,7 +50,6 @@ class WebsitesAdapter(
         DESCRIPTION_TYPE,
         DIVIDER_TYPE,
         SECTION_TITLE_TYPE,
-        SITE_ENTRY
     )
 
     private fun itemsOnTopOfList() = sortedHeaderElements.size
@@ -90,6 +89,11 @@ class WebsitesAdapter(
                     lifecycleOwner,
                     faviconManager
                 )
+            }
+            EMPTY_STATE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_list_item_empty_hint, parent, false)
+                view.findViewById<TextView>(R.id.listItemEmptyHintTitle).setText(R.string.whitelistNoEntries)
+                WebsiteViewHolder.EmptyHintViewHolder(view)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -135,6 +139,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     class DescriptionViewViewHolder(itemView: View) : WebsiteViewHolder(itemView)
     class DividerViewHolder(itemView: View) : WebsiteViewHolder(itemView)
     class SectionTitleViewHolder(itemView: View) : WebsiteViewHolder(itemView)
+    class EmptyHintViewHolder(itemView: View) : WebsiteViewHolder(itemView)
     class WebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
         itemView: View,
