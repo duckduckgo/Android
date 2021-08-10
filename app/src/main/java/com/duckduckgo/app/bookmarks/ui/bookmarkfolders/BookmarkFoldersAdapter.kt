@@ -25,9 +25,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.app.bookmarks.ui.SavedSitePopupMenu
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
+import kotlinx.android.synthetic.main.view_bookmark_folder_entry.view.*
 import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
 import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 
@@ -64,7 +64,7 @@ class BookmarkFoldersAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_FOLDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
+                val view = inflater.inflate(R.layout.view_bookmark_folder_entry, parent, false)
                 BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, view, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
@@ -126,8 +126,6 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
                 itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
 
-            itemView.icon.visibility = View.VISIBLE
-            itemView.favicon.visibility = View.GONE
             itemView.icon.setImageResource(R.drawable.ic_folder)
 
             itemView.overflowMenu.setOnClickListener {
@@ -140,11 +138,11 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
         }
 
         private fun showOverFlowMenu(anchor: ImageView, bookmarkFolder: BookmarkFolder) {
-            val popupMenu = SavedSitePopupMenu(layoutInflater)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editSavedSite) { editBookmarkFolder(bookmarkFolder) }
-                onMenuItemClicked(view.deleteSavedSite) { deleteBookmarkFolder(bookmarkFolder) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmarkFolder(bookmarkFolder) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmarkFolder(bookmarkFolder) }
             }
             popupMenu.show(itemView, anchor)
         }

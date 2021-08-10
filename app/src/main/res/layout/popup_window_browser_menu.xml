@@ -15,46 +15,48 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/popup_menu_bg">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/popupMenuItemHeight"
         android:gravity="center"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/backPopupMenuItem"
-            style="@style/BrowserIconMenuItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_back_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
-            style="@style/BrowserIconMenuItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_forward" />
+            android:src="@drawable/ic_forward"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/refreshPopupMenuItem"
+            app:layout_constraintStart_toEndOf="@+id/backPopupMenuItem"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/refreshPopupMenuItem"
-            style="@style/BrowserIconMenuItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_refresh" />
+            android:src="@drawable/ic_refresh"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -63,91 +65,73 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="13dp"
-            android:paddingBottom="20dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/newTabPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/newTabMenuItem" />
 
             <TextView
                 android:id="@+id/bookmarksPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/bookmarksMenuTitle" />
 
             <TextView
                 android:id="@+id/addBookmarksPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/addBookmarkMenuTitle" />
 
             <TextView
                 android:id="@+id/addFavoritePopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/addFavoriteMenuTitle" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
-                style="@style/BrowserCheckBoxMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
                 android:theme="@style/PopUpMenuSwitchTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:button="@null"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="24dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="0dp"
                 android:text="@string/fireproofWebsiteMenuTitleAdd" />
 
             <TextView
                 android:id="@+id/sharePageMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/shareMenuTitle" />
 
             <TextView
                 android:id="@+id/newEmailAliasMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/newEmailAliasMenuTitle" />
 
             <TextView
                 android:id="@+id/findInPageMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/findInPageMenuTitle" />
 
             <TextView
                 android:id="@+id/addToHome"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/addToHome" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
-                style="@style/BrowserCheckBoxMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
                 android:theme="@style/PopUpMenuSwitchTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:button="@null"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="24dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="0dp"
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
                 android:id="@+id/whitelistPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/enablePrivacyProtection" />
 
             <TextView
                 android:id="@+id/brokenSitePopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
 
             <TextView
                 android:id="@+id/settingsPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/settingsMenuItemTitle" />
 
         </LinearLayout>

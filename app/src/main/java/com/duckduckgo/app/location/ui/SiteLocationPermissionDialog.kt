@@ -27,7 +27,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
 import dagger.android.support.AndroidSupportInjection

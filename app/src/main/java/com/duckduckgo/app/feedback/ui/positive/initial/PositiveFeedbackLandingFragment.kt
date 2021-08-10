@@ -16,17 +16,15 @@
 
 package com.duckduckgo.app.feedback.ui.positive.initial
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackPositiveLandingBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
-class PositiveFeedbackLandingFragment : FeedbackFragment() {
+class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedback_positive_landing) {
 
     interface PositiveFeedbackLandingListener {
         fun userSelectedToRateApp()
@@ -34,8 +32,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
         fun userGavePositiveFeedbackNoDetails()
     }
 
-    private var _binding: ContentFeedbackPositiveLandingBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ContentFeedbackPositiveLandingBinding by viewBinding()
 
     private val viewModel by bindViewModel<PositiveFeedbackLandingViewModel>()
 
@@ -44,11 +41,6 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
 
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = ContentFeedbackPositiveLandingBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(
@@ -68,11 +60,6 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
                 }
             }
         )
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun configureListeners() {

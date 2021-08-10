@@ -37,7 +37,7 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogF
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import kotlinx.android.synthetic.main.include_find_in_page.*
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
@@ -131,7 +131,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     private fun configureUpNavigation(toolbar: Toolbar) {
-        toolbar.setNavigationIcon(R.drawable.ic_back)
+        toolbar.setNavigationIcon(R.drawable.ic_back_24)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }

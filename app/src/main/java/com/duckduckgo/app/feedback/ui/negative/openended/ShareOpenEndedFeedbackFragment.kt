@@ -17,9 +17,6 @@
 package com.duckduckgo.app.feedback.ui.negative.openended
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -31,8 +28,9 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.mainReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.subReasons
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
+class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
 
     interface OpenEndedFeedbackListener {
         fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String)
@@ -40,8 +38,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
         fun userCancelled()
     }
 
-    private var _binding: ContentFeedbackOpenEndedFeedbackBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ContentFeedbackOpenEndedFeedbackBinding by viewBinding()
 
     private val viewModel by bindViewModel<ShareOpenEndedNegativeFeedbackViewModel>()
 
@@ -52,16 +49,6 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
 
     private var mainReason: MainReason? = null
     private var subReason: SubReason? = null
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = ContentFeedbackOpenEndedFeedbackBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(

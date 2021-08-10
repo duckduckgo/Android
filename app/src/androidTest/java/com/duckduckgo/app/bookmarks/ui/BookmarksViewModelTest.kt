@@ -29,8 +29,10 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.any
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -70,13 +72,14 @@ class BookmarksViewModelTest {
     private val bookmarkFoldersRepository: BookmarkFoldersRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
+    private val pixel: Pixel = mock()
 
     private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com", parentId = 0)
     private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
     private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, bookmarkFoldersDao, faviconManager, savedSitesManager, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, bookmarkFoldersDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -145,6 +148,13 @@ class BookmarksViewModelTest {
         verify(commandObserver).onChanged(captor.capture())
         assertNotNull(captor.value)
         assertTrue(captor.value is BookmarksViewModel.Command.OpenSavedSite)
+    }
+
+    @Test
+    fun whenFavoriteSelectedThenPixelSent() {
+        testee.onSelected(favorite)
+
+        verify(pixel).fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
     }
 
     @Test

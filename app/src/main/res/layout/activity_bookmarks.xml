@@ -24,7 +24,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.bookmarks.ui.BookmarksActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <include layout="@layout/content_bookmarks" />
 

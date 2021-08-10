@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+apply from: "$rootDir/spotless.gradle"
+
 android {
     compileSdkVersion compile_sdk
     buildToolsVersion tools_build_version

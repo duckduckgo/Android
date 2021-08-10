@@ -36,14 +36,14 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogF
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.id.action_search
+import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
+import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bookmarks.bookmarkRootView
-import kotlinx.android.synthetic.main.content_bookmarks.recycler
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,9 +62,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private val viewModel: BookmarksViewModel by bindViewModel()
 
+    private val binding: ActivityBookmarksBinding by viewBinding()
+    private lateinit var contentBookmarksBinding: ContentBookmarksBinding
+
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_bookmarks)
+        contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
+        setContentView(binding.root)
         configureToolbar()
 
         val parentFolderId = getParentFolderId()
@@ -114,13 +121,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
             favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
-            recycler.adapter = ConcatAdapter(favoritesAdapter, DividerAdapter(), bookmarkFoldersAdapter, bookmarksAdapter)
+            contentBookmarksBinding.recycler.adapter = ConcatAdapter(favoritesAdapter, DividerAdapter(), bookmarkFoldersAdapter, bookmarksAdapter)
         } else {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
-            recycler.adapter = ConcatAdapter(bookmarkFoldersAdapter, bookmarksAdapter)
+            contentBookmarksBinding.recycler.adapter = ConcatAdapter(bookmarkFoldersAdapter, bookmarksAdapter)
         }
-        recycler.itemAnimator = null
+        contentBookmarksBinding.recycler.itemAnimator = null
     }
 
     private fun observeViewModel(parentId: Long) {
@@ -187,7 +194,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun showMessage(message: String) {
         Snackbar.make(
-            bookmarkRootView,
+            binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).show()
@@ -255,7 +262,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
         Snackbar.make(
-            bookmarkRootView,
+            binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
@@ -266,7 +273,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
-            bookmarkRootView,
+            binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
