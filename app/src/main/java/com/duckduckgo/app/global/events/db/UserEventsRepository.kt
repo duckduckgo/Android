@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -26,7 +27,7 @@ import kotlinx.coroutines.withContext
 
 interface UserEventsRepository {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
-    suspend fun siteVisited(url: String, title: String)
+    suspend fun siteVisited(tabId: String, url: String, title: String)
     suspend fun clearVisitedSite()
     suspend fun userEvents(): Flow<List<UserEventEntity>>
 }
@@ -35,6 +36,7 @@ class AppUserEventsRepository(
     private val userEventsStore: UserEventsStore,
     private val userStageStore: UserStageStore,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val faviconManager: FaviconManager,
     private val dispatcher: DispatcherProvider,
 ) : UserEventsRepository {
 
@@ -44,7 +46,7 @@ class AppUserEventsRepository(
         return userEventsStore.getUserEvent(userEventKey)
     }
 
-    override suspend fun siteVisited(url: String, title: String) {
+    override suspend fun siteVisited(tabId: String, url: String, title: String) {
         if (url.isEmpty()) return
         withContext(dispatcher.io()) {
             if (userStageStore.getUserAppStage() != AppStage.DAX_ONBOARDING) return@withContext
@@ -58,6 +60,7 @@ class AppUserEventsRepository(
                     payloadMapper.addPayload(this, UserEventPayload.SitePayload(url, title))
                 }
             )
+            faviconManager.persistCachedFavicon(tabId, url)
         }
     }
 

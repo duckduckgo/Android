@@ -1518,8 +1518,7 @@ class BrowserTabViewModel(
     private fun handleUserEventsOnPageFinished() {
         viewModelScope.launch(dispatchers.io()) {
             getSiteUrlAndTitle { url, title ->
-                userEventsRepository.siteVisited(url = url, title = title)
-                faviconManager.persistCachedFavicon(tabId, url)
+                userEventsRepository.siteVisited(tabId = tabId, url = url, title = title)
             }
         }
     }
