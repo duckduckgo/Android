@@ -81,6 +81,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             result.putExtra(KEY_BOOKMARK_FOLDER_ID, it.id)
             result.putExtra(KEY_BOOKMARK_FOLDER_NAME, it.name)
             setResult(Activity.RESULT_OK, result)
+            finish()
         }
     }
 
