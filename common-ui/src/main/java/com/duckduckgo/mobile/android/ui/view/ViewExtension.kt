@@ -21,6 +21,7 @@ import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.CompoundButton
 import androidx.core.view.children
 
 /*
@@ -82,6 +83,7 @@ fun View.hideKeyboard(): Boolean {
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+fun Float.toDp(): Float = (this / Resources.getSystem().displayMetrics.density)
 fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)
 
 fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
@@ -111,3 +113,8 @@ fun View.recursiveEnable(enabled: Boolean) {
     }
 }
 
+fun CompoundButton.quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
+    setOnCheckedChangeListener(null)
+    isChecked = newCheckedState
+    setOnCheckedChangeListener(changeListener)
+}

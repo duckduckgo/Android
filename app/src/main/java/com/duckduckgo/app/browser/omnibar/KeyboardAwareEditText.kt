@@ -27,6 +27,7 @@ import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard
@@ -63,7 +64,7 @@ class KeyboardAwareEditText : AppCompatEditText {
                 post { Selection.selectAll(text) }
             }
             // This is triggering multiple keyboard shows, which is unnecessary
-//            showKeyboard()
+            // showKeyboard()
         }
     }
 
@@ -81,8 +82,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (isFocused) {
-            // This is triggering multiple keyboard shows, which is unnecessary
-            // showKeyboard()
+            showKeyboard()
         }
     }
 

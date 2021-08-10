@@ -34,7 +34,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.view.hideKeyboard
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 

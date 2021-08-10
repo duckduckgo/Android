@@ -18,7 +18,7 @@ package com.duckduckgo.widget
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.toDp
+import com.duckduckgo.mobile.android.ui.view.toDp
 import timber.log.Timber
 
 class SearchAndFavoritesGridCalculator {

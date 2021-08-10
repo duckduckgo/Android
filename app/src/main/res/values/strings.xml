@@ -140,7 +140,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear all tabs and data</string>
+    <string name="fireClearAll">Clear All Tabs And Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
