@@ -58,7 +58,7 @@ interface VpnAppTrackerBlockingDao {
     }
 
     @Query("SELECT * from vpn_app_tracker_blocking_app_packages where packageName=:packageName")
-    fun getEntityByAppPackageId(packageName: String) : AppTrackerPackage?
+    fun getEntityByAppPackageId(packageName: String): AppTrackerPackage?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertExclusionList(exclusionList: List<AppTrackerExcludedPackage>)
@@ -70,7 +70,7 @@ interface VpnAppTrackerBlockingDao {
     fun setExclusionListMetadata(appTrackerExclusionListMetadata: AppTrackerExclusionListMetadata)
 
     @Query("SELECT * from vpn_app_tracker_exclusion_list_metadata ORDER BY id DESC LIMIT 1")
-    fun getExclusionListMetadata() : AppTrackerExclusionListMetadata?
+    fun getExclusionListMetadata(): AppTrackerExclusionListMetadata?
 
     @Query("DELETE from vpn_app_tracker_exclusion_list")
     fun deleteExclusionList()
@@ -82,7 +82,6 @@ interface VpnAppTrackerBlockingDao {
         insertExclusionList(exclusionList)
     }
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerExceptionRules(trackerExceptionRules: List<AppTrackerExceptionRule>)
 
@@ -93,7 +92,7 @@ interface VpnAppTrackerBlockingDao {
     fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
 
     @Query("SELECT * from vpn_app_tracker_exception_rules_metadata ORDER BY id DESC LIMIT 1")
-    fun getTrackerExceptionRulesMetadata() : AppTrackerExceptionRuleMetadata?
+    fun getTrackerExceptionRulesMetadata(): AppTrackerExceptionRuleMetadata?
 
     @Query("DELETE from vpn_app_tracker_exception_rules")
     fun deleteTrackerExceptionRules()

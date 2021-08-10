@@ -25,7 +25,7 @@ import org.junit.Test
 
 class AppTrackerRepositoryTest {
 
-    private lateinit var appTrackerRepository : RealAppTrackerRepository
+    private lateinit var appTrackerRepository: RealAppTrackerRepository
     private lateinit var vpnDatabase: VpnDatabase
 
     @Before

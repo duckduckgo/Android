@@ -83,7 +83,6 @@ class SendTrackerDebugReceiver @Inject constructor(
         }
     }
 
-
     override fun onReceive(context: Context, intent: Intent) {
         handleIntent(intent)
     }

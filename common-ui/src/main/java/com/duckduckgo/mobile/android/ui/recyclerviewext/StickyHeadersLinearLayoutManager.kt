@@ -324,12 +324,12 @@ class StickyHeadersLinearLayoutManager<T>(
                 // - There's one to show;
                 // - It's on the edge or it's not the anchor view;
                 // - Isn't followed by another sticky header;
-                if (headerPos != -1 && (headerPos != anchorPos || isViewOnBoundary(anchorView))
-                    && nextHeaderPos != headerPos + 1
+                if (headerPos != -1 && (headerPos != anchorPos || isViewOnBoundary(anchorView)) &&
+                    nextHeaderPos != headerPos + 1
                 ) {
                     // Ensure existing sticky header, if any, is of correct type.
-                    if (mStickyHeader != null
-                        && getItemViewType(mStickyHeader!!) != mAdapter!!.getItemViewType(headerPos)
+                    if (mStickyHeader != null &&
+                        getItemViewType(mStickyHeader!!) != mAdapter!!.getItemViewType(headerPos)
                     ) {
                         // A sticky header was shown before but is not of the correct type. Scrap it.
                         scrapStickyHeader(recycler)

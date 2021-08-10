@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor

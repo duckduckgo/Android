@@ -28,7 +28,6 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-
 @VpnScope
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class

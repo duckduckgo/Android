@@ -22,7 +22,6 @@ import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
 
-
 /**
  * @author amulya
  * @datetime 14 Oct 2014, 3:53 PM
@@ -49,7 +48,6 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
         val r = bounds
-
 
         // draw border
         if (borderThickness > 0) {
@@ -99,7 +97,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         return height
     }
 
-    class Builder: IConfigBuilder, IShapeBuilder, IBuilder {
+    class Builder : IConfigBuilder, IShapeBuilder, IBuilder {
         var text = ""
         var color: Int
         var borderThickness: Int

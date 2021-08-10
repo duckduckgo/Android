@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity

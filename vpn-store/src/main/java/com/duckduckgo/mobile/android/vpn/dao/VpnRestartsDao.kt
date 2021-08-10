@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.dao
 import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
-
 @Entity(tableName = "vpn_phoenix")
 data class VpnPhoenixEntity(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,

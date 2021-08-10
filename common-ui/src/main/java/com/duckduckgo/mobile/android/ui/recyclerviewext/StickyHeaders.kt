@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.ui.recyclerviewext
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-
 /**
  * This is from https://github.com/Doist/RecyclerViewExtensions
  *

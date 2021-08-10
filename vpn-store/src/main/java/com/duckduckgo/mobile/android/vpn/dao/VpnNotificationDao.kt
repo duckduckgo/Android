@@ -33,7 +33,6 @@ interface VpnNotificationsDao {
     fun increment(id: Int)
 }
 
-
 @Entity(tableName = "vpn_notification")
 data class VpnNotification(
     @PrimaryKey val id: Int,

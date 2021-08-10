@@ -61,7 +61,6 @@ data class AppTrackerExceptionRule(
     val packageNames: List<String>
 )
 
-
 @Entity(tableName = "vpn_app_tracker_exception_rules_metadata")
 data class AppTrackerExceptionRuleMetadata(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
@@ -93,7 +92,7 @@ data class TrackerApp(
 sealed class AppTrackerType {
     data class FirstParty(val tracker: AppTracker) : AppTrackerType()
     data class ThirdParty(val tracker: AppTracker) : AppTrackerType()
-    object NotTracker: AppTrackerType()
+    object NotTracker : AppTrackerType()
 }
 
 /** JSON Model that represents the app exclusion list */

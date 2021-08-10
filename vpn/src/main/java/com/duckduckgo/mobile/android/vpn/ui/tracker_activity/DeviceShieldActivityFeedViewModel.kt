@@ -20,10 +20,8 @@ import androidx.lifecycle.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter

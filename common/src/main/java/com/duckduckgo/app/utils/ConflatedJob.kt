@@ -25,21 +25,21 @@ import kotlinx.coroutines.Job
  */
 class ConflatedJob {
 
-  private var job: Job? = null
+    private var job: Job? = null
 
-  val isActive get() = job?.isActive ?: false
+    val isActive get() = job?.isActive ?: false
 
-  @Synchronized
-  operator fun plusAssign(newJob: Job) {
-    cancel()
-    job = newJob
-  }
+    @Synchronized
+    operator fun plusAssign(newJob: Job) {
+        cancel()
+        job = newJob
+    }
 
-  fun cancel() {
-    job?.cancel()
-  }
+    fun cancel() {
+        job?.cancel()
+    }
 
-  fun start() {
-    job?.start()
-  }
+    fun start() {
+        job?.start()
+    }
 }

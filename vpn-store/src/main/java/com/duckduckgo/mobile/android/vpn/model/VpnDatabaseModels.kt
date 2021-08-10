@@ -85,5 +85,3 @@ data class VpnPreferences(
 data class TrackingApp(val packageId: String, val appDisplayName: String) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
-
-

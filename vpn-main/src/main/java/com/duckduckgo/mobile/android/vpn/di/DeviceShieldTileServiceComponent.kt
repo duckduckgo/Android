@@ -29,7 +29,6 @@ import dagger.binding.TileServiceBingingKey
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-
 @VpnScope
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
