@@ -30,7 +30,7 @@ class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val work
         workManager.enqueue(
             OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
                 .addTag(FAVORITES_ONBOARDING_WORK_TAG)
-                .setInitialDelay(1, TimeUnit.DAYS)
+                .setInitialDelay(30, TimeUnit.SECONDS)
                 .build()
         )
     }

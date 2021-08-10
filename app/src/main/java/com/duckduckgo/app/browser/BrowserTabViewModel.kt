@@ -81,6 +81,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper
+import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
@@ -1036,18 +1038,8 @@ class BrowserTabViewModel(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
-            viewModelScope.launch(dispatchers.io()) {
-                url?.let {
-                    userEventsRepository.siteVisited(it)
-                }
-            }
-            if (saveNextVisitedSiteAsFavorite) {
-                saveNextVisitedSiteAsFavorite = false
-                url.takeUnless { it.isNullOrEmpty() }?.let {
-                    val title = title ?: ""
-                    saveSiteAsFavorite(url = it, title = title)
-                }
-            }
+            handleUserEventsOnPageFinished()
+            handleSaveSiteOnPageFinished()
         }
     }
 
@@ -1229,6 +1221,7 @@ class BrowserTabViewModel(
     }
 
     override fun titleReceived(newTitle: String) {
+        Timber.i("titleReceived $newTitle")
         site?.title = newTitle
         onSiteChanged()
     }
@@ -1522,6 +1515,38 @@ class BrowserTabViewModel(
         }
     }
 
+    private fun handleUserEventsOnPageFinished() {
+        viewModelScope.launch(dispatchers.io()) {
+            getSiteUrlAndTitle { url, title ->
+                userEventsRepository.siteVisited(url = url, title = title)
+                faviconManager.persistCachedFavicon(tabId, url)
+            }
+        }
+    }
+
+    private fun handleSaveSiteOnPageFinished() {
+        if (saveNextVisitedSiteAsFavorite) {
+            saveNextVisitedSiteAsFavorite = false
+            viewModelScope.launch(dispatchers.io()) {
+                getSiteUrlAndTitle { url, title ->
+                    saveSiteAsFavorite(url = url, title = title)
+                }
+            }
+        }
+    }
+
+    private suspend fun getSiteUrlAndTitle(onSuccess: suspend (url: String, title: String) -> Unit) {
+        url.takeUnless { it.isNullOrEmpty() }?.let {
+            var siteTitle = title ?: ""
+            delay(TITLE_CHANGED_GRACE_PERIOD_MS)
+            val urlChanged = it != url
+            if (!urlChanged) {
+                siteTitle = title ?: ""
+            }
+            onSuccess.invoke(it, siteTitle)
+        }
+    }
+
     fun onBrokenSiteSelected() {
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
     }
@@ -1776,17 +1801,22 @@ class BrowserTabViewModel(
         }
     }
 
+    private val payloadMapper = UserEventsPayloadMapper()
+
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
         ctaViewModel.onCtaShown(cta)
 
         viewModelScope.launch(dispatchers.io()) {
             if (cta is DaxBubbleCta.DaxFavoritesCTA) {
-                userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.let {
-                    val addedFavorite = favoritesRepository.insert("", it)
-                    userEventsRepository.clearVisitedSite()
-                    withContext(dispatchers.main()) {
-                        command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
+                userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
+                    val payload = payloadMapper.getPayload(it)
+                    if (payload is UserEventPayload.SitePayload) {
+                        val addedFavorite = favoritesRepository.insert(title = payload.title, url = payload.url)
+                        userEventsRepository.clearVisitedSite()
+                        withContext(dispatchers.main()) {
+                            command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
+                        }
                     }
                 }
             }
@@ -2081,6 +2111,7 @@ class BrowserTabViewModel(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+        private const val TITLE_CHANGED_GRACE_PERIOD_MS = 1000L
     }
 }
 

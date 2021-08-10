@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +26,7 @@ import kotlinx.coroutines.withContext
 
 interface UserEventsRepository {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
-    suspend fun siteVisited(url: String)
+    suspend fun siteVisited(url: String, title: String)
     suspend fun clearVisitedSite()
     suspend fun userEvents(): Flow<List<UserEventEntity>>
 }
@@ -34,14 +35,16 @@ class AppUserEventsRepository(
     private val userEventsStore: UserEventsStore,
     private val userStageStore: UserStageStore,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
 ) : UserEventsRepository {
+
+    private val payloadMapper = UserEventsPayloadMapper()
 
     override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {
         return userEventsStore.getUserEvent(userEventKey)
     }
 
-    override suspend fun siteVisited(url: String) {
+    override suspend fun siteVisited(url: String, title: String) {
         if (url.isEmpty()) return
         withContext(dispatcher.io()) {
             if (userStageStore.getUserAppStage() != AppStage.DAX_ONBOARDING) return@withContext
@@ -50,7 +53,11 @@ class AppUserEventsRepository(
             val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)
             if (firstVisitedSiteEvent != null) return@withContext
 
-            userEventsStore.registerUserEvent(UserEventEntity(id = UserEventKey.FIRST_NON_SERP_VISITED_SITE, payload = url))
+            userEventsStore.registerUserEvent(
+                with(UserEventEntity(id = UserEventKey.FIRST_NON_SERP_VISITED_SITE)) {
+                    payloadMapper.addPayload(this, UserEventPayload.SitePayload(url, title))
+                }
+            )
         }
     }
 
