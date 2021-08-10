@@ -74,5 +74,6 @@
     <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
     <attr name="quickAccessItemTitleTextColor" format="color" />
+    <attr name="favoriteAddedHintTextColor" format="color" />
 
 </resources>

@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.AddItemAdapter
+import com.duckduckgo.app.browser.favorites.AutoFavoriteHintAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
@@ -250,6 +251,7 @@ class BrowserTabFragment :
 
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
+    private lateinit var favoriteHintAdapter: AutoFavoriteHintAdapter
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
@@ -672,6 +674,9 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+            is Command.ShowVisitedSiteAsFavoriteHint -> {
+                favoriteHintAdapter.showHint(it.favorite)
+            }
         }
     }
 
@@ -1021,7 +1026,11 @@ class BrowserTabFragment :
         val addItemAdapter = AddItemAdapter {
             viewModel.onAddFavoriteClicked()
         }
-        val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter)
+        favoriteHintAdapter = AutoFavoriteHintAdapter {
+            viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
+            favoriteHintAdapter.clearHint()
+        }
+        val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter, favoriteHintAdapter)
         quickAccessRecyclerView.adapter = concatAdapter
         quickAccessRecyclerView.disableAnimation()
     }
@@ -1057,6 +1066,12 @@ class BrowserTabFragment :
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                if (quickAccessRecyclerView.adapter?.getItemViewType(position) == 2) return numOfColumns
+                return 1
+            }
+        }
         recyclerView.layoutManager = layoutManager
         val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
         recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)

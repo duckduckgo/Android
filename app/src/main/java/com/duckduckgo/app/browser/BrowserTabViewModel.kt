@@ -310,6 +310,7 @@ class BrowserTabViewModel(
         class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
         class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         object ChildTabClosed : Command()
+        class ShowVisitedSiteAsFavoriteHint(val favorite: SavedSite.Favorite) : Command()
 
         class CopyAliasToClipboard(val alias: String) : Command()
         class InjectEmailAddress(val address: String) : Command()
@@ -1782,8 +1783,11 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             if (cta is DaxBubbleCta.DaxFavoritesCTA) {
                 userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.let {
-                    favoritesRepository.insert("", it)
+                    val addedFavorite = favoritesRepository.insert("", it)
                     userEventsRepository.clearVisitedSite()
+                    withContext(dispatchers.main()) {
+                        command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
+                    }
                 }
             }
         }
