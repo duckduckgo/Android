@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding.di
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.AppUserEventsRepository
@@ -56,8 +57,9 @@ class OnboardingModule {
         userEventsStore: UserEventsStore,
         userStageStore: UserStageStore,
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        faviconManager: FaviconManager,
         dispatcherProvider: DispatcherProvider
     ): UserEventsRepository {
-        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, dispatcherProvider)
+        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, faviconManager, dispatcherProvider)
     }
 }

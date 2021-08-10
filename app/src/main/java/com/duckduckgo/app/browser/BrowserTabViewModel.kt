@@ -1416,7 +1416,6 @@ class BrowserTabViewModel(
     }
 
     fun onAddFavoriteClicked() {
-        ctaViewState.value = currentCtaViewState().copy(cta = null)
         command.value = ShowKeyboard
         saveNextVisitedSiteAsFavorite = true
     }

@@ -1025,6 +1025,7 @@ class BrowserTabFragment :
         quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
         val addItemAdapter = AddItemAdapter {
             viewModel.onAddFavoriteClicked()
+            viewModel.onUserDismissedCta()
         }
         favoriteHintAdapter = AutoFavoriteHintAdapter {
             viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
@@ -2147,7 +2148,10 @@ class BrowserTabFragment :
                 bottomDaxCtaContainer.removeAllViews()
                 inflate(context, R.layout.include_dax_buble_button_cta, bottomDaxCtaContainer)
                 configuration.showCta(bottomDaxCtaContainer)
-                bottomDaxCtaContainer.primaryCta.setOnClickListener { viewModel.onAddFavoriteClicked() }
+                bottomDaxCtaContainer.primaryCta.setOnClickListener {
+                    viewModel.onAddFavoriteClicked()
+                    viewModel.onUserDismissedCta()
+                }
                 viewModel.onCtaShown()
             } else {
                 hideHomeBackground()
