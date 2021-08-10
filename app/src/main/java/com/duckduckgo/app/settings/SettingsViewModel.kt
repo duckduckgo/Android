@@ -170,14 +170,18 @@ class SettingsViewModel @Inject constructor(
 
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
-        themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
-            command.send(Command.UpdateTheme)
-        }
+        val currentValue = themingDataStore.theme == DuckDuckGoTheme.LIGHT
+        if (enabled != currentValue) {
+            themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
+            viewModelScope.launch {
+                viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
+                command.send(Command.UpdateTheme)
+            }
 
-        val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
-        pixel.fire(pixelName)
+            val pixelName =
+                if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
+            pixel.fire(pixelName)
+        }
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
