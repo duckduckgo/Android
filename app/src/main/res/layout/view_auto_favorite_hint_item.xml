@@ -20,6 +20,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="16dp"
     android:layout_marginBottom="16dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
     android:text="@string/favoriteAddedOnboardingText"
     android:textColor="?attr/favoriteAddedHintTextColor"
     android:textSize="14sp"

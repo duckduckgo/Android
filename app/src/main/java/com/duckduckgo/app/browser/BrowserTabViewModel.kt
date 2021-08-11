@@ -763,6 +763,10 @@ class BrowserTabViewModel(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(): Boolean {
+        if (ctaViewState.value?.cta is DaxBubbleCta.DaxFavoritesCTA) {
+            onUserDismissedCta()
+            return true
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null

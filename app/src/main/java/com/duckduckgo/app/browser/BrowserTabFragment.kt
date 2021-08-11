@@ -1030,6 +1030,7 @@ class BrowserTabFragment :
         }
         favoriteHintAdapter = AutoFavoriteHintAdapter {
             viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
+            viewModel.onUserDismissedCta()
             favoriteHintAdapter.clearHint()
         }
         val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter, favoriteHintAdapter)
@@ -2155,6 +2156,7 @@ class BrowserTabFragment :
                 }
                 viewModel.onCtaShown()
             } else {
+                bottomDaxCtaContainer.removeAllViews()
                 hideHomeBackground()
                 hideHomeCta()
                 configuration.showCta(daxCtaContainer)
