@@ -174,6 +174,8 @@ class ExperimentationVariantManager(
     }
 }
 
+fun VariantManager.favoritesOnboardingEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FavoritesOnboarding)
+
 /**
  * A variant which can be used for experimentation.
  * @param weight Relative weight. These are normalised to all other variants, so they don't have to add up to any specific number.

@@ -22,6 +22,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -38,6 +40,7 @@ class AppUserEventsRepository(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val faviconManager: FaviconManager,
     private val dispatcher: DispatcherProvider,
+    private val variantManager: VariantManager
 ) : UserEventsRepository {
 
     private val payloadMapper = UserEventsPayloadMapper()
@@ -47,6 +50,8 @@ class AppUserEventsRepository(
     }
 
     override suspend fun siteVisited(tabId: String, url: String, title: String) {
+        if (!variantManager.favoritesOnboardingEnabled()) return
+
         if (url.isEmpty()) return
         withContext(dispatcher.io()) {
             if (userStageStore.getUserAppStage() != AppStage.DAX_ONBOARDING) return@withContext
@@ -65,6 +70,8 @@ class AppUserEventsRepository(
     }
 
     override suspend fun clearVisitedSite() {
+        if (!variantManager.favoritesOnboardingEnabled()) return
+
         withContext(dispatcher.io()) {
             val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext
             val payload = payloadMapper.getPayload(firstVisitedSiteEvent)

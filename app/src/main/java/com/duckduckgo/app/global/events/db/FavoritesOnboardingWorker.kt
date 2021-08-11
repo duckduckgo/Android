@@ -19,14 +19,17 @@ package com.duckduckgo.app.global.events.db
 import android.content.Context
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val workManager: WorkManager) {
+class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val workManager: WorkManager, private val variantManager: VariantManager) {
 
     fun scheduleWork() {
+        if (!variantManager.favoritesOnboardingEnabled()) return
         workManager.enqueue(
             OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
                 .addTag(FAVORITES_ONBOARDING_WORK_TAG)

@@ -36,6 +36,8 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -66,7 +68,8 @@ class CtaViewModel @Inject constructor(
     private val userEventsRepository: UserEventsRepository,
     private val tabRepository: TabRepository,
     private val favoritesOnboardingObserver: FavoritesOnboardingObserver,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val variantManager: VariantManager
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -257,7 +260,8 @@ class CtaViewModel @Inject constructor(
         !daxDialogEndShown() &&
         daxDialogIntroShown() &&
         !settingsDataStore.hideTips &&
-        userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true
+        userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true &&
+        variantManager.favoritesOnboardingEnabled()
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&

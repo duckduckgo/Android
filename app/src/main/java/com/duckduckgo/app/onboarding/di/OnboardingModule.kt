@@ -29,6 +29,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -58,8 +59,9 @@ class OnboardingModule {
         userStageStore: UserStageStore,
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
         faviconManager: FaviconManager,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
+        variantManager: VariantManager
     ): UserEventsRepository {
-        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, faviconManager, dispatcherProvider)
+        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, faviconManager, dispatcherProvider, variantManager)
     }
 }

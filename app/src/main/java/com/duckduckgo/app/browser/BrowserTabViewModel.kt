@@ -102,7 +102,9 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -162,7 +164,8 @@ class BrowserTabViewModel(
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val appLinksHandler: AppLinksHandler
+    private val appLinksHandler: AppLinksHandler,
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -1042,8 +1045,10 @@ class BrowserTabViewModel(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
-            handleUserEventsOnPageFinished()
-            handleSaveSiteOnPageFinished()
+            if (variantManager.favoritesOnboardingEnabled()) {
+                handleUserEventsOnPageFinished()
+                handleSaveSiteOnPageFinished()
+            }
         }
     }
 
@@ -1225,7 +1230,6 @@ class BrowserTabViewModel(
     }
 
     override fun titleReceived(newTitle: String) {
-        Timber.i("titleReceived $newTitle")
         site?.title = newTitle
         onSiteChanged()
     }
@@ -1420,11 +1424,13 @@ class BrowserTabViewModel(
     }
 
     fun onAddFavoriteClicked() {
-        command.value = ShowKeyboard
-        if (!saveNextVisitedSiteAsFavorite) {
-            // send pixel
+        if (variantManager.favoritesOnboardingEnabled()) {
+            command.value = ShowKeyboard
+            if (!saveNextVisitedSiteAsFavorite) {
+                // send pixel
+            }
+            saveNextVisitedSiteAsFavorite = true
         }
-        saveNextVisitedSiteAsFavorite = true
     }
 
     fun onFireproofWebsiteMenuClicked() {
@@ -1812,15 +1818,17 @@ class BrowserTabViewModel(
         val cta = ctaViewState.value?.cta ?: return
         ctaViewModel.onCtaShown(cta)
 
-        viewModelScope.launch(dispatchers.io()) {
-            if (cta is DaxBubbleCta.DaxFavoritesCTA) {
-                userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
-                    val payload = payloadMapper.getPayload(it)
-                    if (payload is UserEventPayload.SitePayload) {
-                        val addedFavorite = favoritesRepository.insert(title = payload.title, url = payload.url)
-                        userEventsRepository.clearVisitedSite()
-                        withContext(dispatchers.main()) {
-                            command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
+        if (variantManager.favoritesOnboardingEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                if (cta is DaxBubbleCta.DaxFavoritesCTA) {
+                    userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
+                        val payload = payloadMapper.getPayload(it)
+                        if (payload is UserEventPayload.SitePayload) {
+                            val addedFavorite = favoritesRepository.insert(title = payload.title, url = payload.url)
+                            userEventsRepository.clearVisitedSite()
+                            withContext(dispatchers.main()) {
+                                command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
+                            }
                         }
                     }
                 }
@@ -2154,12 +2162,13 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
     private val appCoroutineScope: Provider<CoroutineScope>,
-    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>
+    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
+    private val variantManager: Provider<VariantManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
                 else -> null
             }
         }

@@ -19,12 +19,13 @@ package com.duckduckgo.app.global.events.db
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +34,8 @@ import javax.inject.Singleton
 class FavoritesOnboardingObserver @Inject constructor(
     private val appCoroutineScope: CoroutineScope,
     private val userEventsRepository: UserEventsRepository,
-    private val favoritesOnboardingWorkRequestBuilder: FavoritesOnboardingWorkRequestBuilder
+    private val favoritesOnboardingWorkRequestBuilder: FavoritesOnboardingWorkRequestBuilder,
+    private val variantManager: VariantManager
 ) : LifecycleObserver {
 
     private var lastTimeUserClearedData = 0L
@@ -41,23 +43,19 @@ class FavoritesOnboardingObserver @Inject constructor(
     var userClearedDataRecently: Boolean = false
         get() {
             val elapsedTime = System.currentTimeMillis() - lastTimeUserClearedData
-            val recentlyClearedData = elapsedTime <= TimeUnit.SECONDS.toMillis(10)
-            Timber.i("LAST TIME CLEARED DATA: ${System.currentTimeMillis()}, $lastTimeUserClearedData")
-            Timber.i("LAST TIME CLEARED DATA: $elapsedTime, $recentlyClearedData")
-            return recentlyClearedData
+            return elapsedTime <= TimeUnit.SECONDS.toMillis(10)
         }
         private set
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun siteAddedAsFavoriteOnboarding() {
+        if (!variantManager.favoritesOnboardingEnabled()) return
+
         appCoroutineScope.launch {
             userEventsRepository.userEvents().map { events ->
-                Timber.i("FAVORITESOBSERVER $events")
                 events.filter { it.id == UserEventKey.FIRST_NON_SERP_VISITED_SITE }
             }.distinctUntilChanged().collect { filteredEvents ->
-                Timber.i("FAVORITESOBSERVER filtered: $filteredEvents")
                 filteredEvents.find { it.payload.isNotEmpty() }?.let {
-                    Timber.i("FAVORITESOBSERVER SCHEDULED $filteredEvents")
                     favoritesOnboardingWorkRequestBuilder.scheduleWork()
                 }
             }
@@ -67,7 +65,6 @@ class FavoritesOnboardingObserver @Inject constructor(
                 events.filter { it.id == UserEventKey.FIRE_BUTTON_EXECUTED }
             }.distinctUntilChanged().collect { filteredEvents ->
                 filteredEvents.find { it.timestamp != 0L }?.let {
-                    Timber.i("LAST TIME CLEARED DATA: $it")
                     lastTimeUserClearedData = it.timestamp
                 }
             }

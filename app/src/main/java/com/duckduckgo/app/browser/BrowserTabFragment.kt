@@ -123,6 +123,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -1036,18 +1037,23 @@ class BrowserTabFragment :
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
         quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
-        val addItemAdapter = AddItemAdapter {
-            viewModel.onAddFavoriteClicked()
-            viewModel.onUserDismissedCta()
-            showToast(R.string.addFavoriteHint)
+
+        if (variantManager.favoritesOnboardingEnabled()) {
+            val addItemAdapter = AddItemAdapter {
+                viewModel.onAddFavoriteClicked()
+                viewModel.onUserDismissedCta()
+                showToast(R.string.addFavoriteHint)
+            }
+            favoriteHintAdapter = AutoFavoriteHintAdapter {
+                viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
+                viewModel.onUserDismissedCta()
+                favoriteHintAdapter.clearHint()
+            }
+            val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter, favoriteHintAdapter)
+            quickAccessRecyclerView.adapter = concatAdapter
+        } else {
+            quickAccessRecyclerView.adapter = quickAccessAdapter
         }
-        favoriteHintAdapter = AutoFavoriteHintAdapter {
-            viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
-            viewModel.onUserDismissedCta()
-            favoriteHintAdapter.clearHint()
-        }
-        val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter, favoriteHintAdapter)
-        quickAccessRecyclerView.adapter = concatAdapter
         quickAccessRecyclerView.disableAnimation()
     }
 

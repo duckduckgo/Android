@@ -429,7 +429,7 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("ALTER TABLE `user_events` ADD COLUMN `payload` TEXT ")
+            database.execSQL("ALTER TABLE `user_events` ADD COLUMN `payload` TEXT NOT NULL")
         }
     }
 
