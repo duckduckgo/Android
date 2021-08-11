@@ -37,6 +37,11 @@ class FilenameExtractor @Inject constructor(
 
         val firstGuess = guessFilename(url, contentDisposition, mimeType)
         val guesses = Guesses(bestGuess = null, latestGuess = firstGuess)
+
+        if (firstGuess.contains(".")) {
+            return bestGuess(guesses)
+        }
+
         val baseUrl = url.toUri().host ?: ""
         var pathSegments = pathSegments(url)
 
