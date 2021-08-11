@@ -29,4 +29,8 @@
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
     <string name="favoritesWidgetLabel">Favorites Widget</string>
     <string name="searchWidgetLabel">Search Widget</string>
+
+    <!-- Email -->
+    <string name="emailNotSupported">Device not supported</string>
+    <string name="emailNotSupportedExplanation">Email Protection allows you to create a new email address. This address and a security token are encrypted then stored locally on your device. However your device does not support encrypted storage. As a result, Email Protection is unavailable.</string>
 </resources>
