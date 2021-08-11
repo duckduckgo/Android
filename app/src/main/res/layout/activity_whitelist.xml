@@ -32,23 +32,9 @@
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="18dp"
-        android:visibility="visible"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listItem="@layout/view_whitelist_entry" />
-
-    <TextView
-        android:id="@+id/emptyWhitelist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="20dp"
-        android:text="@string/whitelistNoEntries"
-        android:textAlignment="center"
-        android:textColor="?attr/whitelistTextColor"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        tools:listItem="@layout/view_list_single_item_entry" />
 
 </LinearLayout>

@@ -80,9 +80,6 @@ class WhitelistActivity : DuckDuckGoActivity() {
     private fun setupRecycler() {
         adapter = WebsitesAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
-
-        val separator = DividerItemDecoration(this, VERTICAL)
-        recycler.addItemDecoration(separator)
     }
 
     private fun observeViewModel() {
@@ -104,21 +101,8 @@ class WhitelistActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
         adapter.entries = viewState.whitelist
         if (viewState.showWhitelist) {
-            showList()
             invalidateOptionsMenu()
-        } else {
-            hideList()
         }
-    }
-
-    private fun showList() {
-        recycler.show()
-        binding.emptyWhitelist.gone()
-    }
-
-    private fun hideList() {
-        recycler.gone()
-        binding.emptyWhitelist.show()
     }
 
     private fun processCommand(command: WhitelistViewModel.Command?) {
