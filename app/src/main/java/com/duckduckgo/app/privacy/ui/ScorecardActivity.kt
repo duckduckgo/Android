@@ -24,12 +24,13 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class ScorecardActivity : DuckDuckGoActivity() {
@@ -37,7 +38,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabRepository
 
-    private lateinit var binding: ActivityPrivacyScorecardBinding
+    private val binding: ActivityPrivacyScorecardBinding by viewBinding()
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -54,7 +55,6 @@ class ScorecardActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrivacyScorecardBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
 

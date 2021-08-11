@@ -25,10 +25,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class ChangeIconActivity : DuckDuckGoActivity() {
 
-    private lateinit var binding: ActivityAppIconsBinding
+    private val binding: ActivityAppIconsBinding by viewBinding()
     private val viewModel: ChangeIconViewModel by bindViewModel()
     private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
         viewModel.onIconSelected(icon)
@@ -39,7 +40,6 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAppIconsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()

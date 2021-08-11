@@ -43,6 +43,20 @@ class VariantManagerTest {
     }
 
     @Test
+    fun serpGxControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "gx" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpGyExperimentalVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "gy" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {

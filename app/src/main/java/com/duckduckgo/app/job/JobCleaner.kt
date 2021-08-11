@@ -18,6 +18,10 @@ package com.duckduckgo.app.job
 
 import androidx.work.WorkManager
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface JobCleaner {
     fun cleanDeprecatedJobs()
@@ -30,7 +34,9 @@ interface JobCleaner {
     }
 }
 
-class AndroidJobCleaner(private val workManager: WorkManager) : JobCleaner {
+@ContributesBinding(AppObjectGraph::class)
+@Singleton
+class AndroidJobCleaner @Inject constructor(private val workManager: WorkManager) : JobCleaner {
 
     override fun cleanDeprecatedJobs() {
         allDeprecatedNotificationWorkTags().forEach { tag ->

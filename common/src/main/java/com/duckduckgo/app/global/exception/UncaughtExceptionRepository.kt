@@ -47,7 +47,8 @@ class UncaughtExceptionRepositoryDb(
             val exceptionEntity = UncaughtExceptionEntity(
                 message = rootCause.extractExceptionCause(),
                 exceptionSource = exceptionSource,
-                version = deviceInfo.appVersion)
+                version = deviceInfo.appVersion
+            )
             uncaughtExceptionDao.add(exceptionEntity)
 
             lastSeenException = e

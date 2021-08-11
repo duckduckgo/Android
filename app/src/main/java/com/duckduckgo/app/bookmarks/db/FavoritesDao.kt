@@ -33,6 +33,9 @@ interface FavoritesDao {
     @Query("select * from favorites order by position")
     fun favoritesSync(): List<FavoriteEntity>
 
+    @Query("select count(1) > 0 from favorites")
+    fun userHasFavorites(): Boolean
+
     @Query("select count(*) from favorites WHERE url LIKE :domain")
     fun favoritesCountByUrl(domain: String): Int
 

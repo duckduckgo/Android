@@ -30,11 +30,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGlobalPrivacyControlBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
 
-    private lateinit var binding: ActivityGlobalPrivacyControlBinding
+    private val binding: ActivityGlobalPrivacyControlBinding by viewBinding()
 
     private val viewModel: GlobalPrivacyControlViewModel by bindViewModel()
 
@@ -53,7 +54,6 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityGlobalPrivacyControlBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()

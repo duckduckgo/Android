@@ -28,10 +28,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyDashboardBinding
 import com.duckduckgo.app.browser.databinding.ContentPrivacyDashboardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
@@ -41,6 +41,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
@@ -51,7 +52,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
-    private lateinit var binding: ActivityPrivacyDashboardBinding
+    private val binding: ActivityPrivacyDashboardBinding by viewBinding()
     private val trackersRenderer = TrackersRenderer()
     private val upgradeRenderer = PrivacyUpgradeRenderer()
 
@@ -68,7 +69,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPrivacyDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         setupObservers()
