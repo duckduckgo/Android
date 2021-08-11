@@ -67,7 +67,11 @@ class AppUserEventsRepository(
     override suspend fun clearVisitedSite() {
         withContext(dispatcher.io()) {
             val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext
+            val payload = payloadMapper.getPayload(firstVisitedSiteEvent)
             userEventsStore.registerUserEvent(firstVisitedSiteEvent.copy(payload = ""))
+            if (payload is UserEventPayload.SitePayload) {
+                faviconManager.deletePersistedFavicon(payload.url, forceDelete = true)
+            }
         }
     }
 

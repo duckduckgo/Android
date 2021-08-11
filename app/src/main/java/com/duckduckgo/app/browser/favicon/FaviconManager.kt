@@ -42,7 +42,7 @@ interface FaviconManager {
     suspend fun loadToViewFromLocalOrFallback(tabId: String? = null, url: String, view: ImageView)
     suspend fun loadFromDisk(tabId: String?, url: String): Bitmap?
     suspend fun loadFromDiskWithParams(tabId: String? = null, url: String, cornerRadius: Int, width: Int, height: Int): Bitmap?
-    suspend fun deletePersistedFavicon(url: String)
+    suspend fun deletePersistedFavicon(url: String, forceDelete: Boolean = false)
     suspend fun deleteOldTempFavicon(tabId: String, path: String?)
     suspend fun deleteAllTemp()
 }
@@ -151,10 +151,10 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun deletePersistedFavicon(url: String) {
+    override suspend fun deletePersistedFavicon(url: String, forceDelete: Boolean) {
         val domain = url.extractDomain() ?: return
         val remainingFavicons = persistedFaviconsForDomain(domain)
-        if (remainingFavicons == 1) {
+        if (remainingFavicons == 1 || forceDelete) {
             faviconPersister.deletePersistedFavicon(domain)
         }
     }
