@@ -80,6 +80,11 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        feedListener = null
+    }
+
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     companion object {
