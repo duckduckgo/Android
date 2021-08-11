@@ -19,14 +19,14 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.ParamKey
-import com.duckduckgo.app.global.baseHost
 import javax.inject.Inject
 
 class DuckDuckGoUrlDetector @Inject constructor() {
 
     fun isDuckDuckGoEmailUrl(url: String): Boolean {
         val uri = url.toUri()
-        return uri.baseHost?.contains(AppUrl.Url.HOST) == true && uri.pathSegments.contains(AppUrl.Url.EMAIL_SEGMENT)
+        val firstSegment = uri.pathSegments.firstOrNull()
+        return isDuckDuckGoUrl(url) && firstSegment == AppUrl.Url.EMAIL_SEGMENT
     }
 
     fun isDuckDuckGoUrl(uri: String): Boolean {
