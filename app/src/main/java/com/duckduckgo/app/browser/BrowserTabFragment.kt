@@ -1026,6 +1026,7 @@ class BrowserTabFragment :
         val addItemAdapter = AddItemAdapter {
             viewModel.onAddFavoriteClicked()
             viewModel.onUserDismissedCta()
+            showToast(R.string.addFavoriteHint)
         }
         favoriteHintAdapter = AutoFavoriteHintAdapter {
             viewModel.onDeleteQuickAccessItemRequested(savedSite = it)

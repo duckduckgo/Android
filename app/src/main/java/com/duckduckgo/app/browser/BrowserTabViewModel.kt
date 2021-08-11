@@ -1417,6 +1417,9 @@ class BrowserTabViewModel(
 
     fun onAddFavoriteClicked() {
         command.value = ShowKeyboard
+        if (!saveNextVisitedSiteAsFavorite) {
+            // send pixel
+        }
         saveNextVisitedSiteAsFavorite = true
     }
 

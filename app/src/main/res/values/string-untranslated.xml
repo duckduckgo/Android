@@ -20,6 +20,7 @@
     <string name="daxFavoritesNewTabCtaText"><![CDATA[You\'ve got this!<br/><br/>☝️ Use the icons above to visit your favorite sites in a flash. Try adding a favorite now.]]></string>
     <string name="daxFavoritesCtaAddFavorite">Add Favorite</string>
     <string name="favoriteAddedOnboardingText"><![CDATA[We added your first favorite. <u><a href="">Undo</a><u/>]]></string>
+    <string name="addFavoriteHint">Go to the site and it will be saved as Favorite.</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
