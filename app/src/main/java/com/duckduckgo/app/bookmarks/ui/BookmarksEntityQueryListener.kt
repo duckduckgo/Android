@@ -22,17 +22,18 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 
 class BookmarksEntityQueryListener(
-    private val bookmarks: List<SavedSite.Bookmark>?,
+    private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
-    private val bookmarkFolders: List<BookmarkFolder>?,
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
-        if (bookmarks != null && bookmarkFolders != null) {
-            val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-            bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
-            bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+        viewModel.viewState.value?.bookmarks?.let { bookmarks ->
+            viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
+                val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
+                bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
+                bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+            }
         }
         return true
     }

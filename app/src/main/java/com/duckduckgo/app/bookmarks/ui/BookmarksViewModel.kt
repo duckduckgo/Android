@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
@@ -42,6 +43,7 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -79,17 +81,12 @@ class BookmarksViewModel(
     }
 
     companion object {
-        private const val MIN_ITEMS_FOR_SEARCH = 3
+        private const val MIN_ITEMS_FOR_SEARCH = 1
+        private const val NO_PARENT_ID = -1L
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    private var bookmarks: LiveData<List<Bookmark>> = MutableLiveData()
-    private var bookmarkFolders: LiveData<List<BookmarkFolder>> = MutableLiveData()
-
-    private val bookmarksObserver = Observer<List<Bookmark>> { onBookmarksChanged(it!!) }
-    private val bookmarkFoldersObserver = Observer<List<BookmarkFolder>> { onBookmarkFoldersChanged(it!!) }
 
     init {
         viewState.value = ViewState()
@@ -98,11 +95,6 @@ class BookmarksViewModel(
                 onFavoritesChanged(it)
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        removeObservers()
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
@@ -197,15 +189,6 @@ class BookmarksViewModel(
         }
     }
 
-    private fun onBookmarksChanged(bookmarks: List<Bookmark>) {
-        viewState.value = viewState.value?.let { viewState ->
-            viewState.copy(
-                bookmarks = bookmarks,
-                enableSearch = bookmarks.size + viewState.bookmarkFolders.size > MIN_ITEMS_FOR_SEARCH
-            )
-        }
-    }
-
     private fun onFavoritesChanged(favorites: List<Favorite>) {
         viewState.value = viewState.value?.copy(favorites = favorites)
     }
@@ -214,25 +197,41 @@ class BookmarksViewModel(
         command.value = OpenBookmarkFolder(bookmarkFolder)
     }
 
-    fun fetchBookmarksAndFolders(parentId: Long) {
-        bookmarks = bookmarksDao.getBookmarks(parentId).map { bookmarks ->
-            bookmarks.map { Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
+    fun fetchBookmarksAndFolders(parentId: Long = NO_PARENT_ID) {
+        if (parentId == NO_PARENT_ID) {
+            fetchAllItems()
+        } else {
+            fetchItemsByParentId(parentId)
         }
-
-        bookmarkFolders = bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)
-
-        removeObservers()
-        addObservers()
     }
 
-    private fun addObservers() {
-        bookmarks.observeForever(bookmarksObserver)
-        bookmarkFolders.observeForever(bookmarkFoldersObserver)
+    private fun fetchAllItems() {
+        viewModelScope.launch {
+            bookmarksDao.getBookmarks().combine(bookmarkFoldersDao.getBookmarkFolders()) {
+                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolderEntity> ->
+
+                val mappedBookmarks = bookmarks.map {
+                    Bookmark(it.id, it.title ?: "", it.url, it.parentId)
+                }
+                val mappedFolders = folders.map {
+                    BookmarkFolder(it.id, it.name, it.parentId)
+                }
+                onBookmarkItemsChanged(mappedBookmarks, mappedFolders)
+            }.collect()
+        }
     }
 
-    private fun removeObservers() {
-        bookmarks.removeObserver(bookmarksObserver)
-        bookmarkFolders.removeObserver(bookmarkFoldersObserver)
+    private fun fetchItemsByParentId(parentId: Long) {
+        viewModelScope.launch {
+            bookmarksDao.getBookmarks(parentId).combine(bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)) {
+                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
+
+                val mappedBookmarks = bookmarks.map {
+                    Bookmark(it.id, it.title ?: "", it.url, it.parentId)
+                }
+                onBookmarkItemsChanged(mappedBookmarks, folders)
+            }.collect()
+        }
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
@@ -273,18 +272,16 @@ class BookmarksViewModel(
                     branchToDelete = branchToDelete
                 )
             )
-
             bookmarkFoldersRepository.deleteFolderBranch(branchToDelete)
         }
     }
 
-    private fun onBookmarkFoldersChanged(bookmarkFolders: List<BookmarkFolder>) {
-        viewState.value = viewState.value?.let { viewState ->
-            viewState.copy(
-                bookmarkFolders = bookmarkFolders,
-                enableSearch = bookmarkFolders.size + viewState.bookmarks.size > MIN_ITEMS_FOR_SEARCH
-            )
-        }
+    private fun onBookmarkItemsChanged(bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
+        viewState.value = viewState.value?.copy(
+            bookmarks = bookmarks,
+            bookmarkFolders = bookmarkFolders,
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH
+        )
     }
 
     fun insertRecentlyDeletedBookmarksAndFolders() {

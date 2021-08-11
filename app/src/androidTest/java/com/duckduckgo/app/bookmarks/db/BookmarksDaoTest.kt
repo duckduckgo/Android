@@ -20,9 +20,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
@@ -57,27 +57,27 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarkDeleteThenItIsNoLongerInTheList() {
+    fun whenBookmarkDeleteThenItIsNoLongerInTheList() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         dao.delete(bookmark)
-        val list = dao.getBookmarks(0).blockingObserve()
-        assertTrue(list!!.isEmpty())
+        val list = dao.getBookmarks(0).first()
+        assertTrue(list.isEmpty())
     }
 
     @Test
-    fun whenBookmarkAddedThenItIsInList() {
+    fun whenBookmarkAddedThenItIsInList() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
-        val list = dao.getBookmarks(0).blockingObserve()
+        val list = dao.getBookmarks(0).first()
         assertEquals(listOf(bookmark), list)
     }
 
     @Test
-    fun whenInInitialStateThenTheBookmarksAreEmpty() {
-        val list = dao.getBookmarks(0).blockingObserve()
+    fun whenInInitialStateThenTheBookmarksAreEmpty() = runBlocking {
+        val list = dao.getBookmarks(0).first()
         assertNotNull(list)
-        assertTrue(list!!.isEmpty())
+        assertTrue(list.isEmpty())
     }
 
     @Test

@@ -35,7 +35,6 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfi
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.id.action_search
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
 import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -58,7 +57,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var bookmarksAdapter: BookmarksAdapter
     lateinit var favoritesAdapter: FavoritesAdapter
     lateinit var bookmarkFoldersAdapter: BookmarkFoldersAdapter
+
     private var deleteDialog: AlertDialog? = null
+    private var searchMenuItem: MenuItem? = null
 
     private val viewModel: BookmarksViewModel by bindViewModel()
 
@@ -140,7 +141,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     }
                     bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
                     bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
-                    invalidateOptionsMenu()
+                    setSearchMenuItemVisibility()
                 }
             }
         )
@@ -241,11 +242,29 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val searchMenuItem = menu?.findItem(action_search)
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true
+        searchMenuItem = menu?.findItem(R.id.action_search)
+        setSearchMenuItemVisibility()
         val searchView = searchMenuItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, bookmarksAdapter, viewModel.viewState.value?.bookmarkFolders, bookmarkFoldersAdapter))
+
+        searchMenuItem?.setOnActionExpandListener(
+            object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                    viewModel.fetchBookmarksAndFolders()
+                    return true
+                }
+
+                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                    viewModel.fetchBookmarksAndFolders(getParentFolderId())
+                    return true
+                }
+            }
+        )
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter))
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun setSearchMenuItemVisibility() {
+        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != ROOT_FOLDER_ID
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {

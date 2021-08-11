@@ -70,7 +70,7 @@ class BookmarkFoldersDataRepository(
     }
 
     private fun getBookmarkFolders(): List<BookmarkFolder> {
-        return bookmarkFoldersDao.getBookmarkFolders().map {
+        return bookmarkFoldersDao.getBookmarkFoldersImmediate().map {
             BookmarkFolder(id = it.id, name = it.name, parentId = it.parentId)
         }
     }

@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.bookmarks.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarksDao {
@@ -29,8 +29,11 @@ interface BookmarksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmarks: List<BookmarkEntity>)
 
+    @Query("select * from bookmarks")
+    fun getBookmarks(): Flow<List<BookmarkEntity>>
+
     @Query("select * from bookmarks where parentId = :parentId")
-    fun getBookmarks(parentId: Long): LiveData<List<BookmarkEntity>>
+    fun getBookmarks(parentId: Long): Flow<List<BookmarkEntity>>
 
     @Query("select * from bookmarks where parentId = :parentId")
     fun getBookmarksImmediate(parentId: Long): List<BookmarkEntity>

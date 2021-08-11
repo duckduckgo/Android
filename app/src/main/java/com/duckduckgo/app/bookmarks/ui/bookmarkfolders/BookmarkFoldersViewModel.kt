@@ -50,7 +50,7 @@ class BookmarkFoldersViewModel(
     }
 
     private fun getBookmarkFolders(): List<BookmarkFolder> {
-        return bookmarkFoldersDao.getBookmarkFolders().map {
+        return bookmarkFoldersDao.getBookmarkFoldersImmediate().map {
             BookmarkFolder(it.id, it.name, it.parentId)
         }
     }

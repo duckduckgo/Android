@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.bookmarks.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarkFoldersDao {
@@ -30,10 +30,13 @@ interface BookmarkFoldersDao {
     fun insert(bookmarkFolders: List<BookmarkFolderEntity>)
 
     @Query("select * from bookmark_folders")
-    fun getBookmarkFolders(): List<BookmarkFolderEntity>
+    fun getBookmarkFolders(): Flow<List<BookmarkFolderEntity>>
+
+    @Query("select * from bookmark_folders")
+    fun getBookmarkFoldersImmediate(): List<BookmarkFolderEntity>
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
-    fun getBookmarkFoldersByParentId(parentId: Long): LiveData<List<BookmarkFolder>>
+    fun getBookmarkFoldersByParentId(parentId: Long): Flow<List<BookmarkFolder>>
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
     fun getBookmarkFoldersByParentIdImmediate(parentId: Long): List<BookmarkFolder>

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
@@ -37,6 +36,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
@@ -64,7 +64,7 @@ class BookmarksViewModelTest {
     private val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
-    private val liveData = MutableLiveData<List<BookmarkEntity>>()
+    private val mutableStateFlow = MutableStateFlow<List<BookmarkEntity>>(emptyList())
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val bookmarksDao: BookmarksDao = mock()
     private val bookmarkFoldersDao: BookmarkFoldersDao = mock()
@@ -87,8 +87,8 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = coroutineRule.runBlocking {
-        liveData.value = emptyList()
-        whenever(bookmarksDao.getBookmarks(any())).thenReturn(liveData)
+        mutableStateFlow.value = emptyList()
+        whenever(bookmarksDao.getBookmarks(any())).thenReturn(mutableStateFlow)
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
     }
 
