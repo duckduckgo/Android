@@ -75,6 +75,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
+        object LaunchDefaultAppScreen : Command()
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
@@ -97,9 +98,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun start() {
-        val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
-        val isLightTheme = themingDataStore.theme == DuckDuckGoTheme.LIGHT
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
@@ -108,9 +107,9 @@ class SettingsViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     loading = false,
-                    lightThemeEnabled = isLightTheme,
+                    lightThemeEnabled = isLightThemeEnabled,
                     autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                    isAppDefaultBrowser = defaultBrowserAlready,
+                    isAppDefaultBrowser = isAppDefaultBrowser,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                     version = obtainVersion(variant.key),
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
@@ -122,6 +121,12 @@ class SettingsViewModel @Inject constructor(
             )
         }
     }
+
+    private val isLightThemeEnabled: Boolean
+        get() = themingDataStore.theme == DuckDuckGoTheme.LIGHT
+
+    private val isAppDefaultBrowser: Boolean
+        get() = defaultWebBrowserCapability.isDefaultBrowser()
 
     fun viewState(): StateFlow<ViewState> {
         return viewState
@@ -168,8 +173,19 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
     }
 
+    fun onDefaultBrowserChanged(enabled: Boolean) {
+        Timber.i("User changed default browser setting, is now enabled: $enabled")
+        if (isAppDefaultBrowser && enabled || !isAppDefaultBrowser && !enabled) {
+            return
+        }
+        viewModelScope.launch {
+            command.send(Command.LaunchDefaultAppScreen)
+        }
+    }
+
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
+        if (isLightThemeEnabled && enabled) return
         themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
