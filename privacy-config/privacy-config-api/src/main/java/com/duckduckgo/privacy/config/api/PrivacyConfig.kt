@@ -24,7 +24,4 @@ interface PrivacyConfigDownloader {
 
 sealed class PrivacyFeatureName(override val value: String) : FeatureName {
     data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
-    data class OtherFeatureName(override val value: String = "other") : PrivacyFeatureName(value)
 }
-
-data class TestFeatureName(override val value: String = "test") : FeatureName

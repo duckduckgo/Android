@@ -31,8 +31,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 class PrivacyConfigDownloadWorkerTest {
 
@@ -43,12 +41,10 @@ class PrivacyConfigDownloadWorkerTest {
     private val mockPrivacyConfigDownloader: PrivacyConfigDownloader = mock()
 
     private lateinit var context: Context
-    private lateinit var executor: Executor
 
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        executor = Executors.newSingleThreadExecutor()
     }
 
     @Test
