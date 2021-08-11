@@ -14,65 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.SingleLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp">
-
-    <FrameLayout
-        android:id="@+id/locationPermissionEntryFaviconContainer"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/subtle_favicon_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/locationPermissionEntryFavicon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no" />
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/locationPermissionEntryDomain"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:fontFamily="sans-serif"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:ellipsize="end"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/locationPermissionMenu"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@id/locationPermissionEntryFaviconContainer"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark" />
-
-    <ImageView
-        android:id="@+id/locationPermissionMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:background="?selectableItemBackground"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:scaleType="center"
-        android:src="@drawable/ic_overflow"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:ignore="ContentDescription" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_height="wrap_content" />

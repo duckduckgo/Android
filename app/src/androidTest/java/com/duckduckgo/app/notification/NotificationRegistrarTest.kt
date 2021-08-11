@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Test
 
@@ -45,6 +46,7 @@ class NotificationRegistrarTest {
     fun before() {
         whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationRegistrar(
+            TestCoroutineScope(),
             context,
             notificationManager,
             notifcationManagerCompat,

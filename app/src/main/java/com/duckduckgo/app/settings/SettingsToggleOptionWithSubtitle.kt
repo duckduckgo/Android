@@ -23,7 +23,7 @@ import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SettingsToggleOptionWithSubtitleBinding
 import com.duckduckgo.app.global.view.childrenRecursiveSequence
-import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsToggleOptionWithSubtitle : FrameLayout {

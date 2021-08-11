@@ -16,18 +16,33 @@
 
 package com.duckduckgo.app.job
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
-interface WorkScheduler {
-    suspend fun scheduleWork()
-}
-
-class AndroidWorkScheduler(
+@ContributesMultibinding(AppObjectGraph::class)
+@Singleton
+class AndroidWorkScheduler @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val notificationScheduler: AndroidNotificationScheduler,
     private val jobCleaner: JobCleaner
-) : WorkScheduler {
-    override suspend fun scheduleWork() {
-        jobCleaner.cleanDeprecatedJobs()
-        notificationScheduler.scheduleNextNotification()
+) : LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun scheduleWork() {
+        Timber.v("Scheduling work")
+        appCoroutineScope.launch {
+            jobCleaner.cleanDeprecatedJobs()
+            notificationScheduler.scheduleNextNotification()
+        }
     }
 }

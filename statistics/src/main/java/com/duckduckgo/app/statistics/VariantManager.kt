@@ -43,8 +43,8 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "gx", weight = 0.1, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "gy", weight = 0.1, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "gx", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "gy", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             // Favorites onboarding
             Variant(key = "pz", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "po", weight = 1.0, features = listOf(VariantFeature.FavoritesOnboarding), filterBy = { isEnglishLocale() }),

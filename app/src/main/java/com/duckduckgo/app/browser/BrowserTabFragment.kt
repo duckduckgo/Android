@@ -104,7 +104,19 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.DaxDialogListener
+import com.duckduckgo.app.global.view.NonDismissibleBehavior
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.disableAnimation
+import com.duckduckgo.app.global.view.enableAnimation
+import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.toggleFullScreen
+import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
@@ -119,6 +131,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -236,7 +249,7 @@ class BrowserTabFragment :
 
     private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
 
-    private lateinit var popupMenu: BrowserPopupMenu
+    private lateinit var popupMenu: PopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -832,7 +845,7 @@ class BrowserTabFragment :
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
-        val urlIntent = Intent.parseUri(url, URI_NO_FLAG)
+        val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
         val chooserIntent = Intent.createChooser(urlIntent, title)
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
         return chooserIntent
@@ -1741,7 +1754,7 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
+            popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) {

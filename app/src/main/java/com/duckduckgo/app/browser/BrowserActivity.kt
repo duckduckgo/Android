@@ -47,7 +47,10 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.sanitize
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -60,6 +63,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

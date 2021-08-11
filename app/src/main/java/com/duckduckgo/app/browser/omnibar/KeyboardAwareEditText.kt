@@ -27,7 +27,7 @@ import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
-import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard

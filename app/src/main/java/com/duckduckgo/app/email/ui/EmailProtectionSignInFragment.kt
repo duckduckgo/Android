@@ -29,9 +29,9 @@ import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBindi
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.waitlist.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
-import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.launchIn
