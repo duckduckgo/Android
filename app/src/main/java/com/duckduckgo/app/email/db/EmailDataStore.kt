@@ -69,7 +69,6 @@ class EmailEncryptedSharedPreferences(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-            pixel.enqueueFire(AppPixelName.ENCRYPTED_NO_EXCEPTION)
             return encryptedSharedPreferences
         } catch (e: IOException) {
             pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
