@@ -31,9 +31,11 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlin.coroutines.coroutineContext
 
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
@@ -45,6 +47,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private var tickerJob: Job? = null
 
     private fun startTickerRefresher() {
+        Timber.i("startTickerRefresher")
         tickerJob?.cancel()
         tickerJob = viewModelScope.launch {
             while (isActive) {
@@ -58,6 +61,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it) }
+            .flowOn(Dispatchers.Default)
             .map { if (it.isEmpty()) listOf(TrackerFeedItem.TrackerEmptyFeed) else it }
             .onStart {
                 startTickerRefresher()
@@ -65,11 +69,13 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             }
     }
 
-    private fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>): List<TrackerFeedItem> {
+    private suspend fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
 
         perSessionData.values.forEach { sessionTrackers ->
+            coroutineContext.ensureActive()
+
             val perAppData = sessionTrackers.groupBy { it.vpnTracker.trackingApp.packageId }
             var firstInBucket = true
 

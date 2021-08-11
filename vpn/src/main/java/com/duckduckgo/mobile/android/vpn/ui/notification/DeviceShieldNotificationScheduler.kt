@@ -166,13 +166,14 @@ class DeviceShieldNotificationScheduler(
             return Result.success()
         }
 
-        private fun showNotification() {
+        private suspend fun showNotification() {
             val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification().also {
                 notificationPressedHandler.notificationVariant = it.notificationVariant
             }
 
             if (!deviceShieldNotification.hidden) {
-                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
+                val notification =
+                    DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
                 deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
                 Timber.v("Vpn Daily notification is now shown")

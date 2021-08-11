@@ -33,6 +33,7 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.*
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
 class DeviceShieldReminderNotificationSchedulerTest {
 
     @ExperimentalCoroutinesApi

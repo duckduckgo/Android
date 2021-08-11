@@ -16,10 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import kotlinx.coroutines.flow.Flow
@@ -27,27 +24,42 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnTrackerDao {
 
+    @Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: VpnTracker)
 
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(tracker: List<VpnTracker>)
+
+    @Transaction
     @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
     fun getLatestTracker(): Flow<VpnTracker?>
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
+    @Transaction
+    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
+    @Transaction
+    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
+    @Transaction
     @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackersCountBetween(startTime: String, endTime: String): Flow<Int>
 
+    @Transaction
     @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
 
-    @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC")
+    @Transaction
+    @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
+
+    companion object {
+        private const val MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS = 10_000
+    }
 }

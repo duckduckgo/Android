@@ -44,8 +44,10 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
 
     fun getVpnTrackers(startTime: () -> String, endTime: String = noEndDate()): Flow<List<VpnTracker>> {
         return trackerDao.getTrackersBetween(startTime(), endTime)
+            .conflate()
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
+            .flowOn(Dispatchers.Default)
     }
 
     @WorkerThread
@@ -56,10 +58,13 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     @WorkerThread
     fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>> {
         return trackerDao.getPagedTrackersSince(startTime())
+            .conflate()
+            .distinctUntilChanged()
     }
 
     fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {
         return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
+            .conflate()
             .distinctUntilChanged()
             .map { list -> list.filter { it.id >= startTime() } }
             .transform { runningTimes ->
@@ -70,6 +75,7 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
 
     fun getVpnDataStats(startTime: () -> String, endTime: String = noEndDate()): Flow<DataStats> {
         return statsDao.getDataStatsBetween(startTime(), endTime)
+            .conflate()
             .distinctUntilChanged()
             .map { list -> list.filter { it.id >= startTime() } }
             .transform {
@@ -91,11 +97,15 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     @WorkerThread
     fun getBlockedTrackersCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
         return trackerDao.getTrackersCountBetween(startTime(), endTime)
+            .conflate()
+            .distinctUntilChanged()
     }
 
     @WorkerThread
     fun getTrackingAppsCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
         return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
+            .conflate()
+            .distinctUntilChanged()
     }
 
     private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {

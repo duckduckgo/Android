@@ -26,10 +26,11 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.BuildConfig
+import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,7 +64,8 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
-    private val dailyNotificationPressedHandler: DailyNotificationPressedHandler
+    private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
+    @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -79,7 +81,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
             val weekly = kotlin.runCatching { intent.getStringExtra("weekly")?.toInt() }.getOrNull()
             val daily = kotlin.runCatching { intent.getStringExtra("daily")?.toInt() }.getOrNull()
 
-            GlobalScope.launch(Dispatchers.IO) {
+            vpnCoroutineScope.launch(Dispatchers.IO) {
                 val notification = if (weekly != null) {
                     Timber.v("Debug - Sending weekly notification $weekly")
                     weeklyNotificationPressedHandler.notificationVariant = weekly

@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -57,7 +58,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsWeeklyReportNotificationWhenTrackersFoundInOneApp() {
+    fun createsWeeklyReportNotificationWhenTrackersFoundInOneApp() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
 
@@ -67,7 +68,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsWeeklyReportNotificationWhenTrackersFoundInTwoApps() {
+    fun createsWeeklyReportNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
@@ -78,7 +79,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsWeeklyReportNotificationWhenTrackersFoundInMoreThanTwoApps() {
+    fun createsWeeklyReportNotificationWhenTrackersFoundInMoreThanTwoApps() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
@@ -90,7 +91,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsWeeklyReportNotificationWithCorrectSortOrder() {
+    fun createsWeeklyReportNotificationWithCorrectSortOrder() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
@@ -105,13 +106,13 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsHiddenWeeklyReportNotificationWhenNoTrackersFound() {
+    fun createsHiddenWeeklyReportNotificationWhenNoTrackersFound() = runBlocking {
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
         assertTrue(notification.hidden)
     }
 
     @Test
-    fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInOneApp() {
+    fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInOneApp() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
 
@@ -121,7 +122,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInTwoApps() {
+    fun createsWeeklyTopTrackerCompanyNotificationWhenTrackersFoundInTwoApps() = runBlocking {
         val trackerDomain = "example.com"
 
         trackerFound(trackerDomain, company = "Google", appContainingTracker = trackingApp1())
@@ -142,7 +143,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     }
 
     @Test
-    fun createsHiddenWeeklyTopTrackerCompanyNotificationWhenNoTrackersFound() {
+    fun createsHiddenWeeklyTopTrackerCompanyNotificationWhenNoTrackersFound() = runBlocking {
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(1)
         assertTrue(notification.hidden)
     }

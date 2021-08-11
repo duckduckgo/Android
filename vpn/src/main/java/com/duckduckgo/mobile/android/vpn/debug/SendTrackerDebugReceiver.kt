@@ -75,11 +75,13 @@ class SendTrackerDebugReceiver @Inject constructor(
         GlobalScope.launch(Dispatchers.IO) {
             val times = intent.getStringExtra("times")?.toInt() ?: 1
             val hoursAgo = intent.getStringExtra("hago")?.toLong() ?: 0L
+            Timber.i("Inserting %d trackers into the DB", times)
+
+            val insertionList = mutableListOf<VpnTracker>()
             for (i in 0 until times) {
-                vpnDatabase.vpnTrackerDao().insert(
-                    dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo)))
-                )
+                insertionList.add(dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo))))
             }
+            vpnDatabase.vpnTrackerDao().insert(insertionList)
         }
     }
 

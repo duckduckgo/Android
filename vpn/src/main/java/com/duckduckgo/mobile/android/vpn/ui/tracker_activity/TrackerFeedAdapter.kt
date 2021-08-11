@@ -37,6 +37,8 @@ import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.facebook.shimmer.ShimmerFrameLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
@@ -55,6 +57,7 @@ class TrackerFeedAdapter @Inject constructor(
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
@@ -79,7 +82,7 @@ class TrackerFeedAdapter @Inject constructor(
         return trackerFeedItems[position] is TrackerFeedItem.TrackerFeedItemHeader
     }
 
-    fun updateData(data: List<TrackerFeedItem>) {
+    suspend fun updateData(data: List<TrackerFeedItem>) = withContext(Dispatchers.Default) {
         val oldData = trackerFeedItems
         var newData = data
         if (!showHeadings) {
@@ -90,7 +93,10 @@ class TrackerFeedAdapter @Inject constructor(
         val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
 
         trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
-        diffResult.dispatchUpdatesTo(this)
+
+        withContext(Dispatchers.Main) {
+            diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
+        }
     }
 
     fun showTimeWindowHeadings(showHeadings: Boolean) {
