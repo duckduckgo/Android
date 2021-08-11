@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.di
 
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -30,6 +31,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
 import com.duckduckgo.app.statistics.VariantManager
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -57,11 +59,12 @@ class OnboardingModule {
     fun userEventsRepository(
         userEventsStore: UserEventsStore,
         userStageStore: UserStageStore,
+        favoritesRepository: FavoritesRepository,
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        faviconManager: FaviconManager,
+        faviconManager: Lazy<FaviconManager>,
         dispatcherProvider: DispatcherProvider,
         variantManager: VariantManager
     ): UserEventsRepository {
-        return AppUserEventsRepository(userEventsStore, userStageStore, duckDuckGoUrlDetector, faviconManager, dispatcherProvider, variantManager)
+        return AppUserEventsRepository(userEventsStore, userStageStore, favoritesRepository, duckDuckGoUrlDetector, faviconManager, dispatcherProvider, variantManager)
     }
 }

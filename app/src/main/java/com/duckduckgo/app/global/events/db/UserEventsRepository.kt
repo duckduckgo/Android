@@ -16,29 +16,38 @@
 
 package com.duckduckgo.app.global.events.db
 
+import androidx.core.net.toUri
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
+import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface UserEventsRepository {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
     suspend fun siteVisited(tabId: String, url: String, title: String)
     suspend fun clearVisitedSite()
     suspend fun userEvents(): Flow<List<UserEventEntity>>
+    suspend fun visitedSiteByDomain(query: String): Int
+    suspend fun moveVisitedSiteAsFavorite(): SavedSite.Favorite?
 }
 
 class AppUserEventsRepository(
     private val userEventsStore: UserEventsStore,
     private val userStageStore: UserStageStore,
+    private val favoritesRepository: FavoritesRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val faviconManager: FaviconManager,
+    private val faviconManager: Lazy<FaviconManager>,
     private val dispatcher: DispatcherProvider,
     private val variantManager: VariantManager
 ) : UserEventsRepository {
@@ -65,7 +74,40 @@ class AppUserEventsRepository(
                     payloadMapper.addPayload(this, UserEventPayload.SitePayload(url, title))
                 }
             )
-            faviconManager.persistCachedFavicon(tabId, url)
+            Timber.i("DebugFavicon: registerUserEvent for $title, $url")
+            faviconManager.get().persistCachedFavicon(tabId, url)
+        }
+    }
+
+    override suspend fun visitedSiteByDomain(query: String): Int {
+        val notFound = 0
+        return withContext(dispatcher.io()) {
+            val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext notFound
+            val payload = payloadMapper.getPayload(firstVisitedSiteEvent)
+            if (payload is UserEventPayload.SitePayload) {
+                runCatching {
+                    payload.url.toUri().domain()
+                }.onSuccess {
+                    Timber.i("DebugFavicon: VisitedSiteFavicon $it vs $query")
+                    if ("%$it%" == query) {
+                        Timber.i("DebugFavicon: VisitedSiteFavicon found")
+                        return@withContext 1
+                    }
+                }
+            }
+            return@withContext notFound
+        }
+    }
+
+    override suspend fun moveVisitedSiteAsFavorite(): SavedSite.Favorite? {
+        return withContext(dispatcher.io()) {
+            val userEvent = getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext null
+            val payload = payloadMapper.getPayload(userEvent)
+            if (payload is UserEventPayload.SitePayload) {
+                userEventsStore.registerUserEvent(userEvent.copy(payload = ""))
+                return@withContext favoritesRepository.insert(title = payload.title, url = payload.url)
+            }
+            return@withContext null
         }
     }
 
@@ -75,9 +117,9 @@ class AppUserEventsRepository(
         withContext(dispatcher.io()) {
             val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext
             val payload = payloadMapper.getPayload(firstVisitedSiteEvent)
-            userEventsStore.registerUserEvent(firstVisitedSiteEvent.copy(payload = ""))
+            userEventsStore.registerUserEvent(firstVisitedSiteEvent.copy(timestamp = 0L, payload = ""))
             if (payload is UserEventPayload.SitePayload) {
-                faviconManager.deletePersistedFavicon(payload.url, forceDelete = true)
+                faviconManager.get().deletePersistedFavicon(payload.url, forceDelete = true)
             }
         }
     }

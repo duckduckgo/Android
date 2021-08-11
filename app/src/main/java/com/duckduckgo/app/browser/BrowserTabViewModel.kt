@@ -82,7 +82,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper
-import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper.UserEventPayload
 import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
@@ -1821,14 +1820,9 @@ class BrowserTabViewModel(
         if (variantManager.favoritesOnboardingEnabled()) {
             viewModelScope.launch(dispatchers.io()) {
                 if (cta is DaxBubbleCta.DaxFavoritesCTA) {
-                    userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
-                        val payload = payloadMapper.getPayload(it)
-                        if (payload is UserEventPayload.SitePayload) {
-                            val addedFavorite = favoritesRepository.insert(title = payload.title, url = payload.url)
-                            userEventsRepository.clearVisitedSite()
-                            withContext(dispatchers.main()) {
-                                command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
-                            }
+                    userEventsRepository.moveVisitedSiteAsFavorite()?.let { addedFavorite ->
+                        withContext(dispatchers.main()) {
+                            command.value = ShowVisitedSiteAsFavoriteHint(addedFavorite)
                         }
                     }
                 }
