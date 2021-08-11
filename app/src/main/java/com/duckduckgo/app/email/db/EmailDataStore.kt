@@ -60,7 +60,7 @@ class EmailEncryptedSharedPreferences(
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
         try {
-            return EncryptedSharedPreferences.create(
+            val encryptedSharedPreferences = EncryptedSharedPreferences.create(
                 context,
                 FILENAME,
                 MasterKey.Builder(context)
@@ -69,6 +69,8 @@ class EmailEncryptedSharedPreferences(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
+            pixel.enqueueFire(AppPixelName.ENCRYPTED_NO_EXCEPTION)
+            return encryptedSharedPreferences
         } catch (e: IOException) {
             pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
         } catch (e: GeneralSecurityException) {
@@ -150,7 +152,7 @@ class EmailEncryptedSharedPreferences(
             }
         }
 
-    override fun canUseEncryption(): Boolean = encryptedPreferences != null
+    override fun canUseEncryption(): Boolean = false
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
