@@ -19,11 +19,13 @@ package com.duckduckgo.app.global.events.db;
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import dagger.Lazy
@@ -42,13 +44,13 @@ open class UserEventsDependencies(context: Context, dispatcherProvider: Dispatch
         .allowMainThreadQueries()
         .build()
 
-    open val userEventsStore = AppUserEventsStore(db.userEventsDao(), dispatcherProvider)
+    open val userEventsStore: UserEventsStore = AppUserEventsStore(db.userEventsDao(), dispatcherProvider)
 
-    open val userStageStore = AppUserStageStore(db.userStageDao(), dispatcherProvider)
+    open val userStageStore: UserStageStore = AppUserStageStore(db.userStageDao(), dispatcherProvider)
 
-    open val favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
+    open val favoritesRepository: FavoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
 
-    open val userEventsRepository = AppUserEventsRepository(
+    open val userEventsRepository: UserEventsRepository = AppUserEventsRepository(
         userEventsStore,
         userStageStore,
         favoritesRepository,
