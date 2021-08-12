@@ -75,6 +75,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
+        object LaunchDefaultBrowser : Command()
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
@@ -168,20 +169,29 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
     }
 
+    fun onDefaultBrowserToggled(enabled: Boolean) {
+        Timber.i("User toggled default browser, is now enabled: $enabled")
+        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
+        if (enabled && defaultBrowserSelected) return
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(isAppDefaultBrowser = enabled))
+            command.send(Command.LaunchDefaultBrowser)
+        }
+    }
+
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
-        val currentValue = themingDataStore.theme == DuckDuckGoTheme.LIGHT
-        if (enabled != currentValue) {
-            themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
-            viewModelScope.launch {
-                viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
-                command.send(Command.UpdateTheme)
-            }
-
-            val pixelName =
-                if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
-            pixel.fire(pixelName)
+        val lightThemeSelected = themingDataStore.theme == DuckDuckGoTheme.LIGHT
+        if (enabled && lightThemeSelected) return
+        themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
+            command.send(Command.UpdateTheme)
         }
+
+        val pixelName =
+            if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
+        pixel.fire(pixelName)
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

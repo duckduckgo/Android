@@ -196,6 +196,42 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(false)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+            testee.onDefaultBrowserToggled(true)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(true)
+
+            expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
         testee.onAutocompleteSettingChanged(true)
         verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
