@@ -19,8 +19,12 @@ package com.duckduckgo.app.global.events.db
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,6 +38,7 @@ import javax.inject.Singleton
 class FavoritesOnboardingObserver @Inject constructor(
     private val appCoroutineScope: CoroutineScope,
     private val userEventsRepository: UserEventsRepository,
+    private val userStageStore: UserStageStore,
     private val favoritesOnboardingWorkRequestBuilder: FavoritesOnboardingWorkRequestBuilder,
     private val variantManager: VariantManager
 ) : LifecycleObserver {
@@ -52,6 +57,8 @@ class FavoritesOnboardingObserver @Inject constructor(
         if (!variantManager.favoritesOnboardingEnabled()) return
 
         appCoroutineScope.launch {
+            if (userStageStore.getUserAppStage() != AppStage.DAX_ONBOARDING) return@launch
+
             userEventsRepository.userEvents().map { events ->
                 events.filter { it.id == UserEventKey.FIRST_NON_SERP_VISITED_SITE }
             }.distinctUntilChanged().collect { filteredEvents ->
