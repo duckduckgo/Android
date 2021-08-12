@@ -18,10 +18,6 @@ package com.duckduckgo.privacy.config.api
 
 import com.duckduckgo.feature.toggles.api.FeatureName
 
-interface PrivacyConfigDownloader {
-    suspend fun download(): Boolean
-}
-
 sealed class PrivacyFeatureName(override val value: String) : FeatureName {
     data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
 }

@@ -18,13 +18,16 @@ package com.duckduckgo.privacy.config.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
+
+interface PrivacyConfigDownloader {
+    suspend fun download(): Boolean
+}
 
 @ContributesBinding(AppObjectGraph::class)
 class RealPrivacyConfigDownloader @Inject constructor(private val privacyConfigService: PrivacyConfigService, private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>, privacyConfigDatabase: PrivacyConfigDatabase) : PrivacyConfigDownloader {

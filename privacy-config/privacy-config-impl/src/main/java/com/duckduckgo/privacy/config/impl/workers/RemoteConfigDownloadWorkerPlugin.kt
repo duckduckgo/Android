@@ -20,7 +20,7 @@ import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject

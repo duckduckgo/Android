@@ -28,7 +28,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber

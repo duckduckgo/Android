@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.di
 
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -76,6 +77,9 @@ class DatabaseModule {
     @Singleton
     @Provides
     fun providePrivacyConfigDatabase(context: Context): PrivacyConfigDatabase {
-        return PrivacyConfigDatabase.getInstance(context)
+        return Room.databaseBuilder(context, PrivacyConfigDatabase::class.java, "privacy_config.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

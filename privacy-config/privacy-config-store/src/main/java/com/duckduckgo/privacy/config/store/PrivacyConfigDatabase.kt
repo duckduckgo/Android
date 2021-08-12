@@ -16,9 +16,7 @@
 
 package com.duckduckgo.privacy.config.store
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
@@ -29,24 +27,6 @@ import androidx.room.RoomDatabase
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
-
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyFeatureTogglesDao(): PrivacyFeatureTogglesDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: PrivacyConfigDatabase? = null
-
-        fun getInstance(context: Context): PrivacyConfigDatabase =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
-            }
-
-        private fun buildDatabase(context: Context): PrivacyConfigDatabase {
-            return Room.databaseBuilder(context, PrivacyConfigDatabase::class.java, "privacy_config.db")
-                .enableMultiInstanceInvalidation()
-                .fallbackToDestructiveMigration()
-                .build()
-        }
-    }
 }

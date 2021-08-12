@@ -16,10 +16,16 @@
 
 package com.duckduckgo.feature.toggles.api
 
+/**
+ * Any feature toggles implemented in any module should implement [FeatureToggle]
+ */
 interface FeatureToggle {
     fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean?
 }
 
+/**
+ * Each feature toggle created needs a [FeatureName] which can be implemented using this interface
+ */
 interface FeatureName {
     val value: String
 }
