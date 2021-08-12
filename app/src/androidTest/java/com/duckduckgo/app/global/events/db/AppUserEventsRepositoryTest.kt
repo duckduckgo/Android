@@ -62,8 +62,7 @@ class AppUserEventsRepositoryTest {
     private val favoritesRepository = userEventsDependencies.favoritesRepository
 
     private val testee = userEventsDependencies.userEventsRepository
-
-
+    
     @After
     fun after() {
         db.close()
