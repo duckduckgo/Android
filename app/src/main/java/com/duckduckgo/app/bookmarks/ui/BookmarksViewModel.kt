@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
@@ -208,15 +207,12 @@ class BookmarksViewModel(
     private fun fetchAllItems() {
         viewModelScope.launch {
             bookmarksDao.getBookmarks().combine(bookmarkFoldersDao.getBookmarkFolders()) {
-                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolderEntity> ->
+                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
                 val mappedBookmarks = bookmarks.map {
                     Bookmark(it.id, it.title ?: "", it.url, it.parentId)
                 }
-                val mappedFolders = folders.map {
-                    BookmarkFolder(it.id, it.name, it.parentId)
-                }
-                onBookmarkItemsChanged(mappedBookmarks, mappedFolders)
+                onBookmarkItemsChanged(mappedBookmarks, folders)
             }.collect()
         }
     }
