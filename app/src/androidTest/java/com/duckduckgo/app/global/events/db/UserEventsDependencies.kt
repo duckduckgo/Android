@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.events.db;
 
 import android.content.Context
 import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -33,9 +32,11 @@ import dagger.Lazy
 // Temporary class to make easier to provide dependencies until we can use dagger from Test classes
 open class UserEventsDependencies(context: Context, dispatcherProvider: DispatcherProvider) {
 
-    open val mockVariantManager: VariantManager = mock()
-    open val mockfaviconManager: FaviconManager = mock()
-    open val lazyFaviconManager = Lazy { mockfaviconManager }
+    open val variantManager: VariantManager = mock()
+
+    open val faviconManager: FaviconManager = mock()
+
+    open val lazyFaviconManager = Lazy { faviconManager }
 
     open val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
         .allowMainThreadQueries()
@@ -54,6 +55,6 @@ open class UserEventsDependencies(context: Context, dispatcherProvider: Dispatch
         DuckDuckGoUrlDetector(),
         lazyFaviconManager,
         dispatcherProvider,
-        mockVariantManager
+        variantManager
     )
 }

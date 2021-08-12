@@ -63,7 +63,7 @@ class FavoritesOnboardingObserverTest {
     private val mockVariantManager: VariantManager = mock()
 
     private val userEventsDependencies = object : UserEventsDependencies(context, coroutineRule.testDispatcherProvider) {
-        override val mockVariantManager: VariantManager
+        override val variantManager: VariantManager
             get() = this@FavoritesOnboardingObserverTest.mockVariantManager
     }
     private val onboardingWorker = FavoritesOnboardingWorkRequestBuilder(workManager, mockVariantManager)
@@ -73,7 +73,8 @@ class FavoritesOnboardingObserverTest {
         userEventsRepository = userEventsDependencies.userEventsRepository,
         userStageStore = userEventsDependencies.userStageStore,
         favoritesOnboardingWorkRequestBuilder = onboardingWorker,
-        variantManager = mockVariantManager)
+        variantManager = mockVariantManager
+    )
 
     @Test
     fun whenUserVisitsFirstSiteThenScheduleWork() = coroutineRule.runBlocking {

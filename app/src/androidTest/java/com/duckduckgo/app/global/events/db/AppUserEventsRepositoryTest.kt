@@ -17,23 +17,16 @@
 package com.duckduckgo.app.global.events.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.AppUserStageStore
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
@@ -52,29 +45,24 @@ class AppUserEventsRepositoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val mockVariantManager: VariantManager = mock()
-    private val mockfaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy { mockfaviconManager }
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-        .allowMainThreadQueries()
-        .build()
+    private val userEventsDependencies = UserEventsDependencies(context, coroutineRule.testDispatcherProvider)
 
-    private val userEventsStore = AppUserEventsStore(db.userEventsDao(), coroutineRule.testDispatcherProvider)
+    private val mockVariantManager: VariantManager = userEventsDependencies.variantManager
 
-    private val userStageStore = AppUserStageStore(db.userStageDao(), coroutineRule.testDispatcherProvider)
+    private val mockfaviconManager: FaviconManager = userEventsDependencies.faviconManager
 
-    private val favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
+    private val db = userEventsDependencies.db
 
-    private val testee = AppUserEventsRepository(
-        userEventsStore,
-        userStageStore,
-        favoritesRepository,
-        DuckDuckGoUrlDetector(),
-        lazyFaviconManager,
-        coroutineRule.testDispatcherProvider,
-        mockVariantManager
-    )
+    private val userEventsStore = userEventsDependencies.userEventsStore
+
+    private val userStageStore = userEventsDependencies.userStageStore
+
+    private val favoritesRepository = userEventsDependencies.favoritesRepository
+
+    private val testee = userEventsDependencies.userEventsRepository
+
 
     @After
     fun after() {
