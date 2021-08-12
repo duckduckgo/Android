@@ -81,7 +81,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsPayloadMapper
 import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
