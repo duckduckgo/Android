@@ -50,7 +50,6 @@ class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters
 
     override suspend fun doWork(): Result {
         userEvents.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
-            // TODO: check if we need to reset timestamp
             userEvents.clearVisitedSite()
         }
 
