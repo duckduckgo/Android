@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDet
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.BuildConfig
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +84,9 @@ class TcpDeviceToNetwork(
 
         val totalPacketLength = payloadBuffer.limit()
 
-        packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
+        if (BuildConfig.DEBUG) {
+            packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
+        }
 
         val tcb = TCB.getTCB(connectionKey)
 
