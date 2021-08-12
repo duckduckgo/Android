@@ -104,7 +104,7 @@ class AppUserEventsRepository(
             val userEvent = getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext null
             val payload = payloadMapper.getPayload(userEvent)
             if (payload is UserEventPayload.SitePayload) {
-                userEventsStore.registerUserEvent(userEvent.copy(payload = ""))
+                userEventsStore.registerUserEvent(userEvent.copy(timestamp = 0L, payload = ""))
                 return@withContext favoritesRepository.insert(title = payload.title, url = payload.url)
             }
             return@withContext null
