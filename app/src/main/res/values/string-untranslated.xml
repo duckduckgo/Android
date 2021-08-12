@@ -32,5 +32,5 @@
 
     <!-- Email -->
     <string name="emailNotSupported">Device not supported</string>
-    <string name="emailNotSupportedExplanation">We need to encrypt and store the private email addresses you create locally on your device. Because your device does not support encrypted storage Email Protection is unavailable.</string>
+    <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 </resources>
