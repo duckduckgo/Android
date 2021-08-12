@@ -1422,14 +1422,15 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onAddFavoriteClicked() {
-        if (variantManager.favoritesOnboardingEnabled()) {
-            command.value = ShowKeyboard
-            if (!saveNextVisitedSiteAsFavorite) {
-                // send pixel
-            }
-            saveNextVisitedSiteAsFavorite = true
-        }
+    fun onAddFavoriteItemClicked() {
+        pixel.fire(AppPixelName.FAVORITE_HOMETAB_ADD_ITEM_PRESSED)
+        onAddFavoriteClicked()
+    }
+
+    private fun onAddFavoriteClicked() {
+        if (!variantManager.favoritesOnboardingEnabled()) return
+        command.value = ShowKeyboard
+        saveNextVisitedSiteAsFavorite = true
     }
 
     fun onFireproofWebsiteMenuClicked() {
@@ -1539,6 +1540,7 @@ class BrowserTabViewModel(
             saveNextVisitedSiteAsFavorite = false
             viewModelScope.launch(dispatchers.io()) {
                 getSiteUrlAndTitle { url, title ->
+                    pixel.fire(AppPixelName.FAVORITE_HOMETAB_ADDED)
                     saveSiteAsFavorite(url = url, title = title)
                 }
             }
@@ -1811,8 +1813,6 @@ class BrowserTabViewModel(
         }
     }
 
-    private val payloadMapper = UserEventsPayloadMapper()
-
     fun onCtaShown() {
         val cta = ctaViewState.value?.cta ?: return
         ctaViewModel.onCtaShown(cta)
@@ -1860,6 +1860,10 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is DaxBubbleCta.DaxFavoritesCTA -> {
+                onAddFavoriteClicked()
+                return
+            }
             else -> return
         }
     }

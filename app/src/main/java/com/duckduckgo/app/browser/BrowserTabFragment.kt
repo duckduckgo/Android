@@ -1040,11 +1040,12 @@ class BrowserTabFragment :
 
         if (variantManager.favoritesOnboardingEnabled()) {
             val addItemAdapter = AddItemAdapter {
-                viewModel.onAddFavoriteClicked()
+                viewModel.onAddFavoriteItemClicked()
                 viewModel.onUserDismissedCta()
                 showToast(R.string.addFavoriteHint)
             }
             favoriteHintAdapter = AutoFavoriteHintAdapter {
+                pixel.fire(AppPixelName.FAVORITE_ONBOARDING_ITEM_UNDO)
                 viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
                 viewModel.onUserDismissedCta()
                 favoriteHintAdapter.clearHint()
@@ -2170,7 +2171,7 @@ class BrowserTabFragment :
                 inflate(context, R.layout.include_dax_buble_button_cta, bottomDaxCtaContainer)
                 configuration.showCta(bottomDaxCtaContainer)
                 bottomDaxCtaContainer.primaryCta.setOnClickListener {
-                    viewModel.onAddFavoriteClicked()
+                    viewModel.onUserClickCtaOkButton()
                     viewModel.onUserDismissedCta()
                 }
                 viewModel.onCtaShown()
