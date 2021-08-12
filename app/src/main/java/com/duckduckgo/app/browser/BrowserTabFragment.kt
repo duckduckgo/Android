@@ -1041,8 +1041,7 @@ class BrowserTabFragment :
         if (variantManager.favoritesOnboardingEnabled()) {
             val addItemAdapter = AddItemAdapter {
                 viewModel.onAddFavoriteItemClicked()
-                viewModel.onUserDismissedCta()
-                showToast(R.string.addFavoriteHint)
+                Snackbar.make(toolbar, R.string.addFavoriteHint, Snackbar.LENGTH_SHORT).show()
             }
             favoriteHintAdapter = AutoFavoriteHintAdapter {
                 pixel.fire(AppPixelName.FAVORITE_ONBOARDING_ITEM_UNDO)
