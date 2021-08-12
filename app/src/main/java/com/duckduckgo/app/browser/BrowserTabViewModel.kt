@@ -1424,6 +1424,9 @@ class BrowserTabViewModel(
 
     fun onAddFavoriteItemClicked() {
         pixel.fire(AppPixelName.FAVORITE_HOMETAB_ADD_ITEM_PRESSED)
+        ctaViewState.value?.cta.takeIf { it is DaxBubbleCta.DaxFavoritesCTA }?.let {
+            onUserDismissedCta()
+        }
         onAddFavoriteClicked()
     }
 
