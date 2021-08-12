@@ -20,12 +20,11 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.PrivacyCoroutineTestRule
 import com.duckduckgo.privacy.config.impl.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
