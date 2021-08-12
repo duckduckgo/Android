@@ -60,7 +60,7 @@ class EmailEncryptedSharedPreferences(
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
         try {
-            val encryptedSharedPreferences = EncryptedSharedPreferences.create(
+            return EncryptedSharedPreferences.create(
                 context,
                 FILENAME,
                 MasterKey.Builder(context)
@@ -69,7 +69,6 @@ class EmailEncryptedSharedPreferences(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-            return encryptedSharedPreferences
         } catch (e: IOException) {
             pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
         } catch (e: GeneralSecurityException) {

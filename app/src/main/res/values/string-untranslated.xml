@@ -32,5 +32,5 @@
 
     <!-- Email -->
     <string name="emailNotSupported">Device not supported</string>
-    <string name="emailNotSupportedExplanation">Email Protection allows you to create a new email address. This address and a security token are encrypted then stored locally on your device. However your device does not support encrypted storage. As a result, Email Protection is unavailable.</string>
+    <string name="emailNotSupportedExplanation">We need to encrypt and store the private email addresses you create locally on your device. Because your device does not support encrypted storage Email Protection is unavailable.</string>
 </resources>
