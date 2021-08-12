@@ -80,7 +80,6 @@ class AppUserEventsRepositoryTest {
         assertNull(testee.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE))
     }
 
-
     @Test
     fun firstTimeUserVisitsANonSERPSiteDuringOnboardingThenSiteStored() = coroutineRule.runBlocking {
         givenFavoritesOnboarindExpEnabled()

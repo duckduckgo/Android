@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.events.db;
+package com.duckduckgo.app.global.events.db
 
 import android.content.Context
 import androidx.room.Room

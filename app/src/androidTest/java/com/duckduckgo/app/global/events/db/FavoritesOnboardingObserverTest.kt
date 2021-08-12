@@ -98,7 +98,6 @@ class FavoritesOnboardingObserverTest {
         assertFalse(getScheduledWorkers(FAVORITES_ONBOARDING_WORK_TAG).any { it.tags.contains(FavoritesOnboardingWorker::class.jvmName) })
     }
 
-
     @Test
     fun whenFireButtonPressedThenUserClearedDataRecentlyTrue() = coroutineRule.runBlocking {
         givenFavoritesOnboarindExpEnabled()
