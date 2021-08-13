@@ -271,9 +271,15 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore
     ) {
+        override val description: Int
+            get() = if (favoritesOnboarding.userClearedDataRecently) R.string.daxFavoritesClearCtaText else R.string.daxFavoritesNewTabCtaText
+
+        override var ctaPixelParam: String
+            get() = if (favoritesOnboarding.userClearedDataRecently) Pixel.PixelValues.DAX_FAVORITES_CLEAR_CTA else Pixel.PixelValues.DAX_FAVORITES_NEWTAB_CTA
+            set(value) {}
+
         override fun showCta(view: View) {
-            val ctaText = if (favoritesOnboarding.userClearedDataRecently) R.string.daxFavoritesClearCtaText else R.string.daxFavoritesNewTabCtaText
-            val daxText = view.context.getString(ctaText)
+            val daxText = view.context.getString(description)
             view.show()
             view.daxCtaContainer.alpha = 1f
             view.hiddenTextCta.text = daxText.html(view.context)
