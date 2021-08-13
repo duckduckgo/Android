@@ -19,8 +19,7 @@ package com.duckduckgo.app.di
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
-import com.duckduckgo.app.global.events.db.AppUserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.*
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
@@ -96,4 +95,8 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
+
+    @Binds
+    @IntoSet
+    abstract fun bindFavoritesOnboardingObserver(favoritesOnboardingObserver: FavoritesOnboardingObserver): LifecycleObserver
 }
