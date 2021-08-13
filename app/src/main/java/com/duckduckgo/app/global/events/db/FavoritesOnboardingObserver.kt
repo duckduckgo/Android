@@ -55,7 +55,7 @@ class FavoritesOnboardingObserver @Inject constructor(
         if (!variantManager.favoritesOnboardingEnabled()) return
 
         appCoroutineScope.launch {
-            if (userStageStore.getUserAppStage() != AppStage.ESTABLISHED) return@launch
+            if (userStageStore.getUserAppStage() == AppStage.ESTABLISHED) return@launch
 
             userEventsRepository.userEvents().map { events ->
                 events.filter { it.id == UserEventKey.FIRST_NON_SERP_VISITED_SITE }
