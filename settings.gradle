@@ -2,6 +2,7 @@ plugins {
     id("de.fayard.refreshVersions") version "0.10.1"
 }
 
+include ':dummy'
 include ':di'
 include ':app'
 include ':statistics'
