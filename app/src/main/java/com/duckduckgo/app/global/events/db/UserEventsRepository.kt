@@ -80,22 +80,20 @@ class AppUserEventsRepository(
     }
 
     override suspend fun visitedSiteByDomain(query: String): Int {
-        val notFound = 0
+        var hits = 0
         return withContext(dispatcher.io()) {
-            val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext notFound
+            val firstVisitedSiteEvent = userEventsStore.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE) ?: return@withContext hits
             val payload = payloadMapper.getPayload(firstVisitedSiteEvent)
             if (payload is UserEventPayload.SitePayload) {
                 runCatching {
                     payload.url.toUri().domain()
                 }.onSuccess {
-                    Timber.i("DebugFavicon: VisitedSiteFavicon $it vs $query")
                     if ("%$it%" == query) {
-                        Timber.i("DebugFavicon: VisitedSiteFavicon found")
-                        return@withContext 1
+                        return@withContext ++hits
                     }
                 }
             }
-            return@withContext notFound
+            return@withContext hits
         }
     }
 
