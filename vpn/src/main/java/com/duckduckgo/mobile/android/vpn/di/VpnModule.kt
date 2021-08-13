@@ -20,14 +20,12 @@ import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.*
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
-import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import com.duckduckgo.mobile.android.vpn.store.RoomPacketPersister
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.store.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -95,7 +93,11 @@ class VpnModule {
     @VpnScope
     @Provides
     fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
-        return RoomPacketPersister(vpnDatabase)
+        return if (BuildConfig.DEBUG) {
+            DummyPacketPersister()
+        } else {
+            RoomPacketPersister(vpnDatabase)
+        }
     }
 
     @VpnScope

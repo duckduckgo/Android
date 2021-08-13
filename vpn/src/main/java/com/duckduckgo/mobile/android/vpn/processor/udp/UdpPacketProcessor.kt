@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.duckduckgo.mobile.android.vpn.store.BuildConfig
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
@@ -157,9 +156,7 @@ class UdpPacketProcessor @AssistedInject constructor(
                 val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
                 Timber.v("UDP packet. Sent $bytesWritten bytes to $cacheKey")
 
-                if (BuildConfig.DEBUG) {
-                    packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
-                }
+                packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
             }
         } catch (e: IOException) {
             Timber.w("Network write error writing to $cacheKey")
@@ -210,7 +207,6 @@ class UdpPacketProcessor @AssistedInject constructor(
                     val inputChannel = (key.channel() as DatagramChannel)
                     val readBytes = inputChannel.read(receiveBuffer)
                     packetPersister.persistDataReceived(readBytes, PACKET_TYPE_UDP)
-
                     val referencePacket = key.attachment() as Packet
                     referencePacket.updateUdpBuffer(receiveBuffer, readBytes)
                     receiveBuffer.position(HEADER_SIZE + readBytes)

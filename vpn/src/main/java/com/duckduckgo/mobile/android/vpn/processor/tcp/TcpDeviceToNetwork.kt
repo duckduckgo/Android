@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDet
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.duckduckgo.mobile.android.vpn.store.BuildConfig
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import kotlinx.coroutines.CoroutineScope
@@ -84,9 +83,7 @@ class TcpDeviceToNetwork(
 
         val totalPacketLength = payloadBuffer.limit()
 
-        if (BuildConfig.DEBUG) {
-            packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
-        }
+        packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
 
         val tcb = TCB.getTCB(connectionKey)
 
@@ -100,11 +97,11 @@ class TcpDeviceToNetwork(
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
             "New packet. $connectionKey. TCB not initialized. ${
-            TcpPacketProcessor.logPacketDetails(
-                packet,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
-            )
+                TcpPacketProcessor.logPacketDetails(
+                    packet,
+                    packet.tcpHeader.sequenceNumber,
+                    packet.tcpHeader.acknowledgementNumber
+                )
             }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
         )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {

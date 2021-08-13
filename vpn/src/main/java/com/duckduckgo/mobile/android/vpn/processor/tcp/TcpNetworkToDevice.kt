@@ -73,10 +73,22 @@ class TcpNetworkToDevice(
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
-                    Timber.v("Got next network-to-device packet [isReadable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
+                    Timber.v(
+                        "Got next network-to-device packet [isReadable] after ${
+                        TimeUnit.NANOSECONDS.toMillis(
+                            System.nanoTime() - startTime
+                        )
+                        }ms wait"
+                    )
                     processRead(key)
                 } else if (key.isValid && key.isConnectable) {
-                    Timber.v("Got next network-to-device packet [isConnectable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
+                    Timber.v(
+                        "Got next network-to-device packet [isConnectable] after ${
+                        TimeUnit.NANOSECONDS.toMillis(
+                            System.nanoTime() - startTime
+                        )
+                        }ms wait"
+                    )
                     processConnect(key)
                 } else if (key.isValid && key.isWritable) {
                     val tcb = key.attachment() as TCB
@@ -129,7 +141,13 @@ class TcpNetworkToDevice(
             )
             }"
         )
-        packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
+        packet.updateTcpBuffer(
+            receiveBuffer,
+            (PSH or ACK).toByte(),
+            tcb.sequenceNumberToClient,
+            tcb.acknowledgementNumberToClient,
+            readBytes
+        )
 
         tcb.sequenceNumberToClient += readBytes
         receiveBuffer.position(HEADER_SIZE + readBytes)
@@ -169,7 +187,13 @@ class TcpNetworkToDevice(
 
     private fun sendReset(packet: Packet, tcb: TCB) {
         val buffer = ByteBufferPool.acquire()
-        packet.updateTcpBuffer(buffer, (RST or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+        packet.updateTcpBuffer(
+            buffer,
+            (RST or ACK).toByte(),
+            tcb.sequenceNumberToClient,
+            tcb.acknowledgementNumberToClient,
+            0
+        )
         tcb.sequenceNumberToClient++
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
 
@@ -188,7 +212,13 @@ class TcpNetworkToDevice(
                 Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.tcbState}")
 
                 val responseBuffer = ByteBufferPool.acquire()
-                packet.updateTcpBuffer(responseBuffer, (SYN or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+                packet.updateTcpBuffer(
+                    responseBuffer,
+                    (SYN or ACK).toByte(),
+                    tcb.sequenceNumberToClient,
+                    tcb.acknowledgementNumberToClient,
+                    0
+                )
 
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
                 tcb.sequenceNumberToClient++
