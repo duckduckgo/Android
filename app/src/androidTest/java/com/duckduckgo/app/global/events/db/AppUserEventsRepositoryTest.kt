@@ -207,7 +207,7 @@ class AppUserEventsRepositoryTest {
     }
 
     private fun givenFavoritesOnboarindExpEnabled() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "po" })
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zo" })
     }
 
     private suspend fun givenUserEventExists(userEventKey: UserEventKey) {

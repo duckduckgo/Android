@@ -729,7 +729,7 @@ class CtaViewModelTest {
     }
 
     private fun givenFavoritesOnboarindExpEnabled() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "po" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
     }
 
     private fun site(

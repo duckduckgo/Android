@@ -46,8 +46,8 @@ interface VariantManager {
             Variant(key = "gx", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "gy", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             // Favorites onboarding
-            Variant(key = "pz", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "po", weight = 1.0, features = listOf(VariantFeature.FavoritesOnboarding), filterBy = { isEnglishLocale() }),
+            Variant(key = "zp", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zo", weight = 1.0, features = listOf(VariantFeature.FavoritesOnboarding), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
