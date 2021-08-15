@@ -61,7 +61,19 @@ class BookmarksDaoTest {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         dao.delete(bookmark)
-        val list = dao.getBookmarks(0).first()
+        val list = dao.getBookmarks().first()
+        assertTrue(list.isEmpty())
+    }
+
+    @Test
+    fun whenBookmarksDeletedThenTheyAreNoLongerInTheList() = runBlocking {
+        val bookmarks = listOf(
+            BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
+        )
+        dao.insertList(bookmarks)
+        dao.deleteList(bookmarks)
+        val list = dao.getBookmarks().first()
         assertTrue(list.isEmpty())
     }
 
@@ -69,13 +81,36 @@ class BookmarksDaoTest {
     fun whenBookmarkAddedThenItIsInList() = runBlocking {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
-        val list = dao.getBookmarks(0).first()
+        val list = dao.getBookmarks().first()
         assertEquals(listOf(bookmark), list)
     }
 
     @Test
+    fun whenBookmarksAddedThenTheyAreInTheList() = runBlocking {
+        val bookmarks = listOf(
+            BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
+        )
+        dao.insertList(bookmarks)
+        val list = dao.getBookmarks().first()
+        assertEquals(bookmarks, list)
+    }
+
+    @Test
+    fun whenBookmarksAddedThenTheyAreInTheListByParentId() = runBlocking {
+        val bookmarks = listOf(
+            BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
+            BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1)
+        )
+        dao.insertList(bookmarks)
+        val list = dao.getBookmarksByParentId(1).first()
+        assertEquals(list, dao.getBookmarksByParentIdImmediate(1))
+        assertEquals(bookmarks, list)
+    }
+
+    @Test
     fun whenInInitialStateThenTheBookmarksAreEmpty() = runBlocking {
-        val list = dao.getBookmarks(0).first()
+        val list = dao.getBookmarks().first()
         assertNotNull(list)
         assertTrue(list.isEmpty())
     }

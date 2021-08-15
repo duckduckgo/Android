@@ -77,15 +77,15 @@ class BookmarkFoldersDataRepository(
 
     override suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch) {
         appDatabase.runInTransaction {
-            bookmarksDao.delete(branchToDelete.bookmarkEntities)
+            bookmarksDao.deleteList(branchToDelete.bookmarkEntities)
             bookmarkFoldersDao.delete(branchToDelete.bookmarkFolderEntities)
         }
     }
 
     override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
         appDatabase.runInTransaction {
-            bookmarkFoldersDao.insert(branchToInsert.bookmarkFolderEntities)
-            bookmarksDao.insert(branchToInsert.bookmarkEntities)
+            bookmarkFoldersDao.insertList(branchToInsert.bookmarkFolderEntities)
+            bookmarksDao.insertList(branchToInsert.bookmarkEntities)
         }
     }
 
@@ -134,7 +134,7 @@ class BookmarkFoldersDataRepository(
             populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
         }
 
-        val bookmarks = bookmarksDao.getBookmarksImmediate(parentId)
+        val bookmarks = bookmarksDao.getBookmarksByParentIdImmediate(parentId)
 
         bookmarks.forEach { bookmark ->
             bookmark.title?.let { title ->

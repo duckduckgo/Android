@@ -27,7 +27,7 @@ interface BookmarkFoldersDao {
     fun insert(bookmarkFolder: BookmarkFolderEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(bookmarkFolders: List<BookmarkFolderEntity>)
+    fun insertList(bookmarkFolders: List<BookmarkFolderEntity>)
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders")
     fun getBookmarkFolders(): Flow<List<BookmarkFolder>>

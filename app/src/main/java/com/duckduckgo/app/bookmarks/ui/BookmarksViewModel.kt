@@ -219,7 +219,7 @@ class BookmarksViewModel(
 
     private fun fetchItemsByParentId(parentId: Long) {
         viewModelScope.launch {
-            bookmarksDao.getBookmarks(parentId).combine(bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)) {
+            bookmarksDao.getBookmarksByParentId(parentId).combine(bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)) {
                 bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
                 val mappedBookmarks = bookmarks.map {

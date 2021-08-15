@@ -27,19 +27,16 @@ interface BookmarksDao {
     fun insert(bookmark: BookmarkEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(bookmarks: List<BookmarkEntity>)
+    fun insertList(bookmarks: List<BookmarkEntity>)
 
     @Query("select * from bookmarks")
     fun getBookmarks(): Flow<List<BookmarkEntity>>
 
     @Query("select * from bookmarks where parentId = :parentId")
-    fun getBookmarks(parentId: Long): Flow<List<BookmarkEntity>>
+    fun getBookmarksByParentId(parentId: Long): Flow<List<BookmarkEntity>>
 
     @Query("select * from bookmarks where parentId = :parentId")
-    fun getBookmarksImmediate(parentId: Long): List<BookmarkEntity>
-
-    @Query("select * from bookmarks")
-    fun getBookmarksSync(): List<BookmarkEntity>
+    fun getBookmarksByParentIdImmediate(parentId: Long): List<BookmarkEntity>
 
     @Query("select * from bookmarks where parentId in (:parentIds)")
     fun getBookmarksByParentIds(parentIds: List<Long>): List<BookmarkEntity>
@@ -51,7 +48,7 @@ interface BookmarksDao {
     fun delete(bookmark: BookmarkEntity)
 
     @Delete
-    fun delete(bookmarkEntities: List<BookmarkEntity>)
+    fun deleteList(bookmarkEntities: List<BookmarkEntity>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkEntity: BookmarkEntity)

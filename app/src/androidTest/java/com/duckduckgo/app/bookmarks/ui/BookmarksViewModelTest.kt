@@ -30,13 +30,11 @@ import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.any
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
@@ -64,7 +62,6 @@ class BookmarksViewModelTest {
     private val captor: ArgumentCaptor<BookmarksViewModel.Command> = ArgumentCaptor.forClass(BookmarksViewModel.Command::class.java)
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
-    private val mutableStateFlow = MutableStateFlow<List<BookmarkEntity>>(emptyList())
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val bookmarksDao: BookmarksDao = mock()
     private val bookmarkFoldersDao: BookmarkFoldersDao = mock()
@@ -87,8 +84,6 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = coroutineRule.runBlocking {
-        mutableStateFlow.value = emptyList()
-        whenever(bookmarksDao.getBookmarks(any())).thenReturn(mutableStateFlow)
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
     }
 
