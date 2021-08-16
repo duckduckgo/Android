@@ -17,7 +17,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-          ndk: 21.0.6113669
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -29,7 +28,7 @@ jobs:
     strategy:
       matrix:
         api-level: [26]
-        target: [google_apis_playstore]
+        target: [google_apis]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -40,7 +39,6 @@ jobs:
         with:
           java-version: '14'
           distribution: 'adopt'
-          ndk: 21.0.6113669
       - name: Gradle cache
         uses: actions/cache@v2
         with:
