@@ -49,6 +49,9 @@ jobs:
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+        env:
+              ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+              ANDROID_HOME: /usr/local/lib/android/sdk
       - name: Gradle cache
         uses: actions/cache@v2
         with:
