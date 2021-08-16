@@ -47,12 +47,6 @@ jobs:
         with:
           java-version: '14'
           distribution: 'adopt'
-      - name: Add Android SDK to path
-        run: |
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-
       - name: Gradle cache
         uses: actions/cache@v2
         with:
@@ -71,19 +65,21 @@ jobs:
           key: avd-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2.19.1
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
+          target: ${{ matrix.target }}
+          arch: x86_64
+          profile: Nexus 6
+          emulator-build: 7425822
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
       - name: Android Tests
-        uses: ReactiveCircus/android-emulator-runner@v2.19.1
-
+        uses: reactiveCircus/android-emulator-runner@v2.19.1
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
