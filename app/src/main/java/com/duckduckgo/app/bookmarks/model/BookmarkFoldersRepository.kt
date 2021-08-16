@@ -23,8 +23,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 interface BookmarkFoldersRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
     suspend fun update(bookmarkFolder: BookmarkFolder)
-    suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
+    suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun buildFlatStructure(bookmarkFolders: List<BookmarkFolder>, selectedFolderId: Long): List<BookmarkFolderItem>
