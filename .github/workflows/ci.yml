@@ -44,6 +44,11 @@ jobs:
         with:
           java-version: '14'
           distribution: 'adopt'
+      - name: Add Android SDK to path
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
       - name: Gradle cache
         uses: actions/cache@v2
         with:
