@@ -155,35 +155,43 @@ class BookmarkFoldersDataRepositoryTest {
 
         treeStructure.forEachVisit(
             { node ->
-                if (node.value.url != null) {
-                    val entity = itemList[count] as BookmarkEntity
-                    assertEquals(entity.title, node.value.name)
-                    assertEquals(entity.id, node.value.id)
-                    assertEquals(entity.parentId, node.value.parentId)
-                    assertEquals(entity.url, node.value.url)
-                } else {
-                    val entity = itemList[count] as BookmarkFolderEntity
-                    assertEquals(entity.name, node.value.name)
-                    assertEquals(entity.id, node.value.id)
-                    assertEquals(entity.parentId, node.value.parentId)
-                }
+                testNode(node, itemList, count)
                 count++
             },
             { node ->
-                if (node.value.url != null) {
-                    val entity = preOrderList[preOrderCount] as BookmarkEntity
-                    assertEquals(entity.title, node.value.name)
-                    assertEquals(entity.id, node.value.id)
-                    assertEquals(entity.parentId, node.value.parentId)
-                    assertEquals(entity.url, node.value.url)
-                } else {
-                    val entity = preOrderList[preOrderCount] as BookmarkFolderEntity
-                    assertEquals(entity.name, node.value.name)
-                    assertEquals(entity.id, node.value.id)
-                    assertEquals(entity.parentId, node.value.parentId)
-                }
+                testNode(node, preOrderList, preOrderCount)
                 preOrderCount++
             }
         )
+    }
+
+    private fun testNode(node: TreeNode<FolderTreeItem>, itemList: List<Any>, count: Int) {
+        if (node.value.url != null) {
+            val entity = itemList[count] as BookmarkEntity
+
+            assertEquals(entity.title, node.value.name)
+            assertEquals(entity.id, node.value.id)
+            assertEquals(entity.parentId, node.value.parentId)
+            assertEquals(entity.url, node.value.url)
+            assertEquals(2, node.value.depth)
+        } else {
+            val entity = itemList[count] as BookmarkFolderEntity
+
+            assertEquals(entity.name, node.value.name)
+            assertEquals(entity.id, node.value.id)
+            assertEquals(entity.parentId, node.value.parentId)
+
+            when (node.value.parentId) {
+                -1L -> {
+                    assertEquals(0, node.value.depth)
+                }
+                0L -> {
+                    assertEquals(1, node.value.depth)
+                }
+                else -> {
+                    assertEquals(2, node.value.depth)
+                }
+            }
+        }
     }
 }
