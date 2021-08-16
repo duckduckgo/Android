@@ -18,6 +18,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          ndk: 21.0.6113669
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -28,8 +29,8 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        api-level: [21, 29]
-        target: [default, google_apis]
+        api-level: [29]
+        target: [google_apis]
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -38,6 +39,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          ndk: 21.0.6113669
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 6
