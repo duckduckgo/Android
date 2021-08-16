@@ -24,7 +24,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew spotlessCheck :app:assembleOPlayDebug --stacktrace
+        run: ./gradlew spotlessCheck :app:assemblePlayDebug --stacktrace
 
   test:
     runs-on: macos-latest
@@ -46,4 +46,5 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 6
+          mulator-build: 7425822
           script: ./gradlew connectedCheck
