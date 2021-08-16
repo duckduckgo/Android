@@ -13,7 +13,7 @@ jobs:
       - name: Checkout submodules
         uses: textbook/git-checkout-submodule-action@master
 
-      - name: set up JDK 11
+      - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
           java-version: '11'
@@ -21,11 +21,12 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+
+      - name: Spotless
         run: ./gradlew spotlessCheck --stacktrace
 
       - name: Unit Tests
-        run: ./gradlew feature-toggles-impl:testDebugUnitTest --stacktrace
+        run: ./gradlew testDebugUnitTest --stacktrace
 
   android_tests:
     runs-on: macos-latest
@@ -65,13 +66,14 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          ndk: 21.0.6113669
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
       - name: Android Tests
-        uses: ReactiveCircus/android-emulator-runner@v2.19.1
+        uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
