@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -29,6 +30,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.work.Configuration
+import androidx.work.WorkManager
+import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
@@ -76,6 +81,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingWorkRequestBuilder
+import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -100,6 +108,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -265,6 +274,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAppLinksHandler: AppLinksHandler
 
+    @Mock
+    private lateinit var mockUserEventsRepository: UserEventsRepository
+
+    @Mock
+    private lateinit var mockVariantManager: VariantManager
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -285,6 +300,10 @@ class BrowserTabViewModelTest {
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
 
+    private lateinit var favoritesOnboardingObserver: FavoritesOnboardingObserver
+
+    private val context = getInstrumentation().targetContext
+
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
@@ -299,10 +318,20 @@ class BrowserTabViewModelTest {
 
     private val emailStateFlow = MutableStateFlow(false)
 
+    private val workManager: WorkManager by lazy {
+        val config = Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setExecutor(SynchronousExecutor())
+            .build()
+
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+        return@lazy WorkManager.getInstance(context)
+    }
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
@@ -315,19 +344,33 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
+        givenDefaultOnboarding()
+
+        val onboardingWorker = FavoritesOnboardingWorkRequestBuilder(workManager, mockVariantManager)
+
+        favoritesOnboardingObserver = FavoritesOnboardingObserver(
+            appCoroutineScope = TestCoroutineScope(),
+            userEventsRepository = mockUserEventsRepository,
+            userStageStore = mockUserStageStore,
+            favoritesOnboardingWorkRequestBuilder = onboardingWorker,
+            variantManager = mockVariantManager
+        )
 
         ctaViewModel = CtaViewModel(
-            mockAppInstallStore,
-            mockPixel,
-            mockSurveyDao,
-            mockWidgetCapabilities,
-            mockDismissedCtaDao,
-            mockUserWhitelistDao,
-            mockSettingsStore,
-            mockOnboardingStore,
-            mockUserStageStore,
-            mockTabRepository,
-            coroutineRule.testDispatcherProvider
+            appInstallStore = mockAppInstallStore,
+            pixel = mockPixel,
+            surveyDao = mockSurveyDao,
+            widgetCapabilities = mockWidgetCapabilities,
+            dismissedCtaDao = mockDismissedCtaDao,
+            userWhitelistDao = mockUserWhitelistDao,
+            settingsDataStore = mockSettingsStore,
+            onboardingStore = mockOnboardingStore,
+            userStageStore = mockUserStageStore,
+            tabRepository = mockTabRepository,
+            favoritesOnboardingObserver = favoritesOnboardingObserver,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager,
+            userEventsRepository = mockUserEventsRepository
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -379,7 +422,9 @@ class BrowserTabViewModelTest {
             favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
-            temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao
+            temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao,
+            variantManager = mockVariantManager,
+            userEventsRepository = mockUserEventsRepository
         )
 
         testee.loadData("abc", null, false, false)
@@ -565,6 +610,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClicksOnAddFavoriteItemThenPixelSent() = coroutineRule.runBlocking {
+        givenFavoritesOnboarindExpEnabled()
+
+        testee.onAddFavoriteItemClicked()
+
+        verify(mockPixel).fire(AppPixelName.FAVORITE_HOMETAB_ADD_ITEM_PRESSED)
+    }
+
+    @Test
+    fun whenUserClicksOnAddFavoriteItemAndDaxFavoriteCtaPresentThenCtaDismissed() = coroutineRule.runBlocking {
+        givenFavoritesOnboarindExpEnabled()
+        val cta = DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onAddFavoriteItemClicked()
+
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
     fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
 
@@ -741,6 +806,29 @@ class BrowserTabViewModelTest {
         overrideUrl("http://example.com")
 
         verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect("http://example.com"))
+    }
+
+    @Test
+    fun whenPageFinishesThenNotifyUserEventsSiteVisited() = coroutineRule.runBlocking {
+        givenFavoritesOnboarindExpEnabled()
+        loadUrl("http://duckduckgo.com")
+
+        testee.progressChanged(100)
+
+        advanceUntilIdle()
+        verify(mockUserEventsRepository).siteVisited(any(), eq("http://duckduckgo.com"), any())
+    }
+
+    @Test
+    fun whenUserClicksOnAddFavoriteItemAndPageFinishesThenStoreSite() = coroutineRule.runBlocking {
+        givenFavoritesOnboarindExpEnabled()
+        testee.onAddFavoriteItemClicked()
+        loadUrl("http://duckduckgo.com")
+
+        testee.progressChanged(100)
+
+        advanceUntilIdle()
+        verify(mockFavoritesRepository).insert(any(), eq("http://duckduckgo.com"))
     }
 
     @Test
@@ -1128,14 +1216,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
-        val stubView = View(getInstrumentation().targetContext)
+        val stubView = View(context)
         testee.goFullScreen(stubView)
         assertTrue(browserViewState().isFullScreen)
     }
 
     @Test
     fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
-        val stubView = View(getInstrumentation().targetContext)
+        val stubView = View(context)
         testee.goFullScreen(stubView)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowFullScreen)
@@ -1953,6 +2041,17 @@ class BrowserTabViewModelTest {
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
+    fun whenCtaShownIfDaxFavoritesCtaThenMoveVisitedSitesToFavorites() = coroutineRule.runBlocking {
+        givenFavoritesOnboarindExpEnabled()
+        val cta = DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onCtaShown()
+
+        verify(mockUserEventsRepository).moveVisitedSiteAsFavorite()
     }
 
     @Test
@@ -3403,6 +3502,14 @@ class BrowserTabViewModelTest {
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false, false)
+    }
+
+    private fun givenFavoritesOnboarindExpEnabled() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
+    }
+
+    private fun givenDefaultOnboarding() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {

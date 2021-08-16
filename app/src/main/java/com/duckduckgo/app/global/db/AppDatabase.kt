@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 36,
+    exportSchema = true, version = 37,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -428,6 +428,12 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
         override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `user_events` ADD COLUMN `payload` TEXT NOT NULL DEFAULT \"\"")
+        }
+    }
+
+    val MIGRATION_36_TO_37: Migration = object : Migration(36, 37) {
+        override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `bookmark_folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)")
             database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)")
             database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
@@ -493,7 +499,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_32_TO_33,
             MIGRATION_33_TO_34,
             MIGRATION_34_TO_35,
-            MIGRATION_35_TO_36
+            MIGRATION_35_TO_36,
+            MIGRATION_36_TO_37
         )
 
     @Deprecated(

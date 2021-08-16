@@ -20,8 +20,5 @@
     style="@style/Widget.DuckDuckGo.ListItem.SectionTitle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingTop="12dp"
-    android:paddingEnd="16dp"
     android:text="@string/fireproofWebsiteFeatureDescription"
     tools:text="Lorem ipsum dolor sit amet" />
