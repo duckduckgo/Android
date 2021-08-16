@@ -32,7 +32,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        api-level: [29]
+        api-level: [26]
         target: [google_apis]
     steps:
       - name: Checkout repository
