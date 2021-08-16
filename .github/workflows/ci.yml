@@ -83,12 +83,3 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew privacy-config-impl:connectedDebugAndroidTest --stacktrace
-
-      - name: Upload test results
-          if: always()
-          uses: actions/upload-artifact@v2
-          with:
-            name: test-results-${{ matrix.api-level }}-${{ steps.determine-target.outputs.TARGET }}-${{ matrix.shard }}
-            path: |
-              **/build/reports/*
-              **/build/outputs/*/connected/*
