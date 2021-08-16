@@ -78,4 +78,4 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: adb shell am instrument -w -m -e debug false com.duckduckgo.mobile.android.debug.test/androidx.test.runner.AndroidJUnitRunner
+          script: ./gradlew privacy-config-impl:connectedDebugAndroidTest
