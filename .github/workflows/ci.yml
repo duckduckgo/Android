@@ -12,14 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
       - name: set up JDK 11
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
           ndk: 21.0.6113669
-          submodules: recursive
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -33,10 +37,12 @@ jobs:
         api-level: [29]
         target: [google_apis]
     steps:
-      - name: checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
         with:
-          submodules: recursive
+          remote: true
 
       - name: Android Emulator Runner
         uses: ReactiveCircus/android-emulator-runner@v2.19.1
@@ -46,5 +52,5 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 6
-          mulator-build: 7425822
+          emulator-build: 7425822
           script: ./gradlew connectedCheck
