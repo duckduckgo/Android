@@ -19,6 +19,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           ndk: 21.0.6113669
+          submodules: recursive
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -34,9 +35,11 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
-      - name: run tests
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Android Emulator Runner
+        uses: ReactiveCircus/android-emulator-runner@v2.19.1
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
