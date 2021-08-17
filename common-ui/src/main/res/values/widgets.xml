@@ -39,8 +39,8 @@
 
     <style name="Widget.DuckDuckGo.ListItem"/>
     <style name="Widget.DuckDuckGo.ListItem.Description" parent="TextAppearance.DuckDuckGo.Body2">
-        <item name="android:justificationMode">inter_word</item>
         <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textAlignment">viewStart</item>
         <item name="android:textColor">?attr/settingsMinorTextColor</item>
     </style>
 
@@ -53,16 +53,24 @@
     </style>
 
     <style name="Widget.DuckDuckGo.ListItem.SectionTitle">
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
-        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
-        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:padding">16dp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/cornflowerBlue</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:selectable">false</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListItem.EmptyHint">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">

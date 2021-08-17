@@ -24,8 +24,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
 import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
@@ -34,7 +32,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
@@ -80,9 +77,6 @@ class WhitelistActivity : DuckDuckGoActivity() {
     private fun setupRecycler() {
         adapter = WebsitesAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
-
-        val separator = DividerItemDecoration(this, VERTICAL)
-        recycler.addItemDecoration(separator)
     }
 
     private fun observeViewModel() {
@@ -104,21 +98,8 @@ class WhitelistActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
         adapter.entries = viewState.whitelist
         if (viewState.showWhitelist) {
-            showList()
             invalidateOptionsMenu()
-        } else {
-            hideList()
         }
-    }
-
-    private fun showList() {
-        recycler.show()
-        binding.emptyWhitelist.gone()
-    }
-
-    private fun hideList() {
-        recycler.gone()
-        binding.emptyWhitelist.show()
     }
 
     private fun processCommand(command: WhitelistViewModel.Command?) {
