@@ -1,4 +1,4 @@
-name: Android CI
+name: CI
 
 on: [push, pull_request]
 
@@ -95,11 +95,10 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 6
-          emulator-build: 7425822
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew privacy-config-impl:connectedDebugAndroidTest --stacktrace
+          script: ./gradlew privacy-config-impl:connectedDebugAndroidTest app:connectedPlayDebugAndroidTest --stacktrace
 
       - name: (Fail-only) Bundle the build report
         if: failure()
