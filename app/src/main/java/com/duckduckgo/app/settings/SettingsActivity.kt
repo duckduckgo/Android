@@ -298,8 +298,7 @@ class SettingsActivity :
     }
 
     private fun launchDeviceShieldReport() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(DeviceShieldTrackerActivity.intent(this), options)
+        startActivity(DeviceShieldTrackerActivity.intent(this))
     }
 
     private fun launchDeviceShieldOnboarding() {
