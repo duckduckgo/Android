@@ -46,6 +46,7 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
+        <item name="secondaryTextColor">@color/grayishTwo</item>
         <item name="listItemTitleColor">@color/white</item>
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
@@ -209,6 +210,10 @@
         <item name="android:statusBarColor">@color/almostBlack</item>
     </style>
 
+    <style name="AppTheme.Light.ATPOnboarding">
+        <item name="android:statusBarColor">@color/atp_onboardingHeaderBg</item>
+    </style>
+
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/darkThemePrimary</item>
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
@@ -225,6 +230,10 @@
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
+    <style name="ToolbarTheme.Green">
+        <item name="colorAccent">@color/cornflowerGreen</item>
     </style>
 
     <style name="OmnibarToolbarTheme">

@@ -26,5 +26,4 @@
     android:paddingTop="15dp"
     android:paddingBottom="16dp"
     tools:text="Yesterday"
-    android:background="?colorPrimary"
     />

@@ -97,11 +97,11 @@ class TcpDeviceToNetwork(
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
             "New packet. $connectionKey. TCB not initialized. ${
-                TcpPacketProcessor.logPacketDetails(
-                    packet,
-                    packet.tcpHeader.sequenceNumber,
-                    packet.tcpHeader.acknowledgementNumber
-                )
+            TcpPacketProcessor.logPacketDetails(
+                packet,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.acknowledgementNumber
+            )
             }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
         )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {

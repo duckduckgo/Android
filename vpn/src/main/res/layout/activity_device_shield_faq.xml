@@ -16,118 +16,128 @@
   ~ limitations under the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="none"
-    android:clipToPadding="false"
-    android:background="@color/white"
-    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
+    android:orientation="vertical"
+    tools:context=".ui.onboarding.DeviceShieldFAQActivity">
 
-    <LinearLayout
+    <include layout="@layout/include_default_toolbar" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:clipToPadding="false"
+        tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
-            android:text="@string/atp_FAQFirstHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/atp_FAQFirstText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQFirstHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
-            android:text="@string/atp_FAQSecondHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQFirstText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/atp_FAQSecondText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQSecondHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
-            android:text="@string/atp_FAQThirdHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQSecondText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/atp_FAQThirdText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQThirdHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
-            android:text="@string/atp_FAQFourthHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQThirdText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/atp_FAQFourthText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQFourthHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQHeaderStyle"
-            android:layout_marginTop="32dp"
-            android:text="@string/atp_FAQFifthHeader"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQFourthText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/DeviceShieldOnboardingFAQTextStyle"
-            android:layout_marginTop="24dp"
-            android:text="@string/atp_FAQFifthText"
-            android:paddingStart="35dp"
-            android:paddingEnd="35dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQFifthHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
 
-        <ImageView
-            android:layout_marginTop="60dp"
-            android:layout_marginBottom="60dp"
-            android:layout_gravity="center"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_red_dax"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQFifthText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
 
-    </LinearLayout>
-</ScrollView>
+            <ImageView
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="60dp"
+                android:layout_gravity="center"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_red_dax"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>
+

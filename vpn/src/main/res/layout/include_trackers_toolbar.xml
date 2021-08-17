@@ -22,15 +22,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/appBarLayout"
     android:theme="@style/AppTheme.Dark.AppBarOverlay">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/trackers_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
-        android:theme="@style/ToolbarTheme"
+        android:theme="@style/ToolbarTheme.Green"
         app:popupTheme="@style/AppTheme.Dark.PopupOverlay" />
 
 </com.google.android.material.appbar.AppBarLayout>

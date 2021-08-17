@@ -34,16 +34,14 @@ import android.view.View
 import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
@@ -52,8 +50,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
-import dagger.android.AndroidInjection
-import dummy.quietlySetIsChecked
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
 import kotlinx.coroutines.flow.collect
@@ -66,11 +62,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class DeviceShieldTrackerActivity :
-    AppCompatActivity(R.layout.activity_device_shield_activity),
+    DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -100,7 +93,8 @@ class DeviceShieldTrackerActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        AndroidInjection.inject(this)
+        setContentView(R.layout.activity_device_shield_activity)
+        setupToolbar(findViewById(R.id.trackers_toolbar))
 
         bindViews()
         showDeviceShieldActivity()
@@ -246,21 +240,33 @@ class DeviceShieldTrackerActivity :
             resources.getQuantityString(R.plurals.atp_ActivityPastWeekTrackerCount, trackerCountInfo.trackers.value)
 
         trackingAppsCountView.count = trackerCountInfo.stringAppsCount()
-        trackingAppsCountView.footer = resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
+        trackingAppsCountView.footer =
+            resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
     private fun updateRunningState(state: RunningState) {
-        val excludedAppsPrefix = String.format(getString(R.string.atp_ActivityAppTrackersExcludedAppsPrefix), state.excludedAppsCount)
+        val excludedAppsPrefix =
+            String.format(getString(R.string.atp_ActivityAppTrackersExcludedAppsPrefix), state.excludedAppsCount)
         val excludedAppsSuffix = getString(R.string.atp_ActivityAppTrackersExcludedSuffix)
         val textToStyle =
             excludedAppsPrefix + getString(R.string.atp_ActivityAppTrackersExcludedApps) + excludedAppsSuffix
 
         val spannable = SpannableStringBuilder(textToStyle)
         val prefixIndex = textToStyle.indexOf(excludedAppsPrefix)
-        spannable.setSpan(StyleSpan(Typeface.BOLD), prefixIndex, prefixIndex + excludedAppsPrefix.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        spannable.setSpan(
+            StyleSpan(Typeface.BOLD),
+            prefixIndex,
+            prefixIndex + excludedAppsPrefix.length,
+            Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+        )
 
         val suffixIndex = textToStyle.indexOf(excludedAppsSuffix)
-        spannable.setSpan(UnderlineSpan(), suffixIndex, suffixIndex + excludedAppsSuffix.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+        spannable.setSpan(
+            UnderlineSpan(),
+            suffixIndex,
+            suffixIndex + excludedAppsSuffix.length,
+            Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+        )
 
         excludedAppsLabel.text = spannable
         excludedAppsLabel.setOnClickListener {
@@ -271,14 +277,20 @@ class DeviceShieldTrackerActivity :
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(REPORT_ISSUES_ANNOTATION, getText(R.string.atp_ActivityEnabledLabel)) { launchFeedback() }
+                text = addClickableLink(
+                    REPORT_ISSUES_ANNOTATION,
+                    getText(R.string.atp_ActivityEnabledLabel)
+                ) { launchFeedback() }
                 movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(REPORT_ISSUES_ANNOTATION, getText(R.string.atp_ActivityDisabledLabel)) { launchFeedback() }
+                text = addClickableLink(
+                    REPORT_ISSUES_ANNOTATION,
+                    getText(R.string.atp_ActivityDisabledLabel)
+                ) { launchFeedback() }
                 movementMethod = LinkMovementMethod.getInstance()
             }
         }
@@ -393,7 +405,6 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
-        private const val EXCLUDED_APPS_ANNOTATION = "view_exceptions_link"
 
         fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
@@ -401,6 +412,4 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
-
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 }

@@ -17,12 +17,21 @@
   -->
 
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bookmarkRootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.onboarding.DeviceShieldFAQActivity">
+
+    <include layout="@layout/include_default_toolbar" />
+
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:scrollbars="none">
 
         <LinearLayout
@@ -32,14 +41,14 @@
 
             <ImageView
                 android:id="@+id/onboarding_page_header"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="260dp"
                 android:background="@color/white"
                 android:contentDescription="@string/atp_OnboardingLogoDescription"
-                android:src="@drawable/device_shield_trackers_info_header"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:src="@drawable/device_shield_trackers_info_header" />
 
             <TextView
                 android:id="@+id/trackerProfilingInfoHeader"
@@ -48,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="35dp"
                 android:paddingEnd="35dp"
-                android:text="@string/atp_ProfilingInfoTitle"/>
+                android:text="@string/atp_ProfilingInfoTitle" />
 
             <TextView
                 android:id="@+id/trackerProfilingInfoFirstContent"
@@ -61,12 +70,13 @@
                 android:text="@string/atp_ProfilingInfoFirstParagraph" />
 
             <ImageView
-                android:layout_marginTop="60dp"
-                android:layout_marginBottom="60dp"
-                android:layout_gravity="center"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_red_dax"/>
+                android:layout_gravity="center"
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="60dp"
+                android:src="@drawable/ic_red_dax" />
 
         </LinearLayout>
     </ScrollView>
+</LinearLayout>

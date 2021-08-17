@@ -71,7 +71,6 @@ class DeviceShieldAlertNotificationBuilder {
                 .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.DEFAULT_ALL)
                 .setSilent(silent)
-                .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .addAction(
                     NotificationCompat.Action(
                         R.drawable.ic_vpn_notification_24,
@@ -79,6 +78,7 @@ class DeviceShieldAlertNotificationBuilder {
                         restartVpnIntent
                     )
                 )
+                .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
                 .setChannelId(VPN_ALERTS_CHANNEL_ID)
                 .build()
         }

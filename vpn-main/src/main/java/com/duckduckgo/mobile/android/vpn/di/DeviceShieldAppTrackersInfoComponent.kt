@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di.component
+package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -29,25 +28,25 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@VpnScope
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface DeviceShieldExclusionListActivityComponent : AndroidInjector<DeviceShieldExclusionListActivity> {
+interface DeviceShieldAppTrackersInfoComponent : AndroidInjector<DeviceShieldAppTrackersInfo> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DeviceShieldExclusionListActivity>
+    interface Factory : AndroidInjector.Factory<DeviceShieldAppTrackersInfo>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface DeviceShieldExclusionListActivityComponentProvider {
-    fun provideDeviceShieldExclusionListActivityComponentFactory(): DeviceShieldExclusionListActivityComponent.Factory
+interface DeviceShieldAppTrackersInfoComponentProvider {
+    fun provideDeviceShieldAppTrackersInfoComponentFactory(): DeviceShieldAppTrackersInfoComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class DeviceShieldExclusionListActivityBindingModule {
+abstract class DeviceShieldAppTrackersInfoBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(DeviceShieldExclusionListActivity::class)
-    abstract fun bindDeviceShieldExclusionListActivityComponentFactory(factory: DeviceShieldExclusionListActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(DeviceShieldAppTrackersInfo::class)
+    abstract fun bindDeviceShieldAppTrackersInfoComponentFactory(factory: DeviceShieldAppTrackersInfoComponent.Factory): AndroidInjector.Factory<*>
 }

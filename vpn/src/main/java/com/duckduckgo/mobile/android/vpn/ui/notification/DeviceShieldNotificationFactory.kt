@@ -62,7 +62,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
         val prefix = resources.getString(R.string.atp_OnNotificationPrefix)
         val numberOfAppsString = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberOfApps.size, numberOfApps.size)
         val suffixTime = resources.getString(R.string.atp_OnNoTrackersNotificationMessageTimeSuffix)
-        val notificationText = "$prefix$numberOfAppsString $suffixTime"
+        val notificationText = "$prefix $numberOfAppsString $suffixTime"
 
         Timber.i("createTrackersCountDeviceShieldNotification [$notificationText]")
         return DeviceShieldNotification(
@@ -106,13 +106,13 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val textPrefix = resources.getString(R.string.atp_DailyTrackersNotificationPrefix)
             val numberTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, totalTrackersCount, totalTrackersCount)
             val optionalNumberApps = if (apps == 0) "" else {
-                " ${resources.getQuantityString(R.plurals.atp_DailyTrackersNotificationSuffixNumApps, apps, apps, firstAppName)}"
+                resources.getQuantityString(R.plurals.atp_DailyTrackersNotificationSuffixNumApps, apps, apps, firstAppName)
             }
             val textSuffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
-            val textToStyle = "$textPrefix $numberTrackers$optionalNumberApps $textSuffix"
+            val textToStyle = "$textPrefix $numberTrackers $optionalNumberApps $textSuffix"
 
             Timber.i("createDailyTotalTrackersNotification. Trackers=$totalTrackers. Apps=$apps. Output=[$textToStyle]")
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers)))
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(totalTrackers, numberTrackers, optionalNumberApps)))
         }
 
         private fun createDailyTopTrackerCompanyNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
@@ -123,10 +123,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val numAppsText = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberApps, numberApps)
             val pastDaySuffix = resources.getString(R.string.atp_NotificationPastDaySuffix)
             val seeMoreSuffix = resources.getString(R.string.atp_NotificationSeeMoreSuffix)
-            val fullString = "$prefix$numAppsText $pastDaySuffix $seeMoreSuffix"
+            val fullString = "$prefix $numAppsText $pastDaySuffix $seeMoreSuffix"
 
             Timber.i("createDailyTopTrackerCompanyNotification: $fullString")
-            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.companyDisplayName, seeMoreSuffix)))
+            return DeviceShieldNotification(fullString.applyBoldSpanTo(listOf(topOffender.companyDisplayName, numAppsText, seeMoreSuffix)))
         }
 
         private fun createDailyNotificationTopAppsContainingTrackers(apps: List<Pair<TrackingApp, List<VpnTracker>>>): DeviceShieldNotification {
@@ -139,11 +139,11 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val prefix = resources.getString(R.string.atp_DailyCompanyBlockedNotificationPrefix, firstAppName)
             val optionalSecondApp =
-                if (second != null) " ${resources.getString(R.string.atp_DailyCompanyBlockedNotificationOptionalSecondApp, second.appDisplayName)}" else ""
+                if (second != null) resources.getString(R.string.atp_DailyCompanyBlockedNotificationOptionalSecondApp, second.appDisplayName) else ""
 
             val suffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
 
-            val textToStyle = "$prefix$optionalSecondApp $suffix"
+            val textToStyle = "$prefix $optionalSecondApp $suffix"
             val wordsToBold = mutableListOf(firstAppName)
             if (second != null) wordsToBold.add(second.appDisplayName)
 
@@ -170,9 +170,9 @@ class DeviceShieldNotificationFactory @Inject constructor(
             )
             val pastDaySuffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
 
-            val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
+            val textToStyle = "$prefix $numberOfTimesString $latestAppString $otherAppsCount $pastDaySuffix"
             Timber.i("createDailyLastCompanyAttemptNotification. [$textToStyle]")
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.companyDisplayName)))
+            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.companyDisplayName, latestAppString, numberOfTimesString, otherAppsCount)))
         }
 
         private fun getTopOffender(trackers: List<VpnTracker>): VpnTracker {
@@ -254,7 +254,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 )
             val suffixString = resources.getString(R.string.atp_WeeklyCompanyTeaserNotificationSuffix)
 
-            val textToStyle = "$prefixString$numberOfAppsString$mostRecentAppString$suffixString"
+            val textToStyle = "$prefixString $numberOfAppsString$mostRecentAppString$suffixString"
             Timber.i("createWeeklyTopTrackerCompanyNotification. text=$textToStyle")
             return DeviceShieldNotification(
                 textToStyle.applyBoldSpanTo(

@@ -95,7 +95,7 @@ class SettingsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        setupToolbar(toolbar)
+        setupToolbar(findViewById(R.id.toolbar))
 
         configureUiEventHandlers()
         configureInternalFeatures()

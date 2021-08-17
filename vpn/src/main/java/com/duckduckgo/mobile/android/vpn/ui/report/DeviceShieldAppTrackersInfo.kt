@@ -19,14 +19,16 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.vpn.R
 
-class DeviceShieldAppTrackersInfo : AppCompatActivity(R.layout.activity_app_trackers_info) {
+class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        setContentView(R.layout.activity_app_trackers_info)
+        setupToolbar(findViewById(R.id.default_toolbar))
     }
 
     override fun onSupportNavigateUp(): Boolean {

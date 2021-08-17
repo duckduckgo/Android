@@ -206,7 +206,7 @@
 
     <style name="DeviceShieldOnboardingHeaderStyle">
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textColor">?normalTextColor</item>
         <item name="android:textSize">25sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
         <item name="android:textAlignment">center</item>
@@ -214,7 +214,7 @@
 
     <style name="DeviceShieldOnboardingTextStyle">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/brownishGrayTwo</item>
+        <item name="android:textColor">?secondaryTextColor</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:lineSpacingExtra">6sp</item>
@@ -223,7 +223,7 @@
 
     <style name="DeviceShieldOnboardingFAQHeaderStyle">
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textSize">20sp</item>
         <item name="android:lineSpacingExtra">8sp</item>
         <item name="android:textAlignment">viewStart</item>
@@ -231,7 +231,7 @@
 
     <style name="DeviceShieldOnboardingFAQTextStyle">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/brownishGrayTwo</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:lineSpacingExtra">8sp</item>
@@ -591,19 +591,25 @@
     </style>
 
     <style name="DeviceShield.PrivacyReport.TrackerEntry.Time">
-        <item name="android:textColor">@color/paleBrownishGray</item>
+        <item name="android:textColor">?secondaryTextColor</item>
     </style>
 
     <style name="DeviceShield.PrivacyReport.PastWeekCounters">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textColor">?normalTextColor</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
     </style>
 
+    <style name="DeviceShield.PrivacyReport.PastWeekCounters.Title">
+        <item name="android:textColor">@color/warmerGray</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <style name="DeviceShield.PrivacyReport.TrackerEntry">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textColor">?normalTextColor</item>
         <item name="android:lineSpacingExtra">6sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
@@ -611,7 +617,7 @@
     </style>
 
     <style name="DeviceShield.PrivacyReport.Time">
-        <item name="android:textColor">@color/warmerGray</item>
+        <item name="android:textColor">?secondaryTextColor</item>
         <item name="android:textStyle">normal</item>
         <item name="android:selectable">false</item>
         <item name="android:textSize">14sp</item>
@@ -621,7 +627,7 @@
 
     <style name="DeviceShield.NewTab.TextStyle">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/almostBlack</item>
+        <item name="android:textColor">?normalTextColor</item>
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
     </style>

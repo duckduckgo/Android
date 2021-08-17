@@ -21,7 +21,7 @@ package com.duckduckgo.app.fire
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkManager
-import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.mobile.android.ui.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore

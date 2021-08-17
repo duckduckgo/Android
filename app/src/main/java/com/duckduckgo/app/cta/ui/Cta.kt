@@ -39,6 +39,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*

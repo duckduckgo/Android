@@ -24,13 +24,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
 import com.duckduckgo.mobile.android.ui.view.show
@@ -40,16 +37,12 @@ import com.duckduckgo.mobile.android.vpn.apps.ExcludedAppsViewModel
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
 import com.facebook.shimmer.ShimmerFrameLayout
-import dagger.android.AndroidInjection
 import dummy.ui.VpnControllerActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_device_shield_exclusion_list) {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+class DeviceShieldExclusionListActivity : DuckDuckGoActivity() {
 
     private val viewModel: ExcludedAppsViewModel by bindViewModel()
 
@@ -62,6 +55,7 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
     private val appsWithIssuesHeader by lazy { findViewById<TextView>(R.id.exclusionListAppsWithIssuesHeader) }
     private val appsWithIssuesReport by lazy { findViewById<View>(R.id.exclusionListAppsWithIssuesReport) }
     private val otherAppsLabel by lazy { findViewById<View>(R.id.exclusionListOtherAppsLabel) }
+    private val otherAppsBottomLabel by lazy { findViewById<View>(R.id.exclusionListOtherAppsBottomLabel) }
     private val otherAppsContainer by lazy { findViewById<LinearLayout>(R.id.exclusionListOtherAppsContainer) }
     private val otherAppsHeader by lazy { findViewById<TextView>(R.id.exclusionListOtherAppsHeader) }
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
@@ -69,7 +63,8 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        AndroidInjection.inject(this)
+        setContentView(R.layout.activity_device_shield_exclusion_list)
+        setupToolbar(findViewById(R.id.default_toolbar))
 
         shimmerLayout.startShimmer()
 
@@ -100,12 +95,14 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
                 appsWithIssuesReport.gone()
                 appsWithIssuesLabel.gone()
                 otherAppsLabel.show()
+                otherAppsBottomLabel.show()
             } else {
                 addExcludedApps(appsWithIssuesHeader, viewState.appsWithIssues, appsWithIssuesContainer)
                 removeExcludedApps(otherAppsHeader, otherAppsContainer)
                 appsWithIssuesReport.show()
                 appsWithIssuesLabel.show()
                 otherAppsLabel.gone()
+                otherAppsBottomLabel.gone()
             }
         }
     }
@@ -121,12 +118,14 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
                 removeExcludedApps(otherAppsHeader, otherAppsContainer)
                 addExcludedApps(appsWithIssuesHeader, viewState.appsWithIssues, appsWithIssuesContainer)
                 otherAppsLabel.gone()
+                otherAppsBottomLabel.gone()
                 appsWithIssuesReport.show()
                 appsWithIssuesLabel.show()
             } else {
                 addExcludedApps(otherAppsHeader, viewState.otherApps, otherAppsContainer)
                 removeExcludedApps(appsWithIssuesHeader, appsWithIssuesContainer)
                 otherAppsLabel.show()
+                otherAppsBottomLabel.show()
                 appsWithIssuesReport.gone()
                 appsWithIssuesLabel.gone()
             }
@@ -134,6 +133,7 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
     }
 
     private fun addExcludedApps(header: TextView, apps: List<VpnExcludedInstalledAppInfo>, container: LinearLayout) {
+        container.removeAllViews()
         apps.forEach {
             container.addView(createAppView(it))
         }
@@ -188,5 +188,4 @@ class DeviceShieldExclusionListActivity : AppCompatActivity(R.layout.activity_de
         }
     }
 
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 }

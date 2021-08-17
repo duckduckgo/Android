@@ -31,8 +31,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
-import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -140,7 +139,7 @@ class FireDialog(
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-            onFireDialogClearAllEvent(ClearAllDataFinished)
+            onFireDialogClearAllEvent(FireDialogClearAllEvent.ClearAllDataFinished)
         }
     }
 
@@ -162,7 +161,7 @@ class FireDialog(
             override fun onAnimationCancel(animation: Animator?) {}
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
-                onFireDialogClearAllEvent(AnimationFinished)
+                onFireDialogClearAllEvent(FireDialogClearAllEvent.AnimationFinished)
             }
         })
     }
@@ -181,7 +180,7 @@ class FireDialog(
     private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
         if (!canRestart) {
             canRestart = true
-            if (event is ClearAllDataFinished) {
+            if (event is FireDialogClearAllEvent.ClearAllDataFinished) {
                 fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {

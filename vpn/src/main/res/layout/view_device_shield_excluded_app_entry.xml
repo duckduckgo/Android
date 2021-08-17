@@ -26,23 +26,15 @@
     android:paddingBottom="8dp"
     android:gravity="center">
 
-    <FrameLayout
-        android:id="@+id/deviceShieldAppEntryIconContainer"
+    <ImageView
+        android:id="@+id/deviceShieldAppEntryIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/subtle_favicon_background"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/deviceShieldAppEntryIcon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp" />
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/deviceShieldAppEntryName"
@@ -55,7 +47,7 @@
         android:maxLines="1"
         android:orientation="vertical"
         android:singleLine="true"
-        android:textColor="@color/almostBlackDark"
+        android:textColor="?normalTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         tools:text="Facebook" />
