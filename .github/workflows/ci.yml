@@ -43,6 +43,17 @@ jobs:
       - name: Unit Tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
+      - name: (Fail-only) Bundle the Unit Test report
+        if: failure()
+        run: find . -type d -name 'reports' | zip -@ -r unit-test-report.zip
+
+      - name: (Fail-only) Upload the Unit Test report
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-test-error-report
+          path: unit-test-report.zip
+
   android_tests:
     runs-on: macos-latest
     name: Android tests
@@ -111,13 +122,13 @@ jobs:
           disable-animations: true
           script: ./gradlew app:connectedPlayDebugAndroidTest --stacktrace
 
-      - name: (Fail-only) Bundle the build report
+      - name: (Fail-only) Bundle the Android Test report
         if: failure()
-        run: find . -type d -name 'reports' | zip -@ -r build-reports.zip
+        run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
 
-      - name: (Fail-only) Upload the build report
+      - name: (Fail-only) Upload the Android Test report
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: error-report
-          path: build-reports.zip
+          name: android-test-error-report
+          path: android-test-report.zip
