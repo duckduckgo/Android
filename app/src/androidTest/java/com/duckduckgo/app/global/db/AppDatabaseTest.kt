@@ -352,13 +352,18 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion32o33ThenValidationSucceeds() {
+    fun whenMigratingFromVersion32To33ThenValidationSucceeds() {
         createDatabaseAndMigrate(32, 33, migrationsProvider.MIGRATION_32_TO_33)
     }
 
     @Test
-    fun whenMigratingFromVersion33o34ThenValidationSucceeds() {
+    fun whenMigratingFromVersion33To34ThenValidationSucceeds() {
         createDatabaseAndMigrate(33, 34, migrationsProvider.MIGRATION_33_TO_34)
+    }
+
+    @Test
+    fun whenMigratingFromVersion35To36ThenValidationSucceeds() {
+        createDatabaseAndMigrate(35, 36, migrationsProvider.MIGRATION_35_TO_36)
     }
 
     @Test
@@ -425,8 +430,8 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion35To36ThenValidationSucceeds() {
-        createDatabaseAndMigrate(35, 36, migrationsProvider.MIGRATION_35_TO_36)
+    fun whenMigratingFromVersion36To37ThenValidationSucceeds() {
+        createDatabaseAndMigrate(36, 37, migrationsProvider.MIGRATION_36_TO_37)
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
