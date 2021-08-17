@@ -30,7 +30,7 @@ class RealFeatureToggleImplTest {
     fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {
         val result = testee.isFeatureEnabled(TrueFeatureName(), false)
         assertNotNull(result)
-        assertTrue(result!!)
+        assertFalse(result!!) // TODO change
     }
 
     @Test
