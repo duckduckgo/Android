@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   unit_tests:
+    name: Spotless and unit tests
     runs-on: ubuntu-latest
 
     steps:
@@ -35,6 +36,7 @@ jobs:
 
   android_tests:
     runs-on: macos-latest
+    name: Android tests
     strategy:
       matrix:
         api-level: [26]
@@ -69,7 +71,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+          key: avd-emu-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
