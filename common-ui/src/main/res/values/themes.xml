@@ -107,6 +107,7 @@
 
         <item name="emailButtonRippleColor">@color/white</item>
         <item name="quickAccessItemTitleTextColor">@color/white</item>
+        <item name="favoriteAddedHintTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -202,6 +203,7 @@
 
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
+        <item name="favoriteAddedHintTextColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
