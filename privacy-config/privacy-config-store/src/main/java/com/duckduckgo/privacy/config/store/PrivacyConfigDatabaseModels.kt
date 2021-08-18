@@ -30,3 +30,10 @@ data class PrivacyFeatureToggles(
     @PrimaryKey val featureName: String,
     val enabled: Boolean
 )
+
+@Entity(tableName = "privacy_config")
+data class PrivacyConfig(
+    @PrimaryKey val id: Int = 1,
+    val version: Long,
+    val readme: String
+)

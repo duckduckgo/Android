@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store
+package com.duckduckgo.privacy.config.impl.di
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import javax.inject.Scope
 
-@Database(
-    exportSchema = true, version = 1,
-    entities = [
-        ContentBlockingException::class,
-        PrivacyFeatureToggles::class,
-        PrivacyConfig::class
-    ]
-)
-abstract class PrivacyConfigDatabase : RoomDatabase() {
-    abstract fun contentBlockingDao(): ContentBlockingDao
-    abstract fun privacyFeatureTogglesDao(): PrivacyFeatureTogglesDao
-    abstract fun privacyConfigDao(): PrivacyConfigDao
-}
+/**
+ * Identifies a coroutine scope type that is scope to the Privacy Config lifecycle
+ */
+@Scope
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PrivacyConfigCoroutineScope

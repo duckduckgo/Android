@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.models
 import org.json.JSONObject
 
 data class JsonPrivacyConfig(
-    val version: String,
+    val version: Long,
     val readme: String,
     val features: Map<String, JSONObject?>
 )
