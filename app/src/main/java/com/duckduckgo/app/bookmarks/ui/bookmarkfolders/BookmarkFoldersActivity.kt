@@ -41,21 +41,13 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         observeViewModel()
         setupAdapter()
 
-        var currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER)
+        val currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER)
 
-        if (currentFolder == null) {
-            viewModel.fetchBookmarkFolders(
-                intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-                getString(R.string.bookmarksSectionTitle),
-                null
-            )
-        } else {
-            viewModel.fetchBookmarkFolders(
-                intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
-                getString(R.string.bookmarksSectionTitle),
-                currentFolder as BookmarkFolder
-            )
-        }
+        viewModel.fetchBookmarkFolders(
+            intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+            getString(R.string.bookmarksSectionTitle),
+            currentFolder as BookmarkFolder?
+        )
     }
 
     private fun setupAdapter() {
@@ -69,7 +61,15 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             { viewState ->
                 viewState?.let {
                     adapter.submitList(it.folderStructure)
-                    setSelectedFolderResult(it.selectedBookmarkFolder)
+                }
+            }
+        )
+
+        viewModel.command.observe(
+            this,
+            {
+                when (it) {
+                    is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
                 }
             }
         )

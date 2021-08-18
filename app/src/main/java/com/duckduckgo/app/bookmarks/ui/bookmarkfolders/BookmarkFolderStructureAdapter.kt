@@ -66,7 +66,6 @@ class FolderViewHolder(
         setPadding(item.depth)
 
         if (item.isSelected) {
-            viewModel.lastPosition = bindingAdapterPosition
             binding.icon.setImageResource(R.drawable.ic_check)
             binding.iconContainer.setBackgroundResource(R.drawable.selected_icon_background)
         } else {
@@ -75,7 +74,7 @@ class FolderViewHolder(
         }
 
         itemView.setOnClickListener {
-            viewModel.onItemSelected(bindingAdapterPosition, item.bookmarkFolder)
+            viewModel.onItemSelected(item.bookmarkFolder)
         }
     }
 

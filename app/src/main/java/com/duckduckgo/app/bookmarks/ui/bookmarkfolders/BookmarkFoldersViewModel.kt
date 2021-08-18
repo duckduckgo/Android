@@ -22,7 +22,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,13 +38,15 @@ class BookmarkFoldersViewModel(
 ) : ViewModel() {
 
     data class ViewState(
-        val folderStructure: List<BookmarkFolderItem> = emptyList(),
-        val selectedBookmarkFolder: BookmarkFolder? = null
+        val folderStructure: List<BookmarkFolderItem> = emptyList()
     )
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    sealed class Command {
+        class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
+    }
 
-    var lastPosition = 0
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
         viewState.value = ViewState()
@@ -59,14 +63,8 @@ class BookmarkFoldersViewModel(
         viewState.postValue(viewState.value?.copy(folderStructure = folderStructure))
     }
 
-    fun onItemSelected(position: Int, bookmarkFolder: BookmarkFolder) {
-        val folderStructure = viewState.value?.folderStructure?.toMutableList() ?: mutableListOf()
-        folderStructure[lastPosition] = folderStructure[lastPosition].copy(isSelected = false)
-        folderStructure[position] = folderStructure[position].copy(isSelected = true)
-
-        viewState.postValue(viewState.value?.copy(folderStructure = folderStructure, selectedBookmarkFolder = bookmarkFolder))
-
-        lastPosition = position
+    fun onItemSelected(bookmarkFolder: BookmarkFolder) {
+        command.value = SelectFolder(bookmarkFolder)
     }
 }
 
