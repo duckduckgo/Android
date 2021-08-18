@@ -92,7 +92,7 @@ class FireproofWebsiteAdapter(
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             FIREPROOF_WEBSITE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
+                val view = inflater.inflate(R.layout.view_list_single_item_entry, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(
                     inflater,
                     view,
@@ -204,7 +204,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun showOverFlowMenu(anchor: View, entity: FireproofWebsiteEntity) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_delete_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }

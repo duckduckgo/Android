@@ -14,20 +14,16 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.textview.MaterialTextView
+    android:id="@+id/favoriteAddedAsFavoriteHint"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/popup_menu_bg">
-
-    <TextView
-        android:id="@+id/editSavedSite"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/edit" />
-
-    <TextView
-        android:id="@+id/deleteSavedSite"
-        style="@style/Widget.DuckDuckGo.PopupMenuItem"
-        android:text="@string/delete" />
-
-</LinearLayout>
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="16dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:text="@string/favoriteAddedOnboardingText"
+    android:textColor="?attr/favoriteAddedHintTextColor"
+    android:textSize="14sp"
+    android:textStyle="normal"
+    xmlns:android="http://schemas.android.com/apk/res/android" />
