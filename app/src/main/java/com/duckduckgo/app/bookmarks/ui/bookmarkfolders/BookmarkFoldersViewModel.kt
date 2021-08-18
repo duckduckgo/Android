@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
@@ -33,7 +32,6 @@ import javax.inject.Provider
 
 class BookmarkFoldersViewModel(
     val bookmarkFoldersRepository: BookmarkFoldersRepository,
-    val bookmarkFoldersDao: BookmarkFoldersDao,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -43,35 +41,19 @@ class BookmarkFoldersViewModel(
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+
     var lastPosition = 0
 
     init {
         viewState.value = ViewState()
     }
 
-    private fun getBookmarkFolders(): List<BookmarkFolder> {
-        return bookmarkFoldersDao.getBookmarkFoldersImmediate().map {
-            BookmarkFolder(it.id, it.name, it.parentId)
-        }
-    }
-
     fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            var bookmarkFolders = getBookmarkFolders()
-
-            currentFolder?.let {
-                val bookmarkFolderBranch = bookmarkFoldersRepository.getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
-                bookmarkFolders = bookmarkFolders.minus(bookmarkFolderBranch)
-            }
-
-            var folderStructure = bookmarkFoldersRepository.buildFlatStructure(bookmarkFolders, selectedFolderId)
-            folderStructure = addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
+            val folderStructure = bookmarkFoldersRepository.buildFlatStructure(selectedFolderId, currentFolder, rootFolderName)
             onFolderStructureCreated(folderStructure)
         }
     }
-
-    private fun addBookmarksAsRoot(folderStructure: List<BookmarkFolderItem>, rootFolder: String, selectedFolderId: Long) =
-        listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), isSelected = selectedFolderId == 0L)) + folderStructure
 
     private fun onFolderStructureCreated(folderStructure: List<BookmarkFolderItem>) {
         viewState.postValue(viewState.value?.copy(folderStructure = folderStructure))
@@ -91,7 +73,6 @@ class BookmarkFoldersViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarkFoldersViewModelFactory @Inject constructor(
     private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
-    private val bookmarkFoldersDao: Provider<BookmarkFoldersDao>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -100,7 +81,6 @@ class BookmarkFoldersViewModelFactory @Inject constructor(
                 isAssignableFrom(BookmarkFoldersViewModel::class.java) -> (
                     BookmarkFoldersViewModel(
                         bookmarkFoldersRepository.get(),
-                        bookmarkFoldersDao.get(),
                         dispatcherProvider.get()
                     ) as T
                     )

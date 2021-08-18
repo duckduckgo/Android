@@ -123,12 +123,45 @@ class BookmarkFoldersDataRepositoryTest {
         val childFolder = BookmarkFolder(id = 2, name = "another name", parentId = 1)
         val folder = BookmarkFolder(id = 3, name = "folder name", parentId = 0)
 
-        val flatStructure = repository.buildFlatStructure(listOf(parentFolder, childFolder, folder), 3)
+        bookmarkFoldersDao.insertList(
+            listOf(
+                BookmarkFolderEntity(parentFolder.id, parentFolder.name, parentFolder.parentId),
+                BookmarkFolderEntity(childFolder.id, childFolder.name, childFolder.parentId),
+                BookmarkFolderEntity(folder.id, folder.name, folder.parentId)
+            )
+        )
+
+        val flatStructure = repository.buildFlatStructure(3, null, "Bookmarks")
 
         val items = listOf(
+            BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
             BookmarkFolderItem(1, parentFolder, false),
             BookmarkFolderItem(2, childFolder, false),
-            BookmarkFolderItem(1, folder, true),
+            BookmarkFolderItem(1, folder, true)
+        )
+
+        assertEquals(items, flatStructure)
+    }
+
+    @Test
+    fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runBlocking {
+        val parentFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
+        val childFolder = BookmarkFolder(id = 2, name = "another name", parentId = 1)
+        val folder = BookmarkFolder(id = 3, name = "folder name", parentId = 0)
+
+        bookmarkFoldersDao.insertList(
+            listOf(
+                BookmarkFolderEntity(parentFolder.id, parentFolder.name, parentFolder.parentId),
+                BookmarkFolderEntity(childFolder.id, childFolder.name, childFolder.parentId),
+                BookmarkFolderEntity(folder.id, folder.name, folder.parentId)
+            )
+        )
+
+        val flatStructure = repository.buildFlatStructure(3, parentFolder, "Bookmarks")
+
+        val items = listOf(
+            BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
+            BookmarkFolderItem(1, folder, true)
         )
 
         assertEquals(items, flatStructure)

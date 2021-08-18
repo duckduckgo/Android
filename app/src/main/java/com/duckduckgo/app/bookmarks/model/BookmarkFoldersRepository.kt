@@ -27,7 +27,7 @@ interface BookmarkFoldersRepository {
     suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
-    suspend fun buildFlatStructure(bookmarkFolders: List<BookmarkFolder>, selectedFolderId: Long): List<BookmarkFolderItem>
+    suspend fun buildFlatStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
     suspend fun buildTreeStructure(): TreeNode<FolderTreeItem>
 }
 
@@ -90,18 +90,31 @@ class BookmarkFoldersDataRepository(
     }
 
     override suspend fun buildFlatStructure(
-        bookmarkFolders: List<BookmarkFolder>,
-        selectedFolderId: Long
+        selectedFolderId: Long,
+        currentFolder: BookmarkFolder?,
+        rootFolderName: String
     ): List<BookmarkFolderItem> {
+
+        val bookmarkFolders = removeCurrentFolderBranch(currentFolder, getBookmarkFolders())
 
         val parentGroupings = bookmarkFolders
             .sortedWith(compareBy({ it.parentId }, { it.id }))
             .groupBy { it.parentId }
 
-        return bookmarkFolders.map { it.parentId }
+        val folderStructure = bookmarkFolders.map { it.parentId }
             .subtract(bookmarkFolders.map { it.id })
             .flatMap { parentGroupings[it] ?: emptyList() }
             .flatMap { getSubFoldersWithDepth(it, parentGroupings, 1, selectedFolderId) }
+
+        return addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
+    }
+
+    private suspend fun removeCurrentFolderBranch(currentFolder: BookmarkFolder?, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFolder> {
+        currentFolder?.let {
+            val bookmarkFolderBranch = getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
+            return bookmarkFolders.minus(bookmarkFolderBranch)
+        }
+        return bookmarkFolders
     }
 
     private fun getSubFoldersWithDepth(
@@ -117,6 +130,9 @@ class BookmarkFoldersDataRepository(
         return listOf(BookmarkFolderItem(depth, bookmarkFolder, isSelected)) +
             (bookmarkFolders).flatMap { getSubFoldersWithDepth(it, parentGroupings, depth + 1, selectedFolderId) }
     }
+
+    private fun addBookmarksAsRoot(folderStructure: List<BookmarkFolderItem>, rootFolder: String, selectedFolderId: Long) =
+        listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), isSelected = selectedFolderId == 0L)) + folderStructure
 
     override suspend fun buildTreeStructure(): TreeNode<FolderTreeItem> {
         val node = TreeNode(FolderTreeItem(0, BOOKMARKS_FOLDER, -1, null, 0))
