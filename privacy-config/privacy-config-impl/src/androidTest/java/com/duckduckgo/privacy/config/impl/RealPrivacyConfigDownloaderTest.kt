@@ -18,14 +18,13 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDao
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -41,13 +40,13 @@ class RealPrivacyConfigDownloaderTest {
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var privacyFeatureTogglesDao: PrivacyFeatureTogglesDao
-    private val pluginPoint = FakePrivacyFeaturePluginPoint()
+    private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
 
     @Before
     fun before() {
         prepareDb()
 
-        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), pluginPoint, db)
+        testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister)
     }
 
     private fun prepareDb() {
@@ -59,7 +58,7 @@ class RealPrivacyConfigDownloaderTest {
 
     @Test
     fun whenDownloadIsNotSuccessfulThenReturnTrue() = coroutineRule.runBlocking {
-        testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), pluginPoint, db)
+        testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
         assertFalse(testee.download())
     }
 
@@ -69,36 +68,10 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
-    fun whenDownloadIsSuccessfulThenDeleteAllTogglesPreviouslyStored() = coroutineRule.runBlocking {
-        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
+    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() = coroutineRule.runBlocking {
         testee.download()
 
-        assertNull(privacyFeatureTogglesDao.get("feature"))
-    }
-
-    @Test
-    fun whenDownloadIsSuccessfulAndPluginMatchesFeatureNameThenStoreCalled() = coroutineRule.runBlocking {
-        testee.download()
-
-        val plugin = pluginPoint.getPlugins().first() as FakePrivacyFeaturePlugin
-        assertEquals(1, plugin.count)
-    }
-
-    class FakePrivacyFeaturePluginPoint : PluginPoint<PrivacyFeaturePlugin> {
-        val plugin = FakePrivacyFeaturePlugin()
-        override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-            return listOf(plugin)
-        }
-    }
-
-    class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
-        var count = 0
-
-        override fun store(name: String, jsonObject: JSONObject?): Boolean {
-            count++
-            return true
-        }
-        override val featureName: PrivacyFeatureName = PrivacyFeatureName.ContentBlockingFeatureName()
+        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
     }
 
     class TestFailingPrivacyConfigService : PrivacyConfigService {
@@ -109,7 +82,7 @@ class RealPrivacyConfigDownloaderTest {
 
     class TestPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
-            return JsonPrivacyConfig(version = "1", readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)))
+            return JsonPrivacyConfig(version = 1, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)))
         }
     }
 

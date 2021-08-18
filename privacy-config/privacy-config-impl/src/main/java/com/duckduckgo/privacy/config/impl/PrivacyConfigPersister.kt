@@ -34,7 +34,7 @@ interface PrivacyConfigPersister {
 @WorkerThread
 @Singleton
 @ContributesBinding(AppObjectGraph::class)
-class RealPrivacyConfigRepository @Inject constructor(private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>, private val database: PrivacyConfigDatabase) : PrivacyConfigPersister {
+class RealPrivacyConfigPersister @Inject constructor(private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>, private val database: PrivacyConfigDatabase) : PrivacyConfigPersister {
 
     private val privacyFeatureTogglesDao = database.privacyFeatureTogglesDao()
     private val privacyConfigDao = database.privacyConfigDao()
