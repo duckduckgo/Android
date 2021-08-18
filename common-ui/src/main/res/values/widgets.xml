@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Widget"/>
+    <style name="Widget.DuckDuckGo"/>
+
+    <style name="Widget.DuckDuckGo.SingleLineListItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.TwoLineListItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListItem"/>
+    <style name="Widget.DuckDuckGo.ListItem.Description" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:textColor">?attr/settingsMinorTextColor</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListItem.Divider">
+        <item name="android:background">?attr/settingsDividerColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListItem.SectionTitle">
+        <item name="android:padding">16dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.ListItem.EmptyHint">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BottomSheet.Model" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="behavior_peekHeight">512dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.AutoCompleteTextView" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Snackbar" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
+        <item name="android:background">@drawable/popup_menu_bg</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.PopupMenuItem" parent="TextAppearance.DuckDuckGo.Body1">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Icon">
+        <item name="android:tint">?attr/browserIconColorSelector</item>
+        <item name="android:layout_width">@dimen/popupMenuItemHeight</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text">
+        <item name="android:paddingEnd">@dimen/keyline_4</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox">
+        <item name="android:button">@null</item>
+        <item name="android:drawableEnd">?android:attr/listChoiceIndicatorMultiple</item>
+        <item name="android:paddingEnd">@dimen/keyline_2</item>
+    </style>
+
+</resources>

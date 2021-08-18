@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGlobalPrivacyControlBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class GlobalPrivacyControlActivity : DuckDuckGoActivity() {

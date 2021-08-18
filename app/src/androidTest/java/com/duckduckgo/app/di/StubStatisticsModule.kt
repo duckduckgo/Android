@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.AtbInitializer
@@ -30,7 +31,9 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.reactivex.Completable
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -86,13 +89,15 @@ class StubStatisticsModule {
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
     @Provides
+    @IntoSet
     @Singleton
     fun atbInitializer(
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
-    ): AtbInitializer {
-        return AtbInitializer(statisticsDataStore, statisticsUpdater, listeners)
+    ): LifecycleObserver {
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 
     @Provides

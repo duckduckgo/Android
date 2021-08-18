@@ -24,21 +24,32 @@ import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@ContributesMultibinding(AppObjectGraph::class)
 class NotificationRegistrar @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val context: Context,
     private val manager: NotificationManager,
     private val compatManager: NotificationManagerCompat,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel
-) {
+) : LifecycleObserver {
 
     data class Channel(
         val id: String,
@@ -77,6 +88,22 @@ class NotificationRegistrar @Inject constructor(
         )
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onApplicationCreated() {
+        appCoroutineScope.launch { registerApp() }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun updateNotificationStatus() {
+        val systemEnabled = compatManager.areNotificationsEnabled()
+        val allChannelsEnabled = when {
+            SDK_INT >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
+            else -> true
+        }
+
+        updateStatus(systemEnabled && allChannelsEnabled)
+    }
+
     private val channels = listOf(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
@@ -84,7 +111,7 @@ class NotificationRegistrar @Inject constructor(
         ChannelType.EMAIL_WAITLIST
     )
 
-    fun registerApp() {
+    private fun registerApp() {
         if (SDK_INT < O) {
             Timber.d("No need to register for notification channels on this SDK version")
             return
@@ -100,16 +127,7 @@ class NotificationRegistrar @Inject constructor(
         manager.createNotificationChannels(notificationChannels)
     }
 
-    fun updateStatus() {
-        val systemEnabled = compatManager.areNotificationsEnabled()
-        val allChannelsEnabled = when {
-            SDK_INT >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
-            else -> true
-        }
-
-        updateStatus(systemEnabled && allChannelsEnabled)
-    }
-
+    @VisibleForTesting
     fun updateStatus(enabled: Boolean) {
         if (settingsDataStore.appNotificationsEnabled != enabled) {
             pixel.fire(if (enabled) AppPixelName.NOTIFICATIONS_ENABLED else AppPixelName.NOTIFICATIONS_DISABLED)

@@ -30,7 +30,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.app.global.view.setAllParentsClip
+import com.duckduckgo.mobile.android.ui.view.setAllParentsClip
 
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()

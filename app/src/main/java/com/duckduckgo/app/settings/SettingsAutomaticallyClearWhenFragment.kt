@@ -25,7 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 

@@ -25,8 +25,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.view.showKeyboard
 
 class EditSavedSiteDialogFragment : DialogFragment() {
 
