@@ -50,6 +50,7 @@ class DomainBasedTrackerDetectorTest {
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val tcb: TCB = mock()
     private val appTrackerRepository: AppTrackerRepository = mock()
+    private val appTrackerRecorder: AppTrackerRecorder = mock()
     private val defaultOriginatingApp = AppNameResolver.OriginatingApp("foo.id.com", "Foo App")
 
     @Before
@@ -65,7 +66,7 @@ class DomainBasedTrackerDetectorTest {
             .allowMainThreadQueries()
             .build()
 
-        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, vpnDatabase)
+        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, vpnDatabase)
     }
 
     @Test
