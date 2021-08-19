@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 class TrackerDataDevReceiver(
     context: Context,
-    intentAction: String = "downloadTds",
+    intentAction: String = DOWNLOAD_TDS_INTENT_ACTION,
     private val receiver: (Intent) -> Unit
 ) : BroadcastReceiver(), LifecycleObserver {
     init {
@@ -46,6 +46,10 @@ class TrackerDataDevReceiver(
 
     override fun onReceive(context: Context, intent: Intent) {
         receiver(intent)
+    }
+
+    companion object {
+        const val DOWNLOAD_TDS_INTENT_ACTION = "downloadTds"
     }
 }
 
@@ -65,8 +69,7 @@ class TrackerDataDevReceiverRegister @Inject constructor(
 
         Timber.i("Debug receiver TrackerDataDevReceiverRegister registered")
 
-        TrackerDataDevReceiver(context) { intent ->
-            Timber.d("MARCOS intent received")
+        TrackerDataDevReceiver(context) { _ ->
             Completable.merge(listOf(trackerDataLoader.deleteAllData(), trackderDataDownloader.downloadTds()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

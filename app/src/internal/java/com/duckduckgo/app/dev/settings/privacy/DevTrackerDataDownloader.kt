@@ -17,11 +17,9 @@
 package com.duckduckgo.app.dev.settings.privacy
 
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import io.reactivex.Completable
 import okhttp3.Headers
 import timber.log.Timber
@@ -30,9 +28,7 @@ import javax.inject.Inject
 
 class DevTrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
-    private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase,
     private val metadataDao: TdsMetadataDao
 ) {

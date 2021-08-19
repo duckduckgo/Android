@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.dev.settings
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -29,12 +28,12 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.android.synthetic.internal.activity_dev_settings.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import javax.inject.Inject
 
 class DevSettingsActivity : DuckDuckGoActivity() {
@@ -97,29 +96,13 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun sendTdsIntent() {
-        Timber.d("MARCOS send intent")
         Toast.makeText(this, "Please wait while we download the tds version", Toast.LENGTH_SHORT).show()
         val intent = Intent()
-        intent.action = "downloadTds"
+        intent.action = DOWNLOAD_TDS_INTENT_ACTION
         sendBroadcast(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == FEEDBACK_REQUEST_CODE) {
-            handleFeedbackResult(resultCode)
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun handleFeedbackResult(resultCode: Int) {
-        if (resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
-        }
-    }
-
     companion object {
-        private const val FEEDBACK_REQUEST_CODE = 100
-
         fun intent(context: Context): Intent {
             return Intent(context, DevSettingsActivity::class.java)
         }

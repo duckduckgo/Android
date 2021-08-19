@@ -36,13 +36,13 @@ class ApiDevTdsInterceptor @Inject constructor(
         val request = chain.request().newBuilder()
 
         val url = chain.request().url
-        if (url.toString().contains("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/")) {
+        if (url.toString().contains(TDS_URL)) {
             val tds = if (devSettingsDataStore.nextTdsEnabled) {
-                "next-tds.json"
+                NEXT_TDS
             } else {
-                "tds.json"
+                TDS
             }
-            request.url("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/$tds")
+            request.url("$TDS_URL$tds")
         }
 
         return chain.proceed(request.build())
@@ -51,4 +51,11 @@ class ApiDevTdsInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor {
         return this
     }
+
+    companion object {
+        private const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/"
+        private const val NEXT_TDS = "next-tds.json"
+        private const val TDS = "tds.json"
+    }
+
 }

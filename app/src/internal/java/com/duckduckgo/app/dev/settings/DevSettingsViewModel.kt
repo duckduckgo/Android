@@ -50,12 +50,7 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     private val viewState = MutableStateFlow(ViewState())
-
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-
-    init {
-
-    }
 
     fun start() {
         viewModelScope.launch {
