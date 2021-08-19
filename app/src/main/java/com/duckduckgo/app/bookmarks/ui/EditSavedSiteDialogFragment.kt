@@ -79,7 +79,17 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     private val urlTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            setConfirmationVisibility(editable.toString() != getSavedSite().url)
+            when {
+                editable.toString().isBlank() -> {
+                    setConfirmationVisibility(ValidationState.INVALID)
+                }
+                editable.toString() != getSavedSite().url -> {
+                    setConfirmationVisibility(ValidationState.CHANGED)
+                }
+                else -> {
+                    setConfirmationVisibility(ValidationState.UNCHANGED)
+                }
+            }
         }
     }
 

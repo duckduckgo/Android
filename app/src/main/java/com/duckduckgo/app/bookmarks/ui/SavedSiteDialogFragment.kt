@@ -49,7 +49,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     protected val binding get() = _binding!!
 
     private var initialTitle: String? = null
-    private var titleChanged = false
+    private var titleState = ValidationState.UNCHANGED
+
     private var initialParentFolderId: Long? = null
     private var folderChanged = false
 
@@ -169,14 +170,32 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureUpNavigation(toolbar)
     }
 
-    protected fun setConfirmationVisibility(isVisible: Boolean = false) {
-        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = isVisible || titleChanged || folderChanged
+    protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
+        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
+            (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
+            (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
 
     private val titleTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            titleChanged = editable.toString() != initialTitle
+            titleState = when {
+                editable.toString().isBlank() -> {
+                    ValidationState.INVALID
+                }
+                editable.toString() != initialTitle -> {
+                    ValidationState.CHANGED
+                }
+                else -> {
+                    ValidationState.UNCHANGED
+                }
+            }
             setConfirmationVisibility()
         }
     }
+}
+
+enum class ValidationState {
+    CHANGED,
+    UNCHANGED,
+    INVALID
 }
