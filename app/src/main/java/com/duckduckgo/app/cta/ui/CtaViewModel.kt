@@ -24,6 +24,9 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
@@ -33,6 +36,8 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -60,8 +65,11 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
+    private val userEventsRepository: UserEventsRepository,
     private val tabRepository: TabRepository,
-    private val dispatchers: DispatcherProvider
+    private val favoritesOnboardingObserver: FavoritesOnboardingObserver,
+    private val dispatchers: DispatcherProvider,
+    private val variantManager: VariantManager
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -163,7 +171,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, favoritesOnboarding: Boolean = false, locale: Locale = Locale.getDefault()): Cta? {
         surveyCta(locale)?.let {
             return it
         }
@@ -172,7 +180,12 @@ class CtaViewModel @Inject constructor(
             if (isBrowserShowing) {
                 getBrowserCta(site)
             } else {
-                getHomeCta()
+                Timber.i("favoritesOnboarding: - refreshCta $favoritesOnboarding")
+                if (favoritesOnboarding) {
+                    BubbleCta.DaxFavoritesOnboardingCta()
+                } else {
+                    getHomeCta()
+                }
             }
         }
     }
@@ -190,6 +203,9 @@ class CtaViewModel @Inject constructor(
         return when {
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+            }
+            canShowDaxFavoritesOnboarding() -> {
+                DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -238,6 +254,14 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !settingsDataStore.hideTips
+
+    @WorkerThread
+    private suspend fun canShowDaxFavoritesOnboarding(): Boolean = daxOnboardingActive() &&
+        !daxDialogEndShown() &&
+        daxDialogIntroShown() &&
+        !settingsDataStore.hideTips &&
+        userEventsRepository.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.payload?.isNotEmpty() == true &&
+        variantManager.favoritesOnboardingEnabled()
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&

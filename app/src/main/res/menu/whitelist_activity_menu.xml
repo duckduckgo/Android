@@ -21,7 +21,7 @@
 
     <item
         android:id="@+id/add"
-        android:icon="@drawable/ic_add_24dp"
+        android:icon="@drawable/ic_add"
         android:title="@string/dialogAddTitle"
         app:showAsAction="always" />
 

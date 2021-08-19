@@ -37,7 +37,6 @@ class ApiRequestInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
 
-
         val url = chain.request().url
         if (url.toString().startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
             // user agent for re-query pixels needs to be the same for the webview

@@ -20,7 +20,6 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
@@ -29,8 +28,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
-import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
-import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
 import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
 import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 import kotlinx.coroutines.launch
@@ -131,27 +130,30 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
     ) : BookmarkScreenViewHolders(itemView) {
 
         fun update(bookmark: SavedSite.Bookmark) {
-            itemView.overflowMenu.contentDescription = itemView.context.getString(
-                R.string.bookmarkOverflowContentDescription,
-                bookmark.title
-            )
+            val twoListItem = itemView as TwoLineListItem
 
-            itemView.title.text = bookmark.title
-            itemView.url.text = parseDisplayUrl(bookmark.url)
+            twoListItem.setContentDescription(
+                itemView.context.getString(
+                    R.string.bookmarkOverflowContentDescription,
+                    bookmark.title
+                )
+            )
+            twoListItem.setTitle(bookmark.title)
+            twoListItem.setSubtitle(parseDisplayUrl(bookmark.url))
             loadFavicon(bookmark.url)
 
-            itemView.overflowMenu.setOnClickListener {
-                showOverFlowMenu(itemView.overflowMenu, bookmark)
+            twoListItem.setOverflowClickListener { anchor ->
+                showOverFlowMenu(anchor, bookmark)
             }
 
-            itemView.setOnClickListener {
+            twoListItem.setClickListener {
                 viewModel.onSelected(bookmark)
             }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.favicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
@@ -160,12 +162,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(anchor: ImageView, bookmark: SavedSite.Bookmark) {
-            val popupMenu = SavedSitePopupMenu(layoutInflater)
+        private fun showOverFlowMenu(anchor: View, bookmark: SavedSite.Bookmark) {
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editSavedSite) { editBookmark(bookmark) }
-                onMenuItemClicked(view.deleteSavedSite) { deleteBookmark(bookmark) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmark(bookmark) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmark(bookmark) }
             }
             popupMenu.show(itemView, anchor)
         }

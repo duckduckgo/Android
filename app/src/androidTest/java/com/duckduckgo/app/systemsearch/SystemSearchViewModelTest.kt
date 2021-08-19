@@ -285,6 +285,15 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenQuickAccessItemClickedThenPixelSent() {
+        val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
+
+        testee.onQuickAccesItemClicked(quickAccessItem)
+
+        verify(mockPixel).fire(FAVORITE_SYSTEM_SEARCH_ITEM_PRESSED)
+    }
+
+    @Test
     fun whenQuickAccessItemEditRequestedThenLaunchEditDialog() {
         val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
 

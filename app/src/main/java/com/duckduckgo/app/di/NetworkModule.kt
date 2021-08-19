@@ -44,11 +44,13 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import timber.log.Timber
 import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
@@ -82,10 +84,17 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
+        pixelAtbRemovalInterceptor: PixelAtbRemovalInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
+            .addInterceptor(pixelAtbRemovalInterceptor)
+            // shall be the last one as it is logging the pixel request url that goes out
+            .addInterceptor { chain: Interceptor.Chain ->
+                Timber.v("Pixel url request: ${chain.request().url}")
+                return@addInterceptor chain.proceed(chain.request())
+            }
             .build()
     }
 
@@ -126,6 +135,11 @@ class NetworkModule {
     @Provides
     fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
         return PixelReQueryInterceptor()
+    }
+
+    @Provides
+    fun pixelAtbRemovalInterceptor(): PixelAtbRemovalInterceptor {
+        return PixelAtbRemovalInterceptor()
     }
 
     @Provides

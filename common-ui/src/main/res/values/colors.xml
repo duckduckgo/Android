@@ -70,6 +70,8 @@
     <color name="grayscale">#EEEEEE</color>
     <color name="revised_cornflower">#332FF3</color>
 
+    <color name="marketing_red">#CE2929</color>
+
     <color name="brickOrange">#d03a10</color>
     <color name="red50">#DE5833</color>
 
@@ -114,4 +116,14 @@
     <color name="light_blue">#F2F5F9</color>
     <color name="yellow_10">#FFF2BF</color>
 
+    <color name="defaultTextColor">@color/white</color>
+
+    <!-- widget day/night -->
+    <color name="favoriteTitleTextColor">@color/brownishGrayTwo</color>
+    <color name="favoriteFaviconBackgroundColor">@color/whiteFive</color>
+    <color name="searchWidgetBackgroundColor">@color/white</color>
+    <color name="searchWidgetSearchBarBackgroundColor">@color/whiteFour</color>
+    <color name="searchWidgetSearchBarHintColor">@color/brownishGrayTwo</color>
+    <color name="searchWidgetSearchBarLoupeColor">@color/almostBlack</color>
+>>>>>>> develop
 </resources>

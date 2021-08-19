@@ -16,16 +16,13 @@
 
 package com.duckduckgo.app.dev.privacy
 
-import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.filterBlankItems
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
-import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
 import okhttp3.Headers
 import timber.log.Timber

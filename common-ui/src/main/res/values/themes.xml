@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
@@ -26,15 +26,19 @@
         <item name="colorPrimary">@color/almostBlackDark</item>
         <item name="colorPrimaryDark">@color/black</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
+
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:statusBarColor">?toolbarBgColor</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="android:statusBarColor">?toolbarBgColor</item>
-        <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="android:colorEdgeEffect">@color/newBlack</item>
+
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+        <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
+        <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
+        <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -42,6 +46,9 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
+        <item name="listItemTitleColor">@color/white</item>
+        <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
         <item name="toolbarBgColor">@color/newBlack</item>
@@ -65,12 +72,10 @@
         <item name="whitelistTextColor">@color/white</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="websiteListFaviconBackground">@color/almostBlack</item>
-        <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="listItemImageBackground">@color/almostBlack</item>
         <item name="savedSiteEmptyTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
         <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
-        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
-        <item name="savedSiteSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
@@ -101,6 +106,8 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
         <item name="emailButtonRippleColor">@color/white</item>
+        <item name="quickAccessItemTitleTextColor">@color/white</item>
+        <item name="favoriteAddedHintTextColor">@color/white</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -112,6 +119,15 @@
     <style name="AppTheme.Dark.Transparent">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <style name="AppTheme.Transparent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <!-- To create a new color theme, copy this light one and update the suffix as appropriate.
@@ -126,6 +142,7 @@
         <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
+        <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="toolbarIconColor">@color/almostBlackDark</item>
         <item name="toolbarTextColor">@color/almostBlackDark</item>
         <item name="toolbarBgColor">@color/white</item>
@@ -147,14 +164,14 @@
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
-        <item name="bookmarkTitleTextColor">@color/almostBlackDark</item>
+        <item name="listItemTitleColor">@color/almostBlackDark</item>
+        <item name="listItemSubtitleColor">@color/warmerGray</item>
         <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
+        <item name="listItemImageBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
         <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
-        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
-        <item name="savedSiteSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
@@ -185,6 +202,8 @@
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
 
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
+        <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
+        <item name="favoriteAddedHintTextColor">@color/brownishGrayTwo</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -237,6 +256,15 @@
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/omnibarHintColor</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <style name="PopUpOverflowButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_overflow</item>
+        <item name="android:src">@drawable/ic_overflow</item>
     </style>
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">

@@ -35,7 +35,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
-
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
 ) : ViewModel() {

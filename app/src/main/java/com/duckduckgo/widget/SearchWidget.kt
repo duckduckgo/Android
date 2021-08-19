@@ -21,6 +21,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
@@ -65,14 +67,33 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            updateAppWidget(context, appWidgetManager, appWidgetId, null)
         }
     }
 
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+        updateAppWidget(context, appWidgetManager, appWidgetId, newOptions)
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+    }
+
+    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+        val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+
+        if (newOptions != null) {
+            portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        }
+
+        val shouldShowHint = shouldShowSearchBarHint(portraitWidth)
+
         val views = RemoteViews(context.packageName, layoutId)
+        views.setViewVisibility(R.id.searchInputBox, if (shouldShowHint) View.VISIBLE else View.INVISIBLE)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
         appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    private fun shouldShowSearchBarHint(portraitWidth: Int): Boolean {
+        return portraitWidth > SEARCH_BAR_MIN_HINT_WIDTH_SIZE
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
@@ -85,5 +106,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
             appInstallStore.widgetInstalled = false
             pixel.fire(WIDGETS_DELETED)
         }
+    }
+
+    companion object {
+        private const val SEARCH_BAR_MIN_HINT_WIDTH_SIZE = 168
     }
 }

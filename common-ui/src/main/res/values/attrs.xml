@@ -18,6 +18,7 @@
 
     <attr name="daxLogoTextColor" format="color" />
     <attr name="normalTextColor" format="color" />
+    <attr name="secondaryTextColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
@@ -41,9 +42,6 @@
     <attr name="whitelistTextColor" format="color" />
     <attr name="bookmarkIconColor" format="color" />
     <attr name="websiteListFaviconBackground" format="color" />
-    <attr name="bookmarkTitleTextColor" format="color" />
-    <attr name="bookmarkSubtitleTextColor" format="color" />
-    <attr name="savedSiteSubtitleTextColor" format="color" />
     <attr name="savedSiteEmptyTextColor" format="color" />
     <attr name="settingsItemTextColor" format="color" />
     <attr name="settingsItemTextColorDisabled" format="color" />
@@ -73,5 +71,11 @@
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
     <attr name="emailButtonRippleColor" format="color" />
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
+    <attr name="quickAccessItemTitleTextColor" format="color" />
+    <attr name="listItemImageBackground" format="color" />
+    <attr name="favoriteAddedHintTextColor" format="color" />
+
+    <attr name="textAppearanceButton1" format="reference" />
+    <attr name="textAppearanceButton2" format="reference" />
 
 </resources>

@@ -16,9 +16,17 @@
 
 package com.duckduckgo.app.statistics
 
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
 interface AtbInitializerListener {
 
@@ -35,12 +43,22 @@ interface AtbInitializerListener {
 }
 
 class AtbInitializer(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: Set<AtbInitializerListener>
-) {
+) : LifecycleObserver {
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun initializeOnResume() {
+        appCoroutineScope.launch {
+            initialize()
+        }
+    }
+
+    @VisibleForTesting
     suspend fun initialize() {
+        Timber.v("Initialize ATB")
         listeners.forEach {
             withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) {
                 it.beforeAtbInit()
