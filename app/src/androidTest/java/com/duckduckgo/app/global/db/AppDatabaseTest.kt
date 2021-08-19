@@ -423,23 +423,6 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion36To37IfUseOurAppCtasExistThenCtasAreDeletedFromDatabase() {
-        testHelper.createDatabase(TEST_DB_NAME, 36).use {
-            it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP') ")
-            it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP_DELETION') ")
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
-
-            val ctaCount = it.query("select count(*) from dismissed_cta").run {
-                moveToFirst()
-                getInt(0)
-            }
-
-            assertEquals(0, ctaCount)
-        }
-    }
-
-    @Test
     fun whenMigratingFromVersion36To37ThenValidationSucceeds() {
         createDatabaseAndMigrate(36, 37, migrationsProvider.MIGRATION_36_TO_37)
     }
