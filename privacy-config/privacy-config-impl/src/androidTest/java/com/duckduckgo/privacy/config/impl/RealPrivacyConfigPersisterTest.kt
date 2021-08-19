@@ -77,11 +77,24 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
+        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
         privacyConfigDao.insert(PrivacyConfig(version = 3, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertEquals(3, privacyConfigDao.get()!!.version)
+        assertNotNull(privacyFeatureTogglesDao.get("feature"))
+    }
+
+    @Test
+    fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
+        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
+        privacyConfigDao.insert(PrivacyConfig(version = 2, readme = "readme"))
+
+        testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+        assertEquals(2, privacyConfigDao.get()!!.version)
+        assertNotNull(privacyFeatureTogglesDao.get("feature"))
     }
 
     @Test

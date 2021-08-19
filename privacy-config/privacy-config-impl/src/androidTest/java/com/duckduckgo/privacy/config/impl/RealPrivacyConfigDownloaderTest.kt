@@ -57,7 +57,7 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
-    fun whenDownloadIsNotSuccessfulThenReturnTrue() = coroutineRule.runBlocking {
+    fun whenDownloadIsNotSuccessfulThenReturnFalse() = coroutineRule.runBlocking {
         testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
         assertFalse(testee.download())
     }
