@@ -41,6 +41,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -81,7 +82,6 @@ class BookmarksViewModel(
 
     companion object {
         private const val MIN_ITEMS_FOR_SEARCH = 1
-        private const val NO_PARENT_ID = -1L
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -196,38 +196,25 @@ class BookmarksViewModel(
         command.value = OpenBookmarkFolder(bookmarkFolder)
     }
 
-    fun fetchBookmarksAndFolders(parentId: Long = NO_PARENT_ID) {
-        if (parentId == NO_PARENT_ID) {
-            fetchAllItems()
-        } else {
-            fetchItemsByParentId(parentId)
+    fun fetchBookmarksAndFolders(parentId: Long? = null) {
+        viewModelScope.launch {
+            if (parentId == null) {
+                collectItems(bookmarksDao.getBookmarks(), bookmarkFoldersDao.getBookmarkFolders())
+            } else {
+                collectItems(bookmarksDao.getBookmarksByParentId(parentId), bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId))
+            }
         }
     }
 
-    private fun fetchAllItems() {
-        viewModelScope.launch {
-            bookmarksDao.getBookmarks().combine(bookmarkFoldersDao.getBookmarkFolders()) {
-                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
+    private suspend fun collectItems(bookmarksFlow: Flow<List<BookmarkEntity>>, bookmarkFoldersFlow: Flow<List<BookmarkFolder>>) {
+        bookmarksFlow.combine(bookmarkFoldersFlow) {
+            bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
-                val mappedBookmarks = bookmarks.map {
-                    Bookmark(it.id, it.title ?: "", it.url, it.parentId)
-                }
-                onBookmarkItemsChanged(mappedBookmarks, folders)
-            }.collect()
-        }
-    }
-
-    private fun fetchItemsByParentId(parentId: Long) {
-        viewModelScope.launch {
-            bookmarksDao.getBookmarksByParentId(parentId).combine(bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId)) {
-                bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
-
-                val mappedBookmarks = bookmarks.map {
-                    Bookmark(it.id, it.title ?: "", it.url, it.parentId)
-                }
-                onBookmarkItemsChanged(mappedBookmarks, folders)
-            }.collect()
-        }
+            val mappedBookmarks = bookmarks.map {
+                Bookmark(it.id, it.title ?: "", it.url, it.parentId)
+            }
+            onBookmarkItemsChanged(mappedBookmarks, folders)
+        }.collect()
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
