@@ -29,6 +29,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
@@ -38,6 +39,7 @@ import javax.inject.Provider
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
+    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -52,7 +54,8 @@ class ScorecardViewModel(
         val practices: PrivacyPractices.Summary,
         val privacyOn: Boolean,
         val showIsMemberOfMajorNetwork: Boolean,
-        val showEnhancedGrade: Boolean
+        val showEnhancedGrade: Boolean,
+        val isSiteInTempAllowedList: Boolean
     )
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -83,7 +86,8 @@ class ScorecardViewModel(
             practices = UNKNOWN,
             privacyOn = true,
             showIsMemberOfMajorNetwork = false,
-            showEnhancedGrade = false
+            showEnhancedGrade = false,
+            isSiteInTempAllowedList = false
         )
     }
 
@@ -94,6 +98,7 @@ class ScorecardViewModel(
         val improvedGrade = grades.improvedGrade
 
         val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        val isSiteInTempList = withContext(dispatchers.io()) { temporaryTrackingWhitelistDao.contains(domain) }
 
         withContext(dispatchers.main()) {
             viewState.value = viewState.value?.copy(
@@ -105,9 +110,10 @@ class ScorecardViewModel(
                 httpsStatus = site.https,
                 allTrackersBlocked = site.allTrackersBlocked,
                 practices = site.privacyPractices.summary,
-                privacyOn = !isWhitelisted,
+                privacyOn = !isWhitelisted && !isSiteInTempList,
                 showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-                showEnhancedGrade = grade != improvedGrade
+                showEnhancedGrade = grade != improvedGrade,
+                isSiteInTempAllowedList = isSiteInTempList
             )
         }
     }
@@ -116,11 +122,12 @@ class ScorecardViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class ScorecardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
+    private val temporaryTrackingWhitelistDao: Provider<TemporaryTrackingWhitelistDao>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get()) as T
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get(), temporaryTrackingWhitelistDao.get()) as T
                 else -> null
             }
         }

@@ -18,9 +18,13 @@ package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.api.EmailAlias
+import com.duckduckgo.app.email.api.EmailInviteCodeResponse
 import com.duckduckgo.app.email.api.EmailService
+import com.duckduckgo.app.email.api.WaitlistResponse
+import com.duckduckgo.app.email.api.WaitlistStatusResponse
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
@@ -184,7 +188,172 @@ class AppEmailManagerTest {
         assertEquals("username$DUCK_EMAIL_DOMAIN", testee.getEmailAddress())
     }
 
+    @Test
+    fun whenWaitlistStateIfTimestampExistsCodeDoesNotExistAndSendNotificationIsTrueThenReturnJoinedQueueWithTrue() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.sendNotification).thenReturn(true)
+
+        assertEquals(JoinedQueue(true), testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampExistsCodeDoesNotExistAndSendNotificationIsFalseThenReturnJoinedQueueWithFalse() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.sendNotification).thenReturn(false)
+
+        assertEquals(JoinedQueue(false), testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampExistsAndCodeExistsThenReturnInBeta() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.inviteCode).thenReturn("abcde")
+
+        assertEquals(InBeta, testee.waitlistState())
+    }
+
+    @Test
+    fun whenWaitlistStateIfTimestampAndCodeDoesNotExistThenReturnNotJoinedQueue() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(-1)
+        whenever(mockEmailDataStore.inviteCode).thenReturn(null)
+
+        assertEquals(NotJoinedQueue, testee.waitlistState())
+    }
+
+    @Test
+    fun whenJoinWaitlistIfTimestampAndTokenDidNotExistThenStoreTimestampAndToken() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(-1)
+        whenever(mockEmailDataStore.waitlistToken).thenReturn(null)
+
+        testee.joinWaitlist(1234, "abcde")
+
+        verify(mockEmailDataStore).waitlistTimestamp = 1234
+        verify(mockEmailDataStore).waitlistToken = "abcde"
+    }
+    @Test
+    fun whenJoinWaitlistIfTimestampAndTokenDidExistThenStoreTimestampAndTokenAreNotStored() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.waitlistToken).thenReturn("abcde")
+
+        testee.joinWaitlist(4321, "edcba")
+
+        verify(mockEmailDataStore, never()).waitlistTimestamp = 4321
+        verify(mockEmailDataStore, never()).waitlistToken = "edcba"
+    }
+
+    @Test
+    fun whenGetInviteCodeIfCodeExistsThenReturnCode() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn("abcde")
+        assertEquals("abcde", testee.getInviteCode())
+    }
+
+    @Test
+    fun whenGetInviteCodeIfCodeDoesNotExistThenReturnEmpty() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn(null)
+        assertEquals("", testee.getInviteCode())
+    }
+
+    @Test
+    fun whenDoesCodeAlreadyExistIfCodeExistsThenReturnTrue() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn("inviteCode")
+
+        assertTrue(testee.doesCodeAlreadyExist())
+    }
+
+    @Test
+    fun whenDoesCodeAlreadyExistIfCodeIsNullThenReturnFalse() {
+        whenever(mockEmailDataStore.inviteCode).thenReturn(null)
+
+        assertFalse(testee.doesCodeAlreadyExist())
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfCodeAlreadyExistsThenReturnCodeExisted() = coroutineRule.runBlocking {
+        whenever(mockEmailDataStore.inviteCode).thenReturn("inviteCode")
+
+        assertEquals(AppEmailManager.FetchCodeResult.CodeExisted, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfTimestampIsSmallerThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
+        givenUserIsInWaitlist()
+        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(12345))
+
+        testee.fetchInviteCode()
+
+        verify(mockEmailService).getCode("token")
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfTimestampIsEqualsThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
+        givenUserIsInWaitlist()
+        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
+
+        testee.fetchInviteCode()
+
+        verify(mockEmailService).getCode("token")
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeAvailableThenReturnCode() = coroutineRule.runBlocking {
+        givenUserIsTopOfTheQueue()
+        whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse("code"))
+
+        assertEquals(AppEmailManager.FetchCodeResult.Code, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
+        givenUserIsTopOfTheQueue()
+        whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse(""))
+
+        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeServiceNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
+        testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        givenUserIsTopOfTheQueue()
+
+        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenFetchInviteCodeIfUserInTheQueueAndStatusServiceNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
+        testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        givenUserIsInWaitlist()
+
+        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+    }
+
+    @Test
+    fun whenNotifyOnJoinedWaitlistThenSendNotificationSetToTrue() {
+        testee.notifyOnJoinedWaitlist()
+        verify(mockEmailDataStore).sendNotification = true
+    }
+
+    private fun givenUserIsInWaitlist() {
+        whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
+        whenever(mockEmailDataStore.waitlistToken).thenReturn("token")
+    }
+
+    private fun givenUserIsTopOfTheQueue() = coroutineRule.runBlocking {
+        givenUserIsInWaitlist()
+        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
+    }
+
     private suspend fun givenNextAliasExists() {
         aliasSharedFlow.emit("alias")
+    }
+
+    class TestEmailService : EmailService {
+        override suspend fun newAlias(authorization: String): EmailAlias = EmailAlias("alias")
+        override suspend fun joinWaitlist(): WaitlistResponse = WaitlistResponse("token", 12345)
+        override suspend fun waitlistStatus(): WaitlistStatusResponse {
+            throw Exception()
+        }
+        override suspend fun getCode(token: String): EmailInviteCodeResponse {
+            throw Exception()
+        }
     }
 }

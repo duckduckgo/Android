@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -30,7 +29,6 @@ import com.duckduckgo.app.statistics.VariantManager
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
-    var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
@@ -41,7 +39,7 @@ interface SettingsDataStore {
     var appLocationPermission: Boolean
     var appLocationPermissionDeniedForever: Boolean
     var globalPrivacyControlEnabled: Boolean
-    var devSettingsEnabled: Boolean
+    var appLinksEnabled: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -74,13 +72,6 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
                 else putString(KEY_BACKGROUND_JOB_ID, value)
             }
         }
-
-    override var theme: DuckDuckGoTheme?
-        get() {
-            val themeName = preferences.getString(KEY_THEME, null) ?: return null
-            return DuckDuckGoTheme.valueOf(themeName)
-        }
-        set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
 
     override var hideTips: Boolean
         get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
@@ -147,9 +138,9 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         get() = preferences.getBoolean(KEY_DO_NOT_SELL_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_DO_NOT_SELL_ENABLED, enabled) }
 
-    override var devSettingsEnabled: Boolean
-        get() = preferences.getBoolean(KEY_DEV_SETTINGS_ENABLED, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_DEV_SETTINGS_ENABLED, enabled) }
+    override var appLinksEnabled: Boolean
+        get() = preferences.getBoolean(APP_LINKS_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(APP_LINKS_ENABLED, enabled) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
@@ -204,7 +195,7 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
         const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
-        const val KEY_DEV_SETTINGS_ENABLED = "KEY_DEV_SETTINGS_ENABLED"
+        const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
 
         private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
             AppIcon.BLUE

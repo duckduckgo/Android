@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
@@ -47,6 +48,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.FireButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -109,18 +111,15 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.nhaarman.mockitokotlin2.*
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.firstValue
-import com.nhaarman.mockitokotlin2.lastValue
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import dagger.Lazy
 import io.reactivex.Observable
@@ -143,11 +142,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.mockito.Mockito.never
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
@@ -241,6 +242,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
+    private lateinit var mockTemporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao
+
+    @Mock
     private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
 
     @Mock
@@ -264,6 +268,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockFavoritesRepository: FavoritesRepository
 
+    @Mock
+    private lateinit var mockSpecialUrlDetector: SpecialUrlDetector
+
+    @Mock
+    private lateinit var mockAppLinksHandler: AppLinksHandler
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -272,6 +282,9 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
+
+    @Captor
+    private lateinit var appLinkCaptor: ArgumentCaptor<() -> Unit>
 
     private lateinit var db: AppDatabase
 
@@ -337,6 +350,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockTemporaryTrackingWhitelistDao.contains(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
@@ -352,7 +366,7 @@ class BrowserTabViewModelTest {
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetectorImpl(),
+            specialUrlDetector = mockSpecialUrlDetector,
             faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
@@ -375,7 +389,9 @@ class BrowserTabViewModelTest {
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
-            appCoroutineScope = TestCoroutineScope()
+            appCoroutineScope = TestCoroutineScope(),
+            appLinksHandler = mockAppLinksHandler,
+            temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao
         )
 
         testee.loadData("abc", null, false)
@@ -558,17 +574,6 @@ class BrowserTabViewModelTest {
         testee.onAddFavoriteMenuClicked()
 
         verify(mockFavoritesRepository, times(0)).insert(any(), any())
-    }
-
-    @Test
-    fun whenQuickAccessItemClickedThenSubmitNewQuery() {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
-
-        testee.onQuickAccesItemClicked(savedSite)
-
-        assertCommandIssued<Command.SubmitQuery> {
-            assertEquals("http://example.com", this.url)
-        }
     }
 
     @Test
@@ -1119,6 +1124,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+    }
+
+    @Test
+    fun whenEnteringAppLinkQueryThenNavigateInBrowser() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3011,24 +3024,24 @@ class BrowserTabViewModelTest {
     @Test
     fun whenExternalAppLinkClickedIfGpcIsEnabledThenAddHeaderToUrl() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
-        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
-        testee.externalAppLinkClicked(intentType)
+        testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
         assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
     }
 
     @Test
     fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
-        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
-        testee.externalAppLinkClicked(intentType)
+        testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
-        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
         assertTrue(command.headers.isEmpty())
     }
 
@@ -3195,6 +3208,75 @@ class BrowserTabViewModelTest {
         testee.showEmailTooltip()
 
         assertCommandNotIssued<Command.ShowEmailTooltip>()
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledThenHandleAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
+        verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.HandleAppLink>()
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), "http://example.com")
+        testee.handleNonHttpAppLink(urlType, false)
+        verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
+    fun whenResetAppLinkStateCalledThenResetAppLinkState() {
+        testee.resetAppLinkState()
+        verify(mockAppLinksHandler).reset()
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockAppLinksHandler).userEnteredBrowserState()
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNullThenResetHistoryCommandSent() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNotNullThenResetHistoryCommandNotSent() {
+        setupNavigation(isBrowsing = true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandNotIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenIsWhitelistedIsTrue() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertTrue(browserViewState().isWhitelisted)
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInTempAllowListThenPrivacyOnIsFalse() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().privacyOn)
+    }
+
+    @Test
+    fun whenLoadUrlAndSiteIsInTempAllowListThenDoNotChangePrivacyGrade() {
+        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        loadUrl("https://example.com")
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     private suspend fun givenFireButtonPulsing() {

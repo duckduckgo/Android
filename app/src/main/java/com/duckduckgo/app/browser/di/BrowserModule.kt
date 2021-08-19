@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.di
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
@@ -74,6 +75,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
+import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -174,7 +176,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(): SpecialUrlDetector = SpecialUrlDetectorImpl()
+    fun specialUrlDetector(packageManager: PackageManager, settingsDataStore: SettingsDataStore): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, settingsDataStore)
 
     @Provides
     @Singleton
@@ -287,6 +289,9 @@ class BrowserModule {
     ): NavigationAwareLoginDetector {
         return NextPageLoginDetection(settingsDataStore, appCoroutineScope)
     }
+
+    @Provides
+    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
 
     @Provides
     fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
