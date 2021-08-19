@@ -60,12 +60,20 @@ class NetworkModule {
     @Provides
     @Singleton
     @Named("api")
-    fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+    fun apiOkHttpClient(
+        context: Context,
+        apiRequestInterceptor: ApiRequestInterceptor,
+        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>
+    ): OkHttpClient {
         val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
-            .cache(cache)
+            .cache(cache).apply {
+                apiInterceptorPlugins.getPlugins().forEach {
+                    addInterceptor(it.getInterceptor())
+                }
+            }
             .build()
     }
 

@@ -23,7 +23,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/appBarLayout"
-    android:theme="@style/AppTheme.Dark.AppBarOverlay">
+    android:theme="@style/ToolbarTheme"
+    tools:showIn="@layout/activity_tracker_networks">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -31,7 +32,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
         android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/AppTheme.Dark.PopupOverlay" />
+        app:popupTheme="@style/PopUpOverflowMenu" />
 
 </com.google.android.material.appbar.AppBarLayout>
 
