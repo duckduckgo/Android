@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.dev.settings.privacy
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -25,11 +26,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -56,10 +55,10 @@ class TrackerDataDevReceiver(
 @ContributesMultibinding(AppObjectGraph::class)
 class TrackerDataDevReceiverRegister @Inject constructor(
     private val context: Context,
-    private val trackderDataDownloader: TrackerDataDownloader,
-    private val trackerDataLoader: TrackerDataLoader
+    private val trackderDataDownloader: TrackerDataDownloader
 ) : LifecycleObserver {
 
+    @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun register() {
         if (!BuildConfig.DEBUG) {
@@ -70,7 +69,7 @@ class TrackerDataDevReceiverRegister @Inject constructor(
         Timber.i("Debug receiver TrackerDataDevReceiverRegister registered")
 
         TrackerDataDevReceiver(context) { _ ->
-            Completable.merge(listOf(trackerDataLoader.deleteAllData(), trackderDataDownloader.downloadTds()))
+            trackderDataDownloader.downloadTds()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

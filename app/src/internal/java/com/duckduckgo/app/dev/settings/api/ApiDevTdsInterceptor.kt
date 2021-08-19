@@ -54,7 +54,7 @@ class ApiDevTdsInterceptor @Inject constructor(
 
     companion object {
         private const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v2.1/"
-        private const val NEXT_TDS = "next-tds.json"
+        private const val NEXT_TDS = "tds-next.json"
         private const val TDS = "tds.json"
     }
 

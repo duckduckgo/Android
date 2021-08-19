@@ -28,4 +28,5 @@ class BrowserAutoCompleteModule {
 
     @Provides
     fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
+
 }

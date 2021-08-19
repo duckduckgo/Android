@@ -30,7 +30,6 @@ import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -54,18 +53,6 @@ class TrackerDataLoader @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onApplicationCreated() {
         appCoroutineScope.launch { loadData() }
-    }
-
-    fun deleteAllData(): Completable {
-        Timber.d("MARCOS delete all data")
-        return Completable.fromAction {
-            appDatabase.runInTransaction {
-                tdsMetadataDao.deleteAll()
-                tdsEntityDao.deleteAll()
-                tdsDomainEntityDao.deleteAll()
-                tdsTrackerDao.deleteAll()
-            }
-        }
     }
 
     private fun loadData() {
