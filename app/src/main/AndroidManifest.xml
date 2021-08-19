@@ -340,10 +340,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"
-            android:label="@string/devSettingsActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

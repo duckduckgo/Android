@@ -125,7 +125,7 @@ class NetworkModule {
     @Provides
     fun apiRequestInterceptor(
         context: Context,
-        userAgentProvider: UserAgentProvider,
+        userAgentProvider: UserAgentProvider
     ): ApiRequestInterceptor {
         return ApiRequestInterceptor(context, userAgentProvider)
     }
