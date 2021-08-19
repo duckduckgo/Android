@@ -91,7 +91,7 @@ class BookmarksViewModelTest {
         whenever(bookmarkFoldersDao.getBookmarkFolders()).thenReturn(flowOf(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)))
 
         whenever(bookmarksDao.getBookmarksByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkEntity)))
-        whenever(bookmarkFoldersDao.getBookmarkFoldersByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkFolder)))
+        whenever(bookmarkFoldersDao.getBookmarkFoldersByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)))
     }
 
     @After
@@ -204,6 +204,25 @@ class BookmarksViewModelTest {
 
         verify(bookmarksDao).getBookmarks()
         verify(bookmarkFoldersDao).getBookmarkFolders()
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+
+        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
+        assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
+
+        assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
+        assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
+        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
+    }
+
+    @Test
+    fun whenFetchBookmarksAndFoldersWithParentIdThenUpdateStateWithCollectedBookmarksAndFoldersByParentId() {
+        val parentId = 1L
+
+        testee.fetchBookmarksAndFolders(parentId)
+
+        verify(bookmarksDao).getBookmarksByParentId(parentId)
+        verify(bookmarkFoldersDao).getBookmarkFoldersByParentId(parentId)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
