@@ -26,20 +26,17 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
-import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.android.synthetic.internal.activity_dev_settings.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 class DevSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var pixel: Pixel
+    private val binding: ActivityDevSettingsBinding by viewBinding()
 
     private val viewModel: DevSettingsViewModel by bindViewModel()
 
@@ -49,8 +46,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dev_settings)
-        setupToolbar(toolbar)
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
         observeViewModel()
@@ -62,8 +59,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
-        privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
+        binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
+        binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
     }
 
     private fun observeViewModel() {
@@ -71,7 +68,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState ->
                 viewState.let {
-                    nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
                 }
             }.launchIn(lifecycleScope)
 
@@ -83,10 +80,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command?) {
         when (it) {
-            is Command.UpdateTheme -> TODO()
             is Command.SendTdsIntent -> sendTdsIntent()
             is Command.GoToUrl -> goToUrl(it.url)
-            null -> TODO()
+            else -> TODO()
         }
     }
 
@@ -96,7 +92,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun sendTdsIntent() {
-        Toast.makeText(this, "Please wait while we download the tds version", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.devSettingsScreenTdsWait), Toast.LENGTH_SHORT).show()
         val intent = Intent()
         intent.action = DOWNLOAD_TDS_INTENT_ACTION
         sendBroadcast(intent)

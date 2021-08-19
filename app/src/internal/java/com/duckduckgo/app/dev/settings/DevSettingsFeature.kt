@@ -17,19 +17,20 @@
 package com.duckduckgo.app.dev.settings
 
 import android.content.Context
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppObjectGraph::class)
-class DevSettingsFeature @Inject constructor() : InternalFeaturePlugin {
+class DevSettingsFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "Developer Settings"
+        return context.getString(R.string.devSettingsTitle)
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "Features useful for devs and debugging"
+        return context.getString(R.string.devSettingsSubtitle)
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {

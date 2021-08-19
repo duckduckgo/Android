@@ -22,7 +22,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.dev.settings.DevSettingsActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <TextView
         android:layout_width="match_parent"
@@ -33,7 +35,7 @@
         android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
         android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
         android:layout_marginBottom="8dp"
-        android:text="Welcome to the Developer Settings"
+        android:text="@string/devSettingsScreenTitle"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal" />
@@ -44,7 +46,7 @@
     <TextView
         android:id="@+id/privacyTitle"
         style="@style/SettingsSectionTitle"
-        android:text="PRIVACY"
+        android:text="@string/devSettingsScreenPrivacySection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -53,8 +55,8 @@
         android:id="@+id/nextTdsEnabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:toggleSubTitle="Use next TDS version"
-        app:toggleTitle="TDS version"
+        app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
+        app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/privacyTitle" />
@@ -63,8 +65,8 @@
         android:id="@+id/privacyTest1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="Major via script"
-        app:subtitle="Check DoubleClick is blocked"
+        app:title="@string/devSettingsScreenMajorScript"
+        app:subtitle="@string/devSettingsScreenMajorScriptSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nextTdsEnabled"/>
@@ -73,8 +75,8 @@
         android:id="@+id/privacyTest2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:title="Major via fetch"
-        app:subtitle="Check Facebook is blocked"
+        app:title="@string/devSettingsScreenMajorFetch"
+        app:subtitle="@string/devSettingsScreenMajorFetchSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/privacyTest1"/>
