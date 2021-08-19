@@ -44,7 +44,6 @@ class DevSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object UpdateTheme : Command()
         object SendTdsIntent : Command()
         data class GoToUrl(val url: String) : Command()
     }
@@ -80,15 +79,20 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     fun goToPrivacyTest1() {
-        viewModelScope.launch { command.send(Command.GoToUrl("https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")) }
+        viewModelScope.launch { command.send(Command.GoToUrl(PRIVACY_TEST_URL_1)) }
     }
 
     fun goToPrivacyTest2() {
-        viewModelScope.launch { command.send(Command.GoToUrl("https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-fetch.html")) }
+        viewModelScope.launch { command.send(Command.GoToUrl(PRIVACY_TEST_URL_2)) }
     }
 
     private fun currentViewState(): ViewState {
         return viewState.value
+    }
+
+    companion object {
+        private const val PRIVACY_TEST_URL_1 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html"
+        private const val PRIVACY_TEST_URL_2 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-fetch.html"
     }
 }
 
