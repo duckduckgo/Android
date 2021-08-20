@@ -46,6 +46,8 @@
     <TextView
         android:id="@+id/privacyTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/devSettingsScreenPrivacySection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
