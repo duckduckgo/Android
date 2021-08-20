@@ -18,18 +18,20 @@ package com.duckduckgo.app.flipper.plugins
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
 import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.random.Random
 
 @ContributesMultibinding(AppObjectGraph::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
@@ -38,9 +40,12 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : FlipperPlugin {
 
-    private var job: Job? = null
+    private var job = ConflatedJob()
     private var connection: FlipperConnection? = null
     private val vpnTrackerDatabase = vpnDatabase.vpnTrackerDao()
+    private val rows = CopyOnWriteArrayList<FlipperObject>()
+    private val periodicSenderJob = ConflatedJob()
+    private val senderDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     override fun getId(): String {
         return "ddg-apptp-trackers"
@@ -50,7 +55,14 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
         Timber.v("$id: connected")
         this.connection = connection
 
-        job = vpnTrackerDatabase.getLatestTracker()
+        periodicSenderJob += appCoroutineScope.launch(senderDispatcher) {
+            while(isActive) {
+                delay(Random.nextLong(PERIODIC_SEND_FREQUENCY_MS))
+                sendRows()
+            }
+        }
+
+        job += vpnTrackerDatabase.getLatestTracker()
             .onEach { tracker ->
                 tracker?.let {
                     Timber.v("$id: sending $tracker")
@@ -62,16 +74,18 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
                         .put("appId", tracker.trackingApp.packageId)
                         .put("appName", tracker.trackingApp.appDisplayName)
                         .build()
-                        .also { newRow(it) }
+                        .also { enqueueRow(it) }
                 }
             }
+            .flowOn(Dispatchers.IO)
             .launchIn(appCoroutineScope)
     }
 
     override fun onDisconnect() {
         Timber.v("$id: disconnected")
         connection = null
-        job?.cancel()
+        job.cancel()
+        periodicSenderJob.cancel()
     }
 
     override fun runInBackground(): Boolean {
@@ -79,7 +93,18 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
         return false
     }
 
-    private fun newRow(row: FlipperObject) {
-        connection?.send("newData", row)
+    private fun enqueueRow(row: FlipperObject) {
+        rows.add(row)
+    }
+
+    private fun sendRows() {
+        while(rows.isNotEmpty()) {
+            connection?.send("newData", rows.removeAt(0))
+        }
+        rows.clear()
+    }
+
+    companion object {
+        private const val PERIODIC_SEND_FREQUENCY_MS: Long = 1_000
     }
 }
