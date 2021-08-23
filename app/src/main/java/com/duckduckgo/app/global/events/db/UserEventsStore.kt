@@ -17,13 +17,16 @@
 package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface UserEventsStore {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
     suspend fun registerUserEvent(userEventKey: UserEventKey)
+    suspend fun registerUserEvent(userEventEntity: UserEventEntity)
     suspend fun removeUserEvent(userEventKey: UserEventKey)
+    suspend fun userEvents(): Flow<List<UserEventEntity>>
 }
 
 class AppUserEventsStore @Inject constructor(
@@ -39,7 +42,13 @@ class AppUserEventsStore @Inject constructor(
 
     override suspend fun registerUserEvent(userEventKey: UserEventKey) {
         withContext(dispatcher.io()) {
-            userEventsDao.insert(UserEventEntity(userEventKey))
+            registerUserEvent(UserEventEntity(userEventKey))
+        }
+    }
+
+    override suspend fun registerUserEvent(userEventEntity: UserEventEntity) {
+        withContext(dispatcher.io()) {
+            userEventsDao.insert(userEventEntity)
         }
     }
 
@@ -47,5 +56,9 @@ class AppUserEventsStore @Inject constructor(
         withContext(dispatcher.io()) {
             userEventsDao.delete(userEventKey)
         }
+    }
+
+    override suspend fun userEvents(): Flow<List<UserEventEntity>> {
+        return userEventsDao.userEvents()
     }
 }
