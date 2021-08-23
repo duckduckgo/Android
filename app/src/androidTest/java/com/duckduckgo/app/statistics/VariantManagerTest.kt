@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -54,6 +55,23 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "gy" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
+    }
+
+    // FAVORITES ONBOARDING EXPERIMENT
+    @Test
+    fun favoritesOnboardingControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zp" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun favoritesOnboardingExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zo" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(FavoritesOnboarding))
     }
 
     @Test

@@ -78,7 +78,9 @@ class SettingsActivity :
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
-    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
+    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onDefaultBrowserToggled(isChecked)
+    }
 
     private val lightThemeToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onLightThemeToggled(isChecked)
@@ -211,6 +213,7 @@ class SettingsActivity :
 
     private fun processCommand(it: Command?) {
         when (it) {
+            is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.LaunchLocation -> launchLocation()

@@ -169,7 +169,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOnThenLighThemePixelIsSent() {
+    fun whenLightThemeToggledOnThenLightThemePixelIsSent() {
         testee.onLightThemeToggled(true)
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
     }
@@ -177,6 +177,7 @@ class SettingsViewModelTest {
     @Test
     fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
             testee.onLightThemeToggled(false)
             verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
@@ -188,8 +189,60 @@ class SettingsViewModelTest {
 
     @Test
     fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.LIGHT)
         testee.onLightThemeToggled(false)
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
+    }
+
+    @Test
+    fun whenLightThemeToggledButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
+            testee.onLightThemeToggled(true)
+
+            verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+            verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
+
+            expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(false)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+            testee.onDefaultBrowserToggled(true)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(true)
+
+            expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -463,5 +516,9 @@ class SettingsViewModelTest {
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
+    }
+
+    private fun givenThemeSelected(theme: DuckDuckGoTheme) {
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
     }
 }

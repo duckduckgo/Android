@@ -57,10 +57,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -79,6 +76,8 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favorites.AddItemAdapter
+import com.duckduckgo.app.browser.favorites.AutoFavoriteHintAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
@@ -124,6 +123,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -265,6 +265,7 @@ class BrowserTabFragment :
 
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
+    private lateinit var favoriteHintAdapter: AutoFavoriteHintAdapter
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
@@ -687,6 +688,9 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+            is Command.ShowVisitedSiteAsFavoriteHint -> {
+                favoriteHintAdapter.showHint(it.favorite)
+            }
         }
     }
 
@@ -1033,7 +1037,23 @@ class BrowserTabFragment :
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
         quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
-        quickAccessRecyclerView.adapter = quickAccessAdapter
+
+        if (variantManager.favoritesOnboardingEnabled()) {
+            val addItemAdapter = AddItemAdapter {
+                viewModel.onAddFavoriteItemClicked()
+                Snackbar.make(toolbar, R.string.addFavoriteHint, Snackbar.LENGTH_SHORT).show()
+            }
+            favoriteHintAdapter = AutoFavoriteHintAdapter {
+                pixel.fire(AppPixelName.FAVORITE_ONBOARDING_ITEM_UNDO)
+                viewModel.onDeleteQuickAccessItemRequested(savedSite = it)
+                viewModel.onUserDismissedCta()
+                favoriteHintAdapter.clearHint()
+            }
+            val concatAdapter = ConcatAdapter(quickAccessAdapter, addItemAdapter, favoriteHintAdapter)
+            quickAccessRecyclerView.adapter = concatAdapter
+        } else {
+            quickAccessRecyclerView.adapter = quickAccessAdapter
+        }
         quickAccessRecyclerView.disableAnimation()
     }
 
@@ -1068,6 +1088,12 @@ class BrowserTabFragment :
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                if (quickAccessRecyclerView.adapter?.getItemViewType(position) == 2) return numOfColumns
+                return 1
+            }
+        }
         recyclerView.layoutManager = layoutManager
         val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
         recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)
@@ -2096,6 +2122,7 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                Timber.i("CTAVIEWSTATE: $viewState")
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
@@ -2111,7 +2138,7 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta -> showDaxCta(configuration)
+                is DaxBubbleCta -> showDaxCta(configuration, favorites)
                 is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
@@ -2134,12 +2161,27 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showDaxCta(configuration: DaxBubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxCtaContainer)
-            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
+        private fun showDaxCta(configuration: DaxBubbleCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+            if (configuration is DaxBubbleCta.DaxFavoritesCTA) {
+                showHomeBackground(favorites)
+                hideHomeCta()
+                if (bottomDaxCtaContainer.isVisible) return
+                bottomDaxCtaContainer.removeAllViews()
+                inflate(context, R.layout.include_dax_buble_button_cta, bottomDaxCtaContainer)
+                configuration.showCta(bottomDaxCtaContainer)
+                bottomDaxCtaContainer.primaryCta.setOnClickListener {
+                    viewModel.onUserClickCtaOkButton()
+                    viewModel.onUserDismissedCta()
+                }
+                viewModel.onCtaShown()
+            } else {
+                bottomDaxCtaContainer.removeAllViews()
+                hideHomeBackground()
+                hideHomeCta()
+                configuration.showCta(daxCtaContainer)
+                newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+                viewModel.onCtaShown()
+            }
         }
 
         private fun showBubleCta(configuration: BubbleCta) {
@@ -2187,6 +2229,7 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             dialogTextCta.cancelAnimation()
             daxCtaContainer.hide()
+            bottomDaxCtaContainer.hide()
         }
 
         private fun hideHomeCta() {

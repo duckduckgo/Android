@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.DaxDialog
@@ -262,6 +263,33 @@ sealed class DaxBubbleCta(
         onboardingStore,
         appInstallStore
     )
+
+    class DaxFavoritesCTA(val favoritesOnboarding: FavoritesOnboardingObserver, override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+        CtaId.DAX_END,
+        R.string.daxFavoritesClearCtaText,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_FAVORITES_CLEAR_CTA,
+        onboardingStore,
+        appInstallStore
+    ) {
+        override val description: Int
+            get() = if (favoritesOnboarding.userClearedDataRecently) R.string.daxFavoritesClearCtaText else R.string.daxFavoritesNewTabCtaText
+
+        override var ctaPixelParam: String
+            get() = if (favoritesOnboarding.userClearedDataRecently) Pixel.PixelValues.DAX_FAVORITES_CLEAR_CTA else Pixel.PixelValues.DAX_FAVORITES_NEWTAB_CTA
+            set(value) {}
+
+        override fun showCta(view: View) {
+            val daxText = view.context.getString(description)
+            view.show()
+            view.daxCtaContainer.alpha = 1f
+            view.hiddenTextCta.text = daxText.html(view.context)
+            view.primaryCta.text = view.context.getString(R.string.daxFavoritesCtaAddFavorite)
+            view.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+    }
 }
 
 sealed class BubbleCta(
