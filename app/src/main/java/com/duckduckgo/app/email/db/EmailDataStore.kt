@@ -150,7 +150,7 @@ class EmailEncryptedSharedPreferences(
             }
         }
 
-    override fun canUseEncryption(): Boolean = false
+    override fun canUseEncryption(): Boolean = encryptedPreferences != null
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"
