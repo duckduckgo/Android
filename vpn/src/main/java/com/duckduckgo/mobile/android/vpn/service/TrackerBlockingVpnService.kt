@@ -448,9 +448,3 @@ class VpnQueues @Inject constructor() {
         networkToDevice.clear()
     }
 }
-
-sealed class VpnStopReason {
-    object SelfStop : VpnStopReason()
-    object Error : VpnStopReason()
-    object Revoked : VpnStopReason()
-}

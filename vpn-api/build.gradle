@@ -17,32 +17,13 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    api project(path: ':vpn')
-    implementation project(path: ':di')
-
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
-    implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
 
-    // Dagger
-    implementation Google.dagger
-    // fixme: for whatever reason moving to AndroidX.room.compiler breaks room kapt and vpn database is not generated
-    // the problem is not with refreshVersions but with the dagger version. AndroidX.room.compiler uses 2.32
-    // I don't understand yet what happens tho so I will leave it as is for now
-    kapt Google.dagger.compiler
-    kaptAndroidTest Google.dagger.compiler
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
 }

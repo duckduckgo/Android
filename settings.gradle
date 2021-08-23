@@ -4,6 +4,8 @@ plugins {
 
 include ':vpn-store'
 include ':vpn-main'
+include ':vpn-api'
+include ':vpn-internal'
 include ':di'
 include ':vpn'
 include ':app'

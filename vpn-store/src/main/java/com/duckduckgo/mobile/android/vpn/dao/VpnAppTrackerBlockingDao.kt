@@ -88,6 +88,9 @@ interface VpnAppTrackerBlockingDao {
     @Query("SELECT * from vpn_app_tracker_exception_rules WHERE rule = :domain LIMIT 1")
     fun getRuleByTrackerDomain(domain: String): AppTrackerExceptionRule?
 
+    @Query("SELECT * from vpn_app_tracker_exception_rules")
+    fun getTrackerExceptionRules(): List<AppTrackerExceptionRule>
+
     @Insert
     fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
 

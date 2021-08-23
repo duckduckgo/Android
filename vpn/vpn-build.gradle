@@ -72,6 +72,7 @@ ext {
 
 dependencies {
     implementation project(path: ':vpn-store')
+    api project(path: ':vpn-api')
     implementation project(path: ':app-store')
     implementation project(path: ':di')
     implementation project(path: ':common')

@@ -17,32 +17,51 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+}
+
 dependencies {
-    api project(path: ':vpn')
+    implementation project(path: ':vpn-store')
+    implementation project(path: ':vpn-api')
     implementation project(path: ':di')
+    implementation project(path: ':common')
+    implementation project(path: ':common-ui')
 
     implementation Kotlin.stdlib.jdk7
+
     implementation AndroidX.core.ktx
+
     implementation AndroidX.appCompat
-    implementation KotlinX.coroutines.core
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.appCompat
+    implementation Kotlin.stdlib.jdk7
+    implementation AndroidX.constraintLayout
 
     // Dagger
     implementation Google.dagger
-    // fixme: for whatever reason moving to AndroidX.room.compiler breaks room kapt and vpn database is not generated
-    // the problem is not with refreshVersions but with the dagger version. AndroidX.room.compiler uses 2.32
-    // I don't understand yet what happens tho so I will leave it as is for now
-    kapt Google.dagger.compiler
-    kaptAndroidTest Google.dagger.compiler
+
+    implementation KotlinX.coroutines.core
+
+    implementation JakeWharton.timber
 
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -47,7 +48,8 @@ class DomainBasedTrackerDetector(
     private val hostnameExtractor: HostnameExtractor,
     private val appTrackerRepository: AppTrackerRepository,
     private val appTrackerRecorder: AppTrackerRecorder,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
+    private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
 ) : VpnTrackerDetector {
 
     override fun determinePacketType(
@@ -69,6 +71,10 @@ class DomainBasedTrackerDetector(
         if (hostname == null) {
             Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
             return RequestTrackerType.Undetermined
+        }
+
+        for (interceptor in requestInterceptors.getPlugins()) {
+            interceptor.interceptTrackerRequest(hostname, requestingApp.packageId)?.let { return it }
         }
 
         tcb.trackerTypeDetermined = true
@@ -131,5 +137,4 @@ class DomainBasedTrackerDetector(
     }
 
     private fun OriginatingApp.isInvalid() = isDdg() || isUnknown()
-
 }

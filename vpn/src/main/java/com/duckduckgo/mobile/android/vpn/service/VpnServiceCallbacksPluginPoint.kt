@@ -23,13 +23,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import kotlinx.coroutines.CoroutineScope
-
-interface VpnServiceCallbacks {
-    fun onVpnStarted(coroutineScope: CoroutineScope)
-
-    fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason)
-}
 
 private class VpnServiceCallbacksPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards VpnServiceCallbacks>

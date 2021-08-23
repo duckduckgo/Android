@@ -24,7 +24,6 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -51,7 +50,9 @@ class VpnAppModule {
 
     @Provides
     @Singleton
-    fun provideAppTrackerLoader(context: Context, moshi: Moshi, vpnDatabase: VpnDatabase): AppTrackerRepository {
+    fun provideAppTrackerLoader(
+        vpnDatabase: VpnDatabase
+    ): AppTrackerRepository {
         return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao())
     }
 
