@@ -16,27 +16,9 @@
 
 package com.duckduckgo.app.email.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionNotSupportedBinding
+import com.duckduckgo.app.browser.R
 
-class EmailProtectionNotSupportedFragment : EmailProtectionFragment() {
-
-    private var _binding: FragmentEmailProtectionNotSupportedBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentEmailProtectionNotSupportedBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
+class EmailProtectionNotSupportedFragment : EmailProtectionFragment(R.layout.fragment_email_protection_not_supported) {
     companion object {
         fun instance(): EmailProtectionNotSupportedFragment {
             return EmailProtectionNotSupportedFragment()
