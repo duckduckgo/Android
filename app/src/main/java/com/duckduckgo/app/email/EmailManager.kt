@@ -42,6 +42,7 @@ interface EmailManager : LifecycleObserver {
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
     fun notifyOnJoinedWaitlist()
     fun getCohort(): String
+    fun isEmailFeatureSupported(): Boolean
 }
 
 class AppEmailManager(
@@ -135,6 +136,8 @@ class AppEmailManager(
         val cohort = emailDataStore.cohort
         return if (cohort.isNullOrBlank()) UNKNOWN_COHORT else cohort
     }
+
+    override fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
 
     private fun consumeAlias(): String? {
         val alias = nextAliasFlow.value
