@@ -24,38 +24,30 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnTrackerDao {
 
-    @Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: VpnTracker)
 
-    @Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: List<VpnTracker>)
 
-    @Transaction
     @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
     fun getLatestTracker(): Flow<VpnTracker?>
 
-    @Transaction
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
 
-    @Transaction
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
-    @Transaction
     @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackersCountBetween(startTime: String, endTime: String): Flow<Int>
 
-    @Transaction
     @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
 
-    @Transaction
     @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 

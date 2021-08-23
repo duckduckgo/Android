@@ -17,9 +17,9 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
@@ -38,7 +38,7 @@ interface VpnTrackerDetector {
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: AppNameResolver.OriginatingApp
+        requestingApp: OriginatingApp
     ): RequestTrackerType
 }
 
@@ -46,6 +46,7 @@ class DomainBasedTrackerDetector(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val hostnameExtractor: HostnameExtractor,
     private val appTrackerRepository: AppTrackerRepository,
+    private val appTrackerRecorder: AppTrackerRecorder,
     private val vpnDatabase: VpnDatabase
 ) : VpnTrackerDetector {
 
@@ -54,7 +55,7 @@ class DomainBasedTrackerDetector(
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: AppNameResolver.OriginatingApp
+        requestingApp: OriginatingApp
     ): RequestTrackerType {
 
         if (isLocalAddress) {
@@ -103,18 +104,18 @@ class DomainBasedTrackerDetector(
         }
     }
 
-    private fun isTrackerInExceptionRules(tracker: RequestTrackerType.Tracker, originatingApp: AppNameResolver.OriginatingApp): Boolean {
+    private fun isTrackerInExceptionRules(tracker: RequestTrackerType.Tracker, originatingApp: OriginatingApp): Boolean {
         val exceptionRule = vpnDatabase.vpnAppTrackerBlockingDao().getRuleByTrackerDomain(tracker.hostName)
 
         return exceptionRule != null && exceptionRule.packageNames.contains(originatingApp.packageId)
     }
 
-    private fun insertTracker(tracker: AppTracker, requestingApp: AppNameResolver.OriginatingApp) {
-        if (requestingApp.isDdg() || requestingApp.isUnknown()) {
+    private fun insertTracker(tracker: AppTracker, requestingApp: OriginatingApp) {
+        if (requestingApp.isInvalid()) {
             // FIXME exclude false positive of DDG app
             // we don't yet know the reason why the DDG app appears sometimes in the list of of tracking apps
             // for now we manually exclude while we investigate the root cause
-            Timber.d("Originating app is either DDG or UNKNOWN, skipping db insertion")
+            Timber.d("Originating app is either DDG or UNKNOWN, skipping db insertion for %s (%s)", requestingApp.appName, requestingApp.packageId)
             return
         }
 
@@ -125,7 +126,10 @@ class DomainBasedTrackerDetector(
             trackingApp = TrackingApp(requestingApp.packageId, requestingApp.appName),
             domain = tracker.hostname
         )
-        Timber.i("Inserting $vpnTracker as tracker")
-        vpnDatabase.vpnTrackerDao().insert(vpnTracker)
+
+        appTrackerRecorder.insertTracker(vpnTracker)
     }
+
+    private fun OriginatingApp.isInvalid() = isDdg() || isUnknown()
+
 }
