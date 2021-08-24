@@ -16,6 +16,6 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.duckduckgo.mobile.android.vpn">
+          package="com.duckduckgo.mobile.android.vpn.api">
 
 </manifest>
