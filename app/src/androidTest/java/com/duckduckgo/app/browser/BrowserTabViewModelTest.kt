@@ -117,10 +117,10 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -245,7 +245,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
-    private lateinit var mockTemporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao
+    private lateinit var mockContentBlocking: ContentBlocking
 
     @Mock
     private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
@@ -383,7 +383,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
-        whenever(mockTemporaryTrackingWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
@@ -422,7 +422,7 @@ class BrowserTabViewModelTest {
             favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
-            temporaryTrackingWhitelistDao = mockTemporaryTrackingWhitelistDao,
+            contentBlocking = mockContentBlocking,
             variantManager = mockVariantManager,
             userEventsRepository = mockUserEventsRepository
         )
@@ -3386,22 +3386,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInTempAllowListThenIsWhitelistedIsTrue() {
-        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() {
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertTrue(browserViewState().isWhitelisted)
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInTempAllowListThenPrivacyOnIsFalse() {
-        whenever(mockTemporaryTrackingWhitelistDao.contains("example.com")).thenReturn(true)
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().privacyOn)
     }
 
     @Test
-    fun whenLoadUrlAndSiteIsInTempAllowListThenDoNotChangePrivacyGrade() {
-        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() {
+        whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
         loadUrl("https://example.com")
         assertNull(privacyGradeState().privacyGrade)
     }

@@ -20,7 +20,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.duckduckgo.privacy.config.impl.FileUtilities.loadText
 import com.duckduckgo.privacy.config.store.ContentBlockingDao
-import com.duckduckgo.privacy.config.store.ContentBlockingException
+import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDao
 import org.json.JSONObject
@@ -28,7 +28,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class ContentBlockingPluginTest {
+class ContentBlockingFeaturePluginTest {
 
     lateinit var testee: ContentBlockingPlugin
 
@@ -80,7 +80,7 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenDeleteAllExistingExceptions() {
-        contentBlockingDao.insertAll(listOf(ContentBlockingException("test", "test")))
+        contentBlockingDao.insertAll(listOf(ContentBlockingExceptionEntity("test", "test")))
         val jsonObject = getJsonObjectFromFile("json/content_blocking.json")
 
         testee.store(FEATURE_NAME, jsonObject)
@@ -90,7 +90,7 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenAddAllTheExceptionsWithTheirReasons() {
-        contentBlockingDao.insertAll(listOf(ContentBlockingException("test", "test")))
+        contentBlockingDao.insertAll(listOf(ContentBlockingExceptionEntity("test", "test")))
         val jsonObject = getJsonObjectFromFile("json/content_blocking.json")
 
         testee.store(FEATURE_NAME, jsonObject)

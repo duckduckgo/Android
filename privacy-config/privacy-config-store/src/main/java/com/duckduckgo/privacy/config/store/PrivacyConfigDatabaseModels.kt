@@ -18,12 +18,17 @@ package com.duckduckgo.privacy.config.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.duckduckgo.privacy.config.api.ContentBlockingException
 
 @Entity(tableName = "content_blocking_exceptions")
-data class ContentBlockingException(
+data class ContentBlockingExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String
 )
+
+fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
+    return ContentBlockingException(domain = this.domain, reason = this.reason)
+}
 
 @Entity(tableName = "toggles")
 data class PrivacyFeatureToggles(

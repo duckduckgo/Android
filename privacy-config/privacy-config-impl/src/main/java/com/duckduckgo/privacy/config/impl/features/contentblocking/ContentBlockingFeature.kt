@@ -16,9 +16,9 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
-import com.duckduckgo.privacy.config.store.ContentBlockingException
+import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 
-data class ContentBlocking(
+data class ContentBlockingFeature(
     val state: String,
-    val exceptions: List<ContentBlockingException>
+    val exceptions: List<ContentBlockingExceptionEntity>
 )

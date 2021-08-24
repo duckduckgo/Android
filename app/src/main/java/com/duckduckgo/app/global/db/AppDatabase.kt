@@ -67,12 +67,11 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 36,
+    exportSchema = true, version = 37,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
-        TemporaryTrackingWhitelistedDomain::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsFalsePositiveDomain::class,
@@ -119,7 +118,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
-    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
@@ -433,6 +431,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_36_TO_37: Migration = object : Migration(36, 37) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `temporary_tracking_whitelist`")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             MIGRATION_29_TO_30.migrate(database)
@@ -481,7 +485,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_32_TO_33,
             MIGRATION_33_TO_34,
             MIGRATION_34_TO_35,
-            MIGRATION_35_TO_36
+            MIGRATION_35_TO_36,
+            MIGRATION_36_TO_37
         )
 
     @Deprecated(

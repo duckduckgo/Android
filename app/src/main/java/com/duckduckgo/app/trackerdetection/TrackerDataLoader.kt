@@ -28,6 +28,7 @@ import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
-    private val tempWhitelistDao: TemporaryTrackingWhitelistDao,
+    private val contentBlocking: ContentBlocking,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
@@ -93,11 +94,7 @@ class TrackerDataLoader @Inject constructor(
     }
 
     fun loadTemporaryWhitelist() {
-        val whitelist = tempWhitelistDao.getAll()
-        Timber.d("Loaded ${whitelist.size} temporarily whitelisted domains from DB")
-
-        val client = DocumentDomainClient(Client.ClientName.TEMPORARY_WHITELIST, whitelist)
-        trackerDetector.addClient(client)
+        contentBlocking.load()
     }
 
     companion object {

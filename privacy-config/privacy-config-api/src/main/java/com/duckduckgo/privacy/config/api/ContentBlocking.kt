@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.privacy.config.api
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+interface ContentBlocking {
 
-@Entity(tableName = "temporary_tracking_whitelist")
-data class TemporaryTrackingWhitelistedDomain(
-    @PrimaryKey override val domain: String
-) : DomainContainer
+    fun load()
+    fun isAnException(documentUrl: String): Boolean
+}
+
+data class ContentBlockingException(val domain: String, val reason: String)

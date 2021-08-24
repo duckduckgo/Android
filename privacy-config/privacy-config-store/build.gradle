@@ -24,6 +24,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 
+    implementation project(path: ':privacy-config-api')
+
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 

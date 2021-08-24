@@ -37,8 +37,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ import javax.inject.Provider
 
 class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
-    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
+    private val contentBlocking: ContentBlocking,
     networkLeaderboardDao: NetworkLeaderboardDao,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -153,7 +153,7 @@ class PrivacyDashboardViewModel(
         val domain = site.domain ?: ""
         val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
         val isInTemporaryAllowlist = withContext(dispatchers.io()) {
-            temporaryTrackingWhitelistDao.contains(domain)
+            contentBlocking.isAnException(domain)
         }
 
         withContext(dispatchers.main()) {
@@ -216,7 +216,7 @@ class PrivacyDashboardViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class PrivacyDashboardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val temporaryTrackingWhitelistDao: Provider<TemporaryTrackingWhitelistDao>,
+    private val contentBlocking: Provider<ContentBlocking>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
     private val pixel: Provider<Pixel>,
     private val appCoroutineScope: Provider<CoroutineScope>
@@ -224,7 +224,7 @@ class PrivacyDashboardViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
                 else -> null
             }
         }

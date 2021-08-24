@@ -26,20 +26,26 @@ import androidx.room.Transaction
 abstract class ContentBlockingDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(domains: List<ContentBlockingException>)
+    abstract fun insertAll(domains: List<ContentBlockingExceptionEntity>)
 
     @Transaction
-    open fun updateAll(domains: List<ContentBlockingException>) {
+    open fun updateAll(domains: List<ContentBlockingExceptionEntity>) {
         deleteAll()
         insertAll(domains)
     }
 
     @Query("select * from content_blocking_exceptions where domain = :domain")
-    abstract fun get(domain: String): ContentBlockingException
+    abstract fun get(domain: String): ContentBlockingExceptionEntity
 
     @Query("select * from content_blocking_exceptions")
-    abstract fun getAll(): List<ContentBlockingException>
+    abstract fun getAll(): List<ContentBlockingExceptionEntity>
 
     @Query("delete from content_blocking_exceptions")
     abstract fun deleteAll()
+
+    @Query("select count(*) from content_blocking_exceptions")
+    abstract fun count(): Int
+
+    @Query("select count(1) > 0 from content_blocking_exceptions where :domain LIKE '%'||domain||'%'")
+    abstract fun contains(domain: String): Boolean
 }

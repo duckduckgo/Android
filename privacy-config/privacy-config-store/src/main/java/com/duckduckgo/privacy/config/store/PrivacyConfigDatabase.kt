@@ -22,7 +22,7 @@ import androidx.room.RoomDatabase
 @Database(
     exportSchema = true, version = 1,
     entities = [
-        ContentBlockingException::class,
+        ContentBlockingExceptionEntity::class,
         PrivacyFeatureToggles::class,
         PrivacyConfig::class
     ]
