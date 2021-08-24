@@ -21,11 +21,11 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.R
-import com.duckduckgo.privacy.config.impl.di.PrivacyConfigCoroutineScope
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,7 +41,7 @@ import javax.inject.Singleton
 class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,
     private val privacyConfigPersister: PrivacyConfigPersister,
-    @PrivacyConfigCoroutineScope val coroutineScope: CoroutineScope,
+    @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : LifecycleObserver {
 
