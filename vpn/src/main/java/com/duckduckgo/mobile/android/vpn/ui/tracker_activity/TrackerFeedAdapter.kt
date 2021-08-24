@@ -48,8 +48,6 @@ class TrackerFeedAdapter @Inject constructor(
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
 
-    private var showHeadings: Boolean = true
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData)
@@ -82,25 +80,16 @@ class TrackerFeedAdapter @Inject constructor(
         return trackerFeedItems[position] is TrackerFeedItem.TrackerFeedItemHeader
     }
 
-    suspend fun updateData(data: List<TrackerFeedItem>) = withContext(Dispatchers.Default) {
+    suspend fun updateData(data: List<TrackerFeedItem>) {
+        val newData = data
         val oldData = trackerFeedItems
-        var newData = data
-        if (!showHeadings) {
-            newData = newData.toMutableList().also { items ->
-                items.removeAll { it is TrackerFeedItem.TrackerFeedItemHeader }
-            }
+        val diffResult = withContext(Dispatchers.IO) {
+            DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
         }
-        val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
 
         trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
 
-        withContext(Dispatchers.Main) {
-            diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
-        }
-    }
-
-    fun showTimeWindowHeadings(showHeadings: Boolean) {
-        this.showHeadings = showHeadings
+        diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
     }
 
     private class TrackerEmptyFeedViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -129,7 +118,8 @@ class TrackerFeedAdapter @Inject constructor(
         }
     }
 
-    private class TrackerFeedHeaderViewHolder(val view: TextView, private val timeDiffFormatter: TimeDiffFormatter) : RecyclerView.ViewHolder(view) {
+    private class TrackerFeedHeaderViewHolder(val view: TextView, private val timeDiffFormatter: TimeDiffFormatter) :
+        RecyclerView.ViewHolder(view) {
         companion object {
             fun create(parent: ViewGroup, timeDiffFormatter: TimeDiffFormatter): TrackerFeedHeaderViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -139,7 +129,8 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
-            val title = timeDiffFormatter.formatTimePassedInDays(LocalDateTime.now(), LocalDateTime.parse(item.timestamp))
+            val title =
+                timeDiffFormatter.formatTimePassedInDays(LocalDateTime.now(), LocalDateTime.parse(item.timestamp))
             view.text = title
         }
     }
@@ -169,7 +160,9 @@ class TrackerFeedAdapter @Inject constructor(
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
-                                R.string.atp_ActivityTrackersBlocked, item.trackersTotalCount, item.trackingApp.appDisplayName
+                                R.string.atp_ActivityTrackersBlocked,
+                                item.trackersTotalCount,
+                                item.trackingApp.appDisplayName
                             ),
                             FROM_HTML_MODE_COMPACT
                         )
@@ -201,7 +194,8 @@ class TrackerFeedAdapter @Inject constructor(
         }
     }
 
-    private class DiffCallback(private val old: List<TrackerFeedItem>, private val new: List<TrackerFeedItem>) : DiffUtil.Callback() {
+    private class DiffCallback(private val old: List<TrackerFeedItem>, private val new: List<TrackerFeedItem>) :
+        DiffUtil.Callback() {
         override fun getOldListSize() = old.size
 
         override fun getNewListSize() = new.size

@@ -56,7 +56,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
         this.connection = connection
 
         periodicSenderJob += appCoroutineScope.launch(senderDispatcher) {
-            while(isActive) {
+            while (isActive) {
                 delay(Random.nextLong(PERIODIC_SEND_FREQUENCY_MS))
                 sendRows()
             }
@@ -98,7 +98,7 @@ class TrackerProtectionFlipperPlugin @Inject constructor(
     }
 
     private fun sendRows() {
-        while(rows.isNotEmpty()) {
+        while (rows.isNotEmpty()) {
             connection?.send("newData", rows.removeAt(0))
         }
         rows.clear()

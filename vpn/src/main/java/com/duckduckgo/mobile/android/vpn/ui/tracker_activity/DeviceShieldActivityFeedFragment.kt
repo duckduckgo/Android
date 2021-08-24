@@ -52,7 +52,6 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
-        trackerFeedAdapter.showTimeWindowHeadings(config.showTimeWindowHeadings)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
@@ -63,7 +62,8 @@ class DeviceShieldActivityFeedFragment : Fragment() {
                 DeviceShieldActivityFeedViewModel.TimeWindow(
                     config.timeWindow.toLong(),
                     config.timeWindowUnits
-                )
+                ),
+                config.showTimeWindowHeadings
             )
                 .collect {
                     feedListener?.onTrackerListShowed(it.size)
