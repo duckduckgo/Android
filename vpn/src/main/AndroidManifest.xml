@@ -71,7 +71,7 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
             <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
-                       android:value=false/>
+                       android:value="false"/>
         </service>
 
         <service
