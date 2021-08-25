@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
@@ -41,6 +42,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -96,6 +98,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         )
     }
 
+    private val privacyToggleListener = CompoundButton.OnCheckedChangeListener { _, enabled ->
+        viewModel.onPrivacyToggled(enabled)
+    }
+
     private fun setupClickListeners() {
         with(contentPrivacyDashboard) {
             privacyDashboardHeader.privacyHeader.setOnClickListener {
@@ -110,9 +116,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
                 viewModel.onReportBrokenSiteSelected()
             }
 
-            privacyToggle.setOnCheckedChangeListener { _, enabled ->
-                viewModel.onPrivacyToggled(enabled)
-            }
+            privacyToggle.setOnCheckedChangeListener(privacyToggleListener)
         }
     }
 
@@ -190,9 +194,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     private fun renderToggle(enabled: Boolean, isSiteIntTempAllowedList: Boolean) {
-        val backgroundColor = if (enabled) R.color.midGreen else R.color.warmerGray
+        val backgroundColor = if (enabled && !isSiteIntTempAllowedList) R.color.midGreen else R.color.warmerGray
         contentPrivacyDashboard.privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
-        contentPrivacyDashboard.privacyToggle.isChecked = enabled && !isSiteIntTempAllowedList
+        contentPrivacyDashboard.privacyToggle.quietlySetIsChecked(enabled && !isSiteIntTempAllowedList, privacyToggleListener)
         contentPrivacyDashboard.privacyToggle.isEnabled = !isSiteIntTempAllowedList
     }
 
