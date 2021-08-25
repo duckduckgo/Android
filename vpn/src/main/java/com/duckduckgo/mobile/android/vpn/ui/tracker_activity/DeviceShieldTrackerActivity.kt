@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
+import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.text.*
@@ -129,6 +130,22 @@ class DeviceShieldTrackerActivity :
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
+            when (resultCode) {
+                RESULT_OK -> {
+                    startVPN()
+                    return
+                }
+                else -> {
+                    deviceShieldSwitch.quietlySetIsChecked(false, deviceShieldToggleListener)
+                    Timber.d("Permission not granted")
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onTrackerListShowed(totalTrackers: Int) {
         if (totalTrackers >= MIN_ROWS_FOR_ALL_ACTIVITY) {
             ctaShowAll.show()
@@ -185,7 +202,7 @@ class DeviceShieldTrackerActivity :
 
     private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command?) {
         when (it) {
-            is DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield -> startDeviceShield()
+            is DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield -> startVpnIfAllowed()
             is DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield -> stopDeviceShield()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
@@ -216,7 +233,7 @@ class DeviceShieldTrackerActivity :
         startActivity(DeviceShieldMostRecentActivity.intent(this))
     }
 
-    private fun startDeviceShield() {
+    private fun startVPN() {
         TrackerBlockingVpnService.startService(this)
     }
 
@@ -382,6 +399,24 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun startVpnIfAllowed() {
+        when (val permissionStatus = checkVpnPermission()) {
+            is VpnPermissionStatus.Granted -> startVPN()
+            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
+        }
+    }
+
+    private fun checkVpnPermission(): VpnPermissionStatus {
+        val intent = VpnService.prepare(this)
+        return if (intent == null) {
+            VpnPermissionStatus.Granted
+        } else {
+            VpnPermissionStatus.Denied(intent)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun obtainVpnRequestPermission(intent: Intent) {
+        startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
     }
 
     private fun launchFeedback() {
@@ -399,11 +434,17 @@ class DeviceShieldTrackerActivity :
         }
     }
 
+    private sealed class VpnPermissionStatus {
+        object Granted : VpnPermissionStatus()
+        data class Denied(val intent: Intent) : VpnPermissionStatus()
+    }
+
     companion object {
         private const val RESULT_RECEIVER_EXTRA = "RESULT_RECEIVER_EXTRA"
         private const val ON_LAUNCHED_CALLED_SUCCESS = 0
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 
+        private const val REQUEST_ASK_VPN_PERMISSION = 101
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
         fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
