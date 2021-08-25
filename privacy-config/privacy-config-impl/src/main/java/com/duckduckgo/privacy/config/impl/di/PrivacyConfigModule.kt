@@ -18,7 +18,9 @@ package com.duckduckgo.privacy.config.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -37,6 +39,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
+import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -97,8 +100,8 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideContentBLockingRepository(database: PrivacyConfigDatabase): ContentBlockingRepository {
-        return RealContentBlockingRepository(database)
+    fun provideContentBLockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
+        return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton

@@ -18,17 +18,24 @@ package com.duckduckgo.privacy.config.store.features.contentblocking
 
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
+import com.duckduckgo.privacy.config.store.PrivacyStoreCoroutineTestRule
+import com.duckduckgo.privacy.config.store.runBlocking
 import com.duckduckgo.privacy.config.store.toContentBlockingException
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
 class RealContentBlockingRepositoryTest {
+
+    @get:Rule
+    var coroutineRule = PrivacyStoreCoroutineTestRule()
 
     lateinit var testee: RealContentBlockingRepository
 
@@ -44,14 +51,14 @@ class RealContentBlockingRepositoryTest {
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenContentBlockingDaoContainsExceptions()
 
-        testee = RealContentBlockingRepository(mockDatabase)
+        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(contentBlockingException.toContentBlockingException(), testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() {
-        testee = RealContentBlockingRepository(mockDatabase)
+    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
+        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
         testee.updateAll(listOf())
 
@@ -59,9 +66,9 @@ class RealContentBlockingRepositoryTest {
     }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() {
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
         givenContentBlockingDaoContainsExceptions()
-        testee = RealContentBlockingRepository(mockDatabase)
+        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
         assertEquals(1, testee.exceptions.size)
         reset(mockContentBlockingDao)
 
