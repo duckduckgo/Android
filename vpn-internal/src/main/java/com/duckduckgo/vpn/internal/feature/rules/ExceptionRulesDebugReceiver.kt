@@ -23,7 +23,6 @@ import android.content.IntentFilter
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +41,7 @@ import javax.inject.Inject
  */
 class ExceptionRulesDebugReceiver(
     context: Context,
-    intentAction: String = "rule",
+    intentAction: String = ACTION,
     private val receiver: (Intent) -> Unit
 ) : BroadcastReceiver() {
 
@@ -54,12 +53,23 @@ class ExceptionRulesDebugReceiver(
     override fun onReceive(context: Context, intent: Intent) {
         receiver(intent)
     }
+
+    companion object {
+        private const val ACTION = "rule"
+
+        fun ruleIntent(packageId: String, domain: String): Intent {
+            return Intent(ACTION).apply {
+                putExtra("app", packageId)
+                putExtra("domain", domain)
+            }
+        }
+    }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
-    private val vpnDatabase: VpnDatabase
+    private val exclusionRulesRepository: ExclusionRulesRepository,
 ) : VpnServiceCallbacks {
 
     private val exceptionRulesSavedState = mutableListOf<AppTrackerExceptionRule>()
@@ -75,9 +85,7 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
             if (appId != null && domain != null) {
                 coroutineScope.launch(Dispatchers.IO) {
-                    vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerExceptionRules(
-                        listOf(AppTrackerExceptionRule(rule = domain, packageNames = listOf(appId)))
-                    )
+                    exclusionRulesRepository.upsertRule(appId, domain)
                 }
             }
         }
@@ -87,8 +95,8 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 
         coroutineScope.launch(Dispatchers.IO) {
-            vpnDatabase.vpnAppTrackerBlockingDao().deleteTrackerExceptionRules()
-            vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerExceptionRules(exceptionRulesSavedState).also {
+            exclusionRulesRepository.deleteAllTrackerRules()
+            exclusionRulesRepository.insertTrackerRules(exceptionRulesSavedState).also {
                 exceptionRulesSavedState.clear()
             }
         }
@@ -97,8 +105,8 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private fun saveExceptionRulesState(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.IO) {
             exceptionRulesSavedState.clear()
-            vpnDatabase.vpnAppTrackerBlockingDao().deleteTrackerExceptionRules()
-            exceptionRulesSavedState.addAll(vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRules())
+            exclusionRulesRepository.deleteAllTrackerRules()
+            exceptionRulesSavedState.addAll(exclusionRulesRepository.getAllTrackerRules())
         }
     }
 }

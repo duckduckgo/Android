@@ -43,4 +43,3 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerD
         }
     }
 }
-

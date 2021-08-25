@@ -16,4 +16,5 @@
 
 <resources>
     <string name="vpnDevSettingsTitle">AppTp Dev Settings</string>
+    <string name="vpnExceptionRulesDebugActivityTitle">AppTp Exception Rules</string>
 </resources>

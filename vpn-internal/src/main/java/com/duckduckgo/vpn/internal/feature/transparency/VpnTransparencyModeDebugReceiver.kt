@@ -69,7 +69,7 @@ class TransparencyModeDebugReceiver(
                 putExtra("turn", "off")
             }
         }
-        
+
         fun isTurnOnIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "on"
         }

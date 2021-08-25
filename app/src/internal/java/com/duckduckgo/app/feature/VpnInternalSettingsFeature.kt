@@ -17,7 +17,6 @@
 package com.duckduckgo.app.feature
 
 import android.content.Context
-import androidx.core.content.ContextCompat
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.vpn.internal.feature.VpnInternalSettingsActivity

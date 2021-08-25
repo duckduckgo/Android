@@ -21,9 +21,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
+import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
@@ -45,11 +45,18 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.toolbar)
 
         setupTransparencyMode()
+        setupAppTrackerExceptionRules()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         receiver?.let { it.unregister() }
+    }
+
+    private fun setupAppTrackerExceptionRules() {
+        binding.exceptionRules.setOnClickListener {
+            startActivity(ExceptionRulesDebugActivity.intent(this))
+        }
     }
 
     private fun setupTransparencyMode() {

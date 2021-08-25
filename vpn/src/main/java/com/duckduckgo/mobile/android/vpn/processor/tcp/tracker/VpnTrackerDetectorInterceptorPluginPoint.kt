@@ -26,7 +26,7 @@ import dagger.multibindings.Multibinds
 
 private class VpnTrackerDetectorInterceptorPluginPoint(
     private val requestInterceptors: Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
-): PluginPoint<VpnTrackerDetectorInterceptor> {
+) : PluginPoint<VpnTrackerDetectorInterceptor> {
     override fun getPlugins(): Collection<VpnTrackerDetectorInterceptor> {
         return requestInterceptors
     }

@@ -3,10 +3,11 @@
           package="com.duckduckgo.vpn.internal">
 
     <application>
+        <activity android:name=".feature.rules.ExceptionRulesDebugActivity">
+        </activity>
         <activity
             android:name=".feature.VpnInternalSettingsActivity"
-            android:label="@string/vpnDevSettingsTitle"
-        />
+            android:label="@string/vpnDevSettingsTitle"/>
     </application>
 
 </manifest>

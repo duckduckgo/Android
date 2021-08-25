@@ -51,6 +51,9 @@ interface VpnTrackerDao {
     @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 
+    @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
+    fun getTrackersForApp(appPackage: String): List<VpnTracker>
+
     companion object {
         private const val MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS = 10_000
     }

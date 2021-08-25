@@ -63,6 +63,13 @@
                 android:theme="@style/SettingsSwitchTheme"
             />
 
+            <TextView
+                android:id="@+id/exceptionRules"
+                style="@style/SettingsItemClickable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="App/Tracker exception rules"
+            />
 
         </LinearLayout>
 

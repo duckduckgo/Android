@@ -21,6 +21,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VpnAppTrackerBlockingDao {
@@ -90,6 +91,9 @@ interface VpnAppTrackerBlockingDao {
 
     @Query("SELECT * from vpn_app_tracker_exception_rules")
     fun getTrackerExceptionRules(): List<AppTrackerExceptionRule>
+
+    @Query("SELECT * from vpn_app_tracker_exception_rules")
+    fun getTrackerExceptionRulesFlow(): Flow<List<AppTrackerExceptionRule>>
 
     @Insert
     fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
