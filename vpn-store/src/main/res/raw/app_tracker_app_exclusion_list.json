@@ -43,6 +43,7 @@
     "com.brave.browser",
     "com.UCMobile.intl",
     "com.android.browser",
+    "com.android.captiveportallogin",
     "com.sec.android.app.sbrowser",
     "info.guardianproject.orfo",
     "org.torproject.torbrowser_alpha",
@@ -93,6 +94,20 @@
     "com.treemolabs.apps.cbsnews",
     "com.main.gopuff",
     "com.rogers.sportsnet.sportsnet",
-    "com.simplygood.ct"
+    "com.simplygood.ct",
+    "co.ritual.app",
+    "com.wayfair.wayfair",
+    "com.jwaala.mobile.justice",
+    "org.dayup.stocks",
+    "com.usaa.mobile.android.usaa",
+    "com.usbank.mobilebanking",
+    "com.robinhood.android",
+    "com.discoverfinancial.mobile",
+    "com.weightwatchers.mobile",
+    "com.soundcloud.android",
+    "com.blueshellgames.luckyslots",
+    "com.google.android.projection.gearhead",
+    "com.gm.chevrolet.nomad.ownership",
+    "com.onelouder.baconreader"
   ]
 }
