@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl.workers
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
@@ -43,7 +42,7 @@ class PrivacyConfigDownloadWorkerTest {
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
+        context = mock()
     }
 
     @Test

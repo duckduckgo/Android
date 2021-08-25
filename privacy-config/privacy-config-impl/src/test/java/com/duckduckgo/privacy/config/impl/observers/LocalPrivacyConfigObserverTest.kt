@@ -17,13 +17,15 @@
 package com.duckduckgo.privacy.config.impl.observers
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
+import android.content.res.Resources
+import com.duckduckgo.privacy.config.impl.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.PrivacyCoroutineTestRule
 import com.duckduckgo.privacy.config.impl.runBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -36,18 +38,26 @@ class LocalPrivacyConfigObserverTest {
     var coroutineRule = PrivacyCoroutineTestRule()
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
-    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val mockContext: Context = mock()
     lateinit var testee: LocalPrivacyConfigObserver
 
     @Before
     fun before() {
-        testee = LocalPrivacyConfigObserver(context, mockPrivacyConfigPersister, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        testee = LocalPrivacyConfigObserver(mockContext, mockPrivacyConfigPersister, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenOnCreateApplicationThenCallPersistPrivacyConfig() = coroutineRule.runBlocking {
+        givenLocalPrivacyConfigFileExists()
+
         testee.storeLocalPrivacyConfig()
 
         verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+    }
+
+    private fun givenLocalPrivacyConfigFileExists() {
+        val resources: Resources = mock()
+        whenever(mockContext.resources).thenReturn(resources)
+        whenever(resources.openRawResource(any())).thenReturn(loadResource("json/privacy_config.json"))
     }
 }

@@ -28,7 +28,6 @@ import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +43,6 @@ class TrackerDataLoader @Inject constructor(
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
-    private val contentBlocking: ContentBlocking,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
@@ -59,7 +57,6 @@ class TrackerDataLoader @Inject constructor(
     private fun loadData() {
         Timber.d("Loading tracker data")
         loadTds()
-        loadTemporaryWhitelist()
     }
 
     private fun loadTds() {
@@ -91,10 +88,6 @@ class TrackerDataLoader @Inject constructor(
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
         val client = TdsClient(Client.ClientName.TDS, trackers)
         trackerDetector.addClient(client)
-    }
-
-    fun loadTemporaryWhitelist() {
-        contentBlocking.load()
     }
 
     companion object {

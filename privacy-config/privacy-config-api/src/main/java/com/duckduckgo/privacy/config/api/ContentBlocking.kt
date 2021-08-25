@@ -17,9 +17,7 @@
 package com.duckduckgo.privacy.config.api
 
 interface ContentBlocking {
-
-    fun load()
-    fun isAnException(documentUrl: String): Boolean
+    fun isAnException(url: String): Boolean
 }
 
 data class ContentBlockingException(val domain: String, val reason: String)

@@ -19,10 +19,10 @@ package com.duckduckgo.privacy.config.impl.features.contentblocking
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.store.ContentBlockingDao
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import javax.inject.Inject
@@ -31,11 +31,9 @@ import com.squareup.moshi.Moshi
 
 @ContributesMultibinding(AppObjectGraph::class)
 class ContentBlockingPlugin @Inject constructor(
-    privacyConfigDatabase: PrivacyConfigDatabase
+    private val contentBlockingRepository: ContentBlockingRepository,
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
-
-    private val contentBlockingDao: ContentBlockingDao = privacyConfigDatabase.contentBlockingDao()
-    private val privacyFeatureTogglesDao = privacyConfigDatabase.privacyFeatureTogglesDao()
 
     override fun store(name: String, jsonObject: JSONObject?): Boolean {
         if (name == featureName.value) {
@@ -48,10 +46,9 @@ class ContentBlockingPlugin @Inject constructor(
             contentBlockingFeature?.exceptions?.map {
                 contentBlockingExceptions.add(ContentBlockingExceptionEntity(it.domain, it.reason))
             }
-            contentBlockingDao.updateAll(contentBlockingExceptions)
+            contentBlockingRepository.updateAll(contentBlockingExceptions)
             val isEnabled = contentBlockingFeature?.state == "enabled"
-            privacyFeatureTogglesDao.insert(PrivacyFeatureToggles(name, isEnabled))
-
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true
         }
         return false

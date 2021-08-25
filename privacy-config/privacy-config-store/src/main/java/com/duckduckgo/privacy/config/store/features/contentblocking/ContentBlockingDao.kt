@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store
+package com.duckduckgo.privacy.config.store.features.contentblocking
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 
 @Dao
 abstract class ContentBlockingDao {
@@ -42,10 +43,4 @@ abstract class ContentBlockingDao {
 
     @Query("delete from content_blocking_exceptions")
     abstract fun deleteAll()
-
-    @Query("select count(*) from content_blocking_exceptions")
-    abstract fun count(): Int
-
-    @Query("select count(1) > 0 from content_blocking_exceptions where :domain LIKE '%'||domain||'%'")
-    abstract fun contains(domain: String): Boolean
 }

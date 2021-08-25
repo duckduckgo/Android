@@ -16,20 +16,25 @@
 
 package com.duckduckgo.privacy.config.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
+interface PrivacyConfigRepository {
+    fun insert(privacyConfig: PrivacyConfig)
+    fun get(): PrivacyConfig?
+    fun delete()
+}
 
-@Database(
-    exportSchema = true, version = 1,
-    entities = [
-        ContentBlockingExceptionEntity::class,
-        PrivacyFeatureToggles::class,
-        PrivacyConfig::class
-    ]
-)
-abstract class PrivacyConfigDatabase : RoomDatabase() {
-    abstract fun contentBlockingDao(): ContentBlockingDao
-    abstract fun privacyFeatureTogglesDao(): PrivacyFeatureTogglesDao
-    abstract fun privacyConfigDao(): PrivacyConfigDao
+class RealPrivacyConfigRepository(database: PrivacyConfigDatabase) : PrivacyConfigRepository {
+
+    private val privacyConfigDao: PrivacyConfigDao = database.privacyConfigDao()
+
+    override fun insert(privacyConfig: PrivacyConfig) {
+        privacyConfigDao.insert(privacyConfig)
+    }
+
+    override fun get(): PrivacyConfig? {
+        return privacyConfigDao.get()
+    }
+
+    override fun delete() {
+        privacyConfigDao.delete()
+    }
 }

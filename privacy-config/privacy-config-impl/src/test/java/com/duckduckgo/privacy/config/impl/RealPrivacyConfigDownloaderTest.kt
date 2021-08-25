@@ -16,12 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl
 
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDao
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -38,22 +34,11 @@ class RealPrivacyConfigDownloaderTest {
 
     lateinit var testee: RealPrivacyConfigDownloader
 
-    private lateinit var db: PrivacyConfigDatabase
-    private lateinit var privacyFeatureTogglesDao: PrivacyFeatureTogglesDao
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
 
     @Before
     fun before() {
-        prepareDb()
-
         testee = RealPrivacyConfigDownloader(TestPrivacyConfigService(), mockPrivacyConfigPersister)
-    }
-
-    private fun prepareDb() {
-        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), PrivacyConfigDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-        privacyFeatureTogglesDao = db.privacyFeatureTogglesDao()
     }
 
     @Test

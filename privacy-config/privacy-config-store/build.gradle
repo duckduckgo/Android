@@ -36,13 +36,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
 
-    testImplementation "junit:junit:_"
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation Testing.mockito.android
-    androidTestImplementation Testing.mockito.kotlin
+    testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
 }

@@ -19,36 +19,21 @@ package com.duckduckgo.privacy.config.impl.features.contentblocking
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.ContentBlockingException
-import com.duckduckgo.privacy.config.store.ContentBlockingDao
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toContentBlockingException
+import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealContentBlocking @Inject constructor(val database: PrivacyConfigDatabase) : ContentBlocking {
+class RealContentBlocking @Inject constructor(val repository: ContentBlockingRepository) : ContentBlocking {
 
-    private val contentBlockingDao: ContentBlockingDao = database.contentBlockingDao()
-
-    private val exceptions = CopyOnWriteArrayList<ContentBlockingException>()
-
-    override fun load() {
-        exceptions.clear()
-        contentBlockingDao.getAll().map {
-            exceptions.add(it.toContentBlockingException())
-        }
+    override fun isAnException(url: String): Boolean {
+        return matches(url)
     }
 
-    override fun isAnException(documentUrl: String): Boolean {
-        return matches(documentUrl)
-    }
-
-    private fun matches(documentUrl: String): Boolean {
-        return exceptions.any { sameOrSubdomain(documentUrl, it.domain) }
+    private fun matches(url: String): Boolean {
+        return repository.exceptions.any { sameOrSubdomain(url, it.domain) }
     }
 
 }

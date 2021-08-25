@@ -17,22 +17,27 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
-import com.duckduckgo.privacy.config.store.PrivacyConfigDao
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDao
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
+import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
+import com.nhaarman.mockitokotlin2.mock
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class RealPrivacyConfigPersisterTest {
     @get:Rule
     var coroutineRule = PrivacyCoroutineTestRule()
@@ -40,31 +45,31 @@ class RealPrivacyConfigPersisterTest {
     lateinit var testee: RealPrivacyConfigPersister
 
     private lateinit var db: PrivacyConfigDatabase
-    private lateinit var privacyFeatureTogglesDao: PrivacyFeatureTogglesDao
-    private lateinit var privacyConfigDao: PrivacyConfigDao
+    private lateinit var togglesRepository: PrivacyFeatureTogglesRepository
+    private lateinit var privacyRepository: PrivacyConfigRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint()
 
     @Before
     fun before() {
         prepareDb()
 
-        testee = RealPrivacyConfigPersister(pluginPoint, db)
+        testee = RealPrivacyConfigPersister(pluginPoint, togglesRepository, privacyRepository, db)
     }
 
     private fun prepareDb() {
-        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), PrivacyConfigDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        privacyFeatureTogglesDao = db.privacyFeatureTogglesDao()
-        privacyConfigDao = db.privacyConfigDao()
+        togglesRepository = RealPrivacyFeatureTogglesRepository(db)
+        privacyRepository = RealPrivacyConfigRepository(db)
     }
 
     @Test
     fun whenPersistPrivacyConfigThenDeleteAllTogglesPreviouslyStored() = coroutineRule.runBlocking {
-        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
+        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        assertNull(privacyFeatureTogglesDao.get("feature"))
+        assertNull(togglesRepository.get("feature"))
     }
 
     @Test
@@ -77,33 +82,33 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
-        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
-        privacyConfigDao.insert(PrivacyConfig(version = 3, readme = "readme"))
+        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
+        privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        assertEquals(3, privacyConfigDao.get()!!.version)
-        assertNotNull(privacyFeatureTogglesDao.get("feature"))
+        assertEquals(3, privacyRepository.get()!!.version)
+        assertNotNull(togglesRepository.get("feature"))
     }
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
-        privacyFeatureTogglesDao.insert(PrivacyFeatureToggles("feature", true))
-        privacyConfigDao.insert(PrivacyConfig(version = 2, readme = "readme"))
+        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
+        privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        assertEquals(2, privacyConfigDao.get()!!.version)
-        assertNotNull(privacyFeatureTogglesDao.get("feature"))
+        assertEquals(2, privacyRepository.get()!!.version)
+        assertNotNull(togglesRepository.get("feature"))
     }
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsHigherThanPreviousOneStoredThenStoreNewConfig() = coroutineRule.runBlocking {
-        privacyConfigDao.insert(PrivacyConfig(version = 1, readme = "readme"))
+        privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        assertEquals(2, privacyConfigDao.get()!!.version)
+        assertEquals(2, privacyRepository.get()!!.version)
     }
 
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
