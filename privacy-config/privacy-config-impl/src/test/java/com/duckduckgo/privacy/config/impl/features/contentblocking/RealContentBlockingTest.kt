@@ -16,7 +16,9 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -32,30 +34,25 @@ class RealContentBlockingTest {
     lateinit var testee: RealContentBlocking
 
     private val mockContentBlockingRepository: ContentBlockingRepository = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
 
     @Before
     fun before() {
-        testee = RealContentBlocking(mockContentBlockingRepository)
+        givenFeatureIsEnabled()
+
+        testee = RealContentBlocking(mockContentBlockingRepository, mockFeatureToggle)
     }
 
     @Test
     fun whenIsAnExceptionAndDomainIsListedInTheExceptionsListThenReturnTrue() {
-        whenever(mockContentBlockingRepository.exceptions).thenReturn(
-            arrayListOf(
-                ContentBlockingException("example.com", "my reason here")
-            )
-        )
+        givenThereAreExceptions()
 
         assertTrue(testee.isAnException("http://www.example.com"))
     }
 
     @Test
     fun whenIsAnExceptionWithSubdomainAndDomainIsListedInTheExceptionsListThenReturnTrue() {
-        whenever(mockContentBlockingRepository.exceptions).thenReturn(
-            arrayListOf(
-                ContentBlockingException("example.com", "my reason here")
-            )
-        )
+        givenThereAreExceptions()
 
         assertTrue(testee.isAnException("http://test.example.com"))
     }
@@ -65,5 +62,29 @@ class RealContentBlockingTest {
         whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
 
         assertFalse(testee.isAnException("http://test.example.com"))
+    }
+
+    @Test
+    fun whenIsAnExceptionAndFeatureIsDisabledThenReturnFalse() {
+        givenThereAreExceptions()
+        givenFeatureIsDisabled()
+
+        assertFalse(testee.isAnException("http://test.example.com"))
+    }
+
+    private fun givenThereAreExceptions() {
+        whenever(mockContentBlockingRepository.exceptions).thenReturn(
+            arrayListOf(
+                ContentBlockingException("example.com", "my reason here")
+            )
+        )
+    }
+
+    private fun givenFeatureIsEnabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(true)
+    }
+
+    private fun givenFeatureIsDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(false)
     }
 }
