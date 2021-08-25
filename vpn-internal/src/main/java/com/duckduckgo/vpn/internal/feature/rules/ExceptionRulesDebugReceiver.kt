@@ -83,6 +83,8 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
             val appId = kotlin.runCatching { intent.getStringExtra("app") }.getOrNull()
             val domain = kotlin.runCatching { intent.getStringExtra("domain") }.getOrNull()
 
+            Timber.i("Excluding %s for app %s", domain, appId)
+
             if (appId != null && domain != null) {
                 coroutineScope.launch(Dispatchers.IO) {
                     exclusionRulesRepository.upsertRule(appId, domain)

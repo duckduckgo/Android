@@ -226,7 +226,7 @@ class TcpDeviceToNetwork(
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestingApp = determineRequestingApp(tcb, packet)
             val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
-            Timber.i("App %s attempting to send %d bytes to $%s. $requestType", requestingApp, payloadSize, tcb.ipAndPort)
+            Timber.i("App %s attempting to send %d bytes to %s. %s", requestingApp, payloadSize, tcb.ipAndPort, requestType)
 
             if (requestType is RequestTrackerType.Tracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
