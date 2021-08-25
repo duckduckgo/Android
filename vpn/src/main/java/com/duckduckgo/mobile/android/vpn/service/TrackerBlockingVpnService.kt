@@ -173,6 +173,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private suspend fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
+
             // Add IPv6 Unique Local Address
             addAddress("fd00:1:fd00:1:fd00:1:fd00:1", 128)
 

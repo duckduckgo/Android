@@ -81,7 +81,13 @@ class DomainBasedTrackerDetector(
 
         return when (val trackerType = appTrackerRepository.findTracker(hostname, requestingApp.packageId)) {
             is FirstParty -> {
-                Timber.d("Determined $hostname to be a 1st party tracker for ${requestingApp.packageId}, both owned by ${trackerType.tracker.owner.name} [${tcb.ipAndPort}]")
+                Timber.d(
+                    "Determined %s to be a 1st party tracker for %s, both owned by %s [%s]",
+                    hostname,
+                    requestingApp.packageId,
+                    trackerType.tracker.owner.name,
+                    tcb.ipAndPort
+                )
                 tcb.isTracker = false
                 RequestTrackerType.NotTracker(hostname)
             }
@@ -89,13 +95,19 @@ class DomainBasedTrackerDetector(
                 val trackerHostname = trackerType.tracker.hostname
                 val trackerModel = RequestTrackerType.Tracker(trackerHostname)
                 return if (isTrackerInExceptionRules(trackerModel, requestingApp)) {
-                    Timber.d("Tracker $trackerHostname is excluded in App $requestingApp")
+                    Timber.d("Tracker %s is excluded in App %s", trackerHostname, requestingApp)
                     tcb.isTracker = false
                     RequestTrackerType.NotTracker(trackerHostname)
                 } else {
                     tcb.isTracker = true
                     tcb.trackerHostName = trackerHostname
-                    Timber.i("Determined $hostname to be a 3rd party tracker for ${requestingApp.packageId}, tracker owned by ${trackerType.tracker.owner.name} [${tcb.ipAndPort}]")
+                    Timber.i(
+                        "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
+                        hostname,
+                        requestingApp.packageId,
+                        trackerType.tracker.owner.name,
+                        tcb.ipAndPort
+                    )
                     insertTracker(trackerType.tracker, requestingApp)
                     deviceShieldPixels.trackerBlocked()
                     RequestTrackerType.Tracker(trackerType.tracker.hostname)

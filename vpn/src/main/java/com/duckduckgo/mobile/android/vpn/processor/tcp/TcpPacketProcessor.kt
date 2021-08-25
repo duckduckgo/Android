@@ -94,7 +94,7 @@ class TcpPacketProcessor @AssistedInject constructor(
         )
 
     override fun run() {
-        Timber.i("Starting ${this::class.simpleName}")
+        Timber.i("Starting %s", this::class.simpleName)
 
         if (pollJobDeviceToNetwork == null) {
             pollJobDeviceToNetwork = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
@@ -107,7 +107,7 @@ class TcpPacketProcessor @AssistedInject constructor(
     }
 
     fun stop() {
-        Timber.i("Stopping ${this::class.simpleName}")
+        Timber.i("Stopping %s", this::class.simpleName)
 
         pollJobDeviceToNetwork?.cancel()
         pollJobDeviceToNetwork = null
@@ -116,7 +116,7 @@ class TcpPacketProcessor @AssistedInject constructor(
         pollJobNetworkToDevice = null
     }
 
-    private suspend fun pollForDeviceToNetworkWork() {
+    private fun pollForDeviceToNetworkWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobDeviceToNetwork?.isActive == true) {
@@ -128,7 +128,7 @@ class TcpPacketProcessor @AssistedInject constructor(
         }
     }
 
-    private suspend fun pollForNetworkToDeviceWork() {
+    private fun pollForNetworkToDeviceWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobNetworkToDevice?.isActive == true) {
@@ -226,7 +226,11 @@ class TcpPacketProcessor @AssistedInject constructor(
 
                 if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
                     acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
-                    Timber.v("$ipAndPort - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to $acknowledgementNumberToClient")
+                    Timber.v(
+                        "%s - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to %d",
+                        ipAndPort,
+                        acknowledgementNumberToClient
+                    )
                 }
 
                 Timber.i(
@@ -244,10 +248,6 @@ class TcpPacketProcessor @AssistedInject constructor(
             }
         }
 
-        fun TCB.logAckSeqDetails(): String {
-            return "[mySeq:rel=${sequenceNumberToClient - sequenceNumberToClientInitial}, abs=$sequenceNumberToClient, myAck: $acknowledgementNumberToClient]"
-        }
-
         fun TCB.updateState(state: MoveState) {
             when (state) {
                 is MoveClientToState -> updateState(state)
@@ -256,12 +256,12 @@ class TcpPacketProcessor @AssistedInject constructor(
         }
 
         private fun TCB.updateState(newState: MoveServerToState) {
-            Timber.v("Updating server state: ${newState.state}")
+            Timber.v("Updating server state: %s", newState.state)
             updateState(tcbState.copy(serverState = newState.state))
         }
 
         private fun TCB.updateState(newState: MoveClientToState) {
-            Timber.v("Updating client state: ${newState.state}")
+            Timber.v("Updating client state: %s", newState.state)
             updateState(tcbState.copy(clientState = newState.state))
         }
 

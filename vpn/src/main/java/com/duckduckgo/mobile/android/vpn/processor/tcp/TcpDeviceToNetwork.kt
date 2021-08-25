@@ -96,13 +96,15 @@ class TcpDeviceToNetwork(
 
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
-            "New packet. $connectionKey. TCB not initialized. ${
+            "New packet. %s. TCB not initialized. %s. Packet length: %d.  Data length: %d",
+            connectionKey,
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
                 packet.tcpHeader.acknowledgementNumber
-            )
-            }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
+            ),
+            totalPacketLength,
+            packet.tcpPayloadSize(true)
         )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
             when (it) {
@@ -123,7 +125,7 @@ class TcpDeviceToNetwork(
                         queues.networkToDevice.offer(connectionParams.responseBuffer)
                     }
                 }
-                else -> Timber.e("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
+                else -> Timber.e("No connection open and won't open one to %s. Dropping packet. (action=%s)", connectionKey, it)
             }
         }
 
@@ -155,7 +157,7 @@ class TcpDeviceToNetwork(
 
         val action =
             TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
-        Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
+        Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
 
         action.events.forEach {
             when (it) {
@@ -172,7 +174,7 @@ class TcpDeviceToNetwork(
                     }
                 }
                 SendAck -> tcb.sendAck(queues, packet)
-                else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
+                else -> Timber.e("Unknown event for how to process device-to-network packet: %s", action.events)
             }
 
         }
@@ -190,7 +192,7 @@ class TcpDeviceToNetwork(
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 SendSynAck -> {
-                    Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
+                    Timber.v("Channel finished connecting to %s", tcb.ipAndPort)
                     synchronized(tcb) {
                         params.packet.updateTcpBuffer(
                             params.responseBuffer,
@@ -204,11 +206,11 @@ class TcpDeviceToNetwork(
                     }
                 }
                 WaitToConnect -> {
-                    Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
+                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
                     selector.wakeup()
                     tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
                 }
-                else -> Timber.w("Unexpected action: $it")
+                else -> Timber.w("Unexpected action: %s", it)
             }
         }
     }
@@ -217,14 +219,14 @@ class TcpDeviceToNetwork(
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) {
-                Timber.v(" ${tcb.ipAndPort} Payload Size is 0. There's nothing to Process")
+                Timber.v(" %s Payload Size is 0. There's nothing to Process", tcb.ipAndPort)
                 return
             }
 
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestingApp = determineRequestingApp(tcb, packet)
             val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
-            Timber.i("App $requestingApp attempting to send $payloadSize bytes to ${tcb.ipAndPort}. $requestType")
+            Timber.i("App %s attempting to send %d bytes to $%s. $requestType", requestingApp, payloadSize, tcb.ipAndPort)
 
             if (requestType is RequestTrackerType.Tracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
@@ -233,7 +235,7 @@ class TcpDeviceToNetwork(
             }
 
             if (!tcb.waitingForNetworkData) {
-                Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
+                Timber.v("Not waiting for network data %s; register for OP_READ and wait for network data", tcb.ipAndPort)
                 Timber.i(
                     "Registering for OP_READ. Took: %d",
                     measureNanoTime {
@@ -260,7 +262,7 @@ class TcpDeviceToNetwork(
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
-                Timber.w(e, "Network write error for ${tcb.ipAndPort}. Wrote $bytesWritten; $bytesUnwritten unwritten")
+                Timber.w(e, "Network write error for %s. Wrote %d; %d unwritten", tcb.ipAndPort, bytesWritten, bytesUnwritten)
                 tcbCloser.sendResetPacket(tcb, queues, packet, bytesWritten)
                 return
             }

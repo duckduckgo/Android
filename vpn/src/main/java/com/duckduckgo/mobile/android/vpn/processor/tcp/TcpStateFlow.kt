@@ -47,7 +47,7 @@ class TcpStateFlow {
                 CLOSED -> handlePacketInClosed(packetType)
                 else -> unhandledEvent(connectionKey, currentState, packetType)
             }
-            Timber.d("$connectionKey. [$currentState]. New actions are [${newActions.ifEmpty { listOf("No Actions") }.joinToString()}]")
+            Timber.d("%s. [%s]. New actions are [%s]", connectionKey, currentState, newActions.ifEmpty { listOf("No Actions") }.joinToString())
 
             return TcpStateAction(newActions)
         }
@@ -77,7 +77,7 @@ class TcpStateFlow {
         private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String, currentState: TcbState): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in $currentState. Closing connection")
+                    Timber.w("Received RESET while in %s. Closing connection", currentState)
                     listOf(CloseConnection)
                 }
                 isAckForOurFin(packetType, connectionKey, currentState) -> {
@@ -291,7 +291,7 @@ class TcpStateFlow {
         }
 
         private fun unhandledEvent(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
-            Timber.e("Unhandled event in $currentState: $packetType for $connectionKey")
+            Timber.e("Unhandled event in %s: %s for %s", currentState, packetType, connectionKey)
             return emptyList()
         }
     }

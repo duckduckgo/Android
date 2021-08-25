@@ -73,26 +73,14 @@ class TcpNetworkToDevice(
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
-                    Timber.v(
-                        "Got next network-to-device packet [isReadable] after ${
-                        TimeUnit.NANOSECONDS.toMillis(
-                            System.nanoTime() - startTime
-                        )
-                        }ms wait"
-                    )
+                    Timber.v("Got next network-to-device packet [isReadable] after %dms wait", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime))
                     processRead(key)
                 } else if (key.isValid && key.isConnectable) {
-                    Timber.v(
-                        "Got next network-to-device packet [isConnectable] after ${
-                        TimeUnit.NANOSECONDS.toMillis(
-                            System.nanoTime() - startTime
-                        )
-                        }ms wait"
-                    )
+                    Timber.v("Got next network-to-device packet [isConnectable] after %dms wait", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime))
                     processConnect(key)
                 } else if (key.isValid && key.isWritable) {
                     val tcb = key.attachment() as TCB
-                    Timber.v("Now is the chance to write to the socket ${tcb.ipAndPort}")
+                    Timber.v("Now is the chance to write to the socket %s", tcb.ipAndPort)
                     tcpSocketWriter.writeToSocket(tcb)
                 }
             }.onFailure {
@@ -114,7 +102,7 @@ class TcpNetworkToDevice(
             val channel = key.channel() as SocketChannel
             try {
                 val readBytes = channel.read(receiveBuffer)
-                Timber.d("Read $readBytes bytes from ${tcb.ipAndPort} bound for ${tcb.requestingAppName}/${tcb.requestingAppPackage}")
+                Timber.d("Read %d bytes from %s bound for %s/%s", readBytes, tcb.ipAndPort, tcb.requestingAppName, tcb.requestingAppPackage)
 
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key)
@@ -133,13 +121,10 @@ class TcpNetworkToDevice(
 
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
         Timber.i(
-            "Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${
-            logPacketDetails(
-                packet,
-                tcb.sequenceNumberToClient,
-                tcb.acknowledgementNumberToClient
-            )
-            }"
+            "Network-to-device packet %s. %d bytes. %s",
+            tcb.ipAndPort,
+            readBytes,
+            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
         )
         packet.updateTcpBuffer(
             receiveBuffer,
@@ -157,13 +142,11 @@ class TcpNetworkToDevice(
 
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey) {
         Timber.w(
-            "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime)}ms after creation ${
-            logPacketDetails(
-                packet,
-                tcb.sequenceNumberToClient,
-                tcb.acknowledgementNumberToClient
-            )
-            }"
+            "Network-to-device end of stream %s. %s %dms after creation %s",
+            tcb.ipAndPort,
+            tcb.tcbState,
+            TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime),
+            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
         )
 
         key.cancel()
@@ -180,7 +163,7 @@ class TcpNetworkToDevice(
                         event.events.forEach { tcb.updateState(it) }
                     }
                 }
-                else -> Timber.w("Unhandled event for ${tcb.ipAndPort} for socket end of stream. $event")
+                else -> Timber.w("Unhandled event for %s for socket end of stream. %s", tcb.ipAndPort, event)
             }
         }
     }
@@ -205,11 +188,11 @@ class TcpNetworkToDevice(
         val packet = tcb.referencePacket
         runCatching {
             if (tcb.channel.finishConnect()) {
-                Timber.d("Finished connecting to ${tcb.ipAndPort}. Sending SYN+ACK.")
+                Timber.d("Finished connecting to %s. Sending SYN+ACK.", tcb.ipAndPort)
 
                 tcb.updateState(MoveServerToState(SYN_RECEIVED))
                 tcb.updateState(MoveClientToState(SYN_SENT))
-                Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.tcbState}")
+                Timber.v("Update TCB %s status: %s", tcb.ipAndPort, tcb.tcbState)
 
                 val responseBuffer = ByteBufferPool.acquire()
                 packet.updateTcpBuffer(
@@ -225,11 +208,11 @@ class TcpNetworkToDevice(
 
                 tcb.channel.register(selector, OP_NONE)
             } else {
-                Timber.v("Not finished connecting yet ${tcb.ipAndPort}")
+                Timber.v("Not finished connecting yet %s", tcb.ipAndPort)
                 tcb.channel.register(selector, OP_CONNECT, tcb)
             }
         }.onFailure {
-            Timber.w(it, "Failed to process TCP connect ${tcb.ipAndPort}")
+            Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)
             val responseBuffer = ByteBufferPool.acquire()
             packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
 

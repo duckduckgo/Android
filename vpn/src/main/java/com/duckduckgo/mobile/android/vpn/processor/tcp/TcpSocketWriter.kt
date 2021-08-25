@@ -87,7 +87,13 @@ class RealTcpSocketWriter @Inject constructor(
 
         do {
             val writeData = writeQueue.pollFirst() ?: break
-            Timber.v("Writing data to socket ${tcb.ipAndPort}: ${writeData.payloadSize} bytes. ack=${writeData.ackNumber}, seq=${writeData.seqNumber}")
+            Timber.v(
+                "Writing data to socket %s: %d bytes. ack=%d, seq=%d",
+                tcb.ipAndPort,
+                writeData.payloadSize,
+                writeData.ackNumber,
+                writeData.seqNumber
+            )
 
             val payloadBuffer = writeData.payloadBuffer
             val payloadSize = writeData.payloadSize
@@ -97,10 +103,10 @@ class RealTcpSocketWriter @Inject constructor(
             val bytesWritten = socket.write(payloadBuffer)
 
             if (payloadBuffer.remaining() == 0) {
-                Timber.i("Fully wrote $payloadSize bytes for ${getLogLabel(tcb)}")
+                Timber.i("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
                 fullyWritten(tcb, writeData, connectionParams)
             } else {
-                Timber.w("Partial write. ${payloadBuffer.remaining()} bytes remaining to be written for ${getLogLabel(tcb)}")
+                Timber.w("Partial write. %d bytes remaining to be written for %s", payloadBuffer.remaining(), getLogLabel(tcb))
                 partiallyWritten(writeData, bytesWritten, payloadBuffer, payloadSize)
             }
 
@@ -128,7 +134,14 @@ class RealTcpSocketWriter @Inject constructor(
         val seqToClient = tcb.sequenceNumberToClient
         val ackToServer = tcb.acknowledgementNumberToServer
         val seqAckDiff = seqToClient - ackToServer
-        Timber.i("${writeData.tcb.ipAndPort} - seqToClient=$seqToClient, ackToClient=${tcb.acknowledgementNumberToClient}, ackToServer=$ackToServer, diff=$seqAckDiff")
+        Timber.i(
+            "%s - seqToClient=%d, ackToClient=%d, ackToServer=%d, diff=%d",
+            writeData.tcb.ipAndPort,
+            seqToClient,
+            tcb.acknowledgementNumberToClient,
+            ackToServer,
+            seqAckDiff
+        )
 
         val responseBuffer = connectionParams.responseBuffer
 
