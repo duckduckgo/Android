@@ -356,7 +356,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders())
+        verify(webView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders(validHttpsUri().toString()))
     }
 
     @Test
@@ -390,7 +390,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders())
+        verify(webView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders(validUri().toString()))
     }
 
     @Test
@@ -579,15 +579,15 @@ class WebViewRequestInterceptorTest {
 
     private fun configureShouldAddGpcHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
-        whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
-        whenever(mockGlobalPrivacyControl.shouldAddHeaders(any())).thenReturn(true)
+        whenever(mockGlobalPrivacyControl.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
+        whenever(mockGlobalPrivacyControl.canPerformARedirect(any())).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
     private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(false)
-        whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
-        whenever(mockGlobalPrivacyControl.shouldAddHeaders(any())).thenReturn(false)
+        whenever(mockGlobalPrivacyControl.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
+        whenever(mockGlobalPrivacyControl.canPerformARedirect(any())).thenReturn(false)
         whenever(mockRequest.method).thenReturn("GET")
     }
 

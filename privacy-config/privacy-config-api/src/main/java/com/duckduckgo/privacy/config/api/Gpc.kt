@@ -16,9 +16,8 @@
 
 package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.feature.toggles.api.FeatureName
-
-sealed class PrivacyFeatureName(override val value: String) : FeatureName {
-    data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
-    data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
+interface Gpc {
+    fun isAnException(url: String): Boolean
 }
+
+data class GpcException(val domain: String)

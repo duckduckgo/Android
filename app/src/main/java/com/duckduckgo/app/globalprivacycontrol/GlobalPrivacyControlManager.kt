@@ -24,15 +24,21 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 
 interface GlobalPrivacyControl {
     fun injectDoNotSellToDom(webView: WebView)
     fun isGpcActive(): Boolean
-    fun getHeaders(): Map<String, String>
-    fun shouldAddHeaders(url: Uri): Boolean
+    fun isGpcRemoteFeatureEnabled(): Boolean
+    fun getHeaders(url: String?): Map<String, String>
+    fun canPerformARedirect(url: Uri): Boolean
+    fun enableGpc()
+    fun disableGpc()
 }
 
-class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: SettingsDataStore) : GlobalPrivacyControl {
+class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: SettingsDataStore, private val featureToggle: FeatureToggle, val gpc: Gpc) : GlobalPrivacyControl {
     private val javaScriptInjector = JavaScriptInjector()
     private val headerConsumers = listOf(
         "nytimes.com",
@@ -40,15 +46,32 @@ class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: Setti
         "global-privacy-control.glitch.me"
     )
 
-    override fun shouldAddHeaders(url: Uri): Boolean {
+    override fun disableGpc() {
+        appSettingsPreferencesStore.globalPrivacyControlEnabled = false
+    }
+
+    override fun enableGpc() {
+        appSettingsPreferencesStore.globalPrivacyControlEnabled = true
+    }
+
+    override fun isGpcRemoteFeatureEnabled(): Boolean {
+        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+    }
+
+    override fun canPerformARedirect(url: Uri): Boolean {
         val domain = url.domain() ?: return false
-        return headerConsumers.any { UriString.sameOrSubdomain(domain, it) }
+
+        return if (canGpcBeUsed(domain)) {
+            headerConsumers.any { UriString.sameOrSubdomain(domain, it) }
+        } else {
+            false
+        }
     }
 
     override fun isGpcActive(): Boolean = appSettingsPreferencesStore.globalPrivacyControlEnabled
 
-    override fun getHeaders(): Map<String, String> {
-        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
+    override fun getHeaders(url: String?): Map<String, String> {
+        return if (canGpcBeUsed(url)) {
             mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         } else {
             emptyMap()
@@ -57,9 +80,18 @@ class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: Setti
 
     @UiThread
     override fun injectDoNotSellToDom(webView: WebView) {
-        if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
+        if (canGpcBeUsed(webView.url)) {
             webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context)}", null)
         }
+    }
+
+    private fun canGpcBeUsed(url: String?): Boolean {
+        return isGpcActive() && isGpcRemoteFeatureEnabled() && !isUrlAnException(url)
+    }
+
+    private fun isUrlAnException(url: String?): Boolean {
+        if (url == null) return false
+        return gpc.isAnException(url)
     }
 
     companion object {

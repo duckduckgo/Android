@@ -25,6 +25,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
@@ -39,11 +41,13 @@ import org.junit.Test
 class GlobalPrivacyControlManagerTest {
 
     private val mockSettingsStore: SettingsDataStore = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockGpc: Gpc = mock()
     lateinit var testee: GlobalPrivacyControlManager
 
     @Before
     fun setup() {
-        testee = GlobalPrivacyControlManager(mockSettingsStore)
+        testee = GlobalPrivacyControlManager(mockSettingsStore, mockFeatureToggle, mockGpc)
     }
 
     @UiThreadTest
@@ -90,7 +94,7 @@ class GlobalPrivacyControlManagerTest {
     fun whenGetHeadersIfGpcIsEnabledThenReturnHeaders() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
 
-        val headers = testee.getHeaders()
+        val headers = testee.getHeaders("example.com")
 
         assertEquals(GPC_HEADER_VALUE, headers[GPC_HEADER])
     }
@@ -99,19 +103,19 @@ class GlobalPrivacyControlManagerTest {
     fun whenGetHeadersIfGpcIsDisabledThenReturnEmptyMap() {
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
 
-        val headers = testee.getHeaders()
+        val headers = testee.getHeaders("example.com")
 
         assertTrue(headers.isEmpty())
     }
 
     @Test
     fun whenShouldAddHeadersAndUrlIsFromTheHeadersConsumersListThenReturnTrue() {
-        assertTrue(testee.shouldAddHeaders("http://nytimes.com".toUri()))
+        assertTrue(testee.canPerformARedirect("http://nytimes.com".toUri()))
     }
 
     @Test
     fun whenShouldAddHeadersAndUrlIsNotFromTheHeadersConsumersListThenReturnFalse() {
-        assertFalse(testee.shouldAddHeaders("http://example.com".toUri()))
+        assertFalse(testee.canPerformARedirect("http://example.com".toUri()))
     }
 
     private fun getJsToEvaluate(): String {

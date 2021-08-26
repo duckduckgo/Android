@@ -71,6 +71,8 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -299,8 +301,9 @@ class BrowserModule {
     }
 
     @Provides
-    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore): GlobalPrivacyControl {
-        return GlobalPrivacyControlManager(appSettingsPreferencesStore)
+    @Singleton
+    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore, featureToggle: FeatureToggle, gpc: Gpc): GlobalPrivacyControl {
+        return GlobalPrivacyControlManager(appSettingsPreferencesStore, featureToggle, gpc)
     }
 
     @Provides

@@ -158,18 +158,17 @@ class WebViewRequestInterceptor(
 
     private fun getHeaders(request: WebResourceRequest): Map<String, String> {
         return request.requestHeaders.apply {
-            putAll(globalPrivacyControl.getHeaders())
+            putAll(globalPrivacyControl.getHeaders(request.url.toString()))
         }
     }
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val headers = request.requestHeaders
         return (
-            globalPrivacyControl.isGpcActive() &&
+            globalPrivacyControl.canPerformARedirect(request.url) &&
                 !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER) &&
                 request.isForMainFrame &&
-                request.method == "GET" &&
-                globalPrivacyControl.shouldAddHeaders(request.url)
+                request.method == "GET"
             )
     }
 

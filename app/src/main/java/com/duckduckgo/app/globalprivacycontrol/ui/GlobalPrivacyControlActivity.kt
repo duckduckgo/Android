@@ -92,6 +92,7 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
             { viewState ->
                 viewState?.let {
                     binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
+                    binding.globalPrivacyControlToggle.isEnabled = it.globalPrivacyControlRemoteEnabled
                 }
             }
         )

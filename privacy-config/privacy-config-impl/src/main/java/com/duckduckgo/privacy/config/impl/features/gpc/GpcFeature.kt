@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 
-sealed class PrivacyFeatureName(override val value: String) : FeatureName {
-    data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
-    data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
-}
+data class GpcFeature(
+    val state: String,
+    val exceptions: List<GpcExceptionEntity>
+)

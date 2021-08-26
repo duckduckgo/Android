@@ -21,8 +21,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -31,11 +31,12 @@ import javax.inject.Provider
 
 class GlobalPrivacyControlViewModel(
     private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : ViewModel() {
 
     data class ViewState(
-        val globalPrivacyControlEnabled: Boolean = false
+        val globalPrivacyControlEnabled: Boolean = false,
+        val globalPrivacyControlRemoteEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -48,15 +49,22 @@ class GlobalPrivacyControlViewModel(
 
     init {
         _viewState.value = ViewState(
-            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
+            globalPrivacyControlEnabled = globalPrivacyControl.isGpcActive(),
+            globalPrivacyControlRemoteEnabled = globalPrivacyControl.isGpcRemoteFeatureEnabled()
         )
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
     fun onUserToggleGlobalPrivacyControl(enabled: Boolean) {
-        val pixelName = if (enabled) SETTINGS_DO_NOT_SELL_ON else SETTINGS_DO_NOT_SELL_OFF
+        val pixelName = if (enabled) {
+            globalPrivacyControl.enableGpc()
+            SETTINGS_DO_NOT_SELL_ON
+        } else {
+            globalPrivacyControl.disableGpc()
+            SETTINGS_DO_NOT_SELL_OFF
+        }
         pixel.fire(pixelName)
-        settingsDataStore.globalPrivacyControlEnabled = enabled
+
         _viewState.value = _viewState.value?.copy(globalPrivacyControlEnabled = enabled)
     }
 
@@ -72,12 +80,12 @@ class GlobalPrivacyControlViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class GlobalPrivacyControlViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
-    private val settingsDataStore: Provider<SettingsDataStore>
+    private val globalPrivacyControl: Provider<GlobalPrivacyControl>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), settingsDataStore.get()) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), globalPrivacyControl.get()) as T)
                 else -> null
             }
         }

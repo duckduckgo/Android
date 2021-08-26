@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -51,6 +52,7 @@ class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
+    private val globalPrivacyControl: GlobalPrivacyControl,
     private val pixel: Pixel
 ) : ViewModel() {
 
@@ -117,7 +119,7 @@ class SettingsViewModel @Inject constructor(
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
+                    globalPrivacyControlEnabled = globalPrivacyControl.isGpcActive() && globalPrivacyControl.isGpcRemoteFeatureEnabled(),
                     appLinksEnabled = settingsDataStore.appLinksEnabled
                 )
             )
@@ -310,12 +312,13 @@ class SettingsViewModelFactory @Inject constructor(
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
+    private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
     private val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), pixel.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), globalPrivacyControl.get(), pixel.get()) as T)
                 else -> null
             }
         }

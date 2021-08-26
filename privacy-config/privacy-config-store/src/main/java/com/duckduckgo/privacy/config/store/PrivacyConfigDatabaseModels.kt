@@ -19,6 +19,16 @@ package com.duckduckgo.privacy.config.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.privacy.config.api.ContentBlockingException
+import com.duckduckgo.privacy.config.api.GpcException
+
+@Entity(tableName = "gpc_exceptions")
+data class GpcExceptionEntity(
+    @PrimaryKey val domain: String
+)
+
+fun GpcExceptionEntity.toGpcException(): GpcException {
+    return GpcException(domain = this.domain)
+}
 
 @Entity(tableName = "content_blocking_exceptions")
 data class ContentBlockingExceptionEntity(

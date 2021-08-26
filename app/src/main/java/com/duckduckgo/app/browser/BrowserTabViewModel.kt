@@ -618,7 +618,7 @@ class BrowserTabViewModel(
             fireQueryChangedPixel(trimmedInput)
 
             appLinksHandler.userEnteredBrowserState()
-            command.value = Navigate(urlToNavigate, getUrlHeaders())
+            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -628,7 +628,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
+    private fun getUrlHeaders(url: String?): Map<String, String> = globalPrivacyControl.getHeaders(url)
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -1693,7 +1693,7 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders())
+            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
             command.value = Refresh
         }
@@ -1923,7 +1923,7 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink, getUrlHeaders())
+        command.value = HandleAppLink(appLink, getUrlHeaders(appLink.uriString))
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
@@ -1931,7 +1931,7 @@ class BrowserTabViewModel(
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders())
+        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
     }
 
     override fun openMessageInNewTab(message: Message) {
