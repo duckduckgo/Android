@@ -28,6 +28,7 @@ import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.statistics.VariantManager
@@ -59,12 +60,20 @@ class NetworkModule {
     @Provides
     @Singleton
     @Named("api")
-    fun apiOkHttpClient(context: Context, apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+    fun apiOkHttpClient(
+        context: Context,
+        apiRequestInterceptor: ApiRequestInterceptor,
+        apiInterceptorPlugins: PluginPoint<ApiInterceptorPlugin>
+    ): OkHttpClient {
         val cacheLocation = File(context.cacheDir, NetworkApiCache.FILE_NAME)
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
-            .cache(cache)
+            .cache(cache).apply {
+                apiInterceptorPlugins.getPlugins().forEach {
+                    addInterceptor(it.getInterceptor())
+                }
+            }
             .build()
     }
 

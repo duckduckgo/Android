@@ -43,16 +43,21 @@ class EmailProtectionViewModel(
     data class ViewState(val emailState: EmailState)
 
     sealed class EmailState {
+        object NotSupported : EmailState()
         object SignedOut : EmailState()
         data class SignedIn(val emailAddress: String) : EmailState()
     }
 
     private fun emailState(isSignedIn: Boolean) = flow {
-        if (isSignedIn) {
-            val emailAddress = emailManager.getEmailAddress() // If signed in there is always a non-null address
-            emit(ViewState(EmailState.SignedIn(emailAddress!!)))
+        if (emailManager.isEmailFeatureSupported()) {
+            if (isSignedIn) {
+                val emailAddress = emailManager.getEmailAddress() // If signed in there is always a non-null address
+                emit(ViewState(EmailState.SignedIn(emailAddress!!)))
+            } else {
+                emit(ViewState(EmailState.SignedOut))
+            }
         } else {
-            emit(ViewState(EmailState.SignedOut))
+            emit(ViewState(EmailState.NotSupported))
         }
     }
 }
