@@ -60,7 +60,7 @@ class TrackerDetectorImpl(
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
-            val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || whitelisted(documentUrl)
+            val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || isSiteAContentBlockingException(documentUrl)
             val isBlocked = !isDocumentInAllowedList
             return TrackingEvent(documentUrl, url, result.categories, entity, isBlocked, result.surrogate)
         }
@@ -69,7 +69,7 @@ class TrackerDetectorImpl(
         return null
     }
 
-    private fun whitelisted(documentUrl: String): Boolean {
+    private fun isSiteAContentBlockingException(documentUrl: String): Boolean {
         return contentBlocking.isAnException(documentUrl)
     }
 
