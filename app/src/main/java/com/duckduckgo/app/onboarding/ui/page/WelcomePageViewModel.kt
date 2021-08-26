@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+@SuppressLint("StaticFieldLeak")
 class WelcomePageViewModel(
     private val appInstallStore: AppInstallStore,
     private val context: Context,
@@ -90,7 +92,7 @@ class WelcomePageViewModelFactory(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return with(modelClass) {
             when {
                 isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
