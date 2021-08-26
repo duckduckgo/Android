@@ -355,6 +355,20 @@ class AppEmailManagerTest {
         assertEquals(UNKNOWN_COHORT, testee.getCohort())
     }
 
+    @Test
+    fun whenIsEmailFeatureSupportedAndEncryptionCanBeUsedThenReturnTrue() {
+        whenever(mockEmailDataStore.canUseEncryption()).thenReturn(true)
+
+        assertTrue(testee.isEmailFeatureSupported())
+    }
+
+    @Test
+    fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() {
+        whenever(mockEmailDataStore.canUseEncryption()).thenReturn(false)
+
+        assertFalse(testee.isEmailFeatureSupported())
+    }
+
     private fun givenUserIsInWaitlist() {
         whenever(mockEmailDataStore.waitlistTimestamp).thenReturn(1234)
         whenever(mockEmailDataStore.waitlistToken).thenReturn("token")

@@ -42,6 +42,7 @@ interface EmailDataStore {
     var sendNotification: Boolean
     var cohort: String?
     fun nextAliasFlow(): StateFlow<String?>
+    fun canUseEncryption(): Boolean
 }
 
 @FlowPreview
@@ -148,6 +149,8 @@ class EmailEncryptedSharedPreferences(
                 else putString(KEY_COHORT, value)
             }
         }
+
+    override fun canUseEncryption(): Boolean = encryptedPreferences != null
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.email.settings"

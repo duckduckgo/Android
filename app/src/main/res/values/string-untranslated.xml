@@ -37,6 +37,10 @@
     <string name="favoritesWidgetLabel">Favorites Widget</string>
     <string name="searchWidgetLabel">Search Widget</string>
 
+    <!-- Email -->
+    <string name="emailNotSupported">Device not supported</string>
+    <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
+
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
     <string name="favoriteDialogTitleEdit">Edit Favorite</string>
