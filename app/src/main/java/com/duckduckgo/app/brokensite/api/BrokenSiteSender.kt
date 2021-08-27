@@ -24,7 +24,9 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,11 +41,14 @@ class BrokenSiteSubmitter(
     private val variantManager: VariantManager,
     private val tdsMetadataDao: TdsMetadataDao,
     private val gpc: Gpc,
+    private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
     private val appCoroutineScope: CoroutineScope
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
+        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+
         appCoroutineScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
@@ -57,7 +62,7 @@ class BrokenSiteSubmitter(
                 MODEL_KEY to Build.MODEL,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
-                GPC to gpc.isGpcActive().toString()
+                GPC to isGpcEnabled
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,

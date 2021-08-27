@@ -162,9 +162,9 @@ class WebViewRequestInterceptor(
     }
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
-        val headers = request.requestHeaders
+        val existingHeaders = request.requestHeaders
         return (
-            gpc.canPerformARedirect(request.url.toString(), headers) &&
+            gpc.canUrlAddHeaders(request.url.toString(), existingHeaders) &&
                 request.isForMainFrame &&
                 request.method == "GET"
             )

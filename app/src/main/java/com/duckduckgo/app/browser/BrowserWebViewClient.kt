@@ -198,8 +198,10 @@ class BrowserWebViewClient(
     }
 
     private fun injectGpcToDom(webView: WebView) {
-        if (gpc.isGpcActive() && gpc.isGpcRemoteFeatureEnabled()) {
-            webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
+        webView.url?.let { url ->
+            if (gpc.canGpcBeUsedByUrl(url)) {
+                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
+            }
         }
     }
 

@@ -34,37 +34,24 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
 
     private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
 
-    private fun containsGpcHeader(headers: Map<String, String>): Boolean {
-        return headers.containsKey(GPC_HEADER)
-    }
-
-    override fun isAnException(url: String?): Boolean {
-        url?.let {
-            return matches(url)
-        }
-        return false
-    }
-
     override fun getGpcJs(): String {
         return gpcJsFunctions
     }
 
-    override fun isGpcActive(): Boolean = gpcRepository.isGpcEnabled()
-
-    override fun isGpcRemoteFeatureEnabled(): Boolean {
-        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+    override fun isEnabled(): Boolean {
+        return gpcRepository.isGpcEnabled()
     }
 
-    override fun getHeaders(url: String?): Map<String, String> {
-        return if (canGpcBeUsed(url)) {
+    override fun getHeaders(url: String): Map<String, String> {
+        return if (canGpcBeUsedByUrl(url)) {
             mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         } else {
             emptyMap()
         }
     }
 
-    override fun canPerformARedirect(url: String, headers: Map<String, String>): Boolean {
-        return if (canGpcBeUsed(url) && !containsGpcHeader(headers)) {
+    override fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean {
+        return if (canGpcBeUsedByUrl(url) && !containsGpcHeader(existingHeaders)) {
             headerConsumers.any { sameOrSubdomain(url, it) }
         } else {
             false
@@ -79,8 +66,20 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         gpcRepository.disableGpc()
     }
 
-    private fun canGpcBeUsed(url: String?): Boolean {
-        return isGpcActive() && isGpcRemoteFeatureEnabled() && !isAnException(url)
+    override fun canGpcBeUsedByUrl(url: String): Boolean {
+        return isFeatureEnabled() && isEnabled() && !isAnException(url)
+    }
+
+    private fun isFeatureEnabled(): Boolean {
+        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+    }
+
+    private fun containsGpcHeader(headers: Map<String, String>): Boolean {
+        return headers.containsKey(GPC_HEADER)
+    }
+
+    private fun isAnException(url: String): Boolean {
+        return matches(url)
     }
 
     private fun matches(url: String): Boolean {
