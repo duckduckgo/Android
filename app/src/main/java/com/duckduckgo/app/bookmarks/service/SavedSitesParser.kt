@@ -22,7 +22,7 @@ import org.jsoup.nodes.Element
 
 interface SavedSitesParser {
     fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String
-    suspend fun parseHtml(document: Document, bookmarkFoldersRepository: BookmarkFoldersRepository): List<SavedSite>
+    suspend fun parseHtml(document: Document, bookmarksRepository: BookmarksRepository): List<SavedSite>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
@@ -101,15 +101,15 @@ class RealSavedSitesParser : SavedSitesParser {
 
     override suspend fun parseHtml(
         document: Document,
-        bookmarkFoldersRepository: BookmarkFoldersRepository
+        bookmarksRepository: BookmarksRepository
     ): List<SavedSite> {
-        return parseElement(document, 0, bookmarkFoldersRepository, mutableListOf(), false)
+        return parseElement(document, 0, bookmarksRepository, mutableListOf(), false)
     }
 
     private suspend fun parseElement(
         documentElement: Element,
         parentId: Long,
-        bookmarkFoldersRepository: BookmarkFoldersRepository,
+        bookmarksRepository: BookmarksRepository,
         savedSites: MutableList<SavedSite>,
         inFavorite: Boolean
     ): List<SavedSite> {
@@ -129,11 +129,11 @@ class RealSavedSitesParser : SavedSitesParser {
                         val folderName = folder.text()
 
                         if (folderName == FAVORITES_FOLDER || folderName == BOOKMARKS_FOLDER) {
-                            parseElement(element, 0, bookmarkFoldersRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(element, 0, bookmarksRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
                             val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId)
-                            val id = bookmarkFoldersRepository.insert(bookmarkFolder)
-                            parseElement(element, id, bookmarkFoldersRepository, savedSites, false)
+                            val id = bookmarksRepository.insert(bookmarkFolder)
+                            parseElement(element, id, bookmarksRepository, savedSites, false)
                         }
                     } else {
                         val linkItem = element.select("a")

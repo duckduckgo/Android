@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -33,7 +33,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class BookmarkFoldersViewModel(
-    val bookmarkFoldersRepository: BookmarkFoldersRepository,
+    val bookmarksRepository: BookmarksRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -54,7 +54,7 @@ class BookmarkFoldersViewModel(
 
     fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarkFoldersRepository.buildFlatStructure(selectedFolderId, currentFolder, rootFolderName)
+            val folderStructure = bookmarksRepository.buildFlatStructure(selectedFolderId, currentFolder, rootFolderName)
             onFolderStructureCreated(folderStructure)
         }
     }
@@ -70,7 +70,7 @@ class BookmarkFoldersViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarkFoldersViewModelFactory @Inject constructor(
-    private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
+    private val bookmarksRepository: Provider<BookmarksRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -78,7 +78,7 @@ class BookmarkFoldersViewModelFactory @Inject constructor(
             return when {
                 isAssignableFrom(BookmarkFoldersViewModel::class.java) -> (
                     BookmarkFoldersViewModel(
-                        bookmarkFoldersRepository.get(),
+                        bookmarksRepository.get(),
                         dispatcherProvider.get()
                     ) as T
                     )

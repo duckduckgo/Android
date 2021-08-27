@@ -4,7 +4,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import org.jsoup.Jsoup
@@ -38,7 +38,7 @@ class RealSavedSitesImporter(
     private val contentResolver: ContentResolver,
     private val bookmarksDao: BookmarksDao,
     private val favoritesRepository: FavoritesRepository,
-    private val bookmarkFoldersRepository: BookmarkFoldersRepository,
+    private val bookmarksRepository: BookmarksRepository,
     private val savedSitesParser: SavedSitesParser
 ) : SavedSitesImporter {
 
@@ -50,7 +50,7 @@ class RealSavedSitesImporter(
         return try {
             val savedSites = contentResolver.openInputStream(uri).use { stream ->
                 val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
-                savedSitesParser.parseHtml(document, bookmarkFoldersRepository)
+                savedSitesParser.parseHtml(document, bookmarksRepository)
             }
 
             savedSites.forEach {

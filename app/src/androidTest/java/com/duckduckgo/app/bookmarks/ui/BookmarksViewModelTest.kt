@@ -64,7 +64,7 @@ class BookmarksViewModelTest {
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val bookmarksDao: BookmarksDao = mock()
     private val favoritesRepository: FavoritesRepository = mock()
-    private val bookmarkFoldersRepository: BookmarkFoldersRepository = mock()
+    private val bookmarksRepository: BookmarksRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
     private val pixel: Pixel = mock()
@@ -75,7 +75,7 @@ class BookmarksViewModelTest {
     private val bookmarkFolder = BookmarkFolder(id = 1, name = "folder", parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarksRepository, bookmarksDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -89,7 +89,7 @@ class BookmarksViewModelTest {
 
         whenever(bookmarksDao.getBookmarksByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkEntity)))
 
-        whenever(bookmarkFoldersRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
+        whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
     }
 
     @After
@@ -202,7 +202,7 @@ class BookmarksViewModelTest {
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
 
-        verify(bookmarkFoldersRepository).fetchBookmarksAndFolders(parentId)
+        verify(bookmarksRepository).fetchBookmarksAndFolders(parentId)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
@@ -219,7 +219,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderAddedThenCallInsertOnRepository() = coroutineRule.runBlocking {
         testee.onBookmarkFolderAdded(bookmarkFolder)
 
-        verify(bookmarkFoldersRepository).insert(bookmarkFolder)
+        verify(bookmarksRepository).insert(bookmarkFolder)
     }
 
     @Test
@@ -234,7 +234,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = coroutineRule.runBlocking {
         testee.onBookmarkFolderUpdated(bookmarkFolder)
 
-        verify(bookmarkFoldersRepository).update(bookmarkFolder)
+        verify(bookmarksRepository).update(bookmarkFolder)
     }
 
     @Test
@@ -243,17 +243,17 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
         )
-        whenever(bookmarkFoldersRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
-        verify(bookmarkFoldersRepository).getBookmarkFolderBranch(bookmarkFolder)
+        verify(bookmarksRepository).getBookmarkFolderBranch(bookmarkFolder)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
         assertEquals(BookmarkFolderBranch(emptyList(), emptyList()), viewStateCaptor.allValues[0].branchToDelete)
         assertEquals(bookmarkFolderBranch, viewStateCaptor.allValues[1].branchToDelete)
 
-        verify(bookmarkFoldersRepository).deleteFolderBranch(bookmarkFolderBranch)
+        verify(bookmarksRepository).deleteFolderBranch(bookmarkFolderBranch)
     }
 
     @Test
@@ -262,7 +262,7 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
         )
-        whenever(bookmarkFoldersRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         val nonEmptyBookmarkFolder = bookmarkFolder.copy(numBookmarks = 1)
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
@@ -281,6 +281,6 @@ class BookmarksViewModelTest {
 
         testee.insertRecentlyDeletedBookmarksAndFolders()
 
-        verify(bookmarkFoldersRepository).insertFolderBranch(bookmarkFolderBranch)
+        verify(bookmarksRepository).insertFolderBranch(bookmarkFolderBranch)
     }
 }

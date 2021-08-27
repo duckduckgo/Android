@@ -22,7 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.*
@@ -49,7 +49,7 @@ class BookmarkFoldersViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val bookmarkFoldersRepository: BookmarkFoldersRepository = mock()
+    private val bookmarksRepository: BookmarksRepository = mock()
 
     private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
@@ -63,7 +63,7 @@ class BookmarkFoldersViewModelTest {
     )
 
     private val testee: BookmarkFoldersViewModel by lazy {
-        val model = BookmarkFoldersViewModel(bookmarkFoldersRepository, coroutineRule.testDispatcherProvider)
+        val model = BookmarkFoldersViewModel(bookmarksRepository, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -71,7 +71,7 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = coroutineRule.runBlocking {
-        whenever(bookmarkFoldersRepository.buildFlatStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
+        whenever(bookmarksRepository.buildFlatStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
     }
 
     @Test
@@ -82,7 +82,7 @@ class BookmarkFoldersViewModelTest {
 
         testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
 
-        verify(bookmarkFoldersRepository).buildFlatStructure(selectedFolderId, folder, rootFolderName)
+        verify(bookmarksRepository).buildFlatStructure(selectedFolderId, folder, rootFolderName)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)

@@ -33,7 +33,7 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 
 @ExperimentalCoroutinesApi
-class BookmarkFoldersDataRepositoryTest {
+class BookmarksDataRepositoryTest {
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -45,7 +45,7 @@ class BookmarkFoldersDataRepositoryTest {
     private lateinit var db: AppDatabase
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
     private lateinit var bookmarksDao: BookmarksDao
-    private lateinit var repository: BookmarkFoldersRepository
+    private lateinit var repository: BookmarksRepository
 
     private var mockBookmarkFoldersDao: BookmarkFoldersDao = mock()
 
@@ -56,7 +56,7 @@ class BookmarkFoldersDataRepositoryTest {
             .build()
         bookmarkFoldersDao = db.bookmarkFoldersDao()
         bookmarksDao = db.bookmarksDao()
-        repository = BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, db)
+        repository = BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, db)
     }
 
     @Test
@@ -67,7 +67,7 @@ class BookmarkFoldersDataRepositoryTest {
 
     @Test
     fun whenUpdateBookmarkFolderThenUpdateBookmarkFolderCalled() = runBlocking {
-        repository = BookmarkFoldersDataRepository(mockBookmarkFoldersDao, bookmarksDao, db)
+        repository = BookmarksDataRepository(mockBookmarkFoldersDao, bookmarksDao, db)
         val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         repository.update(bookmarkFolder)
 

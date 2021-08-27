@@ -54,7 +54,7 @@ class SavedSitesExporterTest {
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
     private lateinit var favoritesRepository: FavoritesRepository
-    private lateinit var bookmarkFoldersRepository: BookmarkFoldersRepository
+    private lateinit var bookmarksRepository: BookmarksRepository
     private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
@@ -68,9 +68,9 @@ class SavedSitesExporterTest {
         bookmarksDao = db.bookmarksDao()
         bookmarkFoldersDao = db.bookmarkFoldersDao()
         favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
-        bookmarkFoldersRepository = BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, db)
+        bookmarksRepository = BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, db)
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarkFoldersRepository, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, RealSavedSitesParser())
     }
 
     @After

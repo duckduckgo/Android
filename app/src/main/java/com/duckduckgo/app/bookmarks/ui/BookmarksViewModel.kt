@@ -48,7 +48,7 @@ import javax.inject.Provider
 
 class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
-    private val bookmarkFoldersRepository: BookmarkFoldersRepository,
+    private val bookmarksRepository: BookmarksRepository,
     private val bookmarksDao: BookmarksDao,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
@@ -194,7 +194,7 @@ class BookmarksViewModel(
 
     fun fetchBookmarksAndFolders(parentId: Long? = null) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarkFoldersRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
+            bookmarksRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
                 onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
             }
         }
@@ -202,7 +202,7 @@ class BookmarksViewModel(
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarkFoldersRepository.insert(bookmarkFolder)
+            bookmarksRepository.insert(bookmarkFolder)
         }
     }
 
@@ -212,7 +212,7 @@ class BookmarksViewModel(
 
     override fun onBookmarkFolderUpdated(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            bookmarkFoldersRepository.update(bookmarkFolder)
+            bookmarksRepository.update(bookmarkFolder)
         }
     }
 
@@ -231,14 +231,14 @@ class BookmarksViewModel(
 
     private fun deleteFolder(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            val branchToDelete = bookmarkFoldersRepository.getBookmarkFolderBranch(bookmarkFolder)
+            val branchToDelete = bookmarksRepository.getBookmarkFolderBranch(bookmarkFolder)
 
             viewState.postValue(
                 viewState.value?.copy(
                     branchToDelete = branchToDelete
                 )
             )
-            bookmarkFoldersRepository.deleteFolderBranch(branchToDelete)
+            bookmarksRepository.deleteFolderBranch(branchToDelete)
         }
     }
 
@@ -253,7 +253,7 @@ class BookmarksViewModel(
     fun insertRecentlyDeletedBookmarksAndFolders() {
         viewState.value?.let { viewState ->
             viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                bookmarkFoldersRepository.insertFolderBranch(viewState.branchToDelete)
+                bookmarksRepository.insertFolderBranch(viewState.branchToDelete)
             }
         }
     }
@@ -262,7 +262,7 @@ class BookmarksViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
-    private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
+    private val bookmarksRepository: Provider<BookmarksRepository>,
     private val bookmarksDao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val savedSitesManager: Provider<SavedSitesManager>,
@@ -275,7 +275,7 @@ class BookmarksViewModelFactory @Inject constructor(
                 isAssignableFrom(BookmarksViewModel::class.java) -> (
                     BookmarksViewModel(
                         favoritesRepository.get(),
-                        bookmarkFoldersRepository.get(),
+                        bookmarksRepository.get(),
                         bookmarksDao.get(),
                         faviconManager.get(),
                         savedSitesManager.get(),

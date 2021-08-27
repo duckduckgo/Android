@@ -22,7 +22,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
-interface BookmarkFoldersRepository {
+interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
     suspend fun update(bookmarkFolder: BookmarkFolder)
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
@@ -34,11 +34,11 @@ interface BookmarkFoldersRepository {
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>>
 }
 
-class BookmarkFoldersDataRepository(
+class BookmarksDataRepository(
     private val bookmarkFoldersDao: BookmarkFoldersDao,
     private val bookmarksDao: BookmarksDao,
     private val appDatabase: AppDatabase
-) : BookmarkFoldersRepository {
+) : BookmarksRepository {
 
     override suspend fun insert(bookmarkFolder: BookmarkFolder): Long {
         return bookmarkFoldersDao.insert(BookmarkFolderEntity(name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))

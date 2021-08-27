@@ -19,7 +19,7 @@ package com.duckduckgo.app.bookmarks.service
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FolderTreeItem
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.model.TreeNode
@@ -47,13 +47,13 @@ class SavedSitesParserTest {
 
     private lateinit var parser: RealSavedSitesParser
 
-    private var mockBookmarkFoldersRepository: BookmarkFoldersRepository = mock()
+    private var mockBookmarksRepository: BookmarksRepository = mock()
 
     @Before
     fun before() {
         parser = RealSavedSitesParser()
         runBlocking {
-            whenever(mockBookmarkFoldersRepository.insert(any())).thenReturn(0L)
+            whenever(mockBookmarksRepository.insert(any())).thenReturn(0L)
         }
     }
 
@@ -102,7 +102,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_invalid.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
 
         Assert.assertTrue(bookmarks.isEmpty())
     }
@@ -112,7 +112,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_firefox.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
 
         assertEquals(7, bookmarks.size)
 
@@ -130,7 +130,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_chrome.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
 
         assertEquals(4, bookmarks.size)
 
@@ -151,7 +151,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, mockBookmarkFoldersRepository)
+        val bookmarks = parser.parseHtml(document, mockBookmarksRepository)
         assertEquals(8, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
@@ -164,7 +164,7 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource("bookmarks/bookmarks_favorites_ddg.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val savedSites = parser.parseHtml(document, mockBookmarkFoldersRepository)
+        val savedSites = parser.parseHtml(document, mockBookmarksRepository)
 
         val favorites = savedSites.filterIsInstance<SavedSite.Favorite>()
         val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()

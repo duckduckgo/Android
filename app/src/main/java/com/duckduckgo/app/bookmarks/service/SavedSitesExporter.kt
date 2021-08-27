@@ -18,7 +18,7 @@ package com.duckduckgo.app.bookmarks.service
 
 import android.content.ContentResolver
 import android.net.Uri
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -40,7 +40,7 @@ sealed class ExportSavedSitesResult {
 class RealSavedSitesExporter(
     private val contentResolver: ContentResolver,
     private val favoritesRepository: FavoritesRepository,
-    private val bookmarkFoldersRepository: BookmarkFoldersRepository,
+    private val bookmarksRepository: BookmarksRepository,
     private val savedSitesParser: SavedSitesParser,
     private val dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : SavedSitesExporter {
@@ -50,7 +50,7 @@ class RealSavedSitesExporter(
             favoritesRepository.favoritesSync()
         }
         val treeStructure = withContext(dispatcher.io()) {
-            bookmarkFoldersRepository.buildTreeStructure()
+            bookmarksRepository.buildTreeStructure()
         }
         val html = savedSitesParser.generateHtml(treeStructure, favorites)
         return storeHtml(uri, html)

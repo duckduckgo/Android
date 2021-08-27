@@ -30,8 +30,8 @@ import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersDataRepository
-import com.duckduckgo.app.bookmarks.model.BookmarkFoldersRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksDataRepository
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -53,10 +53,10 @@ class BookmarksModule {
         context: Context,
         bookmarksDao: BookmarksDao,
         favoritesRepository: FavoritesRepository,
-        bookmarkFoldersRepository: BookmarkFoldersRepository,
+        bookmarksRepository: BookmarksRepository,
         savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
-        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarkFoldersRepository, savedSitesParser)
+        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarksRepository, savedSitesParser)
     }
 
     @Provides
@@ -71,10 +71,10 @@ class BookmarksModule {
         context: Context,
         savedSitesParser: SavedSitesParser,
         favoritesRepository: FavoritesRepository,
-        bookmarkFoldersRepository: BookmarkFoldersRepository,
+        bookmarksRepository: BookmarksRepository,
         dispatcherProvider: DispatcherProvider
     ): SavedSitesExporter {
-        return RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarkFoldersRepository, savedSitesParser, dispatcherProvider)
+        return RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, savedSitesParser, dispatcherProvider)
     }
 
     @Provides
@@ -95,7 +95,7 @@ class BookmarksModule {
 
     @Provides
     @Singleton
-    fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarkFoldersRepository {
-        return BookmarkFoldersDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
+    fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarksRepository {
+        return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }
 }
