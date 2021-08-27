@@ -22,7 +22,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
-import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
@@ -64,7 +63,6 @@ class BookmarksViewModelTest {
 
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val bookmarksDao: BookmarksDao = mock()
-    private val bookmarkFoldersDao: BookmarkFoldersDao = mock()
     private val favoritesRepository: FavoritesRepository = mock()
     private val bookmarkFoldersRepository: BookmarkFoldersRepository = mock()
     private val faviconManager: FaviconManager = mock()
@@ -77,7 +75,7 @@ class BookmarksViewModelTest {
     private val bookmarkFolder = BookmarkFolder(id = 1, name = "folder", parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, bookmarkFoldersDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarkFoldersRepository, bookmarksDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -88,10 +86,10 @@ class BookmarksViewModelTest {
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
 
         whenever(bookmarksDao.getBookmarks()).thenReturn(flowOf(listOf(bookmarkEntity)))
-        whenever(bookmarkFoldersDao.getBookmarkFolders()).thenReturn(flowOf(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)))
 
         whenever(bookmarksDao.getBookmarksByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkEntity)))
-        whenever(bookmarkFoldersDao.getBookmarkFoldersByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)))
+
+        whenever(bookmarkFoldersRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
     }
 
     @After
@@ -199,30 +197,13 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() {
-        testee.fetchBookmarksAndFolders()
-
-        verify(bookmarksDao).getBookmarks()
-        verify(bookmarkFoldersDao).getBookmarkFolders()
-        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
-
-        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
-        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
-        assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
-
-        assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
-        assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
-        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
-    }
-
-    @Test
-    fun whenFetchBookmarksAndFoldersWithParentIdThenUpdateStateWithCollectedBookmarksAndFoldersByParentId() {
+    fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() = coroutineRule.runBlocking {
         val parentId = 1L
 
-        testee.fetchBookmarksAndFolders(parentId)
+        testee.fetchBookmarksAndFolders(parentId = parentId)
 
-        verify(bookmarksDao).getBookmarksByParentId(parentId)
-        verify(bookmarkFoldersDao).getBookmarkFoldersByParentId(parentId)
+        verify(bookmarkFoldersRepository).fetchBookmarksAndFolders(parentId)
+
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)

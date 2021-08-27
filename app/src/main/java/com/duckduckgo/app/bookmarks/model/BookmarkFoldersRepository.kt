@@ -19,6 +19,8 @@ package com.duckduckgo.app.bookmarks.model
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser.Companion.BOOKMARKS_FOLDER
 import com.duckduckgo.app.global.db.AppDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 interface BookmarkFoldersRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
@@ -29,6 +31,7 @@ interface BookmarkFoldersRepository {
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun buildFlatStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
     suspend fun buildTreeStructure(): TreeNode<FolderTreeItem>
+    suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>>
 }
 
 class BookmarkFoldersDataRepository(
@@ -157,6 +160,29 @@ class BookmarkFoldersDataRepository(
                 val childNode = TreeNode(FolderTreeItem(bookmark.id, title, bookmark.parentId, bookmark.url, currentDepth))
                 parentNode.add(childNode)
             }
+        }
+    }
+
+    override suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>> {
+        return if (parentId == null) {
+            getBookmarksAndFoldersFlow(bookmarksDao.getBookmarks(), bookmarkFoldersDao.getBookmarkFolders())
+        } else {
+            getBookmarksAndFoldersFlow(bookmarksDao.getBookmarksByParentId(parentId), bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId))
+        }
+    }
+
+    private fun getBookmarksAndFoldersFlow(
+        bookmarksFlow: Flow<List<BookmarkEntity>>,
+        bookmarkFoldersFlow: Flow<List<BookmarkFolder>>
+    ): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>> {
+
+        return bookmarksFlow.combine(bookmarkFoldersFlow) {
+            bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
+
+            val mappedBookmarks = bookmarks.map {
+                SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId)
+            }
+            Pair(mappedBookmarks, folders)
         }
     }
 }

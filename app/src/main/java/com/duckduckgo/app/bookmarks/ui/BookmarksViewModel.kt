@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
@@ -41,9 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -53,7 +50,6 @@ class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
     private val bookmarkFoldersRepository: BookmarkFoldersRepository,
     private val bookmarksDao: BookmarksDao,
-    private val bookmarkFoldersDao: BookmarkFoldersDao,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
@@ -197,24 +193,11 @@ class BookmarksViewModel(
     }
 
     fun fetchBookmarksAndFolders(parentId: Long? = null) {
-        viewModelScope.launch {
-            if (parentId == null) {
-                collectItems(bookmarksDao.getBookmarks(), bookmarkFoldersDao.getBookmarkFolders())
-            } else {
-                collectItems(bookmarksDao.getBookmarksByParentId(parentId), bookmarkFoldersDao.getBookmarkFoldersByParentId(parentId))
+        viewModelScope.launch(dispatcherProvider.io()) {
+            bookmarkFoldersRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
+                onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
             }
         }
-    }
-
-    private suspend fun collectItems(bookmarksFlow: Flow<List<BookmarkEntity>>, bookmarkFoldersFlow: Flow<List<BookmarkFolder>>) {
-        bookmarksFlow.combine(bookmarkFoldersFlow) {
-            bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
-
-            val mappedBookmarks = bookmarks.map {
-                Bookmark(it.id, it.title ?: "", it.url, it.parentId)
-            }
-            onBookmarkItemsChanged(mappedBookmarks, folders)
-        }.collect()
     }
 
     override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
@@ -281,7 +264,6 @@ class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val bookmarkFoldersRepository: Provider<BookmarkFoldersRepository>,
     private val bookmarksDao: Provider<BookmarksDao>,
-    private val bookmarkFoldersDao: Provider<BookmarkFoldersDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val savedSitesManager: Provider<SavedSitesManager>,
     private val pixel: Provider<Pixel>,
@@ -295,7 +277,6 @@ class BookmarksViewModelFactory @Inject constructor(
                         favoritesRepository.get(),
                         bookmarkFoldersRepository.get(),
                         bookmarksDao.get(),
-                        bookmarkFoldersDao.get(),
                         faviconManager.get(),
                         savedSitesManager.get(),
                         pixel.get(),
