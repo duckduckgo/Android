@@ -97,9 +97,9 @@ class VpnModule {
     @Provides
     fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
         return if (BuildConfig.DEBUG) {
-            DummyPacketPersister()
-        } else {
             RoomPacketPersister(vpnDatabase)
+        } else {
+            DummyPacketPersister()
         }
     }
 
