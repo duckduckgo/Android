@@ -33,8 +33,8 @@ interface BookmarksRepository {
     suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
-    suspend fun buildFlatStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
-    suspend fun buildTreeStructure(): TreeNode<FolderTreeItem>
+    suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
+    suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem>
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 }
 
@@ -108,7 +108,7 @@ class BookmarksDataRepository(
         }
     }
 
-    override suspend fun buildFlatStructure(
+    override suspend fun getFlatFolderStructure(
         selectedFolderId: Long,
         currentFolder: BookmarkFolder?,
         rootFolderName: String
@@ -153,7 +153,7 @@ class BookmarksDataRepository(
     private fun addBookmarksAsRoot(folderStructure: List<BookmarkFolderItem>, rootFolder: String, selectedFolderId: Long) =
         listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), isSelected = selectedFolderId == 0L)) + folderStructure
 
-    override suspend fun buildTreeStructure(): TreeNode<FolderTreeItem> {
+    override suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
         val node = TreeNode(FolderTreeItem(0, BOOKMARKS_FOLDER, -1, null, 0))
         populateNode(node, 0, 1)
         return node

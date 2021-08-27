@@ -192,7 +192,7 @@ class BookmarksDataRepositoryTest {
             )
         )
 
-        val flatStructure = repository.buildFlatStructure(3, null, "Bookmarks")
+        val flatStructure = repository.getFlatFolderStructure(3, null, "Bookmarks")
 
         val items = listOf(
             BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
@@ -218,7 +218,7 @@ class BookmarksDataRepositoryTest {
             )
         )
 
-        val flatStructure = repository.buildFlatStructure(3, parentFolder, "Bookmarks")
+        val flatStructure = repository.getFlatFolderStructure(3, parentFolder, "Bookmarks")
 
         val items = listOf(
             BookmarkFolderItem(0, BookmarkFolder(0, "Bookmarks", -1), false),
@@ -242,7 +242,7 @@ class BookmarksDataRepositoryTest {
         val itemList = listOf(root, parentFolder, childFolder, childBookmark)
         val preOrderList = listOf(childFolder, childBookmark, parentFolder, root)
 
-        val treeStructure = repository.buildTreeStructure()
+        val treeStructure = repository.getTreeFolderStructure()
 
         var count = 0
         var preOrderCount = 0

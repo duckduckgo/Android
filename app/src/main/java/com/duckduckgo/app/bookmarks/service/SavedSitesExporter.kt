@@ -50,7 +50,7 @@ class RealSavedSitesExporter(
             favoritesRepository.favoritesSync()
         }
         val treeStructure = withContext(dispatcher.io()) {
-            bookmarksRepository.buildTreeStructure()
+            bookmarksRepository.getTreeFolderStructure()
         }
         val html = savedSitesParser.generateHtml(treeStructure, favorites)
         return storeHtml(uri, html)

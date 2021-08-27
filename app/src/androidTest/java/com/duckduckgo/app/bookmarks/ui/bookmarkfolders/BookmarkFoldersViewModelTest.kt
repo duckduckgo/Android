@@ -71,7 +71,7 @@ class BookmarkFoldersViewModelTest {
 
     @Before
     fun before() = coroutineRule.runBlocking {
-        whenever(bookmarksRepository.buildFlatStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
+        whenever(bookmarksRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
     }
 
     @Test
@@ -82,7 +82,7 @@ class BookmarkFoldersViewModelTest {
 
         testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
 
-        verify(bookmarksRepository).buildFlatStructure(selectedFolderId, folder, rootFolderName)
+        verify(bookmarksRepository).getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
