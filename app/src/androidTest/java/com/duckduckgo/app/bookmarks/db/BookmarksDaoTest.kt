@@ -104,7 +104,7 @@ class BookmarksDaoTest {
         )
         dao.insertList(bookmarks)
         val list = dao.getBookmarksByParentId(1).first()
-        assertEquals(list, dao.getBookmarksByParentIdImmediate(1))
+        assertEquals(list, dao.getBookmarksByParentIdSync(1))
         assertEquals(bookmarks, list)
     }
 

@@ -70,7 +70,7 @@ class BookmarkFoldersDataRepository(
     }
 
     private fun getBookmarkFolders(): List<BookmarkFolder> {
-        return bookmarkFoldersDao.getBookmarkFoldersImmediate().map {
+        return bookmarkFoldersDao.getBookmarkFoldersSync().map {
             BookmarkFolder(id = it.id, name = it.name, parentId = it.parentId)
         }
     }
@@ -142,7 +142,7 @@ class BookmarkFoldersDataRepository(
 
     private fun populateNode(parentNode: TreeNode<FolderTreeItem>, parentId: Long, currentDepth: Int) {
 
-        val bookmarkFolders = bookmarkFoldersDao.getBookmarkFoldersByParentIdImmediate(parentId)
+        val bookmarkFolders = bookmarkFoldersDao.getBookmarkFoldersByParentIdSync(parentId)
 
         bookmarkFolders.forEach { bookmarkFolder ->
             val childNode = TreeNode(FolderTreeItem(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, null, currentDepth))
@@ -150,7 +150,7 @@ class BookmarkFoldersDataRepository(
             populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
         }
 
-        val bookmarks = bookmarksDao.getBookmarksByParentIdImmediate(parentId)
+        val bookmarks = bookmarksDao.getBookmarksByParentIdSync(parentId)
 
         bookmarks.forEach { bookmark ->
             bookmark.title?.let { title ->

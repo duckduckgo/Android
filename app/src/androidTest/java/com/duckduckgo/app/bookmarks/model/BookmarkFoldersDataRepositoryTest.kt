@@ -114,7 +114,7 @@ class BookmarkFoldersDataRepositoryTest {
         repository.deleteFolderBranch(branchToDelete)
 
         assertFalse(bookmarksDao.hasBookmarks())
-        assertTrue(bookmarkFoldersDao.getBookmarkFoldersImmediate().isEmpty())
+        assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
     }
 
     @Test

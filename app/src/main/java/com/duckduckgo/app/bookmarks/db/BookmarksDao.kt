@@ -36,7 +36,7 @@ interface BookmarksDao {
     fun getBookmarksByParentId(parentId: Long): Flow<List<BookmarkEntity>>
 
     @Query("select * from bookmarks where parentId = :parentId")
-    fun getBookmarksByParentIdImmediate(parentId: Long): List<BookmarkEntity>
+    fun getBookmarksByParentIdSync(parentId: Long): List<BookmarkEntity>
 
     @Query("select * from bookmarks where parentId in (:parentIds)")
     fun getBookmarksByParentIds(parentIds: List<Long>): List<BookmarkEntity>

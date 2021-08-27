@@ -82,7 +82,7 @@ class BookmarkFoldersDaoTest {
     @Test
     fun whenBookmarkFoldersAddedThenTheyAreInTheList() = runBlocking {
         bookmarkFoldersDao.insertList(bookmarkFolderList)
-        val list = bookmarkFoldersDao.getBookmarkFoldersImmediate()
+        val list = bookmarkFoldersDao.getBookmarkFoldersSync()
         assertEquals(bookmarkFolderList, list)
     }
 
@@ -110,14 +110,14 @@ class BookmarkFoldersDaoTest {
         bookmarksDao.insertList(bookmarksList)
 
         var list = bookmarkFoldersDao.getBookmarkFoldersByParentId(0).first()
-        assertEquals(list, bookmarkFoldersDao.getBookmarkFoldersByParentIdImmediate(0))
+        assertEquals(list, bookmarkFoldersDao.getBookmarkFoldersByParentIdSync(0))
         assertEquals(1, list.size)
 
         assertEquals(list[0].numFolders, 2)
         assertEquals(list[0].numBookmarks, 1)
 
         list = bookmarkFoldersDao.getBookmarkFoldersByParentId(1).first()
-        assertEquals(list, bookmarkFoldersDao.getBookmarkFoldersByParentIdImmediate(1))
+        assertEquals(list, bookmarkFoldersDao.getBookmarkFoldersByParentIdSync(1))
         assertEquals(2, list.size)
 
         assertEquals(list[0].numFolders, 0)
@@ -150,7 +150,7 @@ class BookmarkFoldersDaoTest {
         val bookmarkFolderEntity = BookmarkFolderEntity(id = 1, name = "updated name", parentId = 0)
         bookmarkFoldersDao.update(bookmarkFolderEntity)
 
-        val list = bookmarkFoldersDao.getBookmarkFoldersImmediate()
+        val list = bookmarkFoldersDao.getBookmarkFoldersSync()
         assertEquals(1, list.size)
         assertEquals(bookmarkFolderEntity, list.first())
     }

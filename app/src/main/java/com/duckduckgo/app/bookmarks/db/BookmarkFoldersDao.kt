@@ -33,13 +33,13 @@ interface BookmarkFoldersDao {
     fun getBookmarkFolders(): Flow<List<BookmarkFolder>>
 
     @Query("select * from bookmark_folders")
-    fun getBookmarkFoldersImmediate(): List<BookmarkFolderEntity>
+    fun getBookmarkFoldersSync(): List<BookmarkFolderEntity>
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
     fun getBookmarkFoldersByParentId(parentId: Long): Flow<List<BookmarkFolder>>
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
-    fun getBookmarkFoldersByParentIdImmediate(parentId: Long): List<BookmarkFolder>
+    fun getBookmarkFoldersByParentIdSync(parentId: Long): List<BookmarkFolder>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkFolder: BookmarkFolderEntity)
