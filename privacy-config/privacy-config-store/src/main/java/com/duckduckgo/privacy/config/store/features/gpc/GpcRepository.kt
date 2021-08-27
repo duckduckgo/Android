@@ -26,10 +26,13 @@ import kotlinx.coroutines.launch
 
 interface GpcRepository {
     fun updateAll(exceptions: List<GpcExceptionEntity>)
+    fun enableGpc()
+    fun disableGpc()
+    fun isGpcEnabled(): Boolean
     val exceptions: ArrayList<GpcException>
 }
 
-class RealGpcRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
+class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
     GpcRepository {
 
     private val gpcDao: GpcDao = database.gpcDao()
@@ -45,6 +48,16 @@ class RealGpcRepository(val database: PrivacyConfigDatabase, coroutineScope: Cor
         gpcDao.updateAll(exceptions)
         loadToMemory()
     }
+
+    override fun enableGpc() {
+        gpcDataStore.gpcEnabled = true
+    }
+
+    override fun disableGpc() {
+        gpcDataStore.gpcEnabled = false
+    }
+
+    override fun isGpcEnabled(): Boolean = gpcDataStore.gpcEnabled
 
     private fun loadToMemory() {
         exceptions.clear()

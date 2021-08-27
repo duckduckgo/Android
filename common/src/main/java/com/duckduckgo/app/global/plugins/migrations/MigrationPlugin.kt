@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+package com.duckduckgo.app.global.plugins.migrations
 
-interface Gpc {
-    fun isAnException(url: String?): Boolean
-    fun getGpcJs(): String
-    fun isGpcActive(): Boolean
-    fun isGpcRemoteFeatureEnabled(): Boolean
-    fun getHeaders(url: String?): Map<String, String>
-    fun canPerformARedirect(url: String, headers: Map<String, String>): Boolean
-    fun enableGpc()
-    fun disableGpc()
+import com.duckduckgo.app.global.plugins.PluginPoint
+import javax.inject.Inject
+import javax.inject.Singleton
+
+interface MigrationPlugin {
+    fun run(currentVersion: Int)
+    val version: Int
 }
 
-data class GpcException(val domain: String)
+@Singleton
+class MigrationPluginPoint @Inject constructor(
+    private val injectorPlugins: Set<@JvmSuppressWildcards MigrationPlugin>
+) : PluginPoint<MigrationPlugin> {
+    override fun getPlugins(): List<MigrationPlugin> {
+        return injectorPlugins.toList()
+    }
+}

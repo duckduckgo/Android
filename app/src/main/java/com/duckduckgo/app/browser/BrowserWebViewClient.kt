@@ -38,8 +38,8 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
@@ -55,7 +55,7 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -168,7 +168,7 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
-            globalPrivacyControl.injectDoNotSellToDom(webView)
+            injectGpcToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
             webViewClientListener?.resetAppLinkState()
         } catch (e: Throwable) {
@@ -194,6 +194,12 @@ class BrowserWebViewClient(
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
+        }
+    }
+
+    private fun injectGpcToDom(webView: WebView) {
+        if (gpc.isGpcActive() && gpc.isGpcRemoteFeatureEnabled()) {
+            webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
         }
     }
 

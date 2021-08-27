@@ -16,9 +16,13 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
+import android.content.Context
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -26,14 +30,72 @@ import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealGpc @Inject constructor(private val gpcRepository: GpcRepository) : Gpc {
+class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository) : Gpc {
 
-    override fun isAnException(url: String): Boolean {
-        return matches(url)
+    private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
+
+    private fun containsGpcHeader(headers: Map<String, String>): Boolean {
+        return headers.containsKey(GPC_HEADER)
+    }
+
+    override fun isAnException(url: String?): Boolean {
+        url?.let {
+            return matches(url)
+        }
+        return false
+    }
+
+    override fun getGpcJs(): String {
+        return gpcJsFunctions
+    }
+
+    override fun isGpcActive(): Boolean = gpcRepository.isGpcEnabled()
+
+    override fun isGpcRemoteFeatureEnabled(): Boolean {
+        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+    }
+
+    override fun getHeaders(url: String?): Map<String, String> {
+        return if (canGpcBeUsed(url)) {
+            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
+        } else {
+            emptyMap()
+        }
+    }
+
+    override fun canPerformARedirect(url: String, headers: Map<String, String>): Boolean {
+        return if (canGpcBeUsed(url) && !containsGpcHeader(headers)) {
+            headerConsumers.any { sameOrSubdomain(url, it) }
+        } else {
+            false
+        }
+    }
+
+    override fun enableGpc() {
+        gpcRepository.enableGpc()
+    }
+
+    override fun disableGpc() {
+        gpcRepository.disableGpc()
+    }
+
+    private fun canGpcBeUsed(url: String?): Boolean {
+        return isGpcActive() && isGpcRemoteFeatureEnabled() && !isAnException(url)
     }
 
     private fun matches(url: String): Boolean {
         return gpcRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
+    }
+
+    companion object {
+        const val GPC_HEADER = "sec-gpc"
+        const val GPC_HEADER_VALUE = "1"
+
+        private val headerConsumers = listOf(
+            "nytimes.com",
+            "globalprivacycontrol.org",
+            "global-privacy-control.glitch.me"
+        )
     }
 
 }

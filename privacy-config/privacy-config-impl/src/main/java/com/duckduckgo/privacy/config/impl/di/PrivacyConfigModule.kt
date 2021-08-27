@@ -34,7 +34,9 @@ import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
+import com.duckduckgo.privacy.config.store.features.gpc.GpcDataStore
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
 import com.duckduckgo.privacy.config.store.features.gpc.RealGpcRepository
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -108,8 +110,14 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideGpcRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
-        return RealGpcRepository(database, coroutineScope, dispatcherProvider)
+    fun provideGpcDataStore(context: Context): GpcDataStore {
+        return GpcSharedPreferences(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
+        return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton

@@ -57,8 +57,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -71,7 +69,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
@@ -106,7 +103,7 @@ class BrowserModule {
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        globalPrivacyControl: GlobalPrivacyControl,
+        gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
@@ -123,7 +120,7 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl,
+            gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
@@ -192,9 +189,9 @@ class BrowserModule {
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
-        globalPrivacyControl: GlobalPrivacyControl,
+        gpc: Gpc,
         userAgentProvider: UserAgentProvider
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl, userAgentProvider)
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
 
     @Provides
     fun cookieManager(
@@ -298,12 +295,6 @@ class BrowserModule {
     @Provides
     fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
-    }
-
-    @Provides
-    @Singleton
-    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore, featureToggle: FeatureToggle, gpc: Gpc): GlobalPrivacyControl {
-        return GlobalPrivacyControlManager(appSettingsPreferencesStore, featureToggle, gpc)
     }
 
     @Provides

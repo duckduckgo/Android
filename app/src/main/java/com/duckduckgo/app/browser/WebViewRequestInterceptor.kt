@@ -23,14 +23,13 @@ import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.isHttp
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -57,7 +56,7 @@ class WebViewRequestInterceptor(
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
-    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val gpc: Gpc,
     private val userAgentProvider: UserAgentProvider
 ) : RequestInterceptor {
 
@@ -158,15 +157,14 @@ class WebViewRequestInterceptor(
 
     private fun getHeaders(request: WebResourceRequest): Map<String, String> {
         return request.requestHeaders.apply {
-            putAll(globalPrivacyControl.getHeaders(request.url.toString()))
+            putAll(gpc.getHeaders(request.url.toString()))
         }
     }
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val headers = request.requestHeaders
         return (
-            globalPrivacyControl.canPerformARedirect(request.url) &&
-                !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER) &&
+            gpc.canPerformARedirect(request.url.toString(), headers) &&
                 request.isForMainFrame &&
                 request.method == "GET"
             )
