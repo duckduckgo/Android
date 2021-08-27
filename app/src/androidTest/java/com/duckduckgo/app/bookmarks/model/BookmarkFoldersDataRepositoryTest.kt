@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -115,6 +116,37 @@ class BookmarkFoldersDataRepositoryTest {
 
         assertFalse(bookmarksDao.hasBookmarks())
         assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
+    }
+
+    @Test
+    fun whenFetchBookmarksAndFoldersWithNullParentIdThenFetchAllBookmarksAndFolders() = runBlocking {
+        val folder = BookmarkFolder(id = 1, name = "name", parentId = 0)
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
+
+        repository.insert(folder)
+        bookmarksDao.insert(bookmark)
+
+        val bookmarksAndFolders = repository.fetchBookmarksAndFolders(null)
+
+        assertEquals(listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(listOf(BookmarkFolder(folder.id, folder.name, folder.parentId, numBookmarks = 1)), bookmarksAndFolders.first().second)
+    }
+
+    @Test
+    fun whenFetchBookmarksAndFoldersWithParentIdThenFetchBookmarksAndFoldersForParentId() = runBlocking {
+        val folder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
+        val anotherFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 0)
+        val childFolder = BookmarkFolderEntity(id = 3, name = "child folder", parentId = 2)
+
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
+        val anotherBookmark = BookmarkEntity(id = 2, title = "another title", url = "www.foo.com", parentId = 2)
+
+        repository.insertFolderBranch(BookmarkFolderBranch(listOf(bookmark, anotherBookmark), listOf(folder, anotherFolder, childFolder)))
+
+        val bookmarksAndFolders = repository.fetchBookmarksAndFolders(2)
+
+        assertEquals(listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(listOf(BookmarkFolder(childFolder.id, childFolder.name, childFolder.parentId)), bookmarksAndFolders.first().second)
     }
 
     @Test
