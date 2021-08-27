@@ -107,7 +107,6 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private fun saveExceptionRulesState(coroutineScope: CoroutineScope) {
         coroutineScope.launch(Dispatchers.IO) {
             exceptionRulesSavedState.clear()
-            exclusionRulesRepository.deleteAllTrackerRules()
             exceptionRulesSavedState.addAll(exclusionRulesRepository.getAllTrackerRules())
         }
     }

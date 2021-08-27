@@ -37,7 +37,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 15,
+    exportSchema = true, version = 16,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -93,6 +93,7 @@ abstract class VpnDatabase : RoomDatabase() {
                             prepopulateUUID(context)
                             prepopulateAppTrackerBlockingList(context, getInstance(context))
                             prepopulateAppTrackerExclusionList(context, getInstance(context))
+                            prepopulateAppTrackerExceptionRules(context, getInstance(context))
                         }
                     }
 
@@ -101,6 +102,7 @@ abstract class VpnDatabase : RoomDatabase() {
                             prepopulateUUID(context)
                             prepopulateAppTrackerBlockingList(context, getInstance(context))
                             prepopulateAppTrackerExclusionList(context, getInstance(context))
+                            prepopulateAppTrackerExceptionRules(context, getInstance(context))
                         }
                     }
                 })
@@ -136,6 +138,15 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
+        private fun prepopulateAppTrackerExceptionRules(context: Context, vpnDatabase: VpnDatabase) {
+            context.resources.openRawResource(R.raw.app_tracker_exception_rules).bufferedReader()
+                .use { it.readText() }
+                .also { json ->
+                    val rules = parseJsonAppTrackerExceptionRules(json)
+                    vpnDatabase.vpnAppTrackerBlockingDao().insertTrackerExceptionRules(rules)
+                }
+        }
+
         private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
             return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
@@ -146,6 +157,12 @@ abstract class VpnDatabase : RoomDatabase() {
             return adapter.fromJson(json)?.rules.orEmpty().map {
                 AppTrackerExcludedPackage(it)
             }
+        }
+
+        private fun parseJsonAppTrackerExceptionRules(json: String): List<AppTrackerExceptionRule> {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<JsonAppTrackerExceptionRules> = moshi.adapter(JsonAppTrackerExceptionRules::class.java)
+            return adapter.fromJson(json)?.rules.orEmpty()
         }
 
     }

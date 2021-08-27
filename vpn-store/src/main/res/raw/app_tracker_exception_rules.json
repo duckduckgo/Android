@@ -1,0 +1,32 @@
+{
+  "rules": [
+    {
+      "rule": "api2.branch.io",
+      "packageNames": [
+        "com.glovo",
+        "com.imdb.mobile",
+        "com.marriott.mrt",
+        "com.esharesinc.android"
+      ]
+    },
+    {
+      "rule": "dpm.demdex.net",
+      "packageNames": [
+        "com.marriott.mrt",
+        "com.excentus.frn.android"
+      ]
+    },
+    {
+      "rule": "cm.everesttech.net",
+      "packageNames": [
+        "com.excentus.frn.android"
+      ]
+    },
+    {
+      "rule": "t.co",
+      "packageNames": [
+        "com.zecwalletmobile"
+      ]
+    }
+  ]
+}
