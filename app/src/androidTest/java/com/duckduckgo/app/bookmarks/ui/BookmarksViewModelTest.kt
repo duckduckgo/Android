@@ -22,7 +22,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -62,7 +61,6 @@ class BookmarksViewModelTest {
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
 
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
-    private val bookmarksDao: BookmarksDao = mock()
     private val favoritesRepository: FavoritesRepository = mock()
     private val bookmarksRepository: BookmarksRepository = mock()
     private val faviconManager: FaviconManager = mock()
@@ -71,11 +69,11 @@ class BookmarksViewModelTest {
 
     private val bookmark = SavedSite.Bookmark(id = 0, title = "title", url = "www.example.com", parentId = 0)
     private val favorite = SavedSite.Favorite(id = 0, title = "title", url = "www.example.com", position = 0)
-    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
     private val bookmarkFolder = BookmarkFolder(id = 1, name = "folder", parentId = 0)
+    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarksRepository, bookmarksDao, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(favoritesRepository, bookmarksRepository, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -84,10 +82,6 @@ class BookmarksViewModelTest {
     @Before
     fun before() = coroutineRule.runBlocking {
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
-
-        whenever(bookmarksDao.getBookmarks()).thenReturn(flowOf(listOf(bookmarkEntity)))
-
-        whenever(bookmarksDao.getBookmarksByParentId(anyLong())).thenReturn(flowOf(listOf(bookmarkEntity)))
 
         whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
     }
@@ -99,10 +93,10 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkInsertedThenDaoUpdated() {
+    fun whenBookmarkInsertedThenDaoUpdated() = coroutineRule.runBlocking {
         testee.insert(bookmark)
 
-        verify(bookmarksDao).insert(bookmarkEntity)
+        verify(bookmarksRepository).insert(bookmark)
     }
 
     @Test
@@ -117,7 +111,7 @@ class BookmarksViewModelTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
-        verify(bookmarksDao).delete(bookmarkEntity)
+        verify(bookmarksRepository).delete(bookmark)
     }
 
     @Test
@@ -131,7 +125,7 @@ class BookmarksViewModelTest {
     fun whenBookmarkEditedThenDaoUpdated() = coroutineRule.runBlocking {
         testee.onSavedSiteEdited(bookmark)
 
-        verify(bookmarksDao).update(bookmarkEntity)
+        verify(bookmarksRepository).update(bookmark)
     }
 
     @Test

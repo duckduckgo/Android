@@ -47,6 +47,9 @@ class BookmarksDataRepositoryTest {
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var repository: BookmarksRepository
 
+    private val bookmark = SavedSite.Bookmark(id = 1, title = "title", url = "foo.com", parentId = 0)
+    private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId)
+
     private var mockBookmarkFoldersDao: BookmarkFoldersDao = mock()
 
     @Before
@@ -63,6 +66,32 @@ class BookmarksDataRepositoryTest {
     fun whenInsertBookmarkFolderThenReturnId() = runBlocking {
         val id = repository.insert(BookmarkFolder(id = 1, name = "name", parentId = 0))
         assertEquals(1, id)
+    }
+
+    @Test
+    fun whenInsertBookmarkThenPopulateDB() = runBlocking {
+        repository.insert(bookmark)
+        assertEquals(listOf(bookmarkEntity), bookmarksDao.getBookmarks().first())
+    }
+
+    @Test
+    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runBlocking {
+        repository.insert(bookmark)
+
+        val updatedBookmark = SavedSite.Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = 2)
+
+        repository.update(updatedBookmark)
+        val bookmarkList = bookmarksDao.getBookmarks().first()
+
+        assertTrue(bookmarkList.size == 1)
+        assertEquals(BookmarkEntity(updatedBookmark.id, updatedBookmark.title, updatedBookmark.url, updatedBookmark.parentId), bookmarkList.first())
+    }
+
+    @Test
+    fun whenDeleteBookmarkThenRemoveBookmarkFromDB() = runBlocking {
+        repository.insert(bookmark)
+        repository.delete(bookmark)
+        assertFalse(bookmarksDao.hasBookmarks())
     }
 
     @Test

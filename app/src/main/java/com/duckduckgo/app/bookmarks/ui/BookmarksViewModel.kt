@@ -18,8 +18,6 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.net.Uri
 import androidx.lifecycle.*
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
@@ -49,7 +47,6 @@ import javax.inject.Provider
 class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
     private val bookmarksRepository: BookmarksRepository,
-    private val bookmarksDao: BookmarksDao,
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
@@ -128,7 +125,7 @@ class BookmarksViewModel(
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
                     faviconManager.deletePersistedFavicon(savedSite.url)
-                    bookmarksDao.delete(BookmarkEntity(savedSite.id, savedSite.title, savedSite.url, savedSite.parentId))
+                    bookmarksRepository.delete(savedSite)
                 }
             }
             is Favorite -> {
@@ -143,7 +140,7 @@ class BookmarksViewModel(
         when (savedSite) {
             is Bookmark -> {
                 viewModelScope.launch(dispatcherProvider.io()) {
-                    bookmarksDao.insert(BookmarkEntity(title = savedSite.title, url = savedSite.url, parentId = savedSite.parentId))
+                    bookmarksRepository.insert(savedSite)
                 }
             }
             is Favorite -> {
@@ -174,7 +171,7 @@ class BookmarksViewModel(
 
     private suspend fun editBookmark(bookmark: Bookmark) {
         withContext(dispatcherProvider.io()) {
-            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
+            bookmarksRepository.update(bookmark)
         }
     }
 
@@ -193,7 +190,7 @@ class BookmarksViewModel(
     }
 
     fun fetchBookmarksAndFolders(parentId: Long? = null) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             bookmarksRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
                 onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
             }
@@ -263,7 +260,6 @@ class BookmarksViewModel(
 class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val bookmarksRepository: Provider<BookmarksRepository>,
-    private val bookmarksDao: Provider<BookmarksDao>,
     private val faviconManager: Provider<FaviconManager>,
     private val savedSitesManager: Provider<SavedSitesManager>,
     private val pixel: Provider<Pixel>,
@@ -276,7 +272,6 @@ class BookmarksViewModelFactory @Inject constructor(
                     BookmarksViewModel(
                         favoritesRepository.get(),
                         bookmarksRepository.get(),
-                        bookmarksDao.get(),
                         faviconManager.get(),
                         savedSitesManager.get(),
                         pixel.get(),

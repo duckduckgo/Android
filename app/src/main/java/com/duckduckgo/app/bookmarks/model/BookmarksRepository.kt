@@ -17,6 +17,7 @@
 package com.duckduckgo.app.bookmarks.model
 
 import com.duckduckgo.app.bookmarks.db.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser.Companion.BOOKMARKS_FOLDER
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
@@ -24,14 +25,17 @@ import kotlinx.coroutines.flow.combine
 
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
+    suspend fun insert(bookmark: Bookmark)
     suspend fun update(bookmarkFolder: BookmarkFolder)
+    suspend fun update(bookmark: Bookmark)
+    suspend fun delete(bookmark: Bookmark)
     suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
     suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun buildFlatStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
     suspend fun buildTreeStructure(): TreeNode<FolderTreeItem>
-    suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>>
+    suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
 }
 
 class BookmarksDataRepository(
@@ -44,8 +48,20 @@ class BookmarksDataRepository(
         return bookmarkFoldersDao.insert(BookmarkFolderEntity(name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
     }
 
+    override suspend fun insert(bookmark: Bookmark) {
+        bookmarksDao.insert(BookmarkEntity(title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId))
+    }
+
     override suspend fun update(bookmarkFolder: BookmarkFolder) {
         bookmarkFoldersDao.update(BookmarkFolderEntity(id = bookmarkFolder.id, name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
+    }
+
+    override suspend fun update(bookmark: Bookmark) {
+        bookmarksDao.update(BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId))
+    }
+
+    override suspend fun delete(bookmark: Bookmark) {
+        bookmarksDao.delete(BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId))
     }
 
     override suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch {
@@ -163,7 +179,7 @@ class BookmarksDataRepository(
         }
     }
 
-    override suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>> {
+    override suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
         return if (parentId == null) {
             getBookmarksAndFoldersFlow(bookmarksDao.getBookmarks(), bookmarkFoldersDao.getBookmarkFolders())
         } else {
@@ -174,13 +190,13 @@ class BookmarksDataRepository(
     private fun getBookmarksAndFoldersFlow(
         bookmarksFlow: Flow<List<BookmarkEntity>>,
         bookmarkFoldersFlow: Flow<List<BookmarkFolder>>
-    ): Flow<Pair<List<SavedSite.Bookmark>, List<BookmarkFolder>>> {
+    ): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
 
         return bookmarksFlow.combine(bookmarkFoldersFlow) {
             bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
             val mappedBookmarks = bookmarks.map {
-                SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId)
+                Bookmark(it.id, it.title ?: "", it.url, it.parentId)
             }
             Pair(mappedBookmarks, folders)
         }

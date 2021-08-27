@@ -19,10 +19,7 @@ package com.duckduckgo.app.bookmarks.service
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.model.FolderTreeItem
-import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.model.TreeNode
+import com.duckduckgo.app.bookmarks.model.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -53,7 +50,7 @@ class SavedSitesParserTest {
     fun before() {
         parser = RealSavedSitesParser()
         runBlocking {
-            whenever(mockBookmarksRepository.insert(any())).thenReturn(0L)
+            whenever(mockBookmarksRepository.insert(any<BookmarkFolder>())).thenReturn(0L)
         }
     }
 
@@ -228,9 +225,4 @@ class SavedSitesParserTest {
         assertEquals(3, favoritesLists.size)
         assertEquals(9, bookmarks.size)
     }
-
-    data class SavedSites(val favoriteFolder: FavoriteFolder, val bookmarkFolders: List<BookmarkFolder>)
-    data class BookmarkFolder(val name: String, val bookmarks: List<SavedSite.Bookmark>)
-    data class FavoriteFolder(val name: String = "Favorites", val favorites: List<SavedSite.Favorite>)
-
 }
