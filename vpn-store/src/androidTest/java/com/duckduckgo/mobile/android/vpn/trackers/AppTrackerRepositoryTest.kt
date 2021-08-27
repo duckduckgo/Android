@@ -38,7 +38,7 @@ class AppTrackerRepositoryTest {
             VpnDatabase.prepopulateAppTrackerBlockingList(context, this)
         }
 
-        appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), setOf())
+        appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao())
     }
 
     @Test

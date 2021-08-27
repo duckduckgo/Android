@@ -60,7 +60,7 @@ class DeviceShieldActivityFeedViewModelTest {
 
     @Test
     fun whenGetMostRecentTrackersIsEmptyThenEmitEmpty() = runBlocking {
-        viewModel.getMostRecentTrackers(timeWindow).test {
+        viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -72,7 +72,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[1])
         db.vpnTrackerDao().insert(dummyTrackers[2])
 
-        viewModel.getMostRecentTrackers(timeWindow).test {
+        viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             assertEquals(
                 listOf(
@@ -113,7 +113,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[3])
 
         // we always start with empty, that's why we expect two items
-        viewModel.getMostRecentTrackers(timeWindow).test {
+        viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             expectNoEvents()
@@ -126,7 +126,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[4])
 
         // we always start with empty, that's why we expect two items
-        viewModel.getMostRecentTrackers(timeWindow).test {
+        viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
             expectNoEvents()

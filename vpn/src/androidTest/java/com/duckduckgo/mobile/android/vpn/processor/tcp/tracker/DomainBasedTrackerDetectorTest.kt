@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
@@ -66,7 +67,14 @@ class DomainBasedTrackerDetectorTest {
             .allowMainThreadQueries()
             .build()
 
-        testee = DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, vpnDatabase)
+        testee = DomainBasedTrackerDetector(
+            deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, vpnDatabase,
+            object : PluginPoint<VpnTrackerDetectorInterceptor> {
+                override fun getPlugins(): Collection<VpnTrackerDetectorInterceptor> {
+                    return listOf()
+                }
+            }
+        )
     }
 
     @Test
