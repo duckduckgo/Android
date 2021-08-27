@@ -71,7 +71,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
     }
 
     private fun isFeatureEnabled(): Boolean {
-        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+        return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true
     }
 
     private fun containsGpcHeader(headers: Map<String, String>): Boolean {

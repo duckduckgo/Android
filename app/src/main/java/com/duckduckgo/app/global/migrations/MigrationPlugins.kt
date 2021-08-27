@@ -35,7 +35,7 @@ class GpcMigrationPlugin @Inject constructor(
     override val version: Int = 1
 
     override fun run(currentVersion: Int) {
-        if (currentVersion > version) {
+        if (currentVersion < version) {
             Timber.d("Migrating gpc settings")
             val gpcEnabled = settingsDataStore.globalPrivacyControlEnabled
             if (gpcEnabled) {

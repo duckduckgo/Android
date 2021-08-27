@@ -163,11 +163,7 @@ class WebViewRequestInterceptor(
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val existingHeaders = request.requestHeaders
-        return (
-            gpc.canUrlAddHeaders(request.url.toString(), existingHeaders) &&
-                request.isForMainFrame &&
-                request.method == "GET"
-            )
+        return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }
 
     private suspend fun requestWasInTheStack(url: Uri, webView: WebView): Boolean {

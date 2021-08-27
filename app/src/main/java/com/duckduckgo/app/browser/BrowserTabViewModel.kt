@@ -630,7 +630,7 @@ class BrowserTabViewModel(
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
         url?.let {
-            gpc.getHeaders(url)
+            return gpc.getHeaders(url)
         }
         return emptyMap()
     }
