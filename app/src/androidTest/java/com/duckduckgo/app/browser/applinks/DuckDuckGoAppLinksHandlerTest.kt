@@ -34,13 +34,14 @@ class DuckDuckGoAppLinksHandlerTest {
     @Before
     fun setup() {
         testee = DuckDuckGoAppLinksHandler()
+        testee.disabledUrl = "example.com"
     }
 
     @Test
     fun whenAppLinkHandledAndIsRedirectAndAppLinkNotOpenedInBrowserThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertTrue(testee.handleAppLink(isRedirect = true, isForMainFrame = true, launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -49,7 +50,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsNotRedirectAndAppLinkOpenedInBrowserThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -58,7 +59,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsRedirectAndAppLinkOpenedInBrowserThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = true, launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
@@ -67,7 +68,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsForMainFrameThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -76,7 +77,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsNotForMainFrameThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertFalse(testee.handleAppLink(isRedirect = false, isForMainFrame = false, launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = false, isForMainFrame = false, urlString = "", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
@@ -85,7 +86,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledOnApiLessThan24ThenReturnFalse() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = false, launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = false, urlString = "", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
@@ -138,14 +139,14 @@ class DuckDuckGoAppLinksHandlerTest {
     @Test
     fun whenEnterBrowserStateCalledThenSetAppLinkOpenedInBrowserToTrue() {
         assertFalse(testee.appLinkOpenedInBrowser)
-        testee.enterBrowserState()
+        testee.enterBrowserState("foo.com")
         assertTrue(testee.appLinkOpenedInBrowser)
     }
 
     @Test
     fun whenUserEntersBrowserStateThenSetUserEnteredLinkToTrue() {
         assertFalse(testee.userEnteredLink)
-        testee.userEnteredBrowserState()
+        testee.userEnteredBrowserState("foo.com")
         assertTrue(testee.userEnteredLink)
     }
 
