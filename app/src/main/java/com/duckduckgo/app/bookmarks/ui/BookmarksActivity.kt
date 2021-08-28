@@ -25,6 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
@@ -158,7 +159,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
                     is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
                     is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
                 }
             }
         )
@@ -289,14 +290,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }.show()
     }
 
-    private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
+    private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder, folderBranch: BookmarkFolderBranch) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
             binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertRecentlyDeletedBookmarksAndFolders()
+            viewModel.insertDeletedFolderBranch(folderBranch)
         }.show()
     }
 

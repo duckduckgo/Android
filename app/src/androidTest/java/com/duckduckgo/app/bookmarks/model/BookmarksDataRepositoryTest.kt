@@ -45,7 +45,7 @@ class BookmarksDataRepositoryTest {
     private lateinit var db: AppDatabase
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
     private lateinit var bookmarksDao: BookmarksDao
-    private lateinit var repository: BookmarksRepository
+    private lateinit var repository: BookmarksDataRepository
 
     private val bookmark = SavedSite.Bookmark(id = 1, title = "title", url = "foo.com", parentId = 0)
     private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId)
@@ -161,8 +161,9 @@ class BookmarksDataRepositoryTest {
         val branchToDelete = BookmarkFolderBranch(listOf(childBookmark), listOf(parentFolderEntity, childFolderEntity))
 
         repository.insertFolderBranch(branchToDelete)
-        repository.deleteFolderBranch(branchToDelete)
+        val deletedBranch = repository.deleteFolderBranch(BookmarkFolder(parentFolderEntity.id, parentFolderEntity.name, parentFolderEntity.parentId))
 
+        assertEquals(branchToDelete, deletedBranch)
         assertFalse(bookmarksDao.hasBookmarks())
         assertTrue(bookmarkFoldersDao.getBookmarkFoldersSync().isEmpty())
     }

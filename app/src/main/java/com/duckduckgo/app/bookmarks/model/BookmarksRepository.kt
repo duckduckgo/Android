@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.model
 
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
@@ -30,9 +31,7 @@ interface BookmarksRepository {
     suspend fun delete(bookmark: Bookmark)
     fun getBookmarkFoldersByParentId(parentId: Long): List<BookmarkFolder>
     fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity>
-    suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
-    suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder>
-    suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch)
+    suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
@@ -72,7 +71,8 @@ class BookmarksDataRepository(
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
     }
 
-    override suspend fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch {
+    @VisibleForTesting
+    fun getBookmarkFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch {
         val branchFolders = getBranchFolders(bookmarkFolder)
         val branchFolderIds = branchFolders.map { it.id }
 
@@ -82,7 +82,8 @@ class BookmarksDataRepository(
         return BookmarkFolderBranch(bookmarkEntities = bookmarkEntities, bookmarkFolderEntities = bookmarkFolderEntities)
     }
 
-    override suspend fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder> {
+    @VisibleForTesting
+    fun getBranchFolders(bookmarkFolder: BookmarkFolder): List<BookmarkFolder> {
         val parentGroupings = getBookmarkFolders()
             .sortedWith(compareBy({ it.parentId }, { it.id }))
             .groupBy { it.parentId }
@@ -102,11 +103,14 @@ class BookmarksDataRepository(
         }
     }
 
-    override suspend fun deleteFolderBranch(branchToDelete: BookmarkFolderBranch) {
+    override suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch {
+        val branchToDelete = getBookmarkFolderBranch(bookmarkFolder)
+
         appDatabase.runInTransaction {
             bookmarksDao.deleteList(branchToDelete.bookmarkEntities)
             bookmarkFoldersDao.delete(branchToDelete.bookmarkFolderEntities)
         }
+        return branchToDelete
     }
 
     override suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch) {
@@ -136,7 +140,7 @@ class BookmarksDataRepository(
         return addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
     }
 
-    private suspend fun removeCurrentFolderBranch(currentFolder: BookmarkFolder?, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFolder> {
+    private fun removeCurrentFolderBranch(currentFolder: BookmarkFolder?, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFolder> {
         currentFolder?.let {
             val bookmarkFolderBranch = getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
             return bookmarkFolders.minus(bookmarkFolderBranch)

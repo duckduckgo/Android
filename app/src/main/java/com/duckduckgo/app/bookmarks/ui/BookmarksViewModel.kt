@@ -58,7 +58,6 @@ class BookmarksViewModel(
         val bookmarks: List<Bookmark> = emptyList(),
         val favorites: List<Favorite> = emptyList(),
         val bookmarkFolders: List<BookmarkFolder> = emptyList(),
-        val branchToDelete: BookmarkFolderBranch = BookmarkFolderBranch(emptyList(), emptyList())
     )
 
     sealed class Command {
@@ -68,7 +67,7 @@ class BookmarksViewModel(
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
+        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder, val folderBranch: BookmarkFolderBranch) : Command()
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
     }
@@ -214,8 +213,10 @@ class BookmarksViewModel(
     }
 
     override fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
-        deleteFolder(bookmarkFolder)
-        command.value = ConfirmDeleteBookmarkFolder(bookmarkFolder)
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+            val folderBranch = bookmarksRepository.deleteFolderBranch(bookmarkFolder)
+            command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
+        }
     }
 
     fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
@@ -223,19 +224,6 @@ class BookmarksViewModel(
             onBookmarkFolderDeleted(bookmarkFolder)
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)
-        }
-    }
-
-    private fun deleteFolder(bookmarkFolder: BookmarkFolder) {
-        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            val branchToDelete = bookmarksRepository.getBookmarkFolderBranch(bookmarkFolder)
-
-            viewState.postValue(
-                viewState.value?.copy(
-                    branchToDelete = branchToDelete
-                )
-            )
-            bookmarksRepository.deleteFolderBranch(branchToDelete)
         }
     }
 
@@ -247,11 +235,9 @@ class BookmarksViewModel(
         )
     }
 
-    fun insertRecentlyDeletedBookmarksAndFolders() {
-        viewState.value?.let { viewState ->
-            viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-                bookmarksRepository.insertFolderBranch(viewState.branchToDelete)
-            }
+    fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+            bookmarksRepository.insertFolderBranch(folderBranch)
         }
     }
 }

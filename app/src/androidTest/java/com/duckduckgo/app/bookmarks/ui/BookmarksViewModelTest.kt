@@ -232,22 +232,20 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndUpdateUndoViewState() = coroutineRule.runBlocking {
+    fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = coroutineRule.runBlocking {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
         )
-        whenever(bookmarksRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
 
-        verify(bookmarksRepository).getBookmarkFolderBranch(bookmarkFolder)
+        verify(bookmarksRepository).deleteFolderBranch(bookmarkFolder)
 
-        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
-        assertEquals(BookmarkFolderBranch(emptyList(), emptyList()), viewStateCaptor.allValues[0].branchToDelete)
-        assertEquals(bookmarkFolderBranch, viewStateCaptor.allValues[1].branchToDelete)
-
-        verify(bookmarksRepository).deleteFolderBranch(bookmarkFolderBranch)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
+        assertEquals(bookmarkFolderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
     }
 
     @Test
@@ -256,7 +254,7 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
         )
-        whenever(bookmarksRepository.getBookmarkFolderBranch(any())).thenReturn(bookmarkFolderBranch)
+        whenever(bookmarksRepository.deleteFolderBranch(any())).thenReturn(bookmarkFolderBranch)
 
         val nonEmptyBookmarkFolder = bookmarkFolder.copy(numBookmarks = 1)
         testee.onDeleteBookmarkFolderRequested(nonEmptyBookmarkFolder)
@@ -271,9 +269,8 @@ class BookmarksViewModelTest {
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
         )
-        testee.viewState.value = testee.viewState.value?.copy(branchToDelete = bookmarkFolderBranch)
 
-        testee.insertRecentlyDeletedBookmarksAndFolders()
+        testee.insertDeletedFolderBranch(bookmarkFolderBranch)
 
         verify(bookmarksRepository).insertFolderBranch(bookmarkFolderBranch)
     }
