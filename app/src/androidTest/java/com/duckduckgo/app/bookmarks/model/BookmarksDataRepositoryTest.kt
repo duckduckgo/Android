@@ -95,6 +95,26 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
+    fun whenGetBookmarkFoldersByParentIdThenReturnBookmarkFoldersForParentId() = runBlocking {
+        val folder = BookmarkFolder(id = 1, name = "name", parentId = 2)
+        repository.insert(folder)
+        val folders = repository.getBookmarkFoldersByParentId(2)
+
+        assertTrue(folders.size == 1)
+        assertEquals(folder, folders.first())
+    }
+
+    @Test
+    fun whenGetBookmarksByParentIdThenReturnBookmarksForParentId() = runBlocking {
+        val bookmark = SavedSite.Bookmark(id = 1, title = "name", url = "foo.com", parentId = 2)
+        repository.insert(bookmark)
+        val bookmarks = repository.getBookmarksByParentId(2)
+
+        assertTrue(bookmarks.size == 1)
+        assertEquals(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId), bookmarks.first())
+    }
+
+    @Test
     fun whenUpdateBookmarkFolderThenUpdateBookmarkFolderCalled() = runBlocking {
         repository = BookmarksDataRepository(mockBookmarkFoldersDao, bookmarksDao, db)
         val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
@@ -226,66 +246,5 @@ class BookmarksDataRepositoryTest {
         )
 
         assertEquals(items, flatStructure)
-    }
-
-    @Test
-    fun whenBuildTreeStructureThenReturnTraversableTree() = runBlocking {
-        val root = BookmarkFolderEntity(id = 0, name = "DuckDuckGo Bookmarks", parentId = -1)
-        val parentFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
-        val childFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
-        val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
-
-        val folderList = listOf(parentFolder, childFolder)
-
-        repository.insertFolderBranch(BookmarkFolderBranch(listOf(childBookmark), folderList))
-
-        val itemList = listOf(root, parentFolder, childFolder, childBookmark)
-        val preOrderList = listOf(childFolder, childBookmark, parentFolder, root)
-
-        val treeStructure = repository.getTreeFolderStructure()
-
-        var count = 0
-        var preOrderCount = 0
-
-        treeStructure.forEachVisit(
-            { node ->
-                testNode(node, itemList, count)
-                count++
-            },
-            { node ->
-                testNode(node, preOrderList, preOrderCount)
-                preOrderCount++
-            }
-        )
-    }
-
-    private fun testNode(node: TreeNode<FolderTreeItem>, itemList: List<Any>, count: Int) {
-        if (node.value.url != null) {
-            val entity = itemList[count] as BookmarkEntity
-
-            assertEquals(entity.title, node.value.name)
-            assertEquals(entity.id, node.value.id)
-            assertEquals(entity.parentId, node.value.parentId)
-            assertEquals(entity.url, node.value.url)
-            assertEquals(2, node.value.depth)
-        } else {
-            val entity = itemList[count] as BookmarkFolderEntity
-
-            assertEquals(entity.name, node.value.name)
-            assertEquals(entity.id, node.value.id)
-            assertEquals(entity.parentId, node.value.parentId)
-
-            when (node.value.parentId) {
-                -1L -> {
-                    assertEquals(0, node.value.depth)
-                }
-                0L -> {
-                    assertEquals(1, node.value.depth)
-                }
-                else -> {
-                    assertEquals(2, node.value.depth)
-                }
-            }
-        }
     }
 }
