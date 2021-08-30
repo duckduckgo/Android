@@ -150,7 +150,10 @@
     <string name="settingsHeadingGeneral">General</string>
     <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
+    <string name="settingsTheme" translatable="false">Theme</string>
     <string name="settingsLightTheme">Light Theme</string>
+    <string name="settingsDarkTheme" translatable="false">Dark Theme</string>
+    <string name="settingsSystemTheme" translatable="false">System Default</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
@@ -492,6 +495,9 @@
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>
     <string name="disableLoginDetectionDialogNegative">CANCEL</string>
     <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave" translatable="false">Set Theme</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Fire Button Animation</string>
