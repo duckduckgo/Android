@@ -168,6 +168,9 @@
     <string name="settingsHeadingOther">Annat</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
     <string name="settingsLightTheme">Ljust</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Mörkt tema</string>
+    <string name="settingsSystemTheme">Systemfel</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
@@ -507,6 +510,9 @@
     <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>
     <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
     <string name="fireproofWebsiteRemovalConfirmation">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Ange tema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation för brännarknapp</string>

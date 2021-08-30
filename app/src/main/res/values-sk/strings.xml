@@ -176,6 +176,9 @@
     <string name="settingsHeadingOther">Iné</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
     <string name="settingsLightTheme">Svetlý motív</string>
+    <string name="settingsTheme">Téma</string>
+    <string name="settingsDarkTheme">Temná téma</string>
+    <string name="settingsSystemTheme">Predvolený systém</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
     <string name="leaveFeedback">Zdieľať spätnú väzbu</string>
@@ -519,6 +522,9 @@
     <string name="disableLoginDetectionDialogPositive">VYPNÚŤ</string>
     <string name="disableLoginDetectionDialogNegative">ZRUŠIŤ</string>
     <string name="fireproofWebsiteRemovalConfirmation">Odstránilo sa zabezpečenie pre &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Nastaviť tému</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>

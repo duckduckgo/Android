@@ -168,6 +168,9 @@
     <string name="settingsHeadingOther">Άλλα</string>
     <string name="settingsHeadingPrivacy">Ιδιωτικότητα</string>
     <string name="settingsLightTheme">Ανοιχτόχρωμο θέμα</string>
+    <string name="settingsTheme">Θέμα</string>
+    <string name="settingsDarkTheme">Σκούρο Θέμα</string>
+    <string name="settingsSystemTheme">Προεπιλογή συστήματος</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
@@ -507,6 +510,9 @@
     <string name="disableLoginDetectionDialogPositive">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>
     <string name="disableLoginDetectionDialogNegative">ΑΚΥΡΩΣΗ</string>
     <string name="fireproofWebsiteRemovalConfirmation">Η διαγραφή δραστηριότητας αφαιρέθηκε για το &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Ορισμός θέματος</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Κινούμενο κουμπί φωτιάς</string>

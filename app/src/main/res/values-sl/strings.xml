@@ -176,6 +176,9 @@
     <string name="settingsHeadingOther">Drugo</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
     <string name="settingsLightTheme">Svetli način</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Temna tema</string>
+    <string name="settingsSystemTheme">Sistemska privzeta vrednost</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
@@ -519,6 +522,9 @@
     <string name="disableLoginDetectionDialogPositive">ONEMOGOČI</string>
     <string name="disableLoginDetectionDialogNegative">PREKLIČI</string>
     <string name="fireproofWebsiteRemovalConfirmation">Požarna zaščita odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Nastavi temo</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija za gumb ogenj</string>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,6 +167,9 @@
     <string name="settingsHeadingOther">Otros</string>
     <string name="settingsHeadingPrivacy">Privacidad</string>
     <string name="settingsLightTheme">Tema claro</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Tema oscuro</string>
+    <string name="settingsSystemTheme">Sistema por defecto</string>
     <string name="settingsAboutDuckduckgo">Acerca de DuckDuckGo</string>
     <string name="settingsVersion">Versión</string>
     <string name="leaveFeedback">Compartir opiniones</string>
@@ -507,6 +509,9 @@
     <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>
     <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
     <string name="fireproofWebsiteRemovalConfirmation">A prueba de fuego desactivado para &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Establecer tema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animación del botón Fuego</string>

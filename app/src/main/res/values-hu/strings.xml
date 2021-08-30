@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,6 +167,9 @@
     <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
     <string name="settingsLightTheme">Világos felület</string>
+    <string name="settingsTheme">Téma</string>
+    <string name="settingsDarkTheme">Sötét téma</string>
+    <string name="settingsSystemTheme">Rendszer alapértelmezett</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
@@ -507,6 +509,9 @@
     <string name="disableLoginDetectionDialogPositive">LETILT</string>
     <string name="disableLoginDetectionDialogNegative">MÉGSEM</string>
     <string name="fireproofWebsiteRemovalConfirmation">Tűzállóvá tétel törölve a következőhöz: &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Állítsa be a témát</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tűz gomb animáció</string>

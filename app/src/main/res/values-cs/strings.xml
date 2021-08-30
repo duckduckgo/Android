@@ -160,6 +160,9 @@
     <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
     <string name="settingsLightTheme">Světlý motiv</string>
+    <string name="settingsTheme">Téma</string>
+    <string name="settingsDarkTheme">Tmavé téma</string>
+    <string name="settingsSystemTheme">Výchozí nastavení systému</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
@@ -503,6 +506,9 @@
     <string name="disableLoginDetectionDialogPositive">VYPNOUT</string>
     <string name="disableLoginDetectionDialogNegative">ZRUŠIT</string>
     <string name="fireproofWebsiteRemovalConfirmation">Ochrana odstraněna pro &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Nastavit téma</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animace tlačítka pro mazání</string>

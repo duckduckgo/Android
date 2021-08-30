@@ -168,6 +168,9 @@
     <string name="settingsHeadingOther">Annet</string>
     <string name="settingsHeadingPrivacy">Personvern</string>
     <string name="settingsLightTheme">Lyst utseende</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Mørkt tema</string>
+    <string name="settingsSystemTheme">System standard</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
     <string name="leaveFeedback">Del tilbakemelding</string>
@@ -507,6 +510,9 @@
     <string name="disableLoginDetectionDialogPositive">DEAKTIVER</string>
     <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
     <string name="fireproofWebsiteRemovalConfirmation">Brannsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Angi tema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animasjon for brannknappen</string>

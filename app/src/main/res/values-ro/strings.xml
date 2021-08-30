@@ -172,6 +172,9 @@
     <string name="settingsHeadingOther">Altele</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
     <string name="settingsLightTheme">Temă luminoasă</string>
+    <string name="settingsTheme">Temă</string>
+    <string name="settingsDarkTheme">Tema întunecată</string>
+    <string name="settingsSystemTheme">Defectiune de sistem</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Partajează feedback</string>
@@ -513,6 +516,9 @@
     <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>
     <string name="disableLoginDetectionDialogNegative">ANULARE</string>
     <string name="fireproofWebsiteRemovalConfirmation">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Setează Tema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animație buton Foc</string>

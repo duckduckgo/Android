@@ -176,6 +176,9 @@
     <string name="settingsHeadingOther">Kiti</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
     <string name="settingsLightTheme">Šviesus apipavidalinimas</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Tamsi tema</string>
+    <string name="settingsSystemTheme">Sistemos numatytasis</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
@@ -519,6 +522,9 @@
     <string name="disableLoginDetectionDialogPositive">IŠJUNGTI</string>
     <string name="disableLoginDetectionDialogNegative">ATŠAUKTI</string>
     <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; apsauga pašalinta</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Nustatykite temą</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
