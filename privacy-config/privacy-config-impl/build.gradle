@@ -63,7 +63,10 @@ dependencies {
 
     // Testing dependencies
     androidTestImplementation Testing.mockito.kotlin
-    testImplementation Testing.junit4
+    androidTestImplementation Testing.mockito.android
+    androidTestImplementation AndroidX.test.core
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation CashApp.turbine
 }

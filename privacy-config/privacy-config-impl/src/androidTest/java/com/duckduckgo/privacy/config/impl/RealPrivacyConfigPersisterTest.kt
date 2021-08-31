@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -28,7 +29,6 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
-import com.nhaarman.mockitokotlin2.mock
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -54,7 +54,7 @@ class RealPrivacyConfigPersisterTest {
     }
 
     private fun prepareDb() {
-        db = Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), PrivacyConfigDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         togglesRepository = RealPrivacyFeatureTogglesRepository(db)
