@@ -36,11 +36,13 @@ class MigrationLifecycleObserver @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun migrate() {
         val currentVersion = migrationStore.version
-        migrationPluginPoint.getPlugins().filter {
-            currentVersion < it.version
-        }.forEach {
-            it.run()
-        }
+        migrationPluginPoint.getPlugins()
+            .sortedBy { it.version }
+            .filter {
+                currentVersion < it.version
+            }.forEach {
+                it.run()
+            }
 
         if (currentVersion < CURRENT_VERSION) {
             migrationStore.version = CURRENT_VERSION
