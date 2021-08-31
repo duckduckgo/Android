@@ -24,7 +24,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
@@ -36,8 +35,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.privacy.config.api.Gpc
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -81,7 +82,10 @@ class SettingsViewModelTest {
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
     @Mock
-    private lateinit var mockGlobalPrivacyControl: GlobalPrivacyControl
+    private lateinit var mockGpc: Gpc
+
+    @Mock
+    private lateinit var mockFeatureToggle: FeatureToggle
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -92,7 +96,7 @@ class SettingsViewModelTest {
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockGlobalPrivacyControl, mockPixel)
+        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockGpc, mockFeatureToggle, mockPixel)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)

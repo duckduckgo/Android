@@ -168,7 +168,7 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
-            injectGpcToDom(webView)
+            injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
             webViewClientListener?.resetAppLinkState()
         } catch (e: Throwable) {
@@ -197,8 +197,8 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun injectGpcToDom(webView: WebView) {
-        webView.url?.let { url ->
+    private fun injectGpcToDom(webView: WebView, url: String?) {
+        url?.let {
             if (gpc.canGpcBeUsedByUrl(url)) {
                 webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
             }

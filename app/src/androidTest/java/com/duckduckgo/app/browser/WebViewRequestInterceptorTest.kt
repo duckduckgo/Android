@@ -22,8 +22,6 @@ import android.net.Uri
 import android.webkit.*
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -31,6 +29,8 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -54,7 +54,7 @@ class WebViewRequestInterceptorTest {
     private var mockResourceSurrogates: ResourceSurrogates = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
-    private val mockGlobalPrivacyControl: GlobalPrivacyControl = mock()
+    private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
     private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
 
@@ -72,7 +72,7 @@ class WebViewRequestInterceptorTest {
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            globalPrivacyControl = mockGlobalPrivacyControl,
+            gpc = mockGpc,
             userAgentProvider = userAgentProvider
         )
     }
@@ -356,7 +356,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders(validHttpsUri().toString()))
+        verify(webView).loadUrl(validHttpsUri().toString(), mockGpc.getHeaders(validHttpsUri().toString()))
     }
 
     @Test
@@ -390,7 +390,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders(validUri().toString()))
+        verify(webView).loadUrl(validUri().toString(), mockGpc.getHeaders(validUri().toString()))
     }
 
     @Test
@@ -571,23 +571,23 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
-        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
-        whenever(mockRequest.requestHeaders).thenReturn(mapOf(GlobalPrivacyControlManager.GPC_HEADER to "test"))
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf(GPC_HEADER to "test"))
 
     }
 
     private fun configureShouldAddGpcHeader() = runBlocking<Unit> {
-        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
-        whenever(mockGlobalPrivacyControl.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
-        whenever(mockGlobalPrivacyControl.canPerformARedirect(any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+        whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
+        whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
     private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
-        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(false)
-        whenever(mockGlobalPrivacyControl.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
-        whenever(mockGlobalPrivacyControl.canPerformARedirect(any())).thenReturn(false)
+        whenever(mockGpc.isEnabled()).thenReturn(false)
+        whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
+        whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(false)
         whenever(mockRequest.method).thenReturn("GET")
     }
 

@@ -88,9 +88,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -122,7 +119,12 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.*
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -286,7 +288,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
-    private lateinit var mockGpc: Gpc
+    private lateinit var mockGpcRepository: GpcRepository
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -424,7 +426,7 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore, mockFeatureToggle, mockGpc),
+            gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
@@ -3106,21 +3108,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsEnabledThenAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
 
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
         assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        val url = "foo.com"
+        givenUrlCannotUseGpc(url)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
     }
 
     @Test
     fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
 
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3130,8 +3145,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledThenAddHeaderToUrl() {
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
         loadUrl("http://m.example.com")
 
         testee.onDesktopSiteModeToggled(true)
@@ -3142,8 +3157,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        givenUrlCannotUseGpc("example.com")
         loadUrl("http://m.example.com")
 
         testee.onDesktopSiteModeToggled(true)
@@ -3154,9 +3169,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledThenAddHeaderToUrl() {
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
-        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
+    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3166,9 +3193,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
-        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() {
+        givenUrlCanUseGpc()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        val url = "fallback"
+        givenUrlCannotUseGpc(url)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), url)
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
         testee.nonHttpAppLinkClicked(intentType)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3412,6 +3464,23 @@ class BrowserTabViewModelTest {
         whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
         loadUrl("https://example.com")
         assertNull(privacyGradeState().privacyGrade)
+    }
+
+    private fun givenUrlCanUseGpc() {
+        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
+        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf())
+    }
+
+    private fun givenUrlCannotUseGpc(url: String) {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
+        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(url)))
+    }
+
+    private fun givenGpcIsDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
     }
 
     private suspend fun givenFireButtonPulsing() {
