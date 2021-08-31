@@ -38,7 +38,7 @@ dependencies {
 
     implementation KotlinX.coroutines.core
 
-    testImplementation (KotlinX.coroutines.test) {
+    androidTestImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
@@ -55,22 +55,24 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    testImplementation AndroidX.room.testing
+    androidTestImplementation AndroidX.room.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
+    androidTestImplementation AndroidX.work.testing
 
     // Testing dependencies
-    testImplementation Testing.mockito.kotlin
+    androidTestImplementation Testing.mockito.kotlin
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
-    testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation CashApp.turbine
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    defaultConfig {
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 }

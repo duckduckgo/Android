@@ -98,3 +98,5 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
     }
 
 }
+
+class Testa()
