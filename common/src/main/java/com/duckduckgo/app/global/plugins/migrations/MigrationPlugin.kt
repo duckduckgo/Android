@@ -21,7 +21,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface MigrationPlugin {
-    fun run(currentVersion: Int)
+    fun run()
     val version: Int
 }
 

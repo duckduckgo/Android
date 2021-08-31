@@ -39,6 +39,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -110,6 +111,43 @@ class SettingsViewModelTest {
     fun whenViewModelInitialisedThenPixelIsFired() {
         testee // init
         verify(mockPixel).fire(AppPixelName.SETTINGS_OPENED)
+    }
+
+    @Test
+    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(false)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
