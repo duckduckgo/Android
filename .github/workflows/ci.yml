@@ -58,9 +58,13 @@ jobs:
     runs-on: macos-latest
     name: Android tests
     strategy:
+      fail-fast: false
       matrix:
         api-level: [22, 26]
         target: [google_apis]
+        module:
+          - app
+          - privacy-config-impl
 
     steps:
       - name: Cancel previous
@@ -120,15 +124,13 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew app:connectedPlayDebugAndroidTest privacy-config-impl:connectedDebugAndroidTest --stacktrace
+          script: ./gradlew ${{ matrix.module }}:connectedCheck --stacktrace
 
-      - name: (Fail-only) Bundle the Android Test report
-        if: failure()
+      - name: Bundle the Android Test report
         run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
 
-      - name: (Fail-only) Upload the Android Test report
-        if: failure()
+      - name: Upload the Android Test report
         uses: actions/upload-artifact@v2
         with:
-          name: android-test-error-report
+          name: android-test-report
           path: android-test-report.zip
