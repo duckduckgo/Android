@@ -43,12 +43,10 @@ jobs:
       - name: Unit Tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
-      - name: (Fail-only) Bundle the Unit Test report
-        if: failure()
+      - name: Bundle the Unit Test report
         run: find . -type d -name 'reports' | zip -@ -r unit-test-report.zip
 
-      - name: (Fail-only) Upload the Unit Test report
-        if: failure()
+      - name: Upload the Unit Test report
         uses: actions/upload-artifact@v2
         with:
           name: unit-test-error-report
@@ -59,7 +57,7 @@ jobs:
     name: Android tests
     strategy:
       matrix:
-        api-level: [22, 26]
+        api-level: [22, 29]
 
     steps:
       - name: Cancel previous
