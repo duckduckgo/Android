@@ -60,7 +60,7 @@ jobs:
     strategy:
       matrix:
         api-level: [22, 26]
-        target: [default]
+        target: [playstore]
 
     steps:
       - name: Cancel previous
@@ -93,7 +93,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-emul-${{ matrix.api-level }}
+          key: avd-emula-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
