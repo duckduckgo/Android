@@ -97,7 +97,7 @@ jobs:
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2.19.1
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
@@ -110,7 +110,7 @@ jobs:
           script: echo "Generated AVD snapshot for caching."
 
       - name: Android Tests
-        uses: reactiveCircus/android-emulator-runner@v2.19.1
+        uses: reactiveCircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
@@ -120,7 +120,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew app:connectedCheck --stacktrace
+          script: ./gradlew app:connectedPlayDebugAndroidTest
 
       - name: Bundle the Android Test report
         run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
