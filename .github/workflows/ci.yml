@@ -60,7 +60,6 @@ jobs:
     strategy:
       matrix:
         api-level: [22, 26]
-        target: [playstore]
 
     steps:
       - name: Cancel previous
@@ -101,7 +100,6 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
-          target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: true
@@ -114,7 +112,6 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
-          target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: false
