@@ -62,9 +62,6 @@ jobs:
       matrix:
         api-level: [22, 26]
         target: [google_apis]
-        module:
-          - app
-          - privacy-config-impl
 
     steps:
       - name: Cancel previous
@@ -124,7 +121,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew ${{ matrix.module }}:connectedCheck --stacktrace
+          script: ./gradlew app:connectedPlayDebugAndroidTest privacy-config-impl:connectedCheck --stacktrace
 
       - name: Bundle the Android Test report
         run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
