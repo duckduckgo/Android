@@ -48,7 +48,7 @@ jobs:
 
   android_tests:
     runs-on: macos-latest
-    name: Android tests
+    name: Android testss
     strategy:
       matrix:
         api-level: [22, 26]
