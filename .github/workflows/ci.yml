@@ -60,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [22, 26]
+        api-level: [22, 29]
 
     steps:
       - name: Cancel previous
