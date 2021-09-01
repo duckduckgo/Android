@@ -38,10 +38,13 @@ dependencies {
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
 
-    testImplementation Testing.junit4
-    testImplementation Testing.mockito.kotlin
+    androidTestImplementation Testing.junit4
+    androidTestImplementation Testing.mockito.kotlin
+    androidTestImplementation Testing.mockito.android
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
 
-    testImplementation (KotlinX.coroutines.test) {
+    androidTestImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
