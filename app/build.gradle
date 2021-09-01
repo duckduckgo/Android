@@ -7,10 +7,6 @@ apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
 apply from: "$rootDir/spotless.gradle"
 
-ext {
-    USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
-}
-
 android {
     compileSdkVersion compile_sdk
     ndkVersion '21.0.6113669'
@@ -59,7 +55,7 @@ android {
             applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_blue",
+                    appIcon     : "@mipmap/ic_launcher_blue",
                     appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
         }
@@ -68,20 +64,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_red",
+                    appIcon     : "@mipmap/ic_launcher_red",
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
         }
     }
     flavorDimensions "store"
     productFlavors {
-        internal{
+        internal {
             dimension "store"
         }
-        fdroid{
+        fdroid {
             dimension "store"
         }
-        play{
+        play {
             dimension "store"
         }
     }
@@ -104,10 +100,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
-
-        if (USE_ORCHESTRATOR) {
-            execution 'ANDROID_TEST_ORCHESTRATOR'
-        }
+        execution 'ANDROID_TEST_ORCHESTRATOR'
     }
 
     def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
@@ -140,7 +133,7 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
-    androidTestImplementation (KotlinX.coroutines.test) {
+    androidTestImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
@@ -177,7 +170,7 @@ dependencies {
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
 
-    implementation  AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.commonJava8
     testImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.archCore.testing
 
