@@ -1,7 +1,7 @@
 name: Manually Triggered
 
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 jobs:
   unit_tests:
