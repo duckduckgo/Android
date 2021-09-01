@@ -55,7 +55,7 @@ jobs:
           path: unit-test-report.zip
 
   android_tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Android tests
     strategy:
       fail-fast: false
