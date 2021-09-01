@@ -60,7 +60,7 @@ jobs:
     strategy:
       matrix:
         api-level: [22, 26]
-        target: [google_apis]
+        target: [default]
 
     steps:
       - name: Cancel previous
@@ -73,7 +73,7 @@ jobs:
           submodules: recursive
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-      - name: set up JDK 14
+      - name: set up JDK 11
         uses: actions/setup-java@v2
         with:
           java-version: '11'
