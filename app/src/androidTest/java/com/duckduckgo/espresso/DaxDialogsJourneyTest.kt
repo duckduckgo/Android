@@ -42,7 +42,7 @@ class DaxDialogsJourneyTest {
     @get:Rule
     var activityScenarioRule = activityScenarioRule<OnboardingActivity>()
 
-    @Test @UserJourney @FlakyTest @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N)
+    @Test @UserJourney @FlakyTest @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N, maxSdkVersion = Build.VERSION_CODES.P)
     fun daxDialogs_supports_default_browser_journey() {
 
         onView(isRoot()).perform(waitForView(withId(R.id.primaryCta)))
@@ -50,18 +50,6 @@ class DaxDialogsJourneyTest {
 
         onView(isRoot()).perform(waitForView(withId(R.id.continueButton)))
         onView(withId(R.id.continueButton)).perform(click())
-
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(withId(R.id.browserMenu)).perform(click())
-
-        onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
-    }
-
-    @Test @UserJourney @FlakyTest @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N)
-    fun daxDialogs_does_not_support_default_browser_journey() {
-
-        onView(isRoot()).perform(waitForView(withId(R.id.primaryCta)))
-        onView(withId(R.id.primaryCta)).perform(click())
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
         onView(withId(R.id.browserMenu)).perform(click())
