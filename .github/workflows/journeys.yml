@@ -12,7 +12,7 @@ jobs:
     name: Android tests
     strategy:
       matrix:
-        api-level: [22, 29]
+        api-level: [22, 26]
         target: [google_apis]
 
     steps:
