@@ -100,7 +100,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
-        execution 'ANDROID_TEST_ORCHESTRATOR'
+//        execution 'ANDROID_TEST_ORCHESTRATOR'
     }
 
     def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
