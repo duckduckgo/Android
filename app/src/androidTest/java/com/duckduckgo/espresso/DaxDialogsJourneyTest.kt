@@ -21,9 +21,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.activityScenarioRule
-import androidx.test.filters.LargeTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import org.junit.Rule
