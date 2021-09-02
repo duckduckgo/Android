@@ -44,11 +44,11 @@ jobs:
         run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: (Fail-only) Bundle the Unit Test report
-        if: failure()
+        if: always()
         run: find . -type d -name 'reports' | zip -@ -r unit-test-report.zip
 
       - name: (Fail-only) Upload the Unit Test report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: unit-test-error-report
@@ -121,9 +121,11 @@ jobs:
           script: ./gradlew app:connectedPlayDebugAndroidTest privacy-config-impl:connectedCheck privacy-config-store:connectedCheck --stacktrace
 
       - name: Bundle the Android Test report
+        if: always()
         run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
 
       - name: Upload the Android Test report
+        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: android-test-report
