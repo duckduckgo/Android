@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.os.SystemClock
+import androidx.test.filters.FlakyTest
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import org.junit.Assert.assertEquals
@@ -76,6 +77,7 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
     }
 
     @Test
+    @FlakyTest
     fun enoughTimePassed() {
         val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow.invoke())
         assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
