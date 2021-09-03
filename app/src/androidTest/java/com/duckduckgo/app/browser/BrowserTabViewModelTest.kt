@@ -3177,7 +3177,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewVisible()
 
-        advanceTimeBy(3_600_000)
+        advanceTimeBy(3_600_001)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
     }

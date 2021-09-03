@@ -113,7 +113,9 @@ class BrowserViewModelTest {
 
     @After
     fun after() {
-        testee.command.removeObserver(mockCommandObserver)
+        if (this::testee.isInitialized) {
+            testee.command.removeObserver(mockCommandObserver)
+        }
     }
 
     @Test
