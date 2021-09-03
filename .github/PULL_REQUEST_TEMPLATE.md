@@ -10,16 +10,15 @@ If your PR does not involve UI changes, you can remove the **UI changes** sectio
 
 Task/Issue URL:
 
-**Description**:
+### Description
 
+### Steps to test this PR
 
-**Steps to test this PR**:
-
-***Feature***
+_Feature 1_
 1. 
 2.
 
-**UI changes**:
+### UI changes
 | Before  | After |
 | ------ | ----- |
 !(Upload before screenshot)|(Upload after screenshot)|
