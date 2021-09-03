@@ -21,6 +21,12 @@ import androidx.room.PrimaryKey
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.GpcException
 
+@Entity(tableName = "https_exceptions")
+data class HttpsExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
 @Entity(tableName = "gpc_exceptions")
 data class GpcExceptionEntity(
     @PrimaryKey val domain: String
