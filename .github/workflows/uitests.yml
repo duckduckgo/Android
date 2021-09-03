@@ -1,4 +1,4 @@
-name: Tests for basic user journeys
+name: User Journeys UI Tests
 
 on:
   push:
