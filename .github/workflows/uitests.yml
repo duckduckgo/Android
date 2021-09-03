@@ -73,7 +73,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew app:connectedPlayDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=com.duckduckgo.espresso.UserJourney
+          script: ./gradlew app:connectedPlayDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.notAnnotation=com.duckduckgo.espresso.UserJourney
 
       - name: (Fail-only) Bundle the Android Test report
         if: failure()
