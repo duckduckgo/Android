@@ -175,10 +175,6 @@
     <string name="settingsHeadingGeneral">Ogólne</string>
     <string name="settingsHeadingOther">Inne</string>
     <string name="settingsHeadingPrivacy">Prywatność</string>
-    <string name="settingsLightTheme">Jasny motyw</string>
-    <string name="settingsTheme">Temat</string>
-    <string name="settingsDarkTheme">Ciemny schemat</string>
-    <string name="settingsSystemTheme">Domyślne ustawienie systemowe</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Wersja</string>
     <string name="leaveFeedback">Podziel się opinią</string>
@@ -522,9 +518,6 @@
     <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>
     <string name="disableLoginDetectionDialogNegative">ANULUJ</string>
     <string name="fireproofWebsiteRemovalConfirmation">Usunięto zabezpieczenie dla &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Ustaw motyw</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacja przycisku ognia</string>

@@ -175,10 +175,6 @@
     <string name="settingsHeadingGeneral">Общие настройки</string>
     <string name="settingsHeadingOther">Дополнительные настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
-    <string name="settingsLightTheme">Светлая тема</string>
-    <string name="settingsTheme">Тема</string>
-    <string name="settingsDarkTheme">Темная тема</string>
-    <string name="settingsSystemTheme">Системные установки по умолчанию</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>
@@ -522,9 +518,6 @@
     <string name="disableLoginDetectionDialogPositive">Выключить</string>
     <string name="disableLoginDetectionDialogNegative">Отменить</string>
     <string name="fireproofWebsiteRemovalConfirmation">С сайта &lt;b&gt;%1$s&lt;/b&gt; снята огнеупорность</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Установить тему</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Анимация кнопки «Пожар»</string>

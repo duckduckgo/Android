@@ -167,10 +167,6 @@
     <string name="settingsHeadingGeneral">Yleistä</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsLightTheme">Vaalea teema</string>
-    <string name="settingsTheme">Teema</string>
-    <string name="settingsDarkTheme">Tumma teema</string>
-    <string name="settingsSystemTheme">Järjestelmän oletusarvo</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
@@ -510,9 +506,6 @@
     <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>
     <string name="disableLoginDetectionDialogNegative">PERUUTA</string>
     <string name="fireproofWebsiteRemovalConfirmation">Palonkestävyys poistettu sivustolta &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Aseta teema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Liekki-painikkeen animaatio</string>

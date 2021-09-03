@@ -114,7 +114,7 @@ class SettingsActivity :
         locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
         globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
 
-        themeToggle.setOnClickListener{ viewModel.userRequestedToChangeTheme() }
+        selectedThemeSetting.setOnClickListener{ viewModel.userRequestedToChangeTheme() }
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
@@ -187,7 +187,7 @@ class SettingsActivity :
             DuckDuckGoTheme.LIGHT-> R.string.settingsLightTheme
             DuckDuckGoTheme.SYSTEM_DEFAULT-> R.string.settingsSystemTheme
         })
-        themeToggle.setSubtitle(subtitle)
+        selectedThemeSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {

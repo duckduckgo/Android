@@ -167,10 +167,6 @@
     <string name="settingsHeadingGeneral">Üldine</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsLightTheme">Kerge teema</string>
-    <string name="settingsTheme">Teema</string>
-    <string name="settingsDarkTheme">Tume teema</string>
-    <string name="settingsSystemTheme">Süsteemi vaikeseade</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
@@ -510,9 +506,6 @@
     <string name="disableLoginDetectionDialogPositive">KEELA</string>
     <string name="disableLoginDetectionDialogNegative">TÜHISTA</string>
     <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tulekindlus on eemaldatud</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Määra teema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tulenupu animatsioon</string>

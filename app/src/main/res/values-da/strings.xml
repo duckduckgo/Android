@@ -167,10 +167,6 @@
     <string name="settingsHeadingGeneral">Generelt</string>
     <string name="settingsHeadingOther">Andet</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
-    <string name="settingsLightTheme">Lystema</string>
-    <string name="settingsTheme">Tema</string>
-    <string name="settingsDarkTheme">Mørkt tema</string>
-    <string name="settingsSystemTheme">System Standard</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>
@@ -510,9 +506,6 @@
     <string name="disableLoginDetectionDialogPositive">Deaktiver</string>
     <string name="disableLoginDetectionDialogNegative">Afbestil</string>
     <string name="fireproofWebsiteRemovalConfirmation">Brandsikring fjernet for &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Indstil tema</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Ildknap-animation</string>

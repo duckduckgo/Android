@@ -17,12 +17,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="20dp"
     android:paddingTop="10dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="20dp"
+    tools:background="@color/white">
 
     <RadioGroup
         android:id="@+id/themeSelectorGroup"
@@ -31,6 +31,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/themeSelectorSystemDefault"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="@string/settingsSystemTheme"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <RadioButton
             android:id="@+id/themeSelectorLight"
@@ -50,18 +62,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsDarkTheme"/>
-
-        <RadioButton
-            android:id="@+id/themeSelectorSystemDefault"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:padding="10dp"
-            android:visibility="gone"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:text="@string/settingsSystemTheme" />
+            android:text="@string/settingsDarkTheme" />
 
     </RadioGroup>
 

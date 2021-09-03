@@ -37,7 +37,7 @@ class SettingsThemeSelectorFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: DuckDuckGoTheme =
-            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: SYSTEM_DEFAULT
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: LIGHT
 
         val rootView =
             View.inflate(activity, R.layout.settings_theme_selector_fragment, null)

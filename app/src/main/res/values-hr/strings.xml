@@ -175,10 +175,6 @@
     <string name="settingsHeadingGeneral">Općenito</string>
     <string name="settingsHeadingOther">Ostalo</string>
     <string name="settingsHeadingPrivacy">Zaštita privatnosti</string>
-    <string name="settingsLightTheme">Svijetla tema</string>
-    <string name="settingsTheme">Tema</string>
-    <string name="settingsDarkTheme">Tamna tema</string>
-    <string name="settingsSystemTheme">Zadani sistem</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGou</string>
     <string name="settingsVersion">Verzija</string>
     <string name="leaveFeedback">Podijeli povratne informacije</string>
@@ -522,9 +518,6 @@
     <string name="disableLoginDetectionDialogPositive">ONEMOGUĆI</string>
     <string name="disableLoginDetectionDialogNegative">ODUSTANI</string>
     <string name="fireproofWebsiteRemovalConfirmation">Oznaka sigurnog web-mjesta uklonjena je za &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Postavi temu</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija gumba Vatre</string>

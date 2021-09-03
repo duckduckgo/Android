@@ -151,10 +151,6 @@
     <string name="settingsHeadingGeneral">Обща информация</string>
     <string name="settingsHeadingOther">Други</string>
     <string name="settingsHeadingPrivacy">Поверителност</string>
-    <string name="settingsTheme">Тема</string>
-    <string name="settingsLightTheme">Светла тема</string>
-    <string name="settingsDarkTheme">Тъмна тема</string>
-    <string name="settingsSystemTheme">Система по подразбиране</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Споделяне на отзив</string>
@@ -494,9 +490,6 @@
     <string name="disableLoginDetectionDialogPositive">ЗАБРАНИ</string>
     <string name="disableLoginDetectionDialogNegative">ОТМЕНИ</string>
     <string name="fireproofWebsiteRemovalConfirmation">Премахната огнеустойчивост за &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Задаване на тема</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Анимация на огнения бутон</string>

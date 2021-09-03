@@ -167,10 +167,6 @@
     <string name="settingsHeadingGeneral">Algemeen</string>
     <string name="settingsHeadingOther">Anders</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsLightTheme">Licht thema</string>
-    <string name="settingsTheme">Thema</string>
-    <string name="settingsDarkTheme">Donker thema</string>
-    <string name="settingsSystemTheme">Systeemfout</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
@@ -510,9 +506,6 @@
     <string name="disableLoginDetectionDialogPositive">UITSCHAKELEN</string>
     <string name="disableLoginDetectionDialogNegative">ANNULEREN</string>
     <string name="fireproofWebsiteRemovalConfirmation">Brandveiligheid verwijderd voor &lt;b&gt;%1$s&lt;/b&gt;</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Thema instellen</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animatie vuurknop</string>

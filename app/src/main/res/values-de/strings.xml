@@ -167,10 +167,6 @@
     <string name="settingsHeadingGeneral">Allgemeines</string>
     <string name="settingsHeadingOther">Sonstiges</string>
     <string name="settingsHeadingPrivacy">Privatsphäre</string>
-    <string name="settingsLightTheme">Helles Design</string>
-    <string name="settingsTheme">Thema</string>
-    <string name="settingsDarkTheme">Dunkles Thema</string>
-    <string name="settingsSystemTheme">Systemfehler</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback teilen</string>
@@ -510,9 +506,6 @@
     <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
     <string name="disableLoginDetectionDialogNegative">ABBRECHEN</string>
     <string name="fireproofWebsiteRemovalConfirmation">Feuerfest-Einstellung für &lt;b&gt;%1$s&lt;/b&gt; deaktiviert</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Ορισμός θέματος</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation der Schaltfläche „Feuer“</string>

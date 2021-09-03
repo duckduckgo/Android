@@ -171,10 +171,6 @@
     <string name="settingsHeadingGeneral">Vispārīgi</string>
     <string name="settingsHeadingOther">Cits</string>
     <string name="settingsHeadingPrivacy">Privātums</string>
-    <string name="settingsLightTheme">Gaišs motīvs</string>
-    <string name="settingsTheme">Tēma</string>
-    <string name="settingsDarkTheme">Tumša tēma</string>
-    <string name="settingsSystemTheme">Sistēmas noklusējums</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Kopīgot atsauksmi</string>
@@ -516,9 +512,6 @@
     <string name="disableLoginDetectionDialogPositive">ATSPĒJOT</string>
     <string name="disableLoginDetectionDialogNegative">ATCELT</string>
     <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ir noņemta ugunsdrošība</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Iestatiet motīvu</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Uguns pogas animācija</string>

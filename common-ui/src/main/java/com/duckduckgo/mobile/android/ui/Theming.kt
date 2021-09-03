@@ -32,9 +32,9 @@ import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGE
 import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 
 enum class DuckDuckGoTheme {
+    SYSTEM_DEFAULT,
     DARK,
-    LIGHT,
-    SYSTEM_DEFAULT;
+    LIGHT;
 }
 
 object Theming {

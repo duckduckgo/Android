@@ -40,4 +40,13 @@
     <!-- Email -->
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsLightTheme">Light</string>
+    <string name="settingsTheme">Theme</string>
+    <string name="settingsDarkTheme">Dark </string>
+    <string name="settingsSystemTheme">System Default</string>
+
+    <!--    Theme Settings-->
+    <string name="settingsThemeDialogSave">Set Theme</string>
 </resources>

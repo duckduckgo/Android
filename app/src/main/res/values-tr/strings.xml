@@ -151,10 +151,6 @@
     <string name="settingsHeadingGeneral">Genel</string>
     <string name="settingsHeadingOther">Diğer</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsLightTheme">Açık Tema</string>
-    <string name="settingsTheme">Tema</string>
-    <string name="settingsDarkTheme">Sistem varsayılanı</string>
-    <string name="settingsSystemTheme">Systemfel</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
@@ -494,9 +490,6 @@
     <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>
     <string name="disableLoginDetectionDialogNegative">İPTAL</string>
     <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; için Koruma kaldırıldı</string>
-
-    <!--    Theme Settings-->
-    <string name="settingsThemeDialogSave">Tema Ayarla</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
