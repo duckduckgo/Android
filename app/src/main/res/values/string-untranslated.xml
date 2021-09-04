@@ -44,7 +44,7 @@
     <!-- Settings Activity -->
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
-    <string name="settingsDarkTheme">Dark </string>
+    <string name="settingsDarkTheme">Dark</string>
     <string name="settingsSystemTheme">System Default</string>
 
     <!--    Theme Settings-->

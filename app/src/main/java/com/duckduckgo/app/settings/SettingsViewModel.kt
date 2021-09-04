@@ -151,6 +151,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeTheme(){
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
+        pixel.fire(SETTINGS_THEME_OPENED)
     }
 
     fun onFireproofWebsitesClicked() {

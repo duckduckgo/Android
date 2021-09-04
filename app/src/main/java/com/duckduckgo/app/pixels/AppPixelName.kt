@@ -109,6 +109,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
 
     SETTINGS_OPENED("ms"),
+    SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),
     SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT("ms_tsd"),
