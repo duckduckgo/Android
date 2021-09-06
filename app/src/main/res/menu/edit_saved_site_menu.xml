@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,20 +17,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/bookmark_import"
-        android:title="@string/importBookmarksMenu" />
-    <item
-        android:id="@+id/bookmark_export"
-        android:title="@string/exportBookmarksMenu" />
-    <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_loupe_24dp"
-        android:title="@string/search"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always|collapseActionView" />
-    <item
-        android:id="@+id/action_add_folder"
-        android:icon="@drawable/ic_add_folder"
-        android:title="@string/addFolder"
+        android:id="@+id/action_confirm_changes"
+        android:icon="@drawable/ic_check_action"
+        android:title="@string/dialogConfirmTitle"
+        android:visible="false"
         app:showAsAction="always" />
 </menu>

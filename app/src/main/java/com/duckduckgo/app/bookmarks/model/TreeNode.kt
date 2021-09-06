@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.db
+package com.duckduckgo.app.bookmarks.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+class TreeNode<T>(val value: T) {
 
-/**
- * If this is modified, please consider the following instructions carefully:
- *
- * Every time  we change BookmarkEntity we also need to check (and probably change)
- * @property com.duckduckgo.app.global.db.MigrationsProvider.BOOKMARKS_DB_ON_CREATE
- * which is located in AppDatabase.kt
- */
-@Entity(tableName = "bookmarks")
-data class BookmarkEntity(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    var title: String?,
-    var url: String,
-    var parentId: Long
-)
+    private val children: MutableList<TreeNode<T>> = mutableListOf()
+    fun add(child: TreeNode<T>) = children.add(child)
+    fun isEmpty() = children.isEmpty()
+
+    fun forEachVisit(visitBefore: Visitor<T>, visitAfter: Visitor<T>) {
+        visitBefore(this)
+        children.forEach {
+            it.forEachVisit(visitBefore, visitAfter)
+        }
+        visitAfter(this)
+    }
+}
+
+typealias Visitor<T> = (TreeNode<T>) -> Unit
