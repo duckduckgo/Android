@@ -32,5 +32,5 @@
         android:id="@+id/action_add_folder"
         android:icon="@drawable/ic_add_folder"
         android:title="@string/addFolder"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 </menu>
