@@ -90,7 +90,6 @@
             android:enabled="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.duckduckgo.vpn.internaltesters.reminder" />
             </intent-filter>
         </receiver>
