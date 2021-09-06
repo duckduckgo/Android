@@ -54,5 +54,5 @@ class HttpsPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.GpcFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.HttpsFeatureName()
 }

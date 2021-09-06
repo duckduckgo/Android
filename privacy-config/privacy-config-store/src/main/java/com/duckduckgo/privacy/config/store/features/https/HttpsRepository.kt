@@ -17,24 +17,23 @@
 package com.duckduckgo.privacy.config.store.features.https
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.store.GpcExceptionEntity
+import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toGpcException
+import com.duckduckgo.privacy.config.store.toHttpsException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface HttpsRepository {
     fun updateAll(exceptions: List<HttpsExceptionEntity>)
-    val exceptions: ArrayList<GpcException>
+    val exceptions: ArrayList<HttpsException>
 }
 
-class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    GpcRepository {
+class RealHttpsRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
+    HttpsRepository {
 
-    private val gpcDao: GpcDao = database.gpcDao()
-    override val exceptions = ArrayList<GpcException>()
+    private val httpsDao: HttpsDao = database.httpsDao()
+    override val exceptions = ArrayList<HttpsException>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -42,25 +41,15 @@ class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: Pr
         }
     }
 
-    override fun updateAll(exceptions: List<GpcExceptionEntity>) {
-        gpcDao.updateAll(exceptions)
+    override fun updateAll(exceptions: List<HttpsExceptionEntity>) {
+        httpsDao.updateAll(exceptions)
         loadToMemory()
     }
 
-    override fun enableGpc() {
-        gpcDataStore.gpcEnabled = true
-    }
-
-    override fun disableGpc() {
-        gpcDataStore.gpcEnabled = false
-    }
-
-    override fun isGpcEnabled(): Boolean = gpcDataStore.gpcEnabled
-
     private fun loadToMemory() {
         exceptions.clear()
-        gpcDao.getAll().map {
-            exceptions.add(it.toGpcException())
+        httpsDao.getAll().map {
+            exceptions.add(it.toHttpsException())
         }
     }
 }

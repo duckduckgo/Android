@@ -38,6 +38,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcDataStore
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
 import com.duckduckgo.privacy.config.store.features.gpc.RealGpcRepository
+import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
+import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -104,7 +106,7 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideContentBLockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
+    fun provideContentBlockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
         return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
     }
 
@@ -118,6 +120,12 @@ class DatabaseModule {
     @Provides
     fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
         return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
+        return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
