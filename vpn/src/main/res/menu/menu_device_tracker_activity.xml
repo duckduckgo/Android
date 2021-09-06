@@ -28,13 +28,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/debugLogging"
-        android:checkable="true"
-        android:title="Verbose Logging"
-        app:actionViewClass="android.widget.CheckBox"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/customDnsServer"
         android:checkable="true"
         android:title="Use Cloudflare DNS"

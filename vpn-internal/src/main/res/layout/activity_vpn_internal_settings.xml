@@ -71,6 +71,15 @@
                 android:text="App/Tracker exception rules"
             />
 
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/debug_logging_toggle"
+                style="@style/SettingsSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VPN Debug Logging"
+                android:theme="@style/SettingsSwitchTheme"
+            />
+
         </LinearLayout>
 
     </ScrollView>

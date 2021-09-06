@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.vpn.internal.feature.transparency
+package com.duckduckgo.vpn.internal.feature.logs
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * This receiver allows to enable/disable transparency mode. Where
- * traffic passes through the VPN but no tracker is blocked.
- *
- * $ adb shell am broadcast -a transparency --es turn <on/off>
- *
- * where `--es turn <on/off> to enable/disable VPN transparency mode
- */
-class TransparencyModeDebugReceiver(
+class DebugLoggingReceiver(
     context: Context,
     receiver: (Intent) -> Unit
 ) : InternalFeatureReceiver(context, receiver) {
@@ -44,68 +35,53 @@ class TransparencyModeDebugReceiver(
     override fun intentAction(): String = ACTION
 
     companion object {
+        private const val ACTION = "logging"
 
-        private const val ACTION = "transparency"
         fun turnOnIntent(): Intent {
             return Intent(ACTION).apply {
                 putExtra("turn", "on")
             }
         }
-
         fun turnOffIntent(): Intent {
             return Intent(ACTION).apply {
                 putExtra("turn", "off")
             }
         }
 
-        fun isTurnOnIntent(intent: Intent): Boolean {
+        fun isLoggingOnIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "on"
         }
-        fun isTurnOffIntent(intent: Intent): Boolean {
+
+        fun isLoggingOffIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "off"
         }
     }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
-class ExceptionRulesDebugReceiverRegister @Inject constructor(
-    private val context: Context,
-    private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor
+class DebugLoggingReceiverRegister @Inject constructor(
+    private val context: Context
 ) : VpnServiceCallbacks {
 
-    private val stateRefresherJob = ConflatedJob()
-    private var receiver: TransparencyModeDebugReceiver? = null
+    private var receiver: DebugLoggingReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        Timber.i("Debug receiver TransparencyModeDebugReceiver registered")
+        Timber.v("Debug receiver DebugLoggingReceiver registered")
 
-        unregisterReceiver()
-
-        receiver = TransparencyModeDebugReceiver(context) { intent ->
+        receiver = DebugLoggingReceiver(context) { intent ->
             when {
-                TransparencyModeDebugReceiver.isTurnOnIntent(intent) -> {
-                    Timber.i("Debug receiver TransparencyModeDebugReceiver turning ON transparency mode")
-                    trackerDetectorInterceptor.setEnable(true)
+                DebugLoggingReceiver.isLoggingOnIntent(intent) -> {
+                    TimberExtensions.enableLogging()
                 }
-                TransparencyModeDebugReceiver.isTurnOffIntent(intent) -> {
-                    Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
-                    trackerDetectorInterceptor.setEnable(false)
+                DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
+                    TimberExtensions.disableLogging()
                 }
-                else -> {
-                    Timber.v("Debug receiver TransparencyModeDebugReceiver unknown intent")
-                }
+                else -> Timber.w("Debug receiver DebugLoggingReceiver unknown intent")
             }
         }.apply { register() }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
-        Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
-        trackerDetectorInterceptor.setEnable(false)
-        stateRefresherJob.cancel()
-        unregisterReceiver()
-    }
-
-    private fun unregisterReceiver() {
         receiver?.unregister()
     }
 }

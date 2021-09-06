@@ -118,8 +118,6 @@ class DeviceShieldTrackerActivityViewModel(
         }
     }
 
-    internal fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
-    internal fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
     internal fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
 

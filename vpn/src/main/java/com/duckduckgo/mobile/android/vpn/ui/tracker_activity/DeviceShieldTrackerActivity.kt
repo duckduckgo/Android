@@ -356,14 +356,12 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.debugLogging).isChecked = viewModel.getDebugLoggingPreference()
         menu.findItem(R.id.customDnsServer)?.let {
             it.isChecked = viewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
         menu.findItem(R.id.diagnosticsScreen).isVisible = BuildConfig.DEBUG
         menu.findItem(R.id.dataScreen).isVisible = BuildConfig.DEBUG
-        menu.findItem(R.id.debugLogging).isVisible = BuildConfig.DEBUG
         menu.findItem(R.id.customDnsServer).isVisible = BuildConfig.DEBUG
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
@@ -382,12 +380,6 @@ class DeviceShieldTrackerActivity :
             }
             R.id.diagnosticsScreen -> {
                 startActivity(VpnDiagnosticsActivity.intent(this)); true
-            }
-            R.id.debugLogging -> {
-                val enabled = !item.isChecked
-                viewModel.useDebugLogging(enabled)
-                reconfigureTimber(enabled)
-                true
             }
             R.id.customDnsServer -> {
                 val enabled = !item.isChecked
@@ -421,17 +413,6 @@ class DeviceShieldTrackerActivity :
 
     private fun launchFeedback() {
         startActivity(Intent(Intent.ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL))
-    }
-
-    private fun reconfigureTimber(debugLoggingEnabled: Boolean) {
-        if (debugLoggingEnabled) {
-            Timber.uprootAll()
-            Timber.plant(Timber.DebugTree())
-            Timber.w("Logging Started")
-        } else {
-            Timber.w("Logging Ended")
-            Timber.uprootAll()
-        }
     }
 
     private sealed class VpnPermissionStatus {
