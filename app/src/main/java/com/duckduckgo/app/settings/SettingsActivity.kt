@@ -114,7 +114,7 @@ class SettingsActivity :
         locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
         globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
 
-        selectedThemeSetting.setOnClickListener{ viewModel.userRequestedToChangeTheme() }
+        selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
@@ -182,11 +182,13 @@ class SettingsActivity :
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
-        val subtitle =  getString(when (selectedTheme){
-            DuckDuckGoTheme.DARK-> R.string.settingsDarkTheme
-            DuckDuckGoTheme.LIGHT-> R.string.settingsLightTheme
-            DuckDuckGoTheme.SYSTEM_DEFAULT-> R.string.settingsSystemTheme
-        })
+        val subtitle = getString(
+            when (selectedTheme) {
+                DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
+                DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
+            }
+        )
         selectedThemeSetting.setSubtitle(subtitle)
     }
 

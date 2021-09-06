@@ -143,7 +143,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenThemeSettingsClickedThenPixelSent(){
+    fun whenThemeSettingsClickedThenPixelSent() {
         testee.userRequestedToChangeTheme()
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_OPENED)
     }
