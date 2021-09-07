@@ -53,6 +53,9 @@ class VpnReminderReceiver : BroadcastReceiver() {
             goAsync(pendingResult) {
                 TrackerBlockingVpnService.startService(context)
             }
+        } else {
+            Timber.w("VpnReminderReceiver: unknown action")
+            pendingResult?.finish()
         }
     }
 
