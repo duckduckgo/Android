@@ -1,0 +1,11 @@
+{
+  "state": "enabled",
+  "exceptions": [
+    {
+      "domain": "www.livenewsnow.com"
+    },
+    {
+      "domain": "weather.com"
+    }
+  ]
+}
