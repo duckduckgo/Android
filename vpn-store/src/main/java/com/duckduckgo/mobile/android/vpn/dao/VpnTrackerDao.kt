@@ -30,6 +30,9 @@ interface VpnTrackerDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: List<VpnTracker>)
 
+    @Query("DELETE FROM vpn_tracker")
+    fun deleteAllTrackers()
+
     @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
     fun getLatestTracker(): Flow<VpnTracker?>
 

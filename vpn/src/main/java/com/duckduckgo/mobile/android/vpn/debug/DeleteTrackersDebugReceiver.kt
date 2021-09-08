@@ -93,4 +93,3 @@ class DeleteTrackersDebugReceiver @Inject constructor(
         private const val INTENT_ACTION = "delete-trackers"
     }
 }
-
