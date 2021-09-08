@@ -363,6 +363,17 @@ class AppEmailManagerTest {
     }
 
     @Test
+    fun whenGetLastUsedDateIfNullThenReturnEmpty() {
+        assertEquals("", testee.getLastUsedDate())
+    }
+
+    @Test
+    fun whenGetLastUsedDateIfNotNullThenReturnValueFromStore() {
+        whenever(mockEmailDataStore.lastUsedDate).thenReturn("2021-01-01")
+        assertEquals("2021-01-01", testee.getLastUsedDate())
+    }
+
+    @Test
     fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() {
         whenever(mockEmailDataStore.canUseEncryption()).thenReturn(false)
 
