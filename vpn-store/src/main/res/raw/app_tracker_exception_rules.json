@@ -6,7 +6,8 @@
         "com.glovo",
         "com.imdb.mobile",
         "com.marriott.mrt",
-        "com.esharesinc.android"
+        "com.esharesinc.android",
+        "com.cvs.launchers.cvs"
       ]
     },
     {
@@ -26,6 +27,59 @@
       "rule": "t.co",
       "packageNames": [
         "com.zecwalletmobile"
+      ]
+    },
+    {
+      "rule": "g.doubleclick.net",
+      "packageNames": [
+        "pl.promate.bilkom",
+        "com.tour.pgatour",
+        "com.treemolabs.apps.cbsnews",
+        "com.bloomberg.android.plus",
+        "com.cbs.app",
+        "com.thoptv.livetvstream",
+        "com.ftt.boxingstar.gl.aos",
+        "ro.rcsrds.mydigi",
+        "com.goldtouch.ynet"
+      ]
+    },
+    {
+      "rule": "www.google-analytics.com",
+      "packageNames": [
+        "pl.promate.bilkom",
+        "com.fitbit.FitbitMobile",
+        "jp.naver.line.android",
+        "com.bladock.perkopolis"
+      ]
+    },
+    {
+      "rule": "acdn.adnxs.com",
+      "packageNames": [
+        "se.prisjakt.pricespy"
+      ]
+    },
+    {
+      "rule": "ib.adnxs.com",
+      "packageNames": [
+        "se.prisjakt.pricespy"
+      ]
+    },
+    {
+      "rule": "events.appsflyer.com",
+      "packageNames": [
+        "com.mapswithme.maps.pro"
+      ]
+    },
+    {
+      "rule": "data.flurry.com",
+      "packageNames": [
+        "ru.afisha.android"
+      ]
+    },
+    {
+      "rule": "v.fwmrm.net",
+      "packageNames": [
+        "com.crunchyroll.crunchyroid"
       ]
     }
   ]
