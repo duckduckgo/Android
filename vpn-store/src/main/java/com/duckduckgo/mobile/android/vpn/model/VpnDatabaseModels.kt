@@ -20,10 +20,14 @@ package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
-@Entity(tableName = "vpn_tracker")
+@Entity(
+    tableName = "vpn_tracker",
+    indices = [Index(value = ["timestamp"])]
+)
 data class VpnTracker(
     @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,

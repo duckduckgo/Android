@@ -37,7 +37,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 16,
+    exportSchema = true, version = 17,
     entities = [
         VpnState::class,
         VpnTracker::class,
