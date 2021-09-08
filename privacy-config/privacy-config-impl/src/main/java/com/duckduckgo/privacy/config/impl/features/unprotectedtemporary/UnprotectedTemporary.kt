@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.https
+package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.privacy.config.api.Https
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface UnprotectedTemporary {
+    fun isAnException(url: String): Boolean
+}
+
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealHttps @Inject constructor(private val httpsRepository: HttpsRepository, private val unprotectedTemporary: UnprotectedTemporary) : Https {
+class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {
-        return unprotectedTemporary.isAnException(url) || matches(url)
+        return matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return httpsRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
+        return unprotectedTemporaryRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 }

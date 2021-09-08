@@ -22,6 +22,12 @@ import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.HttpsException
 
+@Entity(tableName = "unprotected_temporary")
+data class UnprotectedTemporaryEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
 @Entity(tableName = "https_exceptions")
 data class HttpsExceptionEntity(
     @PrimaryKey val domain: String,

@@ -28,7 +28,11 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -47,13 +51,14 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var togglesRepository: PrivacyFeatureTogglesRepository
     private lateinit var privacyRepository: PrivacyConfigRepository
+    private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint()
 
     @Before
     fun before() {
         prepareDb()
 
-        testee = RealPrivacyConfigPersister(pluginPoint, togglesRepository, privacyRepository, db)
+        testee = RealPrivacyConfigPersister(pluginPoint, togglesRepository, unprotectedTemporaryRepository, privacyRepository, db)
     }
 
     private fun prepareDb() {
@@ -62,6 +67,7 @@ class RealPrivacyConfigPersisterTest {
             .build()
         togglesRepository = RealPrivacyFeatureTogglesRepository(db)
         privacyRepository = RealPrivacyConfigRepository(db)
+        unprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -70,6 +76,15 @@ class RealPrivacyConfigPersisterTest {
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertNull(togglesRepository.get("feature"))
+    }
+
+    @Test
+    fun whenPersistPrivacyConfigThenUpdateAllUnprotectedTemporaryExceptions() = coroutineRule.runBlocking {
+        assertEquals(0, unprotectedTemporaryRepository.exceptions.size)
+
+        testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+        assertEquals(1, unprotectedTemporaryRepository.exceptions.size)
     }
 
     @Test
@@ -112,7 +127,7 @@ class RealPrivacyConfigPersisterTest {
     }
 
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
-        return JsonPrivacyConfig(version = 2, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)))
+        return JsonPrivacyConfig(version = 2, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)), unprotectedTemporaryList)
     }
 
     class FakePrivacyFeaturePluginPoint : PluginPoint<PrivacyFeaturePlugin> {
@@ -135,5 +150,6 @@ class RealPrivacyConfigPersisterTest {
     companion object {
         private const val FEATURE_NAME = "test"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
+        val unprotectedTemporaryList = listOf(UnprotectedTemporaryEntity("example.com", "reason"))
     }
 }
