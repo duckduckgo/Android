@@ -126,7 +126,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
      */
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ReferrerInitialising) {
-            Timber.d("Referrer already determined; immediately answering")
+            Timber.d("Referrer already determined (%s); immediately answering", referralResult.javaClass.simpleName)
             return referralResult
         }
 

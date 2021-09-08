@@ -22,13 +22,13 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
     fun setDaxText(daxText: String)
@@ -45,10 +45,9 @@ interface DaxDialogListener {
     fun onDaxDialogHideClick()
 }
 
-class TypewriterDaxDialog : DialogFragment(), DaxDialog {
+class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDialog {
 
-    private var _binding: ContentDaxDialogBinding? = null
-    private val binding get() = _binding!!
+    private val binding: ContentDaxDialogBinding by viewBinding()
 
     private var daxText: String = ""
     private var primaryButtonText: String = ""
@@ -62,11 +61,6 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
     override fun setDaxDialogListener(listener: DaxDialogListener) {
         daxDialogListener = listener
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = ContentDaxDialogBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -107,11 +101,6 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         }
     }
 
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
-    }
-
     override fun getTheme(): Int {
         return R.style.DaxDialogFragment
     }
@@ -128,7 +117,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        if (activity != null && _binding != null) {
+        if (activity != null) {
             binding.dialogText.cancelAnimation()
             daxDialogListener?.onDaxDialogDismiss()
         }

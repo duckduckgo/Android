@@ -19,24 +19,45 @@ package com.duckduckgo.app.browser.shortcut
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@ContributesMultibinding(
+    scope = AppObjectGraph::class,
+    boundType = LifecycleObserver::class
+)
+@Singleton
 class ShortcutReceiver @Inject constructor(
+    private val context: Context,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
-) :
-    BroadcastReceiver() {
+) : BroadcastReceiver(), LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun registerShortcutReceiver() {
+        Timber.v("Registering shortcut receiver")
+        // ensure we unregister the receiver first
+        kotlin.runCatching { context.unregisterReceiver(this) }
+        context.registerReceiver(this, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
+    }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)

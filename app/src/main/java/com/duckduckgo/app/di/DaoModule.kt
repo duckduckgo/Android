@@ -54,6 +54,9 @@ class DaoModule {
     fun providesFavoritesDao(database: AppDatabase) = database.favoritesDao()
 
     @Provides
+    fun providesBookmarkFoldersDao(database: AppDatabase) = database.bookmarkFoldersDao()
+
+    @Provides
     fun providesTabsDao(database: AppDatabase) = database.tabsDao()
 
     @Provides

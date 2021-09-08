@@ -16,13 +16,10 @@
 
 package com.duckduckgo.app.email.ui
 
-import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -32,19 +29,19 @@ import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBindi
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.waitlist.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
-import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class EmailProtectionSignInFragment : EmailProtectionFragment() {
+class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_email_protection_sign_in) {
 
     private val viewModel by bindViewModel<EmailProtectionSignInViewModel>()
 
-    private var _binding: FragmentEmailProtectionSignInBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FragmentEmailProtectionSignInBinding by viewBinding()
 
     private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
         override fun onClick(widget: View) {
@@ -62,16 +59,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment() {
         override fun onClick(widget: View) {
             viewModel.readPrivacyGuarantees()
         }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentEmailProtectionSignInBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun configureViewModelObservers() {

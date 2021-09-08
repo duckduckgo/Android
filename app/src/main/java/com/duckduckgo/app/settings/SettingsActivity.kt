@@ -37,7 +37,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
@@ -75,7 +75,9 @@ class SettingsActivity :
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
-    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
+    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onDefaultBrowserToggled(isChecked)
+    }
 
     private val lightThemeToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onLightThemeToggled(isChecked)
@@ -146,7 +148,7 @@ class SettingsActivity :
 
     private fun observeViewModel() {
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
                     version.setSubtitle(it.version)
@@ -206,6 +208,7 @@ class SettingsActivity :
 
     private fun processCommand(it: Command?) {
         when (it) {
+            is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.LaunchLocation -> launchLocation()

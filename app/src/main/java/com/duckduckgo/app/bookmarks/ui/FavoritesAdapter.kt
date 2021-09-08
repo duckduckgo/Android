@@ -20,7 +20,6 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
@@ -29,10 +28,10 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
-import kotlinx.android.synthetic.main.popup_window_saved_site_menu.view.*
-import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
-import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
-import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
+import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.savedSiteEmptyHint
+import kotlinx.android.synthetic.main.view_saved_site_section_title.view.savedSiteSectionTitle
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
@@ -67,7 +66,7 @@ class FavoritesAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             FAVORITE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
+                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false) as TwoLineListItem
                 return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
@@ -140,29 +139,32 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         lateinit var favorite: Favorite
 
         fun update(favorite: Favorite) {
+            val listItem = itemView as TwoLineListItem
             this.favorite = favorite
 
-            itemView.overflowMenu.contentDescription = itemView.context.getString(
-                R.string.bookmarkOverflowContentDescription,
-                favorite.title
+            listItem.setContentDescription(
+                itemView.context.getString(
+                    R.string.bookmarkOverflowContentDescription,
+                    favorite.title
+                )
             )
 
-            itemView.title.text = favorite.title
-            itemView.url.text = parseDisplayUrl(favorite.url)
+            listItem.setTitle(favorite.title)
+            listItem.setSubtitle(parseDisplayUrl(favorite.url))
             loadFavicon(favorite.url)
 
-            itemView.overflowMenu.setOnClickListener {
-                showOverFlowMenu(itemView.overflowMenu, favorite)
+            listItem.setOverflowClickListener { anchor ->
+                showOverFlowMenu(anchor, favorite)
             }
 
-            itemView.setOnClickListener {
+            listItem.setClickListener {
                 viewModel.onSelected(favorite)
             }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.favicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
@@ -171,12 +173,12 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(anchor: ImageView, favorite: Favorite) {
-            val popupMenu = SavedSitePopupMenu(layoutInflater)
+        private fun showOverFlowMenu(anchor: View, favorite: Favorite) {
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.editSavedSite) { editFavorite(favorite) }
-                onMenuItemClicked(view.deleteSavedSite) { deleteFavorite(favorite) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editFavorite(favorite) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteFavorite(favorite) }
             }
             popupMenu.show(itemView, anchor)
         }

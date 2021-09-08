@@ -32,6 +32,9 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
+    <string name="addFavoriteMenuTitle">Add Favorite</string>
+    <string name="favoriteAddedMessage">Favorite added</string>
+    <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
 
     <!-- Downloading files -->
@@ -87,6 +90,7 @@
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
+    <string name="privacyProtectionTemporarilyDisabled">We temporarily disabled Privacy Protection as it appears to be breaking this site.</string>
 
     <string name="httpsGood">Encrypted Connection</string>
     <string name="httpsMixed">Mixed Encryption Connection</string>
@@ -136,7 +140,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear all tabs and data</string>
+    <string name="fireClearAll">Clear All Tabs And Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -150,6 +154,8 @@
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
+    <string name="settingsEmailProtectionTitle">Email Protection</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
@@ -200,14 +206,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
-    <string name="bookmarkAddedFeedback">Bookmark added</string>
-    <string name="bookmarkTitleHint">Bookmark title</string>
-    <string name="bookmarkUrlHint">Bookmark URL</string>
-    <string name="bookmarkTitleEdit">Edit bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
-    <string name="bookmarkEdited">Bookmark added</string>
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
     <string name="exportBookmarksMenu">Export</string>
     <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
@@ -218,6 +218,13 @@
     <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
     <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
     <string name="importBookmarksSuccess">Successfully imported %1$d bookmarks</string>
+    <string name="savedSiteDialogTitleHint">Title</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Edit</string>
+    <string name="bookmarksSectionTitle">Bookmarks</string>
+    <string name="favoritesSectionTitle">Favorites</string>
+    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
+    <string name="favoritesEmptyHint">No favorites added yet</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
@@ -230,6 +237,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home</string>
+    <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Help us improve the app!</string>
@@ -509,6 +517,7 @@
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for This Site</string>
     <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationDDGDialogSubtitle">We only use your anonymous location to deliver better results, closer to you. You can always change your mind later.</string>
     <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Always</string>
     <string name="preciseLocationSiteDialogAllowOnce">Only for This Session</string>
@@ -538,4 +547,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Open Links in Associated Apps</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Disable to prevent links from automatically opening in other installed apps.</string>
+    <string name="appLinkDialogTitle">Open in another app?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
+    <string name="autofillTooltipUseYourAlias">Use %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
+    <string name="autofillTooltipGenerateAddress">Generate a Private Address</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
+    <string name="newEmailAliasMenuTitle">Create Duck Address</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Remove Email Protections?</string>
+    <string name="emailSignOutDialogText">Note: Removing Email Protections from this device will not delete your Duck Address.</string>
+    <string name="emailSignOutDialogCancel">Cancel</string>
+    <string name="emailSignOutDialogDisable">Remove</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Email waitlist</string>
+    <string name="waitlistNotificationTitle">Your Email Protection Invitation is Here!</string>
+    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it\'s your turn to try our Email Protection feature. Tap to view your invitation.</string>
+
+    <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
+    <string name="waitlistNotificationDialogNoThanks">NO THANKS</string>
+    <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[We do not save your emails. <b><a href="">Learn more</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
+    <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
+    <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
+    <string name="emailProtectionWaitlistCta">Join the Private Waitlist</string>
+    <string name="emailProtectionGetStartedCta">Get Started</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when<br/> Email Protection is ready for you. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us at <a href="mailto:support@duck.com">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 </resources>

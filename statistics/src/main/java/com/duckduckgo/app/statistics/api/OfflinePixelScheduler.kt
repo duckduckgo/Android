@@ -17,17 +17,23 @@
 package com.duckduckgo.app.statistics.api
 
 import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class OfflinePixelScheduler @Inject constructor(private val workManager: WorkManager) {
+@ContributesMultibinding(AppObjectGraph::class)
+class OfflinePixelScheduler @Inject constructor(
+    private val workManager: WorkManager
+) : LifecycleObserver {
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleOfflinePixels() {
 
         Timber.v("Scheduling offline pixels to be sent")

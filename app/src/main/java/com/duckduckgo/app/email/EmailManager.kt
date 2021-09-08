@@ -32,7 +32,7 @@ interface EmailManager : LifecycleObserver {
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
-    fun storeCredentials(token: String, username: String)
+    fun storeCredentials(token: String, username: String, cohort: String)
     fun signOut()
     fun getEmailAddress(): String?
     fun waitlistState(): AppEmailManager.WaitlistState
@@ -41,6 +41,8 @@ interface EmailManager : LifecycleObserver {
     fun doesCodeAlreadyExist(): Boolean
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
     fun notifyOnJoinedWaitlist()
+    fun getCohort(): String
+    fun isEmailFeatureSupported(): Boolean
 }
 
 class AppEmailManager(
@@ -61,7 +63,8 @@ class AppEmailManager(
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
     }
 
-    override fun storeCredentials(token: String, username: String) {
+    override fun storeCredentials(token: String, username: String, cohort: String) {
+        emailDataStore.cohort = cohort
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -129,6 +132,13 @@ class AppEmailManager(
         emailDataStore.sendNotification = true
     }
 
+    override fun getCohort(): String {
+        val cohort = emailDataStore.cohort
+        return if (cohort.isNullOrBlank()) UNKNOWN_COHORT else cohort
+    }
+
+    override fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
+
     private fun consumeAlias(): String? {
         val alias = nextAliasFlow.value
         emailDataStore.clearNextAlias()
@@ -172,6 +182,7 @@ class AppEmailManager(
 
     companion object {
         const val DUCK_EMAIL_DOMAIN = "@duck.com"
+        const val UNKNOWN_COHORT = "unknown"
     }
 
     private fun EmailDataStore.clearEmailData() {

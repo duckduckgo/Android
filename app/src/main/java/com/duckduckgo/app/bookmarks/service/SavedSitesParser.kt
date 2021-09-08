@@ -16,24 +16,25 @@
 
 package com.duckduckgo.app.bookmarks.service
 
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.*
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 interface SavedSitesParser {
-    fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<SavedSite.Favorite>): String
-    fun parseHtml(document: Document): List<SavedSite>
+    fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String
+    suspend fun parseHtml(document: Document, bookmarksRepository: BookmarksRepository): List<SavedSite>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
 
     companion object {
         const val FAVORITES_FOLDER = "DuckDuckGo Favorites"
-        const val BOOKSMARKS_FOLDER = "DuckDuckGo Bookmarks"
+        const val BOOKMARKS_FOLDER = "DuckDuckGo Bookmarks"
     }
 
-    override fun generateHtml(bookmarks: List<BookmarkEntity>, favorites: List<SavedSite.Favorite>): String {
-        if (bookmarks.isEmpty() && favorites.isEmpty()) {
+    override fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String {
+
+        if (folderTree.isEmpty() && favorites.isEmpty()) {
             return ""
         }
 
@@ -46,24 +47,42 @@ class RealSavedSitesParser : SavedSitesParser {
             appendLine("<Title>Bookmarks</Title>")
             appendLine("<H1>Bookmarks</H1>")
             appendLine("<DL><p>")
-            append(addBookmarks(bookmarks))
+            append(addFoldersAndBookmarks(folderTree))
             append(addFavorites(favorites))
             appendLine("</DL><p>")
         }
     }
 
-    private fun addBookmarks(bookmarks: List<BookmarkEntity>): String {
-        if (bookmarks.isEmpty()) {
-            return ""
-        }
+    private fun addFoldersAndBookmarks(folderTree: FolderTree): String {
         return buildString {
-            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">$BOOKSMARKS_FOLDER</H3>")
-            appendLine("    <DL><p>")
-            bookmarks.forEach { entity ->
-                appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
-            }
-            appendLine("    </DL><p>")
+            folderTree.forEachVisit(
+                { node ->
+                    if (node.value.url == null) {
+                        if (node.value.depth == 0) {
+                            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>")
+                        } else {
+                            appendLine(getTabString(node.value.depth) + "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>")
+                        }
+                        appendLine(getTabString(node.value.depth) + "    <DL><p>")
+                    } else {
+                        appendLine(getTabString(node.value.depth) + "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</A>")
+                    }
+                },
+                { node ->
+                    if (node.value.url == null) {
+                        appendLine(getTabString(node.value.depth) + "    </DL><p>")
+                    }
+                }
+            )
         }
+    }
+
+    private fun getTabString(multiplier: Int): String {
+        var tabString = ""
+        repeat(multiplier) {
+            tabString += "    "
+        }
+        return tabString
     }
 
     private fun addFavorites(favorites: List<SavedSite.Favorite>): String {
@@ -80,49 +99,58 @@ class RealSavedSitesParser : SavedSitesParser {
         }
     }
 
-    override fun parseHtml(document: Document): List<SavedSite> {
-        val savedSites = mutableListOf<SavedSite>()
+    override suspend fun parseHtml(
+        document: Document,
+        bookmarksRepository: BookmarksRepository
+    ): List<SavedSite> {
+        return parseElement(document, 0, bookmarksRepository, mutableListOf(), false)
+    }
 
-        var inFolder = false
-        var inFavorite = false
+    private suspend fun parseElement(
+        documentElement: Element,
+        parentId: Long,
+        bookmarksRepository: BookmarksRepository,
+        savedSites: MutableList<SavedSite>,
+        inFavorite: Boolean
+    ): List<SavedSite> {
 
         var favorites = 0
-        val fileItems = document.select("DT")
 
-        fileItems.forEach {
-            if (it.select("H3").isNotEmpty()) {
-                val folderItem = it.select("H3")
-                if (inFolder) {
-                    // we get here when a folder has been read and a new one starts
-                    // bookmarkFolders.add(bookmarkFolder)
-                }
+        documentElement.select("DL").first()?.let { itemBlock ->
 
-                val folderName = folderItem.text()
-                if (folderName == FAVORITES_FOLDER) {
-                    inFavorite = true
-                    inFolder = false
-                } else {
-                    inFolder = true
-                    inFavorite = false
-                    // we start a new folder
-                    // bookmarks.clear()
-                    // bookmarkFolder = BookmarkFolder(folderName, bookmarks)
-                }
-            } else {
-                val linkItem = it.select("a")
-                if (linkItem.isNotEmpty()) {
-                    val link = linkItem.attr("href")
-                    val title = linkItem.text()
-                    if (inFavorite) {
-                        savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
-                        favorites++
+            itemBlock.childNodes()
+                .map { it as Element }
+                .filter { it.select("DT").isNotEmpty() }
+                .forEach { element ->
+
+                    val folder = element.select("H3").first()
+
+                    if (folder != null) {
+                        val folderName = folder.text()
+
+                        if (folderName == FAVORITES_FOLDER || folderName == BOOKMARKS_FOLDER) {
+                            parseElement(element, 0, bookmarksRepository, savedSites, folderName == FAVORITES_FOLDER)
+                        } else {
+                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId)
+                            val id = bookmarksRepository.insert(bookmarkFolder)
+                            parseElement(element, id, bookmarksRepository, savedSites, false)
+                        }
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link))
+                        val linkItem = element.select("a")
+                        if (linkItem.isNotEmpty()) {
+                            val link = linkItem.attr("href")
+                            val title = linkItem.text()
+                            if (inFavorite) {
+                                savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
+                                favorites++
+                            } else {
+                                val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = parentId)
+                                savedSites.add(bookmark)
+                            }
+                        }
                     }
                 }
-            }
         }
-
         return savedSites
     }
 }

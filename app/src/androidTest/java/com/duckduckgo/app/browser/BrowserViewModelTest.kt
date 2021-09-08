@@ -113,7 +113,9 @@ class BrowserViewModelTest {
 
     @After
     fun after() {
-        testee.command.removeObserver(mockCommandObserver)
+        if (this::testee.isInitialized) {
+            testee.command.removeObserver(mockCommandObserver)
+        }
     }
 
     @Test
@@ -206,6 +208,22 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(AppPixelName.SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenFavoriteThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenFavoriteFromWidget(url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url)
+    }
+
+    @Test
+    fun whenOpenFavoriteFromWidgetThenFirePixel() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenFavoriteFromWidget(url)
+        verify(mockPixel).fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
     }
 
     companion object {

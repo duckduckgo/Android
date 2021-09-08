@@ -24,15 +24,16 @@ import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
-import kotlinx.android.synthetic.main.activity_user_survey.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class SurveyActivity : DuckDuckGoActivity() {
@@ -42,10 +43,15 @@ class SurveyActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    private val binding: ActivityUserSurveyBinding by viewBinding()
+
+    private val webView
+        get() = binding.webView
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_survey)
+        setContentView(binding.root)
         configureListeners()
 
         webView.settings.javaScriptEnabled = true
@@ -68,7 +74,7 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        dismissButton.setOnClickListener {
+        binding.dismissButton.setOnClickListener {
             onSurveyDismissed()
         }
     }
@@ -92,18 +98,18 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun loadSurvey(url: String) {
-        progress.show()
+        binding.progress.show()
         webView.loadUrl(url)
     }
 
     private fun showSurvey() {
-        progress.gone()
+        binding.progress.gone()
         webView.show()
     }
 
     private fun showError() {
-        progress.gone()
-        errorView.show()
+        binding.progress.gone()
+        binding.errorView.show()
         destroyWebView()
     }
 
@@ -132,7 +138,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun destroyWebView() {
         webView.gone()
-        surveyActivityContainerViewGroup.removeView(webView)
+        binding.surveyActivityContainerViewGroup.removeView(webView)
         webView.destroy()
     }
 

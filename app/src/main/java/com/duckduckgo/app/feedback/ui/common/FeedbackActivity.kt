@@ -34,7 +34,8 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
 class FeedbackActivity :
@@ -48,14 +49,13 @@ class FeedbackActivity :
 
     private val viewModel: FeedbackViewModel by bindViewModel()
 
-    private lateinit var binding: ActivityFragmentWithToolbarBinding
+    private val binding: ActivityFragmentWithToolbarBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFragmentWithToolbarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureObservers()

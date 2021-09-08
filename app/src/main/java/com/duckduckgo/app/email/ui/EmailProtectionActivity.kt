@@ -26,20 +26,20 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFragmentWithToolbarBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private val viewModel: EmailProtectionViewModel by bindViewModel()
-    private lateinit var binding: ActivityFragmentWithToolbarBinding
+    private val binding: ActivityFragmentWithToolbarBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityFragmentWithToolbarBinding.inflate(layoutInflater)
 
         viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
         setContentView(binding.root)
@@ -50,6 +50,7 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         when (val state = viewState.emailState) {
             is EmailProtectionViewModel.EmailState.SignedIn -> launchEmailProtectionSignOut(state.emailAddress)
             is EmailProtectionViewModel.EmailState.SignedOut -> launchEmailProtectionSignIn()
+            is EmailProtectionViewModel.EmailState.NotSupported -> launchEmailProtectionNotSupported()
         }
     }
 
@@ -60,6 +61,11 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionSignIn() {
         val fragment = EmailProtectionSignInFragment.instance()
+        updateFragment(fragment)
+    }
+
+    private fun launchEmailProtectionNotSupported() {
+        val fragment = EmailProtectionNotSupportedFragment.instance()
         updateFragment(fragment)
     }
 

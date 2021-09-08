@@ -23,8 +23,36 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_global_privacy_control" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/globalPrivacyControlDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:layout_margin="16dp"
+            android:paddingTop="12dp"
+            android:lineSpacingExtra="4sp"
+            android:text="@string/globalPrivacyControlDescription"
+            android:textColor="?attr/settingsMinorTextColor"
+            android:textSize="14sp"
+            android:textStyle="normal" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/globalPrivacyControlToggle"
+            style="@style/SettingsSwitch"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/globalPrivacyControlToggle"
+            android:theme="@style/SettingsSwitchTheme" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+apply from: "$rootDir/spotless.gradle"
+
 android {
     compileSdkVersion compile_sdk
     buildToolsVersion tools_build_version
@@ -26,6 +28,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -40,5 +43,8 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }

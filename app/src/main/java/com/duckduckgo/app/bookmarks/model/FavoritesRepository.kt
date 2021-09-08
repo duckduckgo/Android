@@ -35,6 +35,7 @@ interface FavoritesRepository {
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
+    fun userHasFavorites(): Boolean
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -53,7 +54,8 @@ sealed class SavedSite(
     data class Bookmark(
         override val id: Long,
         override val title: String,
-        override val url: String
+        override val url: String,
+        val parentId: Long
     ) : SavedSite(id, title, url)
 }
 
@@ -95,6 +97,10 @@ class FavoritesDataRepository(
 
     override fun favorites(): Flow<List<SavedSite.Favorite>> {
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
+    }
+
+    override fun userHasFavorites(): Boolean {
+        return favoritesDao.userHasFavorites()
     }
 
     override suspend fun delete(favorite: SavedSite.Favorite) {

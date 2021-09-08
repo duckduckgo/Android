@@ -23,7 +23,7 @@ import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityPrivacyPracticesBinding
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.model.Site
@@ -31,8 +31,7 @@ import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
-import kotlinx.android.synthetic.main.content_privacy_practices.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
@@ -40,13 +39,21 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: TabRepository
 
+    private val binding: ActivityPrivacyPracticesBinding by viewBinding()
+
     private val practicesAdapter = PrivacyPracticesAdapter()
 
     private val viewModel: PrivacyPracticesViewModel by bindViewModel()
 
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    private val privacyPractices
+        get() = binding.contentPrivacyPractices
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_privacy_practices)
+        setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()
 
@@ -66,15 +73,17 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecycler() {
-        practicesList.layoutManager = LinearLayoutManager(this)
-        practicesList.adapter = practicesAdapter
+        privacyPractices.practicesList.layoutManager = LinearLayoutManager(this)
+        privacyPractices.practicesList.adapter = practicesAdapter
     }
 
     private fun render(viewState: PrivacyPracticesViewModel.ViewState) {
-        practicesBanner.setImageResource(viewState.practices.banner())
-        domain.text = viewState.domain
-        heading.text = viewState.practices.text(applicationContext)
-        practicesAdapter.updateData(viewState.goodTerms, viewState.badTerms)
+        with(privacyPractices) {
+            practicesBanner.setImageResource(viewState.practices.banner())
+            domain.text = viewState.domain
+            heading.text = viewState.practices.text(applicationContext)
+            practicesAdapter.updateData(viewState.goodTerms, viewState.badTerms)
+        }
     }
 
     fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {

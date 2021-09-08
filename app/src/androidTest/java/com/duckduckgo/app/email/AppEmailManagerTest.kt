@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
+import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailInviteCodeResponse
 import com.duckduckgo.app.email.api.EmailService
@@ -134,17 +135,18 @@ class AppEmailManagerTest {
         whenever(mockEmailDataStore.emailToken).thenReturn("token")
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
 
-        testee.storeCredentials("token", "username")
+        testee.storeCredentials("token", "username", "cohort")
 
         verify(mockEmailService).newAlias(any())
     }
 
     @Test
     fun whenStoreCredentialsThenCredentialsAreStoredInDataStore() {
-        testee.storeCredentials("token", "username")
+        testee.storeCredentials("token", "username", "cohort")
 
         verify(mockEmailDataStore).emailUsername = "username"
         verify(mockEmailDataStore).emailToken = "token"
+        verify(mockEmailDataStore).cohort = "cohort"
     }
 
     @Test
@@ -152,14 +154,14 @@ class AppEmailManagerTest {
         whenever(mockEmailDataStore.emailToken).thenReturn("token")
         whenever(mockEmailDataStore.emailUsername).thenReturn("username")
 
-        testee.storeCredentials("token", "username")
+        testee.storeCredentials("token", "username", "cohort")
 
         assertTrue(testee.signedInFlow().first())
     }
 
     @Test
     fun whenStoreCredentialsIfCredentialsWereNotCorrectlyStoredThenIsSignedInChannelSendsFalse() = coroutineRule.runBlocking {
-        testee.storeCredentials("token", "username")
+        testee.storeCredentials("token", "username", "cohort")
 
         assertFalse(testee.signedInFlow().first())
     }
@@ -330,6 +332,41 @@ class AppEmailManagerTest {
     fun whenNotifyOnJoinedWaitlistThenSendNotificationSetToTrue() {
         testee.notifyOnJoinedWaitlist()
         verify(mockEmailDataStore).sendNotification = true
+    }
+
+    @Test
+    fun whenGetCohortThenReturnCohort() {
+        whenever(mockEmailDataStore.cohort).thenReturn("cohort")
+
+        assertEquals("cohort", testee.getCohort())
+    }
+
+    @Test
+    fun whenGetCohortIfCohortIsNullThenReturnUnknown() {
+        whenever(mockEmailDataStore.cohort).thenReturn(null)
+
+        assertEquals(UNKNOWN_COHORT, testee.getCohort())
+    }
+
+    @Test
+    fun whenGetCohortIfCohortIsEmtpyThenReturnUnknown() {
+        whenever(mockEmailDataStore.cohort).thenReturn("")
+
+        assertEquals(UNKNOWN_COHORT, testee.getCohort())
+    }
+
+    @Test
+    fun whenIsEmailFeatureSupportedAndEncryptionCanBeUsedThenReturnTrue() {
+        whenever(mockEmailDataStore.canUseEncryption()).thenReturn(true)
+
+        assertTrue(testee.isEmailFeatureSupported())
+    }
+
+    @Test
+    fun whenIsEmailFeatureSupportedAndEncryptionCannotBeUsedThenReturnFalse() {
+        whenever(mockEmailDataStore.canUseEncryption()).thenReturn(false)
+
+        assertFalse(testee.isEmailFeatureSupported())
     }
 
     private fun givenUserIsInWaitlist() {

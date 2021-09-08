@@ -18,14 +18,25 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
 
@@ -40,15 +51,25 @@ interface HttpsUpgrader {
     fun reloadData()
 }
 
-class HttpsUpgraderImpl(
+@Singleton
+@ContributesBinding(
+    scope = AppObjectGraph::class,
+    boundType = HttpsUpgrader::class
+)
+class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val userAllowListDao: UserWhitelistDao,
     private val pixel: Pixel
-) : HttpsUpgrader {
+) : HttpsUpgrader, LifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null
     private val bloomReloadLock = ReentrantLock()
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onApplicationCreated() {
+        thread { reloadData() }
+    }
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
@@ -82,6 +103,7 @@ class HttpsUpgraderImpl(
 
     @WorkerThread
     override fun reloadData() {
+        Timber.v("Reload Https upgrader data")
         bloomReloadLock.lock()
         try {
             bloomFilter = bloomFactory.create()
@@ -97,4 +119,16 @@ class HttpsUpgraderImpl(
             bloomReloadLock.unlock()
         }
     }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+abstract class HttpsUpgraderModule {
+
+    @Singleton
+    @Binds
+    @IntoSet
+    abstract fun bindHttpsUpgraderLifecycleObserver(
+        httpsUpgraderImpl: HttpsUpgraderImpl
+    ): LifecycleObserver
 }
