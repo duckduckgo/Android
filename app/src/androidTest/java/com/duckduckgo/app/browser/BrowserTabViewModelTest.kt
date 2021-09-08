@@ -124,6 +124,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.*
 import com.nhaarman.mockitokotlin2.any
@@ -290,6 +291,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockGpcRepository: GpcRepository
 
+    @Mock
+    private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -426,7 +430,7 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             fileDownloader = mockFileDownloader,
-            gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository),
+            gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary),
             fireproofDialogsEventHandler = fireproofDialogsEventHandler,
             emailManager = mockEmailManager,
             favoritesRepository = mockFavoritesRepository,
