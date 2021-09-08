@@ -2030,20 +2030,42 @@ class BrowserTabViewModel(
     fun consumeAliasAndCopyToClipboard() {
         emailManager.getAlias()?.let {
             command.value = CopyAliasToClipboard(it)
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun consumeAlias() {
         emailManager.getAlias()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ALIAS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun useAddress() {
         emailManager.getEmailAddress()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ADDRESS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 

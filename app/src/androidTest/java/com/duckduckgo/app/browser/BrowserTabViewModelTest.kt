@@ -3252,6 +3252,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenConsumeAliasAndCopyToClipboardThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAliasAndCopyToClipboard()
+
+        verify(mockEmailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
+
+        testee.consumeAlias()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
     fun whenEmailIsSignedOutThenIsEmailSignedInReturnsFalse() = coroutineRule.runBlocking {
         emailStateFlow.emit(false)
 
@@ -3280,10 +3300,20 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test
@@ -3311,10 +3341,20 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenPixelSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
         testee.useAddress()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenUseAddressThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test

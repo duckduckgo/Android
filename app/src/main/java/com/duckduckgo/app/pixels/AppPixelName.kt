@@ -222,6 +222,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EMAIL_TOOLTIP_DISMISSED("m_e_t_d"),
     EMAIL_USE_ALIAS("m_e_ua"),
     EMAIL_USE_ADDRESS("m_e_uad"),
+    EMAIL_COPIED_TO_CLIPBOARD("m_e_cc"),
 
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
