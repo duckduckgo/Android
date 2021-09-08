@@ -144,6 +144,7 @@ class FavoritesQuickAccessAdapter(
                 false
             }
             itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
+            itemView.quickAccessTitle.setOnClickListener { onItemSelected(item) }
         }
 
         private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
