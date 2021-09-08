@@ -22,7 +22,7 @@ class TimberExtensions {
     companion object {
         @JvmStatic
         fun isLoggingEnabled(): Boolean {
-            return Timber.treeCount() != 0
+            return Timber.forest().isNotEmpty()
         }
 
         @JvmStatic

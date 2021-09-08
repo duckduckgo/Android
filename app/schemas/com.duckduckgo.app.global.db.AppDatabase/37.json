@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 37,
-    "identityHash": "8d6c9672d659f3e3d88ec061aa022a3d",
+    "identityHash": "956974f96f33ffaf4d8d5a061cbda403",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -400,7 +400,7 @@
       },
       {
         "tableName": "bookmarks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `url` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `url` TEXT NOT NULL, `parentId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -418,6 +418,12 @@
             "fieldPath": "url",
             "columnName": "url",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -476,6 +482,38 @@
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_title_url` ON `${TABLE_NAME}` (`title`, `url`)"
           }
         ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "bookmark_folders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
         "foreignKeys": []
       },
       {
@@ -891,44 +929,6 @@
         "foreignKeys": []
       },
       {
-        "tableName": "web_trackers_blocked",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `trackerUrl` TEXT NOT NULL, `trackerCompany` TEXT NOT NULL, `timestamp` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "trackerUrl",
-            "columnName": "trackerUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "trackerCompany",
-            "columnName": "trackerCompany",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "timestamp",
-            "columnName": "timestamp",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "auth_cookies_allowed_domains",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
@@ -952,7 +952,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8d6c9672d659f3e3d88ec061aa022a3d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '956974f96f33ffaf4d8d5a061cbda403')"
     ]
   }
 }

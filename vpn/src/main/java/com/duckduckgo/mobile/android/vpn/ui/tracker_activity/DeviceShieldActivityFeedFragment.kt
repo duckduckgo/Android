@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayou
 import com.duckduckgo.mobile.android.vpn.R
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -57,7 +58,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
             adapter = trackerFeedAdapter
         }
 
-        addRepeatingJob(Lifecycle.State.CREATED) {
+        lifecycleScope.launch {
             activityFeedViewModel.getMostRecentTrackers(
                 DeviceShieldActivityFeedViewModel.TimeWindow(
                     config.timeWindow.toLong(),
@@ -65,6 +66,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
                 ),
                 config.showTimeWindowHeadings
             )
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
                     feedListener?.onTrackerListShowed(it.size)
                     trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows))

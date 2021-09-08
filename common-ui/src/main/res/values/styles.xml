@@ -754,4 +754,14 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
+    <style name="SavedSiteFullScreenDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="SavedSiteTextInputEditTextTheme">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:backgroundTint">?attr/savedSiteEditTextUnderlineColor</item>
+    </style>
+
 </resources>

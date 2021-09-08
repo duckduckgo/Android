@@ -345,6 +345,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
+            android:label="@string/folderLocationTitle"
+            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
