@@ -3365,8 +3365,8 @@ class BrowserTabViewModelTest {
     fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
-        testee.onUserSubmittedQuery("foo.com")
-        verify(mockAppLinksHandler).userEnteredBrowserState(null)
+        testee.onUserSubmittedQuery("foo")
+        verify(mockAppLinksHandler).userEnteredBrowserState("foo.com")
         assertCommandIssued<Navigate>()
     }
 
