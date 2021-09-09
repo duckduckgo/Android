@@ -2213,9 +2213,11 @@ class BrowserTabFragment :
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
                 homeBackgroundLogo.showLogo()
+                quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
+                quickAccessRecyclerView.show()
             }
 
             newTabQuickAcessItemsLayout.show()
