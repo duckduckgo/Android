@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Dodaj zaznamek</string>
     <string name="editBookmarkMenuTitle">Uredi zaznamek</string>
     <string name="addFavoriteMenuTitle">Dodaj priljubljene</string>
+    <string name="removeFavoriteMenuTitle">Odstrani priljubljene</string>
     <string name="favoriteAddedMessage">Priljubljeni dodan</string>
     <string name="bookmarkAddedMessage">Zaznamek je dodan</string>
     <string name="requestDesktopSiteMenuTitle">Namizna stran</string>

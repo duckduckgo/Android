@@ -35,6 +35,7 @@
     <string name="addBookmarkMenuTitle">Добави отметка</string>
     <string name="editBookmarkMenuTitle">Редактиране на отметка</string>
     <string name="addFavoriteMenuTitle">Добавяне в любими</string>
+    <string name="removeFavoriteMenuTitle">Премахване от любими</string>
     <string name="favoriteAddedMessage">Добавено в любими</string>
     <string name="bookmarkAddedMessage">Добавена е отметка</string>
     <string name="requestDesktopSiteMenuTitle">Сайт на работния плот</string>

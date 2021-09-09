@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
     <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
     <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
+    <string name="removeFavoriteMenuTitle">Kedvenc eltávolítása</string>
     <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
     <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>
     <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>

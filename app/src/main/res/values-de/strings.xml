@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Lesezeichen hinzufügen</string>
     <string name="editBookmarkMenuTitle">Lesezeichen bearbeiten</string>
     <string name="addFavoriteMenuTitle">Favorit hinzufügen</string>
+    <string name="removeFavoriteMenuTitle">Favorit entfernen</string>
     <string name="favoriteAddedMessage">Favorit wurde hinzugefügt</string>
     <string name="bookmarkAddedMessage">Lesezeichen hinzugefügt</string>
     <string name="requestDesktopSiteMenuTitle">Desktop-Seite</string>

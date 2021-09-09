@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Добавить закладку</string>
     <string name="editBookmarkMenuTitle">Редактировать закладку</string>
     <string name="addFavoriteMenuTitle">Добавить в избранное</string>
+    <string name="removeFavoriteMenuTitle">Удалить из избранного</string>
     <string name="favoriteAddedMessage">Сайт добавлен в избранное</string>
     <string name="bookmarkAddedMessage">Закладка добавлена</string>
     <string name="requestDesktopSiteMenuTitle">Полная версия сайта</string>

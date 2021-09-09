@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Aggiungi ai segnalibri</string>
     <string name="editBookmarkMenuTitle">Modifica segnalibro</string>
     <string name="addFavoriteMenuTitle">Aggiungi preferito</string>
+    <string name="removeFavoriteMenuTitle">Rimuovi Preferito</string>
     <string name="favoriteAddedMessage">Preferito aggiunto</string>
     <string name="bookmarkAddedMessage">Segnalibro aggiunto</string>
     <string name="requestDesktopSiteMenuTitle">Sito desktop</string>

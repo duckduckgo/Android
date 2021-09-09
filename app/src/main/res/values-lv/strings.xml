@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Pievienot grāmatzīmi</string>
     <string name="editBookmarkMenuTitle">Rediģēt grāmatzīmi</string>
     <string name="addFavoriteMenuTitle">Pievienot izlases vienumu</string>
+    <string name="removeFavoriteMenuTitle">Noņemt izlasi</string>
     <string name="favoriteAddedMessage">Izlases vienums ir pievienots</string>
     <string name="bookmarkAddedMessage">Pievienota grāmatzīme</string>
     <string name="requestDesktopSiteMenuTitle">Darbvirsmas vietne</string>

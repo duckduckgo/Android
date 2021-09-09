@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Lägg till bokmärke</string>
     <string name="editBookmarkMenuTitle">Redigera bokmärke</string>
     <string name="addFavoriteMenuTitle">Lägg till favorit</string>
+    <string name="removeFavoriteMenuTitle">Ta bort favorit</string>
     <string name="favoriteAddedMessage">Favorit har lagts till</string>
     <string name="bookmarkAddedMessage">Bokmärke sparat</string>
     <string name="requestDesktopSiteMenuTitle">Webbplats för dator</string>

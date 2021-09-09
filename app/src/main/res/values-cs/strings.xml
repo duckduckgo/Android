@@ -35,6 +35,7 @@
     <string name="addBookmarkMenuTitle">Přidat záložku</string>
     <string name="editBookmarkMenuTitle">Upravit záložku</string>
     <string name="addFavoriteMenuTitle">Přidat oblíbené</string>
+    <string name="removeFavoriteMenuTitle">Odebrat oblíbenou položku</string>
     <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
     <string name="bookmarkAddedMessage">Záložka přidána</string>
     <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>

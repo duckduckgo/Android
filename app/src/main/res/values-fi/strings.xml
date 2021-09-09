@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
     <string name="editBookmarkMenuTitle">Muokkaa kirjanmerkkiä</string>
     <string name="addFavoriteMenuTitle">Lisää suosikki</string>
+    <string name="removeFavoriteMenuTitle">Poista suosikki</string>
     <string name="favoriteAddedMessage">Suosikki lisätty</string>
     <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>
     <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>

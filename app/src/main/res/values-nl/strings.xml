@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Bladwijzer toevoegen</string>
     <string name="editBookmarkMenuTitle">Bladwijzer bewerken</string>
     <string name="addFavoriteMenuTitle">Favoriet toevoegen</string>
+    <string name="removeFavoriteMenuTitle">Favoriet verwijderen</string>
     <string name="favoriteAddedMessage">Favoriet toegevoegd</string>
     <string name="bookmarkAddedMessage">Bladwijzer toegevoegd</string>
     <string name="requestDesktopSiteMenuTitle">Desktopsite</string>

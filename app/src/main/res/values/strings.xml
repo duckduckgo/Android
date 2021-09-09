@@ -34,6 +34,7 @@
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
     <string name="editBookmarkMenuTitle">Edit Bookmark</string>
     <string name="addFavoriteMenuTitle">Add Favorite</string>
+    <string name="removeFavoriteMenuTitle">Remove Favorite</string>
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>

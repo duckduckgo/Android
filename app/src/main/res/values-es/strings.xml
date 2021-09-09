@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Añadir marcador</string>
     <string name="editBookmarkMenuTitle">Editar marcador</string>
     <string name="addFavoriteMenuTitle">Añadir favorito</string>
+    <string name="removeFavoriteMenuTitle">Eliminar favorito</string>
     <string name="favoriteAddedMessage">Favorito añadido</string>
     <string name="bookmarkAddedMessage">Marcador añadido</string>
     <string name="requestDesktopSiteMenuTitle">Versión de escritorio del sitio web</string>

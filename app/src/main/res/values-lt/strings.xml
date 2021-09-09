@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Pridėti žymę</string>
     <string name="editBookmarkMenuTitle">Redaguoti žymę</string>
     <string name="addFavoriteMenuTitle">Pridėti mėgstamą</string>
+    <string name="removeFavoriteMenuTitle">Šalinti mėgstamą</string>
     <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
     <string name="bookmarkAddedMessage">Žymė pridėta</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>

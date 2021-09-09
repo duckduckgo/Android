@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Dodaj zakładkę</string>
     <string name="editBookmarkMenuTitle">Edytuj zakładkę</string>
     <string name="addFavoriteMenuTitle">Dodaj do Ulubionych</string>
+    <string name="removeFavoriteMenuTitle">Usuń ulubione</string>
     <string name="favoriteAddedMessage">Dodano ulubione</string>
     <string name="bookmarkAddedMessage">Dodano zakładkę</string>
     <string name="requestDesktopSiteMenuTitle">Witryna w wersji komputerowej</string>

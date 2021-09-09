@@ -35,6 +35,7 @@
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
     <string name="editBookmarkMenuTitle">Yer İşaretini Düzenle</string>
     <string name="addFavoriteMenuTitle">Favori Ekle</string>
+    <string name="removeFavoriteMenuTitle">Favoriyi Kaldır</string>
     <string name="favoriteAddedMessage">Favori eklendi</string>
     <string name="bookmarkAddedMessage">Yer imi eklendi</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>

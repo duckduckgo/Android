@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Dodaj knjižnu oznaku</string>
     <string name="editBookmarkMenuTitle">Uredi knjižnu oznaku</string>
     <string name="addFavoriteMenuTitle">Dodaj omiljenu stavku</string>
+    <string name="removeFavoriteMenuTitle">Ukloni omiljeno</string>
     <string name="favoriteAddedMessage">Dodano u Omiljeno</string>
     <string name="bookmarkAddedMessage">Knjižna je oznaka dodana</string>
     <string name="requestDesktopSiteMenuTitle">Mjesto radne površine</string>

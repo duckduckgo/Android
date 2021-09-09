@@ -51,6 +51,7 @@
     <string name="addBookmarkMenuTitle">Adăugare semn de carte</string>
     <string name="editBookmarkMenuTitle">Editare semn de carte</string>
     <string name="addFavoriteMenuTitle">Adaugă preferință</string>
+    <string name="removeFavoriteMenuTitle">Elimină Favoritul</string>
     <string name="favoriteAddedMessage">Preferință adăugată</string>
     <string name="bookmarkAddedMessage">Semn de carte adăugat</string>
     <string name="requestDesktopSiteMenuTitle">Versiune desktop</string>
