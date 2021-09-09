@@ -41,7 +41,24 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsRedirectAndAppLinkNotOpenedInBrowserThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertTrue(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
+            verify(mockCallback).invoke()
+        }
+    }
+
+    @Test
+    fun whenAppLinkHandledAndIsSameOrSubdomainThenReturnFalse() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.appLinkOpenedInBrowser = false
+            assertFalse(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback))
+        }
+    }
+
+    @Test
+    fun whenAppLinkHandledAndIsNotSameOrSubdomainThenReturnTrueAbdLaunchAppLink() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.appLinkOpenedInBrowser = false
+            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -50,7 +67,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsNotRedirectAndAppLinkOpenedInBrowserThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -59,7 +76,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsRedirectAndAppLinkOpenedInBrowserThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
@@ -68,7 +85,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsForMainFrameThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "", launchAppLink = mockCallback))
+            assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
             verify(mockCallback).invoke()
         }
     }
@@ -77,7 +94,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsNotForMainFrameThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
-            assertFalse(testee.handleAppLink(isRedirect = false, isForMainFrame = false, urlString = "", launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = false, isForMainFrame = false, urlString = "foo.com", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
@@ -86,7 +103,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledOnApiLessThan24ThenReturnFalse() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = true
-            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = false, urlString = "", launchAppLink = mockCallback))
+            assertFalse(testee.handleAppLink(isRedirect = true, isForMainFrame = false, urlString = "foo.com", launchAppLink = mockCallback))
             verifyZeroInteractions(mockCallback)
         }
     }
