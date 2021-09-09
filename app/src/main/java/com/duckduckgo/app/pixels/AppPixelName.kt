@@ -219,9 +219,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
 
-    EMAIL_TOOLTIP_DISMISSED("m_e_t_d"),
-    EMAIL_USE_ALIAS("m_e_ua"),
-    EMAIL_USE_ADDRESS("m_e_uad"),
+    EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+    EMAIL_USE_ALIAS("email_filled_random"),
+    EMAIL_USE_ADDRESS("email_filled_main"),
+    EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
 
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
