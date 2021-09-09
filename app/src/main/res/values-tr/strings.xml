@@ -33,6 +33,7 @@
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
+    <string name="editBookmarkMenuTitle">Yer İşaretini Düzenle</string>
     <string name="addFavoriteMenuTitle">Favori Ekle</string>
     <string name="favoriteAddedMessage">Favori eklendi</string>
     <string name="bookmarkAddedMessage">Yer imi eklendi</string>

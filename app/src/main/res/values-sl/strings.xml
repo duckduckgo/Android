@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Počisti vhod iskanja</string>
     <string name="no_compatible_third_party_app_installed">Ni nameščene združljive aplikacije</string>
     <string name="addBookmarkMenuTitle">Dodaj zaznamek</string>
+    <string name="editBookmarkMenuTitle">Uredi zaznamek</string>
     <string name="addFavoriteMenuTitle">Dodaj priljubljene</string>
     <string name="favoriteAddedMessage">Priljubljeni dodan</string>
     <string name="bookmarkAddedMessage">Zaznamek je dodan</string>

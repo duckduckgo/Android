@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Notīrīt meklēšanas ievadi</string>
     <string name="no_compatible_third_party_app_installed">Nav instalēta saderīga lietotne</string>
     <string name="addBookmarkMenuTitle">Pievienot grāmatzīmi</string>
+    <string name="editBookmarkMenuTitle">Rediģēt grāmatzīmi</string>
     <string name="addFavoriteMenuTitle">Pievienot izlases vienumu</string>
     <string name="favoriteAddedMessage">Izlases vienums ir pievienots</string>
     <string name="bookmarkAddedMessage">Pievienota grāmatzīme</string>

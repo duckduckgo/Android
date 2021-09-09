@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
     <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
     <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
+    <string name="editBookmarkMenuTitle">Muokkaa kirjanmerkkiä</string>
     <string name="addFavoriteMenuTitle">Lisää suosikki</string>
     <string name="favoriteAddedMessage">Suosikki lisätty</string>
     <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>

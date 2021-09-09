@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Borrar búsqueda</string>
     <string name="no_compatible_third_party_app_installed">No hay ninguna aplicación compatible instalada</string>
     <string name="addBookmarkMenuTitle">Añadir marcador</string>
+    <string name="editBookmarkMenuTitle">Editar marcador</string>
     <string name="addFavoriteMenuTitle">Añadir favorito</string>
     <string name="favoriteAddedMessage">Favorito añadido</string>
     <string name="bookmarkAddedMessage">Marcador añadido</string>

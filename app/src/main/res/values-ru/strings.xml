@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Сбросить поисковый запрос</string>
     <string name="no_compatible_third_party_app_installed">Совместимое приложение не установлено</string>
     <string name="addBookmarkMenuTitle">Добавить закладку</string>
+    <string name="editBookmarkMenuTitle">Редактировать закладку</string>
     <string name="addFavoriteMenuTitle">Добавить в избранное</string>
     <string name="favoriteAddedMessage">Сайт добавлен в избранное</string>
     <string name="bookmarkAddedMessage">Закладка добавлена</string>

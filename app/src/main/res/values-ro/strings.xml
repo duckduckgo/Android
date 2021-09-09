@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Ștergeți datele introduse pentru căutare</string>
     <string name="no_compatible_third_party_app_installed">Nicio aplicație compatibilă instalată</string>
     <string name="addBookmarkMenuTitle">Adăugare semn de carte</string>
+    <string name="editBookmarkMenuTitle">Editare semn de carte</string>
     <string name="addFavoriteMenuTitle">Adaugă preferință</string>
     <string name="favoriteAddedMessage">Preferință adăugată</string>
     <string name="bookmarkAddedMessage">Semn de carte adăugat</string>

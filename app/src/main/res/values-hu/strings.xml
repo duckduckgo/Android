@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
     <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
+    <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
     <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
     <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
     <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>

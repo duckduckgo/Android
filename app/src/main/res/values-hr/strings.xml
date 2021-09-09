@@ -49,6 +49,7 @@
     <string name="clearButtonContentDescription">Obriši unos pretraživanja</string>
     <string name="no_compatible_third_party_app_installed">Nije instalirana kompatibilna aplikacija</string>
     <string name="addBookmarkMenuTitle">Dodaj knjižnu oznaku</string>
+    <string name="editBookmarkMenuTitle">Uredi knjižnu oznaku</string>
     <string name="addFavoriteMenuTitle">Dodaj omiljenu stavku</string>
     <string name="favoriteAddedMessage">Dodano u Omiljeno</string>
     <string name="bookmarkAddedMessage">Knjižna je oznaka dodana</string>
