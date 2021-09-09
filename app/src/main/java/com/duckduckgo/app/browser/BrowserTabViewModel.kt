@@ -617,7 +617,7 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            appLinksHandler.userEnteredBrowserState(url)
+            appLinksHandler.userEnteredBrowserState(urlToNavigate)
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
