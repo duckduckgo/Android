@@ -101,7 +101,7 @@ class FavoritesQuickAccessAdapter(
 
         @SuppressLint("ClickableViewAccessibility")
         private fun configureTouchListener() {
-            itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
+            itemView.setOnTouchListener { _, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_MOVE -> {
                         if (itemState != ItemState.LongPress) return@setOnTouchListener false
@@ -137,14 +137,13 @@ class FavoritesQuickAccessAdapter(
         }
 
         private fun configureClickListeners(item: QuickAccessFavorite) {
-            itemView.quickAccessFaviconCard.setOnLongClickListener {
+            itemView.setOnLongClickListener {
                 itemState = ItemState.LongPress
                 scaleUpFavicon()
-                showOverFlowMenu(inflater, it, item)
+                showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
                 false
             }
-            itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
-            itemView.quickAccessTitle.setOnClickListener { onItemSelected(item) }
+            itemView.setOnClickListener { onItemSelected(item) }
         }
 
         private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
