@@ -167,7 +167,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            webViewClientListener?.pageChanged(url)
+            webViewClientListener?.pageStarted(url)
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))

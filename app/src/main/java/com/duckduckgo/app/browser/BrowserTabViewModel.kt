@@ -1917,7 +1917,7 @@ class BrowserTabViewModel(
         appLinksHandler.reset()
     }
 
-    override fun pageChanged(url: String?) {
+    override fun pageStarted(url: String?) {
         appLinksHandler.updateDisabledUrl(url)
     }
 

@@ -150,6 +150,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenListenerNotified() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
