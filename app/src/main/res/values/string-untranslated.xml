@@ -47,9 +47,9 @@
     <string name="settingsDarkTheme">Dark</string>
     <string name="settingsSystemTheme">System Default</string>
 
-    <!--    Theme Settings-->
+    <!-- Theme Settings -->
     <string name="settingsThemeDialogSave">Set Theme</string>
-  
+
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
     <string name="favoriteDialogTitleEdit">Edit Favorite</string>
