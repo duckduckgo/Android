@@ -81,6 +81,12 @@
       "packageNames": [
         "com.crunchyroll.crunchyroid"
       ]
+    },
+    {
+      "rule": "www.facebook.com",
+      "packageNames": [
+        "com.chefsteps.circulator"
+      ]
     }
   ]
 }
