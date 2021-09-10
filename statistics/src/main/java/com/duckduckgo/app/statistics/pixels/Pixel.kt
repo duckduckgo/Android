@@ -73,6 +73,7 @@ interface Pixel {
         const val FIRE_EXECUTED = "fe"
         const val BOOKMARK_COUNT = "bco"
         const val COHORT = "cohort"
+        const val LAST_USED_DAY = "duck_address_last_used"
     }
 
     object PixelValues {

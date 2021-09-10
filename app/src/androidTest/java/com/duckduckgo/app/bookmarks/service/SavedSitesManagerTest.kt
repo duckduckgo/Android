@@ -104,7 +104,7 @@ class SavedSitesManagerTest {
     }
 
     private fun aBookmark(): SavedSite.Bookmark {
-        return SavedSite.Bookmark(0, "title", "url")
+        return SavedSite.Bookmark(0, "title", "url", 0)
     }
 
     private fun aFavorite(): SavedSite.Favorite {

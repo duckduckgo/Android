@@ -27,6 +27,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 interface EmailManager : LifecycleObserver {
     fun signedInFlow(): StateFlow<Boolean>
@@ -42,6 +46,9 @@ interface EmailManager : LifecycleObserver {
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
     fun notifyOnJoinedWaitlist()
     fun getCohort(): String
+    fun isEmailFeatureSupported(): Boolean
+    fun getLastUsedDate(): String
+    fun setNewLastUsedDate()
 }
 
 class AppEmailManager(
@@ -134,6 +141,18 @@ class AppEmailManager(
     override fun getCohort(): String {
         val cohort = emailDataStore.cohort
         return if (cohort.isNullOrBlank()) UNKNOWN_COHORT else cohort
+    }
+
+    override fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
+
+    override fun getLastUsedDate(): String = emailDataStore.lastUsedDate.orEmpty()
+
+    override fun setNewLastUsedDate() {
+        val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("US/Eastern")
+        }
+        val date = formatter.format(Date())
+        emailDataStore.lastUsedDate = date
     }
 
     private fun consumeAlias(): String? {

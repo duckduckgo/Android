@@ -25,7 +25,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +45,7 @@ class EmailProtectionViewModelTest {
     fun before() {
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
+        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(true)
         testee = EmailProtectionViewModel(mockEmailManager)
     }
 
@@ -59,7 +59,7 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenSignedInFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
             emailStateFlow.emit(false)
             (expectItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
@@ -69,10 +69,21 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenSignedInFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
             emailStateFlow.emit(true)
             assert(expectItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFeatureIsNotSupportedThenEmitNotSupportedState() = coroutineRule.runBlocking {
+        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
+        testee.viewState.test {
+            emailStateFlow.emit(true)
+            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.NotSupported)
 
             cancelAndConsumeRemainingEvents()
         }

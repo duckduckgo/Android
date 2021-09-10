@@ -116,7 +116,7 @@ class AutoCompleteApi @Inject constructor(
 
     private fun rankBookmarks(query: String, bookmarks: List<BookmarkEntity>): List<SavedSite> {
         return bookmarks.asSequence()
-            .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url) }
+            .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
             .sortByRank(query)
     }
 
