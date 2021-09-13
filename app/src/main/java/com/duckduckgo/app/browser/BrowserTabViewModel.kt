@@ -89,7 +89,6 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -114,6 +113,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.Gpc
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -158,7 +158,7 @@ class BrowserTabViewModel(
     private val userEventsRepository: UserEventsRepository,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
-    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val gpc: Gpc,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -618,7 +618,7 @@ class BrowserTabViewModel(
             fireQueryChangedPixel(trimmedInput)
 
             appLinksHandler.userEnteredBrowserState()
-            command.value = Navigate(urlToNavigate, getUrlHeaders())
+            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -628,7 +628,12 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
+    private fun getUrlHeaders(url: String?): Map<String, String> {
+        url?.let {
+            return gpc.getHeaders(url)
+        }
+        return emptyMap()
+    }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -1693,7 +1698,7 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders())
+            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
             command.value = Refresh
         }
@@ -1923,7 +1928,7 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink, getUrlHeaders())
+        command.value = HandleAppLink(appLink, getUrlHeaders(appLink.uriString))
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
@@ -1931,7 +1936,7 @@ class BrowserTabViewModel(
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders())
+        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
     }
 
     override fun openMessageInNewTab(message: Message) {
@@ -2158,7 +2163,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val userEventsRepository: Provider<UserEventsRepository>,
     private val userEventsStore: Provider<UserEventsStore>,
     private val fileDownloader: Provider<FileDownloader>,
-    private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
+    private val gpc: Provider<Gpc>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
     private val appCoroutineScope: Provider<CoroutineScope>,
@@ -2168,7 +2173,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
                 else -> null
             }
         }
