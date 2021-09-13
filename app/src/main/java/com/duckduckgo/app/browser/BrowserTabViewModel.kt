@@ -1389,9 +1389,9 @@ class BrowserTabViewModel(
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
             }
-            val bookmarkEntity = BookmarkEntity(title = title, url = url)
+            val bookmarkEntity = BookmarkEntity(title = title, url = url, parentId = 0)
             val id = bookmarksDao.insert(bookmarkEntity)
-            SavedSite.Bookmark(id, title, url)
+            SavedSite.Bookmark(id, title, url, 0)
         }
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
@@ -1524,7 +1524,7 @@ class BrowserTabViewModel(
 
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
-            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
         }
     }
 
@@ -2035,20 +2035,42 @@ class BrowserTabViewModel(
     fun consumeAliasAndCopyToClipboard() {
         emailManager.getAlias()?.let {
             command.value = CopyAliasToClipboard(it)
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun consumeAlias() {
         emailManager.getAlias()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ALIAS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun useAddress() {
         emailManager.getEmailAddress()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ADDRESS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 

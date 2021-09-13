@@ -21,22 +21,23 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class PixelAtbRemovalInterceptorTest {
-    private lateinit var pixelAtbRemovalInterceptor: PixelAtbRemovalInterceptor
+class PixelEmailRemovalInterceptorTest {
+    private lateinit var pixelEmailRemovalInterceptor: PixelEmailRemovalInterceptor
 
     @Before
     fun setup() {
-        pixelAtbRemovalInterceptor = PixelAtbRemovalInterceptor()
+        pixelEmailRemovalInterceptor = PixelEmailRemovalInterceptor()
     }
 
     @Test
     fun whenSendPixelTheRedactAtvInfoFromDefinedPixels() {
         AppPixelName.values().map { it.pixelName }.forEach { pixelName ->
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = PixelAtbRemovalInterceptor.pixels.contains(pixelName)
+            val removalExpected = PixelEmailRemovalInterceptor.pixels.contains(pixelName)
 
-            val interceptedUrl = pixelAtbRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
+            val interceptedUrl = pixelEmailRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
             assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
+            assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }
     }
 

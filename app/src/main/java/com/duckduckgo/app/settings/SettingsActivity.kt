@@ -37,20 +37,21 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_internal.*
 import kotlinx.android.synthetic.main.content_settings_other.*
@@ -65,6 +66,7 @@ class SettingsActivity :
     DuckDuckGoActivity(),
     SettingsAutomaticallyClearWhatFragment.Listener,
     SettingsAutomaticallyClearWhenFragment.Listener,
+    SettingsThemeSelectorFragment.Listener,
     SettingsFireAnimationSelectorFragment.Listener {
 
     @Inject
@@ -77,10 +79,6 @@ class SettingsActivity :
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
-    }
-
-    private val lightThemeToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onLightThemeToggled(isChecked)
     }
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
@@ -116,7 +114,7 @@ class SettingsActivity :
         locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
         globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
 
-        lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
+        selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
@@ -152,7 +150,7 @@ class SettingsActivity :
             .onEach { viewState ->
                 viewState.let {
                     version.setSubtitle(it.version)
-                    lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                    updateSelectedTheme(it.theme)
                     autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
@@ -181,6 +179,17 @@ class SettingsActivity :
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
         selectedFireAnimationSetting.setSubtitle(subtitle)
+    }
+
+    private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
+        val subtitle = getString(
+            when (selectedTheme) {
+                DuckDuckGoTheme.DARK -> R.string.settingsDarkTheme
+                DuckDuckGoTheme.LIGHT -> R.string.settingsLightTheme
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
+            }
+        )
+        selectedThemeSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
@@ -217,6 +226,7 @@ class SettingsActivity :
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
+            is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
@@ -271,6 +281,11 @@ class SettingsActivity :
         dialog.show(supportFragmentManager, FIRE_ANIMATION_SELECTOR_TAG)
     }
 
+    private fun launchThemeSelector(theme: DuckDuckGoTheme) {
+        val dialog = SettingsThemeSelectorFragment.create(theme)
+        dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
+    }
+
     private fun launchGlobalPrivacyControl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
@@ -279,6 +294,10 @@ class SettingsActivity :
     private fun launchEmailProtectionScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(EmailProtectionActivity.intent(this), options)
+    }
+
+    override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
+        viewModel.onThemeSelected(selectedTheme)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -329,6 +348,7 @@ class SettingsActivity :
 
     companion object {
         private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
+        private const val THEME_SELECTOR_TAG = "THEME_SELECTOR_DIALOG_FRAGMENT"
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100

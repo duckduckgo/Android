@@ -102,6 +102,7 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
@@ -189,28 +190,28 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeSettingsClickedThenPixelSent() {
+        testee.userRequestedToChangeTheme()
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_OPENED)
+    }
+
+    @Test
+    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
-            testee.onLightThemeToggled(true)
-            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+            testee.userRequestedToChangeTheme()
 
-            assertEquals(Command.UpdateTheme, expectItem())
+            assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), expectItem())
 
-            cancelAndConsumeRemainingEvents()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenLightThemeToggledOnThenLightThemePixelIsSent() {
-        testee.onLightThemeToggled(true)
-        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
-    }
-
-    @Test
-    fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onLightThemeToggled(false)
+            testee.onThemeSelected(DuckDuckGoTheme.DARK)
+
             verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
             assertEquals(Command.UpdateTheme, expectItem())
@@ -220,17 +221,31 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
+    fun whenThemeChangedToLightThenLightThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.DARK)
+        testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+    }
+
+    @Test
+    fun whenThemeChangedToDarkThenDarkThemePixelIsSent() {
         givenThemeSelected(DuckDuckGoTheme.LIGHT)
-        testee.onLightThemeToggled(false)
+        testee.onThemeSelected(DuckDuckGoTheme.DARK)
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
     }
 
     @Test
-    fun whenLightThemeToggledButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedToSystemDefaultThenSystemDefaultThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.LIGHT)
+        testee.onThemeSelected(DuckDuckGoTheme.SYSTEM_DEFAULT)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT)
+    }
+
+    @Test
+    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onLightThemeToggled(true)
+            testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
 
             verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
             verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
@@ -524,5 +539,6 @@ class SettingsViewModelTest {
 
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
+        whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
     }
 }

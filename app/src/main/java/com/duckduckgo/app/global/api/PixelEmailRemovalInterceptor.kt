@@ -19,15 +19,16 @@ package com.duckduckgo.app.global.api
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class PixelAtbRemovalInterceptor : Interceptor {
+class PixelEmailRemovalInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
         val url = if (pixels.contains(pixel.substringBefore("_android_"))) {
-            chain.request().url.newBuilder().removeAllQueryParameters(AppUrl.ParamKey.ATB).build()
+            chain.request().url.newBuilder().removeAllQueryParameters(AppUrl.ParamKey.ATB).removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION).build()
         } else {
             chain.request().url.newBuilder().build()
         }
@@ -36,12 +37,13 @@ class PixelAtbRemovalInterceptor : Interceptor {
     }
 
     companion object {
-        // list of pixels for which we'll remove the ATB information
+        // list of pixels for which we'll remove the ATB and App version information
         @VisibleForTesting
         val pixels = listOf(
             AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
             AppPixelName.EMAIL_USE_ALIAS.pixelName,
-            AppPixelName.EMAIL_USE_ADDRESS.pixelName
+            AppPixelName.EMAIL_USE_ADDRESS.pixelName,
+            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName
         )
     }
 }

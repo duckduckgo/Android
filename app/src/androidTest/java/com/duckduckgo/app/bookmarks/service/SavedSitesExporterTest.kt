@@ -22,22 +22,19 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
-import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import java.io.File
 import dagger.Lazy
+import org.junit.*
 
 class SavedSitesExporterTest {
 
@@ -51,9 +48,11 @@ class SavedSitesExporterTest {
 
     private lateinit var db: AppDatabase
     private lateinit var bookmarksDao: BookmarksDao
+    private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
     private lateinit var favoritesRepository: FavoritesRepository
+    private lateinit var bookmarksRepository: BookmarksRepository
     private lateinit var exporter: RealSavedSitesExporter
 
     private lateinit var filesDir: File
@@ -65,9 +64,11 @@ class SavedSitesExporterTest {
             .allowMainThreadQueries()
             .build()
         bookmarksDao = db.bookmarksDao()
+        bookmarkFoldersDao = db.bookmarkFoldersDao()
         favoritesRepository = FavoritesDataRepository(db.favoritesDao(), lazyFaviconManager)
+        bookmarksRepository = BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, db)
         filesDir = context.filesDir
-        exporter = RealSavedSitesExporter(context.contentResolver, bookmarksDao, favoritesRepository, RealSavedSitesParser())
+        exporter = RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, RealSavedSitesParser())
     }
 
     @After
@@ -77,7 +78,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
         val testFile = File(filesDir, "test_bookmarks.html")
@@ -91,7 +92,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenFileDoesNotExistThenExportingFails() = runBlocking {
-        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com")
+        val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
         val localUri = Uri.parse("uridoesnotexist")
@@ -122,4 +123,64 @@ class SavedSitesExporterTest {
         assertTrue(result is ExportSavedSitesResult.Success)
     }
 
+    @Test
+    fun whenGetTreeStructureThenReturnTraversableTree() = runBlocking {
+        val root = BookmarkFolderEntity(id = 0, name = "DuckDuckGo Bookmarks", parentId = -1)
+        val parentFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
+        val childFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
+        val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
+
+        val folderList = listOf(parentFolder, childFolder)
+
+        bookmarksRepository.insertFolderBranch(BookmarkFolderBranch(listOf(childBookmark), folderList))
+
+        val itemList = listOf(root, parentFolder, childFolder, childBookmark)
+        val preOrderList = listOf(childFolder, childBookmark, parentFolder, root)
+
+        val treeStructure = exporter.getTreeFolderStructure()
+
+        var count = 0
+        var preOrderCount = 0
+
+        treeStructure.forEachVisit(
+            { node ->
+                testNode(node, itemList, count)
+                count++
+            },
+            { node ->
+                testNode(node, preOrderList, preOrderCount)
+                preOrderCount++
+            }
+        )
+    }
+
+    private fun testNode(node: TreeNode<FolderTreeItem>, itemList: List<Any>, count: Int) {
+        if (node.value.url != null) {
+            val entity = itemList[count] as BookmarkEntity
+
+            Assert.assertEquals(entity.title, node.value.name)
+            Assert.assertEquals(entity.id, node.value.id)
+            Assert.assertEquals(entity.parentId, node.value.parentId)
+            Assert.assertEquals(entity.url, node.value.url)
+            Assert.assertEquals(2, node.value.depth)
+        } else {
+            val entity = itemList[count] as BookmarkFolderEntity
+
+            Assert.assertEquals(entity.name, node.value.name)
+            Assert.assertEquals(entity.id, node.value.id)
+            Assert.assertEquals(entity.parentId, node.value.parentId)
+
+            when (node.value.parentId) {
+                -1L -> {
+                    Assert.assertEquals(0, node.value.depth)
+                }
+                0L -> {
+                    Assert.assertEquals(1, node.value.depth)
+                }
+                else -> {
+                    Assert.assertEquals(2, node.value.depth)
+                }
+            }
+        }
+    }
 }

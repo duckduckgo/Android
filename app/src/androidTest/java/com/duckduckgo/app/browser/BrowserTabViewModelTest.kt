@@ -582,8 +582,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com"))
-        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com", 0))
+        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
     }
 
     @Test
@@ -598,7 +598,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
@@ -1575,7 +1575,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
-        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
+        whenever(mockBookmarksDao.insert(any<BookmarkEntity>())).thenReturn(1)
 
         testee.onBookmarkAddRequested()
 
@@ -3241,7 +3241,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewVisible()
 
-        advanceTimeBy(3_600_000)
+        advanceTimeBy(3_600_001)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
     }
@@ -3316,6 +3316,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenConsumeAliasAndCopyToClipboardThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAliasAndCopyToClipboard()
+
+        verify(mockEmailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
+
+        testee.consumeAlias()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
     fun whenEmailIsSignedOutThenIsEmailSignedInReturnsFalse() = coroutineRule.runBlocking {
         emailStateFlow.emit(false)
 
@@ -3344,10 +3364,20 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenPixelSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test
@@ -3375,10 +3405,20 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenPixelSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
         testee.useAddress()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenUseAddressThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test

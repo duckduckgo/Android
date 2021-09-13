@@ -42,7 +42,10 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,7 +65,7 @@ class SettingsViewModel @Inject constructor(
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
-        val lightThemeEnabled: Boolean = false,
+        val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
@@ -88,6 +91,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
+        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
@@ -105,7 +109,7 @@ class SettingsViewModel @Inject constructor(
     fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
-        val isLightTheme = themingDataStore.theme == DuckDuckGoTheme.LIGHT
+        val savedTheme = themingDataStore.theme
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
@@ -114,7 +118,7 @@ class SettingsViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     loading = false,
-                    lightThemeEnabled = isLightTheme,
+                    theme = savedTheme,
                     autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
@@ -150,6 +154,11 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
+    fun userRequestedToChangeTheme() {
+        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
+        pixel.fire(SETTINGS_THEME_OPENED)
+    }
+
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
     }
@@ -182,21 +191,6 @@ class SettingsViewModel @Inject constructor(
             viewState.emit(currentViewState().copy(isAppDefaultBrowser = enabled))
             command.send(Command.LaunchDefaultBrowser)
         }
-    }
-
-    fun onLightThemeToggled(enabled: Boolean) {
-        Timber.i("User toggled light theme, is now enabled: $enabled")
-        val lightThemeSelected = themingDataStore.theme == DuckDuckGoTheme.LIGHT
-        if (enabled && lightThemeSelected) return
-        themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
-            command.send(Command.UpdateTheme)
-        }
-
-        val pixelName =
-            if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
-        pixel.fire(pixelName)
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
@@ -264,6 +258,27 @@ class SettingsViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
+        Timber.d("User toggled theme, theme to set: $selectedTheme")
+        if (themingDataStore.isCurrentlySelected(selectedTheme)) {
+            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            return
+        }
+        themingDataStore.theme = selectedTheme
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(theme = selectedTheme))
+            command.send(Command.UpdateTheme)
+        }
+
+        val pixelName =
+            when (selectedTheme) {
+                DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+            }
+        pixel.fire(pixelName)
     }
 
     fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {

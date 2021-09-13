@@ -27,10 +27,9 @@ class ViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        val viewModel = viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }.first() as T
-            ?: throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
-        return viewModel
+        return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }
+            .first()
     }
 }

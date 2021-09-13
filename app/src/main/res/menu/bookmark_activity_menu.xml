@@ -28,4 +28,9 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/action_add_folder"
+        android:icon="@drawable/ic_add_folder"
+        android:title="@string/addFolder"
+        app:showAsAction="always" />
 </menu>

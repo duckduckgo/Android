@@ -84,12 +84,12 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
-        pixelAtbRemovalInterceptor: PixelAtbRemovalInterceptor
+        pixelEmailRemovalInterceptor: PixelEmailRemovalInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
-            .addInterceptor(pixelAtbRemovalInterceptor)
+            .addInterceptor(pixelEmailRemovalInterceptor)
             // shall be the last one as it is logging the pixel request url that goes out
             .addInterceptor { chain: Interceptor.Chain ->
                 Timber.v("Pixel url request: ${chain.request().url}")
@@ -137,8 +137,8 @@ class NetworkModule {
     }
 
     @Provides
-    fun pixelAtbRemovalInterceptor(): PixelAtbRemovalInterceptor {
-        return PixelAtbRemovalInterceptor()
+    fun pixelEmailRemovalInterceptor(): PixelEmailRemovalInterceptor {
+        return PixelEmailRemovalInterceptor()
     }
 
     @Provides
