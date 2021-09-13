@@ -29,8 +29,8 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +39,7 @@ import javax.inject.Provider
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
-    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
+    private val contentBlocking: ContentBlocking,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -98,7 +98,7 @@ class ScorecardViewModel(
         val improvedGrade = grades.improvedGrade
 
         val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
-        val isSiteInTempList = withContext(dispatchers.io()) { temporaryTrackingWhitelistDao.contains(domain) }
+        val isSiteAContentBlockingException = withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
 
         withContext(dispatchers.main()) {
             viewState.value = viewState.value?.copy(
@@ -110,10 +110,10 @@ class ScorecardViewModel(
                 httpsStatus = site.https,
                 allTrackersBlocked = site.allTrackersBlocked,
                 practices = site.privacyPractices.summary,
-                privacyOn = !isWhitelisted && !isSiteInTempList,
+                privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
                 showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
                 showEnhancedGrade = grade != improvedGrade,
-                isSiteInTempAllowedList = isSiteInTempList
+                isSiteInTempAllowedList = isSiteAContentBlockingException
             )
         }
     }
@@ -122,12 +122,12 @@ class ScorecardViewModel(
 @ContributesMultibinding(AppObjectGraph::class)
 class ScorecardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val temporaryTrackingWhitelistDao: Provider<TemporaryTrackingWhitelistDao>
+    private val contentBlocking: Provider<ContentBlocking>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get(), temporaryTrackingWhitelistDao.get()) as T
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao.get(), contentBlocking.get()) as T
                 else -> null
             }
         }

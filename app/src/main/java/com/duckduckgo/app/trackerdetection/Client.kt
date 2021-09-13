@@ -26,7 +26,6 @@ interface Client {
     enum class ClientName(val type: ClientType) {
         // current clients
         TDS(ClientType.BLOCKING),
-        TEMPORARY_WHITELIST(ClientType.WHITELIST),
 
         // legacy clients
         EASYLIST(ClientType.BLOCKING),

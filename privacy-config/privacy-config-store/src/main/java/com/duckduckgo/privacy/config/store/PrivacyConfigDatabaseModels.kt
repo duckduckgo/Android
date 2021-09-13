@@ -18,15 +18,54 @@ package com.duckduckgo.privacy.config.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.duckduckgo.privacy.config.api.ContentBlockingException
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.HttpsException
 
-@Entity(tableName = "content_blocking_exceptions")
-data class ContentBlockingException(
+@Entity(tableName = "unprotected_temporary")
+data class UnprotectedTemporaryEntity(
     @PrimaryKey val domain: String,
     val reason: String
 )
+
+@Entity(tableName = "https_exceptions")
+data class HttpsExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
+fun HttpsExceptionEntity.toHttpsException(): HttpsException {
+    return HttpsException(domain = this.domain, reason = this.reason)
+}
+
+@Entity(tableName = "gpc_exceptions")
+data class GpcExceptionEntity(
+    @PrimaryKey val domain: String
+)
+
+fun GpcExceptionEntity.toGpcException(): GpcException {
+    return GpcException(domain = this.domain)
+}
+
+@Entity(tableName = "content_blocking_exceptions")
+data class ContentBlockingExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
+fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
+    return ContentBlockingException(domain = this.domain, reason = this.reason)
+}
 
 @Entity(tableName = "toggles")
 data class PrivacyFeatureToggles(
     @PrimaryKey val featureName: String,
     val enabled: Boolean
+)
+
+@Entity(tableName = "privacy_config")
+data class PrivacyConfig(
+    @PrimaryKey val id: Int = 1,
+    val version: Long,
+    val readme: String
 )

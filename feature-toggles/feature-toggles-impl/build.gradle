@@ -39,7 +39,7 @@ dependencies {
     implementation AndroidX.core.ktx
 
     // Testing dependencies
-    testImplementation "junit:junit:_"
+    testImplementation Testing.junit4
 }
 
 anvil {
