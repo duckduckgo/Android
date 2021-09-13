@@ -3522,7 +3522,7 @@ class BrowserTabViewModelTest {
         loadUrl("https://example.com")
         assertNull(privacyGradeState().privacyGrade)
     }
-         t
+
     fun whenEditBookmarkRequestedThenDaoIsNotUpdated() {
         coroutineRule.runBlocking {
             bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
@@ -3605,7 +3605,6 @@ class BrowserTabViewModelTest {
             assertEquals("title", command.savedSite.title)
         }
     }
-
 
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
