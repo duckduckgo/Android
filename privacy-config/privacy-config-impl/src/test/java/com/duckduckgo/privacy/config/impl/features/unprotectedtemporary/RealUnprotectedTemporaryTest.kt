@@ -25,6 +25,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(RobolectricTestRunner::class)
 class RealUnprotectedTemporaryTest {
@@ -52,16 +53,16 @@ class RealUnprotectedTemporaryTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(arrayListOf())
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
+        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
 
     private fun givenThereAreExceptions() {
-        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(
-            arrayListOf(
-                UnprotectedTemporaryEntity("example.com", "my reason here")
-            )
-        )
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
+        exceptions.add(UnprotectedTemporaryEntity("example.com", "my reason here"))
+
+        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
     }
 }
