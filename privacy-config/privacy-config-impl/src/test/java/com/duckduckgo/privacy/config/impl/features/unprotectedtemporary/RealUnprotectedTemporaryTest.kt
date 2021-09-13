@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.https
+package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
-import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
+import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
@@ -26,16 +25,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(RobolectricTestRunner::class)
-class RealHttpsTest {
-    private val mockHttpsRepository: HttpsRepository = mock()
-    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
-    lateinit var testee: RealHttps
+class RealUnprotectedTemporaryTest {
+    private val mockUnprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
+    lateinit var testee: RealUnprotectedTemporary
 
     @Before
     fun before() {
-        testee = RealHttps(mockHttpsRepository, mockUnprotectedTemporary)
+        testee = RealUnprotectedTemporary(mockUnprotectedTemporaryRepository)
     }
 
     @Test
@@ -54,25 +53,16 @@ class RealHttpsTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        whenever(mockHttpsRepository.exceptions).thenReturn(arrayListOf())
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
+        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
 
-    @Test
-    fun whenIsAnExceptionAndDomainIsListedInTheUnprotectedTemporaryListThenReturnTrue() {
-        val url = "http://example.com"
-        whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
-        whenever(mockHttpsRepository.exceptions).thenReturn(arrayListOf())
-
-        assertTrue(testee.isAnException(url))
-    }
-
     private fun givenThereAreExceptions() {
-        whenever(mockHttpsRepository.exceptions).thenReturn(
-            arrayListOf(
-                HttpsException("example.com", "my reason here")
-            )
-        )
+        val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
+        exceptions.add(UnprotectedTemporaryEntity("example.com", "my reason here"))
+
+        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptions)
     }
 }

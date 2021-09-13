@@ -24,6 +24,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -40,6 +41,7 @@ import java.io.ByteArrayInputStream
 class RealGpcTest {
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockContext: Context = mock()
     private val mockResources: Resources = mock()
     lateinit var testee: RealGpc
@@ -50,7 +52,7 @@ class RealGpcTest {
         whenever(mockResources.openRawResource(any())).thenReturn(ByteArrayInputStream("".toByteArray()))
         whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(EXCEPTION_URL)))
 
-        testee = RealGpc(mockContext, mockFeatureToggle, mockGpcRepository)
+        testee = RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
     }
 
     @Test
@@ -190,6 +192,14 @@ class RealGpcTest {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         assertFalse(testee.canGpcBeUsedByUrl("test.com"))
+    }
+
+    @Test
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsInUnprotectedTemporaryThenReturnFalse() {
+        givenFeatureAndGpcAreEnabled()
+        whenever(mockUnprotectedTemporary.isAnException(VALID_CONSUMER_URL)).thenReturn(true)
+
+        assertFalse(testee.canGpcBeUsedByUrl(VALID_CONSUMER_URL))
     }
 
     private fun givenFeatureAndGpcAreEnabled() {

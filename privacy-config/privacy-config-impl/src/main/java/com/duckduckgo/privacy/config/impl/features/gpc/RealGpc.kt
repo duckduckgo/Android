@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.R
+import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,7 +31,7 @@ import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository) : Gpc {
+class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository, private val unprotectedTemporary: UnprotectedTemporary) : Gpc {
 
     private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
 
@@ -79,7 +80,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
     }
 
     private fun isAnException(url: String): Boolean {
-        return matches(url)
+        return matches(url) || unprotectedTemporary.isAnException(url)
     }
 
     private fun matches(url: String): Boolean {

@@ -29,7 +29,7 @@ interface MigrationPlugin {
 class MigrationPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards MigrationPlugin>
 ) : PluginPoint<MigrationPlugin> {
-    override fun getPlugins(): List<MigrationPlugin> {
-        return injectorPlugins.toList()
+    override fun getPlugins(): Collection<MigrationPlugin> {
+        return injectorPlugins
     }
 }

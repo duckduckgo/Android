@@ -40,6 +40,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
 import com.duckduckgo.privacy.config.store.features.gpc.RealGpcRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -126,6 +128,12 @@ class DatabaseModule {
     @Provides
     fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
         return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUnprotectedTemporaryRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): UnprotectedTemporaryRepository {
+        return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton

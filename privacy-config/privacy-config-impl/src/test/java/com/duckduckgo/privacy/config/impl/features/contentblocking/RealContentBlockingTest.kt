@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.contentblocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -34,13 +35,14 @@ class RealContentBlockingTest {
     lateinit var testee: RealContentBlocking
 
     private val mockContentBlockingRepository: ContentBlockingRepository = mock()
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
 
     @Before
     fun before() {
         givenFeatureIsEnabled()
 
-        testee = RealContentBlocking(mockContentBlockingRepository, mockFeatureToggle)
+        testee = RealContentBlocking(mockContentBlockingRepository, mockFeatureToggle, mockUnprotectedTemporary)
     }
 
     @Test
@@ -62,6 +64,15 @@ class RealContentBlockingTest {
         whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
 
         assertFalse(testee.isAnException("http://test.example.com"))
+    }
+
+    @Test
+    fun whenIsAnExceptionAndDomainIsInTheUnprotectedTemporaryListThenReturnTrue() {
+        val url = "http://test.example.com"
+        whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
+        whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
+
+        assertTrue(testee.isAnException(url))
     }
 
     @Test
