@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.contentblocking
+package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
+import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
+class RealHttps @Inject constructor(private val httpsRepository: HttpsRepository, private val unprotectedTemporary: UnprotectedTemporary) : Https {
 
     override fun isAnException(url: String): Boolean {
-        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
-            unprotectedTemporary.isAnException(url) || matches(url)
-        } else {
-            false
-        }
+        return unprotectedTemporary.isAnException(url) || matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return contentBlockingRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
+        return httpsRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
     }
-
 }

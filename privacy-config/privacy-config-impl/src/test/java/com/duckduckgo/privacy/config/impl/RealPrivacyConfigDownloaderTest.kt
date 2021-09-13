@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl
 
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
+import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -70,12 +71,13 @@ class RealPrivacyConfigDownloaderTest {
 
     class TestPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
-            return JsonPrivacyConfig(version = 1, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)))
+            return JsonPrivacyConfig(version = 1, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)), unprotectedTemporaryList)
         }
     }
 
     companion object {
         private const val FEATURE_NAME = "test"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
+        val unprotectedTemporaryList = listOf(UnprotectedTemporaryEntity("example.com", "reason"))
     }
 }

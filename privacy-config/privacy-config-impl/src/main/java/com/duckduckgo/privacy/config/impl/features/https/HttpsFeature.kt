@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.plugins.migrations
+package com.duckduckgo.privacy.config.impl.features.https
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 
-interface MigrationPlugin {
-    fun run()
-    val version: Int
-}
-
-@Singleton
-class MigrationPluginPoint @Inject constructor(
-    private val injectorPlugins: Set<@JvmSuppressWildcards MigrationPlugin>
-) : PluginPoint<MigrationPlugin> {
-    override fun getPlugins(): Collection<MigrationPlugin> {
-        return injectorPlugins
-    }
-}
+data class HttpsFeature(
+    val state: String,
+    val exceptions: List<HttpsExceptionEntity>
+)

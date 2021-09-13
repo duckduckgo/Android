@@ -20,10 +20,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcDao
+import com.duckduckgo.privacy.config.store.features.https.HttpsDao
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
 
 @Database(
     exportSchema = true, version = 1,
     entities = [
+        UnprotectedTemporaryEntity::class,
+        HttpsExceptionEntity::class,
         GpcExceptionEntity::class,
         ContentBlockingExceptionEntity::class,
         PrivacyFeatureToggles::class,
@@ -31,6 +35,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcDao
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
+    abstract fun unprotectedTemporaryDao(): UnprotectedTemporaryDao
+    abstract fun httpsDao(): HttpsDao
     abstract fun gpcDao(): GpcDao
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyFeatureTogglesDao(): PrivacyFeatureTogglesDao
