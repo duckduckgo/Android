@@ -18,7 +18,9 @@ package com.duckduckgo.privacy.config.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -26,11 +28,26 @@ import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePluginPoint
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
+import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
+import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
+import com.duckduckgo.privacy.config.store.features.gpc.GpcDataStore
+import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
+import com.duckduckgo.privacy.config.store.features.gpc.RealGpcRepository
+import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
+import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
+import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -81,5 +98,47 @@ class DatabaseModule {
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun providePrivacyConfigRepository(database: PrivacyConfigDatabase): PrivacyConfigRepository {
+        return RealPrivacyConfigRepository(database)
+    }
+
+    @Singleton
+    @Provides
+    fun provideContentBlockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
+        return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGpcDataStore(context: Context): GpcDataStore {
+        return GpcSharedPreferences(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
+        return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
+        return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUnprotectedTemporaryRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): UnprotectedTemporaryRepository {
+        return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun providePrivacyFeatureTogglesRepository(database: PrivacyConfigDatabase): PrivacyFeatureTogglesRepository {
+        return RealPrivacyFeatureTogglesRepository(database)
     }
 }

@@ -18,6 +18,11 @@ package com.duckduckgo.privacy.config.api
 
 import com.duckduckgo.feature.toggles.api.FeatureName
 
+/**
+ * List of [FeatureName] that belong to the Privacy Configuration
+ */
 sealed class PrivacyFeatureName(override val value: String) : FeatureName {
     data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
+    data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
+    data class HttpsFeatureName(override val value: String = "https") : PrivacyFeatureName(value)
 }

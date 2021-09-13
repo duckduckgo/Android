@@ -39,9 +39,6 @@ class DaoModule {
     fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
 
     @Provides
-    fun providesTemporaryTrackingWhitelist(database: AppDatabase) = database.temporaryTrackingWhitelistDao()
-
-    @Provides
     fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
 
     @Provides

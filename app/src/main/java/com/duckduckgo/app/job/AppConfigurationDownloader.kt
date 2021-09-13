@@ -36,7 +36,6 @@ class AppConfigurationDownloader(
 
     override fun downloadTask(): Completable {
         val tdsDownload = trackerDataDownloader.downloadTds()
-        val temporaryTrackingWhitelist = trackerDataDownloader.downloadTemporaryWhitelist()
         val clearLegacyLists = trackerDataDownloader.clearLegacyLists()
         val surrogatesDownload = resourceSurrogateDownloader.downloadList()
         val httpsUpgradeDownload = httpsUpgradeDataDownloader.download()
@@ -45,7 +44,6 @@ class AppConfigurationDownloader(
         return Completable.mergeDelayError(
             listOf(
                 tdsDownload,
-                temporaryTrackingWhitelist,
                 clearLegacyLists,
                 surrogatesDownload,
                 httpsUpgradeDownload,

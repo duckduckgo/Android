@@ -23,6 +23,9 @@ import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
+import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,20 +37,24 @@ interface PrivacyConfigPersister {
 @WorkerThread
 @Singleton
 @ContributesBinding(AppObjectGraph::class)
-class RealPrivacyConfigPersister @Inject constructor(private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>, private val database: PrivacyConfigDatabase) : PrivacyConfigPersister {
-
-    private val privacyFeatureTogglesDao = database.privacyFeatureTogglesDao()
-    private val privacyConfigDao = database.privacyConfigDao()
+class RealPrivacyConfigPersister @Inject constructor(
+    private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
+    private val privacyConfigRepository: PrivacyConfigRepository,
+    private val database: PrivacyConfigDatabase
+) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig) {
-        val privacyConfig = privacyConfigDao.get()
+        val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
 
         if (newVersion > previousVersion) {
             database.runInTransaction {
-                privacyFeatureTogglesDao.deleteAll()
-                privacyConfigDao.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
+                privacyFeatureTogglesRepository.deleteAll()
+                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
+                unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
                         plugin.store(feature.key, feature.value)

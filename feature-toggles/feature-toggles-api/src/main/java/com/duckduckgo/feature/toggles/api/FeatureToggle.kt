@@ -20,7 +20,11 @@ package com.duckduckgo.feature.toggles.api
  * Any feature toggles implemented in any module should implement [FeatureToggle]
  */
 interface FeatureToggle {
-    fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean?
+    /**
+     * This method takes a [featureName] and optionally a default value.
+     * @return `true` if the feature is enabled, `false` is is not and `null` if the feature does not exist.
+     */
+    fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean = true): Boolean?
 }
 
 /**

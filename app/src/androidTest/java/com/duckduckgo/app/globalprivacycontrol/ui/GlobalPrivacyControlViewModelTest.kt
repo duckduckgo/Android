@@ -21,8 +21,9 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel.Companion.LEARN_MORE_URL
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
@@ -43,7 +44,8 @@ class GlobalPrivacyControlViewModelTest {
     val schedulers = InstantSchedulersRule()
 
     private val mockPixel: Pixel = mock()
-    private val mockSettingsStore: SettingsDataStore = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockGpc: Gpc = mock()
     private val commandCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.Command::class.java)
     private val viewStateCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.ViewState::class.java)
     private val mockCommandObserver: Observer<GlobalPrivacyControlViewModel.Command> = mock()
@@ -52,7 +54,7 @@ class GlobalPrivacyControlViewModelTest {
 
     @Before
     fun setup() {
-        testee = GlobalPrivacyControlViewModel(mockPixel, mockSettingsStore)
+        testee = GlobalPrivacyControlViewModel(mockPixel, mockFeatureToggle, mockGpc)
         testee.command.observeForever(mockCommandObserver)
         testee.viewState.observeForever(mockViewStateObserver)
     }
@@ -103,14 +105,14 @@ class GlobalPrivacyControlViewModelTest {
     fun whenOnUserToggleGlobalPrivacyControlSwitchedOnThenValueStoredInSettings() {
         testee.onUserToggleGlobalPrivacyControl(true)
 
-        verify(mockSettingsStore).globalPrivacyControlEnabled = true
+        verify(mockGpc).enableGpc()
     }
 
     @Test
     fun whenOnUserToggleGlobalPrivacyControlSwitchedOffThenValueStoredInSettings() {
         testee.onUserToggleGlobalPrivacyControl(false)
 
-        verify(mockSettingsStore).globalPrivacyControlEnabled = false
+        verify(mockGpc).disableGpc()
     }
 
     @Test

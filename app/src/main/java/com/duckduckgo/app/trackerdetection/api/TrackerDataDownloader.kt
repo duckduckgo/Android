@@ -16,15 +16,11 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.filterBlankItems
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
-import com.duckduckgo.app.trackerdetection.model.TemporaryTrackingWhitelistedDomain
 import io.reactivex.Completable
 import okhttp3.Headers
 import timber.log.Timber
@@ -35,7 +31,6 @@ class TrackerDataDownloader @Inject constructor(
     private val trackerListService: TrackerListService,
     private val binaryDataStore: BinaryDataStore,
     private val trackerDataLoader: TrackerDataLoader,
-    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
     private val appDatabase: AppDatabase,
     private val metadataDao: TdsMetadataDao
 ) {
@@ -62,36 +57,6 @@ class TrackerDataDownloader @Inject constructor(
                     trackerDataLoader.persistTds(eTag, body)
                     trackerDataLoader.loadTrackers()
                 }
-            }
-        }
-    }
-
-    fun downloadTemporaryWhitelist(): Completable {
-
-        return Completable.fromAction {
-
-            Timber.d("Downloading temporary tracking whitelist")
-
-            val call = trackerListService.temporaryWhitelist()
-            val response = call.execute()
-
-            if (!response.isSuccessful) {
-                throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
-            }
-            if (response.isCached && temporaryTrackingWhitelistDao.count() != 0) {
-                Timber.d("Temporary whitelist data already cached and stored")
-                return@fromAction
-            }
-
-            Timber.d("Updating temporary tracking whitelist data from server")
-            val body = response.body()!!
-
-            appDatabase.runInTransaction {
-                temporaryTrackingWhitelistDao.updateAll(
-                    body.lines().filterBlankItems()
-                        .map { TemporaryTrackingWhitelistedDomain(it) }
-                )
-                trackerDataLoader.loadTemporaryWhitelist()
             }
         }
     }
