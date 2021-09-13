@@ -64,12 +64,11 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 37,
+    exportSchema = true, version = 38,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
-        TemporaryTrackingWhitelistedDomain::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsFalsePositiveDomain::class,
@@ -117,7 +116,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
-    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
@@ -442,6 +440,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_37_TO_38: Migration = object : Migration(37, 38) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `temporary_tracking_whitelist`")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -500,7 +504,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_33_TO_34,
             MIGRATION_34_TO_35,
             MIGRATION_35_TO_36,
-            MIGRATION_36_TO_37
+            MIGRATION_36_TO_37,
+            MIGRATION_37_TO_38,
         )
 
     @Deprecated(
