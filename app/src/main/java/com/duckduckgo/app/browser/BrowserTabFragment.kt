@@ -1310,9 +1310,7 @@ class BrowserTabFragment :
         }
         Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
-                addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
-                addBookmarkDialog.listener = viewModel
+                editSavedSite(savedSite)
             }
             .show()
     }
@@ -1785,13 +1783,10 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) {
-                    launch {
-                        pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
-                        viewModel.onBookmarkAddRequested()
-                    }
+                    viewModel.onBookmarkSelected()
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
-                    viewModel.onAddFavoriteMenuClicked()
+                    viewModel.onFavoriteSelected()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
@@ -2057,11 +2052,13 @@ class BrowserTabFragment :
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+                addBookmarksPopupMenuItem?.text =
+                    getString(if (viewState.isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
-                if (viewState.addFavorite.isHighlighted()) {
-                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitleHighlighted)
-                } else {
-                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitle)
+                addFavoritePopupMenuItem.text = when {
+                    viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
+                    viewState.isFavorite -> getString(R.string.removeFavoriteMenuTitle)
+                    else -> getString(R.string.addFavoriteMenuTitle)
                 }
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite

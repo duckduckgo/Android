@@ -22,6 +22,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
@@ -35,6 +37,7 @@ interface BookmarksRepository {
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
+    fun bookmarks(): Flow<List<Bookmark>>
 }
 
 class BookmarksDataRepository(
@@ -69,6 +72,10 @@ class BookmarksDataRepository(
 
     override fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity> {
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
+    }
+
+    override fun bookmarks(): Flow<List<Bookmark>> {
+        return bookmarksDao.getBookmarks().distinctUntilChanged().map { bookmarks -> bookmarks.mapToSavedSites() }
     }
 
     @VisibleForTesting
@@ -187,4 +194,6 @@ class BookmarksDataRepository(
             Pair(mappedBookmarks, folders)
         }
     }
+
+    private fun List<BookmarkEntity>.mapToSavedSites(): List<Bookmark> = this.map { Bookmark(it.id, it.title.orEmpty(), it.url, it.parentId) }
 }
