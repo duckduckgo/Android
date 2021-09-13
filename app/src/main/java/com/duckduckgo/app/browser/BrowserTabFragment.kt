@@ -1783,10 +1783,10 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) {
-                    viewModel.onBookmarkSelected()
+                    viewModel.onBookmarkMenuClicked()
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
-                    viewModel.onFavoriteSelected()
+                    viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)

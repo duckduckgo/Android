@@ -1396,7 +1396,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onBookmarkSelected() {
+    fun onBookmarkMenuClicked() {
         val url = url ?: return
         viewModelScope.launch {
             if (currentBrowserViewState().isBookmark) {
@@ -1433,15 +1433,12 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFavoriteSelected() {
+    fun onFavoriteMenuClicked() {
         val url = url ?: return
 
         val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
         if (currentBrowserViewState().isFavorite) {
-            pixel.fire(
-                AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName,
-                mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString())
-            )
+            pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
             removeFavoriteSite(url)
         } else {
             pixel.fire(
