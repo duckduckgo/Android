@@ -3523,87 +3523,74 @@ class BrowserTabViewModelTest {
         assertNull(privacyGradeState().privacyGrade)
     }
 
-    fun whenEditBookmarkRequestedThenDaoIsNotUpdated() {
-        coroutineRule.runBlocking {
-            bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onBookmarkMenuClicked()
-            verify(mockBookmarksDao, never()).insert(any())
-        }
+    @Test
+    fun whenEditBookmarkRequestedThenDaoIsNotUpdated() = coroutineRule.runBlocking {
+        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockBookmarksDao, never()).insert(any())
     }
 
     @Test
-    fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() {
-        coroutineRule.runBlocking {
-            bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onBookmarkMenuClicked()
-            verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
-        }
+    fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = coroutineRule.runBlocking {
+        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
     }
 
     @Test
-    fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() {
-        coroutineRule.runBlocking {
-            bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onBookmarkMenuClicked()
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
-            val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
-            assertEquals("www.example.com", command.savedSite.url)
-            assertEquals("title", command.savedSite.title)
-        }
+    fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
+        val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenDaoInsertIsNotCalled() {
-        coroutineRule.runBlocking {
-            val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
-            favoriteListFlow.send(listOf(favoriteSite))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onFavoriteMenuClicked()
-            verify(mockFavoritesRepository, never()).insert(any())
-        }
+    fun whenRemoveFavoriteRequestedThenDaoInsertIsNotCalled() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, never()).insert(any())
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() {
-        coroutineRule.runBlocking {
-            val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
-            favoriteListFlow.send(listOf(favoriteSite))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onFavoriteMenuClicked()
-            verify(mockPixel).fire(
-                AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
-            )
-        }
+    fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
+        )
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() {
-        coroutineRule.runBlocking {
-            val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
-            favoriteListFlow.send(listOf(favoriteSite))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onFavoriteMenuClicked()
-            verify(mockFavoritesRepository, atLeastOnce()).delete(favoriteSite)
-        }
+    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, atLeastOnce()).delete(favoriteSite)
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() {
-        coroutineRule.runBlocking {
-            val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
-            favoriteListFlow.send(listOf(favoriteSite))
-            loadUrl("www.example.com", isBrowserShowing = true)
-            testee.onFavoriteMenuClicked()
-            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-            assertTrue(commandCaptor.lastValue is Command.DeleteSavedSiteConfirmation)
-            val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
-            assertEquals("www.example.com", command.savedSite.url)
-            assertEquals("title", command.savedSite.title)
-        }
+    fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.DeleteSavedSiteConfirmation)
+        val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
     }
 
     private fun givenUrlCanUseGpc() {
