@@ -18,11 +18,9 @@ package com.duckduckgo.app.email.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.google.android.material.textview.MaterialTextView
 
 class EmailLogoutDialog : DialogFragment() {
 
