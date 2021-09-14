@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2018 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.di
 
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.statistics.config.DefaultStatisticsLibraryConfig
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.di.scopes.AppObjectGraph

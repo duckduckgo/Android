@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 39,
-    "identityHash": "9711e84837e925f3941f78899fe240bb",
+    "identityHash": "9dddb353fa099d886faebb44501a74ab",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -93,26 +93,6 @@
           {
             "fieldPath": "entityName",
             "columnName": "entityName",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "domain"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "temporary_tracking_whitelist",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
-        "fields": [
-          {
-            "fieldPath": "domain",
-            "columnName": "domain",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -990,7 +970,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9711e84837e925f3941f78899fe240bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9dddb353fa099d886faebb44501a74ab')"
     ]
   }
 }

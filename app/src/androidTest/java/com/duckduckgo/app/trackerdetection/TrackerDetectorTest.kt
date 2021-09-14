@@ -20,9 +20,9 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
-import com.duckduckgo.app.trackerdetection.Client.ClientName.TEMPORARY_WHITELIST
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
@@ -33,8 +33,9 @@ class TrackerDetectorTest {
 
     private val mockEntityLookup: EntityLookup = mock()
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockContentBlocking: ContentBlocking = mock()
+    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockContentBlocking)
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
-    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockWebTrackersBlockedDao)
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
@@ -118,8 +119,8 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsInTempAllowListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
-        trackerDetector.addClient(tempListClient())
+    fun whenSiteIsInContentBlockingExceptionsListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
         val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
@@ -164,13 +165,6 @@ class TrackerDetectorTest {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(false))
-        return client
-    }
-
-    private fun tempListClient(): Client {
-        val client: Client = mock()
-        whenever(client.name).thenReturn(TEMPORARY_WHITELIST)
-        whenever(client.matches(anyString(), anyString())).thenReturn(Client.Result(true))
         return client
     }
 

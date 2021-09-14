@@ -36,14 +36,20 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -57,8 +63,10 @@ class SettingsViewModel(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore
+    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val gpc: Gpc,
+    private val featureToggle: FeatureToggle,
+    private val pixel: Pixel
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -66,7 +74,7 @@ class SettingsViewModel(
     data class ViewState(
         val loading: Boolean = true,
         val version: String = "",
-        val lightThemeEnabled: Boolean = false,
+        val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
@@ -94,6 +102,7 @@ class SettingsViewModel(
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
+        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object LaunchDeviceShieldReport : Command()
         object LaunchDeviceShieldOnboarding : Command()
@@ -113,7 +122,7 @@ class SettingsViewModel(
     fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
-        val isLightTheme = themingDataStore.theme == DuckDuckGoTheme.LIGHT
+        val savedTheme = themingDataStore.theme
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
@@ -122,7 +131,7 @@ class SettingsViewModel(
             viewState.emit(
                 currentViewState().copy(
                     loading = false,
-                    lightThemeEnabled = isLightTheme,
+                    theme = savedTheme,
                     autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
@@ -130,7 +139,7 @@ class SettingsViewModel(
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
+                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
                     appLinksEnabled = settingsDataStore.appLinksEnabled,
                     deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
                     deviceShieldOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
@@ -177,6 +186,11 @@ class SettingsViewModel(
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
+    fun userRequestedToChangeTheme() {
+        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
+        pixel.fire(SETTINGS_THEME_OPENED)
+    }
+
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
     }
@@ -217,21 +231,6 @@ class SettingsViewModel(
         } else {
             viewModelScope.launch { command.send(Command.LaunchDeviceShieldOnboarding) }
         }
-    }
-
-    fun onLightThemeToggled(enabled: Boolean) {
-        Timber.i("User toggled light theme, is now enabled: $enabled")
-        val lightThemeSelected = themingDataStore.theme == DuckDuckGoTheme.LIGHT
-        if (enabled && lightThemeSelected) return
-        themingDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(lightThemeEnabled = enabled))
-            command.send(Command.UpdateTheme)
-        }
-
-        val pixelName =
-            if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
-        pixel.fire(pixelName)
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
@@ -301,6 +300,27 @@ class SettingsViewModel(
         }
     }
 
+    fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
+        Timber.d("User toggled theme, theme to set: $selectedTheme")
+        if (themingDataStore.isCurrentlySelected(selectedTheme)) {
+            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            return
+        }
+        themingDataStore.theme = selectedTheme
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(theme = selectedTheme))
+            command.send(Command.UpdateTheme)
+        }
+
+        val pixelName =
+            when (selectedTheme) {
+                DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+            }
+        pixel.fire(pixelName)
+    }
+
     fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
         if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
             Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
@@ -351,6 +371,8 @@ class SettingsViewModelFactory @Inject constructor(
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
+    private val gpc: Provider<Gpc>,
+    private val featureToggle: Provider<FeatureToggle>,
     private val pixel: Provider<Pixel>,
     private val deviceShieldOnboarding: Provider<DeviceShieldOnboardingStore>
 ) : ViewModelFactoryPlugin {
@@ -365,8 +387,10 @@ class SettingsViewModelFactory @Inject constructor(
                         defaultWebBrowserCapability.get(),
                         variantManager.get(),
                         fireAnimationLoader.get(),
-                        pixel.get(),
-                        deviceShieldOnboarding.get()
+                        deviceShieldOnboarding.get(),
+                        gpc.get(),
+                        featureToggle.get(),
+                        pixel.get()
                     ) as T
                     )
                 else -> null

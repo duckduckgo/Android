@@ -22,7 +22,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -48,7 +47,7 @@ class DatabaseModule {
     }
 
     @Provides
-    fun provideDatabaseMigrations(context: Context, settingsDataStore: SettingsDataStore): MigrationsProvider {
-        return MigrationsProvider(context, settingsDataStore)
+    fun provideDatabaseMigrations(context: Context): MigrationsProvider {
+        return MigrationsProvider(context)
     }
 }

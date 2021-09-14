@@ -151,6 +151,11 @@ dependencies {
     implementation project(path: ':vpn-store')
     internalImplementation project(path: ':vpn-internal')
 
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':feature-toggles-impl')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':privacy-config-impl')
+
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 

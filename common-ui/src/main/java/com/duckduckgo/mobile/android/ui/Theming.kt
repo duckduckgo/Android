@@ -16,6 +16,9 @@
 
 package com.duckduckgo.mobile.android.ui
 
+import android.app.UiModeManager
+import android.app.UiModeManager.MODE_NIGHT_NO
+import android.app.UiModeManager.MODE_NIGHT_YES
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -29,6 +32,7 @@ import com.duckduckgo.mobile.android.ui.Theming.Constants.BROADCAST_THEME_CHANGE
 import com.duckduckgo.mobile.android.ui.Theming.Constants.THEME_MAP
 
 enum class DuckDuckGoTheme {
+    SYSTEM_DEFAULT,
     DARK,
     LIGHT;
 }
@@ -60,8 +64,18 @@ private fun AppCompatActivity.manifestThemeId(): Int {
 }
 
 fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
-    val themeId = THEME_MAP[Pair(manifestThemeId(), theme)] ?: return null
-    setTheme(themeId)
+    if (theme == DuckDuckGoTheme.SYSTEM_DEFAULT) {
+        val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        val themeId = when (uiManager.nightMode) {
+            MODE_NIGHT_YES -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.DARK)]
+            MODE_NIGHT_NO -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
+            else -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
+        }
+        if (themeId != null) setTheme(themeId)
+    } else {
+        val themeId = THEME_MAP[Pair(manifestThemeId(), theme)] ?: return null
+        setTheme(themeId)
+    }
     return registerForThemeChangeBroadcast()
 }
 

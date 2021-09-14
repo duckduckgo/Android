@@ -34,9 +34,12 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -84,6 +87,12 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 
+    @Mock
+    private lateinit var mockGpc: Gpc
+
+    @Mock
+    private lateinit var mockFeatureToggle: FeatureToggle
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -100,13 +109,16 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockFireAnimationLoader,
+            deviceShieldOnboardingStore,
+            mockGpc,
+            mockFeatureToggle,
             mockPixel,
-            deviceShieldOnboardingStore
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
@@ -116,6 +128,43 @@ class SettingsViewModelTest {
     fun whenViewModelInitialisedThenPixelIsFired() {
         testee // init
         verify(mockPixel).fire(AppPixelName.SETTINGS_OPENED)
+    }
+
+    @Test
+    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(false)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -157,28 +206,28 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeSettingsClickedThenPixelSent() {
+        testee.userRequestedToChangeTheme()
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_OPENED)
+    }
+
+    @Test
+    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
-            testee.onLightThemeToggled(true)
-            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+            testee.userRequestedToChangeTheme()
 
-            assertEquals(Command.UpdateTheme, expectItem())
+            assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), expectItem())
 
-            cancelAndConsumeRemainingEvents()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenLightThemeToggledOnThenLightThemePixelIsSent() {
-        testee.onLightThemeToggled(true)
-        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
-    }
-
-    @Test
-    fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onLightThemeToggled(false)
+            testee.onThemeSelected(DuckDuckGoTheme.DARK)
+
             verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
             assertEquals(Command.UpdateTheme, expectItem())
@@ -188,17 +237,31 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
+    fun whenThemeChangedToLightThenLightThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.DARK)
+        testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+    }
+
+    @Test
+    fun whenThemeChangedToDarkThenDarkThemePixelIsSent() {
         givenThemeSelected(DuckDuckGoTheme.LIGHT)
-        testee.onLightThemeToggled(false)
+        testee.onThemeSelected(DuckDuckGoTheme.DARK)
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
     }
 
     @Test
-    fun whenLightThemeToggledButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedToSystemDefaultThenSystemDefaultThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.LIGHT)
+        testee.onThemeSelected(DuckDuckGoTheme.SYSTEM_DEFAULT)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT)
+    }
+
+    @Test
+    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
-            testee.onLightThemeToggled(true)
+            testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
 
             verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
             verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
@@ -520,5 +583,6 @@ class SettingsViewModelTest {
 
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
+        whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
     }
 }

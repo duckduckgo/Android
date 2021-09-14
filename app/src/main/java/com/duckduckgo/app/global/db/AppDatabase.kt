@@ -70,7 +70,6 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
-        TemporaryTrackingWhitelistedDomain::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsFalsePositiveDomain::class,
@@ -119,7 +118,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
-    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
@@ -147,7 +145,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
+class MigrationsProvider(val context: Context) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -445,6 +443,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_37_TO_38: Migration = object : Migration(37, 38) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `temporary_tracking_whitelist`")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -515,6 +519,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_34_TO_35,
             MIGRATION_35_TO_36,
             MIGRATION_36_TO_37,
+            MIGRATION_37_TO_38,
             MIGRATION_VPN,
         )
 

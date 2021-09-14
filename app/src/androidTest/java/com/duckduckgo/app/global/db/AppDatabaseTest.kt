@@ -26,7 +26,6 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -46,8 +45,7 @@ class AppDatabaseTest {
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
-    private val mockSettingsDataStore = mock<SettingsDataStore>()
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
 
     @Before
     fun setup() {
@@ -309,6 +307,18 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion28To29IfUserStageIsDaxOnboardingThenMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 28).use {
+            givenUserStageIs(it, AppStage.DAX_ONBOARDING)
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 29, true, migrationsProvider.MIGRATION_28_TO_29)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
     fun whenMigratingFromVersion28To29ThenValidationSucceeds() {
         createDatabaseAndMigrate(28, 29, migrationsProvider.MIGRATION_28_TO_29)
     }
@@ -330,18 +340,6 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion28To29IfUserStageIsDaxOnboardingThenMigrateToEstablished() {
-        testHelper.createDatabase(TEST_DB_NAME, 28).use {
-            givenUserStageIs(it, AppStage.DAX_ONBOARDING)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 29, true, migrationsProvider.MIGRATION_28_TO_29)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
     fun whenMigratingFromVersion30To31ThenValidationSucceeds() {
         createDatabaseAndMigrate(30, 31, migrationsProvider.MIGRATION_30_TO_31)
     }
@@ -359,11 +357,6 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion33To34ThenValidationSucceeds() {
         createDatabaseAndMigrate(33, 34, migrationsProvider.MIGRATION_33_TO_34)
-    }
-
-    @Test
-    fun whenMigratingFromVersion35To36ThenValidationSucceeds() {
-        createDatabaseAndMigrate(35, 36, migrationsProvider.MIGRATION_35_TO_36)
     }
 
     @Test
@@ -430,8 +423,18 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion35To36ThenValidationSucceeds() {
+        createDatabaseAndMigrate(35, 36, migrationsProvider.MIGRATION_35_TO_36)
+    }
+
+    @Test
     fun whenMigratingFromVersion36To37ThenValidationSucceeds() {
         createDatabaseAndMigrate(36, 37, migrationsProvider.MIGRATION_36_TO_37)
+    }
+
+    @Test
+    fun whenMigratingFromVersion37To38ThenValidationSucceeds() {
+        createDatabaseAndMigrate(37, 38, migrationsProvider.MIGRATION_37_TO_38)
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {

@@ -29,7 +29,6 @@ import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,6 +37,8 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -83,13 +84,13 @@ class NetworkModule {
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
         pixelReQueryInterceptor: PixelReQueryInterceptor,
-        pixelAtbRemovalInterceptor: PixelAtbRemovalInterceptor,
+        pixelEmailRemovalInterceptor: PixelEmailRemovalInterceptor,
         pixelInterceptorPlugins: PluginPoint<PixelInterceptorPlugin>,
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
             .addInterceptor(pixelReQueryInterceptor)
-            .addInterceptor(pixelAtbRemovalInterceptor)
+            .addInterceptor(pixelEmailRemovalInterceptor)
             .apply {
                 pixelInterceptorPlugins.getPlugins().forEach { addInterceptor(it.getInterceptor()) }
             }
@@ -140,8 +141,8 @@ class NetworkModule {
     }
 
     @Provides
-    fun pixelAtbRemovalInterceptor(): PixelAtbRemovalInterceptor {
-        return PixelAtbRemovalInterceptor()
+    fun pixelEmailRemovalInterceptor(): PixelEmailRemovalInterceptor {
+        return PixelEmailRemovalInterceptor()
     }
 
     @Provides
@@ -170,10 +171,11 @@ class NetworkModule {
         variantManager: VariantManager,
         tdsMetadataDao: TdsMetadataDao,
         pixel: Pixel,
-        globalPrivacyControl: GlobalPrivacyControl,
+        gpc: Gpc,
+        featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, globalPrivacyControl, pixel, appCoroutineScope)
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =

@@ -2,17 +2,29 @@ plugins {
     id("de.fayard.refreshVersions") version "0.11.0"
 }
 
+include ':vpn'
 include ':vpn-store'
 include ':vpn-main'
 include ':vpn-api'
 include ':vpn-internal'
 include ':di'
-include ':vpn'
 include ':app'
 include ':statistics'
 include ':common'
 include ':common-ui'
 include ':app-store'
+
+include ':feature-toggles-api'
+include ':feature-toggles-impl'
+include ':privacy-config-api'
+include ':privacy-config-impl'
+include ':privacy-config-store'
+
+project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
+project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
+project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
+project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
+project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
 
 rootProject.children.each { subproject ->
 
