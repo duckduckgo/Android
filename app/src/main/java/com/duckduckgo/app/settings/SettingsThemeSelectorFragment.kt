@@ -48,7 +48,7 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         }
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.themeSelectorGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
+        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setView(rootView)
             .setTitle(R.string.settingsTheme)
             .setPositiveButton(R.string.settingsThemeDialogSave) { _, _ ->

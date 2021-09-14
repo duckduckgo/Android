@@ -161,6 +161,11 @@
     </style>
 
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorBackground">?attr/dialogBgColor</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:colorAccent">?attr/normalTextColor</item>
+        <item name="android:textColorPrimary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/normalTextColor</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
     </style>

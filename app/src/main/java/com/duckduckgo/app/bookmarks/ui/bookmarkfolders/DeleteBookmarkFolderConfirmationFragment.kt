@@ -36,7 +36,7 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
     var listener: DeleteBookmarkFolderListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogTheme)
             .setMessage(getMessageString())
             .setTitle(R.string.delete)
             .setPositiveButton(R.string.delete) { _, _ -> listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder) }

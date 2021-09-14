@@ -38,6 +38,7 @@
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
     </style>
 
@@ -46,6 +47,7 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
+        <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="listItemTitleColor">@color/white</item>
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
@@ -290,6 +292,11 @@
 
     <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="buttonTint">@color/cornflowerBlue</item>
     </style>
 
 </resources>
