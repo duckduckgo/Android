@@ -41,17 +41,17 @@ jobs:
         run: ./gradlew spotlessCheck --stacktrace
 
       - name: Unit Tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+        run: ./gradlew app:testPlayDebugUnitTest privacy-config-impl:testDebugUnitTest privacy-config-store:testDebugUnitTest --stacktrace
 
-      - name: (Fail-only) Bundle the Unit Test report
-        if: failure()
+      - name: Bundle the Unit Test report
+        if: always()
         run: find . -type d -name 'reports' | zip -@ -r unit-test-report.zip
 
-      - name: (Fail-only) Upload the Unit Test report
-        if: failure()
+      - name: Upload the Unit Test report
+        if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: unit-test-error-report
+          name: unit-test-report
           path: unit-test-report.zip
 
   android_tests:
@@ -59,8 +59,7 @@ jobs:
     name: Android tests
     strategy:
       matrix:
-        api-level: [22, 26]
-        target: [google_apis]
+        api-level: [22, 29]
 
     steps:
       - name: Cancel previous
@@ -73,10 +72,10 @@ jobs:
           submodules: recursive
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-      - name: set up JDK 14
+      - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
-          java-version: '14'
+          java-version: '11'
           distribution: 'adopt'
       - name: Gradle cache
         uses: actions/cache@v2
@@ -93,7 +92,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-emu-${{ matrix.api-level }}
+          key: avd-emul-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -101,7 +100,6 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
-          target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: true
@@ -114,7 +112,6 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
-          target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 5
           force-avd-creation: false
@@ -122,13 +119,13 @@ jobs:
           disable-animations: true
           script: ./gradlew app:connectedPlayDebugAndroidTest --stacktrace
 
-      - name: (Fail-only) Bundle the Android Test report
-        if: failure()
+      - name: Bundle the Android Test report
+        if: always()
         run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
 
-      - name: (Fail-only) Upload the Android Test report
-        if: failure()
+      - name: Upload the Android Test report
+        if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: android-test-error-report
+          name: android-test-report
           path: android-test-report.zip

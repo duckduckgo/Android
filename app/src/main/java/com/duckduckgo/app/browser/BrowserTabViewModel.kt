@@ -89,7 +89,6 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -110,10 +109,11 @@ import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.Gpc
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -136,7 +136,7 @@ class BrowserTabViewModel(
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
-    private val temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao,
+    private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val favoritesRepository: FavoritesRepository,
@@ -158,7 +158,7 @@ class BrowserTabViewModel(
     private val userEventsRepository: UserEventsRepository,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
-    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val gpc: Gpc,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -618,7 +618,7 @@ class BrowserTabViewModel(
             fireQueryChangedPixel(trimmedInput)
 
             appLinksHandler.userEnteredBrowserState(urlToNavigate)
-            command.value = Navigate(urlToNavigate, getUrlHeaders())
+            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -628,7 +628,12 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
+    private fun getUrlHeaders(url: String?): Map<String, String> {
+        url?.let {
+            return gpc.getHeaders(url)
+        }
+        return emptyMap()
+    }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -943,7 +948,7 @@ class BrowserTabViewModel(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) {
-            userWhitelistDao.contains(domain) || temporaryTrackingWhitelistDao.contains(domain)
+            userWhitelistDao.contains(domain) || contentBlocking.isAnException(domain)
         }
     }
 
@@ -1384,9 +1389,9 @@ class BrowserTabViewModel(
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
             }
-            val bookmarkEntity = BookmarkEntity(title = title, url = url)
+            val bookmarkEntity = BookmarkEntity(title = title, url = url, parentId = 0)
             val id = bookmarksDao.insert(bookmarkEntity)
-            SavedSite.Bookmark(id, title, url)
+            SavedSite.Bookmark(id, title, url, 0)
         }
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
@@ -1519,7 +1524,7 @@ class BrowserTabViewModel(
 
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
-            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url))
+            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
         }
     }
 
@@ -1693,7 +1698,7 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders())
+            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
             command.value = Refresh
         }
@@ -1927,7 +1932,7 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink, getUrlHeaders())
+        command.value = HandleAppLink(appLink, getUrlHeaders(appLink.uriString))
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
@@ -1935,7 +1940,7 @@ class BrowserTabViewModel(
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders())
+        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
     }
 
     override fun openMessageInNewTab(message: Message) {
@@ -2034,20 +2039,42 @@ class BrowserTabViewModel(
     fun consumeAliasAndCopyToClipboard() {
         emailManager.getAlias()?.let {
             command.value = CopyAliasToClipboard(it)
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun consumeAlias() {
         emailManager.getAlias()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ALIAS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
     fun useAddress() {
         emailManager.getEmailAddress()?.let {
             command.postValue(InjectEmailAddress(it))
-            pixel.enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+            pixel.enqueueFire(
+                AppPixelName.EMAIL_USE_ADDRESS,
+                mapOf(
+                    PixelParameter.COHORT to emailManager.getCohort(),
+                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()
+                )
+            )
+            emailManager.setNewLastUsedDate()
         }
     }
 
@@ -2140,7 +2167,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val siteFactory: Provider<SiteFactory>,
     private val tabRepository: Provider<TabRepository>,
     private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val temporaryTrackingWhitelistDao: Provider<TemporaryTrackingWhitelistDao>,
+    private val contentBlocking: Provider<ContentBlocking>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
     private val bookmarksDao: Provider<BookmarksDao>,
     private val favoritesRepository: Provider<FavoritesRepository>,
@@ -2162,7 +2189,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val userEventsRepository: Provider<UserEventsRepository>,
     private val userEventsStore: Provider<UserEventsStore>,
     private val fileDownloader: Provider<FileDownloader>,
-    private val globalPrivacyControl: Provider<GlobalPrivacyControl>,
+    private val gpc: Provider<Gpc>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
     private val appCoroutineScope: Provider<CoroutineScope>,
@@ -2172,7 +2199,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), temporaryTrackingWhitelistDao.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), globalPrivacyControl.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksDao.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsRepository.get(), userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
                 else -> null
             }
         }

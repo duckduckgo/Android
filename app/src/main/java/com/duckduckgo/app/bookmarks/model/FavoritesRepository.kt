@@ -54,7 +54,8 @@ sealed class SavedSite(
     data class Bookmark(
         override val id: Long,
         override val title: String,
-        override val url: String
+        override val url: String,
+        val parentId: Long
     ) : SavedSite(id, title, url)
 }
 

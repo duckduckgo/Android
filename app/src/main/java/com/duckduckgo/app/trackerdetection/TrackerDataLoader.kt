@@ -43,7 +43,6 @@ class TrackerDataLoader @Inject constructor(
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
-    private val tempWhitelistDao: TemporaryTrackingWhitelistDao,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
@@ -58,7 +57,6 @@ class TrackerDataLoader @Inject constructor(
     private fun loadData() {
         Timber.d("Loading tracker data")
         loadTds()
-        loadTemporaryWhitelist()
     }
 
     private fun loadTds() {
@@ -89,14 +87,6 @@ class TrackerDataLoader @Inject constructor(
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
         val client = TdsClient(Client.ClientName.TDS, trackers)
-        trackerDetector.addClient(client)
-    }
-
-    fun loadTemporaryWhitelist() {
-        val whitelist = tempWhitelistDao.getAll()
-        Timber.d("Loaded ${whitelist.size} temporarily whitelisted domains from DB")
-
-        val client = DocumentDomainClient(Client.ClientName.TEMPORARY_WHITELIST, whitelist)
         trackerDetector.addClient(client)
     }
 
