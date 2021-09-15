@@ -170,6 +170,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenListenerNotified() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
@@ -382,9 +389,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenResetAppLinkState() {
+    fun whenOnPageStartedCalledThenCallPageStarted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).resetAppLinkState()
+        verify(listener).pageStarted(EXAMPLE_URL)
     }
 
     private class TestWebView(context: Context) : WebView(context)

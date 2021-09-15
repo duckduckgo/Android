@@ -617,7 +617,7 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            appLinksHandler.userEnteredBrowserState()
+            appLinksHandler.userEnteredBrowserState(urlToNavigate)
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
@@ -1915,15 +1915,19 @@ class BrowserTabViewModel(
     }
 
     override fun handleAppLink(appLink: AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean {
-        return appLinksHandler.handleAppLink(isRedirect, isForMainFrame) { appLinkClicked(appLink) }
+        return appLinksHandler.handleAppLink(isRedirect, isForMainFrame, appLink.uriString) { appLinkClicked(appLink) }
     }
 
-    override fun resetAppLinkState() {
+    fun resetAppLinkState() {
         appLinksHandler.reset()
     }
 
+    override fun pageStarted(url: String?) {
+        appLinksHandler.updatePreviousUrl(url)
+    }
+
     fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {
-        appLinksHandler.enterBrowserState()
+        appLinksHandler.enterBrowserState(url)
         command.value = Navigate(url, headers)
     }
 

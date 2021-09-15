@@ -17,23 +17,30 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
+import com.duckduckgo.app.global.UriString
 import javax.inject.Inject
 
 interface AppLinksHandler {
-    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean
+    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean
     fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
-    fun enterBrowserState()
-    fun userEnteredBrowserState()
+    fun enterBrowserState(urlString: String?)
+    fun userEnteredBrowserState(url: String?)
+    fun updatePreviousUrl(urlString: String?)
     fun reset()
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
+    var previousUrl: String? = null
     var appLinkOpenedInBrowser = false
     var userEnteredLink = false
 
-    override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, launchAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || isRedirect && appLinkOpenedInBrowser || !isForMainFrame) {
+    override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
+            isRedirect && appLinkOpenedInBrowser ||
+            !isForMainFrame ||
+            UriString.sameOrSubdomain(previousUrl ?: "", urlString)
+        ) {
             return false
         }
         launchAppLink()
@@ -48,13 +55,19 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         return true
     }
 
-    override fun enterBrowserState() {
+    override fun enterBrowserState(urlString: String?) {
         appLinkOpenedInBrowser = true
+        previousUrl = urlString
     }
 
-    override fun userEnteredBrowserState() {
+    override fun userEnteredBrowserState(url: String?) {
         userEnteredLink = true
-        enterBrowserState()
+        enterBrowserState(url)
+    }
+
+    override fun updatePreviousUrl(urlString: String?) {
+        previousUrl = urlString
+        reset()
     }
 
     override fun reset() {

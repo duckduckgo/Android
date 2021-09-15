@@ -170,7 +170,7 @@ class BrowserWebViewClient(
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            webViewClientListener?.resetAppLinkState()
+            webViewClientListener?.pageStarted(url)
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
