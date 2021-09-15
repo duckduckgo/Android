@@ -96,6 +96,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.webview.enableDarkMode
+import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
@@ -132,7 +134,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -237,6 +241,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+
+    @Inject
+    lateinit var themingDataStore: ThemingDataStore
 
     @Inject
     @AppCoroutineScope
@@ -1192,6 +1199,7 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
+                configureDarkThemeSupport(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -1219,6 +1227,21 @@ class BrowserTabFragment :
 
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
+        }
+    }
+
+    private fun configureDarkThemeSupport(webSettings: WebSettings) {
+        when (themingDataStore.theme) {
+            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
+            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                    webSettings.enableDarkMode()
+                } else {
+                    webSettings.enableLightMode()
+                }
+            }
         }
     }
 
