@@ -18,16 +18,16 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.text.*
 import android.text.Annotation
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
@@ -46,7 +46,7 @@ import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
@@ -74,7 +74,6 @@ class DeviceShieldTrackerActivity :
     private lateinit var ctaTrackerFaq: View
     private lateinit var deviceShieldEnabledLabel: TextView
     private lateinit var deviceShieldDisabledLabel: TextView
-    private lateinit var excludedAppsLabel: TextView
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
@@ -110,8 +109,11 @@ class DeviceShieldTrackerActivity :
         ctaTrackerFaq = findViewById(R.id.cta_tracker_faq)
         deviceShieldEnabledLabel = findViewById(R.id.deviceShieldTrackerLabelEnabled)
         deviceShieldDisabledLabel = findViewById(R.id.deviceShieldTrackerLabelDisabled)
-        excludedAppsLabel = findViewById(R.id.cta_excluded_apps)
         ctaShowAll = findViewById(R.id.cta_show_all)
+
+        findViewById<Button>(R.id.cta_excluded_apps).setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
 
         findViewById<Button>(R.id.cta_tracker_faq).setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
@@ -213,7 +215,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchExcludedApps() {
-        startActivity(DeviceShieldExclusionListActivity.intent(this))
+        startActivity(TrackingProtectionExclusionListActivity.intent(this))
     }
 
     private fun launchDeviceShieldFAQ() {
@@ -262,34 +264,6 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun updateRunningState(state: RunningState) {
-        val excludedAppsPrefix =
-            String.format(getString(R.string.atp_ActivityAppTrackersExcludedAppsPrefix), state.excludedAppsCount)
-        val excludedAppsSuffix = getString(R.string.atp_ActivityAppTrackersExcludedSuffix)
-        val textToStyle =
-            excludedAppsPrefix + getString(R.string.atp_ActivityAppTrackersExcludedApps) + excludedAppsSuffix
-
-        val spannable = SpannableStringBuilder(textToStyle)
-        val prefixIndex = textToStyle.indexOf(excludedAppsPrefix)
-        spannable.setSpan(
-            StyleSpan(Typeface.BOLD),
-            prefixIndex,
-            prefixIndex + excludedAppsPrefix.length,
-            Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-        )
-
-        val suffixIndex = textToStyle.indexOf(excludedAppsSuffix)
-        spannable.setSpan(
-            UnderlineSpan(),
-            suffixIndex,
-            suffixIndex + excludedAppsSuffix.length,
-            Spannable.SPAN_EXCLUSIVE_INCLUSIVE
-        )
-
-        excludedAppsLabel.text = spannable
-        excludedAppsLabel.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
-        }
-
         if (state.isRunning) {
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()

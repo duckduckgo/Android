@@ -108,5 +108,15 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     VPN_PROCESS_MEMORY_MODERATE_DAILY("m_apptb_m_md"),
     VPN_PROCESS_MEMORY_CRITICAL("m_apptb_m_c"),
     VPN_PROCESS_MEMORY_CRITICAL_DAILY("m_apptb_m_cd"),
+
+    APP_EXCLUSION_DISABLE_APP("m_apptb_ae_d"),
+    APP_EXCLUSION_ENABLE_APP("m_apptb_ae_e"),
+    APP_EXCLUSION_RESTORE_PROTECTION_LIST("m_apptb_ae_rp"),
+    APP_EXCLUSION_LAUNCH_FEEDBACK("m_apptb_ae_lf"),
     ;
+}
+
+object DeviceShieldPixelParameter {
+    const val PACKAGE_NAME = "packageName"
+    const val EXCLUDING_REASON = "reason"
 }

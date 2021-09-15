@@ -17,89 +17,133 @@
 package com.duckduckgo.mobile.android.vpn.apps
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
 class ExcludedAppsViewModel(
-    private val deviceShieldExcludedApps: DeviceShieldExcludedApps
+    private val excludedApps: TrackingProtectionProtectedApps,
+    private val pixel: DeviceShieldPixels
 ) : ViewModel() {
 
-    internal suspend fun getExcludedApps() = flow {
-        val (otherApps, appsWithIssues) = deviceShieldExcludedApps.getExclusionAppList()
-            .filterNot { it.isDdgApp }
-            .partition { BROWSERS.contains(it.packageName) }
-        emit(ViewState(appsWithIssues, otherApps))
+    private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
+    private val manualChanges: MutableList<String> = mutableListOf()
+
+    internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
+
+    fun onAppProtectionDisabled(answer: Int = 0, packageName: String) {
+        if (answer > ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED) {
+            pixel.disableAppProtection(packageName, answer)
+        }
+        recordManualChange(packageName)
+        viewModelScope.launch {
+            excludedApps.manuallyExcludedApp(packageName)
+        }
     }
 
-    companion object {
-        private val BROWSERS = listOf(
-            "com.duckduckgo.mobile.android",
-            "com.duckduckgo.mobile.android.debug",
-            "com.duckduckgo.mobile.android.vpn",
-            "com.duckduckgo.mobile.android.vpn.debug",
-            "com.android.chrome",
-            "org.mozilla.firefox",
-            "com.opera.browser",
-            "com.microsoft.emmx",
-            "com.brave.browser",
-            "com.UCMobile.intl",
-            "com.android.browser",
-            "com.sec.android.app.sbrowser",
-            "info.guardianproject.orfo",
-            "org.torproject.torbrowser_alpha",
-            "mobi.mgeek.TunnyBrowser",
-            "com.linkbubble.playstore",
-            "org.adblockplus.browser",
-            "arun.com.chromer",
-            "com.flynx",
-            "com.ghostery.android.ghostery",
-            "com.cliqz.browser",
-            "com.opera.mini.native",
-            "com.uc.browser.en",
-            "com.chrome.beta",
-            "org.mozilla.firefox_beta",
-            "com.opera.browser.beta",
-            "com.opera.mini.native.beta",
-            "com.sec.android.app.sbrowser.beta",
-            "org.mozilla.fennec_fdroid",
-            "org.mozilla.rocket",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "org.mozilla.fennec_aurora",
-            "org.mozilla.fennec",
-            "com.google.android.apps.chrome",
-            "org.chromium.chrome",
-            "com.microsoft.bing",
-            "com.yahoo.mobile.client.android.search",
-            "com.google.android.apps.searchlite",
-            "com.baidu.searchbox",
-            "ru.yandex.searchplugin",
-            "com.ecosia.android",
-            "com.qwant.liberty",
-            "com.qwantjunior.mobile",
-            "com.nhn.android.search",
-            "cz.seznam.sbrowser",
-            "com.coccoc.trinhduyet"
-        )
+    fun onAppProtectionEnabled(packageName: String, excludingReason: Int) {
+        recordManualChange(packageName)
+        pixel.enableAppProtection(packageName, excludingReason)
+        viewModelScope.launch {
+            excludedApps.manuallyEnabledApp(packageName)
+        }
+    }
+
+    private fun recordManualChange(packageName: String) {
+        if (manualChanges.contains(packageName)) {
+            manualChanges.remove(packageName)
+        } else {
+            manualChanges.add(packageName)
+        }
+    }
+
+    fun restoreProtectedApps() {
+        pixel.restoreDefaultProtectionList()
+        viewModelScope.launch {
+            excludedApps.restoreDefaultProtectedList()
+            command.send(Command.RestartVpn)
+        }
+    }
+
+    fun onLeavingScreen() {
+        viewModelScope.launch {
+            if (manualChanges.isNotEmpty()) {
+                command.send(Command.RestartVpn)
+            }
+        }
+    }
+
+    fun onAppProtectionChanged(excludedAppInfo: VpnExcludedInstalledAppInfo, position: Int, enabled: Boolean) {
+        viewModelScope.launch {
+            if (enabled) {
+                checkForAppProtectionEnabled(excludedAppInfo, position)
+            } else {
+                checkForAppProtectionDisabled(excludedAppInfo)
+            }
+        }
+    }
+
+    private suspend fun checkForAppProtectionEnabled(excludedAppInfo: VpnExcludedInstalledAppInfo, position: Int) {
+        if (excludedAppInfo.excludingReason == VpnExcludedInstalledAppInfo.MANUALLY_EXCLUDED || excludedAppInfo.excludingReason == VpnExcludedInstalledAppInfo.NO_ISSUES) {
+            onAppProtectionEnabled(excludedAppInfo.packageName, excludedAppInfo.excludingReason)
+        } else {
+            command.send(Command.ShowEnableProtectionDialog(excludedAppInfo, position))
+        }
+    }
+
+    private suspend fun checkForAppProtectionDisabled(excludedAppInfo: VpnExcludedInstalledAppInfo) {
+        if (excludedAppInfo.excludingReason == VpnExcludedInstalledAppInfo.MANUALLY_EXCLUDED || excludedAppInfo.excludingReason == VpnExcludedInstalledAppInfo.NO_ISSUES) {
+            command.send(Command.ShowDisableProtectionDialog(excludedAppInfo))
+        } else {
+            onAppProtectionDisabled(
+                ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED,
+                excludedAppInfo.packageName
+            )
+        }
+    }
+
+    fun launchFeedback() {
+        pixel.launchAppTPFeedback()
+        viewModelScope.launch {
+            command.send(Command.LaunchFeedback)
+        }
     }
 }
 
-internal data class ViewState(val appsWithIssues: List<VpnExcludedInstalledAppInfo>, val otherApps: List<VpnExcludedInstalledAppInfo>)
+internal data class ViewState(val excludedApps: List<VpnExcludedInstalledAppInfo>)
+internal sealed class Command {
+    object RestartVpn : Command()
+    object LaunchFeedback : Command()
+    data class ShowEnableProtectionDialog(val excludingReason: VpnExcludedInstalledAppInfo, val position: Int) :
+        Command()
+
+    data class ShowDisableProtectionDialog(val excludingReason: VpnExcludedInstalledAppInfo) : Command()
+}
 
 @ContributesMultibinding(AppObjectGraph::class)
 class ExcludedAppsViewModelFactory @Inject constructor(
-    private val deviceShieldExcludedApps: Provider<DeviceShieldExcludedApps>
+    private val deviceShieldExcludedApps: Provider<TrackingProtectionProtectedApps>,
+    private val deviceShieldPixels: Provider<DeviceShieldPixels>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
                     ExcludedAppsViewModel(
-                        deviceShieldExcludedApps.get()
+                        deviceShieldExcludedApps.get(),
+                        deviceShieldPixels.get()
                     ) as T
                     )
                 else -> null

@@ -132,20 +132,19 @@
                 android:layout_height="1dp"
                 android:background="@color/splitterGray" />
 
-            <TextView
+            <Button
                 android:id="@+id/cta_excluded_apps"
-                style="@style/DeviceShield.PrivacyReport.Label.Blue"
+                style="@style/DeviceShield.Button.Border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:padding="16dp"
-                android:text="@string/atp_ActivityAppTrackersExcludedApps" />
+                android:text="@string/atp_ActivityManageProtection" />
 
             <Button
                 android:id="@+id/cta_what_are_app_trackers"
-                style="@style/DeviceShield.Button.Transparent"
+                style="@style/DeviceShield.Button.Border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -155,7 +154,7 @@
 
             <Button
                 android:id="@+id/cta_tracker_faq"
-                style="@style/DeviceShield.Button.Transparent"
+                style="@style/DeviceShield.Button.Border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -167,7 +166,7 @@
 
             <Button
                 android:id="@+id/cta_beta_instructions"
-                style="@style/DeviceShield.Button.Transparent"
+                style="@style/DeviceShield.Button.Border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"

@@ -108,7 +108,7 @@
 
         <Button
             android:id="@+id/onboarding_faq_cta"
-            style="@style/DeviceShield.Button.Transparent"
+            style="@style/DeviceShield.Button.Border"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

@@ -67,6 +67,9 @@ interface VpnAppTrackerBlockingDao {
     @Query("SELECT * from vpn_app_tracker_exclusion_list")
     fun getAppExclusionList(): List<AppTrackerExcludedPackage>
 
+    @Query("SELECT * from vpn_app_tracker_exclusion_list")
+    fun getAppExclusionListFlow(): Flow<List<AppTrackerExcludedPackage>>
+
     @Insert
     fun setExclusionListMetadata(appTrackerExclusionListMetadata: AppTrackerExclusionListMetadata)
 
@@ -110,4 +113,17 @@ interface VpnAppTrackerBlockingDao {
         deleteTrackerExceptionRules()
         insertTrackerExceptionRules(exceptionRules)
     }
+
+    @Query("SELECT * from vpn_app_tracker_manual_exclusion_list")
+    fun getManualAppExclusionList(): List<AppTrackerManualExcludedApp>
+
+    @Query("SELECT * from vpn_app_tracker_manual_exclusion_list")
+    fun getManualAppExclusionListFlow(): Flow<List<AppTrackerManualExcludedApp>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertIntoManualAppExclusionList(excludedApp: AppTrackerManualExcludedApp)
+
+    @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
+    fun deleteManualAppExclusionList()
+
 }

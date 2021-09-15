@@ -43,9 +43,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     override fun getItemCount() = trackers.size
 
-    fun updateData(dataUpdate: List<TrackerInfo>) {
+    fun updateData(newData: List<TrackerInfo>) {
         val oldData = trackers
-        val newData = dataUpdate
+        val newData = newData
         val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
 
         trackers.clear().also { trackers.addAll(newData) }
@@ -87,17 +87,17 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
     }
 
-    private class DiffCallback(private val old: List<TrackerInfo>, private val new: List<TrackerInfo>) : DiffUtil.Callback() {
-        override fun getOldListSize() = old.size
+    private class DiffCallback(private val oldList: List<TrackerInfo>, private val newList: List<TrackerInfo>) : DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
 
-        override fun getNewListSize() = new.size
+        override fun getNewListSize() = newList.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return old[oldItemPosition].companyName == new[newItemPosition].companyName
+            return oldList[oldItemPosition].companyName == newList[newItemPosition].companyName
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return old == new
+            return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }
 }

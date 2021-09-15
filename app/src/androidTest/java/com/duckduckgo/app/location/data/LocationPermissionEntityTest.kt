@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.location.data
 
-import com.duckduckgo.mobile.android.ui.view.asLocationPermissionOrigin
+import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import org.junit.Assert
 import org.junit.Test
 

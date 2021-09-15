@@ -23,11 +23,10 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionProtectedApps
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.runBlocking
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -58,7 +57,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     private lateinit var vpnPreferences: VpnPreferences
 
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
-    private val deviceShieldExcludedApps = mock<DeviceShieldExcludedApps>()
+    private val deviceShieldExcludedApps = mock<TrackingProtectionProtectedApps>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -83,7 +82,6 @@ class DeviceShieldTrackerActivityViewModelTest {
             deviceShieldPixels,
             vpnPreferences,
             appTrackerBlockingStatsRepository,
-            deviceShieldExcludedApps,
             VpnCoroutineTestRule().testDispatcherProvider
         )
     }
@@ -178,7 +176,10 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        return Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
+        return Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            VpnDatabase::class.java
+        )
             .allowMainThreadQueries()
             .build()
     }

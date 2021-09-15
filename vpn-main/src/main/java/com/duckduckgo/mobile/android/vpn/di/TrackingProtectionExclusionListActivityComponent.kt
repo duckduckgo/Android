@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -32,21 +32,21 @@ import dagger.multibindings.IntoMap
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
-interface DeviceShieldExclusionListActivityComponent : AndroidInjector<DeviceShieldExclusionListActivity> {
+interface TrackingProtectionExclusionListActivityComponent : AndroidInjector<TrackingProtectionExclusionListActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DeviceShieldExclusionListActivity>
+    interface Factory : AndroidInjector.Factory<TrackingProtectionExclusionListActivity>
 }
 
 @ContributesTo(AppObjectGraph::class)
-interface DeviceShieldExclusionListActivityComponentProvider {
-    fun provideDeviceShieldExclusionListActivityComponentFactory(): DeviceShieldExclusionListActivityComponent.Factory
+interface TrackingProtectionExclusionListActivityComponentProvider {
+    fun provideTrackingProtectionExclusionListActivityComponentFactory(): TrackingProtectionExclusionListActivityComponent.Factory
 }
 
 @Module
 @ContributesTo(AppObjectGraph::class)
-abstract class DeviceShieldExclusionListActivityBindingModule {
+abstract class TrackingProtectionExclusionListActivityBindingModule {
     @Binds
     @IntoMap
-    @ClassKey(DeviceShieldExclusionListActivity::class)
-    abstract fun bindDeviceShieldExclusionListActivityComponentFactory(factory: DeviceShieldExclusionListActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(TrackingProtectionExclusionListActivity::class)
+    abstract fun bindDeviceShieldExclusionListActivityComponentFactory(factory: TrackingProtectionExclusionListActivityComponent.Factory): AndroidInjector.Factory<*>
 }

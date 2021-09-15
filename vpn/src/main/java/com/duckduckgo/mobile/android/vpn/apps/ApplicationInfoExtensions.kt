@@ -53,6 +53,10 @@ fun ApplicationInfo.isGame(): Boolean {
     return getAppCategoryCompat() == ApplicationInfo.CATEGORY_GAME
 }
 
+fun ApplicationInfo.isSystemApp(): Boolean {
+    return (flags and ApplicationInfo.FLAG_SYSTEM) != 0
+}
+
 fun ApplicationInfo.getAppType(): String? {
     return if ((flags and ApplicationInfo.FLAG_SYSTEM) != 0) {
         "System"
