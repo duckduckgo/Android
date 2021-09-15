@@ -22,46 +22,54 @@
             android:process=":vpn" >
         </activity>
 
-        <activity android:name=".service.VpnPermissionRequesterActivity" />
+        <activity android:name=".service.VpnPermissionRequesterActivity"
+                  android:screenOrientation="portrait"/>
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
             android:theme="@style/AppTheme.Light.ATPOnboarding"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity"
             android:theme="@style/AppTheme.Light.ATPOnboarding"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo"
             android:label="@string/atp_ProfilingActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
             android:label="@string/atp_FAQActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:label="@string/atp_ActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldMostRecentActivity"
             android:label="@string/atp_MostRecentActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.DeviceShieldExclusionListActivity"
             android:label="@string/atp_ExclusionListActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"/>
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".service.TrackerBlockingVpnService"
