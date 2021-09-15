@@ -33,7 +33,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.events.db.FavoritesOnboardingObserver
 import com.duckduckgo.app.global.events.db.FavoritesOnboardingWorkRequestBuilder
 import com.duckduckgo.app.global.events.db.UserEventsDependencies
 import com.duckduckgo.app.global.events.db.UserEventsStore

@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 38,
+    exportSchema = true, version = 39,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -446,6 +446,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_38_TO_39: Migration = object : Migration(37, 38) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM user_events WHERE id = \"FIRST_NON_SERP_VISITED_SITE\"")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -506,6 +512,7 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_35_TO_36,
             MIGRATION_36_TO_37,
             MIGRATION_37_TO_38,
+            MIGRATION_38_TO_39
         )
 
     @Deprecated(

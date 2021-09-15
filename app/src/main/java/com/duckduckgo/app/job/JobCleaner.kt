@@ -29,8 +29,10 @@ interface JobCleaner {
     companion object {
         private const val STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous"
         private const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
+        private const val FAVORITES_ONBOARDING_WORK_TAG = "FavoritesOnboardingWorker"
 
         fun allDeprecatedNotificationWorkTags() = listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG, USE_OUR_APP_WORK_REQUEST_TAG)
+        fun allDeprecatedWorkerTags() = listOf(FAVORITES_ONBOARDING_WORK_TAG)
     }
 }
 
@@ -39,7 +41,7 @@ interface JobCleaner {
 class AndroidJobCleaner @Inject constructor(private val workManager: WorkManager) : JobCleaner {
 
     override fun cleanDeprecatedJobs() {
-        allDeprecatedNotificationWorkTags().forEach { tag ->
+        allDeprecatedNotificationWorkTags().plus(allDeprecatedNotificationWorkTags()).forEach { tag ->
             workManager.cancelAllWorkByTag(tag)
         }
     }
