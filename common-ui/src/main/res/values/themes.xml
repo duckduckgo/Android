@@ -47,8 +47,6 @@
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
         <item name="secondaryTextColor">@color/grayishTwo</item>
-        <item name="listItemTitleColor">@color/white</item>
-        <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
@@ -111,6 +109,11 @@
         <item name="favoriteAddedHintTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
+
+        <item name="listItemTitleColor">@color/white</item>
+        <item name="listItemSubtitleColor">@color/grayishTwo</item>
+        <item name="listItemBackgroundColor">@color/almostBlack</item>
+        <item name="listItemSeparatorColor">@color/charcoalGrey</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -167,8 +170,6 @@
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
-        <item name="listItemTitleColor">@color/almostBlackDark</item>
-        <item name="listItemSubtitleColor">@color/warmerGray</item>
         <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
@@ -209,6 +210,11 @@
         <item name="favoriteAddedHintTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+
+        <item name="listItemTitleColor">@color/almostBlackDark</item>
+        <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemBackgroundColor">@color/whiteFive</item>
+        <item name="listItemSeparatorColor">@color/whiteSix</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

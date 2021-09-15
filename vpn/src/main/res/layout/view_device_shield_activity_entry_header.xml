@@ -16,14 +16,15 @@
   -->
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/timestamp_header"
-    style="@style/SettingsSectionTitle"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    android:paddingStart="16dp"
-    android:paddingEnd="0dp"
-    android:paddingTop="15dp"
-    android:paddingBottom="16dp"
-    tools:text="Yesterday"
-    />
+          xmlns:tools="http://schemas.android.com/tools"
+          android:id="@+id/timestamp_header"
+          style="@style/SettingsSectionTitle"
+          android:background="?attr/listItemBackgroundColor"
+          android:layout_height="wrap_content"
+          android:layout_width="match_parent"
+          android:paddingStart="16dp"
+          android:paddingEnd="0dp"
+          android:paddingTop="15dp"
+          android:paddingBottom="16dp"
+          tools:text="Yesterday"
+/>

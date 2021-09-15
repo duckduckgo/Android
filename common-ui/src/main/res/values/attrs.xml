@@ -79,5 +79,7 @@
     <attr name="textAppearanceButton1" format="reference" />
     <attr name="textAppearanceButton2" format="reference" />
     <attr name="savedSiteEditTextUnderlineColor" format="color" />
+    <attr name="listItemBackgroundColor" format="color" />
+    <attr name="listItemSeparatorColor" format="color" />
 
 </resources>
