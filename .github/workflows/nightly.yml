@@ -34,7 +34,7 @@ jobs:
         run: ./gradlew spotlessCheck --stacktrace
 
       - name: Unit Tests
-        run: ./gradlew app:testPlayDebugUnitTest --stacktrace
+        run: ./gradlew app:testPlayDebugUnitTest privacy-config-impl:testDebugUnitTest privacy-config-store:testDebugUnitTest --stacktrace
 
       - name: Bundle the Unit Test report
         if: always()

@@ -22,4 +22,5 @@ interface ThemingDataStore {
 
     var theme: DuckDuckGoTheme
 
+    fun isCurrentlySelected(theme: DuckDuckGoTheme): Boolean
 }

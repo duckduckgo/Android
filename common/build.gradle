@@ -30,6 +30,9 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
 
+    // Android KTX
+    implementation AndroidX.core.ktx
+
     implementation Google.dagger
 
     implementation JakeWharton.timber

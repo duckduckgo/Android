@@ -109,8 +109,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
 
     SETTINGS_OPENED("ms"),
+    SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),
+    SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT("ms_tsd"),
     SETTINGS_MANAGE_WHITELIST("ms_mw"),
     SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
     SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
@@ -219,9 +221,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
 
-    EMAIL_TOOLTIP_DISMISSED("m_e_t_d"),
-    EMAIL_USE_ALIAS("m_e_ua"),
-    EMAIL_USE_ADDRESS("m_e_uad"),
+    EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+    EMAIL_USE_ALIAS("email_filled_random"),
+    EMAIL_USE_ADDRESS("email_filled_main"),
+    EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
 
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),
