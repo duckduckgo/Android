@@ -24,7 +24,6 @@ interface AppLinksHandler {
     fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean
     fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
     fun enterBrowserState(urlString: String?)
-    fun userEnteredBrowserState(url: String?)
     fun updatePreviousUrl(urlString: String?)
     fun reset()
 }
@@ -33,7 +32,6 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null
     var appLinkOpenedInBrowser = false
-    var userEnteredLink = false
 
     override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
@@ -43,12 +41,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         ) {
             return false
         }
+        enterBrowserState(urlString)
         launchAppLink()
-        return true
+        return false
     }
 
     override fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser && !userEnteredLink) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser) {
             return true
         }
         launchNonHttpAppLink()
@@ -60,11 +59,6 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         previousUrl = urlString
     }
 
-    override fun userEnteredBrowserState(url: String?) {
-        userEnteredLink = true
-        enterBrowserState(url)
-    }
-
     override fun updatePreviousUrl(urlString: String?) {
         previousUrl = urlString
         reset()
@@ -72,6 +66,5 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     override fun reset() {
         appLinkOpenedInBrowser = false
-        userEnteredLink = false
     }
 }

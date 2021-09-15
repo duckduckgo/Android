@@ -550,7 +550,11 @@
     <!-- Opening app links -->
     <string name="settingTitleOpenLinksInAssociatedApps">Open Links in Associated Apps</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Disable to prevent links from automatically opening in other installed apps.</string>
-    <string name="appLinkDialogTitle">Open in another app?</string>
+    <string name="appLinkSnackBarAction">Open in app</string>
+    <string name="appLinkMultipleSnackBarAction">Choose app</string>
+    <string name="appLinkSnackBarMessage">You can open this link in the %s app</string>
+    <string name="appLinkMultipleSnackBarMessage">You can open this link in associated apps</string>
+    <string name="appLinkIntentChooserTitle">Continue with</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>

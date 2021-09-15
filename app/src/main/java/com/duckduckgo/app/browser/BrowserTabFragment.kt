@@ -151,6 +151,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import android.content.pm.ApplicationInfo
 
 class BrowserTabFragment :
     Fragment(),
@@ -653,7 +654,7 @@ class BrowserTabFragment :
                 }
             }
             is Command.HandleAppLink -> {
-                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString, it.headers)
+                showAppLinkSnackBar(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString)
             }
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
@@ -829,18 +830,61 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
-    private fun openAppLinkDialog(
+    private fun showAppLinkSnackBar(
         appIntent: Intent?,
         excludedComponents: List<ComponentName>?,
-        url: String,
-        headers: Map<String, String> = emptyMap()
+        url: String
+    ) {
+        view?.let { view ->
+
+            val message: String?
+            val action: String?
+
+            if (appIntent != null) {
+                val packageName = appIntent.component?.packageName ?: return
+                message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
+                action = getString(R.string.appLinkSnackBarAction)
+            } else {
+                message = getString(R.string.appLinkMultipleSnackBarMessage)
+                action = getString(R.string.appLinkMultipleSnackBarAction)
+            }
+
+            Snackbar.make(
+                view,
+                message,
+                Snackbar.LENGTH_LONG
+            ).setAction(action) {
+                openAppLink(appIntent, excludedComponents, url)
+            }.setDuration(7000)
+                .show()
+        }
+    }
+
+    private fun getAppName(packageName: String): String? {
+        val packageManager: PackageManager? = context?.packageManager
+        val applicationInfo: ApplicationInfo? = try {
+            packageManager?.getApplicationInfo(packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
+        }
+        return if (applicationInfo != null) {
+            packageManager?.getApplicationLabel(applicationInfo).toString()
+        } else {
+            null
+        }
+    }
+
+    private fun openAppLink(
+        appIntent: Intent?,
+        excludedComponents: List<ComponentName>?,
+        url: String
     ) {
         if (appIntent != null) {
-            launchAppLinkDialog(requireContext(), url, headers) { startActivity(appIntent) }
+            startActivity(appIntent)
         } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val title = getString(R.string.openExternalApp)
+            val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(url, title, excludedComponents)
-            launchAppLinkDialog(requireContext(), url, headers) { startActivity(chooserIntent) }
+            startActivity(chooserIntent)
         }
     }
 
@@ -943,24 +987,6 @@ class BrowserTabFragment :
                 }
                 .show()
         }
-    }
-
-    private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
-        alertDialog?.dismiss()
-
-        alertDialog = AlertDialog.Builder(context)
-            .setTitle(R.string.appLinkDialogTitle)
-            .setMessage(getString(R.string.confirmOpenExternalApp))
-            .setPositiveButton(R.string.yes) { dialog, _ ->
-                launchApp()
-                viewModel.resetAppLinkState()
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.no) { dialog, _ ->
-                viewModel.navigateToAppLinkInBrowser(url, headers)
-                dialog.dismiss()
-            }
-            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -1662,7 +1688,6 @@ class BrowserTabFragment :
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
-        private const val LAYOUT_TRANSITION_MS = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -1681,8 +1706,6 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
-
-        private const val URI_NO_FLAG = 0
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()

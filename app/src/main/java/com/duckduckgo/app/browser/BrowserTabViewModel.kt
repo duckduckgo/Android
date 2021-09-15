@@ -293,7 +293,7 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
-        class HandleAppLink(val appLink: AppLink, val headers: Map<String, String>) : Command()
+        class HandleAppLink(val appLink: AppLink) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -617,7 +617,6 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            appLinksHandler.userEnteredBrowserState(urlToNavigate)
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
@@ -1932,7 +1931,7 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink, getUrlHeaders(appLink.uriString))
+        command.value = HandleAppLink(appLink)
     }
 
     override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
