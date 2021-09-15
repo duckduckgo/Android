@@ -50,6 +50,8 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.constraintLayout
 
+    implementation Square.retrofit2.converter.moshi
+
     // Dagger
     implementation Google.dagger
 

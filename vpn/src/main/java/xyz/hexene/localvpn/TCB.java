@@ -21,8 +21,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import timber.log.Timber;
 
 /** Transmission Control Block */
@@ -93,6 +92,16 @@ public class TCB {
             tcbCache.put(ipAndPort, tcb);
         }
         Timber.v("TCB cache size has now reached %d entries", tcbCache.size());
+    }
+
+    public static List<TCB> copyTCBs() {
+        List<TCB> tcbCopy = new ArrayList<>();
+        synchronized (tcbCache) {
+            for (Map.Entry<String, TCB> entry : tcbCache.entrySet()) {
+                tcbCopy.add(entry.getValue());
+            }
+        }
+        return tcbCopy;
     }
 
     public TCB(

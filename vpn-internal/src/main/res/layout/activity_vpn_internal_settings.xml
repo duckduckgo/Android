@@ -80,6 +80,13 @@
                 android:theme="@style/SettingsSwitchTheme"
             />
 
+            <com.duckduckgo.vpn.internal.feature.ui.SettingsToggleOptionWithLoadingState
+                android:id="@+id/apptp_bugreport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="Generate AppTP bugreport"
+            />
+
         </LinearLayout>
 
     </ScrollView>
