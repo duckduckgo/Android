@@ -1918,12 +1918,12 @@ class BrowserTabViewModel(
         return appLinksHandler.handleAppLink(isRedirect, isForMainFrame, appLink.uriString) { appLinkClicked(appLink) }
     }
 
-    override fun resetAppLinkState() {
+    fun resetAppLinkState() {
         appLinksHandler.reset()
     }
 
     override fun pageStarted(url: String?) {
-        appLinksHandler.updateDisabledUrl(url)
+        appLinksHandler.updatePreviousUrl(url)
     }
 
     fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {

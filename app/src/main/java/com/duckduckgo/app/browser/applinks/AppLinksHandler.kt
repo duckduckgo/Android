@@ -25,13 +25,13 @@ interface AppLinksHandler {
     fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
     fun enterBrowserState(urlString: String?)
     fun userEnteredBrowserState(url: String?)
-    fun updateDisabledUrl(urlString: String?)
+    fun updatePreviousUrl(urlString: String?)
     fun reset()
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
-    var disabledUrl: String? = null
+    var previousUrl: String? = null
     var appLinkOpenedInBrowser = false
     var userEnteredLink = false
 
@@ -39,7 +39,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
             isRedirect && appLinkOpenedInBrowser ||
             !isForMainFrame ||
-            UriString.sameOrSubdomain(disabledUrl ?: "", urlString)
+            UriString.sameOrSubdomain(previousUrl ?: "", urlString)
         ) {
             return false
         }
@@ -57,7 +57,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     override fun enterBrowserState(urlString: String?) {
         appLinkOpenedInBrowser = true
-        disabledUrl = urlString
+        previousUrl = urlString
     }
 
     override fun userEnteredBrowserState(url: String?) {
@@ -65,8 +65,9 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         enterBrowserState(url)
     }
 
-    override fun updateDisabledUrl(urlString: String?) {
-        disabledUrl = urlString
+    override fun updatePreviousUrl(urlString: String?) {
+        previousUrl = urlString
+        reset()
     }
 
     override fun reset() {

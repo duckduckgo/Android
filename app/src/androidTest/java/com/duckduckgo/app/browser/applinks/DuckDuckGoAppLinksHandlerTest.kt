@@ -34,7 +34,7 @@ class DuckDuckGoAppLinksHandlerTest {
     @Before
     fun setup() {
         testee = DuckDuckGoAppLinksHandler()
-        testee.disabledUrl = "example.com"
+        testee.previousUrl = "example.com"
     }
 
     @Test
@@ -172,6 +172,15 @@ class DuckDuckGoAppLinksHandlerTest {
         testee.appLinkOpenedInBrowser = true
         testee.userEnteredLink = true
         testee.reset()
+        assertFalse(testee.appLinkOpenedInBrowser)
+        assertFalse(testee.userEnteredLink)
+    }
+
+    @Test
+    fun whenPreviousUrlUpdatedThenResetAppLinkState() {
+        testee.appLinkOpenedInBrowser = true
+        testee.userEnteredLink = true
+        testee.updatePreviousUrl("foo.com")
         assertFalse(testee.appLinkOpenedInBrowser)
         assertFalse(testee.userEnteredLink)
     }
