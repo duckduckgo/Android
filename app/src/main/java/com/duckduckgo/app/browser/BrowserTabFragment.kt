@@ -58,8 +58,6 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.*
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -98,6 +96,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.webview.enableDarkMode
+import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
@@ -1230,24 +1230,17 @@ class BrowserTabFragment :
         }
     }
 
-    @SuppressLint("RequiresFeature")
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        if (themingDataStore.theme == DuckDuckGoTheme.DARK || currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
-            ) {
-                // requires WebView v76
-                WebSettingsCompat.setForceDark(webSettings, WebSettingsCompat.FORCE_DARK_ON)
-                // requires WebView v83
-                WebSettingsCompat.setForceDarkStrategy(
-                    webSettings,
-                    WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
-                )
-            }
-        } else {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                WebSettingsCompat.setForceDark(webSettings, WebSettingsCompat.FORCE_DARK_OFF)
+        when (themingDataStore.theme) {
+            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
+            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                    webSettings.enableDarkMode()
+                } else {
+                    webSettings.enableLightMode()
+                }
             }
         }
     }
