@@ -1232,7 +1232,8 @@ class BrowserTabFragment :
 
     @SuppressLint("RequiresFeature")
     private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        if (themingDataStore.theme == DuckDuckGoTheme.DARK) {
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (themingDataStore.theme == DuckDuckGoTheme.DARK || currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
                 WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
             ) {
