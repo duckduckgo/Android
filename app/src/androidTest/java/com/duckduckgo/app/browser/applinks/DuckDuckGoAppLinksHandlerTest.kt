@@ -55,7 +55,7 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenAppLinkHandledAndIsNotSameOrSubdomainThenReturnTrueAbdLaunchAppLink() {
+    fun whenAppLinkHandledAndIsNotSameOrSubdomainThenReturnTrueAndLaunchAppLink() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             testee.appLinkOpenedInBrowser = false
             assertTrue(testee.handleAppLink(isRedirect = false, isForMainFrame = true, urlString = "foo.com", launchAppLink = mockCallback))
