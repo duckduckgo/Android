@@ -194,7 +194,7 @@ class BrowserTabViewModel(
         val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
-        val isBookmark: Boolean = false,
+        val bookmark: SavedSite.Bookmark? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val isFavorite: Boolean = false,
         val canFireproofSite: Boolean = false,
@@ -375,7 +375,6 @@ class BrowserTabViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val bookmarksState: LiveData<List<SavedSite.Bookmark>> = bookmarksRepository.bookmarks().asLiveData()
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -394,10 +393,6 @@ class BrowserTabViewModel(
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
-    }
-
-    private val bookmarksObserver = Observer<List<SavedSite.Bookmark>> {
-        browserViewState.value = currentBrowserViewState().copy(isBookmark = isBookmark(site?.url))
     }
 
     private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
@@ -455,7 +450,6 @@ class BrowserTabViewModel(
         initializeViewStates()
         configureAutoComplete()
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
-        bookmarksState.observeForever(bookmarksObserver)
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
@@ -475,6 +469,11 @@ class BrowserTabViewModel(
             ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
             autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
             browserViewState.value = currentBrowserViewState().copy(isFavorite = isFavorite(site?.url))
+        }.launchIn(viewModelScope)
+
+        bookmarksRepository.bookmarks().onEach { bookmarks ->
+            val bookmark = bookmarks.firstOrNull { it.url == url }
+            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
     }
 
@@ -544,7 +543,6 @@ class BrowserTabViewModel(
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
-        bookmarksState.removeObserver(bookmarksObserver)
         browserViewState.removeObserver(favoritesOnboardingObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
         fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
@@ -911,7 +909,6 @@ class BrowserTabViewModel(
             canAddBookmarks = true,
             addFavorite = addFavorite,
             isFavorite = isFavorite(url),
-            isBookmark = isBookmark(url),
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
@@ -934,6 +931,8 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+
+        viewModelScope.launch { updateBookmarkState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
@@ -963,6 +962,19 @@ class BrowserTabViewModel(
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) {
             userWhitelistDao.contains(domain) || contentBlocking.isAnException(domain)
+        }
+    }
+
+    private suspend fun updateBookmarkState(url: String) {
+        val bookmark = getBookmark(url)
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+        }
+    }
+
+    private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
+        return withContext(dispatchers.io()) {
+            bookmarksRepository.getBookmark(url)
         }
     }
 
@@ -999,7 +1011,8 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-        browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite(), isBookmark = isBookmark(url), isFavorite = isFavorite(url)))
+        browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
+        viewModelScope.launch { updateBookmarkState(url) }
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -1399,7 +1412,7 @@ class BrowserTabViewModel(
     fun onBookmarkMenuClicked() {
         val url = url ?: return
         viewModelScope.launch {
-            if (currentBrowserViewState().isBookmark) {
+            if (currentBrowserViewState().bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
                 editSiteBookmark(url)
             } else {
@@ -1424,9 +1437,10 @@ class BrowserTabViewModel(
     }
 
     private suspend fun editSiteBookmark(url: String) {
-        withContext(dispatchers.io()) {
-            bookmarksState.value?.firstOrNull { it.url == url }
-        }?.let {
+        val bookmark = withContext(dispatchers.io()) {
+            browserViewState.value?.bookmark
+        }
+        bookmark?.let {
             withContext(dispatchers.main()) {
                 command.value = ShowEditSavedSiteDialog(it)
             }
@@ -2032,12 +2046,6 @@ class BrowserTabViewModel(
         if (domain == null) return false
         val fireproofWebsites = fireproofWebsiteState.value
         return fireproofWebsites?.any { it.domain == domain } ?: false
-    }
-
-    private fun isBookmark(url: String?): Boolean {
-        if (url == null) return false
-        val bookmarks = bookmarksState.value
-        return bookmarks?.any { it.url == url } ?: false
     }
 
     private fun isFavorite(url: String?): Boolean {

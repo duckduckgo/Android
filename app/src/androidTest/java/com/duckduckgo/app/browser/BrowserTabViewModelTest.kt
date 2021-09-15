@@ -3525,7 +3525,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenDaoIsNotUpdated() = coroutineRule.runBlocking {
-        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
+        val bookmark = Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
         verify(mockBookmarksDao, never()).insert(any())
@@ -3533,7 +3535,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = coroutineRule.runBlocking {
-        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)))
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
@@ -3541,7 +3545,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
-        bookmarksListFlow.send(listOf(Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)))
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())

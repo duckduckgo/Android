@@ -268,4 +268,37 @@ class BookmarksDataRepositoryTest {
 
         assertEquals(emptyList<SavedSite.Bookmark>(), bookmarks.first())
     }
+
+    @Test
+    fun whenBookmarkByUrlRequestedAndAvailableThenReturnBookmark() = runBlocking {
+        val firstBookmark = SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0)
+        val secondBookmark = SavedSite.Bookmark(id = 2, title = "other title", url = "www.other-website.com", parentId = 0)
+
+        repository.insert(firstBookmark)
+        repository.insert(secondBookmark)
+
+        val bookmark = repository.getBookmark("www.website.com")
+
+        assertEquals(firstBookmark, bookmark)
+    }
+
+    @Test
+    fun whenBookmarkByUrlRequestedAndNotAvailableThenReturnNull() = runBlocking {
+        val firstBookmark = SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0)
+        val secondBookmark = SavedSite.Bookmark(id = 2, title = "other title", url = "www.other-website.com", parentId = 0)
+
+        repository.insert(firstBookmark)
+        repository.insert(secondBookmark)
+
+        val bookmark = repository.getBookmark("www.test.com")
+
+        assertNull(bookmark)
+    }
+
+    @Test
+    fun whenBookmarkByUrlRequestedAndNoBookmarksAvailableThenReturnNull() = runBlocking {
+        val bookmark = repository.getBookmark("www.test.com")
+
+        assertNull(bookmark)
+    }
 }

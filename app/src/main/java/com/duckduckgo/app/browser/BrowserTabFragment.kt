@@ -2053,7 +2053,7 @@ class BrowserTabFragment :
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 addBookmarksPopupMenuItem?.text =
-                    getString(if (viewState.isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
+                    getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
                 addFavoritePopupMenuItem.text = when {
                     viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
