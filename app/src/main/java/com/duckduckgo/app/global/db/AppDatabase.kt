@@ -446,7 +446,7 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
-    val MIGRATION_38_TO_39: Migration = object : Migration(37, 38) {
+    val MIGRATION_38_TO_39: Migration = object : Migration(38, 39) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("DELETE FROM user_events WHERE id = \"FIRST_NON_SERP_VISITED_SITE\"")
         }
