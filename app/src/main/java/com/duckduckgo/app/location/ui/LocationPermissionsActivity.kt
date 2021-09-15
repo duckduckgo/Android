@@ -17,7 +17,7 @@
 package com.duckduckgo.app.location.ui
 
 import android.Manifest
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
