@@ -22,7 +22,5 @@ import androidx.work.WorkerParameters
 
 @Deprecated(message = "Worker used during Favorites Onboarding experiment", level = DeprecationLevel.ERROR)
 class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
-    override suspend fun doWork(): Result {
-        return Result.success()
-    }
+    override suspend fun doWork() = Result.success()
 }
