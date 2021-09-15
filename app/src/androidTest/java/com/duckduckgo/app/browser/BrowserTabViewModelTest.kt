@@ -81,8 +81,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.events.db.FavoritesOnboardingWorkRequestBuilder
-import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -279,9 +277,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppLinksHandler: AppLinksHandler
 
     @Mock
-    private lateinit var mockUserEventsRepository: UserEventsRepository
-
-    @Mock
     private lateinit var mockVariantManager: VariantManager
 
     @Mock
@@ -312,8 +307,6 @@ class BrowserTabViewModelTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
-
-    private lateinit var favoritesOnboardingObserver: FavoritesOnboardingObserver
 
     private val context = getInstrumentation().targetContext
 
@@ -357,17 +350,6 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
-        givenDefaultOnboarding()
-
-        val onboardingWorker = FavoritesOnboardingWorkRequestBuilder(workManager, mockVariantManager)
-
-        favoritesOnboardingObserver = FavoritesOnboardingObserver(
-            appCoroutineScope = TestCoroutineScope(),
-            userEventsRepository = mockUserEventsRepository,
-            userStageStore = mockUserStageStore,
-            favoritesOnboardingWorkRequestBuilder = onboardingWorker,
-            variantManager = mockVariantManager
-        )
 
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -380,10 +362,7 @@ class BrowserTabViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            favoritesOnboardingObserver = favoritesOnboardingObserver,
-            dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager,
-            userEventsRepository = mockUserEventsRepository
+            dispatchers = coroutineRule.testDispatcherProvider
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -435,9 +414,7 @@ class BrowserTabViewModelTest {
             favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
-            contentBlocking = mockContentBlocking,
-            variantManager = mockVariantManager,
-            userEventsRepository = mockUserEventsRepository
+            contentBlocking = mockContentBlocking
         )
 
         testee.loadData("abc", null, false, false)
@@ -623,26 +600,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnAddFavoriteItemThenPixelSent() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-
-        testee.onAddFavoriteItemClicked()
-
-        verify(mockPixel).fire(AppPixelName.FAVORITE_HOMETAB_ADD_ITEM_PRESSED)
-    }
-
-    @Test
-    fun whenUserClicksOnAddFavoriteItemAndDaxFavoriteCtaPresentThenCtaDismissed() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-        val cta = DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onAddFavoriteItemClicked()
-
-        assertNull(testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
     fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
 
@@ -819,29 +776,6 @@ class BrowserTabViewModelTest {
         overrideUrl("http://example.com")
 
         verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect("http://example.com"))
-    }
-
-    @Test
-    fun whenPageFinishesThenNotifyUserEventsSiteVisited() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-        loadUrl("http://duckduckgo.com")
-
-        testee.progressChanged(100)
-
-        advanceUntilIdle()
-        verify(mockUserEventsRepository).siteVisited(any(), eq("http://duckduckgo.com"), any())
-    }
-
-    @Test
-    fun whenUserClicksOnAddFavoriteItemAndPageFinishesThenStoreSite() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-        testee.onAddFavoriteItemClicked()
-        loadUrl("http://duckduckgo.com")
-
-        testee.progressChanged(100)
-
-        advanceUntilIdle()
-        verify(mockFavoritesRepository).insert(any(), eq("http://duckduckgo.com"))
     }
 
     @Test
@@ -2054,17 +1988,6 @@ class BrowserTabViewModelTest {
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenCtaShownIfDaxFavoritesCtaThenMoveVisitedSitesToFavorites() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-        val cta = DaxBubbleCta.DaxFavoritesCTA(favoritesOnboardingObserver, mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onCtaShown()
-
-        verify(mockUserEventsRepository).moveVisitedSiteAsFavorite()
     }
 
     @Test
@@ -3622,10 +3545,6 @@ class BrowserTabViewModelTest {
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false, false)
-    }
-
-    private fun givenFavoritesOnboarindExpEnabled() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
     }
 
     private fun givenDefaultOnboarding() {

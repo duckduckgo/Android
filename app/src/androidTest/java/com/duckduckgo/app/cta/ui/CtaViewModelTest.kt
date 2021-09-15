@@ -18,14 +18,9 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.work.Configuration
-import androidx.work.WorkManager
-import androidx.work.impl.utils.SynchronousExecutor
-import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.R
@@ -33,8 +28,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.events.db.FavoritesOnboardingWorkRequestBuilder
-import com.duckduckgo.app.global.events.db.UserEventsDependencies
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -66,7 +59,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -141,23 +133,9 @@ class CtaViewModelTest {
         CtaId.DAX_END
     )
 
-    private lateinit var favoritesOnboardingObserver: FavoritesOnboardingObserver
-
     private lateinit var testee: CtaViewModel
 
     val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    private lateinit var userEventsDependencies: UserEventsDependencies
-
-    private val workManager: WorkManager by lazy {
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .build()
-
-        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
-        return@lazy WorkManager.getInstance(context)
-    }
 
     @Before
     fun before() {
@@ -171,27 +149,6 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
 
-        userEventsDependencies = object : UserEventsDependencies(context, coroutineRule.testDispatcherProvider) {
-            override val db: AppDatabase
-                get() = this@CtaViewModelTest.db
-
-            override val variantManager: VariantManager
-                get() = this@CtaViewModelTest.mockVariantManager
-
-            override val userStageStore: UserStageStore
-                get() = this@CtaViewModelTest.mockUserStageStore
-        }
-
-        val onboardingWorker = FavoritesOnboardingWorkRequestBuilder(workManager, mockVariantManager)
-
-        favoritesOnboardingObserver = FavoritesOnboardingObserver(
-            appCoroutineScope = TestCoroutineScope(),
-            userEventsRepository = userEventsDependencies.userEventsRepository,
-            userStageStore = userEventsDependencies.userStageStore,
-            favoritesOnboardingWorkRequestBuilder = onboardingWorker,
-            variantManager = mockVariantManager
-        )
-
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
@@ -203,10 +160,7 @@ class CtaViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = userEventsDependencies.variantManager,
-            favoritesOnboardingObserver = favoritesOnboardingObserver,
-            userEventsRepository = userEventsDependencies.userEventsRepository
+            dispatchers = coroutineRule.testDispatcherProvider
         )
     }
 
@@ -528,19 +482,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownAndVisitedSitePresentThenFavoritesCtaShown() = coroutineRule.runBlocking {
-        givenFavoritesOnboarindExpEnabled()
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        givenAtLeastOneDaxDialogCtaShown()
-        userEventsDependencies.userEventsRepository.siteVisited("1", "http://example.com", "example")
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-
-        assertTrue(value is DaxBubbleCta.DaxFavoritesCTA)
-    }
-
-    @Test
     fun whenRefreshCtaWhileBrowsingWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnNull() = runBlockingTest {
         givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
         givenUserIsEstablished()
@@ -725,10 +666,6 @@ class CtaViewModelTest {
 
     private suspend fun givenOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun givenFavoritesOnboarindExpEnabled() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
     }
 
     private fun site(
