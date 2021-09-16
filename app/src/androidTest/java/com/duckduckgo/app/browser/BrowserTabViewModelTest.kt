@@ -3569,6 +3569,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() = coroutineRule.runBlocking {
         val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
@@ -3580,6 +3581,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = coroutineRule.runBlocking {
         val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
@@ -3589,6 +3591,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
         val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()

@@ -2057,7 +2057,7 @@ class BrowserTabFragment :
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
                 addFavoritePopupMenuItem.text = when {
                     viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
-                    viewState.isFavorite -> getString(R.string.removeFavoriteMenuTitle)
+                    viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
                     else -> getString(R.string.addFavoriteMenuTitle)
                 }
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite

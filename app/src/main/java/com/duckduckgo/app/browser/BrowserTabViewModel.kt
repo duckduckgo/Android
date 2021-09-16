@@ -196,7 +196,7 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
-        val isFavorite: Boolean = false,
+        val favorite: SavedSite.Favorite? = null,
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
@@ -464,11 +464,12 @@ class BrowserTabViewModel(
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
         }.launchIn(viewModelScope)
 
-        favoritesRepository.favorites().onEach { favorite ->
-            val favorites = favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
+        favoritesRepository.favorites().onEach { favoriteSites ->
+            val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
             ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
             autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
-            browserViewState.value = currentBrowserViewState().copy(isFavorite = isFavorite(site?.url))
+            val favorite = favoriteSites.firstOrNull { it.url == url }
+            browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
         }.launchIn(viewModelScope)
 
         bookmarksRepository.bookmarks().onEach { bookmarks ->
@@ -908,7 +909,6 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addFavorite = addFavorite,
-            isFavorite = isFavorite(url),
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
@@ -932,7 +932,7 @@ class BrowserTabViewModel(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
 
-        viewModelScope.launch { updateBookmarkState(url) }
+        viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
@@ -965,16 +965,23 @@ class BrowserTabViewModel(
         }
     }
 
-    private suspend fun updateBookmarkState(url: String) {
+    private suspend fun updateBookmarkAndFavoriteState(url: String) {
         val bookmark = getBookmark(url)
+        val favorite = getFavorite(url)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark, favorite = favorite)
         }
     }
 
     private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
         return withContext(dispatchers.io()) {
             bookmarksRepository.getBookmark(url)
+        }
+    }
+
+    private suspend fun getFavorite(url: String): SavedSite.Favorite? {
+        return withContext(dispatchers.io()) {
+            favoritesRepository.favorite(url)
         }
     }
 
@@ -1012,7 +1019,7 @@ class BrowserTabViewModel(
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
         browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
-        viewModelScope.launch { updateBookmarkState(url) }
+        viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -1449,12 +1456,12 @@ class BrowserTabViewModel(
 
     fun onFavoriteMenuClicked() {
         val url = url ?: return
-
-        val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
-        if (currentBrowserViewState().isFavorite) {
+        val favorite = currentBrowserViewState().favorite
+        if (favorite != null) {
             pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
-            removeFavoriteSite(url)
+            removeFavoriteSite(favorite)
         } else {
+            val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
             pixel.fire(
                 AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
                 mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString())
@@ -1463,30 +1470,26 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun removeFavoriteSite(url: String) {
+    private fun removeFavoriteSite(favorite: SavedSite.Favorite) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                currentCtaViewState().favorites.firstOrNull {
-                    it.favorite.url == url
-                }?.apply {
-                    favoritesRepository.delete(this.favorite)
-                }
-            }?.let {
-                withContext(dispatchers.main()) {
-                    command.value = DeleteSavedSiteConfirmation(it.favorite)
-                }
+                favoritesRepository.delete(favorite)
+            }
+            withContext(dispatchers.main()) {
+                command.value = DeleteSavedSiteConfirmation(favorite)
             }
         }
     }
 
     private fun saveFavoriteSite(url: String, title: String) {
         viewModelScope.launch {
-            withContext(dispatchers.io()) {
+            val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
                     favoritesRepository.insert(title = title, url = url)
                 } else null
-            }?.let {
+            }
+            favorite?.let {
                 withContext(dispatchers.main()) {
                     command.value = ShowSavedSiteAddedConfirmation(it)
                 }
@@ -2046,12 +2049,6 @@ class BrowserTabViewModel(
         if (domain == null) return false
         val fireproofWebsites = fireproofWebsiteState.value
         return fireproofWebsites?.any { it.domain == domain } ?: false
-    }
-
-    private fun isFavorite(url: String?): Boolean {
-        if (url == null) return false
-        val favorites = currentCtaViewState().favorites
-        return favorites.any { it.favorite.url == url }
     }
 
     private fun invalidateBrowsingActions() {
