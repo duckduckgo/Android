@@ -34,8 +34,8 @@ class TrackerDetectorTest {
     private val mockEntityLookup: EntityLookup = mock()
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
-    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockContentBlocking)
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockWebTrackersBlockedDao)
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
