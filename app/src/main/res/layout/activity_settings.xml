@@ -20,8 +20,12 @@
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.settings.SettingsActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_settings" />
+    <include
+        android:id="@+id/includeSettings"
+        layout="@layout/content_settings" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
