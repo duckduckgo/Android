@@ -29,6 +29,7 @@
         android:paddingBottom="20dp">
 
         <include
+            android:id="@+id/contentSettingsGeneral"
             layout="@layout/content_settings_general"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,9 +41,10 @@
             style="@style/SettingsGroupDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionGeneral" />
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsGeneral" />
 
         <include
+            android:id="@+id/contentSettingsPrivacy"
             layout="@layout/content_settings_privacy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,20 +55,21 @@
             style="@style/SettingsGroupDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacy" />
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsPrivacy" />
 
         <include
-            android:id="@+id/settingsSectionOtherBottomDivider"
+            android:id="@+id/contentSettingsOther"
             layout="@layout/content_settings_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
 
         <include
+            android:id="@+id/contentSettingsInternal"
             layout="@layout/content_settings_internal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionOtherBottomDivider" />
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsOther" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
