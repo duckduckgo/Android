@@ -147,6 +147,39 @@ class FavoritesDataRepositoryTest {
         assertTrue(repository.userHasFavorites())
     }
 
+    @Test
+    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = coroutineRule.runBlocking {
+        val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
+        val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
+
+        repository.insert(favorite)
+        repository.insert(otherFavorite)
+
+        val result = repository.favorite("www.website.com")
+
+        assertEquals(favorite, result)
+    }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = coroutineRule.runBlocking {
+        val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
+        val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
+
+        repository.insert(favorite)
+        repository.insert(otherFavorite)
+
+        val result = repository.favorite("www.test.com")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = coroutineRule.runBlocking {
+        val result = repository.favorite("www.test.com")
+
+        assertNull(result)
+    }
+
     private fun givenFavorite(vararg favorite: Favorite) {
         favorite.forEach {
             favoritesDao.insert(FavoriteEntity(it.id, it.title, it.url, it.position))
