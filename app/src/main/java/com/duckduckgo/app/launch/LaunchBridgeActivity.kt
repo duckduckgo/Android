@@ -66,7 +66,6 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private fun showOnboarding() {
         startActivity(OnboardingActivity.intent(this))
-        startActivity(SettingsActivity.intent(this))
         finish()
     }
 
