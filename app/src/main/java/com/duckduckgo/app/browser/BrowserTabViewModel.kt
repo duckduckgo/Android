@@ -1419,9 +1419,10 @@ class BrowserTabViewModel(
     fun onBookmarkMenuClicked() {
         val url = url ?: return
         viewModelScope.launch {
-            if (currentBrowserViewState().bookmark != null) {
+            val bookmark = currentBrowserViewState().bookmark
+            if (bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
-                editSiteBookmark(url)
+                onEditSavedSiteRequested(bookmark)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                 saveSiteBookmark(url, title ?: "")
@@ -1440,17 +1441,6 @@ class BrowserTabViewModel(
         }
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
-        }
-    }
-
-    private suspend fun editSiteBookmark(url: String) {
-        val bookmark = withContext(dispatchers.io()) {
-            browserViewState.value?.bookmark
-        }
-        bookmark?.let {
-            withContext(dispatchers.main()) {
-                command.value = ShowEditSavedSiteDialog(it)
-            }
         }
     }
 
