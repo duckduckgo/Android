@@ -29,7 +29,6 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 
 class FireAnimationActivity : DuckDuckGoActivity() {
 
@@ -67,9 +66,9 @@ class FireAnimationActivity : DuckDuckGoActivity() {
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator?) {
-            fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
-            if (fireAnimationView.speed > ANIMATION_MAX_SPEED) {
-                fireAnimationView.removeUpdateListener(this)
+            binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
+            if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
+                binding.fireAnimationView.removeUpdateListener(this)
             }
         }
     }
