@@ -18,7 +18,6 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.extensions.extractETag
-import com.duckduckgo.app.global.filterBlankItems
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader

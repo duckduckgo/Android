@@ -90,7 +90,7 @@ class NewAppBroadcastReceiver @Inject constructor(
 
     @WorkerThread
     private suspend fun isInExclusionList(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext appTrackerRepository.getAppExclusionList().contains(packageName)
+        return@withContext appTrackerRepository.getAppExclusionList().any { it.packageId == packageName }
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {

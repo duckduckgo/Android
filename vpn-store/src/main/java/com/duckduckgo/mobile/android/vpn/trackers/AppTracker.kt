@@ -67,6 +67,12 @@ data class AppTrackerExceptionRuleMetadata(
     val eTag: String?
 )
 
+@Entity(tableName = "vpn_app_tracker_manual_exclusion_list")
+data class AppTrackerManualExcludedApp(
+    @PrimaryKey val packageId: String,
+    val isProtected: Boolean
+)
+
 data class JsonAppBlockingList(
     val trackers: Map<String, JsonAppTracker>,
     val packageNames: Map<String, String>

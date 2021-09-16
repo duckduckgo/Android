@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.di.VpnScope
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.vpn.internal.feature.VpnInternalSettingsActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -30,9 +30,9 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@VpnScope
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = VpnObjectGraph::class
 )
 interface VpnInternalSettingsActivityComponent : AndroidInjector<VpnInternalSettingsActivity> {
     @Subcomponent.Factory

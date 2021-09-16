@@ -135,15 +135,31 @@
 
     <!-- Exclusion List -->
     <string name="atp_ExcludedApps">Excluded Apps</string>
-    <string name="atp_ExclusionListActivityTitle">App Exceptions</string>
-    <string name="atp_ExcludedAppsFeature">App Tracking Protection helps stop companies from tracking you, except in apps they own. For example, Facebook can track you in the Facebook app, but App Tracking Protection helps block them in the Nextdoor app.\n\nApp Tracking Protection excludes some apps so they work as expected.</string>
-    <string name="atp_ExcludedAppsKnownIssuesLabel">Some apps experience problems when their tracking attempts fail. We\'ve excluded them to temporarily so they work as expected.</string>
-    <string name="atp_ExcludedOtherAppsLabel">App Tracking Protection also excludes browsers, search apps, and other apps that frequently load websites so that site content appears as expected.</string>
-    <string name="atp_ExcludedOtherAppsBottomLabel">To block website trackers, consider opening links within the DuckDuckGo app instead.</string>
-    <string name="atp_ExcludedAppsKnownIssuesHeader">Apps with known issues (%s)</string>
-    <string name="atp_ExcludedOtherAppsHeader">Other apps (%s)</string>
+    <string name="atp_ExclusionListActivityTitle">Protection for Your Apps</string>
+    <string name="atp_ExcludedAppsFeature">App Tracking Protection blocks app trackers from other companies, like when Facebook tries to track you in a banking app. Companies might still track you in apps they own.\n\nIf an app isn\'t working as expected, try disabling protection for that app.</string>
+    <string name="atp_ExcludedAppsKnownIssuesLabel">While this feature is in beta, we may disable protection for certain apps, such as those with known issues. Your custom settings won\'t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
     <string name="atp_ExcludedAppEntry">%s app</string>
+    <string name="atp_ExcludedReasonLoadsWebsites">Loads websites</string>
+    <string name="atp_ExcludedReasonKnownIssues">Known issues</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Manually disabled</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">Cancel</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnable">Enable</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppName">Manually enable protection for %s app?</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience problems when tracking attempts fail.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection disabled</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppLabel">Why did you disable Privacy Protection for %s app?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">I don\'t use this app often</string>
+    <string name="atp_ExcludeAppsManuallyCTASubmit">Submit</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100% anonymous and only includes your selection above.</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Your custom protection settings will update to our latest default protections. You can always change your protection settings again later.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Protection restored to default settings</string>
 
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">About App Trackers</string>
@@ -157,7 +173,9 @@
     <string name="atp_ActivityRecentActivity">Recent Activity</string>
     <string name="atp_ActivityCtaShowAll">View All Recent Activity</string>
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
+    <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
+    <string name="atp_ActivityManageProtection">Manage Protection for Your Apps</string>
     <string name="atp_ActivityTrackersBlocked">%1d tracking attempts blocked in <![CDATA[<b>%2s</b>]]> app</string>
     <string name="atp_ActivityTrackersCountOne">from %1$s</string>
     <string name="atp_ActivityTrackersCountTwo">from %1$s and 1 other</string>
@@ -185,10 +203,10 @@
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
-    <string name="atp_FAQFirstHeader">What trackers does App Tracking Protection block?</string>
-    <string name="atp_FAQFirstText"><b>App Tracking Protection blocks known trackers that it identifies from third-party companies, or those different from the company that owns each app.</b> For example, if Facebook owns the app, App Tracking Protection doesn’t block its trackers, but would block trackers from Google or Amazon. We’re always on the lookout for other trackers for App Tracking Protection to block.\n\nSome apps and known trackers might be excluded automatically based on whether they’d work properly with App Tracking Protection enabled.</string>
+    <string name="atp_FAQFirstHeader">How does App Tracking Protection work?</string>
+    <string name="atp_FAQFirstText"><b>App Tracking Protection blocks app trackers from other companies, like when Facebook tries to track you in a banking app</b> Companies may still track you in apps they own.</string>
     <string name="atp_FAQSecondHeader">Does App Tracking Protection block trackers in all my apps?</string>
-    <string name="atp_FAQSecondText">Some apps experience problems when their tracking attempts fail. <b>We\'ve excluded them temporarily so they work as expected.</b> App Tracking Protection also excludes browsers, search apps, and other apps that frequently load websites so that site content appears normally.</string>
+    <string name="atp_FAQSecondText"><b>Some protection for apps amy be automatically disabled due to known issues oor so that site content appears normally</b>This is mostly temporary as we work to improve App Tracking Protection. You can choose to manage this protection in the settings.</string>
     <string name="atp_FAQThirdHeader">Why does App Tracking Protection use a VPN connection?</string>
     <string name="atp_FAQThirdText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for App Tracking Protection to work.</b>\n\nThis permission, which works only on your device, allows App Tracking Protection to monitor network traffic <b>so that it can block known trackers.</b></string>
     <string name="atp_FAQFourthHeader">How is App Tracking Protection different from a VPN?</string>

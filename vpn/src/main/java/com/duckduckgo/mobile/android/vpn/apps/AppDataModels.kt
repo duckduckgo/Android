@@ -51,6 +51,17 @@ data class VpnExcludedInstalledAppInfo(
     val name: String? = null,
     val type: String? = null,
     val category: AppCategory = AppCategory.Undefined,
-    val isDdgApp: Boolean = false,
-    val isExcludedFromVpn: Boolean = true
-)
+    val isExcluded: Boolean = false,
+    val excludingReason: Int
+) {
+    companion object {
+        const val NO_ISSUES = 0
+        const val KNOWN_ISSUES_EXCLUSION_REASON = 1
+        const val LOADS_WEBSITES_EXCLUSION_REASON = 2
+        const val MANUALLY_EXCLUDED = 3
+    }
+
+    fun hasExcludingReason(): Boolean {
+        return excludingReason > 0
+    }
+}

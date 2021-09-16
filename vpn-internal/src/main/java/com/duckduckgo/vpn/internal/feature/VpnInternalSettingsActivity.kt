@@ -20,15 +20,23 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
+import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
 import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var vpnBugReporter: VpnBugReporter
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -58,11 +66,36 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupTransparencyMode()
         setupAppTrackerExceptionRules()
         setupDebugLogging()
+        setupBugReport()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         transparencyModeDebugReceiver?.let { it.unregister() }
+    }
+
+    private fun setupBugReport() {
+        binding.apptpBugreport.setTitle("Generate AppTP bug report")
+        binding.apptpBugreport.setIsLoading(false)
+        binding.apptpBugreport.setOnClickListener {
+            lifecycleScope.launch {
+                binding.apptpBugreport.setIsLoading(true)
+                val bugreport = vpnBugReporter.generateBugReport()
+                shareBugReport(bugreport)
+                binding.apptpBugreport.setIsLoading(false)
+            }
+        }
+    }
+
+    private fun shareBugReport(report: String) {
+        Snackbar.make(binding.root, "AppTP bug report generated", Snackbar.LENGTH_INDEFINITE)
+            .setAction("Share") {
+                Intent(Intent.ACTION_SEND).run {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, report)
+                    startActivity(Intent.createChooser(this, "Share AppTP bug report"))
+                }
+            }.show()
     }
 
     private fun setupAppTrackerExceptionRules() {

@@ -76,4 +76,7 @@
     <!-- PopupMenu -->
     <dimen name="popupMenuItemHeight">48dp</dimen>
 
+    <!-- Dialogs -->
+    <dimen name="dialogButtonHeight">40dp</dimen>
+
 </resources>

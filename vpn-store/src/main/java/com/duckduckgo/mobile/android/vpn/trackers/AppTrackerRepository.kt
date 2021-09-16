@@ -18,12 +18,25 @@ package com.duckduckgo.mobile.android.vpn.trackers
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
+import kotlinx.coroutines.flow.Flow
 
 @WorkerThread
 interface AppTrackerRepository {
     fun findTracker(hostname: String, packageName: String): AppTrackerType
 
-    fun getAppExclusionList(): List<String>
+    fun getAppExclusionList(): List<AppTrackerExcludedPackage>
+
+    fun getAppExclusionListFlow(): Flow<List<AppTrackerExcludedPackage>>
+
+    fun getManualAppExclusionList(): List<AppTrackerManualExcludedApp>
+
+    fun getManualAppExclusionListFlow(): Flow<List<AppTrackerManualExcludedApp>>
+
+    fun manuallyExcludedApp(packageName: String)
+
+    fun manuallyEnabledApp(packageName: String)
+
+    fun restoreDefaultProtectedList()
 }
 
 class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao) : AppTrackerRepository {
@@ -43,8 +56,32 @@ class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrack
         return tracker.owner.name == entityName.entityName
     }
 
-    override fun getAppExclusionList(): List<String> {
-        return vpnAppTrackerBlockingDao.getAppExclusionList().map { it.packageId }
+    override fun getAppExclusionList(): List<AppTrackerExcludedPackage> {
+        return vpnAppTrackerBlockingDao.getAppExclusionList()
+    }
+
+    override fun getAppExclusionListFlow(): Flow<List<AppTrackerExcludedPackage>> {
+        return vpnAppTrackerBlockingDao.getAppExclusionListFlow()
+    }
+
+    override fun getManualAppExclusionList(): List<AppTrackerManualExcludedApp> {
+        return vpnAppTrackerBlockingDao.getManualAppExclusionList()
+    }
+
+    override fun getManualAppExclusionListFlow(): Flow<List<AppTrackerManualExcludedApp>> {
+        return vpnAppTrackerBlockingDao.getManualAppExclusionListFlow()
+    }
+
+    override fun manuallyExcludedApp(packageName: String) {
+        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(AppTrackerManualExcludedApp(packageName, false))
+    }
+
+    override fun manuallyEnabledApp(packageName: String) {
+        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(AppTrackerManualExcludedApp(packageName, true))
+    }
+
+    override fun restoreDefaultProtectedList() {
+        vpnAppTrackerBlockingDao.deleteManualAppExclusionList()
     }
 
 }

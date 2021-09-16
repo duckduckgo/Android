@@ -26,7 +26,7 @@ import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.mobile.android.vpn.apps.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionProtectedApps
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -51,7 +51,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var vpnPreferences: VpnPreferences
 
     @Inject
-    lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
+    lateinit var deviceShieldExcludedApps: TrackingProtectionProtectedApps
 
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
@@ -203,9 +203,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
             } else {
                 safelyAddDisallowedApps(
-                    deviceShieldExcludedApps.getExclusionAppList()
-                        .filter { it.isExcludedFromVpn }
-                        .map { it.packageName }
+                    deviceShieldExcludedApps.getExclusionAppsList()
                 )
             }
 
@@ -264,7 +262,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */ }
+            VpnStopReason.SelfStop -> { /* noop */
+            }
             VpnStopReason.Error -> deviceShieldPixels.startError()
             VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
