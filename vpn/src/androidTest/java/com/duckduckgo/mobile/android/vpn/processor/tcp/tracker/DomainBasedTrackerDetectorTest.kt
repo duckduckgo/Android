@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ContentTypeExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.TlsContentType.TlsApplicationData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -51,6 +54,8 @@ class DomainBasedTrackerDetectorTest {
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val tcb: TCB = mock()
     private val appTrackerRepository: AppTrackerRepository = mock()
+    private val payloadBytesExtractor: PayloadBytesExtractor = mock()
+    private val tlsContentTypeExtractor: ContentTypeExtractor = mock()
     private val appTrackerRecorder: AppTrackerRecorder = mock()
     private val defaultOriginatingApp = AppNameResolver.OriginatingApp("foo.id.com", "Foo App")
 
@@ -68,7 +73,7 @@ class DomainBasedTrackerDetectorTest {
             .build()
 
         testee = DomainBasedTrackerDetector(
-            deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, vpnDatabase,
+            deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase,
             object : PluginPoint<VpnTrackerDetectorInterceptor> {
                 override fun getPlugins(): Collection<VpnTrackerDetectorInterceptor> {
                     return listOf()
@@ -95,6 +100,7 @@ class DomainBasedTrackerDetectorTest {
     fun whenTrackerType3rdPartyThenTrackerBlocked() {
         val trackerDomain = "doubleclick.net".also {
             givenExtractedHostname(it)
+            whenever(tlsContentTypeExtractor.isTlsApplicationData(anyOrNull())).thenReturn(TlsApplicationData)
             whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
         }
         testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), defaultOriginatingApp)
@@ -156,6 +162,7 @@ class DomainBasedTrackerDetectorTest {
     fun whenTrackerDetectedAndAndUnknownAppThenSkipDbInsertion() {
         val trackerDomain = "doubleclick.net".also {
             givenExtractedHostname(it)
+            whenever(tlsContentTypeExtractor.isTlsApplicationData(anyOrNull())).thenReturn(TlsApplicationData)
             whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
         }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("foo.id.com", "Unknown"))
@@ -168,9 +175,11 @@ class DomainBasedTrackerDetectorTest {
     fun whenTrackerDetectedAndAndDDGAppThenSkipDbInsertion() {
         val trackerDomain = "doubleclick.net".also {
             givenExtractedHostname(it)
+            whenever(tlsContentTypeExtractor.isTlsApplicationData(anyOrNull())).thenReturn(TlsApplicationData)
             whenever(appTrackerRepository.findTracker(eq(it), any())).thenReturn(aThirdPartyTracker(it))
         }
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("com.duckduckgo.mobile.vpn", "DDG App"))
+        val type =
+            testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress(), AppNameResolver.OriginatingApp("com.duckduckgo.mobile.vpn", "DDG App"))
         assertEquals(Tracker(trackerDomain), type)
         assertTrue(vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(noStartDate(), noEndDate()).isEmpty())
 
@@ -185,7 +194,7 @@ class DomainBasedTrackerDetectorTest {
     }
 
     private fun givenExtractedHostname(desiredHostname: String?) {
-        whenever(hostnameExtractor.extract(any(), any(), any())).thenReturn(desiredHostname)
+        whenever(hostnameExtractor.extract(any(), anyOrNull())).thenReturn(desiredHostname)
     }
 
     private fun RequestTrackerType.assertNotTracker() {

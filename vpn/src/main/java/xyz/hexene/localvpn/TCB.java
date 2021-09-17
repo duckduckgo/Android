@@ -21,10 +21,12 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import timber.log.Timber;
 
-/** Transmission Control Block */
 public class TCB {
     public final long creationTime;
     public String ipAndPort;
@@ -39,6 +41,7 @@ public class TCB {
     public boolean isTracker = false;
     public boolean trackerTypeDetermined = false;
     public String trackerHostName = null;
+    @Nullable public Long stopRespondingTime;
 
     public Boolean requestingAppDetermined = false;
     public String requestingAppPackage = null;

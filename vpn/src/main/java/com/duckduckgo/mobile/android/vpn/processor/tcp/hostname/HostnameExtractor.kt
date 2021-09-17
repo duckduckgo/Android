@@ -17,35 +17,28 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import timber.log.Timber
-import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
-import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 interface HostnameExtractor {
 
-    fun extract(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String?
+    fun extract(tcb: TCB, payloadBytes: ByteArray): String?
 
 }
 
 class AndroidHostnameExtractor(
     private val hostnameHeaderExtractor: HostnameHeaderExtractor,
-    private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
-    private val payloadBytesExtractor: PayloadBytesExtractor
+    private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor
 ) : HostnameExtractor {
 
-    override fun extract(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String? {
+    override fun extract(tcb: TCB, payloadBytes: ByteArray): String? {
         if (tcb.hostName != null) return tcb.hostName
-        determineHost(tcb, packet, payloadBuffer)
+        determineHost(tcb, payloadBytes)
         Timber.i("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
         return tcb.hostName
     }
 
-    private fun determineHost(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer) {
-        if (tcb.hostName != null) return
-
-        val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
-
+    private fun determineHost(tcb: TCB, payloadBytes: ByteArray) {
         var host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
         if (host != null) {
             Timber.v("Found domain from plaintext headers: %s", host)

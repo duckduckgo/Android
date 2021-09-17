@@ -25,6 +25,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
@@ -33,15 +35,13 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
+import java.lang.Runnable
 import java.nio.ByteBuffer
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
@@ -57,8 +57,11 @@ class TcpPacketProcessor @AssistedInject constructor(
     originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     appNameResolver: AppNameResolver,
     @TcpNetworkSelector selector: Selector,
-    private val tcbCloser: TCBCloser,
+    tcbCloser: TCBCloser,
+    hostnameExtractor: HostnameExtractor,
+    payloadBytesExtractor: PayloadBytesExtractor,
     tcpSocketWriter: TcpSocketWriter,
+    recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope
 ) : Runnable {
 
@@ -69,6 +72,7 @@ class TcpPacketProcessor @AssistedInject constructor(
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
+    private var staleTcpConnectionCleanerJob: Job? = null
 
     private val tcpNetworkToDevice = TcpNetworkToDevice(
         queues = queues,
@@ -90,6 +94,9 @@ class TcpPacketProcessor @AssistedInject constructor(
             originatingAppPackageResolver = originatingAppPackageResolver,
             appNameResolver = appNameResolver,
             tcbCloser = tcbCloser,
+            hostnameExtractor = hostnameExtractor,
+            payloadBytesExtractor = payloadBytesExtractor,
+            recentAppTrackerCache = recentAppTrackerCache,
             vpnCoroutineScope = vpnCoroutineScope
         )
 
@@ -104,6 +111,17 @@ class TcpPacketProcessor @AssistedInject constructor(
             pollJobNetworkToDevice = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
         }
 
+        if (staleTcpConnectionCleanerJob == null) {
+            staleTcpConnectionCleanerJob = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { periodicConnectionCleanup() }
+        }
+
+    }
+
+    private suspend fun periodicConnectionCleanup() {
+        while (staleTcpConnectionCleanerJob?.isActive == true) {
+            tcpDeviceToNetwork.cleanupStaleConnections()
+            delay(PERIODIC_STALE_CONNECTION_CLEANUP_PERIOD_MS)
+        }
     }
 
     fun stop() {
@@ -114,6 +132,9 @@ class TcpPacketProcessor @AssistedInject constructor(
 
         pollJobNetworkToDevice?.cancel()
         pollJobNetworkToDevice = null
+
+        staleTcpConnectionCleanerJob?.cancel()
+        staleTcpConnectionCleanerJob = null
     }
 
     private fun pollForDeviceToNetworkWork() {
@@ -270,6 +291,7 @@ class TcpPacketProcessor @AssistedInject constructor(
         }
 
         private val MAX_SEQUENCE_NUMBER = (2.0.pow(32.0) - 1).toLong()
+        private const val PERIODIC_STALE_CONNECTION_CLEANUP_PERIOD_MS = 30_000L
     }
 
 }

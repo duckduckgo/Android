@@ -24,7 +24,7 @@ interface EncryptedRequestHostExtractor {
 }
 
 // based on https://www.ietf.org/rfc/rfc5246.txt
-class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
+class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: TlsMessageDetector) : EncryptedRequestHostExtractor {
 
     override fun extract(packet: ByteArray): String? {
 
@@ -105,7 +105,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
     }
 
     private fun isClientHelloProtocol(packet: ByteArray): Boolean {
-        if (packet.size < TLS_HEADER_SIZE) {
+        if (!tlsMessageDetector.isTlsMessage(packet)) {
             return false
         }
 
@@ -114,6 +114,10 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         val tlsVersionMinor = packet[2].toInt()
 
         Timber.v("Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d", tlsVersionMajor, tlsVersionMinor, contentType, packet.size)
+
+        if (packet.size < TLS_HEADER_SIZE) {
+            return false
+        }
 
         if (tlsVersionMajor < 0x03) {
             Timber.v("TLS version wouldn't include a SNI header so no point in looking further for it")

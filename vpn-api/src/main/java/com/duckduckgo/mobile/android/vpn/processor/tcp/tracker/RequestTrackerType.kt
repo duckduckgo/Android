@@ -22,6 +22,10 @@ sealed class RequestTrackerType {
         override fun toString(): String = "Tracker: $hostName"
     }
 
+    data class TrackerDelayedBlock(val hostName: String) : RequestTrackerType() {
+        override fun toString(): String = "Delayed Tracker: $hostName"
+    }
+
     data class NotTracker(val hostName: String) : RequestTrackerType() {
         override fun toString(): String = "Not a tracker: $hostName"
     }

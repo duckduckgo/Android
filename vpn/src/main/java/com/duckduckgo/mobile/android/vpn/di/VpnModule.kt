@@ -79,18 +79,17 @@ class VpnModule {
     fun provideNameHeaderExtractor(): HostnameHeaderExtractor = PlaintextHostHeaderExtractor()
 
     @Provides
-    fun provideEncryptedRequestHostExtractor(): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
+    fun provideEncryptedRequestHostExtractor(tlsMessageDetector: TlsMessageDetector): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor(tlsMessageDetector)
 
     @Provides
-    fun providePayloadBytesExtractor(): PayloadBytesExtractor = PayloadBytesExtractor()
+    fun providePayloadBytesExtractor(): PayloadBytesExtractor = ConcretePayloadBytesExtractor()
 
     @Provides
     fun provideAndroidHostnameExtractor(
         hostnameHeaderExtractor: HostnameHeaderExtractor,
-        encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
-        payloadBytesExtractor: PayloadBytesExtractor
+        encryptedRequestHostExtractor: EncryptedRequestHostExtractor
     ): HostnameExtractor {
-        return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
+        return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor)
     }
 
     @VpnScope
@@ -110,10 +109,18 @@ class VpnModule {
         hostnameExtractor: HostnameExtractor,
         appTrackerRepository: AppTrackerRepository,
         appTrackerRecorder: AppTrackerRecorder,
+        payloadBytesExtractor: PayloadBytesExtractor,
         vpnDatabase: VpnDatabase,
+        tlsContentTypeExtractor: ContentTypeExtractor,
         requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
     ): VpnTrackerDetector {
-        return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, vpnDatabase, requestInterceptors)
+        return DomainBasedTrackerDetector(deviceShieldPixels, hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase, requestInterceptors)
+    }
+
+    @VpnScope
+    @Provides
+    fun providesContentTypeExtractor(tlsMessageDetector: TlsMessageDetector): ContentTypeExtractor {
+        return TlsContentTypeExtractor(tlsMessageDetector)
     }
 
     @VpnScope

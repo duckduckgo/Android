@@ -27,6 +27,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
@@ -60,6 +62,9 @@ class TcpDeviceToNetwork(
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     private val appNameResolver: AppNameResolver,
     private val tcbCloser: TCBCloser,
+    private val hostnameExtractor: HostnameExtractor,
+    private val payloadBytesExtractor: PayloadBytesExtractor,
+    private val recentAppTrackerCache: RecentAppTrackerCache,
     private val vpnCoroutineScope: CoroutineScope
 ) {
 
@@ -215,6 +220,14 @@ class TcpDeviceToNetwork(
         }
     }
 
+    private fun isARetryForRecentlyBlockedTracker(requestingApp: OriginatingApp, hostName: String?): Boolean {
+        if (hostName == null) return false
+        val recentTrackerEvent = recentAppTrackerCache.getRecentTrackingAttempt(requestingApp.packageId, hostName) ?: return false
+        val timeSinceTrackerRequested = System.currentTimeMillis() - recentTrackerEvent.timestamp
+        Timber.v("Tracker %s was last sent by %s %dms ago", hostName, requestingApp.packageId, timeSinceTrackerRequested)
+        return true
+    }
+
     private fun processPacket(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
@@ -225,12 +238,28 @@ class TcpDeviceToNetwork(
 
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestingApp = determineRequestingApp(tcb, packet)
+            val hostName = determineHostName(tcb, packet, payloadBuffer)
             val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
-            Timber.i("App %s attempting to send %d bytes to %s. %s", requestingApp, payloadSize, tcb.ipAndPort, requestType)
+            val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName)
+            Timber.i(
+                "App %s attempting to send %d bytes to (%s). %s host=%s, localAddress=%s, retry=%s",
+                requestingApp,
+                payloadSize,
+                tcb.ipAndPort,
+                requestType,
+                hostName,
+                isLocalAddress,
+                isATrackerRetryRequest
+            )
 
             if (requestType is RequestTrackerType.Tracker) {
-                // TODO - validate the best option here: send RESET, FIN or DROP packet?
-                tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
+                processTrackingRequestPacket(
+                    isATrackerRetryRequest,
+                    tcb,
+                    requestingApp,
+                    packet,
+                    payloadSize
+                )
                 return
             }
 
@@ -269,6 +298,36 @@ class TcpDeviceToNetwork(
         }
     }
 
+    private fun processTrackingRequestPacket(isATrackerRetryRequest: Boolean, tcb: TCB, requestingApp: OriginatingApp, packet: Packet, payloadSize: Int) {
+        if (isATrackerRetryRequest) {
+            tcb.enterGhostingMode()
+            processPacketInGhostingMode(tcb)
+        } else {
+            Timber.i("Blocking tracker request. [%s] ---> [%s] %s", tcb.requestingAppPackage, tcb.trackerHostName, tcb.ipAndPort)
+
+            recentAppTrackerCache.addTrackerForApp(requestingApp.packageId, tcb.hostName, tcb.ipAndPort)
+            tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
+        }
+    }
+
+    private fun processPacketInGhostingMode(tcb: TCB) {
+        val ghostingDuration = (System.currentTimeMillis() - tcb.getGhostingStartTime()).coerceAtLeast(0)
+
+        Timber.v(
+            "Blocking tracker request (dropping packet). [%s] ---> [%s] %s. Ghosting for %sms",
+            tcb.requestingAppPackage,
+            tcb.trackerHostName,
+            tcb.ipAndPort,
+            ghostingDuration
+        )
+    }
+
+    private fun determineHostName(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String? {
+        if (tcb.hostName != null) return tcb.hostName
+        val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
+        return hostnameExtractor.extract(tcb, payloadBytes)
+    }
+
     private fun determineIfTracker(
         tcb: TCB,
         packet: Packet,
@@ -276,6 +335,7 @@ class TcpDeviceToNetwork(
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean
     ): RequestTrackerType {
+        Timber.v("Determining if a tracker. Already determined? %s", tcb.trackerTypeDetermined)
         if (tcb.trackerTypeDetermined) {
             return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
                 tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
@@ -303,4 +363,21 @@ class TcpDeviceToNetwork(
         return OriginatingApp(packageId, tcb.requestingAppName)
     }
 
+    private fun TCB.getGhostingStartTime(): Long {
+        val currentTimestamp = System.currentTimeMillis()
+        val originalGhostingTimestamp = stopRespondingTime
+
+        if (originalGhostingTimestamp != null) {
+            return originalGhostingTimestamp
+        }
+        return currentTimestamp.also { stopRespondingTime = it }
+    }
+
+    fun cleanupStaleConnections() {
+        recentAppTrackerCache.cleanupStaleConnections()
+    }
+
+    private fun TCB.enterGhostingMode() {
+        if (stopRespondingTime == null) stopRespondingTime = System.currentTimeMillis()
+    }
 }

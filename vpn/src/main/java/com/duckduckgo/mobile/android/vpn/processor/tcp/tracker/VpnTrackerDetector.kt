@@ -21,7 +21,10 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ContentTypeExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.TlsContentType.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -48,6 +51,8 @@ class DomainBasedTrackerDetector(
     private val hostnameExtractor: HostnameExtractor,
     private val appTrackerRepository: AppTrackerRepository,
     private val appTrackerRecorder: AppTrackerRecorder,
+    private val payloadBytesExtractor: PayloadBytesExtractor,
+    private val tlsContentTypeExtractor: ContentTypeExtractor,
     private val vpnDatabase: VpnDatabase,
     private val requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
 ) : VpnTrackerDetector {
@@ -64,10 +69,12 @@ class DomainBasedTrackerDetector(
             Timber.v("%s is a local address; not looking for trackers", packet.ip4Header.destinationAddress)
             tcb.trackerTypeDetermined = true
             tcb.isTracker = false
+
             return RequestTrackerType.NotTracker(packet.ip4Header.destinationAddress.hostName)
         }
 
-        val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
+        val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
+        val hostname = hostnameExtractor.extract(tcb, payloadBytes)
         if (hostname == null) {
             Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
             return RequestTrackerType.Undetermined
@@ -76,8 +83,6 @@ class DomainBasedTrackerDetector(
         for (interceptor in requestInterceptors.getPlugins()) {
             interceptor.interceptTrackerRequest(hostname, requestingApp.packageId)?.let { return it }
         }
-
-        tcb.trackerTypeDetermined = true
 
         return when (val trackerType = appTrackerRepository.findTracker(hostname, requestingApp.packageId)) {
             is FirstParty -> {
@@ -88,6 +93,7 @@ class DomainBasedTrackerDetector(
                     trackerType.tracker.owner.name,
                     tcb.ipAndPort
                 )
+                tcb.trackerTypeDetermined = true
                 tcb.isTracker = false
                 RequestTrackerType.NotTracker(hostname)
             }
@@ -96,30 +102,55 @@ class DomainBasedTrackerDetector(
                 val trackerModel = RequestTrackerType.Tracker(trackerHostname)
                 return if (isTrackerInExceptionRules(trackerModel, requestingApp)) {
                     Timber.d("Tracker %s is excluded in App %s", trackerHostname, requestingApp)
+                    tcb.trackerTypeDetermined = true
                     tcb.isTracker = false
                     RequestTrackerType.NotTracker(trackerHostname)
                 } else {
-                    tcb.isTracker = true
                     tcb.trackerHostName = trackerHostname
-                    Timber.i(
-                        "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
-                        hostname,
-                        requestingApp.packageId,
-                        trackerType.tracker.owner.name,
-                        tcb.ipAndPort
-                    )
-                    insertTracker(trackerType.tracker, requestingApp)
-                    deviceShieldPixels.trackerBlocked()
-                    RequestTrackerType.Tracker(trackerType.tracker.hostname)
-                    RequestTrackerType.Tracker(trackerHostname)
+
+                    when (tlsContentTypeExtractor.isTlsApplicationData(payloadBytes)) {
+                        Undetermined -> {
+                            Timber.v("Unable to determine TLS content type, fallback to blocking as if it were application data %s", tcb.ipAndPort)
+                            tcb.trackerTypeDetermined = true
+                            tcb.isTracker = true
+                            recordTrackerBlocked(trackerType, tcb, requestingApp)
+                            RequestTrackerType.Tracker(trackerHostname)
+                        }
+                        TlsApplicationData -> {
+                            Timber.v("This is TLS content type: Application Data and is a 3rd party tracker. We'll block this. %s", tcb.ipAndPort)
+                            tcb.trackerTypeDetermined = true
+                            tcb.isTracker = true
+                            recordTrackerBlocked(trackerType, tcb, requestingApp)
+                            RequestTrackerType.Tracker(trackerHostname)
+                        }
+                        NotApplicationData -> {
+                            // this is request for a tracker, but we don't want to block the TLS handshake, so treat this as a non-tracker for now
+                            tcb.trackerTypeDetermined = false
+                            Timber.v("This is a TLS message but isn't ApplicationData. We'll allow this for now %s", tcb.ipAndPort)
+                            RequestTrackerType.TrackerDelayedBlock(trackerHostname)
+                        }
+                    }
                 }
             }
             else -> {
+                tcb.trackerTypeDetermined = true
                 tcb.isTracker = false
                 Timber.v("Determined %s is not a tracker %s", hostname, tcb.ipAndPort)
                 RequestTrackerType.NotTracker(hostname)
             }
         }
+    }
+
+    private fun recordTrackerBlocked(trackerType: ThirdParty, tcb: TCB, requestingApp: OriginatingApp) {
+        Timber.i(
+            "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
+            tcb.hostName,
+            requestingApp.packageId,
+            trackerType.tracker.owner.name,
+            tcb.ipAndPort
+        )
+        insertTracker(trackerType.tracker, requestingApp)
+        deviceShieldPixels.trackerBlocked()
     }
 
     private fun isTrackerInExceptionRules(tracker: RequestTrackerType.Tracker, originatingApp: OriginatingApp): Boolean {

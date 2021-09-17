@@ -46,9 +46,10 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
         }
 
         synchronized(this) {
-            Timber.i(
-                "%s - Sending RST, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
+            Timber.d(
+                "%s - Sending RST, %s %s, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                 tcb.ipAndPort,
+                tcb.requestingAppPackage, tcb.trackerHostName,
                 responseSeq, responseAck,
                 tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, payloadSize
             )
