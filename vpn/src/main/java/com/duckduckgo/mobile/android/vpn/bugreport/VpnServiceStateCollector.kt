@@ -55,11 +55,14 @@ class VpnServiceStateCollector @Inject constructor(
         // VPN open connections per app
         val tcbs = TCB.copyTCBs()
         val appConnectionState = JSONObject()
-        tcbs.filter { it.requestingAppPackage.isNotBlank() }.groupBy { it.requestingAppPackage }.forEach { entry ->
-            val app = entry.key
-            val openConnections = entry.value.size
-            appConnectionState.put(app, openConnections.toString())
-        }
+        tcbs
+            .filterNot { it.requestingAppPackage.isNullOrBlank() }
+            .groupBy { it.requestingAppPackage }
+            .forEach { entry ->
+                val app = entry.key
+                val openConnections = entry.value.size
+                appConnectionState.put(app, openConnections.toString())
+            }
         state.put("activeTcpConnections", appConnectionState)
 
         return state
