@@ -33,7 +33,9 @@
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
+    <string name="editBookmarkMenuTitle">Yer İşaretini Düzenle</string>
     <string name="addFavoriteMenuTitle">Favori Ekle</string>
+    <string name="removeFavoriteMenuTitle">Favoriyi Kaldır</string>
     <string name="favoriteAddedMessage">Favori eklendi</string>
     <string name="bookmarkAddedMessage">Yer imi eklendi</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
@@ -151,7 +153,6 @@
     <string name="settingsHeadingGeneral">Genel</string>
     <string name="settingsHeadingOther">Diğer</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
-    <string name="settingsLightTheme">Açık Tema</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>

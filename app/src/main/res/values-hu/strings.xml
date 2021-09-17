@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
     <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
+    <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
     <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
+    <string name="removeFavoriteMenuTitle">Kedvenc eltávolítása</string>
     <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
     <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>
     <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Általános</string>
     <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsLightTheme">Világos felület</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>

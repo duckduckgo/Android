@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Tühjenda otsingusisend</string>
     <string name="no_compatible_third_party_app_installed">Ühtegi ühilduvat rakendust pole installitud</string>
     <string name="addBookmarkMenuTitle">Lisa järjehoidja</string>
+    <string name="editBookmarkMenuTitle">Redigeeri järjehoidjat</string>
     <string name="addFavoriteMenuTitle">Lisa lemmik</string>
+    <string name="removeFavoriteMenuTitle">Eemalda lemmik</string>
     <string name="favoriteAddedMessage">Lemmik lisatud</string>
     <string name="bookmarkAddedMessage">Järjehoidja lisatud</string>
     <string name="requestDesktopSiteMenuTitle">Töölaua sait</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Üldine</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsLightTheme">Kerge teema</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>

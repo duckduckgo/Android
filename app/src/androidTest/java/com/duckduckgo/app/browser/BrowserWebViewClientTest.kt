@@ -35,9 +35,9 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.privacy.config.api.Gpc
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -65,7 +65,7 @@ class BrowserWebViewClientTest {
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
-    private val globalPrivacyControl: GlobalPrivacyControl = mock()
+    private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
@@ -87,7 +87,7 @@ class BrowserWebViewClientTest {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl,
+            gpc,
             thirdPartyCookieManager,
             TestCoroutineScope(),
             coroutinesTestRule.testDispatcherProvider,
@@ -129,9 +129,29 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectDoNotSellToDom() = coroutinesTestRule.runBlocking {
+    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() = coroutinesTestRule.runBlocking {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
+
+        testee.onPageStarted(webView, null, null)
+        verify(gpc, never()).getGpcJs()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() = coroutinesTestRule.runBlocking {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
+
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(globalPrivacyControl).injectDoNotSellToDom(webView)
+        verify(gpc).getGpcJs()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() = coroutinesTestRule.runBlocking {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
+
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(gpc, never()).getGpcJs()
     }
 
     @UiThreadTest
@@ -146,6 +166,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenListenerNotified() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(EXAMPLE_URL)
     }
 
     @UiThreadTest
@@ -362,9 +389,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenResetAppLinkState() {
+    fun whenOnPageStartedCalledThenCallPageStarted() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).resetAppLinkState()
+        verify(listener).pageStarted(EXAMPLE_URL)
     }
 
     private class TestWebView(context: Context) : WebView(context)

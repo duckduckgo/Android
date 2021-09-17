@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Effacer la recherche</string>
     <string name="no_compatible_third_party_app_installed">Aucune application compatible installée</string>
     <string name="addBookmarkMenuTitle">Ajouter un signet</string>
+    <string name="editBookmarkMenuTitle">Modifier le signet</string>
     <string name="addFavoriteMenuTitle">Ajouter un favori</string>
+    <string name="removeFavoriteMenuTitle">Supprimer le favori</string>
     <string name="favoriteAddedMessage">Favori ajouté</string>
     <string name="bookmarkAddedMessage">Signet ajouté</string>
     <string name="requestDesktopSiteMenuTitle">Site en version bureau</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Général</string>
     <string name="settingsHeadingOther">Autre</string>
     <string name="settingsHeadingPrivacy">Confidentialité</string>
-    <string name="settingsLightTheme">Thème clair</string>
     <string name="settingsAboutDuckduckgo">À propos de DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Partagez vos commentaires</string>

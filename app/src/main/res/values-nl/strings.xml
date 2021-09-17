@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Zoekinvoer wissen</string>
     <string name="no_compatible_third_party_app_installed">Geen compatibele app geïnstalleerd</string>
     <string name="addBookmarkMenuTitle">Bladwijzer toevoegen</string>
+    <string name="editBookmarkMenuTitle">Bladwijzer bewerken</string>
     <string name="addFavoriteMenuTitle">Favoriet toevoegen</string>
+    <string name="removeFavoriteMenuTitle">Favoriet verwijderen</string>
     <string name="favoriteAddedMessage">Favoriet toegevoegd</string>
     <string name="bookmarkAddedMessage">Bladwijzer toegevoegd</string>
     <string name="requestDesktopSiteMenuTitle">Desktopsite</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Algemeen</string>
     <string name="settingsHeadingOther">Anders</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsLightTheme">Licht thema</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>

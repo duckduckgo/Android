@@ -35,7 +35,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchMan
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -57,7 +57,7 @@ class PrivacyDashboardViewModelTest {
 
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var mockUserWhitelistDao: UserWhitelistDao = mock()
-    private var mockTemporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao = mock()
+    private var mockContentBlocking: ContentBlocking = mock()
     private var networkLeaderboardDao: NetworkLeaderboardDao = mock()
     private var networkLeaderboardLiveData: LiveData<List<NetworkLeaderboardEntry>> = mock()
     private var sitesVisitedLiveData: LiveData<Int> = mock()
@@ -68,7 +68,7 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockTemporaryTrackingWhitelistDao, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -239,8 +239,8 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInTempAllowListThenReturnTrue() {
-        whenever(mockTemporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+    fun whenOnSiteChangedAndSiteIsInTContentBlockingExceptionsListThenReturnTrue() {
+        whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.isSiteInTempAllowedList)

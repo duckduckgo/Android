@@ -33,7 +33,9 @@
     <string name="clearButtonContentDescription">Vymazat vyhledávací vstup</string>
     <string name="no_compatible_third_party_app_installed">Nebyla nainstalována žádná kompatibilní aplikace</string>
     <string name="addBookmarkMenuTitle">Přidat záložku</string>
+    <string name="editBookmarkMenuTitle">Upravit záložku</string>
     <string name="addFavoriteMenuTitle">Přidat oblíbené</string>
+    <string name="removeFavoriteMenuTitle">Odebrat oblíbenou položku</string>
     <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
     <string name="bookmarkAddedMessage">Záložka přidána</string>
     <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
@@ -159,7 +161,6 @@
     <string name="settingsHeadingGeneral">Obecné</string>
     <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsLightTheme">Světlý motiv</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
