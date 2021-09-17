@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Ryd søgeinput</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installeret</string>
     <string name="addBookmarkMenuTitle">Tilføj bogmærke</string>
+    <string name="editBookmarkMenuTitle">Rediger bogmærke</string>
     <string name="addFavoriteMenuTitle">Tilføj til favorit</string>
+    <string name="removeFavoriteMenuTitle">Fjern favorit</string>
     <string name="favoriteAddedMessage">Favorit tilføjet</string>
     <string name="bookmarkAddedMessage">Bogmærke tilføjet</string>
     <string name="requestDesktopSiteMenuTitle">Stationær computer</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Generelt</string>
     <string name="settingsHeadingOther">Andet</string>
     <string name="settingsHeadingPrivacy">Privatliv</string>
-    <string name="settingsLightTheme">Lystema</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>

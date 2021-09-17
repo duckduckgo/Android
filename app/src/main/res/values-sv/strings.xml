@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Rensa sökfältet</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installerad</string>
     <string name="addBookmarkMenuTitle">Lägg till bokmärke</string>
+    <string name="editBookmarkMenuTitle">Redigera bokmärke</string>
     <string name="addFavoriteMenuTitle">Lägg till favorit</string>
+    <string name="removeFavoriteMenuTitle">Ta bort favorit</string>
     <string name="favoriteAddedMessage">Favorit har lagts till</string>
     <string name="bookmarkAddedMessage">Bokmärke sparat</string>
     <string name="requestDesktopSiteMenuTitle">Webbplats för dator</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Allmänt</string>
     <string name="settingsHeadingOther">Annat</string>
     <string name="settingsHeadingPrivacy">Sekretess</string>
-    <string name="settingsLightTheme">Ljust</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>

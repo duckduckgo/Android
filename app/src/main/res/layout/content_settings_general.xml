@@ -29,14 +29,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/lightThemeToggle"
-        style="@style/SettingsSwitch"
-        android:text="@string/settingsLightTheme"
-        android:theme="@style/SettingsSwitchTheme"
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/selectedThemeSetting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
+        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle"
+        app:subtitle="@string/settingsSystemTheme"
+        app:title="@string/settingsTheme" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
@@ -45,7 +46,7 @@
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
+        app:layout_constraintTop_toBottomOf="@id/selectedThemeSetting" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/setAsDefaultBrowserSetting"

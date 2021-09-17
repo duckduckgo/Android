@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Počisti vhod iskanja</string>
     <string name="no_compatible_third_party_app_installed">Ni nameščene združljive aplikacije</string>
     <string name="addBookmarkMenuTitle">Dodaj zaznamek</string>
+    <string name="editBookmarkMenuTitle">Uredi zaznamek</string>
     <string name="addFavoriteMenuTitle">Dodaj priljubljene</string>
+    <string name="removeFavoriteMenuTitle">Odstrani priljubljene</string>
     <string name="favoriteAddedMessage">Priljubljeni dodan</string>
     <string name="bookmarkAddedMessage">Zaznamek je dodan</string>
     <string name="requestDesktopSiteMenuTitle">Namizna stran</string>
@@ -175,7 +177,6 @@
     <string name="settingsHeadingGeneral">Splošno</string>
     <string name="settingsHeadingOther">Drugo</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
-    <string name="settingsLightTheme">Svetli način</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>

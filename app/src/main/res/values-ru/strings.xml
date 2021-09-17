@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Сбросить поисковый запрос</string>
     <string name="no_compatible_third_party_app_installed">Совместимое приложение не установлено</string>
     <string name="addBookmarkMenuTitle">Добавить закладку</string>
+    <string name="editBookmarkMenuTitle">Редактировать закладку</string>
     <string name="addFavoriteMenuTitle">Добавить в избранное</string>
+    <string name="removeFavoriteMenuTitle">Удалить из избранного</string>
     <string name="favoriteAddedMessage">Сайт добавлен в избранное</string>
     <string name="bookmarkAddedMessage">Закладка добавлена</string>
     <string name="requestDesktopSiteMenuTitle">Полная версия сайта</string>
@@ -175,7 +177,6 @@
     <string name="settingsHeadingGeneral">Общие настройки</string>
     <string name="settingsHeadingOther">Дополнительные настройки</string>
     <string name="settingsHeadingPrivacy">Конфиденциальность</string>
-    <string name="settingsLightTheme">Светлая тема</string>
     <string name="settingsAboutDuckduckgo">Несколько слов о DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
     <string name="leaveFeedback">Оставьте нам отзыв</string>

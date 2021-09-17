@@ -27,8 +27,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -52,10 +52,10 @@ class ScorecardViewModelTest {
 
     private var viewStateObserver: Observer<ScorecardViewModel.ViewState> = mock()
     private var userWhitelistDao: UserWhitelistDao = mock()
-    private var temporaryTrackingWhitelistDao: TemporaryTrackingWhitelistDao = mock()
+    private var contentBlocking: ContentBlocking = mock()
 
     private val testee: ScorecardViewModel by lazy {
-        val model = ScorecardViewModel(userWhitelistDao, temporaryTrackingWhitelistDao, coroutineRule.testDispatcherProvider)
+        val model = ScorecardViewModel(userWhitelistDao, contentBlocking, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model
     }
@@ -167,35 +167,35 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInTempAllowListThenReturnTrue() {
-        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() {
+        whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.isSiteInTempAllowedList)
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInUserAllowListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() {
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
-        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(false)
+        whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.privacyOn)
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListButIsInTempListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
-        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(true)
+        whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertFalse(testee.viewState.value!!.privacyOn)
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInTempListThenPrivacyOnIsTrue() {
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
-        whenever(temporaryTrackingWhitelistDao.contains(any())).thenReturn(false)
+        whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
         assertTrue(testee.viewState.value!!.privacyOn)

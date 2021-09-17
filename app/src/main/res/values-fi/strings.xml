@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
     <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
     <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
+    <string name="editBookmarkMenuTitle">Muokkaa kirjanmerkkiä</string>
     <string name="addFavoriteMenuTitle">Lisää suosikki</string>
+    <string name="removeFavoriteMenuTitle">Poista suosikki</string>
     <string name="favoriteAddedMessage">Suosikki lisätty</string>
     <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>
     <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>
@@ -167,7 +169,6 @@
     <string name="settingsHeadingGeneral">Yleistä</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsLightTheme">Vaalea teema</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>

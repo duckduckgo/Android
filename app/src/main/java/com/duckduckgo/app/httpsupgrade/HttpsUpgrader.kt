@@ -25,8 +25,10 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Https
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
@@ -60,7 +62,8 @@ class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val userAllowListDao: UserWhitelistDao,
-    private val pixel: Pixel
+    private val toggle: FeatureToggle,
+    private val https: Https
 ) : HttpsUpgrader, LifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null
@@ -73,12 +76,21 @@ class HttpsUpgraderImpl @Inject constructor(
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
+        val host = uri.host ?: return false
+
+        if (toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()) != true) {
+            Timber.d("https is disabled in the remote config and so $host is not upgradable")
+            return false
+        }
 
         if (uri.isHttps) {
             return false
         }
 
-        val host = uri.host ?: return false
+        if (https.isAnException(uri.toString())) {
+            Timber.d("$host is in the remote exception list and so not upgradable")
+            return false
+        }
 
         if (userAllowListDao.contains(host)) {
             Timber.d("$host is in user allowlist and so not upgradable")

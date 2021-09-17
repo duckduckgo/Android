@@ -36,6 +36,7 @@ interface FavoritesRepository {
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
     fun userHasFavorites(): Boolean
+    fun favorite(url: String): SavedSite.Favorite?
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -103,11 +104,18 @@ class FavoritesDataRepository(
         return favoritesDao.userHasFavorites()
     }
 
+    override fun favorite(url: String): SavedSite.Favorite? {
+        return favoritesDao.favoriteByUrl(url)?.mapToSavedSite()
+    }
+
     override suspend fun delete(favorite: SavedSite.Favorite) {
         faviconManager.get().deletePersistedFavicon(favorite.url)
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 
     private fun SavedSite.Favorite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
+
+    private fun FavoriteEntity.mapToSavedSite(): SavedSite.Favorite = SavedSite.Favorite(this.id, this.title, this.url, this.position)
+
     private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> = this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
 }

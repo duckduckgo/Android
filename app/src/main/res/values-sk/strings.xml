@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Vymazať hľadaný výraz</string>
     <string name="no_compatible_third_party_app_installed">Žiadna kompatibilná aplikácia nie je nainštalovaná</string>
     <string name="addBookmarkMenuTitle">Pridať záložku</string>
+    <string name="editBookmarkMenuTitle">Upraviť záložku</string>
     <string name="addFavoriteMenuTitle">Pridať do obľúbených položiek</string>
+    <string name="removeFavoriteMenuTitle">Odstrániť obľúbenú položku</string>
     <string name="favoriteAddedMessage">Obľúbená položka bola pridaná</string>
     <string name="bookmarkAddedMessage">Záložka je pridaná</string>
     <string name="requestDesktopSiteMenuTitle">Stránka pre stolové počítače</string>
@@ -175,7 +177,6 @@
     <string name="settingsHeadingGeneral">Všeobecné</string>
     <string name="settingsHeadingOther">Iné</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsLightTheme">Svetlý motív</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
     <string name="leaveFeedback">Zdieľať spätnú väzbu</string>
