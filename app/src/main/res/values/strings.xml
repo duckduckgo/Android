@@ -32,7 +32,9 @@
     <string name="clearButtonContentDescription">Clear search input</string>
     <string name="no_compatible_third_party_app_installed">No compatible app installed</string>
     <string name="addBookmarkMenuTitle">Add Bookmark</string>
+    <string name="editBookmarkMenuTitle">Edit Bookmark</string>
     <string name="addFavoriteMenuTitle">Add Favorite</string>
+    <string name="removeFavoriteMenuTitle">Remove Favorite</string>
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>

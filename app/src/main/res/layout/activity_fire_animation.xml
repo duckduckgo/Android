@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2017 DuckDuckGo
+  ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<com.airbnb.lottie.LottieAnimationView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fireAnimationView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.settings.SettingsActivity">
-
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_toolbar" />
-
-    <include
-        android:id="@+id/includeSettings"
-        layout="@layout/content_settings" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    android:importantForAccessibility="no"
+    android:scaleType="centerCrop"
+    android:visibility="gone"
+    app:lottie_loop="false" />
