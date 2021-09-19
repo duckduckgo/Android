@@ -98,6 +98,11 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
             .launchIn(lifecycleScope)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        refreshTickerJob.cancel()
+    }
+
     private fun getAppTrackers(): List<InstalledAppTrackers> {
         return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
