@@ -97,6 +97,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.webview.enableDarkMode
+import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
@@ -132,7 +134,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -237,6 +241,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+
+    @Inject
+    lateinit var themingDataStore: ThemingDataStore
 
     @Inject
     @AppCoroutineScope
@@ -1166,6 +1173,7 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
+                configureDarkThemeSupport(this)
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -1193,6 +1201,21 @@ class BrowserTabFragment :
 
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
+        }
+    }
+
+    private fun configureDarkThemeSupport(webSettings: WebSettings) {
+        when (themingDataStore.theme) {
+            DuckDuckGoTheme.LIGHT -> webSettings.enableLightMode()
+            DuckDuckGoTheme.DARK -> webSettings.enableDarkMode()
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+                    webSettings.enableDarkMode()
+                } else {
+                    webSettings.enableLightMode()
+                }
+            }
         }
     }
 
@@ -1284,9 +1307,7 @@ class BrowserTabFragment :
         }
         Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
-                addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
-                addBookmarkDialog.listener = viewModel
+                editSavedSite(savedSite)
             }
             .show()
     }
@@ -1759,13 +1780,10 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) {
-                    launch {
-                        pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
-                        viewModel.onBookmarkAddRequested()
-                    }
+                    viewModel.onBookmarkMenuClicked()
                 }
                 onMenuItemClicked(view.addFavoritePopupMenuItem) {
-                    viewModel.onAddFavoriteMenuClicked()
+                    viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
@@ -2031,11 +2049,13 @@ class BrowserTabFragment :
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+                addBookmarksPopupMenuItem?.text =
+                    getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
-                if (viewState.addFavorite.isHighlighted()) {
-                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitleHighlighted)
-                } else {
-                    addFavoritePopupMenuItem.text = getString(R.string.addFavoriteMenuTitle)
+                addFavoritePopupMenuItem.text = when {
+                    viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
+                    viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
+                    else -> getString(R.string.addFavoriteMenuTitle)
                 }
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite

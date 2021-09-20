@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -30,10 +29,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import androidx.work.Configuration
-import androidx.work.WorkManager
-import androidx.work.impl.utils.SynchronousExecutor
-import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
@@ -44,8 +39,9 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
-import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
@@ -199,6 +195,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockBookmarksDao: BookmarksDao
 
     @Mock
+    private lateinit var mockBookmarksRepository: BookmarksRepository
+
+    @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
 
     @Mock
@@ -324,15 +323,9 @@ class BrowserTabViewModelTest {
 
     private val emailStateFlow = MutableStateFlow(false)
 
-    private val workManager: WorkManager by lazy {
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .build()
+    private val bookmarksListFlow = Channel<List<Bookmark>>()
 
-        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
-        return@lazy WorkManager.getInstance(context)
-    }
+    private val favoriteListFlow = Channel<List<Favorite>>()
 
     @Before
     fun before() {
@@ -349,7 +342,8 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
-        whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
+        whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
+        whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
 
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -389,6 +383,7 @@ class BrowserTabViewModelTest {
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = mockBookmarksDao,
+            bookmarksRepository = mockBookmarksRepository,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = mockSpecialUrlDetector,
@@ -426,6 +421,8 @@ class BrowserTabViewModelTest {
     fun after() {
         ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
+        bookmarksListFlow.close()
+        favoriteListFlow.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -558,7 +555,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(SavedSite.Bookmark(0, "A title", "www.example.com", 0))
+        testee.onSavedSiteEdited(Bookmark(0, "A title", "www.example.com", 0))
         verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
     }
 
@@ -573,7 +570,7 @@ class BrowserTabViewModelTest {
     fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
         loadUrl("www.example.com", "A title")
 
-        testee.onBookmarkAddRequested()
+        testee.onBookmarkMenuClicked()
         verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
@@ -585,7 +582,7 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", "A title")
         whenever(mockFavoritesRepository.insert(any(), any())).thenReturn(savedSite)
 
-        testee.onAddFavoriteMenuClicked()
+        testee.onFavoriteMenuClicked()
 
         verify(mockFavoritesRepository).insert(title = "A title", url = "www.example.com")
         assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
@@ -594,7 +591,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNoSiteAndUserSelectsToAddFavoriteThenSiteIsNotAdded() = coroutineRule.runBlocking {
 
-        testee.onAddFavoriteMenuClicked()
+        testee.onFavoriteMenuClicked()
 
         verify(mockFavoritesRepository, times(0)).insert(any(), any())
     }
@@ -1500,7 +1497,7 @@ class BrowserTabViewModelTest {
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = coroutineRule.runBlocking {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
-        testee.onBookmarkAddRequested()
+        testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
         assertEquals("foo.com", command.savedSite.url)
         assertEquals("Foo Title", command.savedSite.title)
@@ -1510,7 +1507,7 @@ class BrowserTabViewModelTest {
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
         whenever(mockBookmarksDao.insert(any<BookmarkEntity>())).thenReturn(1)
 
-        testee.onBookmarkAddRequested()
+        testee.onBookmarkMenuClicked()
 
         verify(mockBookmarksDao, times(0)).insert(any<BookmarkEntity>())
     }
@@ -2930,7 +2927,6 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlIconReceivedFromPreviousUrlThenDontUpdateTabFavicon() = coroutineRule.runBlocking {
         givenOneActiveTabSelected()
-        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         val file = File("test")
         whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
 
@@ -2976,7 +2972,7 @@ class BrowserTabViewModelTest {
         val url = "http://example.com"
         loadUrl(url, "A title")
 
-        testee.onBookmarkAddRequested()
+        testee.onBookmarkMenuClicked()
 
         verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
     }
@@ -2985,7 +2981,7 @@ class BrowserTabViewModelTest {
     fun whenBookmarkAddedButUrlIsNullThenDoNotPersistFavicon() = coroutineRule.runBlocking {
         loadUrl(null, "A title")
 
-        testee.onBookmarkAddRequested()
+        testee.onBookmarkMenuClicked()
 
         verify(mockFaviconManager, never()).persistCachedFavicon(any(), any())
     }
@@ -3432,6 +3428,85 @@ class BrowserTabViewModelTest {
         assertNull(privacyGradeState().privacyGrade)
     }
 
+    @Test
+    fun whenEditBookmarkRequestedThenDaoIsNotUpdated() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockBookmarksDao, never()).insert(any())
+    }
+
+    @Test
+    fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
+    }
+
+    @Test
+    fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
+        val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenDaoInsertIsNotCalled() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, never()).insert(any())
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
+        )
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, atLeastOnce()).delete(favoriteSite)
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.DeleteSavedSiteConfirmation)
+        val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -3545,10 +3620,6 @@ class BrowserTabViewModelTest {
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false, false)
-    }
-
-    private fun givenDefaultOnboarding() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
