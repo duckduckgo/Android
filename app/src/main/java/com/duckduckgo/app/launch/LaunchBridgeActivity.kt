@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,14 +54,8 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     }
 
     private fun processCommand(it: LaunchViewModel.Command?) {
-        when (it) {
-            LaunchViewModel.Command.Onboarding -> {
-                showOnboarding()
-            }
-            is LaunchViewModel.Command.Home -> {
-                showHome()
-            }
-        }
+        startActivity(DeviceShieldTrackerActivity.intent(this))
+        finish()
     }
 
     private fun showOnboarding() {
