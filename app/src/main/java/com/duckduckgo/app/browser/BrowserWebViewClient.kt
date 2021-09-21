@@ -182,6 +182,7 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         try {
+            webView.loadUrl("javascript:document.getElementsByName('viewport')[0].setAttribute('content', 'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');")
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
