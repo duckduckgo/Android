@@ -27,7 +27,7 @@ class EmailLogoutDialog : DialogFragment() {
     var onLogout: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setMessage(R.string.emailSignOutDialogText)
             .setTitle(getString(R.string.emailSignOutDialogTitle))
             .setNegativeButton(R.string.emailSignOutDialogCancel) { _, _ ->
