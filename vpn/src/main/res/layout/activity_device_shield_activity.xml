@@ -26,7 +26,7 @@
 
     <include layout="@layout/include_trackers_toolbar" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -177,5 +177,5 @@
                 android:text="@string/atp_ActivityBetaInstructions" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>
