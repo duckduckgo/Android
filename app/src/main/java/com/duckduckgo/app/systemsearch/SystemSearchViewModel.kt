@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
@@ -62,6 +63,7 @@ class SystemSearchViewModel(
     private val pixel: Pixel,
     private val favoritesRepository: FavoritesRepository,
     private val faviconManager: FaviconManager,
+    private val appSettingsPreferencesStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
@@ -202,11 +204,18 @@ class SystemSearchViewModel(
 
         val suggestions = results.autocomplete.suggestions
         val appResults = results.deviceApps
-        val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
-        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
+        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
+        val hasMultiResults = (autoCompleteSuggestionsEnabled && suggestions.isNotEmpty()) && appResults.isNotEmpty()
+
+        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else {
+            if (autoCompleteSuggestionsEnabled) {
+                suggestions
+            } else {
+                emptyList()
+            }
+        }
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
-
         resultsViewState.postValue(
             when (val currentResultsState = currentResultsState()) {
                 is Suggestions.SystemSearchResultsViewState -> {
@@ -347,7 +356,8 @@ class SystemSearchViewModelFactory @Inject constructor(
     private val deviceAppLookup: Provider<DeviceAppLookup>,
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val faviconManager: Provider<FaviconManager>,
-    private val pixel: Provider<Pixel>
+    private val pixel: Provider<Pixel>,
+    private val appSettingsPreferencesStore: Provider<SettingsDataStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -359,7 +369,8 @@ class SystemSearchViewModelFactory @Inject constructor(
                         deviceAppLookup.get(),
                         pixel.get(),
                         favoritesRepository.get(),
-                        faviconManager.get()
+                        faviconManager.get(),
+                        appSettingsPreferencesStore.get()
                     ) as T
                     )
                 else -> null
