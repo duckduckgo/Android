@@ -888,7 +888,7 @@ class BrowserTabFragment :
         val isShowing = loginDetectionDialog?.isShowing
 
         if (isShowing != true) {
-            loginDetectionDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+            loginDetectionDialog = AlertDialog.Builder(context)
                 .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
@@ -905,7 +905,7 @@ class BrowserTabFragment :
     }
 
     private fun askToDisableLoginDetection(context: Context) {
-        AlertDialog.Builder(context, R.style.AlertDialogTheme)
+        AlertDialog.Builder(context)
             .setTitle(getString(R.string.disableLoginDetectionDialogTitle))
             .setMessage(R.string.disableLoginDetectionDialogDescription)
             .setPositiveButton(R.string.disableLoginDetectionDialogPositive) { _, _ ->
@@ -925,7 +925,7 @@ class BrowserTabFragment :
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
-            alertDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+            alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setPositiveButton(R.string.open) { _, _ ->
@@ -948,7 +948,7 @@ class BrowserTabFragment :
     private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
         alertDialog?.dismiss()
 
-        alertDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+        alertDialog = AlertDialog.Builder(context)
             .setTitle(R.string.appLinkDialogTitle)
             .setMessage(getString(R.string.confirmOpenExternalApp))
             .setPositiveButton(R.string.yes) { dialog, _ ->
@@ -1620,7 +1620,7 @@ class BrowserTabFragment :
     }
 
     private fun launchHideTipsDialog(context: Context, cta: Cta) {
-        AlertDialog.Builder(context, R.style.AlertDialogTheme)
+        AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)
             .setMessage(getString(R.string.hideTipsText))
             .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->

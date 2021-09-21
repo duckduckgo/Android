@@ -113,7 +113,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun showAddDialog() {
         val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val addDialog = AlertDialog.Builder(this, R.style.AlertDialogTheme).apply {
+        val addDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogAddTitle)
             setView(dialogBinding.root)
             setPositiveButton(R.string.dialogSaveAction) { _, _ ->
@@ -130,7 +130,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun showEditDialog(entry: UserWhitelistedDomain) {
         val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val editDialog = AlertDialog.Builder(this, R.style.AlertDialogTheme).apply {
+        val editDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogEditTitle)
             setView(dialogBinding.root)
             setPositiveButton(R.string.dialogSaveAction) { _, _ ->
@@ -149,7 +149,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showDeleteDialog(entry: UserWhitelistedDomain) {
-        val deleteDialog = AlertDialog.Builder(this, R.style.AlertDialogTheme).apply {
+        val deleteDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogConfirmTitle)
             setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this.context))
             setPositiveButton(android.R.string.yes) { _, _ -> viewModel.onEntryDeleted(entry) }

@@ -38,6 +38,7 @@
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
     </style>
@@ -299,4 +300,18 @@
         <item name="buttonTint">@color/cornflowerBlue</item>
     </style>
 
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textColorPrimary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/normalTextColor</item>
+        <item name="android:windowBackground">?attr/dialogBgColor</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
+    </style>
+
+    <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
 </resources>

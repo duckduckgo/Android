@@ -41,7 +41,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.fireAnimationSelectorGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.settingsSelectFireAnimationDialog)
             .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave) { _, _ ->

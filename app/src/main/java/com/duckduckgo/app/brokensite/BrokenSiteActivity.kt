@@ -65,7 +65,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.setOnClickListener {
-            AlertDialog.Builder(this, R.style.AlertDialogTheme)
+            AlertDialog.Builder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
                 .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
                     viewModel.onCategoryIndexChanged(newIndex)

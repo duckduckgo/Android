@@ -54,7 +54,7 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
 
         informationText.text = getString(R.string.authenticationDialogMessage, url)
 
-        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
                 listener?.handleAuthentication(

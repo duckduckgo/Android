@@ -84,7 +84,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
                 finish()
             }
             is ChangeIconViewModel.Command.ShowConfirmationDialog -> {
-                AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                AlertDialog.Builder(this)
                     .setTitle(R.string.changeIconDialogTitle)
                     .setMessage(getString(R.string.changeIconDialogMessage))
                     .setPositiveButton(R.string.changeIconCtaAccept) { _, _ ->

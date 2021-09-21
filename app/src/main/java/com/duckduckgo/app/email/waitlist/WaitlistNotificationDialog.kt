@@ -29,7 +29,7 @@ class WaitlistNotificationDialog : DialogFragment() {
     var onDialogDismissed: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setMessage(R.string.waitlistNotificationDialogDescription)
             .setNegativeButton(R.string.waitlistNotificationDialogNoThanks) { _, _ ->
                 dismiss()
