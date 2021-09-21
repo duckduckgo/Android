@@ -206,7 +206,7 @@
     <string name="atp_FAQFirstHeader">How does App Tracking Protection work?</string>
     <string name="atp_FAQFirstText"><b>App Tracking Protection blocks app trackers from other companies, like when Facebook tries to track you in a banking app</b> Companies may still track you in apps they own.</string>
     <string name="atp_FAQSecondHeader">Does App Tracking Protection block trackers in all my apps?</string>
-    <string name="atp_FAQSecondText"><b>Some protection for apps amy be automatically disabled due to known issues oor so that site content appears normally</b>This is mostly temporary as we work to improve App Tracking Protection. You can choose to manage this protection in the settings.</string>
+    <string name="atp_FAQSecondText"><b>Some protection for apps may be automatically disabled due to known issues or so that site content appears normally</b>. This is mostly temporary as we work to improve App Tracking Protection. You can choose to manage this protection in the settings.</string>
     <string name="atp_FAQThirdHeader">Why does App Tracking Protection use a VPN connection?</string>
     <string name="atp_FAQThirdText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for App Tracking Protection to work.</b>\n\nThis permission, which works only on your device, allows App Tracking Protection to monitor network traffic <b>so that it can block known trackers.</b></string>
     <string name="atp_FAQFourthHeader">How is App Tracking Protection different from a VPN?</string>
