@@ -26,20 +26,20 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
     @VisibleForTesting
     val recentTrackingAttempts = mutableMapOf<String, MutableMap<String, MutableList<RecentTrackerEvent>>>()
 
-    fun addTrackerForApp(appPackage: String, trackerDomain: String?, tcbId: String, timestamp: Long = System.currentTimeMillis()) {
+    fun addTrackerForApp(appPackage: String, trackerDomain: String?, tcbId: String, payloadSize: Int, timestamp: Long = System.currentTimeMillis()) {
         if (trackerDomain == null) return
 
         synchronized(recentTrackingAttempts) {
             val trackersForApp = getTrackersForApp(appPackage)
-            addTracker(trackersForApp, appPackage, trackerDomain, tcbId, timestamp)
+            addTracker(trackersForApp, appPackage, trackerDomain, tcbId, payloadSize, timestamp)
         }
     }
 
-    fun getRecentTrackingAttempt(appPackage: String, hostName: String): RecentTrackerEvent? {
+    fun getRecentTrackingAttempt(appPackage: String, hostName: String, payloadSize: Int): RecentTrackerEvent? {
         synchronized(recentTrackingAttempts) {
             val trackers = recentTrackingAttempts[appPackage]
             if (trackers.isNullOrEmpty()) return null
-            val trackingEvents = trackers[hostName]
+            val trackingEvents = trackers[hostName]?.filter { it.payloadSize == payloadSize }
             if (trackingEvents.isNullOrEmpty()) return null
             return trackingEvents.last()
         }
@@ -50,10 +50,11 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         appPackage: String,
         trackerDomain: String,
         tcbId: String,
+        payloadSize: Int,
         timestamp: Long
     ) {
         val trackingEvents = getTrackerListForDomain(trackers, trackerDomain)
-        trackingEvents.add(RecentTrackerEvent(appPackage, trackerDomain, tcbId, timestamp))
+        trackingEvents.add(RecentTrackerEvent(appPackage, trackerDomain, payloadSize, tcbId, timestamp))
     }
 
     private fun getTrackerListForDomain(trackers: MutableMap<String, MutableList<RecentTrackerEvent>>, trackerDomain: String): MutableList<RecentTrackerEvent> {
@@ -120,6 +121,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
     data class RecentTrackerEvent(
         val appPackage: String,
         val trackerDomain: String,
+        val payloadSize: Int,
         val tcbCacheKey: String,
         val timestamp: Long = System.currentTimeMillis()
     )

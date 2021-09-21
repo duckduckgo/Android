@@ -220,9 +220,9 @@ class TcpDeviceToNetwork(
         }
     }
 
-    private fun isARetryForRecentlyBlockedTracker(requestingApp: OriginatingApp, hostName: String?): Boolean {
+    private fun isARetryForRecentlyBlockedTracker(requestingApp: OriginatingApp, hostName: String?, payloadSize: Int): Boolean {
         if (hostName == null) return false
-        val recentTrackerEvent = recentAppTrackerCache.getRecentTrackingAttempt(requestingApp.packageId, hostName) ?: return false
+        val recentTrackerEvent = recentAppTrackerCache.getRecentTrackingAttempt(requestingApp.packageId, hostName, payloadSize) ?: return false
         val timeSinceTrackerRequested = System.currentTimeMillis() - recentTrackerEvent.timestamp
         Timber.v("Tracker %s was last sent by %s %dms ago", hostName, requestingApp.packageId, timeSinceTrackerRequested)
         return true
@@ -240,7 +240,7 @@ class TcpDeviceToNetwork(
             val requestingApp = determineRequestingApp(tcb, packet)
             val hostName = determineHostName(tcb, packet, payloadBuffer)
             val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
-            val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName)
+            val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName, payloadSize)
             Timber.i(
                 "App %s attempting to send %d bytes to (%s). %s host=%s, localAddress=%s, retry=%s",
                 requestingApp,
@@ -305,7 +305,7 @@ class TcpDeviceToNetwork(
         } else {
             Timber.i("Blocking tracker request. [%s] ---> [%s] %s", tcb.requestingAppPackage, tcb.trackerHostName, tcb.ipAndPort)
 
-            recentAppTrackerCache.addTrackerForApp(requestingApp.packageId, tcb.hostName, tcb.ipAndPort)
+            recentAppTrackerCache.addTrackerForApp(requestingApp.packageId, tcb.hostName, tcb.ipAndPort, payloadSize)
             tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
         }
     }

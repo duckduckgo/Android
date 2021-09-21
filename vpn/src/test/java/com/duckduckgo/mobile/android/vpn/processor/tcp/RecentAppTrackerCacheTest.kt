@@ -30,37 +30,37 @@ class RecentAppTrackerCacheTest {
 
     @Test
     fun whenAddingSingleEntryThenTotalCacheSizeIsOne() {
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
         val cachedTrackers = testee.recentTrackingAttempts
         assertEquals(1, cachedTrackers.size)
     }
 
     @Test
     fun whenAddingTwoEntriesUnderSamePackageThenTotalCacheSizeIsTwo() {
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId)
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
         val cachedTrackers = testee.recentTrackingAttempts
         assertEquals(1, cachedTrackers.size)
     }
 
     @Test
     fun whenAddingTwoEntriesUnderDifferentPackagesThenTotalCacheSizeIsTwo() {
-        testee.addTrackerForApp("package1", aTracker, aTcbId)
-        testee.addTrackerForApp("package2", aTracker, aTcbId)
+        testee.addTrackerForApp("package1", aTracker, aTcbId, PAYLOAD_SIZE_10)
+        testee.addTrackerForApp("package2", aTracker, aTcbId, PAYLOAD_SIZE_10)
         val cachedTrackers = testee.recentTrackingAttempts
         assertEquals(2, cachedTrackers.size)
     }
 
     @Test
     fun whenAddingTrackingEventThenStoredCorrectlyUnderPackageName() {
-        testee.addTrackerForApp("package", aTracker, aTcbId)
+        testee.addTrackerForApp("package", aTracker, aTcbId, PAYLOAD_SIZE_10)
         val trackersForApp = testee.recentTrackingAttempts["package"]
         assertEquals(1, trackersForApp!!.size)
     }
 
     @Test
     fun whenAddingTrackingEventForAppThenStoredCorrectlyUnderTrackerDomainName() {
-        testee.addTrackerForApp("package", "tracker", aTcbId)
+        testee.addTrackerForApp("package", "tracker", aTcbId, PAYLOAD_SIZE_10)
         val trackersForApp = testee.recentTrackingAttempts["package"]
         assertEquals(1, trackersForApp!!["tracker"]!!.size)
     }
@@ -89,50 +89,58 @@ class RecentAppTrackerCacheTest {
 
     @Test
     fun whenNoTrackingEventsThenNullReturned() {
-        assertNull(testee.getRecentTrackingAttempt(anAppPackage, aTracker))
+        assertNull(testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10))
     }
 
     @Test
     fun whenTrackingEventsForAppUnderADifferentTrackerThenNullReturned() {
-        testee.addTrackerForApp(anAppPackage, "tracker1", aTcbId)
-        assertNull(testee.getRecentTrackingAttempt(anAppPackage, "tracker2"))
+        testee.addTrackerForApp(anAppPackage, "tracker1", aTcbId, PAYLOAD_SIZE_10)
+        assertNull(testee.getRecentTrackingAttempt(anAppPackage, "tracker2", PAYLOAD_SIZE_10))
     }
 
     @Test
     fun whenTrackingEventsForAppAndTrackerDomainThenTrackerReturned() {
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId)
-        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker)!!
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
+        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
         assertEquals(anAppPackage, trackerAttempt.appPackage)
         assertEquals(aTracker, trackerAttempt.trackerDomain)
     }
 
     @Test
+    fun whenTrackingEventsForAppAndTrackerDomainDifferentSizeThenNull() {
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
+        assertNull(testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_20))
+    }
+
+    @Test
     fun whenMultipleTrackingEventsForAppAndTrackerDomainThenMostRecentTrackerReturned() {
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, timestamp = 100)
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, timestamp = 200)
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, timestamp = 300)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10, timestamp = 100)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10, timestamp = 200)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10, timestamp = 300)
 
         // different tracker - should not be returned
-        testee.addTrackerForApp(anAppPackage, "tracker2", aTcbId, timestamp = 400)
+        testee.addTrackerForApp(anAppPackage, "tracker2", aTcbId, PAYLOAD_SIZE_10, timestamp = 400)
 
-        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker)!!
+        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
         assertEquals(300, trackerAttempt.timestamp)
     }
 
     private fun addRecentTrackingAttempt() {
         val timestampNow = System.currentTimeMillis()
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, timestampNow)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10, timestampNow)
     }
 
     private fun addOldTrackingAttempt() {
         val oldTimestamp = Calendar.getInstance().also { it.add(Calendar.HOUR, -1) }.timeInMillis
-        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, oldTimestamp)
+        testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10, oldTimestamp)
     }
 
     companion object {
         private const val aTracker = "tracker"
         private const val anAppPackage = "com.app"
         private const val aTcbId = "123"
+        private const val PAYLOAD_SIZE_10 = 10
+        private const val PAYLOAD_SIZE_20 = 20
     }
 }
 
