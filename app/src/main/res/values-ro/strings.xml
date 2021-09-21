@@ -435,7 +435,7 @@
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
-    <string name="onboardingLetsDoItButton">Hai să o facem!</string>
+    <string name="onboardingLetsDoItButton">Să începem!</string>
     <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
     <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. 🙌</string>
