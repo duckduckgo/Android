@@ -39,6 +39,7 @@
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
     </style>
