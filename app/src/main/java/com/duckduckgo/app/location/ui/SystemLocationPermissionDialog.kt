@@ -45,7 +45,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
         val denyLocationPermission = rootView.findViewById<TextView>(R.id.denyLocationPermission)
         val neverAllowLocationPermission = rootView.findViewById<TextView>(R.id.neverAllowLocationPermission)
 
-        val alertBuilder = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
 
         validateBundleArguments()

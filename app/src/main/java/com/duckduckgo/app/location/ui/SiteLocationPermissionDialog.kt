@@ -79,7 +79,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val extraDivider = rootView.findViewById<View>(R.id.siteAllowOnceLocationPermissionDivider)
         val anotherDivider = rootView.findViewById<View>(R.id.siteDenyLocationPermissionDivider)
 
-        val alertDialog = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        val alertDialog = AlertDialog.Builder(requireActivity())
             .setView(rootView)
 
         validateBundleArguments()

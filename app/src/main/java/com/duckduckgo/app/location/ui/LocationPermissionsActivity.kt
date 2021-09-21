@@ -17,7 +17,7 @@
 package com.duckduckgo.app.location.ui
 
 import android.Manifest
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -107,7 +107,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     private fun confirmDeleteWebsite(entity: LocationPermissionEntity) {
         val message = getString(R.string.preciseLocationDeleteConfirmMessage, entity.domain.websiteFromGeoLocationsApiOrigin()).html(this)
         val title = getString(R.string.dialogConfirmTitle)
-        deleteDialog = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+        deleteDialog = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.delete(entity) }

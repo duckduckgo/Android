@@ -37,7 +37,7 @@ class RateAppDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_RATING_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity())
             .setTitle(R.string.rateAppDialogTitle)
             .setMessage(R.string.rateAppDialogMessage)
             .setPositiveButton(R.string.rateAppDialogPositiveButton) { _, _ ->

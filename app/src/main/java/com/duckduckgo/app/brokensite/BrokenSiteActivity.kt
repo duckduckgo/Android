@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
@@ -29,7 +30,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
 
@@ -65,7 +65,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.setOnClickListener {
-            MaterialAlertDialogBuilder(this)
+            AlertDialog.Builder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
                 .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
                     viewModel.onCategoryIndexChanged(newIndex)
