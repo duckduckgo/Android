@@ -46,22 +46,22 @@ sealed class AppCategory {
     }
 }
 
-data class VpnExcludedInstalledAppInfo(
+data class TrackingProtectionAppInfo(
     val packageName: String,
-    val name: String? = null,
+    val name: String,
     val type: String? = null,
     val category: AppCategory = AppCategory.Undefined,
     val isExcluded: Boolean = false,
-    val excludingReason: Int
+    val knownProblem: Int,
+    val userModifed: Boolean
 ) {
     companion object {
         const val NO_ISSUES = 0
         const val KNOWN_ISSUES_EXCLUSION_REASON = 1
         const val LOADS_WEBSITES_EXCLUSION_REASON = 2
-        const val MANUALLY_EXCLUDED = 3
     }
 
-    fun hasExcludingReason(): Boolean {
-        return excludingReason > 0
+    fun isProblematic(): Boolean {
+        return knownProblem > 0
     }
 }

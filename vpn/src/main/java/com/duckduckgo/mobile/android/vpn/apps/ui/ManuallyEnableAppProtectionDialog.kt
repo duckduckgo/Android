@@ -23,7 +23,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo.Companion.LOADS_WEBSITES_EXCLUSION_REASON
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ManuallyEnableAppProtectionDialog : DialogFragment() {
@@ -53,6 +54,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val appName = rootView.findViewById<TextView>(R.id.trackingProtectionAppName)
+        val label = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
         val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogEnable)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogSkip)
 
@@ -64,6 +66,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
         populateAppIcon(appIcon)
         populateAppName(appName)
+        populateText(label)
         configureListeners(enableCTA, skipCTA)
 
         return alertDialog.create()
@@ -76,6 +79,14 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
     private fun populateAppName(appName: TextView) {
         appName.text = getString(R.string.atp_ExcludeAppsManuallyEnableAppName, getAppName())
+    }
+
+    private fun populateText(label: TextView) {
+        if (getExcludingReason() == LOADS_WEBSITES_EXCLUSION_REASON) {
+            label.text = getString(R.string.atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel)
+        } else {
+            label.text = getString(R.string.atp_ExcludeAppsManuallyEnableAppLabel)
+        }
     }
 
     private fun getPackageName(): String {
@@ -133,12 +144,12 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         private const val KEY_EXCLUDING_REASON = "KEY_EXCLUDING_REASON"
         private const val KEY_POSITION = "KEY_POSITION"
 
-        fun instance(appInfo: VpnExcludedInstalledAppInfo, position: Int): ManuallyEnableAppProtectionDialog {
+        fun instance(appInfo: TrackingProtectionAppInfo, position: Int): ManuallyEnableAppProtectionDialog {
             return ManuallyEnableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)
                 bundle.putString(KEY_APP_NAME, appInfo.name)
-                bundle.putInt(KEY_EXCLUDING_REASON, appInfo.excludingReason)
+                bundle.putInt(KEY_EXCLUDING_REASON, appInfo.knownProblem)
                 bundle.putInt(KEY_POSITION, position)
                 fragment.arguments = bundle
             }

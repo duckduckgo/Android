@@ -582,7 +582,7 @@
 
     <style name="DeviceShield.PrivacyReport.Label.Blue">
         <item name="android:background">@drawable/background_blue_tooltip</item>
-        <item name="android:drawableStart">@drawable/ic_link_blue_16</item>
+        <item name="android:drawableStart">@drawable/ic_check_color_24</item>
     </style>
 
     <style name="DeviceShield.PrivacyReport.Toggle">

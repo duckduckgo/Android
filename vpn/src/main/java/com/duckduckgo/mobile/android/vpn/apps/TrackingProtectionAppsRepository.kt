@@ -32,9 +32,9 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-interface TrackingProtectionProtectedApps {
+interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
-    suspend fun getProtectedApps(): Flow<List<VpnExcludedInstalledAppInfo>>
+    suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>>
 
     /** @return the list of installed apps currently excluded */
     suspend fun getExclusionAppsList(): List<String>
@@ -51,30 +51,32 @@ interface TrackingProtectionProtectedApps {
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealTrackingProtectionProtectedApps @Inject constructor(
+class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider
-) : TrackingProtectionProtectedApps {
+) : TrackingProtectionAppsRepository {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
     override suspend fun getProtectedApps() = withContext(dispatcherProvider.io()) {
         appTrackerRepository.getAppExclusionListFlow()
-            .combine(appTrackerRepository.getManualAppExclusionListFlow()) { exclusionList, manualList ->
+            .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
                 Timber.d("getProtectedApps flow")
                 installedApps
                     .map {
-                        VpnExcludedInstalledAppInfo(
+                        val isExcluded = shouldBeExcluded(it, ddgExclusionList, manualList)
+                        TrackingProtectionAppInfo(
                             packageName = it.packageName,
                             name = packageManager.getApplicationLabel(it).toString(),
                             type = it.getAppType(),
                             category = it.parseAppCategory(),
-                            isExcluded = shouldBeExcluded(it, exclusionList, manualList),
-                            excludingReason = getAppExcludedReason(it.packageName, exclusionList, manualList)
+                            isExcluded = isExcluded,
+                            knownProblem = hasKnownIssue(it.packageName, ddgExclusionList),
+                            userModifed = isUserModified(it.packageName, manualList)
                         )
                     }
-                    .sortedBy { it.name }
+                    .sortedBy { it.name.lowercase() }
                     .toList()
             }.onStart {
                 refreshInstalledApps()
@@ -130,16 +132,25 @@ class RealTrackingProtectionProtectedApps @Inject constructor(
         }
     }
 
-    private fun userManuallyExcludedIt(
+    private fun hasKnownIssue(
+        packageName: String,
+        ddgExclusionList: List<AppTrackerExcludedPackage>
+    ): Int {
+        if (BROWSERS.contains(packageName)) {
+            return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
+        }
+        if (ddgExclusionList.any { it.packageId == packageName }) {
+            return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
+        }
+        return TrackingProtectionAppInfo.NO_ISSUES
+    }
+
+    private fun isUserModified(
         packageName: String,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
         val userExcludedApp = userExclusionList.find { it.packageId == packageName }
-        return if (userExcludedApp != null) {
-            !userExcludedApp.isProtected
-        } else {
-            false
-        }
+        return userExcludedApp != null
     }
 
     override suspend fun manuallyEnabledApp(packageName: String) {
@@ -157,22 +168,6 @@ class RealTrackingProtectionProtectedApps @Inject constructor(
     override suspend fun restoreDefaultProtectedList() {
         withContext(dispatcherProvider.io()) {
             appTrackerRepository.restoreDefaultProtectedList()
-        }
-    }
-
-    private fun getAppExcludedReason(
-        packageName: String,
-        exclusionList: List<AppTrackerExcludedPackage>,
-        manualExclusionList: List<AppTrackerManualExcludedApp>
-    ): Int {
-        return if (userManuallyExcludedIt(packageName, manualExclusionList)) {
-            VpnExcludedInstalledAppInfo.MANUALLY_EXCLUDED
-        } else if (BROWSERS.contains(packageName)) {
-            VpnExcludedInstalledAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
-        } else if (exclusionList.any { it.packageId == packageName }) {
-            VpnExcludedInstalledAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
-        } else {
-            VpnExcludedInstalledAppInfo.NO_ISSUES
         }
     }
 

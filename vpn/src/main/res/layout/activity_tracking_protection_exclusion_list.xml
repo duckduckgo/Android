@@ -15,74 +15,74 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <include
-        android:id="@+id/include_toolbar"
-        layout="@layout/include_default_toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            android:id="@+id/include_toolbar"
+            layout="@layout/include_default_toolbar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/excludedAppsFeature"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
-                android:paddingTop="@dimen/keyline_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/atp_ExcludedAppsFeature"
-                android:textColor="?attr/settingsMinorTextColor"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_toolbar"/>
-
-            <TextView
-                android:id="@+id/excludedAppsLabel"
-                style="@style/DeviceShield.PrivacyReport.Label.Blue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:padding="16dp"
-                android:text="@string/atp_ExcludedAppsKnownIssuesLabel"/>
-
-            <View
-                android:id="@+id/excludedAppsSplitter"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/splitterGray"
-                app:layout_constraintTop_toBottomOf="@+id/excludedAppsLabel"/>
-
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/deviceShieldExclusionAppListSkeleton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
+                android:orientation="vertical">
 
-                <LinearLayout
+            <TextView
+                    android:id="@+id/excludedAppsFeature"
+                    style="@style/TextAppearance.DuckDuckGo.Body2"
+                    android:paddingTop="@dimen/keyline_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:text="@string/atp_ExcludedAppsFeature"
+                    android:textColor="?attr/settingsMinorTextColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/include_toolbar"/>
+
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                    android:id="@+id/excludedAppsLabel"
+                    style="@style/Widget.DuckDuckGo.InfoPanel"
+                    app:panelBackground="@drawable/background_blue_tooltip"
+                    app:panelDrawable="@drawable/ic_link_color_24"
+                    app:panelText="@string/atp_ExcludedAppsKnownIssuesLabel"
+                    android:layout_margin="16dp"/>
+
+            <View
+                    android:id="@+id/excludedAppsSplitter"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/splitterGray"
+                    app:layout_constraintTop_toBottomOf="@+id/excludedAppsLabel"/>
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/deviceShieldExclusionAppListSkeleton"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
+
+                <LinearLayout
+                        android:paddingTop="@dimen/keyline_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
                     <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
 
@@ -111,12 +111,14 @@
             </com.facebook.shimmer.ShimmerFrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/excludedAppsRecycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
+                    android:id="@+id/excludedAppsRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingTop="@dimen/keyline_2"
+                    android:paddingBottom="@dimen/keyline_2"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
         </LinearLayout>
 

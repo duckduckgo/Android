@@ -31,7 +31,7 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ExcludedAppsViewModel
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
-import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
@@ -70,6 +70,13 @@ class TrackingProtectionExclusionListActivity :
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val restoreDefault = menu?.findItem(R.id.restoreDefaults)
+        restoreDefault?.isEnabled = viewModel.userMadeChanges()
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.restoreDefaults -> {
@@ -92,7 +99,7 @@ class TrackingProtectionExclusionListActivity :
     private fun setupRecycler() {
         adapter = TrackingProtectionAppsAdapter(object : AppProtectionListener {
             override fun onAppProtectionChanged(
-                excludedAppInfo: VpnExcludedInstalledAppInfo,
+                excludedAppInfo: TrackingProtectionAppInfo,
                 enabled: Boolean,
                 position: Int
             ) {
@@ -137,7 +144,7 @@ class TrackingProtectionExclusionListActivity :
         }
     }
 
-    private fun showDisableProtectionDialog(excludedAppInfo: VpnExcludedInstalledAppInfo) {
+    private fun showDisableProtectionDialog(excludedAppInfo: TrackingProtectionAppInfo) {
         val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo)
         dialog.show(
             supportFragmentManager,
@@ -145,7 +152,7 @@ class TrackingProtectionExclusionListActivity :
         )
     }
 
-    private fun showEnableProtectionDialog(excludedAppInfo: VpnExcludedInstalledAppInfo, position: Int) {
+    private fun showEnableProtectionDialog(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
         val dialog = ManuallyEnableAppProtectionDialog.instance(excludedAppInfo, position)
         dialog.show(
             supportFragmentManager,

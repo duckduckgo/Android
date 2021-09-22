@@ -23,7 +23,6 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionProtectedApps
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -57,7 +56,6 @@ class DeviceShieldTrackerActivityViewModelTest {
     private lateinit var vpnPreferences: VpnPreferences
 
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
-    private val deviceShieldExcludedApps = mock<TrackingProtectionProtectedApps>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 

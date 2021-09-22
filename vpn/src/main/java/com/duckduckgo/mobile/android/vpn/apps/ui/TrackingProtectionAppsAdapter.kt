@@ -29,17 +29,16 @@ import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import kotlinx.android.synthetic.main.view_device_shield_excluded_app_entry.view.*
-import timber.log.Timber
 
 class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     RecyclerView.Adapter<TrackingProtectionAppViewHolder>() {
 
-    private val excludedApps: MutableList<VpnExcludedInstalledAppInfo> = mutableListOf()
+    private val excludedApps: MutableList<TrackingProtectionAppInfo> = mutableListOf()
 
-    fun update(newList: List<VpnExcludedInstalledAppInfo>) {
+    fun update(newList: List<TrackingProtectionAppInfo>) {
         val oldData = excludedApps
         val diffResult = DiffCallback(oldData, newList).run { DiffUtil.calculateDiff(this) }
         excludedApps.clear().also { excludedApps.addAll(newList) }
@@ -70,8 +69,8 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     }
 
     private class DiffCallback(
-        private val oldList: List<VpnExcludedInstalledAppInfo>,
-        private val newList: List<VpnExcludedInstalledAppInfo>
+        private val oldList: List<TrackingProtectionAppInfo>,
+        private val newList: List<TrackingProtectionAppInfo>
     ) :
         DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
@@ -90,45 +89,55 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 }
 
 interface AppProtectionListener {
-    fun onAppProtectionChanged(excludedAppInfo: VpnExcludedInstalledAppInfo, enabled: Boolean, position: Int)
+    fun onAppProtectionChanged(excludedAppInfo: TrackingProtectionAppInfo, enabled: Boolean, position: Int)
 }
 
 class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(excludedAppInfo: VpnExcludedInstalledAppInfo, position: Int, listener: AppProtectionListener) {
+    fun bind(excludedAppInfo: TrackingProtectionAppInfo, position: Int, listener: AppProtectionListener) {
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
         itemView.deviceShieldAppEntryName.text =
             String.format(itemView.context.resources.getString(R.string.atp_ExcludedAppEntry), excludedAppInfo.name)
                 .applyBoldSpanTo(listOf(excludedAppInfo.name!!))
 
-        if (excludedAppInfo.hasExcludingReason() && excludedAppInfo.isExcluded) {
-            itemView.deviceShieldAppExclusionReason.text =
-                getAppExcludingReasonText(itemView.context, excludedAppInfo.excludingReason)
-            itemView.deviceShieldAppExclusionReason.leftDrawable(getAppExcludingReasonIcon(excludedAppInfo.excludingReason))
-            itemView.deviceShieldAppExclusionReason.show()
+        if (excludedAppInfo.isProblematic()) {
+            if (excludedAppInfo.isExcluded) {
+                itemView.deviceShieldAppExclusionReason.text =
+                    getAppExcludingReasonText(itemView.context, excludedAppInfo.knownProblem)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(getAppExcludingReasonIcon(excludedAppInfo.knownProblem))
+                itemView.deviceShieldAppExclusionReason.show()
+            } else {
+                itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.show()
+            }
         } else {
-            itemView.deviceShieldAppExclusionReason.gone()
+            if (excludedAppInfo.isExcluded) {
+                itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.show()
+            } else {
+                itemView.deviceShieldAppExclusionReason.gone()
+            }
         }
 
         itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
             listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
         }
-        Timber.d("Excluded Apps: bind end")
     }
 
     private fun getAppExcludingReasonText(context: Context, excludingReason: Int): String {
         return when (excludingReason) {
-            VpnExcludedInstalledAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
-            VpnExcludedInstalledAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonKnownIssues)
-            else -> context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonKnownIssues)
+            else -> ""
         }
     }
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            VpnExcludedInstalledAppInfo.MANUALLY_EXCLUDED -> R.drawable.ic_link_blue_16
-            VpnExcludedInstalledAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
-            VpnExcludedInstalledAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
             else -> 0
         }
     }

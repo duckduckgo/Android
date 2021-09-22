@@ -33,7 +33,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCoroutinesApi
 class ExcludedAppsViewModelTest {
 
-    private val trackingProtectionProtectedApps = mock<TrackingProtectionProtectedApps>()
+    private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
 
     private lateinit var viewModel: ExcludedAppsViewModel
@@ -41,7 +41,7 @@ class ExcludedAppsViewModelTest {
     @Before
     fun setup() {
         viewModel = ExcludedAppsViewModel(
-            trackingProtectionProtectedApps,
+            trackingProtectionAppsRepository,
             deviceShieldPixels
         )
     }
@@ -52,7 +52,21 @@ class ExcludedAppsViewModelTest {
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName)
 
         verifyZeroInteractions(deviceShieldPixels)
-        verify(trackingProtectionProtectedApps).manuallyExcludedApp(packageName)
+        verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
+    }
+
+    @Test
+    fun whenPackageNameIsExcludedBecauseStoppedWorkingThenProtectedAppsExcludesItAndLaunchesFeedback() = runBlocking {
+        viewModel.commands().test {
+            val packageName = "com.package.name"
+            viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.STOPPED_WORKING, packageName)
+
+            verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
+            verify(deviceShieldPixels).disableAppProtection(packageName, ManuallyDisableAppProtectionDialog.STOPPED_WORKING)
+
+            Assert.assertEquals(Command.LaunchFeedback, expectItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -61,7 +75,7 @@ class ExcludedAppsViewModelTest {
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName)
 
         verify(deviceShieldPixels).disableAppProtection(packageName, ManuallyDisableAppProtectionDialog.DONT_USE)
-        verify(trackingProtectionProtectedApps).manuallyExcludedApp(packageName)
+        verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
     @Test
@@ -70,7 +84,7 @@ class ExcludedAppsViewModelTest {
         viewModel.onAppProtectionEnabled(packageName, 0)
 
         verify(deviceShieldPixels).enableAppProtection(packageName, 0)
-        verify(trackingProtectionProtectedApps).manuallyEnabledApp(packageName)
+        verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
     @Test
@@ -78,7 +92,7 @@ class ExcludedAppsViewModelTest {
         viewModel.commands().test {
             viewModel.restoreProtectedApps()
             Assert.assertEquals(Command.RestartVpn, expectItem())
-            verify(trackingProtectionProtectedApps).restoreDefaultProtectedList()
+            verify(trackingProtectionAppsRepository).restoreDefaultProtectedList()
             verify(deviceShieldPixels).restoreDefaultProtectionList()
             cancelAndConsumeRemainingEvents()
         }
@@ -177,39 +191,43 @@ class ExcludedAppsViewModelTest {
         }
     }
 
-    private val appWithKnownIssues = VpnExcludedInstalledAppInfo(
+    private val appWithKnownIssues = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
         type = "None",
         category = AppCategory.Undefined,
         isExcluded = true,
-        excludingReason = VpnExcludedInstalledAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
+        knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+        userModifed = false
     )
 
-    private val appLoadsWebsites = VpnExcludedInstalledAppInfo(
+    private val appLoadsWebsites = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
         type = "None",
         category = AppCategory.Undefined,
         isExcluded = true,
-        excludingReason = VpnExcludedInstalledAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
+        knownProblem = TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
+        userModifed = false
     )
 
-    private val appManuallyExcluded = VpnExcludedInstalledAppInfo(
+    private val appManuallyExcluded = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
         type = "None",
         category = AppCategory.Undefined,
         isExcluded = true,
-        excludingReason = VpnExcludedInstalledAppInfo.MANUALLY_EXCLUDED
+        knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
+        userModifed = true
     )
 
-    private val appWithoutIssues = VpnExcludedInstalledAppInfo(
+    private val appWithoutIssues = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
         type = "None",
         category = AppCategory.Undefined,
-        isExcluded = true,
-        excludingReason = VpnExcludedInstalledAppInfo.NO_ISSUES
+        isExcluded = false,
+        knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
+        userModifed = false
     )
 }

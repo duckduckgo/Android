@@ -26,7 +26,7 @@ import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionProtectedApps
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -51,7 +51,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var vpnPreferences: VpnPreferences
 
     @Inject
-    lateinit var deviceShieldExcludedApps: TrackingProtectionProtectedApps
+    lateinit var deviceShieldExcludedApps: TrackingProtectionAppsRepository
 
     @Inject
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory

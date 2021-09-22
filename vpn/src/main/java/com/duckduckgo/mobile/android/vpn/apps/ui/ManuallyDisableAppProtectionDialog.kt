@@ -24,7 +24,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.VpnExcludedInstalledAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -132,7 +132,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         const val TRACKING_OK = 2
         const val DONT_USE = 3
 
-        fun instance(appInfo: VpnExcludedInstalledAppInfo): ManuallyDisableAppProtectionDialog {
+        fun instance(appInfo: TrackingProtectionAppInfo): ManuallyDisableAppProtectionDialog {
             return ManuallyDisableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)

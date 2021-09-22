@@ -136,19 +136,21 @@
     <!-- Exclusion List -->
     <string name="atp_ExcludedApps">Excluded Apps</string>
     <string name="atp_ExclusionListActivityTitle">Protection for Your Apps</string>
-    <string name="atp_ExcludedAppsFeature">App Tracking Protection blocks app trackers from other companies, like when Facebook tries to track you in a banking app. Companies might still track you in apps they own.\n\nIf an app isn\'t working as expected, try disabling protection for that app.</string>
+    <string name="atp_ExcludedAppsFeature">App Tracking Protection blocks app trackers from other companies, like when Facebook tries to track you in a banking app. Companies may still track you in apps they own.\n\nIf an app isn\'t working as expected, try disabling protection for that app.</string>
     <string name="atp_ExcludedAppsKnownIssuesLabel">While this feature is in beta, we may disable protection for certain apps, such as those with known issues. Your custom settings won\'t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsReport">Report Problem With Another App</string>
     <string name="atp_ExcludedAppEntry">%s app</string>
     <string name="atp_ExcludedReasonLoadsWebsites">Loads websites</string>
     <string name="atp_ExcludedReasonKnownIssues">Known issues</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manually disabled</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Manually enabled</string>
     <string name="atp_ExcludeAppsManuallyCTACancel">Cancel</string>
     <string name="atp_ExcludeAppsManuallyCTAEnable">Enable</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
     <string name="atp_ExcludeAppsManuallyEnableAppName">Manually enable protection for %s app?</string>
     <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience problems when tracking attempts fail.</string>
-    <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection disabled</string>
+    <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection Disabled</string>
     <string name="atp_ExcludeAppsManuallyDisableAppLabel">Why did you disable Privacy Protection for %s app?</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>

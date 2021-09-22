@@ -154,4 +154,14 @@
         <item name="cornerSize">16dp</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.InfoPanel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.InfoPanel.Text" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+    </style>
+
 </resources>
