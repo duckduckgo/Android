@@ -1294,9 +1294,9 @@ class BrowserTabFragment :
         val snackbarMessage = when (savedSite) {
             is SavedSite.Bookmark -> {
                 if (bookmarkFolder != null) {
-                    getString(R.string.bookmarkAddedMessage) + " in ${bookmarkFolder.name}"
+                    getString(R.string.bookmarkAddedMessage) + " : ${bookmarkFolder.name}"
                 } else {
-                    getString(R.string.bookmarkAddedMessage) + " in " + getString(R.string.bookmarksSectionTitle)
+                    getString(R.string.bookmarkAddedMessage) + " : " + getString(R.string.bookmarksSectionTitle)
                 }
             }
             is SavedSite.Favorite -> getString(R.string.favoriteAddedMessage)
