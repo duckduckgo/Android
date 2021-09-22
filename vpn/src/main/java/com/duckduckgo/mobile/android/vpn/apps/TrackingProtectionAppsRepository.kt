@@ -72,7 +72,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             type = it.getAppType(),
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
-                            knownProblem = hasKnownIssue(it.packageName, ddgExclusionList),
+                            knownProblem = hasKnownIssue(it, ddgExclusionList),
                             userModifed = isUserModified(it.packageName, manualList)
                         )
                     }
@@ -102,10 +102,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            appInfo.isSystemApp() ||
-            appInfo.isGame()
-
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || appInfo.isSystemApp()
     }
 
     private fun shouldBeExcluded(
@@ -114,32 +111,38 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            appInfo.isSystemApp() ||
-            appInfo.isGame() ||
-            isManuallyExcluded(appInfo.packageName, ddgExclusionList, userExclusionList)
+                appInfo.isSystemApp() ||
+                isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 
     private fun isManuallyExcluded(
-        packageName: String,
+        appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
-        val userExcludedApp = userExclusionList.find { it.packageId == packageName }
-        return if (userExcludedApp != null) {
-            !userExcludedApp.isProtected
-        } else {
-            ddgExclusionList.any { it.packageId == packageName }
+        val userExcludedApp = userExclusionList.find { it.packageId == appInfo.packageName }
+        if (userExcludedApp != null) {
+            return !userExcludedApp.isProtected
         }
+
+        if (appInfo.isGame()) {
+            return true
+        }
+
+        return ddgExclusionList.any { it.packageId == appInfo.packageName }
     }
 
     private fun hasKnownIssue(
-        packageName: String,
+        appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>
     ): Int {
-        if (BROWSERS.contains(packageName)) {
+        if (BROWSERS.contains(appInfo.packageName)) {
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
         }
-        if (ddgExclusionList.any { it.packageId == packageName }) {
+        if (ddgExclusionList.any { it.packageId == appInfo.packageName }) {
+            return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
+        }
+        if (appInfo.isGame()) {
             return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
         }
         return TrackingProtectionAppInfo.NO_ISSUES
