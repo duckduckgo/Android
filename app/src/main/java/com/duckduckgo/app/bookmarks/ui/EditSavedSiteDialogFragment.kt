@@ -20,15 +20,18 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.View
 import android.widget.EditText
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
-        fun onSavedSiteEdited(savedSite: SavedSite)
+        fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite)
+        fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String)
     }
 
     var listener: EditSavedSiteListener? = null
@@ -43,7 +46,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
 
-        populateFields(binding.titleInput, binding.urlInput)
+        populateFields(binding.titleInput, binding.urlInput, binding.savedSiteLocation)
 
         binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
@@ -51,9 +54,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     private fun validateInput(newValue: String, existingValue: String) =
         if (newValue.isNotBlank()) newValue else existingValue
 
-    private fun populateFields(titleInput: EditText, urlInput: EditText) {
+    private fun populateFields(titleInput: EditText, urlInput: EditText, savedLocation: EditText) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
+        getExistingBookmarkFolderName()?.let {
+            if (it.isNotEmpty()) savedLocation.setText(getExistingBookmarkFolderName())
+        }
     }
 
     override fun onConfirmation() {
@@ -65,14 +71,37 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         when (savedSite) {
             is SavedSite.Bookmark -> {
                 val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
+                val parentFolderName = binding.savedSiteLocation.text.toString()
+                listener?.onSavedSiteBookmarkEdited(
+                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
+                    parentFolderName
                 )
             }
             is SavedSite.Favorite -> {
-                listener?.onSavedSiteEdited(
+                listener?.onSavedSiteFavoriteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
+            }
+        }
+    }
+
+    override fun configureClickListeners() {
+        binding.savedSiteLocation.setOnClickListener {
+            context?.let { context ->
+                arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
+                    if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
+                                showAddFolderMenu = true
+                            )
+                        )
+                    } else {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = true))
+                    }
+                }
             }
         }
     }
@@ -96,6 +125,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
+    private fun getExistingBookmarkFolderName(): String? = requireArguments().getSerializable(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME) as String?
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")

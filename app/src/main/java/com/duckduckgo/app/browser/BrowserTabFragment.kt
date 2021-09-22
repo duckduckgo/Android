@@ -64,6 +64,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -107,19 +108,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.DaxDialogListener
-import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.disableAnimation
-import com.duckduckgo.app.global.view.enableAnimation
-import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.isDifferent
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
-import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
@@ -137,6 +126,7 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -597,8 +587,8 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
-            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSite)
-            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite)
+            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSite, it.bookmarkFolder)
+            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite, it.bookmarkFolder)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
@@ -1067,7 +1057,7 @@ class BrowserTabFragment :
                 pixel.fire(originPixel)
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
-            { viewModel.onEditSavedSiteRequested(it.favorite) },
+            { viewModel.onEditSavedSiteRequested(it.favorite, null) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )
     }
@@ -1300,20 +1290,30 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private fun savedSiteAdded(savedSite: SavedSite) {
+    private fun savedSiteAdded(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
         val snackbarMessage = when (savedSite) {
-            is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
-            is SavedSite.Favorite -> R.string.favoriteAddedMessage
+            is SavedSite.Bookmark -> {
+                if (bookmarkFolder != null) {
+                    getString(R.string.bookmarkAddedMessage) + " in ${bookmarkFolder.name}"
+                } else {
+                    getString(R.string.bookmarkAddedMessage) + " in " + getString(R.string.bookmarksSectionTitle)
+                }
+            }
+            is SavedSite.Favorite -> getString(R.string.favoriteAddedMessage)
         }
         Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                editSavedSite(savedSite)
+                editSavedSite(savedSite, bookmarkFolder)
             }
             .show()
     }
 
-    private fun editSavedSite(savedSite: SavedSite) {
-        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
+    private fun editSavedSite(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSite,
+            bookmarkFolder?.id ?: 0,
+            bookmarkFolder?.name
+        )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
     }

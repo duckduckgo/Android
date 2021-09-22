@@ -17,13 +17,13 @@
 package com.duckduckgo.app.bookmarks.model
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.bookmarks.db.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
@@ -33,6 +33,7 @@ interface BookmarksRepository {
     suspend fun delete(bookmark: Bookmark)
     fun getBookmarkFoldersByParentId(parentId: Long): List<BookmarkFolder>
     fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity>
+    suspend fun getBookmarkFolderById(parentId: Long): BookmarkFolder?
     suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
@@ -73,6 +74,10 @@ class BookmarksDataRepository(
 
     override fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity> {
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
+    }
+
+    override suspend fun getBookmarkFolderById(parentId: Long): BookmarkFolder? {
+        return bookmarkFoldersDao.getBookmarkFolders().firstOrNull()?.find { it.id == parentId }
     }
 
     override fun bookmarks(): Flow<List<Bookmark>> {

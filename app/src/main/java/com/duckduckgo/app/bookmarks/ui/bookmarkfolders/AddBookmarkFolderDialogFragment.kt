@@ -40,6 +40,27 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         binding.savedSiteUrlInputContainer.visibility = View.GONE
     }
 
+    override fun configureClickListeners() {
+        binding.savedSiteLocation.setOnClickListener {
+            context?.let { context ->
+                arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
+                    if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
+                                showAddFolderMenu = false
+                            )
+                        )
+                    } else {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = false))
+                    }
+                }
+            }
+        }
+    }
+
     override fun onConfirmation() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text.toString()

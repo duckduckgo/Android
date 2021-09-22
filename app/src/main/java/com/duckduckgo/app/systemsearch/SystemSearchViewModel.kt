@@ -306,14 +306,13 @@ class SystemSearchViewModel(
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
     }
 
-    override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when (savedSite) {
-            is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    favoritesRepository.update(savedSite)
-                }
-            }
-            else -> throw IllegalArgumentException("Illegal SavedSite to edit received")
+    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String) {
+        throw IllegalArgumentException("Illegal SavedSite to edit received")
+    }
+
+    override fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            favoritesRepository.update(favorite)
         }
     }
 

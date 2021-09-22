@@ -38,6 +38,27 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         configureFieldVisibility()
     }
 
+    override fun configureClickListeners() {
+        binding.savedSiteLocation.setOnClickListener {
+            context?.let { context ->
+                arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
+                    if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
+                                showAddFolderMenu = true
+                            )
+                        )
+                    } else {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = true))
+                    }
+                }
+            }
+        }
+    }
+
     private fun configureFieldVisibility() {
         binding.savedSiteLocationContainer.visibility = View.VISIBLE
         binding.savedSiteUrlInputContainer.visibility = View.GONE
