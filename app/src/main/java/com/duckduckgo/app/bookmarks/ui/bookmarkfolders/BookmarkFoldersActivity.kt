@@ -26,7 +26,6 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import timber.log.Timber
 
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
@@ -62,7 +61,6 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         viewModel.viewState.observe(
             this,
             { viewState ->
-                Timber.d("viewState found $viewState")
                 viewState?.let {
                     adapter.submitList(it.folderStructure)
                 }
