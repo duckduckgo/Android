@@ -24,7 +24,7 @@ Please refer to [contributing](CONTRIBUTING.md).
 
 ## Discuss
 
-Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
+Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so, please navigate to Settings and select "Leave Feedback".
 
 ## License
 DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
