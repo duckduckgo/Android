@@ -216,7 +216,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             )
             val pastWeekSuffix = resources.getString(R.string.atp_WeeklyCompanyTeaserNotificationSuffix)
 
-            val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+            val textToStyle = "$prefix $totalTrackers $latestAppString $optionalOtherAppsString$pastWeekSuffix"
 
             Timber.i("createWeeklyReportNotification. $textToStyle\nTotal apps: ${perApp.size}. Other apps: $otherAppsSize")
 
