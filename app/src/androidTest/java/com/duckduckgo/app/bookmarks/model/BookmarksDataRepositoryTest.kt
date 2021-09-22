@@ -75,6 +75,12 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
+    fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runBlocking {
+        repository.insert(title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId)
+        assertEquals(listOf(bookmarkEntity), bookmarksDao.getBookmarks().first())
+    }
+
+    @Test
     fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runBlocking {
         repository.insert(bookmark)
 
@@ -300,5 +306,21 @@ class BookmarksDataRepositoryTest {
         val bookmark = repository.getBookmark("www.test.com")
 
         assertNull(bookmark)
+    }
+
+    @Test
+    fun whenHasBookmarksRequestedAndNoBookmarksAvailableThenReturnFalse() = runBlocking {
+        val result = repository.hasBookmarks()
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenHasBookmarksRequestedAndBookmarksAvailableThenReturnTrue() = runBlocking {
+        repository.insert(SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0))
+
+        val result = repository.hasBookmarks()
+
+        assertTrue(result)
     }
 }
