@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Tøm søkefeltet</string>
     <string name="no_compatible_third_party_app_installed">Ingen kompatibel app installert</string>
     <string name="addBookmarkMenuTitle">Legg til bokmerke</string>
+    <string name="editBookmarkMenuTitle">Rediger bokmerke</string>
     <string name="addFavoriteMenuTitle">Legg til favoritt</string>
+    <string name="removeFavoriteMenuTitle">Fjern favoritt</string>
     <string name="favoriteAddedMessage">Favoritt lagt til</string>
     <string name="bookmarkAddedMessage">Bokmerke lagt til</string>
     <string name="requestDesktopSiteMenuTitle">Skrivebordversjon</string>

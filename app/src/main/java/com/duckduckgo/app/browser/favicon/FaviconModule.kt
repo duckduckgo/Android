@@ -21,7 +21,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import dagger.Module
 import dagger.Provides
@@ -38,7 +37,6 @@ class FaviconModule {
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         locationPermissionsRepository: LocationPermissionsRepository,
         favoritesRepository: FavoritesRepository,
-        userEventsRepository: UserEventsRepository,
         faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider
     ): FaviconManager {
@@ -49,7 +47,6 @@ class FaviconModule {
             locationPermissionsRepository,
             favoritesRepository,
             faviconDownloader,
-            userEventsRepository,
             dispatcherProvider
         )
     }

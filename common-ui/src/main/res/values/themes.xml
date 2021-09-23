@@ -107,7 +107,6 @@
 
         <item name="emailButtonRippleColor">@color/white</item>
         <item name="quickAccessItemTitleTextColor">@color/white</item>
-        <item name="favoriteAddedHintTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
     </style>
@@ -205,7 +204,6 @@
 
         <item name="emailButtonRippleColor">@color/subtleGrayTwo</item>
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
-        <item name="favoriteAddedHintTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
     </style>
