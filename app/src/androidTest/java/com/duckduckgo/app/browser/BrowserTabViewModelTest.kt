@@ -1502,7 +1502,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
-        val bookmark = Bookmark(0, "A title", "www.example.com", 0)
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
         whenever(mockBookmarksRepository.insert(anyString(), anyString(), anyLong())).thenReturn(bookmark)
 
         testee.onBookmarkMenuClicked()
