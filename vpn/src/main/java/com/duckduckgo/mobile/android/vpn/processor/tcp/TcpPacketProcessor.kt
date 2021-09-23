@@ -39,9 +39,9 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.*
+import xyz.hexene.localvpn.Packet.TCPHeader.ACK
+import xyz.hexene.localvpn.Packet.TCPHeader.FIN
 import xyz.hexene.localvpn.TCB
-import java.lang.Runnable
 import java.nio.ByteBuffer
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
@@ -219,7 +219,7 @@ class TcpPacketProcessor @AssistedInject constructor(
                     finSequenceNumberToClient = sequenceNumberToClient
                 }
 
-                Timber.i(
+                Timber.v(
                     "%s - Sending FIN/ACK, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
                     responseSeq, responseAck,

@@ -49,7 +49,6 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
-import kotlin.system.measureNanoTime
 
 class TcpDeviceToNetwork(
     private val queues: VpnQueues,
@@ -100,7 +99,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
-        Timber.i(
+        Timber.v(
             "New packet. %s. TCB not initialized. %s. Packet length: %d.  Data length: %d",
             connectionKey,
             TcpPacketProcessor.logPacketDetails(
@@ -145,7 +144,7 @@ class TcpDeviceToNetwork(
         responseBuffer: ByteBuffer,
         payloadBuffer: ByteBuffer
     ) {
-        Timber.i(
+        Timber.v(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
             connectionKey, tcb.tcbState,
             TcpPacketProcessor.logPacketDetails(
@@ -241,7 +240,7 @@ class TcpDeviceToNetwork(
             val hostName = determineHostName(tcb, packet, payloadBuffer)
             val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
             val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName, payloadSize)
-            Timber.i(
+            Timber.v(
                 "App %s attempting to send %d bytes to (%s). %s host=%s, localAddress=%s, retry=%s",
                 requestingApp,
                 payloadSize,
@@ -264,15 +263,10 @@ class TcpDeviceToNetwork(
             }
 
             if (!tcb.waitingForNetworkData) {
-                Timber.v("Not waiting for network data %s; register for OP_READ and wait for network data", tcb.ipAndPort)
-                Timber.i(
-                    "Registering for OP_READ. Took: %d",
-                    measureNanoTime {
-                        selector.wakeup()
-                        tcb.selectionKey.interestOps(OP_READ)
-                        tcb.waitingForNetworkData = true
-                    }
-                )
+                Timber.v("Register for OP_READ and wait for network data. %s.", tcb.ipAndPort)
+                selector.wakeup()
+                tcb.selectionKey.interestOps(OP_READ)
+                tcb.waitingForNetworkData = true
             }
 
             try {

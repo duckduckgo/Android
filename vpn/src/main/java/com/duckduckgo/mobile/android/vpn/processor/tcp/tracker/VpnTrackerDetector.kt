@@ -142,7 +142,7 @@ class DomainBasedTrackerDetector(
     }
 
     private fun recordTrackerBlocked(trackerType: ThirdParty, tcb: TCB, requestingApp: OriginatingApp) {
-        Timber.i(
+        Timber.d(
             "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
             tcb.hostName,
             requestingApp.packageId,

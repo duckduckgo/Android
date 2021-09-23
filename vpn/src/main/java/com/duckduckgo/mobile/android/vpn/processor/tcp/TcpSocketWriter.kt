@@ -103,7 +103,7 @@ class RealTcpSocketWriter @Inject constructor(
             val bytesWritten = socket.write(payloadBuffer)
 
             if (payloadBuffer.remaining() == 0) {
-                Timber.i("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
+                Timber.v("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
                 fullyWritten(tcb, writeData, connectionParams)
             } else {
                 Timber.w("Partial write. %d bytes remaining to be written for %s", payloadBuffer.remaining(), getLogLabel(tcb))
@@ -112,7 +112,7 @@ class RealTcpSocketWriter @Inject constructor(
 
         } while (writeQueue.isNotEmpty())
 
-        Timber.i("Nothing more to write, switching to read mode")
+        Timber.v("Nothing more to write, switching to read mode")
 
         selector.wakeup()
         tcb.channel.register(selector, OP_READ, tcb)
@@ -134,7 +134,7 @@ class RealTcpSocketWriter @Inject constructor(
         val seqToClient = tcb.sequenceNumberToClient
         val ackToServer = tcb.acknowledgementNumberToServer
         val seqAckDiff = seqToClient - ackToServer
-        Timber.i(
+        Timber.v(
             "%s - seqToClient=%d, ackToClient=%d, ackToServer=%d, diff=%d",
             writeData.tcb.ipAndPort,
             seqToClient,

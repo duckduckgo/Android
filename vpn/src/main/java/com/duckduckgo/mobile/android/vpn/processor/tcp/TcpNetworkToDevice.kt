@@ -120,7 +120,7 @@ class TcpNetworkToDevice(
     }
 
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
-        Timber.i(
+        Timber.v(
             "Network-to-device packet %s. %d bytes. %s",
             tcb.ipAndPort,
             readBytes,
@@ -141,7 +141,7 @@ class TcpNetworkToDevice(
     }
 
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey) {
-        Timber.w(
+        Timber.d(
             "Network-to-device end of stream %s. %s %dms after creation %s",
             tcb.ipAndPort,
             tcb.tcbState,
@@ -188,7 +188,7 @@ class TcpNetworkToDevice(
         val packet = tcb.referencePacket
         runCatching {
             if (tcb.channel.finishConnect()) {
-                Timber.d("Finished connecting to %s. Sending SYN+ACK.", tcb.ipAndPort)
+                Timber.v("Finished connecting to %s. Sending SYN+ACK.", tcb.ipAndPort)
 
                 tcb.updateState(MoveServerToState(SYN_RECEIVED))
                 tcb.updateState(MoveClientToState(SYN_SENT))
@@ -228,7 +228,7 @@ class TcpNetworkToDevice(
     }
 
     private fun logPacket(tcb: TCB, packet: Packet) {
-        Timber.i(
+        Timber.v(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
             tcb.ipAndPort,
             tcb.tcbState,

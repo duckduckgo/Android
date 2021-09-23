@@ -43,19 +43,19 @@ class TcpStateFlow {
                 FIN_WAIT_1 -> handlePacketInFinWait1(connectionKey, currentState, packetType)
                 FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, packetType)
                 CLOSING -> handlePacketInClosing(connectionKey, currentState, packetType)
-                TIME_WAIT -> handlePacketInTimeWait(packetType)
-                CLOSED -> handlePacketInClosed(packetType)
+                TIME_WAIT -> handlePacketInTimeWait(connectionKey, packetType)
+                CLOSED -> handlePacketInClosed(connectionKey, packetType)
                 else -> unhandledEvent(connectionKey, currentState, packetType)
             }
-            Timber.d("%s. [%s]. New actions are [%s]", connectionKey, currentState, newActions.ifEmpty { listOf("No Actions") }.joinToString())
+            Timber.v("%s. [%s]. New actions are [%s]", connectionKey, currentState, newActions.ifEmpty { listOf("No Actions") }.joinToString())
 
             return TcpStateAction(newActions)
         }
 
-        private fun handlePacketInTimeWait(packetType: PacketType): List<Event> {
+        private fun handlePacketInTimeWait(connectionKey: String, packetType: PacketType): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in TIME_WAIT. Closing connection")
+                    Timber.w("Received RESET while in TIME_WAIT. Closing connection %s", connectionKey)
                     listOf(CloseConnection)
                 }
                 else -> listOf(SendReset)
@@ -63,10 +63,10 @@ class TcpStateFlow {
             return events
         }
 
-        private fun handlePacketInClosed(packetType: PacketType): List<Event> {
+        private fun handlePacketInClosed(connectionKey: String, packetType: PacketType): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in CLOSED. Closing connection")
+                    Timber.w("Received RESET while in CLOSED. Closing connection %s", connectionKey)
                     listOf(CloseConnection)
                 }
                 else -> listOf(SendReset)
@@ -77,7 +77,7 @@ class TcpStateFlow {
         private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String, currentState: TcbState): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in %s. Closing connection", currentState)
+                    Timber.w("Received RESET while in %s. Closing connection %s", currentState, connectionKey)
                     listOf(CloseConnection)
                 }
                 isAckForOurFin(packetType, connectionKey, currentState) -> {
@@ -104,7 +104,7 @@ class TcpStateFlow {
                     connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
                 )
             } else {
-                Timber.d(
+                Timber.v(
                     "%s - %s, received [fin=%s, ack=%s] with matching numbers. Expected=%d, actual=%d",
                     connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
                 )
@@ -199,12 +199,12 @@ class TcpStateFlow {
         private fun handlePacketInStateListen(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in LISTEN. Nothing to do")
+                    Timber.d("Received RESET while in LISTEN. Nothing to do. %s", connectionKey)
                     listOf(CloseConnection)
                 }
                 packetType.isSyn -> {
                     if (currentState.clientState == SYN_SENT) {
-                        Timber.i("Opening a connection when SYN already sent; duplicate SYN can be ignored")
+                        Timber.d("Opening a connection when SYN already sent; duplicate SYN can be ignored. %s", connectionKey)
                         return emptyList()
                     }
                     listOf(OpenConnection)

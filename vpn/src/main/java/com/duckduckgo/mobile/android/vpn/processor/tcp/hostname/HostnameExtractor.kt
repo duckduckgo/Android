@@ -34,7 +34,7 @@ class AndroidHostnameExtractor(
     override fun extract(tcb: TCB, payloadBytes: ByteArray): String? {
         if (tcb.hostName != null) return tcb.hostName
         determineHost(tcb, payloadBytes)
-        Timber.i("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
+        Timber.v("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
         return tcb.hostName
     }
 
@@ -52,8 +52,6 @@ class AndroidHostnameExtractor(
             tcb.hostName = host
             return
         }
-
-        Timber.w("Failed to extract host")
     }
 
 }

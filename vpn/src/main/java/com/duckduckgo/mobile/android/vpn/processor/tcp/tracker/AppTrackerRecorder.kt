@@ -74,7 +74,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
         }
 
         dao.insert(toInsert)
-        Timber.i("Inserted %d trackers from memory into db", toInsert.size)
+        Timber.v("Inserted %d trackers from memory into db", toInsert.size)
     }
 
     override fun insertTracker(vpnTracker: VpnTracker) {

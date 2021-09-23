@@ -72,7 +72,7 @@ class VpnConnectionMonitor @Inject constructor(
         try {
             for (networkInterface in NetworkInterface.getNetworkInterfaces()) {
                 if (networkInterface.isUp && networkInterface.name.contains("tun")) {
-                    Timber.d("TUN monitor: ${networkInterface.name} interface is UP")
+                    Timber.v("TUN monitor: ${networkInterface.name} interface is UP")
                     return true
                 }
             }
