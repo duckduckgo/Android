@@ -586,7 +586,12 @@ class BrowserTabFragment :
             renderer.cancelTrackersAnimation()
         }
         when (it) {
-            is Command.Refresh -> refresh()
+            is Command.Refresh -> {
+                // refresh()
+                webView?.settings?.let {
+                    it.textZoom = it.textZoom + 50
+                }
+            }
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -1174,6 +1179,7 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
+                Timber.i("Font size: ${this.textZoom}")
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
