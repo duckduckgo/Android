@@ -552,7 +552,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = coroutineRule.runBlocking {
-        val bookmark = Bookmark(0, "A title", "www.example.com", 0)
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
         testee.onSavedSiteEdited(bookmark)
         verify(mockBookmarksRepository).update(bookmark)
     }
