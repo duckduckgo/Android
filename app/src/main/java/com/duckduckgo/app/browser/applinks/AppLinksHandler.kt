@@ -23,7 +23,6 @@ import javax.inject.Inject
 interface AppLinksHandler {
     fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean
     fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
-    fun enterBrowserState(urlString: String?)
     fun updatePreviousUrl(urlString: String?)
     fun reset()
 }
@@ -41,7 +40,8 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         ) {
             return false
         }
-        enterBrowserState(urlString)
+        appLinkOpenedInBrowser = true
+        previousUrl = urlString
         launchAppLink()
         return false
     }
@@ -52,11 +52,6 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         }
         launchNonHttpAppLink()
         return true
-    }
-
-    override fun enterBrowserState(urlString: String?) {
-        appLinkOpenedInBrowser = true
-        previousUrl = urlString
     }
 
     override fun updatePreviousUrl(urlString: String?) {

@@ -46,6 +46,7 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -173,6 +174,24 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenListenerNotified() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener).pageStarted(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledAndIsAppLinkThenUpdateCachedAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(anyString())).thenReturn(urlType)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).updateCachedAppLink(urlType)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledAndNotAppLinkThenClearCachedAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.Web(webAddress = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(anyString())).thenReturn(urlType)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).clearCachedAppLink()
     }
 
     @UiThreadTest

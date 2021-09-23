@@ -555,6 +555,7 @@
     <string name="appLinkSnackBarMessage">You can open this link in the %s app</string>
     <string name="appLinkMultipleSnackBarMessage">You can open this link in associated apps</string>
     <string name="appLinkIntentChooserTitle">Continue with</string>
+    <string name="appLinkMenuItemTitle">Open in app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>

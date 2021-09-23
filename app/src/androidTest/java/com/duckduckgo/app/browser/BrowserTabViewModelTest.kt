@@ -3509,6 +3509,26 @@ class BrowserTabViewModelTest {
         assertNull(privacyGradeState().privacyGrade)
     }
 
+    @Test
+    fun whenPageStartedThenCacheUrl() {
+        testee.pageStarted("example.com")
+        verify(mockAppLinksHandler).updatePreviousUrl("example.com")
+    }
+
+    @Test
+    fun whenClearCachedAppLinkThenClearAppLink() {
+        testee.browserViewState.value = browserViewState().copy(previousAppLink = SpecialUrlDetector.UrlType.AppLink(uriString = "foo.com"))
+        testee.clearCachedAppLink()
+        assertNull(browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenUpdateCachedAppLinkThenUpdateAppLink() {
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = "foo.com")
+        testee.updateCachedAppLink(appLink)
+        assertEquals(appLink, browserViewState().previousAppLink)
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)

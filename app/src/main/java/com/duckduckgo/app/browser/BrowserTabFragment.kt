@@ -542,6 +542,7 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
+        viewModel.clearCachedAppLink()
         errorSnackbar.dismiss()
         newTabLayout.show()
         browserLayout.gone()
@@ -1841,6 +1842,11 @@ class BrowserTabFragment :
                     viewModel.onPinPageToHomeSelected()
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(view.openInAppMenuItem) {
+                    viewModel.browserViewState.value?.previousAppLink?.let {
+                        openAppLink(it.appIntent, it.excludedComponents, it.uriString)
+                    }
+                }
             }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
@@ -2103,6 +2109,10 @@ class BrowserTabFragment :
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
                     it.isEnabled = viewState.addToHomeEnabled
+                }
+
+                openInAppMenuItem?.let {
+                    it.visibility = if (viewState.previousAppLink != null) VISIBLE else GONE
                 }
             }
         }

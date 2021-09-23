@@ -203,7 +203,8 @@ class BrowserTabViewModel(
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
         val showDaxIcon: Boolean = false,
-        val isEmailSignedIn: Boolean = false
+        val isEmailSignedIn: Boolean = false,
+        var previousAppLink: AppLink? = null
     )
 
     sealed class HighlightableButton {
@@ -1925,9 +1926,16 @@ class BrowserTabViewModel(
         appLinksHandler.updatePreviousUrl(url)
     }
 
-    fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {
-        appLinksHandler.enterBrowserState(url)
-        command.value = Navigate(url, headers)
+    override fun clearCachedAppLink() {
+        browserViewState.value = currentBrowserViewState().copy(
+            previousAppLink = null
+        )
+    }
+
+    override fun updateCachedAppLink(appLink: AppLink) {
+        browserViewState.value = currentBrowserViewState().copy(
+            previousAppLink = appLink
+        )
     }
 
     fun appLinkClicked(appLink: AppLink) {

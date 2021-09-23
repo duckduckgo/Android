@@ -154,13 +154,6 @@ class DuckDuckGoAppLinksHandlerTest {
     }
 
     @Test
-    fun whenEnterBrowserStateCalledThenSetAppLinkOpenedInBrowserToTrue() {
-        assertFalse(testee.appLinkOpenedInBrowser)
-        testee.enterBrowserState("foo.com")
-        assertTrue(testee.appLinkOpenedInBrowser)
-    }
-
-    @Test
     fun whenResetCalledThenResetAppLinkState() {
         testee.appLinkOpenedInBrowser = true
         testee.reset()

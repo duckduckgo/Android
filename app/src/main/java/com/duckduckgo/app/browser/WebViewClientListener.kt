@@ -49,6 +49,8 @@ interface WebViewClientListener {
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
     fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean
     fun pageStarted(url: String?)
+    fun clearCachedAppLink()
+    fun updateCachedAppLink(appLink: SpecialUrlDetector.UrlType.AppLink)
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink, isRedirect: Boolean): Boolean
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
