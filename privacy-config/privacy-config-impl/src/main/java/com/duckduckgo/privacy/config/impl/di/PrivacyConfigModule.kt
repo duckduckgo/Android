@@ -40,6 +40,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
 import com.duckduckgo.privacy.config.store.features.gpc.RealGpcRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
+import com.duckduckgo.privacy.config.store.features.trackerallowlist.RealTrackerAllowlistRepository
+import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -104,6 +106,12 @@ class DatabaseModule {
     @Provides
     fun providePrivacyConfigRepository(database: PrivacyConfigDatabase): PrivacyConfigRepository {
         return RealPrivacyConfigRepository(database)
+    }
+
+    @Singleton
+    @Provides
+    fun providePTrackerAllowlistRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackerAllowlistRepository {
+        return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
