@@ -95,8 +95,4 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
-
-    @Binds
-    @IntoSet
-    abstract fun bindFavoritesOnboardingObserver(favoritesOnboardingObserver: FavoritesOnboardingObserver): LifecycleObserver
 }

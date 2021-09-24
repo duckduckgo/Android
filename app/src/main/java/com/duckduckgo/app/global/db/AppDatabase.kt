@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 39,
+    exportSchema = true, version = 40,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -448,20 +448,20 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
-    /**
-     * WARNING ⚠️
-     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
-     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
-     * constraint.
-     */
+    val MIGRATION_38_TO_39: Migration = object : Migration(38, 39) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM user_events WHERE id = \"FIRST_NON_SERP_VISITED_SITE\"")
+        }
+    }
+
     // todo: This is VPN project migration, KEEP IT ALWAYS LAST
-    val MIGRATION_VPN: Migration = object : Migration(38, 39) {
+    val MIGRATION_VPN: Migration = object : Migration(39, 40) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
             // place here new migrations from the main app
             // this avoids crashes and forcing to uninstall the appTP app every time a new migration
             // is added to the main app
-            MIGRATION_36_TO_37.migrate(database)
+            MIGRATION_38_TO_39.migrate(database)
         }
     }
 
@@ -474,6 +474,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
         override fun onOpen(db: SupportSQLiteDatabase) {
             db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
@@ -519,6 +525,7 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_35_TO_36,
             MIGRATION_36_TO_37,
             MIGRATION_37_TO_38,
+            MIGRATION_38_TO_39,
             MIGRATION_VPN,
         )
 

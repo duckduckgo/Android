@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.events.db
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserEventsDao {
@@ -30,7 +29,4 @@ interface UserEventsDao {
 
     @Query("delete from user_events where id=:userEventKey")
     fun delete(userEventKey: UserEventKey)
-
-    @Query("select * from user_events")
-    fun userEvents(): Flow<List<UserEventEntity>>
 }

@@ -17,7 +17,7 @@ buildscript {
     ext.google_crashlytics_plugin = "2.2.1"
 
     ext.min_sdk = 21
-    ext.target_sdk = 29
+    ext.target_sdk = 30
     ext.compile_sdk = 30
     ext.tools_build_version = "30.0.3"
 

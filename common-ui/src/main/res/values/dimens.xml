@@ -37,7 +37,6 @@
     <dimen name="changeAppIconSize">75dp</dimen>
     <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
 
-    <dimen name="addSavedSiteGridItemIcon">28dp</dimen>
     <dimen name="savedSiteGridItemFavicon">56dp</dimen>
     <dimen name="savedSiteGridItemCornerRadiusFavicon">10dp</dimen>
     <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>

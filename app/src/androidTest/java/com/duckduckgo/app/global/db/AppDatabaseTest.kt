@@ -437,6 +437,11 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(37, 38, migrationsProvider.MIGRATION_37_TO_38)
     }
 
+    @Test
+    fun whenMigratingFromVersion38To39ThenValidationSucceeds() {
+        createDatabaseAndMigrate(38, 39, migrationsProvider.MIGRATION_38_TO_39)
+    }
+
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
         database.execSQL("INSERT INTO `userStage` values (1, '${appStage.name}') ")
     }

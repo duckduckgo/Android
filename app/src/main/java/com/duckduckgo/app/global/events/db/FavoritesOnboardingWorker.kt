@@ -17,55 +17,10 @@
 package com.duckduckgo.app.global.events.db
 
 import android.content.Context
-import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.favoritesOnboardingEnabled
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 
-class FavoritesOnboardingWorkRequestBuilder @Inject constructor(private val workManager: WorkManager, private val variantManager: VariantManager) {
-
-    fun scheduleWork() {
-        if (!variantManager.favoritesOnboardingEnabled()) return
-        workManager.enqueue(
-            OneTimeWorkRequestBuilder<FavoritesOnboardingWorker>()
-                .addTag(FAVORITES_ONBOARDING_WORK_TAG)
-                .setInitialDelay(1, TimeUnit.DAYS)
-                .build()
-        )
-    }
-
-    companion object {
-        const val FAVORITES_ONBOARDING_WORK_TAG = "FavoritesOnboardingWorker"
-    }
-}
-
+@Deprecated(message = "Worker used during Favorites Onboarding experiment", level = DeprecationLevel.ERROR)
 class FavoritesOnboardingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
-
-    @Inject
-    lateinit var userEvents: UserEventsRepository
-
-    override suspend fun doWork(): Result {
-        userEvents.getUserEvent(UserEventKey.FIRST_NON_SERP_VISITED_SITE)?.let {
-            userEvents.clearVisitedSite()
-        }
-
-        return Result.success()
-    }
-}
-
-@ContributesMultibinding(AppObjectGraph::class)
-class FavoritesOnboardingWorkerInjectonPlugin @Inject constructor(
-    private val userEvents: UserEventsRepository
-) : WorkerInjectorPlugin {
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is FavoritesOnboardingWorker) {
-            worker.userEvents = userEvents
-            return true
-        }
-        return false
-    }
+    override suspend fun doWork() = Result.success()
 }
