@@ -566,10 +566,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
-        loadUrl("www.example.com", "A title")
+        val url = "http://www.example.com"
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksRepository).insert(title = "A title", url = "www.example.com")
+        verify(mockBookmarksRepository).insert(title = title, url = url)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
@@ -1492,12 +1496,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = coroutineRule.runBlocking {
-        loadUrl("foo.com")
-        testee.titleReceived("Foo Title")
+        val url = "http://foo.com"
+        val title = "Foo Title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
-        assertEquals("foo.com", command.savedSite.url)
-        assertEquals("Foo Title", command.savedSite.title)
+        assertEquals(url, command.savedSite.url)
+        assertEquals(title, command.savedSite.title)
     }
 
     @Test
@@ -2968,7 +2976,10 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkAddedThenPersistFavicon() = coroutineRule.runBlocking {
         val url = "http://example.com"
-        loadUrl(url, "A title")
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
 
@@ -3428,12 +3439,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = coroutineRule.runBlocking {
-        val bookmark = Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)
-        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        val url = "http://www.example.com"
+        val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark(url = url)).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
-        loadUrl("www.example.com", isBrowserShowing = true)
+        loadUrl(url = url, isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksRepository, never()).insert(anyString(), anyString())
+        verify(mockBookmarksRepository, never()).insert(title = anyString(), url = anyString(), parentId = anyLong())
     }
 
     @Test
