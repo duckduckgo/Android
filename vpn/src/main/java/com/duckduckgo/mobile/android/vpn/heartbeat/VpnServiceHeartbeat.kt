@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.heartbeat
 import android.content.Context
 import android.os.Process
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -28,7 +29,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -42,8 +42,7 @@ class VpnServiceHeartbeatImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : VpnServiceCallbacks {
 
-    private var job: Job? = null
-    private val isRunning = AtomicBoolean(false)
+    private var job = ConflatedJob()
 
     private suspend fun storeHeartbeat(type: String) = withContext(dispatcherProvider.io()) {
         Timber.v("(${Process.myPid()}) - Sending heartbeat $type")
@@ -56,10 +55,8 @@ class VpnServiceHeartbeatImpl @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.v("onVpnStarted called")
-        job?.cancel()
-        job = coroutineScope.launch {
-            isRunning.set(true)
-            while (isRunning.get()) {
+        job += coroutineScope.launch {
+            while (true) {
                 storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
                 delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))
             }
@@ -72,9 +69,9 @@ class VpnServiceHeartbeatImpl @Inject constructor(
             VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
             VpnStopReason.SelfStop -> {
                 Timber.v("HB monitor: self stopped $vpnStopReason")
-                isRunning.set(false)
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }
+        job.cancel()
     }
 }
