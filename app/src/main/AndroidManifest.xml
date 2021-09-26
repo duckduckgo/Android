@@ -14,7 +14,7 @@
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="${appIcon}"
         android:roundIcon="${appIconRound}"
         android:label="@string/appName"
