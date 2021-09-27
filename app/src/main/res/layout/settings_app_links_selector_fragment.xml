@@ -40,9 +40,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="@string/settingsAppLinksAskEveryTime"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:text="@string/settingsAppLinksAskEveryTime" />
 
         <RadioButton
             android:id="@+id/appLinksSelectorAlways"
