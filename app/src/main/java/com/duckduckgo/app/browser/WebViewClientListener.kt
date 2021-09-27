@@ -47,11 +47,11 @@ interface WebViewClientListener {
     fun goFullScreen(view: View)
     fun exitFullScreen()
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
-    fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean
+    fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isForMainFrame: Boolean): Boolean
     fun pageStarted(url: String?)
     fun clearCachedAppLink()
     fun updateCachedAppLink(appLink: SpecialUrlDetector.UrlType.AppLink)
-    fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink, isRedirect: Boolean): Boolean
+    fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)

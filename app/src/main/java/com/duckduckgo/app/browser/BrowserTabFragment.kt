@@ -660,8 +660,11 @@ class BrowserTabFragment :
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleAppLink -> {
-                showAppLinkSnackBar(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString)
+            is Command.ShowAppLinkPrompt -> {
+                showAppLinkSnackBar(it.appLink)
+            }
+            is Command.OpenAppLink -> {
+                openAppLink(it.appLink)
             }
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
@@ -834,18 +837,14 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
-    private fun showAppLinkSnackBar(
-        appIntent: Intent?,
-        excludedComponents: List<ComponentName>?,
-        url: String
-    ) {
+    private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
         view?.let { view ->
 
             val message: String?
             val action: String?
 
-            if (appIntent != null) {
-                val packageName = appIntent.component?.packageName ?: return
+            if (appLink.appIntent != null) {
+                val packageName = appLink.appIntent.component?.packageName ?: return
                 message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
                 action = getString(R.string.appLinkSnackBarAction)
             } else {
@@ -858,7 +857,7 @@ class BrowserTabFragment :
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
-                openAppLink(appIntent, excludedComponents, url)
+                openAppLink(appLink)
             }.setDuration(7000)
                 .show()
         }
@@ -878,18 +877,15 @@ class BrowserTabFragment :
         }
     }
 
-    private fun openAppLink(
-        appIntent: Intent?,
-        excludedComponents: List<ComponentName>?,
-        url: String
-    ) {
-        if (appIntent != null) {
-            startActivity(appIntent)
-        } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
+        if (appLink.appIntent != null) {
+            startActivity(appLink.appIntent)
+        } else if (appLink.excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
-            val chooserIntent = getChooserIntent(url, title, excludedComponents)
+            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
             startActivity(chooserIntent)
         }
+        viewModel.clearCachedUrl()
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -929,7 +925,6 @@ class BrowserTabFragment :
                 }
             }
         }
-        viewModel.resetAppLinkState()
     }
 
     private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {
@@ -1836,7 +1831,7 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
                     viewModel.browserViewState.value?.previousAppLink?.let {
-                        openAppLink(it.appIntent, it.excludedComponents, it.uriString)
+                        openAppLink(it)
                     }
                 }
             }

@@ -21,45 +21,28 @@ import com.duckduckgo.app.global.UriString
 import javax.inject.Inject
 
 interface AppLinksHandler {
-    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean
-    fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
+    fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean
     fun updatePreviousUrl(urlString: String?)
-    fun reset()
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null
-    var appLinkOpenedInBrowser = false
 
-    override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-            isRedirect && appLinkOpenedInBrowser ||
+    override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean {
+        if (!appLinksEnabled ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
             !isForMainFrame ||
             UriString.sameOrSubdomain(previousUrl ?: "", urlString)
         ) {
             return false
         }
-        appLinkOpenedInBrowser = true
         previousUrl = urlString
         launchAppLink()
-        return false
-    }
-
-    override fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser) {
-            return true
-        }
-        launchNonHttpAppLink()
-        return true
+        return shouldOverride
     }
 
     override fun updatePreviousUrl(urlString: String?) {
         previousUrl = urlString
-        reset()
-    }
-
-    override fun reset() {
-        appLinkOpenedInBrowser = false
     }
 }

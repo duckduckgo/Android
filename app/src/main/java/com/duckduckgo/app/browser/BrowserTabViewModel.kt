@@ -293,7 +293,8 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
-        class HandleAppLink(val appLink: AppLink) : Command()
+        class ShowAppLinkPrompt(val appLink: AppLink) : Command()
+        class OpenAppLink(val appLink: AppLink) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -622,6 +623,7 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
+            clearCachedUrl()
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
@@ -1898,16 +1900,21 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
-    override fun handleAppLink(appLink: AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean {
-        return appLinksHandler.handleAppLink(isRedirect, isForMainFrame, appLink.uriString) { appLinkClicked(appLink) }
-    }
-
-    fun resetAppLinkState() {
-        appLinksHandler.reset()
+    override fun handleAppLink(appLink: AppLink, isForMainFrame: Boolean): Boolean {
+        return appLinksHandler.handleAppLink(
+            isForMainFrame,
+            appLink.uriString,
+            appSettingsPreferencesStore.appLinksEnabled,
+            !appSettingsPreferencesStore.showAppLinksPrompt
+        ) { appLinkClicked(appLink) }
     }
 
     override fun pageStarted(url: String?) {
         appLinksHandler.updatePreviousUrl(url)
+    }
+
+    fun clearCachedUrl() {
+        appLinksHandler.updatePreviousUrl(null)
     }
 
     override fun clearCachedAppLink() {
@@ -1923,11 +1930,16 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink)
+        if (appSettingsPreferencesStore.showAppLinksPrompt) {
+            command.value = ShowAppLinkPrompt(appLink)
+        } else {
+            command.value = OpenAppLink(appLink)
+        }
     }
 
-    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
-        return appLinksHandler.handleNonHttpAppLink(isRedirect) { nonHttpAppLinkClicked(nonHttpAppLink) }
+    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
+        nonHttpAppLinkClicked(nonHttpAppLink)
+        return true
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {

@@ -3362,25 +3362,19 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleAppLinkCalledThenHandleAppLink() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
-        testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
-        verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), urlString = eq("http://example.com"), capture(appLinkCaptor))
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockSettingsStore.appLinksEnabled).thenReturn(true)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
-        assertCommandIssued<Command.HandleAppLink>()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
     }
 
     @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), "http://example.com")
-        testee.handleNonHttpAppLink(urlType, false)
-        verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandIssued<Command.HandleNonHttpAppLink>()
-    }
-
-    @Test
-    fun whenResetAppLinkStateCalledThenResetAppLinkState() {
-        testee.resetAppLinkState()
-        verify(mockAppLinksHandler).reset()
     }
 
     @Test
@@ -3388,7 +3382,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
-        verify(mockAppLinksHandler).userEnteredBrowserState("foo.com")
+        verify(mockAppLinksHandler).updatePreviousUrl(null)
         assertCommandIssued<Navigate>()
     }
 
