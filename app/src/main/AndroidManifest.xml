@@ -324,6 +324,10 @@
             android:label="@string/globalPrivacyControlActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.accessibility.AccessibilityActivity"
+            android:label="@string/accessibilityActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.email.ui.EmailProtectionActivity"
             android:label="@string/emailProtectionActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />

@@ -122,6 +122,7 @@ class SettingsActivity :
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
             changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
@@ -238,6 +239,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
+            is Command.LaunchAccessibilitySettigns -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
@@ -277,6 +279,11 @@ class SettingsActivity :
     }
 
     private fun launchFireproofWebsites() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(FireproofWebsitesActivity.intent(this), options)
+    }
+
+    private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
     }

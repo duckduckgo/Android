@@ -87,6 +87,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAccessibilitySettigns : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
@@ -152,6 +153,10 @@ class SettingsViewModel @Inject constructor(
     fun userRequestedToChangeFireAnimation() {
         viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
+    }
+
+    fun onAccessibilitySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettigns) }
     }
 
     fun userRequestedToChangeTheme() {
