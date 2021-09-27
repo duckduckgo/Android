@@ -59,6 +59,6 @@ interface BookmarksDao {
     @Query("select CAST(COUNT(*) AS BIT) from bookmarks")
     suspend fun hasBookmarks(): Boolean
 
-    @Query("select * from bookmarks where url like :url limit 1")
+    @Query("select * from bookmarks where url = :url limit 1")
     fun getBookmarkByUrl(url: String): BookmarkEntity?
 }
