@@ -180,10 +180,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
-
     implementation  AndroidX.lifecycle.commonJava8
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
 
     // Room
     implementation AndroidX.room.runtime
@@ -219,6 +216,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
 
     // Testing dependencies
+    androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
     androidTestUtil AndroidX.test.orchestrator
@@ -227,6 +225,12 @@ dependencies {
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     androidTestImplementation 'app.cash.turbine:turbine:_'
+
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
 }
 
 tasks.register('fastlaneVersionCode') {

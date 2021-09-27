@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -27,15 +28,19 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class TrackerDetectorClientTypeTest {
 
     private var mockEntityLookup: EntityLookup = mock()
     private var mockBlockingClient: Client = mock()
     private var mockUserWhitelistDao: UserWhitelistDao = mock()
     private var mockContentBlocking: ContentBlocking = mock()
+    private var mockTrackerAllowlist: TrackerAllowlist = mock()
 
-    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking)
+    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist)
 
     @Before
     fun before() {
