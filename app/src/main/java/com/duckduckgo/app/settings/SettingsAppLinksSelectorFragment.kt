@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
@@ -40,10 +39,6 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
         val rootView =
             View.inflate(activity, R.layout.settings_app_links_selector_fragment, null)
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            rootView.findViewById<RadioButton>(R.id.appLinksSelectorAskEveryTime).visibility =
-                View.VISIBLE
-        }
         updateCurrentSelection(currentOption, rootView.findViewById(R.id.appLinksSelectorGroup))
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
