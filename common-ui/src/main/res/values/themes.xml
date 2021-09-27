@@ -17,6 +17,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <style name="SplashScreen" parent="AppTheme.Light"/>
+
     <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
 
     <style name="AppTheme" parent="BaseAppTheme">
