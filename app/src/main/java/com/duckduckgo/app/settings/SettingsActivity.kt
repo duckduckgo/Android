@@ -30,6 +30,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
@@ -285,7 +286,7 @@ class SettingsActivity :
 
     private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(FireproofWebsitesActivity.intent(this), options)
+        startActivity(AccessibilityActivity.intent(this), options)
     }
 
     private fun launchLocation() {

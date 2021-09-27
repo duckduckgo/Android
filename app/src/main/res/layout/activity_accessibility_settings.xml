@@ -15,12 +15,63 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_toolbar" />
+
+    <TextView
+        style="@style/TextAppearance.DuckDuckGo.Headline4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/keyline_4"
+        android:text="@string/accessibilityFontSizeTitle"
+        android:textColor="@color/accentBlue"
+        tools:text="Text goes here" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_4">
+
+        <com.google.android.material.slider.Slider
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_4"
+            android:stepSize="10"
+            android:valueFrom="80"
+            android:valueTo="200"
+            app:labelBehavior="gone" />
+
+        <TextView
+            style="@style/TextAppearance.DuckDuckGo.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:text="100%" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/accessitilityDivider"
+        style="@style/SettingsGroupDivider"
+        android:layout_marginBottom="@dimen/keyline_5" />
+
+    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+        android:id="@+id/forceZoomToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:toggleSubTitle="@string/accessibilityForceZoomSubtitle"
+        app:toggleTitle="@string/accessibilityForceZoomTitle" />
 
 </LinearLayout>

@@ -39,6 +39,7 @@
         <item name="actionOverflowButtonStyle">@style/PopUpOverflowButton</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
+        <item name="sliderStyle">@style/Widget.App.Slider</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -290,4 +291,15 @@
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
+    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
+        <item name="tickColorInactive">@color/white</item>
+        <item name="tickColorActive">@color/accentBlue</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Slider" parent="">
+        <item name="colorPrimary">@color/accentBlue</item>
+        <item name="colorOnPrimary">@color/accentBlue</item>
+        <item name="colorOnSurface">@color/paleBrownishGray</item>
+    </style>
 </resources>
