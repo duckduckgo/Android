@@ -28,6 +28,7 @@ import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
 import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
+import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -67,11 +68,19 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupAppTrackerExceptionRules()
         setupDebugLogging()
         setupBugReport()
+        setupDeleteTrackingHistory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         transparencyModeDebugReceiver?.let { it.unregister() }
+    }
+
+    private fun setupDeleteTrackingHistory() {
+        binding.deleteTrackingHistory.setOnClickListener {
+            sendBroadcast(DeleteTrackersDebugReceiver.createIntent())
+            Snackbar.make(binding.root, "Tracking history deleted", Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun setupBugReport() {
