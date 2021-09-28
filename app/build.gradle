@@ -136,6 +136,8 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
 
+    androidTestImplementation project(path: ':common-test')
+
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 
