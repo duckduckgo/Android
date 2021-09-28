@@ -49,8 +49,8 @@
             android:paddingTop="@dimen/keyline_4"
             android:paddingBottom="@dimen/keyline_4"
             android:stepSize="10"
-            android:valueFrom="80"
-            android:valueTo="200"
+            android:valueFrom="70"
+            android:valueTo="170"
             app:labelBehavior="gone" />
 
         <TextView
@@ -59,7 +59,8 @@
             android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="center_vertical|right"
+            android:textColor="?normalTextColor"
+            android:gravity="center_vertical|end"
             android:layout_marginStart="@dimen/keyline_2"
             android:text="100%" />
 

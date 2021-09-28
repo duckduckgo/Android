@@ -295,11 +295,12 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
         <item name="tickColor">@color/white</item>
         <item name="trackHeight">6dp</item>
+        <item name="trackColorInactive">@color/grayish</item>
     </style>
 
     <style name="ThemeOverlay.App.Slider" parent="">
         <item name="colorPrimary">@color/accentBlue</item>
         <item name="colorOnPrimary">@color/accentBlue</item>
-        <item name="colorOnSurface">@color/paleBrownishGray</item>
+        <item name="colorOnSurface">@color/accentBlue</item>
     </style>
 </resources>
