@@ -20,8 +20,10 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.privacy.config.store.AllowlistTrackerEntity
+import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -29,19 +31,23 @@ import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository) : TrackerAllowlist {
+class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
 
     override fun isAnException(documentURL: String, url: String): Boolean {
-        val documentUri = documentURL.toUri()
-        val uri = url.toUri()
+        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
+            val documentUri = documentURL.toUri()
+            val uri = url.toUri()
 
-        return trackerAllowlistRepository.exceptions
-            .filter { it.domain == uri.baseHost }
-            .map { matches(url, documentUri, it) }
-            .firstOrNull() ?: false
+            trackerAllowlistRepository.exceptions
+                .filter { it.domain == uri.baseHost }
+                .map { matches(url, documentUri, it) }
+                .firstOrNull() ?: false
+        } else {
+            false
+        }
     }
 
-    private fun matches(url: String, documentUri: Uri, trackerAllowlist: AllowlistTrackerEntity): Boolean {
+    private fun matches(url: String, documentUri: Uri, trackerAllowlist: TrackerAllowlistEntity): Boolean {
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()
             url.matches(regex) && (it.domains.contains("<all>") || it.domains.contains(documentUri.baseHost))

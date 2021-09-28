@@ -26,8 +26,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
-@Entity(tableName = "allowlist_trackers")
-data class AllowlistTrackerEntity(
+@Entity(tableName = "tracker_allowlist")
+data class TrackerAllowlistEntity(
     @PrimaryKey val domain: String,
     val rules: List<AllowlistRuleEntity>
 )

@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.store.AllowlistTrackerEntity
+import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
@@ -40,12 +40,12 @@ class TrackerAllowlistPlugin @Inject constructor(
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<TrackerAllowlistFeature> =
                 moshi.adapter(TrackerAllowlistFeature::class.java)
-            val exceptions = mutableListOf<AllowlistTrackerEntity>()
+            val exceptions = mutableListOf<TrackerAllowlistEntity>()
 
             val trackerAllowlistFeature: TrackerAllowlistFeature? = jsonAdapter.fromJson(jsonObject.toString())
 
             trackerAllowlistFeature?.settings?.allowlistedTrackers?.entries?.map { entry ->
-                exceptions.add(AllowlistTrackerEntity(entry.key, entry.value.rules))
+                exceptions.add(TrackerAllowlistEntity(entry.key, entry.value.rules))
             }
             trackerAllowlistRepository.updateAll(exceptions)
             val isEnabled = trackerAllowlistFeature?.state == "enabled"

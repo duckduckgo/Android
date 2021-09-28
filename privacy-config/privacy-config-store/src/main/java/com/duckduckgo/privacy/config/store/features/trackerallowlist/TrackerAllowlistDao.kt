@@ -21,26 +21,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.privacy.config.store.AllowlistTrackerEntity
+import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 
 @Dao
 abstract class TrackerAllowlistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(domains: List<AllowlistTrackerEntity>)
+    abstract fun insertAll(domains: List<TrackerAllowlistEntity>)
 
     @Transaction
-    open fun updateAll(trackers: List<AllowlistTrackerEntity>) {
+    open fun updateAll(trackers: List<TrackerAllowlistEntity>) {
         deleteAll()
         insertAll(trackers)
     }
 
-    @Query("select * from allowlist_trackers where domain = :domain")
-    abstract fun get(domain: String): AllowlistTrackerEntity
+    @Query("select * from tracker_allowlist where domain = :domain")
+    abstract fun get(domain: String): TrackerAllowlistEntity
 
-    @Query("select * from allowlist_trackers")
-    abstract fun getAll(): List<AllowlistTrackerEntity>
+    @Query("select * from tracker_allowlist")
+    abstract fun getAll(): List<TrackerAllowlistEntity>
 
-    @Query("delete from allowlist_trackers")
+    @Query("delete from tracker_allowlist")
     abstract fun deleteAll()
 }

@@ -31,7 +31,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 @Database(
     exportSchema = true, version = 2,
     entities = [
-        AllowlistTrackerEntity::class,
+        TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
         HttpsExceptionEntity::class,
         GpcExceptionEntity::class,
