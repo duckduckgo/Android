@@ -67,6 +67,7 @@
     <string name="settingsAccessibility">Accessibility</string>
     <string name="accessibilityActivityTitle">Accessibility</string>
     <string name="accessibilityFontSizeTitle">Text size</string>
+    <string name="accessibilityFontSizeHint">Here is a sample text. Use the slider above to find what’s best for you. We’ll display websites in this size instead of your system settings.</string>
     <string name="accessibilityForceZoomTitle">Zoom on all websites</string>
     <string name="accessibilityForceZoomSubtitle">Overwrite website\'s own zoom setting</string>
 

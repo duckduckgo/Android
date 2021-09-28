@@ -293,8 +293,8 @@
 
     <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
-        <item name="tickColorInactive">@color/white</item>
-        <item name="tickColorActive">@color/accentBlue</item>
+        <item name="tickColor">@color/white</item>
+        <item name="trackHeight">6dp</item>
     </style>
 
     <style name="ThemeOverlay.App.Slider" parent="">
