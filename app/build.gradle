@@ -180,7 +180,10 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
+
     implementation  AndroidX.lifecycle.commonJava8
+    testImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.archCore.testing
 
     // Room
     implementation AndroidX.room.runtime
@@ -234,6 +237,9 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
 }
 
 tasks.register('fastlaneVersionCode') {

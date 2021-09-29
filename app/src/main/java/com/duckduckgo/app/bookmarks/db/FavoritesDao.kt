@@ -54,6 +54,9 @@ interface FavoritesDao {
     @Query("select * from favorites where id = :id")
     fun favorite(id: Long): FavoriteEntity?
 
+    @Query("select * from favorites where url = :url limit 1")
+    fun favoriteByUrl(url: String): FavoriteEntity?
+
     @Transaction
     fun persistChanges(favorites: List<SavedSite.Favorite>) {
         favorites.forEachIndexed { index, favorite ->

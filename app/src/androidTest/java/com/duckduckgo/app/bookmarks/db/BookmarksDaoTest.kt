@@ -143,4 +143,32 @@ class BookmarksDaoTest {
         val count = dao.bookmarksCountByUrl(query)
         assertEquals(1, count)
     }
+
+    @Test
+    fun whenGetBookmarkByUrlAndNoBookmarksMatchThenReturnNull() {
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
+        dao.insert(bookmark)
+        val result = dao.getBookmarkByUrl("test")
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetBookmarkByUrlAndOneBookmarkIsMatchedThenReturnMatchedBookmark() {
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
+        val otherBookmark = BookmarkEntity(id = 2, title = "other title", url = "www.other-example.com", parentId = 0)
+        dao.insert(bookmark)
+        dao.insert(otherBookmark)
+        val result = dao.getBookmarkByUrl("www.example.com")
+        assertEquals(bookmark, result)
+    }
+
+    @Test
+    fun whenGetBookmarkByUrlAndMultipleBookmarksAreMatchedThenLimitTheResultToFirstMatchedBookmark() {
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
+        val sameUrlBookmark = BookmarkEntity(id = 2, title = "other title", url = "www.example.com", parentId = 0)
+        dao.insert(bookmark)
+        dao.insert(sameUrlBookmark)
+        val result = dao.getBookmarkByUrl("www.example.com")
+        assertEquals(bookmark, result)
+    }
 }

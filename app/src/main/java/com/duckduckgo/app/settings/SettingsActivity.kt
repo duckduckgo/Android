@@ -31,6 +31,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
@@ -52,11 +53,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import kotlinx.android.synthetic.main.content_settings_general.*
-import kotlinx.android.synthetic.main.content_settings_internal.*
-import kotlinx.android.synthetic.main.content_settings_other.*
-import kotlinx.android.synthetic.main.content_settings_privacy.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -69,13 +66,14 @@ class SettingsActivity :
     SettingsThemeSelectorFragment.Listener,
     SettingsFireAnimationSelectorFragment.Listener {
 
+    private val viewModel: SettingsViewModel by bindViewModel()
+    private val binding: ActivitySettingsBinding by viewBinding()
+
     @Inject
     lateinit var pixel: Pixel
 
     @Inject
     lateinit var internalFeaturePlugins: PluginPoint<InternalFeaturePlugin>
-
-    private val viewModel: SettingsViewModel by bindViewModel()
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -85,14 +83,26 @@ class SettingsActivity :
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
+    private val viewsGeneral
+        get() = binding.includeSettings.contentSettingsGeneral
+
+    private val viewsPrivacy
+        get() = binding.includeSettings.contentSettingsPrivacy
+
+    private val viewsInternal
+        get() = binding.includeSettings.contentSettingsInternal
+
+    private val viewsOther
+        get() = binding.includeSettings.contentSettingsOther
+
     private val appLinksToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppLinksSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
-        setupToolbar(toolbar)
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
         configureInternalFeatures()
@@ -106,41 +116,49 @@ class SettingsActivity :
     }
 
     private fun configureUiEventHandlers() {
-        changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
-        selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
-        about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
-        provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
-        fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-        locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
-        globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
+        with(viewsGeneral) {
+            selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
+            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+            setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
+            changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+            selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
+        }
 
-        selectedThemeSetting.setOnClickListener { viewModel.userRequestedToChangeTheme() }
-        autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-        setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-        automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-        automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-        whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
-        emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
+        with(viewsPrivacy) {
+            globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
+            fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
+            locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
+            automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
+            automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
+            whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
+        }
+
+        with(viewsOther) {
+            provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
+            about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+        }
+
     }
 
     private fun configureInternalFeatures() {
-        settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
+        viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
         internalFeaturePlugins.getPlugins().forEach { feature ->
             Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
             val view = SettingsOptionWithSubtitle(this).apply {
                 setTitle(feature.internalFeatureTitle())
                 this.setSubtitle(feature.internalFeatureSubtitle())
             }
-            settingsInternalFeaturesContainer.addView(view)
+            viewsInternal.settingsInternalFeaturesContainer.addView(view)
             view.setOnClickListener { feature.onInternalFeatureClicked(this) }
         }
     }
 
     private fun configureAppLinksToggle() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            appLinksToggle.setOnCheckedChangeListener(appLinksToggleListener)
+            viewsPrivacy.appLinksToggle.setOnCheckedChangeListener(appLinksToggleListener)
         } else {
-            appLinksToggle.visibility = View.GONE
+            viewsPrivacy.appLinksToggle.visibility = View.GONE
         }
     }
 
@@ -149,15 +167,15 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    version.setSubtitle(it.version)
+                    viewsOther.version.setSubtitle(it.version)
                     updateSelectedTheme(it.theme)
-                    autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                    viewsGeneral.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                    changeAppIcon.setImageResource(it.appIcon.icon)
+                    viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
-                    appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
+                    viewsPrivacy.appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
                 }
             }.launchIn(lifecycleScope)
 
@@ -173,12 +191,12 @@ class SettingsActivity :
         } else {
             getString(R.string.disabled)
         }
-        globalPrivacyControlSetting.setSubtitle(stateText)
+        viewsPrivacy.globalPrivacyControlSetting.setSubtitle(stateText)
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
-        selectedFireAnimationSetting.setSubtitle(subtitle)
+        viewsGeneral.selectedFireAnimationSetting.setSubtitle(subtitle)
     }
 
     private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
@@ -189,18 +207,18 @@ class SettingsActivity :
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> R.string.settingsSystemTheme
             }
         )
-        selectedThemeSetting.setSubtitle(subtitle)
+        viewsGeneral.selectedThemeSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
         val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
-        automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
+        viewsPrivacy.automaticallyClearWhatSetting.setSubtitle(clearWhatSubtitle)
 
         val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
+        viewsPrivacy.automaticallyClearWhenSetting.setSubtitle(clearWhenSubtitle)
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
-        automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
+        viewsPrivacy.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
     private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
@@ -235,11 +253,13 @@ class SettingsActivity :
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
-        if (it.showDefaultBrowserSetting) {
-            setAsDefaultBrowserSetting.quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
-            setAsDefaultBrowserSetting.visibility = View.VISIBLE
-        } else {
-            setAsDefaultBrowserSetting.visibility = View.GONE
+        with(viewsGeneral.setAsDefaultBrowserSetting) {
+            if (it.showDefaultBrowserSetting) {
+                quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 

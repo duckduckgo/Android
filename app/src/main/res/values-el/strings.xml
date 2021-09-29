@@ -49,7 +49,9 @@
     <string name="clearButtonContentDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="no_compatible_third_party_app_installed">Δεν υπάρχει εγκατεστημένη συμβατή εφαρμογή</string>
     <string name="addBookmarkMenuTitle">Προσθήκη σελιδοδείκτη</string>
+    <string name="editBookmarkMenuTitle">Επεξεργασία σελιδοδείκτη</string>
     <string name="addFavoriteMenuTitle">Προσθήκη Αγαπημένου</string>
+    <string name="removeFavoriteMenuTitle">Αφαίρεση αγαπημένου</string>
     <string name="favoriteAddedMessage">Προστέθηκε αγαπημένο</string>
     <string name="bookmarkAddedMessage">Προστέθηκε σελιδοδείκτης</string>
     <string name="requestDesktopSiteMenuTitle">Ιστότοπος επιφάνειας εργασίας</string>

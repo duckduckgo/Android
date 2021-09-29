@@ -22,16 +22,15 @@
     android:orientation="vertical"
     android:paddingTop="15dp"
     android:paddingBottom="15dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:clickable="true"
+    android:focusable="true">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
         app:cardBackgroundColor="?attr/colorPrimary"

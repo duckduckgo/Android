@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.global.events.db.UserEventsRepository
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.touchFaviconLocation
 import com.duckduckgo.app.global.view.loadFavicon
@@ -43,7 +42,7 @@ interface FaviconManager {
     suspend fun loadToViewFromLocalOrFallback(tabId: String? = null, url: String, view: ImageView)
     suspend fun loadFromDisk(tabId: String?, url: String): Bitmap?
     suspend fun loadFromDiskWithParams(tabId: String? = null, url: String, cornerRadius: Int, width: Int, height: Int): Bitmap?
-    suspend fun deletePersistedFavicon(url: String, forceDelete: Boolean = false)
+    suspend fun deletePersistedFavicon(url: String)
     suspend fun deleteOldTempFavicon(tabId: String, path: String?)
     suspend fun deleteAllTemp()
 }
@@ -60,7 +59,6 @@ class DuckDuckGoFaviconManager constructor(
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val favoritesRepository: FavoritesRepository,
     private val faviconDownloader: FaviconDownloader,
-    private val userEventsRepository: UserEventsRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : FaviconManager {
 
@@ -153,10 +151,10 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun deletePersistedFavicon(url: String, forceDelete: Boolean) {
+    override suspend fun deletePersistedFavicon(url: String) {
         val domain = url.extractDomain() ?: return
         val remainingFavicons = persistedFaviconsForDomain(domain)
-        if (remainingFavicons == 1 || forceDelete) {
+        if (remainingFavicons == 1) {
             faviconPersister.deletePersistedFavicon(domain)
         }
     }
@@ -218,8 +216,7 @@ class DuckDuckGoFaviconManager constructor(
             bookmarksDao.bookmarksCountByUrl(query) +
                 locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +
-                favoritesRepository.favoritesCountByDomain(query) +
-                userEventsRepository.visitedSiteByDomain(query)
+                favoritesRepository.favoritesCountByDomain(query)
         }
     }
 
