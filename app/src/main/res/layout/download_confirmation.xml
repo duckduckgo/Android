@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="?attr/dialogBgColor"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
 
@@ -31,7 +31,7 @@
         android:paddingStart="24dp"
         android:paddingTop="17dp"
         android:paddingEnd="24dp"
-        android:textColor="@color/grayishTwo"
+        android:textColor="?attr/normalTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +59,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="17dp"
             android:text="@string/downloadConfirmationOpenFileText"
-            android:textColor="@color/brownishGray"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal"
             android:visibility="gone" />
@@ -77,7 +77,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="17dp"
             android:text="@string/downloadConfirmationReplaceOldFileText"
-            android:textColor="@color/brownishGray"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal"
             android:visibility="gone" />
@@ -95,7 +95,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="17dp"
             android:text="@string/downloadConfirmationContinue"
-            android:textColor="@color/brownishGray"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal" />
 
@@ -112,7 +112,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="24dp"
             android:text="@string/fireCancel"
-            android:textColor="@color/brownishGray"
+            android:textColor="?attr/normalTextColor"
             android:textSize="16sp"
             android:textStyle="normal"
             tools:ignore="UnusedAttribute" />
