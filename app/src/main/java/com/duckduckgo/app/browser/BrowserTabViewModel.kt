@@ -623,7 +623,11 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            clearCachedUrl()
+            if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                appLinksHandler.updatePreviousUrl(urlToNavigate)
+            } else {
+                clearCachedUrl()
+            }
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
