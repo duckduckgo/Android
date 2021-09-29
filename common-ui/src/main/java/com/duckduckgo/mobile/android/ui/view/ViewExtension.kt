@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.core.view.children
+import com.google.android.material.slider.Slider
 
 /*
  * Common view operations, simplified as Kotlin extensions
@@ -117,4 +118,10 @@ fun CompoundButton.quietlySetIsChecked(newCheckedState: Boolean, changeListener:
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState
     setOnCheckedChangeListener(changeListener)
+}
+
+fun Slider.quietlySetValue(newValue: Float, listener: Slider.OnChangeListener) {
+    removeOnChangeListener(listener)
+    value = newValue
+    addOnChangeListener(listener)
 }
