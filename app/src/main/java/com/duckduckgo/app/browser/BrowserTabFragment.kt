@@ -329,6 +329,8 @@ class BrowserTabFragment :
 
     private var alertDialog: AlertDialog? = null
 
+    private var appLinksSnackBar: Snackbar? = null
+
     private var loginDetectionDialog: AlertDialog? = null
 
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
@@ -549,6 +551,7 @@ class BrowserTabFragment :
 
     private fun showHome() {
         viewModel.clearCachedAppLink()
+        dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newTabLayout.show()
         browserLayout.gone()
@@ -607,9 +610,11 @@ class BrowserTabFragment :
                 navigate(it.url, it.headers)
             }
             is Command.NavigateBack -> {
+                dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
             is Command.NavigateForward -> {
+                dismissAppLinkSnackBar()
                 webView?.goForward()
             }
             is Command.ResetHistory -> {
@@ -852,14 +857,15 @@ class BrowserTabFragment :
                 action = getString(R.string.appLinkMultipleSnackBarAction)
             }
 
-            Snackbar.make(
+            appLinksSnackBar = Snackbar.make(
                 view,
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
                 openAppLink(appLink)
-            }.setDuration(7000)
-                .show()
+            }
+
+            appLinksSnackBar?.setDuration(6000)?.show()
         }
     }
 
@@ -886,6 +892,11 @@ class BrowserTabFragment :
             startActivity(chooserIntent)
         }
         viewModel.clearCachedUrl()
+    }
+
+    private fun dismissAppLinkSnackBar() {
+        appLinksSnackBar?.dismiss()
+        appLinksSnackBar = null
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -1206,6 +1217,7 @@ class BrowserTabFragment :
                 if (omnibarTextInput.isFocused) {
                     focusDummy.requestFocus()
                 }
+                dismissAppLinkSnackBar()
                 false
             }
 
