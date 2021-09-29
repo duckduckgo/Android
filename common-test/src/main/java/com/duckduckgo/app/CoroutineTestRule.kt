@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store
+package com.duckduckgo.app
 
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class PrivacyStoreCoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) : TestWatcher() {
+class CoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) : TestWatcher() {
 
     val testDispatcherProvider = object : DispatcherProvider {
         override fun default(): CoroutineDispatcher = testDispatcher
         override fun io(): CoroutineDispatcher = testDispatcher
         override fun main(): CoroutineDispatcher = testDispatcher
         override fun unconfined(): CoroutineDispatcher = testDispatcher
-
     }
 
     override fun starting(description: Description?) {
@@ -52,6 +47,6 @@ class PrivacyStoreCoroutineTestRule(val testDispatcher: TestCoroutineDispatcher 
 }
 
 @ExperimentalCoroutinesApi
-fun PrivacyStoreCoroutineTestRule.runBlocking(block: suspend TestCoroutineScope.() -> Unit) = this.testDispatcher.runBlockingTest {
+fun CoroutineTestRule.runBlocking(block: suspend TestCoroutineScope.() -> Unit) = this.testDispatcher.runBlockingTest {
     block()
 }

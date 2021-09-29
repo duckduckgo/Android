@@ -16,10 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyStoreCoroutineTestRule
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.duckduckgo.privacy.config.store.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
@@ -34,7 +34,7 @@ import org.mockito.ArgumentMatchers
 class RealUnprotectedTemporaryRepositoryTest {
 
     @get:Rule
-    var coroutineRule = PrivacyStoreCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealUnprotectedTemporaryRepository
 

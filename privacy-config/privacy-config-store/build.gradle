@@ -47,4 +47,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+
+    testImplementation project(path: ':common-test')
 }
