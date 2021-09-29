@@ -19,9 +19,9 @@ package com.duckduckgo.privacy.config.impl.workers
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
-import com.duckduckgo.privacy.config.impl.PrivacyCoroutineTestRule
-import com.duckduckgo.privacy.config.impl.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.hamcrest.CoreMatchers.`is`
@@ -33,7 +33,7 @@ import org.junit.Test
 class PrivacyConfigDownloadWorkerTest {
 
     @get:Rule
-    var coroutineRule = PrivacyCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: PrivacyConfigDownloadWorker
     private val mockPrivacyConfigDownloader: PrivacyConfigDownloader = mock()

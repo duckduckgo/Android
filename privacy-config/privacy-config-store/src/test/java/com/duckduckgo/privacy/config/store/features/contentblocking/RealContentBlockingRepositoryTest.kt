@@ -16,10 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.contentblocking
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyStoreCoroutineTestRule
-import com.duckduckgo.privacy.config.store.runBlocking
 import com.duckduckgo.privacy.config.store.toContentBlockingException
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
@@ -35,7 +35,7 @@ import org.mockito.ArgumentMatchers.anyList
 class RealContentBlockingRepositoryTest {
 
     @get:Rule
-    var coroutineRule = PrivacyStoreCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealContentBlockingRepository
 
