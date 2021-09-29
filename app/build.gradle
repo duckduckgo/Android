@@ -233,6 +233,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
 
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
 }
 
 tasks.register('fastlaneVersionCode') {
