@@ -38,6 +38,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
+    testImplementation Testing.junit4
 }
 
 anvil {

@@ -16,27 +16,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    // Testing Dependencies to Expose
-    api Testing.junit4
-    api KotlinX.coroutines.core
-    api Testing.mockito.kotlin
-    api Testing.mockito.android
-    api Testing.junit4
-    api AndroidX.archCore.testing
-    api 'app.cash.turbine:turbine:_'
-    api AndroidX.archCore.testing
-    api AndroidX.room.testing
-    api AndroidX.test.runner
-    api AndroidX.test.rules
-    api AndroidX.work.testing
-    api "org.jetbrains.kotlin:kotlin-reflect:_"
-    api Square.okHttp3.mockWebServer
-    api 'org.robolectric:robolectric:_'
-    api (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
+    implementation Testing.junit4
 
 }
