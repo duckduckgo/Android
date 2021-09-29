@@ -38,7 +38,6 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(path: ':common-test')
-    androidTestImplementation project(path: ':common-test')
 }
 
 anvil {

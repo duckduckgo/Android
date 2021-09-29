@@ -136,8 +136,6 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
 
-    androidTestImplementation project(path: ':common-test')
-
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 
@@ -146,12 +144,6 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
-    androidTestImplementation (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
-
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -184,20 +176,15 @@ dependencies {
     implementation AndroidX.lifecycle.process
 
     implementation  AndroidX.lifecycle.commonJava8
-    testImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.archCore.testing
 
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
-    androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
     // Dagger
@@ -221,14 +208,8 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
 
     // Testing dependencies
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation Testing.mockito.android
-    androidTestImplementation Testing.mockito.kotlin
-    androidTestImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-    androidTestImplementation 'app.cash.turbine:turbine:_'
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
 }
 
 tasks.register('fastlaneVersionCode') {

@@ -29,22 +29,11 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
-
     implementation JakeWharton.timber
-
-    // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
 
-    testImplementation Testing.junit4
-    testImplementation Testing.mockito.kotlin
-
-    testImplementation (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
-
+    testImplementation project(path: ':common-test')
 }

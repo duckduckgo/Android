@@ -31,6 +31,7 @@ dependencies {
     api AndroidX.test.rules
     api AndroidX.work.testing
     api "org.jetbrains.kotlin:kotlin-reflect:_"
+    api Square.okHttp3.mockWebServer
     api (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
