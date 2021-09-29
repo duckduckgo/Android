@@ -16,10 +16,10 @@
 
 package com.duckduckgo.privacy.config.impl.plugins
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.PrivacyCoroutineTestRule
-import com.duckduckgo.privacy.config.impl.runBlocking
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.nhaarman.mockitokotlin2.mock
@@ -32,8 +32,7 @@ import org.junit.Test
 class PrivacyFeatureTogglesPluginTest {
 
     @get:Rule
-    var coroutineRule = PrivacyCoroutineTestRule()
-
+    var coroutineRule = CoroutineTestRule()
     lateinit var testee: PrivacyFeatureTogglesPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
