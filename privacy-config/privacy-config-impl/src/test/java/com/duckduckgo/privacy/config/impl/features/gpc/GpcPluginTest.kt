@@ -16,13 +16,12 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.privacy.config.impl.FileUtilities.getJsonObjectFromFile
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -77,11 +76,6 @@ class GpcPluginTest {
         testee.store(FEATURE_NAME, jsonObject)
 
         verify(mockGpcRepository).updateAll(ArgumentMatchers.anyList())
-    }
-
-    private fun getJsonObjectFromFile(filename: String): JSONObject {
-        val json = FileUtilities.loadText(filename)
-        return JSONObject(json)
     }
 
     companion object {

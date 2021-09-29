@@ -16,9 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
-import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -35,23 +34,31 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
 
     override fun isAnException(documentURL: String, url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
-            val documentUri = documentURL.toUri()
-            val uri = url.toUri()
 
             trackerAllowlistRepository.exceptions
-                .filter { it.domain == uri.baseHost }
-                .map { matches(url, documentUri, it) }
+                .filter { UriString.sameOrSubdomain(url, it.domain) }
+                .map { matches(url, documentURL, it) }
                 .firstOrNull() ?: false
         } else {
             false
         }
     }
 
-    private fun matches(url: String, documentUri: Uri, trackerAllowlist: TrackerAllowlistEntity): Boolean {
+    private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
+        val cleanedUrl = cleanUrl(url)
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()
-            url.matches(regex) && (it.domains.contains("<all>") || it.domains.contains(documentUri.baseHost))
+            cleanedUrl.matches(regex) && (it.domains.contains("<all>") || it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
         }
     }
 
+    private fun cleanUrl(url: String): String {
+        val uri = url.toUri()
+        val port = uri.port
+        return if (port != -1) {
+            url.replaceFirst(":$port", "")
+        } else {
+            url
+        }
+    }
 }
