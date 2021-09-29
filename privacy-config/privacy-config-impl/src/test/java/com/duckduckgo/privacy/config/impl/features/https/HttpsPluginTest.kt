@@ -27,7 +27,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyList
 
 @RunWith(AndroidJUnit4::class)
 class HttpsPluginTest {
@@ -47,7 +47,7 @@ class HttpsPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesContentBlockingThenReturnTrue() {
+    fun whenFeatureNameMatchesHttpsThenReturnTrue() {
         assertTrue(testee.store(FEATURE_NAME, null))
     }
 
@@ -75,7 +75,7 @@ class HttpsPluginTest {
 
         testee.store(FEATURE_NAME, jsonObject)
 
-        verify(mockHttpsRepository).updateAll(ArgumentMatchers.anyList())
+        verify(mockHttpsRepository).updateAll(anyList())
     }
 
     companion object {

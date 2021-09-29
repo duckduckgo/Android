@@ -41,7 +41,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
-    abstract fun allowlistTrackerDao(): TrackerAllowlistDao
+    abstract fun trackerAllowlistDao(): TrackerAllowlistDao
     abstract fun unprotectedTemporaryDao(): UnprotectedTemporaryDao
     abstract fun httpsDao(): HttpsDao
     abstract fun gpcDao(): GpcDao

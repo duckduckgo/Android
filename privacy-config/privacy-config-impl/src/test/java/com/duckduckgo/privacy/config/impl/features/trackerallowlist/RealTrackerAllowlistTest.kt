@@ -53,13 +53,23 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun isRequestAnException() {
+    fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true)).thenReturn(true)
         mockAllowlist()
 
         val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle)
 
         assertEquals(testCase.isAllowlisted, testee.isAnException(testCase.site, testCase.request))
+    }
+
+    @Test
+    fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true)).thenReturn(false)
+        mockAllowlist()
+
+        val testee = RealTrackerAllowlist(mockTrackerAllowlistRepository, mockFeatureToggle)
+
+        assertEquals(false, testee.isAnException(testCase.site, testCase.request))
     }
 
     private fun mockAllowlist() {

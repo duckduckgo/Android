@@ -140,6 +140,15 @@ class TrackerDetectorTest {
     }
 
     @Test
+    fun whenRequestIsInAllowlistAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+        whenever(mockTrackerAllowlist.isAnException(anyString(), anyString())).thenReturn(true)
+        trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
+        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
+        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com"))

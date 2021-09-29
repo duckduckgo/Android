@@ -34,7 +34,6 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
 
     override fun isAnException(documentURL: String, url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
-
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
                 .map { matches(url, documentURL, it) }
@@ -45,14 +44,14 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
     }
 
     private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
-        val cleanedUrl = cleanUrl(url)
+        val cleanedUrl = removePortFromUrl(url)
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()
             cleanedUrl.matches(regex) && (it.domains.contains("<all>") || it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
         }
     }
 
-    private fun cleanUrl(url: String): String {
+    private fun removePortFromUrl(url: String): String {
         val uri = url.toUri()
         val port = uri.port
         return if (port != -1) {

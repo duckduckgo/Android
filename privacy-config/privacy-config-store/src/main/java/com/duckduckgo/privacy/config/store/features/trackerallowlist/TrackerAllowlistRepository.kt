@@ -30,7 +30,7 @@ interface TrackerAllowlistRepository {
 class RealTrackerAllowlistRepository(database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
     TrackerAllowlistRepository {
 
-    private val trackerAllowlistDao: TrackerAllowlistDao = database.allowlistTrackerDao()
+    private val trackerAllowlistDao: TrackerAllowlistDao = database.trackerAllowlistDao()
     override val exceptions = ArrayList<TrackerAllowlistEntity>()
 
     init {
