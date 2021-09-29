@@ -16,9 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.FileUtilities
-import com.duckduckgo.privacy.config.impl.JsonString
 import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -28,7 +26,6 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 
 class HttpsPluginTest {
