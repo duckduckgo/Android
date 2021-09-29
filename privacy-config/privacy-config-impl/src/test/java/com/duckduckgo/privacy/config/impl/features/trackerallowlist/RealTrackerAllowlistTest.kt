@@ -53,7 +53,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun enoughTimePassed() {
+    fun isRequestAnException() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true)).thenReturn(true)
         mockAllowlist()
 

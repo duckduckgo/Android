@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -27,9 +28,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealContentBlockingTest {
 
     lateinit var testee: RealContentBlocking

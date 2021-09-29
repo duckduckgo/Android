@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -39,9 +40,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigPersisterTest {
     @get:Rule
     var coroutineRule = PrivacyCoroutineTestRule()

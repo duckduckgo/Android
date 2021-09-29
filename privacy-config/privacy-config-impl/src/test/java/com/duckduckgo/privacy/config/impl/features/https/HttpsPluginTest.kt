@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.FileUtilities.getJsonObjectFromFile
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -27,9 +28,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class HttpsPluginTest {
     lateinit var testee: HttpsPlugin
 
