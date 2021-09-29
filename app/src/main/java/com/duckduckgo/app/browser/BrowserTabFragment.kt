@@ -607,6 +607,7 @@ class BrowserTabFragment :
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
+                dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
             is Command.NavigateBack -> {

@@ -625,6 +625,7 @@ class BrowserTabViewModel(
 
             if (!appSettingsPreferencesStore.showAppLinksPrompt) {
                 appLinksHandler.updatePreviousUrl(urlToNavigate)
+                appLinksHandler.setUserQueryState(true)
             } else {
                 clearCachedUrl()
             }
@@ -1922,6 +1923,7 @@ class BrowserTabViewModel(
     }
 
     override fun clearCachedAppLink() {
+        appLinksHandler.setUserQueryState(false)
         browserViewState.value = currentBrowserViewState().copy(
             previousAppLink = null
         )
@@ -1934,8 +1936,9 @@ class BrowserTabViewModel(
     }
 
     fun appLinkClicked(appLink: AppLink) {
-        if (appSettingsPreferencesStore.showAppLinksPrompt) {
+        if (appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery()) {
             command.value = ShowAppLinkPrompt(appLink)
+            appLinksHandler.setUserQueryState(false)
         } else {
             command.value = OpenAppLink(appLink)
         }

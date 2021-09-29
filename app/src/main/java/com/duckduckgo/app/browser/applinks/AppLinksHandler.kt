@@ -23,18 +23,26 @@ import javax.inject.Inject
 interface AppLinksHandler {
     fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean
     fun updatePreviousUrl(urlString: String?)
+    fun setUserQueryState(state: Boolean)
+    fun isUserQuery(): Boolean
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null
+    var userQuery = false
 
     override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean {
+
         if (!appLinksEnabled ||
             Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
             !isForMainFrame ||
             UriString.sameOrSubdomain(previousUrl ?: "", urlString)
         ) {
+            if (userQuery) {
+                previousUrl = urlString
+                launchAppLink()
+            }
             return false
         }
         previousUrl = urlString
@@ -44,5 +52,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     override fun updatePreviousUrl(urlString: String?) {
         previousUrl = urlString
+    }
+
+    override fun setUserQueryState(state: Boolean) {
+        userQuery = state
+    }
+
+    override fun isUserQuery(): Boolean {
+        return userQuery
     }
 }
