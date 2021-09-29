@@ -17,7 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.FileUtilities.getJsonObjectFromFile
+import com.duckduckgo.privacy.config.impl.JsonString
+import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -29,7 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 
-@RunWith(AndroidJUnit4::class)
 class ContentBlockingPluginTest {
     lateinit var testee: ContentBlockingPlugin
 
@@ -43,37 +45,37 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchContentBlockingThenReturnFalse() {
-        assertFalse(testee.store("test", null))
+        assertFalse(testee.store("test", JsonString.fromString("{}")))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, null))
+        assertTrue(testee.store(FEATURE_NAME, JsonString.fromString("{}")))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonObject = getJsonObjectFromFile("json/content_blocking.json")
+        val jsonObject = FileUtilities.loadText("json/content_blocking.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonObject = getJsonObjectFromFile("json/content_blocking_disabled.json")
+        val jsonObject = FileUtilities.loadText("json/content_blocking_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
     }
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenUpdateAllExistingExceptions() {
-        val jsonObject = getJsonObjectFromFile("json/content_blocking.json")
+        val jsonObject = FileUtilities.loadText("json/content_blocking.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockContentBlockingRepository).updateAll(anyList())
     }

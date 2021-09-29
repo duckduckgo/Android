@@ -18,11 +18,19 @@ package com.duckduckgo.privacy.config.impl.plugins
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import org.json.JSONObject
 
 interface PrivacyFeaturePlugin {
-    fun store(name: String, jsonObject: JSONObject?): Boolean
+    fun store(name: String, jsonString: JsonString): Boolean
     val featureName: PrivacyFeatureName
+}
+
+@JvmInline
+value class JsonString private constructor(val string: String) {
+    companion object {
+        fun fromString(string: String): JsonString {
+            return JsonString(string)
+        }
+    }
 }
 
 class PrivacyFeaturePluginPoint(

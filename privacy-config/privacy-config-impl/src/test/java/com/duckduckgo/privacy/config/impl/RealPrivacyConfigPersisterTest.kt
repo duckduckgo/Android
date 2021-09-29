@@ -142,7 +142,7 @@ class RealPrivacyConfigPersisterTest {
     class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
-        override fun store(name: String, jsonObject: JSONObject?): Boolean {
+        override fun store(name: String, jsonString: JsonString): Boolean {
             count++
             return true
         }

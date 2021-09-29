@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.privacy.config.impl.FileUtilities.getJsonObjectFromFile
+import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.privacy.config.impl.JsonString
+import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -29,7 +31,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 
-@RunWith(AndroidJUnit4::class)
 class HttpsPluginTest {
     lateinit var testee: HttpsPlugin
 
@@ -43,37 +44,37 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchHttpsThenReturnFalse() {
-        assertFalse(testee.store("test", null))
+        assertFalse(testee.store("test", JsonString.fromString("{}")))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, null))
+        assertTrue(testee.store(FEATURE_NAME, JsonString.fromString("{}")))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonObject = getJsonObjectFromFile("json/https.json")
+        val jsonObject = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonObject = getJsonObjectFromFile("json/https_disabled.json")
+        val jsonObject = FileUtilities.loadText("json/https_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsThenUpdateAllExistingExceptions() {
-        val jsonObject = getJsonObjectFromFile("json/https.json")
+        val jsonObject = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
 
         verify(mockHttpsRepository).updateAll(anyList())
     }

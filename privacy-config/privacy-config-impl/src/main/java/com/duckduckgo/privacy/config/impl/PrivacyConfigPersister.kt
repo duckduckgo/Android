@@ -20,6 +20,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
+import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -27,6 +28,7 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,8 +58,10 @@ class RealPrivacyConfigPersister @Inject constructor(
                 privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
-                    privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
-                        plugin.store(feature.key, feature.value)
+                    feature.value?.let { jsonObject ->
+                        privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
+                            plugin.store(feature.key, JsonString.fromString(jsonObject.toString()))
+                        }
                     }
                 }
             }
