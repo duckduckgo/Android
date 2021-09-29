@@ -51,7 +51,8 @@
             android:stepSize="10"
             android:valueFrom="70"
             android:valueTo="170"
-            app:labelBehavior="gone" />
+            app:labelBehavior="gone"
+            app:tickVisible="false"/>
 
         <TextView
             android:id="@+id/accessibilitySliderValue"
