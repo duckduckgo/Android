@@ -87,6 +87,15 @@
                 app:title="Generate AppTP bugreport"
             />
 
+
+            <TextView
+                android:id="@+id/delete_tracking_history"
+                style="@style/SettingsItemClickable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Delete Tracking History"
+            />
+
         </LinearLayout>
 
     </ScrollView>
