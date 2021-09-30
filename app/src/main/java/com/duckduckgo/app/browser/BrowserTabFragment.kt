@@ -867,6 +867,11 @@ class BrowserTabFragment :
             }
 
             appLinksSnackBar?.setDuration(6000)?.show()
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Packages that can handle this link")
+                .setMessage(appLink.nonBrowserActivities.map { it.activityInfo.packageName }.toString())
+                .show()
         }
     }
 

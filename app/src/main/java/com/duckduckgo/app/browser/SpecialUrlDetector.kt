@@ -36,7 +36,7 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String) : UrlType()
+        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String, val nonBrowserActivities: List<ResolveInfo>) : UrlType()
         class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
@@ -84,10 +84,10 @@ class SpecialUrlDetectorImpl(
                 if (nonBrowserActivities.isNotEmpty()) {
                     nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
                         val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                        return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
+                        return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString, nonBrowserActivities = nonBrowserActivities)
                     }
                     val excludedComponents = getExcludedComponents(activities)
-                    return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
+                    return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString, nonBrowserActivities = nonBrowserActivities)
                 }
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
