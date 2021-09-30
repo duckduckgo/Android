@@ -2060,9 +2060,13 @@ class BrowserTabFragment :
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
             Timber.i("Accessibility: UpdateAccessibilitySetting $viewState")
             val fontSizeChanged = lastSeenAccessibilityViewState?.fontSize != viewState.fontSize
+            val forceZoomChanged = lastSeenAccessibilityViewState?.forceZoom != viewState.forceZoom
             lastSeenAccessibilityViewState = viewState
             if (fontSizeChanged) {
                 webView?.settings?.textZoom = viewState.fontSize.toInt()
+            }
+            if (forceZoomChanged) {
+                refresh()
             }
         }
 

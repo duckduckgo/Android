@@ -17,6 +17,8 @@
 package com.duckduckgo.app.accessibility.di
 
 import android.content.Context
+import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.accessibility.AppAccessibilityManager
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -39,4 +41,10 @@ class AccessibilityModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): AccessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, dispatcherProvider, appCoroutineScope)
+
+    @Provides
+    @Singleton
+    fun providesAccessibilityManager(
+        accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+    ): AccessibilityManager = AppAccessibilityManager(accessibilitySettingsDataStore)
 }
