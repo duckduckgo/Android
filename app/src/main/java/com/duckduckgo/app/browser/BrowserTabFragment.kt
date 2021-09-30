@@ -849,21 +849,13 @@ class BrowserTabFragment :
             val message: String?
             val action: String?
 
-            when {
-                appLink.appIntent != null -> {
-                    val packageName = appLink.appIntent.component?.packageName ?: return
-                    message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
-                    action = getString(R.string.appLinkSnackBarAction)
-                }
-                appLink.excludedComponents?.size == 1 -> {
-                    val packageName = appLink.excludedComponents.first().packageName
-                    message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
-                    action = getString(R.string.appLinkSnackBarAction)
-                }
-                else -> {
-                    message = getString(R.string.appLinkMultipleSnackBarMessage)
-                    action = getString(R.string.appLinkMultipleSnackBarAction)
-                }
+            if (appLink.appIntent != null) {
+                val packageName = appLink.appIntent.component?.packageName ?: return
+                message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
+                action = getString(R.string.appLinkSnackBarAction)
+            } else {
+                message = getString(R.string.appLinkMultipleSnackBarMessage)
+                action = getString(R.string.appLinkMultipleSnackBarAction)
             }
 
             appLinksSnackBar = Snackbar.make(
