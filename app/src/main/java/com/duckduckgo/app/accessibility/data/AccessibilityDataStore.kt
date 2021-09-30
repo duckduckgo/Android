@@ -19,24 +19,53 @@ package com.duckduckgo.app.accessibility.data
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 interface AccessibilitySettingsDataStore {
     var fontSize: Float
     var forceZoom: Boolean
+    fun settingsFlow(): StateFlow<AccessibilitySettings>
 }
 
-class AccessibilitySettingsSharedPreferences constructor(private val context: Context) : AccessibilitySettingsDataStore {
+class AccessibilitySettingsSharedPreferences(
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider,
+    private val appCoroutineScope: CoroutineScope
+) : AccessibilitySettingsDataStore {
+
+    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(fontSize, forceZoom))
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override var fontSize: Float
         get() = preferences.getFloat(KEY_FONT_SIZE, FONT_SIZE_DEFAULT)
-        set(value) = preferences.edit { putFloat(KEY_FONT_SIZE, value) }
+        set(value) {
+            preferences.edit { putFloat(KEY_FONT_SIZE, value) }
+            emitNewValues()
+        }
 
     override var forceZoom: Boolean
         get() = preferences.getBoolean(KEY_FORCE_ZOOM, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_FORCE_ZOOM, enabled) }
+        set(enabled) {
+            preferences.edit { putBoolean(KEY_FORCE_ZOOM, enabled) }
+            emitNewValues()
+        }
+
+    override fun settingsFlow() = accessibilityStateFlow.asStateFlow()
+
+    private fun emitNewValues() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            accessibilityStateFlow.emit(AccessibilitySettings(fontSize, forceZoom))
+            Timber.i("Accessibility: new value emitted ${AccessibilitySettings(fontSize, forceZoom)}")
+        }
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.accessibility.settings"
@@ -45,3 +74,8 @@ class AccessibilitySettingsSharedPreferences constructor(private val context: Co
         const val FONT_SIZE_DEFAULT = 100f
     }
 }
+
+data class AccessibilitySettings(
+    val fontSize: Float,
+    val forceZoom: Boolean
+)

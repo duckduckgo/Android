@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -140,6 +141,7 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -244,6 +246,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var themingDataStore: ThemingDataStore
+
+    @Inject
+    lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     @Inject
     @AppCoroutineScope
@@ -503,6 +508,13 @@ class BrowserTabFragment :
             }
         )
 
+        viewModel.accessibilityViewState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let { renderer.applyAccessibilitySettings(it) }
+            }
+        )
+
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.command.observe(
@@ -586,12 +598,7 @@ class BrowserTabFragment :
             renderer.cancelTrackersAnimation()
         }
         when (it) {
-            is Command.Refresh -> {
-                // refresh()
-                webView?.settings?.let {
-                    it.textZoom = it.textZoom + 50
-                }
-            }
+            is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -1179,6 +1186,7 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
+                textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 Timber.i("Font size: ${this.textZoom}")
             }
 
@@ -1872,6 +1880,7 @@ class BrowserTabFragment :
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
         private var lastSeenPrivacyGradeViewState: PrivacyGradeViewState? = null
+        private var lastSeenAccessibilityViewState: AccessibilityViewState? = null
 
         fun renderPrivacyGrade(viewState: PrivacyGradeViewState) {
 
@@ -2045,6 +2054,15 @@ class BrowserTabFragment :
                 } else {
                     if (it) exitFullScreen()
                 }
+            }
+        }
+
+        fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
+            Timber.i("Accessibility: UpdateAccessibilitySetting $viewState")
+            val fontSizeChanged = lastSeenAccessibilityViewState?.fontSize != viewState.fontSize
+            lastSeenAccessibilityViewState = viewState
+            if (fontSizeChanged) {
+                webView?.settings?.textZoom = viewState.fontSize.toInt()
             }
         }
 
