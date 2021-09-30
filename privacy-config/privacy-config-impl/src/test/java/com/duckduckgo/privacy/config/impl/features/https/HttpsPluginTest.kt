@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.privacy.config.impl.FileUtilities
-import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -41,42 +40,43 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchHttpsThenReturnFalse() {
-        assertFalse(testee.store("test", JsonString.fromString("{}")))
+        assertFalse(testee.store("test", EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, JsonString.fromString("{}")))
+        assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonObject = FileUtilities.loadText("json/https.json")
+        val jsonString = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonObject = FileUtilities.loadText("json/https_disabled.json")
+        val jsonString = FileUtilities.loadText("json/https_disabled.json")
 
-        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsThenUpdateAllExistingExceptions() {
-        val jsonObject = FileUtilities.loadText("json/https.json")
+        val jsonString = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, JsonString.fromString(jsonObject))
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockHttpsRepository).updateAll(anyList())
     }
 
     companion object {
         private const val FEATURE_NAME = "https"
+        private const val EMPTY_JSON_STRING = "{}"
     }
 }

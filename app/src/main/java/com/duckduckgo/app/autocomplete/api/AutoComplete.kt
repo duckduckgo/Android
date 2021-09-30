@@ -167,8 +167,8 @@ class AutoCompleteApi @Inject constructor(
             }
 
         } else if (savedSite.url.redactSchemeAndWwwSubDomain().startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
-        rankedBookmark.score += 300
-    }
+            rankedBookmark.score += 300
+        }
 
         return rankedBookmark
     }

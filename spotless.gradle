@@ -10,7 +10,7 @@ spotless {
     }
     kotlin {
         target '**/*.kt'
-        ktlint('0.42.0').userData(['disabled_rules': 'no-wildcard-imports, import-ordering, no-blank-line-before-rbrace'])
+        ktlint('0.39.0').userData(['disabled_rules': 'no-wildcard-imports, import-ordering, no-blank-line-before-rbrace'])
         trimTrailingWhitespace()
         indentWithSpaces()
     }

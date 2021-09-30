@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
@@ -35,14 +34,14 @@ class HttpsPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: JsonString): Boolean {
+    override fun store(name: String, jsonString: String): Boolean {
         if (name == featureName.value) {
             val httpsExceptions = mutableListOf<HttpsExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<HttpsFeature> =
                 moshi.adapter(HttpsFeature::class.java)
 
-            val httpsFeature: HttpsFeature? = jsonAdapter.fromJson(jsonString.string)
+            val httpsFeature: HttpsFeature? = jsonAdapter.fromJson(jsonString)
             httpsFeature?.exceptions?.map {
                 httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason))
             }

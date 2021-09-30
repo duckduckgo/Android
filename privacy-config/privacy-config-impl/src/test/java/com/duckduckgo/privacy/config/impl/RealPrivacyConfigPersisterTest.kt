@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
-import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -143,7 +142,7 @@ class RealPrivacyConfigPersisterTest {
     class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
-        override fun store(name: String, jsonString: JsonString): Boolean {
+        override fun store(name: String, jsonString: String): Boolean {
             count++
             return true
         }

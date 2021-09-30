@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.JsonString
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
@@ -35,14 +34,14 @@ class ContentBlockingPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: JsonString): Boolean {
+    override fun store(name: String, jsonString: String): Boolean {
         if (name == featureName.value) {
             val contentBlockingExceptions = mutableListOf<ContentBlockingExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<ContentBlockingFeature> =
                 moshi.adapter(ContentBlockingFeature::class.java)
 
-            val contentBlockingFeature: ContentBlockingFeature? = jsonAdapter.fromJson(jsonString.string)
+            val contentBlockingFeature: ContentBlockingFeature? = jsonAdapter.fromJson(jsonString)
             contentBlockingFeature?.exceptions?.map {
                 contentBlockingExceptions.add(ContentBlockingExceptionEntity(it.domain, it.reason))
             }
