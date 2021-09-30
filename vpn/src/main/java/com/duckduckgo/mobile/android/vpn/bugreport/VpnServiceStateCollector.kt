@@ -31,6 +31,7 @@ import javax.inject.Inject
 class VpnServiceStateCollector @Inject constructor(
     private val context: Context,
     private val memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>,
+    private val vpnUptimeRecorder: VpnUptimeRecorder,
 ) : VpnStateCollectorPlugin {
 
     override val collectorName: String
@@ -58,12 +59,16 @@ class VpnServiceStateCollector @Inject constructor(
         tcbs
             .filterNot { it.requestingAppPackage.isNullOrBlank() }
             .groupBy { it.requestingAppPackage }
+            .toList().sortedByDescending { it.second.size }.toMap()
             .forEach { entry ->
                 val app = entry.key
                 val openConnections = entry.value.size
                 appConnectionState.put(app, openConnections.toString())
             }
         state.put("activeTcpConnections", appConnectionState)
+
+        // VPN up time
+        state.put("upTimeInMillis", vpnUptimeRecorder.getVpnUpTime())
 
         return state
     }

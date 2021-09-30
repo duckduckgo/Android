@@ -27,7 +27,6 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -38,8 +37,6 @@ import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
 import timber.log.Timber
-import xyz.hexene.localvpn.Packet
-import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import java.util.concurrent.*
@@ -433,18 +430,4 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 interface NetworkChannelCreator {
     fun createDatagramChannel(): DatagramChannel
     fun createSocketChannel(): SocketChannel
-}
-
-@VpnScope
-class VpnQueues @Inject constructor() {
-    val tcpDeviceToNetwork: BlockingDeque<Packet> = LinkedBlockingDeque()
-    val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
-
-    val networkToDevice: BlockingDeque<ByteBuffer> = LinkedBlockingDeque()
-
-    fun clearAll() {
-        tcpDeviceToNetwork.clear()
-        udpDeviceToNetwork.clear()
-        networkToDevice.clear()
-    }
 }

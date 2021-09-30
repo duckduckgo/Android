@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.VpnScope
@@ -60,9 +61,12 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()
-        flushInMemoryTrackersToDatabase()
+        coroutineScope.launch(insertionDispatcher) {
+            flushInMemoryTrackersToDatabase()
+        }
     }
 
+    @WorkerThread
     private fun flushInMemoryTrackersToDatabase() {
         val toInsert = mutableListOf<VpnTracker>()
         synchronized(batchedTrackers) {
