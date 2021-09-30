@@ -16,11 +16,11 @@
 
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyStoreCoroutineTestRule
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
-import com.duckduckgo.privacy.config.store.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
@@ -35,7 +35,7 @@ import org.mockito.ArgumentMatchers.anyList
 class RealTrackerAllowlistRepositoryTest {
 
     @get:Rule
-    var coroutineRule = PrivacyStoreCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealTrackerAllowlistRepository
 
