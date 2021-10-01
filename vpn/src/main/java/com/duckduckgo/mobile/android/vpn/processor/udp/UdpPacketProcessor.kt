@@ -91,10 +91,10 @@ class UdpPacketProcessor @AssistedInject constructor(
 
         try {
             while (pollJobDeviceToNetwork?.isActive == true) {
-                kotlin.runCatching {
+                try {
                     deviceToNetworkProcessing()
-                }.onFailure {
-                    Timber.w(it, "Failed to process device-to-network packet")
+                } catch (e: IOException) {
+                    Timber.w(e, "Failed to process device-to-network packet")
                 }
             }
         } finally {
@@ -107,10 +107,10 @@ class UdpPacketProcessor @AssistedInject constructor(
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobNetworkToDevice?.isActive == true) {
-            kotlin.runCatching {
+            try {
                 networkToDeviceProcessing()
-            }.onFailure {
-                Timber.w(it, "Failed to process network-to-device packet")
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process network-to-device packet")
             }
         }
     }

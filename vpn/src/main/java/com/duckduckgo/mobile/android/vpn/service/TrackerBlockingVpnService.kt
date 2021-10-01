@@ -32,7 +32,9 @@ import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.ui.notification.*
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
+import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -378,18 +380,31 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        suspend fun restartVpnService(context: Context) = withContext(Dispatchers.Default) {
+        suspend fun restartVpnService(context: Context, forceGc: Boolean = false) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
                 Timber.v("VPN log: stopping service")
                 stopService(applicationContext)
                 // wait for the service to stop and then restart it
+                waitUntilStopped(applicationContext)
+
+                if (forceGc) {
+                    Timber.d("Forcing a garbage collection to run while VPN is restarting")
+                    System.gc()
+                }
+
+                Timber.v("VPN log: re-starting service")
+                startService(applicationContext)
+            }
+        }
+
+        private suspend fun waitUntilStopped(applicationContext: Context) {
+            // it's possible `isServiceRunning` keeps returning true and we never stop waiting, the timeout ensures we don't block forever
+            withTimeoutOrNull(10_000) {
                 while (isServiceRunning(applicationContext)) {
                     delay(500)
                     Timber.v("VPN log: waiting for service to stop...")
                 }
-                Timber.v("VPN log: re-starting service")
-                startService(applicationContext)
             }
         }
 

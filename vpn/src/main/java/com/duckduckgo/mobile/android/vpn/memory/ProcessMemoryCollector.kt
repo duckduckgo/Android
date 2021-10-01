@@ -32,11 +32,18 @@ class ProcessMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
 
         val metrics = mutableMapOf<String, String>()
 
-        metrics["javaHeapMaxSizeKb"] = (Runtime.getRuntime().maxMemory() / KB).toString()
-        metrics["javaHeapAllocatedKb"] = ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / KB).toString()
+        with(Runtime.getRuntime()) {
+            val heapMax = (maxMemory() / KB)
+            val heapAllocated = (totalMemory() - freeMemory()) / KB
+            val heapRemaining = heapMax - heapAllocated
+            metrics["javaHeapMaxSizeKb"] = heapMax.toString()
+            metrics["javaHeapAllocatedKb"] = heapAllocated.toString()
+            metrics["javaHeapRemainingKb"] = heapRemaining.toString()
+        }
 
         metrics["nativeHeapSizeKb"] = (Debug.getNativeHeapSize() / KB).toString()
         metrics["nativeHeapAllocatedKb"] = (Debug.getNativeHeapAllocatedSize() / KB).toString()
+        metrics["nativeHeapRemainingKb"] = (Debug.getNativeHeapFreeSize() / KB).toString()
 
         return metrics
     }

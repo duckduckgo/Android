@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app.global
 
-import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.app.Application
-import android.os.Build
-import android.os.Process
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -29,26 +25,29 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
+import com.duckduckgo.app.process.ProcessDetector
+import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess
+import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
-import dagger.android.AndroidInjector
-import dagger.android.HasDaggerInjector
+import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.threetenabp.AndroidThreeTen
+import dagger.android.AndroidInjector
+import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
-import timber.log.Timber
 import org.threeten.bp.zone.ZoneRulesProvider
+import timber.log.Timber
 import java.io.File
-import java.lang.RuntimeException
 import javax.inject.Inject
 
 open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleObserver {
@@ -63,6 +62,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
     @Inject
+    lateinit var vpnUncaughtExceptionHandler: VpnUncaughtExceptionHandler
+
+    @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
@@ -75,6 +77,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     @Inject
     lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
 
+    private val processDetector = ProcessDetector()
+
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -85,23 +89,19 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         super.onCreate()
 
         configureLogging()
-        Timber.i("Application Started")
+
+        val currentProcess = processDetector.detectProcess(this)
+        Timber.i("Creating DuckDuckGoApplication. Process %s", currentProcess)
+
         if (appIsRestarting()) return
 
-        Timber.i("Creating DuckDuckGoApplication")
         configureDependencyInjection()
-        configureUncaughtExceptionHandler()
+        configureFirebaseExceptionHandling()
+        configureUncaughtExceptionHandler(currentProcess)
         initializeDateLibrary()
 
-        val processName = processName()
-        Timber.i("Creating DuckDuckGo Application. Process name: $processName")
-
-        // vtodo Temporary inclusion of Firebase while in internal testing
-        FirebaseApp.initializeApp(this)
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-
         if (appIsRestarting()) return
-        if (processName.isVpnProcess()) {
+        if (currentProcess is VpnProcess) {
             Timber.i("VPN process, no further logic executed in application onCreate()")
             return
         }
@@ -121,22 +121,22 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         }
     }
 
-    private fun String.isVpnProcess(): Boolean {
-        return this.endsWith(":vpn")
+    // vtodo Temporary inclusion of Firebase while in internal testing
+    private fun configureFirebaseExceptionHandling() {
+        FirebaseApp.initializeApp(this)
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
     }
 
-    // vtodo maybe remove at some point
-    @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
-    private fun processName(): String {
-        if (Build.VERSION.SDK_INT >= 28) {
-            return getProcessName()
+    private fun configureUncaughtExceptionHandler(currentProcess: DuckDuckGoProcess) {
+        when (currentProcess) {
+            is VpnProcess -> configureUncaughtExceptionHandlerVpn()
+            is DuckDuckGoProcess.BrowserProcess -> configureUncaughtExceptionHandlerBrowser()
+            else -> Timber.w("Unknown process: Not configuring uncaught exception handler for %s", currentProcess)
+
         }
-
-        val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        return am.runningAppProcesses.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
     }
 
-    private fun configureUncaughtExceptionHandler() {
+    private fun configureUncaughtExceptionHandlerBrowser() {
         Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
@@ -145,6 +145,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
                 alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
         }
+    }
+
+    private fun configureUncaughtExceptionHandlerVpn() {
+        Thread.setDefaultUncaughtExceptionHandler(vpnUncaughtExceptionHandler)
     }
 
     private fun appIsRestarting(): Boolean {
@@ -182,7 +186,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     // also help with memory
     override fun getDir(name: String?, mode: Int): File {
         val dir = super.getDir(name, mode)
-        if (name == "webview" && processName().isVpnProcess()) {
+        if (name == "webview" && processDetector.detectProcess(this) is VpnProcess) {
             return File("${dir.absolutePath}/vpn").apply {
                 Timber.d(":vpn process getDir = $absolutePath")
                 if (!exists()) {
@@ -195,7 +199,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
 
     override fun getCacheDir(): File {
         val dir = super.getCacheDir()
-        if (processName().isVpnProcess()) {
+        if (processDetector.detectProcess(this) is VpnProcess) {
             return File("${dir.absolutePath}/vpn").apply {
                 Timber.d(":vpn process getCacheDir = $absolutePath")
                 if (!exists()) {

@@ -42,10 +42,11 @@ import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader.ACK
 import xyz.hexene.localvpn.Packet.TCPHeader.FIN
 import xyz.hexene.localvpn.TCB
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
-import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newSingleThreadExecutor
 import kotlin.math.pow
 
 class TcpPacketProcessor @AssistedInject constructor(
@@ -104,15 +105,15 @@ class TcpPacketProcessor @AssistedInject constructor(
         Timber.i("Starting %s", this::class.simpleName)
 
         if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
+            pollJobDeviceToNetwork = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
         }
 
         if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
+            pollJobNetworkToDevice = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
         }
 
         if (staleTcpConnectionCleanerJob == null) {
-            staleTcpConnectionCleanerJob = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { periodicConnectionCleanup() }
+            staleTcpConnectionCleanerJob = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { periodicConnectionCleanup() }
         }
 
     }
@@ -141,10 +142,10 @@ class TcpPacketProcessor @AssistedInject constructor(
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobDeviceToNetwork?.isActive == true) {
-            kotlin.runCatching {
+            try {
                 tcpDeviceToNetwork.deviceToNetworkProcessing()
-            }.onFailure {
-                Timber.w(it, "Failed to process TCP device-to-network packet")
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
             }
         }
     }
@@ -153,10 +154,10 @@ class TcpPacketProcessor @AssistedInject constructor(
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobNetworkToDevice?.isActive == true) {
-            kotlin.runCatching {
+            try {
                 tcpNetworkToDevice.networkToDeviceProcessing()
-            }.onFailure {
-                Timber.w(it, "Failed to process TCP network-to-device packet")
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
             }
         }
     }
@@ -174,7 +175,11 @@ class TcpPacketProcessor @AssistedInject constructor(
     companion object {
         fun logPacketDetails(packet: Packet, sequenceNumber: Long, acknowledgementNumber: Long): String {
             with(packet.tcpHeader) {
-                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${
+                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
+                isRST.printFlag(
+                    "RST"
+                )
+                }${
                 isURG.printFlag(
                     "URG"
                 )
