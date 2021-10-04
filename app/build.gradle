@@ -242,3 +242,9 @@ tasks.register('fastlaneVersionCode') {
         print buildVersionCode()
     }
 }
+
+tasks.register('vc') {
+    doLast {
+        print buildVersionCode()
+    }
+}
