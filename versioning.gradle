@@ -4,13 +4,20 @@ ext {
         def versionName = buildVersionName()
         def (major, minor, patch) = versionName.toLowerCase().tokenize('.')
         (major, minor, patch) = [major, minor, patch].collect { it.toInteger() }
-        (major * 10000) + (minor * 100) + patch
+        (major * 10_000_000) + (minor * 10_000) + (patch * 1_000) + buildNumberCode()
     }
 
     buildVersionName = {
         def props = new Properties()
         file("version/version.properties").withInputStream { props.load(it) }
-        return props.getProperty("VERSION")
+        def version = props.getProperty("VERSION")
+
+        return version
     }
 
+    buildNumberCode = {
+        return 123
+    }
+// 5.97.239-NIGHTLY
+// 5.97.0
 }

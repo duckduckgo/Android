@@ -31,6 +31,11 @@ Deploy APK to GitHub
 fastlane android release
 ```
 Create new release
+### android release2
+```
+fastlane android release2
+```
+Create new non-interactive release 
 
 ----
 
