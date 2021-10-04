@@ -26,8 +26,8 @@ import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore

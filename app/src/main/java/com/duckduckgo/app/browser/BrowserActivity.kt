@@ -50,7 +50,6 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName

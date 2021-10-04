@@ -24,8 +24,8 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -17,13 +17,15 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener

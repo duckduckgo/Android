@@ -29,10 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyDashboardBinding
 import com.duckduckgo.app.browser.databinding.ContentPrivacyDashboardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
@@ -42,7 +39,10 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 

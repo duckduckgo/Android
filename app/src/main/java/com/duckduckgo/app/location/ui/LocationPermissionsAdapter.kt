@@ -26,14 +26,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
-import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.locationPermissionsSectionTitle
-import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.locationPermissionsToggle
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.*
+import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

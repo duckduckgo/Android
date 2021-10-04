@@ -16,11 +16,7 @@
 
 package com.duckduckgo.app.email.api
 
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface EmailService {
     @POST("https://quack.duckduckgo.com/api/email/addresses")

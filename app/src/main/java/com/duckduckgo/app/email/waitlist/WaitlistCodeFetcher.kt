@@ -20,8 +20,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.WorkManager
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.AppEmailManager.FetchCodeResult.*
+import com.duckduckgo.app.email.AppEmailManager.WaitlistState.JoinedQueue
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder.Companion.EMAIL_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.app.global.DispatcherProvider

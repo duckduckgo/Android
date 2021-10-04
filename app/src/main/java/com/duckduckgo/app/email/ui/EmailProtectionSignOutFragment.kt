@@ -23,8 +23,8 @@ import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
 import android.view.View
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan

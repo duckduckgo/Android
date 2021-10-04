@@ -26,7 +26,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 class ShortcutBuilder @Inject constructor() {

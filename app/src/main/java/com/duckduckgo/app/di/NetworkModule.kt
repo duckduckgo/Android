@@ -20,8 +20,8 @@ import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter

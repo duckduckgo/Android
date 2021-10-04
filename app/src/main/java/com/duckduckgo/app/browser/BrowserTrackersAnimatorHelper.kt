@@ -36,9 +36,9 @@ import androidx.core.widget.TextViewCompat
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.ui.view.toPx
 
 interface TrackersAnimatorListener {
     fun onAnimationFinished()

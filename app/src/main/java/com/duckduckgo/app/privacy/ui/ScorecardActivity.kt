@@ -24,12 +24,12 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 

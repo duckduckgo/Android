@@ -20,11 +20,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
-import android.webkit.GeolocationPermissions
-import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebView
+import android.webkit.*
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.drm.DrmRequestManager

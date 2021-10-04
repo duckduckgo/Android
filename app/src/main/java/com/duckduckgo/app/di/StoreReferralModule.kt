@@ -16,7 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.referral.*
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.referral.EmptyReferrerStateListener
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo

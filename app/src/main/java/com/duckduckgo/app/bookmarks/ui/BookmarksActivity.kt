@@ -27,11 +27,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfirmationFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
@@ -45,9 +45,7 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 import javax.inject.Inject
 
 class BookmarksActivity : DuckDuckGoActivity() {

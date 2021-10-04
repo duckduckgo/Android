@@ -25,8 +25,9 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.widget.SearchAndFavoritesWidget
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 

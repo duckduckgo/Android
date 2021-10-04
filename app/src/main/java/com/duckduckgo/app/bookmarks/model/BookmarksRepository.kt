@@ -17,7 +17,10 @@
 package com.duckduckgo.app.bookmarks.model
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.bookmarks.db.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow

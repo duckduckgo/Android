@@ -30,8 +30,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
-import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.savedSiteEmptyHint
-import kotlinx.android.synthetic.main.view_saved_site_section_title.view.savedSiteSectionTitle
+import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
+import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(

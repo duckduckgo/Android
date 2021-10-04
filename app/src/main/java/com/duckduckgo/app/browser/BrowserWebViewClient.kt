@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
-import android.net.http.SslError.*
+import android.net.http.SslError.SSL_UNTRUSTED
 import android.os.Build
 import android.webkit.*
 import androidx.annotation.RequiresApi

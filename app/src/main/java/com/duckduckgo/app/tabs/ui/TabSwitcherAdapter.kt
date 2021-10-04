@@ -37,9 +37,9 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.card.MaterialCardView
 import kotlinx.android.synthetic.main.item_tab.view.*
 import kotlinx.coroutines.launch

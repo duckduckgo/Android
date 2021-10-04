@@ -23,8 +23,8 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.*
-import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
+import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -56,7 +56,10 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.app.trackerdetection.db.*
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.*
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity

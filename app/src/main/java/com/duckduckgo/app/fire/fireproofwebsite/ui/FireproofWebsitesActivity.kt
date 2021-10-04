@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R

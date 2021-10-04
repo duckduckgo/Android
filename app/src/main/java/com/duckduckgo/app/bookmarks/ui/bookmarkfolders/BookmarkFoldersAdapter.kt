@@ -25,10 +25,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.android.synthetic.main.view_bookmark_folder_entry.view.*
-import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
 import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
 
 class BookmarkFoldersAdapter(

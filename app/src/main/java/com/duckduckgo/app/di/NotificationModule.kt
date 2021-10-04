@@ -22,11 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.notification.AppNotificationSender
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification

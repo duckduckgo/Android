@@ -18,9 +18,8 @@ package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.di.scopes.AppObjectGraph
-
 import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds

@@ -19,8 +19,7 @@ package com.duckduckgo.app.global.view
 
 import android.view.View
 import android.view.ViewGroup
-import java.util.ConcurrentModificationException
-import java.util.NoSuchElementException
+import java.util.*
 
 fun View.childrenSequence(): Sequence<View> = ViewChildrenSequence(this)
 

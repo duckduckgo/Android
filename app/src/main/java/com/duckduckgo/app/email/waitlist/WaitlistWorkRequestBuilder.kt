@@ -17,14 +17,7 @@
 package com.duckduckgo.app.email.waitlist
 
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
