@@ -221,6 +221,7 @@ platform :android do
         # ensure_git_branch( branch: 'develop' )
 
         releaseNotes = 	options[:release_notes]
+        releaseNotes.sub! '\n', "\n"
         UI.message "Release notes: #{releaseNotes}"
         newVersion = options[:new_version]
         UI.message "New version: #{newVersion}"
