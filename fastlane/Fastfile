@@ -93,7 +93,7 @@ platform :android do
    UI.message("Apk path: #{options[:apk_path]}")
    upload_to_play_store(
      apk: options[:apk_path],
-     track: 'dogfood',
+     track: 'Dogfood',
      skip_upload_screenshots: true,
      skip_upload_images: true,
      validate_only: true
