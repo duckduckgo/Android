@@ -16,7 +16,7 @@ ext {
     }
 
     buildNumberCode = {
-        filePath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android/build_number.properties"
+        filePath = "${CI_HOME_DIR}/build_number.properties"
         if(!new File(filePath).exists()) return 0
         def props = new Properties()
         props.load(new FileInputStream(filePath))
