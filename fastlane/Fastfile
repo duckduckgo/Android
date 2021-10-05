@@ -96,7 +96,7 @@ platform :android do
      track: 'Dogfood',
      skip_upload_screenshots: true,
      skip_upload_images: true,
-     validate_only: true
+     validate_only: false
    )
 
  end
