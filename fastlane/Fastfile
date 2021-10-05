@@ -87,6 +87,20 @@ platform :android do
 
  end
 
+ desc "Upload APK to Play Store Dogfood track"
+ lane :deploy_dogfood do |options|
+
+   UI.message("Apk path: #{options[:apk_path]}")
+   upload_to_play_store(
+     apk: options[:apk_path],
+     track: 'dogfood',
+     skip_upload_screenshots: true,
+     skip_upload_images: true,
+     validate_only: true
+   )
+
+ end
+
   desc "Deploy APK to GitHub"
   lane :deploy_github do
 

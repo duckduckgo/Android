@@ -51,3 +51,9 @@ tasks.register('incrementBuildNumber') {
         props.store(os, null)
     }
 }
+
+tasks.register('getBuildVersionName') {
+    doLast {
+        print buildVersionName()
+    }
+}
