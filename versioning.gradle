@@ -1,18 +1,28 @@
 ext {
 
     buildVersionCode = {
-        def versionName = buildVersionName()
+        def versionName = getVersionName()
         def (major, minor, patch) = versionName.toLowerCase().tokenize('.')
         (major, minor, patch) = [major, minor, patch].collect { it.toInteger() }
         (major * 10_000_000) + (minor * 10_000) + (patch * 1_000) + buildNumberCode()
     }
 
-    buildVersionName = {
+    getVersionName = {
         def props = new Properties()
         file("version/version.properties").withInputStream { props.load(it) }
-        def version = props.getProperty("VERSION")
+        return props.getProperty("VERSION")
+    }
 
-        return version
+    getVersionNameSuffix = {
+        if (project.hasProperty("versionNameSuffix")) {
+            return project["versionNameSuffix"]
+        } else {
+            return ""
+        }
+    }
+
+    buildVersionName = {
+        return getVersionName() + "." + buildNumberCode() + getVersionNameSuffix()
     }
 
     buildNumberCode = {
@@ -23,6 +33,4 @@ ext {
         buildNumber = props["build"]
         if (buildNumber == null) return 0 else return Integer.valueOf(buildNumber)
     }
-// 5.97.239-NIGHTLY
-// 5.97.0
 }
