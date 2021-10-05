@@ -26,3 +26,20 @@ ext {
 // 5.97.239-NIGHTLY
 // 5.97.0
 }
+
+
+tasks.register('incrementBuildNumber') {
+    doLast {
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) {
+            return
+        }
+
+        def props = new Properties()
+        props.load(new FileInputStream(filePath))
+        def currentBuildNumber = props["build"]
+        props["build"] = ++currentBuildNumber
+        def os = new FileOutputStream(filePath)
+        props.store(os, null)
+    }
+}
