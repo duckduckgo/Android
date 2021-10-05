@@ -34,3 +34,20 @@ ext {
         if (buildNumber == null) return 0 else return Integer.valueOf(buildNumber)
     }
 }
+
+
+tasks.register('incrementBuildNumber') {
+    doLast {
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) {
+            return
+        }
+
+        def props = new Properties()
+        props.load(new FileInputStream(filePath))
+        def currentBuildNumber = props["build"]
+        props["build"] = ++currentBuildNumber
+        def os = new FileOutputStream(filePath)
+        props.store(os, null)
+    }
+}
