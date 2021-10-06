@@ -40,6 +40,27 @@ ext {
     }
 }
 
+tasks.register("setBuildNumber") {
+    doLast {
+        if(!project.hasProperty("number")) {
+            throw new IllegalArgumentException("Missing argument: 'number' must be provided")
+        }
+
+        filePath = "${CI_HOME_DIR}/build_number.properties"
+        if(!new File(filePath).exists()) {
+            throw new IllegalStateException("build number file could not be found at: $filePath")
+        }
+
+        def buildNumber = project["number"]
+        println("Setting build number to: $buildNumber")
+
+        def props = new Properties()
+        props.load(new FileInputStream(filePath))
+        props["build"] = buildNumber
+        def os = new FileOutputStream(filePath)
+        props.store(os, null)
+    }
+}
 
 tasks.register('incrementBuildNumber') {
     doLast {
@@ -51,6 +72,7 @@ tasks.register('incrementBuildNumber') {
         def props = new Properties()
         props.load(new FileInputStream(filePath))
         def currentBuildNumber = props["build"]
+
         props["build"] = ++currentBuildNumber
         def os = new FileOutputStream(filePath)
         props.store(os, null)
