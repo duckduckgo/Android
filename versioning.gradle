@@ -22,7 +22,12 @@ ext {
     }
 
     buildVersionName = {
-        return getVersionName() + "." + buildNumberCode() + getVersionNameSuffix()
+        def suffix = getVersionNameSuffix()
+        if (suffix?.trim()) {
+            return getVersionName() + "." + buildNumberCode() + getVersionNameSuffix()
+        } else {
+            return getVersionName()
+        }
     }
 
     buildNumberCode = {
