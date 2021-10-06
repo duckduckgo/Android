@@ -51,7 +51,8 @@ tasks.register("setBuildNumber") {
             throw new IllegalStateException("build number file could not be found at: $filePath")
         }
 
-        def buildNumber = project["number"]
+        String buildNumber = project["number"]
+        buildNumber = Integer.parseInt(buildNumber)
         println("Setting build number to: $buildNumber")
 
         def props = new Properties()
