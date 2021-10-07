@@ -84,7 +84,7 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, R.color.cornflowerBlue)
+                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue)
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
@@ -102,11 +102,11 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
 
     private fun launchKonfetti() {
 
-        val magenta = ResourcesCompat.getColor(getResources(), R.color.magenta, null)
-        val blue = ResourcesCompat.getColor(getResources(), R.color.accentBlue, null)
-        val purple = ResourcesCompat.getColor(getResources(), R.color.purple, null)
-        val green = ResourcesCompat.getColor(getResources(), R.color.green, null)
-        val yellow = ResourcesCompat.getColor(getResources(), R.color.yellow, null)
+        val magenta = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.magenta, null)
+        val blue = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.accentBlue, null)
+        val purple = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.purple, null)
+        val green = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.green, null)
+        val yellow = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.yellow, null)
 
         val displayWidth = resources.displayMetrics.widthPixels
 

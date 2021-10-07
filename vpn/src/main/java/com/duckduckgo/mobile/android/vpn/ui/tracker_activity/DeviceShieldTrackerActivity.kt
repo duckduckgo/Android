@@ -313,7 +313,7 @@ class DeviceShieldTrackerActivity :
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, R.color.almostBlackDark)
+                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.almostBlackDark)
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),

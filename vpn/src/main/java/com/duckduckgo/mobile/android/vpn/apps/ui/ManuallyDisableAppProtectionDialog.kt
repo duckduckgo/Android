@@ -57,7 +57,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val submitCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSubmit)
         val radioGroup = rootView.findViewById<RadioGroup>(R.id.trackingProtectionAppRadioGroup)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), R.style.Widget_DuckDuckGo_RoundedDialog)
+        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
             .setView(rootView)
 
         validateBundleArguments()

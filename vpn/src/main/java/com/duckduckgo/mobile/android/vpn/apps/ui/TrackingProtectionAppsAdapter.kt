@@ -108,13 +108,13 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
                 itemView.deviceShieldAppExclusionReason.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
             }
         } else {
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.gone()
@@ -136,8 +136,8 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
             else -> 0
         }
     }
