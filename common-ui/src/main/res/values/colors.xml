@@ -128,5 +128,4 @@
     <color name="searchWidgetSearchBarBackgroundColor">@color/whiteFour</color>
     <color name="searchWidgetSearchBarHintColor">@color/brownishGrayTwo</color>
     <color name="searchWidgetSearchBarLoupeColor">@color/almostBlack</color>
->>>>>>> develop
 </resources>
