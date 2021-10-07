@@ -16,8 +16,8 @@ android {
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
-        minSdkVersion min_sdk
-        targetSdkVersion target_sdk
+        minSdk min_sdk
+        targetSdk target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -47,9 +47,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
     signingConfigs {
         release
@@ -141,7 +138,6 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
     androidTestImplementation(KotlinX.coroutines.test) {
