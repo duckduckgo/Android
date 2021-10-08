@@ -131,7 +131,11 @@ class DeviceShieldFragment : Fragment() {
         )
         val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
 
-        val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+        val textToStyle = if (trackerBlocked.otherAppsSize == 0){
+            "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+        } else {
+            "$prefix $totalTrackers $latestAppString $optionalOtherAppsString$pastWeekSuffix"
+        }
 
         deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
             listOf(
