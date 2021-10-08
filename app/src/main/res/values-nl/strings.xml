@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Zoekinvoer wissen</string>
     <string name="no_compatible_third_party_app_installed">Geen compatibele app geïnstalleerd</string>
     <string name="addBookmarkMenuTitle">Bladwijzer toevoegen</string>
+    <string name="editBookmarkMenuTitle">Bladwijzer bewerken</string>
+    <string name="addFavoriteMenuTitle">Favoriet toevoegen</string>
+    <string name="removeFavoriteMenuTitle">Favoriet verwijderen</string>
+    <string name="favoriteAddedMessage">Favoriet toegevoegd</string>
+    <string name="bookmarkAddedMessage">Bladwijzer toegevoegd</string>
     <string name="requestDesktopSiteMenuTitle">Desktopsite</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBETERD VAN &lt;img src=\"%1$d\" /&gt; NAAR &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privacyklasse</string>
+    <string name="privacyProtectionTemporarilyDisabled">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
 
     <string name="httpsGood">Gecodeerde verbinding</string>
     <string name="httpsMixed">Verbinding met gemengde codering</string>
@@ -147,10 +169,11 @@
     <string name="settingsHeadingGeneral">Algemeen</string>
     <string name="settingsHeadingOther">Anders</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
-    <string name="settingsLightTheme">Licht thema</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
+    <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
+    <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -199,14 +222,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
     <string name="bookmarksActivityTitle">Bladwijzers</string>
-    <string name="bookmarkDeleteConfirmMessage">Weet je zeker dat je bladwijzer &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
-    <string name="bookmarkAddedFeedback">Bladwijzer toegevoegd</string>
-    <string name="bookmarkTitleHint">Naam bladwijzer</string>
-    <string name="bookmarkUrlHint">URL bladwijzer</string>
-    <string name="bookmarkTitleEdit">Bladwijzer bewerken</string>
     <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
     <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %1$s</string>
-    <string name="bookmarkEdited">Bladwijzer toegevoegd</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; verwijderd</string>
     <string name="exportBookmarksMenu">Exporteren</string>
     <string name="exportBookmarksEmpty">Je hebt geen bladwijzers, dus er wordt niets geëxporteerd</string>
@@ -217,6 +234,13 @@
     <string name="importBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geïmporteerd</string>
     <string name="importBookmarksEmpty">Dit bestand bevat geen bladwijzers om te importeren</string>
     <string name="importBookmarksSuccess">%1$d bladwijzers geïmporteerd</string>
+    <string name="savedSiteDialogTitleHint">Titel</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Bewerken</string>
+    <string name="bookmarksSectionTitle">Bladwijzers</string>
+    <string name="favoritesSectionTitle">Favorieten</string>
+    <string name="bookmarksEmptyHint">Nog geen bladwijzers toegevoegd</string>
+    <string name="favoritesEmptyHint">Nog geen favorieten toegevoegd</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bevestigen</string>
@@ -229,6 +253,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Toevoegen aan startscherm</string>
+    <string name="shortcutAddedText">%1$s is toegevoegd aan je startscherm.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Help ons de app te verbeteren!</string>
@@ -508,6 +533,7 @@
     <string name="preciseLocationSystemDialogDeny">Later misschien</string>
     <string name="preciseLocationSystemDialogNeverAllow">Niet opnieuw vragen voor deze site</string>
     <string name="preciseLocationSiteDialogTitle">%1$s toestemming geven om je locatie te gebruiken?</string>
+    <string name="preciseLocationDDGDialogSubtitle">We gebruik je anonieme locatie alleen om betere resultaten dichter bij je in de buurt te bieden. Je kunt dit later altijd weer uitschakelen.</string>
     <string name="preciseLocationSiteDialogSubtitle">De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Altijd</string>
     <string name="preciseLocationSiteDialogAllowOnce">Alleen voor deze sessie</string>
@@ -537,4 +563,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Uitgeschakeld</string>
     <string name="enabled">Ingeschakeld</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Links openen in bijbehorende apps</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Uitschakelen om te voorkomen dat links automatisch geopend worden in andere geïnstalleerde apps.</string>
+    <string name="appLinkDialogTitle">Openen in een andere app?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Nieuw adres gekopieerd naar je klembord</string>
+    <string name="autofillTooltipUseYourAlias">%1$s gebruiken</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokkeert e-mailtrackers</string>
+    <string name="autofillTooltipGenerateAddress">Een privéadres genereren</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokkeert e-mailtrackers en verbergt je adres</string>
+    <string name="newEmailAliasMenuTitle">Duck-adres aanmaken</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">E-mailbescherming verwijderen?</string>
+    <string name="emailSignOutDialogText">Let op: als je E-mailbescherming van dit apparaat verwijdert, wordt je Duck-adres niet verwijderd.</string>
+    <string name="emailSignOutDialogCancel">Annuleren</string>
+    <string name="emailSignOutDialogDisable">Verwijderen</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-mailwachtlijst</string>
+    <string name="waitlistNotificationTitle">Je hebt een uitnodiging voor E-mailbescherming ontvangen!</string>
+    <string name="waitlistNotificationDescription">Je hebt je ingeschreven voor de wachtlijst en ons gevraagd je te laten weten wanneer je aan de beurt bent om onze functie E-mailbescherming uit te proberen. Tik om je uitnodiging te bekijken.</string>
+
+    <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
+    <string name="waitlistNotificationDialogNoThanks">NEE, BEDANKT</string>
+    <string name="waitlistNotificationDialogNotifyMe">MELDING STUREN</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-mailbescherming (bèta)</string>
+    <string name="emailProtectionActivityTitle">E-mailbescherming (bèta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[We bewaren je e-mails niet. <b><a href=\"\">Meer informatie</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
+    <string name="emailProtectionDuckAddressCta">Ik heb al een Duck-adres</string>
+    <string name="emailProtectionInviteCodeCta">Ik heb een uitnodigingscode</string>
+    <string name="emailProtectionWaitlistCta">Schrijf je in voor de privéwachtlijst</string>
+    <string name="emailProtectionGetStartedCta">Aan de slag</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres,<br/>zonder van e-mailprovider te wisselen. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=\"\"><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=\"\"><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres,<br/>zonder van e-mailprovider te wisselen. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Als je E-mailbescherming van dit apparaat verwijdert, kun je je persoonlijke Duck-adres niet meer invullen en geen nieuwe privé-Duck-adressen genereren in e-mailvelden terwijl je op het internet browset.<br/><br/>Als je je Duck-adressen volledig wilt verwijderen of als je andere vragen of feedback hebt, neem dan contact met ons op via <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Verwijderen van apparaat</string>
 </resources>

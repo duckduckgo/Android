@@ -22,10 +22,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.db.FavoriteEntity
-import com.duckduckgo.app.bookmarks.db.FavoritesDao
+import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
@@ -67,12 +64,11 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 35,
+    exportSchema = true, version = 39,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
-        TemporaryTrackingWhitelistedDomain::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsFalsePositiveDomain::class,
@@ -82,6 +78,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TabSelectionEntity::class,
         BookmarkEntity::class,
         FavoriteEntity::class,
+        BookmarkFolderEntity::class,
         Survey::class,
         DismissedCta::class,
         SearchCountEntity::class,
@@ -119,7 +116,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsTrackerDao(): TdsTrackerDao
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
-    abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
@@ -127,6 +123,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
     abstract fun favoritesDao(): FavoritesDao
+    abstract fun bookmarkFoldersDao(): BookmarkFoldersDao
     abstract fun surveyDao(): SurveyDao
     abstract fun dismissedCtaDao(): DismissedCtaDao
     abstract fun searchCountDao(): SearchCountDao
@@ -427,9 +424,46 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_35_TO_36: Migration = object : Migration(35, 36) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `user_events` ADD COLUMN `payload` TEXT NOT NULL DEFAULT \"\"")
+        }
+    }
+
+    val MIGRATION_36_TO_37: Migration = object : Migration(36, 37) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmark_folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)")
+            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
+            database.execSQL("DROP TABLE `bookmarks`")
+            database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
+        }
+    }
+
+    val MIGRATION_37_TO_38: Migration = object : Migration(37, 38) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `temporary_tracking_whitelist`")
+        }
+    }
+
+    val MIGRATION_38_TO_39: Migration = object : Migration(38, 39) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM user_events WHERE id = \"FIRST_NON_SERP_VISITED_SITE\"")
+        }
+    }
+
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
-            MIGRATION_29_TO_30.migrate(database)
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)")
+            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url, parentId) SELECT * FROM `bookmarks`")
+            database.execSQL("DROP TABLE `bookmarks`")
+            database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
         }
     }
 
@@ -474,7 +508,11 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_31_TO_32,
             MIGRATION_32_TO_33,
             MIGRATION_33_TO_34,
-            MIGRATION_34_TO_35
+            MIGRATION_34_TO_35,
+            MIGRATION_35_TO_36,
+            MIGRATION_36_TO_37,
+            MIGRATION_37_TO_38,
+            MIGRATION_38_TO_39
         )
 
     @Deprecated(

@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2021 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+    id 'kotlin-android-extensions'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    implementation project(path: ':di')
+    implementation project(path: ':common')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
+    api project(path: ':privacy-config-store')
+
+    implementation Kotlin.stdlib.jdk7
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation JakeWharton.timber
+
+    implementation KotlinX.coroutines.core
+
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.okHttp3.okHttp
+    implementation Google.dagger
+    implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    implementation AndroidX.work.runtimeKtx
+
+    // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation AndroidX.work.testing
+    testImplementation AndroidX.room.testing
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+}
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+}

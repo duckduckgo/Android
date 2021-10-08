@@ -5,11 +5,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -323,14 +324,48 @@
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
             android:label="@string/globalPrivacyControlActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.email.ui.EmailProtectionActivity"
+            android:label="@string/emailProtectionActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.email.ui.EmailWebViewActivity"
+            android:label="@string/emailProtectionWebViewActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
+        <activity
+            android:name="com.duckduckgo.app.settings.FireAnimationActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
+        <activity
+            android:name="com.duckduckgo.app.WidgetThemeConfiguration"
+            android:label="@string/widgetConfigurationActivityTitle"
+            android:theme="@style/AppTheme.Transparent">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
+            android:label="@string/folderLocationTitle"
+            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <service android:name="com.duckduckgo.widget.FavoritesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
+        <service android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
+
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
-        <receiver android:name="com.duckduckgo.widget.SearchWidget">
+        <receiver android:name="com.duckduckgo.widget.SearchWidget" android:label="@string/searchWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -339,13 +374,22 @@
                 android:resource="@xml/search_widget_info" />
         </receiver>
 
-        <receiver android:name="com.duckduckgo.widget.SearchWidgetLight">
+        <receiver android:name="com.duckduckgo.widget.SearchWidgetLight" android:label="@string/searchWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_widget_info_light" />
+        </receiver>
+
+        <receiver android:name="com.duckduckgo.widget.SearchAndFavoritesWidget" android:label="@string/favoritesWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/search_favorites_widget_info" />
         </receiver>
 
     </application>

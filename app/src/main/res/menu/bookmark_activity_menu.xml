@@ -24,8 +24,13 @@
         android:title="@string/exportBookmarksMenu" />
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_bookmark"
+        android:icon="@drawable/ic_loupe_24dp"
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/action_add_folder"
+        android:icon="@drawable/ic_add_folder"
+        android:title="@string/addFolder"
+        app:showAsAction="always" />
 </menu>

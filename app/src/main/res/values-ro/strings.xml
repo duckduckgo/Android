@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Ștergeți datele introduse pentru căutare</string>
     <string name="no_compatible_third_party_app_installed">Nicio aplicație compatibilă instalată</string>
     <string name="addBookmarkMenuTitle">Adăugare semn de carte</string>
+    <string name="editBookmarkMenuTitle">Editare semn de carte</string>
+    <string name="addFavoriteMenuTitle">Adaugă preferință</string>
+    <string name="removeFavoriteMenuTitle">Elimină Favoritul</string>
+    <string name="favoriteAddedMessage">Preferință adăugată</string>
+    <string name="bookmarkAddedMessage">Semn de carte adăugat</string>
     <string name="requestDesktopSiteMenuTitle">Versiune desktop</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
+    <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să spargă acest site.</string>
 
     <string name="httpsGood">Conexiune criptată</string>
     <string name="httpsMixed">Conexiune cu criptare mixtă</string>
@@ -151,10 +173,11 @@
     <string name="settingsHeadingGeneral">Generalități</string>
     <string name="settingsHeadingOther">Altele</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
-    <string name="settingsLightTheme">Temă luminoasă</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
     <string name="leaveFeedback">Partajează feedback</string>
+    <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
+    <string name="settingsEmailProtectionSubtitle">Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvare</string>
@@ -203,14 +226,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Semne de carte</string>
     <string name="bookmarksActivityTitle">Semne de carte</string>
-    <string name="bookmarkDeleteConfirmMessage">Sunteți sigur că doriți să ștergeți semnul de carte &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Semn de carte adăugat</string>
-    <string name="bookmarkTitleHint">Titlu semn de carte</string>
-    <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
-    <string name="bookmarkTitleEdit">Editare semn de carte</string>
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %1$s</string>
-    <string name="bookmarkEdited">Semn de carte adăugat</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
     <string name="exportBookmarksMenu">Export</string>
     <string name="exportBookmarksEmpty">Nu ai marcaje, nimic nu va fi exportat</string>
@@ -221,6 +238,13 @@
     <string name="importBookmarksError">Nu s-au putut importa marcaje, a apărut o eroare</string>
     <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
     <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
+    <string name="savedSiteDialogTitleHint">Titlu</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Editare</string>
+    <string name="bookmarksSectionTitle">Semne de carte</string>
+    <string name="favoritesSectionTitle">Preferințe</string>
+    <string name="bookmarksEmptyHint">Nu s-a adăugat niciun semn de carte</string>
+    <string name="favoritesEmptyHint">Nicio preferință adăugată încă</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
@@ -233,6 +257,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Adăugare la pagina principală</string>
+    <string name="shortcutAddedText">Succes! %1$s a fost adăugat pe ecranul de pornire.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ajutați-ne să îmbunătățim aplicația!</string>
@@ -410,7 +435,7 @@
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
-    <string name="onboardingLetsDoItButton">Hai să o facem!</string>
+    <string name="onboardingLetsDoItButton">Să începem!</string>
     <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
     <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. 🙌</string>
@@ -514,6 +539,7 @@
     <string name="preciseLocationSystemDialogDeny">Poate mai târziu</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nu întreba din nou pentru acest site</string>
     <string name="preciseLocationSiteDialogTitle">Acorzi %1$s permisiunea de a accesa locația?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Folosim locația ta anonimă doar pentru a oferi rezultate mai bune, mai aproape de tine. Poți oricând să te răzgândești mai târziu.</string>
     <string name="preciseLocationSiteDialogSubtitle">Poți gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale în Setări.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Întotdeauna</string>
     <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
@@ -543,4 +569,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Dezactivat</string>
     <string name="enabled">Activat</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Deschide linkuri în aplicațiile asociate</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Dezactivează pentru a preveni deschiderea automată a linkurilor în alte aplicații instalate.</string>
+    <string name="appLinkDialogTitle">Deschizi în altă aplicație?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Adresă nouă copiată în clipboard</string>
+    <string name="autofillTooltipUseYourAlias">Utilizează %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blochează modulele cookie de urmărire pentru e-mail</string>
+    <string name="autofillTooltipGenerateAddress">Generează o adresă privată</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blochează modulele cookie de urmărire pentru e-mail și îți ascunde adresa</string>
+    <string name="newEmailAliasMenuTitle">Creează adresa Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Elimini protecțiile comunicațiilor prin e-mail?</string>
+    <string name="emailSignOutDialogText">Notă: eliminarea protecțiilor comunicațiilor prin e-mail de pe acest dispozitiv nu va șterge adresa Duck.</string>
+    <string name="emailSignOutDialogCancel">Anulare</string>
+    <string name="emailSignOutDialogDisable">Elimină</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Trimite prin e-mail lista de așteptare</string>
+    <string name="waitlistNotificationTitle">Invitația ta de protecție a comunicațiilor prin e-mail este aici!</string>
+    <string name="waitlistNotificationDescription">Te-ai alăturat listei de așteptare și ne-ai solicitat să te anunțăm când este rândul tău să încerci funcția noastră de protecție a comunicațiilor prin e-mail. Atinge pentru a vizualiza invitația ta.</string>
+
+    <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
+    <string name="waitlistNotificationDialogNoThanks">Nu, mulțumesc</string>
+    <string name="waitlistNotificationDialogNotifyMe">DORESC SĂ PRIMESC NOTIFICĂRI</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
+    <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Nu îți salvăm e-mailurile. <b><a href=\"\">Află mai multe</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>
+    <string name="emailProtectionDuckAddressCta">Am deja o adresă Duck</string>
+    <string name="emailProtectionInviteCodeCta">Am un cod de invitație</string>
+    <string name="emailProtectionWaitlistCta">Alătură-te listei de așteptare private</string>
+    <string name="emailProtectionGetStartedCta">Să începem</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, <br/> fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=\"\"><b>primești o notificare</b></a> când ajunge?<br/><a href=\"\"><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Ești invitat!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, <br/> fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Adresa Duck personală</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Eliminarea protecției comunicațiilor prin e-mail de pe acest dispozitiv elimină opțiunea de a completa adresa personală Duck sau o adresă Duck privată, recent generată în câmpurile de e-mail în timp ce navighezi pe web.<br/><br/>Pentru a șterge complet adresele Duck sau pentru orice alte întrebări sau feedback, contactează-ne la <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Elimină de pe dispozitiv</string>
 </resources>

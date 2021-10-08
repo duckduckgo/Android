@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/almostBlackDark"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="normal"
+            android:textSize="20sp"
+            android:text="@string/widgetConfigurationTitleText" />
+
+        <ImageView
+            android:id="@+id/widgetConfigPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/search_favorites_widget_preview" />
+
+        <RadioGroup
+            android:id="@+id/widgetConfigThemeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <RadioButton
+                android:id="@+id/widgetConfigThemeSystem"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:visibility="gone"
+                android:textSize="16sp"
+                android:text="@string/widgetConfigurationSystemThemeOption" />
+
+            <RadioButton
+                android:id="@+id/widgetConfigThemeLight"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:checked="true"
+                android:text="@string/widgetConfigurationLightThemeOption" />
+
+            <RadioButton
+                android:id="@+id/widgetConfigThemeDark"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="@color/almostBlackDark"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textSize="16sp"
+                android:text="@string/widgetConfigurationDarkThemeOption" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/widgetConfigAddWidgetButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/button_contained_bg"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:layout_gravity="end"
+            android:textAllCaps="true"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/white"
+            android:letterSpacing="0.0"
+            android:layout_marginTop="16dp"
+            android:text="@string/widgetConfigurationAddWidgetOption"/>
+    </LinearLayout>
+</FrameLayout>

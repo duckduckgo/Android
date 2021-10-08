@@ -23,7 +23,8 @@ import androidx.room.TypeConverter
 @Entity(tableName = "user_events")
 data class UserEventEntity(
     @PrimaryKey val id: UserEventKey,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val payload: String = ""
 )
 
 enum class UserEventKey {

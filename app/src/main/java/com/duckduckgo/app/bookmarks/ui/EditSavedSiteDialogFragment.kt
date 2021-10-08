@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.Dialog
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
-import android.view.WindowManager
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.app.global.view.TextChangedWatcher
 
-class EditSavedSiteDialogFragment : DialogFragment() {
+class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onSavedSiteEdited(savedSite: SavedSite)
@@ -36,53 +33,64 @@ class EditSavedSiteDialogFragment : DialogFragment() {
 
     var listener: EditSavedSiteListener? = null
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val rootView = View.inflate(activity, R.layout.edit_saved_site, null)
-        val titleInput = rootView.findViewById<EditText>(R.id.titleInput)
-        val urlInput = rootView.findViewById<EditText>(R.id.urlInput)
-
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.savedSiteDialogTitleEdit)
-            .setPositiveButton(R.string.dialogSave) { _, _ ->
-                userAcceptedDialog(titleInput, urlInput)
-            }
-
+    override fun configureUI() {
         validateBundleArguments()
 
-        populateFields(titleInput, urlInput)
-
-        val alert = alertBuilder.create()
-        showKeyboard(titleInput, alert)
-        return alert
-    }
-
-    private fun userAcceptedDialog(titleInput: EditText, urlInput: EditText) {
-        when (val savedSite = getSavedSite()) {
-            is SavedSite.Bookmark -> {
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
-                )
-            }
-            is SavedSite.Favorite -> {
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = titleInput.text.toString(), url = urlInput.text.toString())
-                )
-            }
+        if (getSavedSite() is SavedSite.Favorite) {
+            setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
+        } else {
+            setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
+            binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
-        titleInput.hideKeyboard()
+
+        populateFields(binding.titleInput, binding.urlInput)
+
+        binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
 
-    private fun showKeyboard(titleInput: EditText, alert: AlertDialog) {
-        titleInput.setSelection(titleInput.text.length)
-        titleInput.showKeyboard()
-        alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-    }
+    private fun validateInput(newValue: String, existingValue: String) =
+        if (newValue.isNotBlank()) newValue else existingValue
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
+    }
+
+    override fun onConfirmation() {
+        val savedSite = getSavedSite()
+
+        val updatedTitle = validateInput(binding.titleInput.text.toString(), savedSite.title)
+        val updatedUrl = validateInput(binding.urlInput.text.toString(), savedSite.url)
+
+        when (savedSite) {
+            is SavedSite.Bookmark -> {
+                val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
+                listener?.onSavedSiteEdited(
+                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
+                )
+            }
+            is SavedSite.Favorite -> {
+                listener?.onSavedSiteEdited(
+                    savedSite.copy(title = updatedTitle, url = updatedUrl)
+                )
+            }
+        }
+    }
+
+    private val urlTextWatcher = object : TextChangedWatcher() {
+        override fun afterTextChanged(editable: Editable) {
+            when {
+                editable.toString().isBlank() -> {
+                    setConfirmationVisibility(ValidationState.INVALID)
+                }
+                editable.toString() != getSavedSite().url -> {
+                    setConfirmationVisibility(ValidationState.CHANGED)
+                }
+                else -> {
+                    setConfirmationVisibility(ValidationState.UNCHANGED)
+                }
+            }
+        }
     }
 
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
@@ -98,12 +106,14 @@ class EditSavedSiteDialogFragment : DialogFragment() {
     }
 
     companion object {
-        private const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
+        const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(savedSite: SavedSite): EditSavedSiteDialogFragment {
+        fun instance(savedSite: SavedSite, parentFolderId: Long = 0, parentFolderName: String? = null): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)
+            bundle.putLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
+            bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME, parentFolderName)
             dialog.arguments = bundle
             return dialog
         }

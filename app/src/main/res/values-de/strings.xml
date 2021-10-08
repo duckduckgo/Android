@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Sucheingabe löschen</string>
     <string name="no_compatible_third_party_app_installed">Keine kompatible App installiert</string>
     <string name="addBookmarkMenuTitle">Lesezeichen hinzufügen</string>
+    <string name="editBookmarkMenuTitle">Lesezeichen bearbeiten</string>
+    <string name="addFavoriteMenuTitle">Favorit hinzufügen</string>
+    <string name="removeFavoriteMenuTitle">Favorit entfernen</string>
+    <string name="favoriteAddedMessage">Favorit wurde hinzugefügt</string>
+    <string name="bookmarkAddedMessage">Lesezeichen hinzugefügt</string>
     <string name="requestDesktopSiteMenuTitle">Desktop-Seite</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Datenschutz-Stufe</string>
+    <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>
 
     <string name="httpsGood">Verschlüsselte Verbindung</string>
     <string name="httpsMixed">Verschlüsselte und unverschlüsselte Verbindung</string>
@@ -147,10 +169,11 @@
     <string name="settingsHeadingGeneral">Allgemeines</string>
     <string name="settingsHeadingOther">Sonstiges</string>
     <string name="settingsHeadingPrivacy">Privatsphäre</string>
-    <string name="settingsLightTheme">Helles Design</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback teilen</string>
+    <string name="settingsEmailProtectionTitle">E-Mail-Schutz</string>
+    <string name="settingsEmailProtectionSubtitle">E-Mail-Tracker blockieren und deine Adresse verbergen.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
@@ -199,14 +222,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Lesezeichen</string>
     <string name="bookmarksActivityTitle">Lesezeichen</string>
-    <string name="bookmarkDeleteConfirmMessage">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
-    <string name="bookmarkAddedFeedback">Lesezeichen hinzugefügt</string>
-    <string name="bookmarkTitleHint">Lesezeichen-Titel</string>
-    <string name="bookmarkUrlHint">Lesezeichen-URL</string>
-    <string name="bookmarkTitleEdit">Lesezeichen bearbeiten</string>
     <string name="noBookmarks">Noch keine Lesezeichen hinzugefügt</string>
     <string name="bookmarkOverflowContentDescription">Mehr Optionen für Lesezeichen %1$s</string>
-    <string name="bookmarkEdited">Lesezeichen hinzugefügt</string>
     <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; wurde gelöscht</string>
     <string name="exportBookmarksMenu">Exportieren</string>
     <string name="exportBookmarksEmpty">Es wird nichts exportiert, da keine Lesezeichen für Sie vorliegen</string>
@@ -217,6 +234,13 @@
     <string name="importBookmarksError">Etwas ist schief gegangen und es konnten keine Lesezeichen importiert werden</string>
     <string name="importBookmarksEmpty">Diese Datei enthält keine Lesezeichen, die importiert werden können</string>
     <string name="importBookmarksSuccess">%1$d Lesezeichen wurden erfolgreich importiert</string>
+    <string name="savedSiteDialogTitleHint">Titel</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Bearbeiten</string>
+    <string name="bookmarksSectionTitle">Lesezeichen</string>
+    <string name="favoritesSectionTitle">Favoriten</string>
+    <string name="bookmarksEmptyHint">Noch keine Lesezeichen hinzugefügt</string>
+    <string name="favoritesEmptyHint">Noch keine Favoriten hinzugefügt</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bestätigen</string>
@@ -229,6 +253,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Zur Startseite hinzufügen</string>
+    <string name="shortcutAddedText">%1$s wurde erfolgreich zu deinem Startbildschirm hinzugefügt.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hilf uns bei der Verbesserung der App!</string>
@@ -508,6 +533,7 @@
     <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
     <string name="preciseLocationSystemDialogNeverAllow">Für diese Website nicht erneut fragen</string>
     <string name="preciseLocationSiteDialogTitle">%1$s Zugriffsberechtigung auf den Gerätestandort erteilen?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Wir verwenden deinen anonymen Standort nur, um dir genauere, standortbasierte Ergebnisse zu liefern. Diese Einstellung kann jederzeit rückgängig gemacht werden.</string>
     <string name="preciseLocationSiteDialogSubtitle">Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Immer</string>
     <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
@@ -537,4 +563,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiviert</string>
     <string name="enabled">Aktiviert</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Links in den dazugehörigen Apps öffnen</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Aktivieren, damit sich Links nicht automatisch in anderen installierten Apps öffnen.</string>
+    <string name="appLinkDialogTitle">In einer anderen App öffnen?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Neue Adresse wurde in deine Zwischenablage kopiert</string>
+    <string name="autofillTooltipUseYourAlias">%1$s verwenden</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blockiert E-Mail-Tracker</string>
+    <string name="autofillTooltipGenerateAddress">Eine private Adresse erstellen</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blockiert E-Mail-Tracker und verbirgt deine Adresse</string>
+    <string name="newEmailAliasMenuTitle">Duck-Adresse erstellen</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">E-Mail-Schutz entfernen?</string>
+    <string name="emailSignOutDialogText">Hinweis: Beim Entfernen des E-Mail-Schutzes von diesem Gerät wird deine Duck-Adresse nicht gelöscht.</string>
+    <string name="emailSignOutDialogCancel">Abbrechen</string>
+    <string name="emailSignOutDialogDisable">Entfernen</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-Mail-Warteliste</string>
+    <string name="waitlistNotificationTitle">Deine Einladung zum E-Mail-Schutz ist da!</string>
+    <string name="waitlistNotificationDescription">Du hast dich auf die Warteliste setzen lassen und uns darum gebeten, dich zu benachrichtigen, wenn auch du die E-Mail-Schutzfunktion testen kannst. Tippe hier, um deine Einladung zu öffnen.</string>
+
+    <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>
+    <string name="waitlistNotificationDialogNoThanks">NEIN, DANKE</string>
+    <string name="waitlistNotificationDialogNotifyMe">ICH MÖCHTE BENACHRICHTIGT WERDEN</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-Mail-Schutz (Beta)</string>
+    <string name="emailProtectionActivityTitle">E-Mail-Schutz (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Wir speichern keine E-Mails. <b><a href=\"\">Mehr erfahren</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Bei der Aktion „Auf die Warteliste setzen“ ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später noch einmal.</string>
+    <string name="emailProtectionDuckAddressCta">Ich habe bereits eine Duck-Adresse</string>
+    <string name="emailProtectionInviteCodeCta">Ich habe einen Einladungscode</string>
+    <string name="emailProtectionWaitlistCta">Auf die private Warteliste setzen</string>
+    <string name="emailProtectionGetStartedCta">Los geht\'s!</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=\"\"><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=\"\"><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Beim Entfernen des E-Mail-Schutzes von diesem Gerät wird auch die Option entfernt, über die beim Browsen automatisch deine persönliche Duck-Adresse oder deine neu erstellte private Duck-Adresse in die E-Mail-Felder eingegeben wird.<br/><br/>Wenn du mehr darüber erfahren möchtest, wie du deine Duck-Adressen vollständig löschen kannst oder andere Fragen oder Feedback an uns hast, melde dich bei uns unter <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Von diesem Gerät entfernen</string>
 </resources>

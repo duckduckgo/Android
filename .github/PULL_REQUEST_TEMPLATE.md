@@ -1,20 +1,24 @@
 <!--
-Note: This checklist is a reminder of our shared engineering expectations. Feel free to change it, although assigning a GitHub reviewer and the items in bold are required.
+Note: This checklist is a reminder of our shared engineering expectations. 
+The items in Bold are required
+If your PR involves UI changes:
+    1. Upload screenshots or screencasts that illustrate the changes before / after
+    2. Add them under the UI changes section (feel free to add more columns if needed)
+    3. Make sure these changes are tested in API 21 and API 26
+If your PR does not involve UI changes, you can remove the **UI changes** section
 -->
 
-Task/Issue URL: 
-Tech Design URL: 
-CC: 
+Task/Issue URL:
 
-**Description**:
+### Description
 
+### Steps to test this PR
 
-**Steps to test this PR**:
+_Feature 1_
 1. 
-1. 
+2.
 
-
----
-###### Internal references:
-[Software Engineering Expectations](https://app.asana.com/0/59792373528535/199064865822552)
-[Technical Design Template](https://app.asana.com/0/59792373528535/184709971311943)
+### UI changes
+| Before  | After |
+| ------ | ----- |
+!(Upload before screenshot)|(Upload after screenshot)|

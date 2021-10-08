@@ -19,10 +19,9 @@ package com.duckduckgo.app.di
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
+import com.duckduckgo.app.global.events.db.*
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.events.db.AppUserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -36,6 +35,11 @@ import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
+import com.duckduckgo.app.widget.FavoritesObserver
+import com.duckduckgo.widget.AppWidgetThemePreferences
+import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
@@ -45,6 +49,9 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindStatisticsStore(statisticsStore: StatisticsSharedPreferences): StatisticsDataStore
+
+    @Binds
+    abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
 
     @Binds
     abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
@@ -81,4 +88,11 @@ abstract class StoreModule {
     @Binds
     @IntoSet
     abstract fun bindTabsDbSanitizerObserver(tabsDbSanitizer: TabsDbSanitizer): LifecycleObserver
+
+    @Binds
+    @IntoSet
+    abstract fun bindFavoritesObserver(favoritesObserver: FavoritesObserver): LifecycleObserver
+
+    @Binds
+    abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
 }

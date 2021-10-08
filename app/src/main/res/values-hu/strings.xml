@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
     <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
+    <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
+    <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
+    <string name="removeFavoriteMenuTitle">Kedvenc eltávolítása</string>
+    <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
+    <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>
     <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
+    <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>
 
     <string name="httpsGood">Titkosított kapcsolat</string>
     <string name="httpsMixed">Vegyes titkosítású kapcsolat</string>
@@ -147,10 +169,11 @@
     <string name="settingsHeadingGeneral">Általános</string>
     <string name="settingsHeadingOther">Egyéb</string>
     <string name="settingsHeadingPrivacy">Adatvédelem</string>
-    <string name="settingsLightTheme">Világos felület</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
+    <string name="settingsEmailProtectionTitle">E-mail védelem</string>
+    <string name="settingsEmailProtectionSubtitle">Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -199,14 +222,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
     <string name="bookmarksActivityTitle">Könyvjelzők</string>
-    <string name="bookmarkDeleteConfirmMessage">Biztos, hogy törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőt?</string>
-    <string name="bookmarkAddedFeedback">Könyvjelző hozzáadva</string>
-    <string name="bookmarkTitleHint">Könyvjelző címe</string>
-    <string name="bookmarkUrlHint">Könyvjelző URL</string>
-    <string name="bookmarkTitleEdit">Könyvjelző szerkesztése</string>
     <string name="noBookmarks">Még nincsenek könyvjelzők hozzáadva</string>
     <string name="bookmarkOverflowContentDescription">%1$s könyvjelző további lehetőségei</string>
-    <string name="bookmarkEdited">Könyvjelző hozzáadva</string>
     <string name="bookmarkDeleteConfirmationMessage">Törölve: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportálás</string>
     <string name="exportBookmarksEmpty">Nincsenek könyvjelzőid, semmi nem kerül exportálásra.</string>
@@ -217,6 +234,13 @@
     <string name="importBookmarksError">Nem sikerült importálni egyetlen könyvjelzőt sem, valami hiba történt.</string>
     <string name="importBookmarksEmpty">A fájlnak nincs importálható könyvjelzője.</string>
     <string name="importBookmarksSuccess">%1$d könyvjelző sikeresen importálva.</string>
+    <string name="savedSiteDialogTitleHint">Cím</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Szerkesztés</string>
+    <string name="bookmarksSectionTitle">Könyvjelzők</string>
+    <string name="favoritesSectionTitle">Kedvencek</string>
+    <string name="bookmarksEmptyHint">Még nincsenek könyvjelzők hozzáadva</string>
+    <string name="favoritesEmptyHint">Még nincsenek hozzáadva kedvencek.</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Megerősítés</string>
@@ -229,6 +253,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Hozzáadás a Kezdőlaphoz</string>
+    <string name="shortcutAddedText">Siker! %1$s hozzáadva a kezdőképernyődhöz.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Segíts nekünk az alkalmazás javításában!</string>
@@ -508,6 +533,7 @@
     <string name="preciseLocationSystemDialogDeny">Talán később</string>
     <string name="preciseLocationSystemDialogNeverAllow">Ehhez a webhelyhez ne kérje újra</string>
     <string name="preciseLocationSiteDialogTitle">Megadod %1$s számára a helyhozzáférési engedélyt?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Csak az anonim helyedet használjuk a jobb, hozzád közelebbi eredmények érdekében. Később bármikor meggondolhatod magad.</string>
     <string name="preciseLocationSiteDialogSubtitle">Az egyes webhelyeknek megadott helyhozzáférési engedélyeket a Beállításokban kezelheted.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Mindig</string>
     <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
@@ -537,4 +563,62 @@
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="disabled">Letiltva</string>
     <string name="enabled">Engedélyezve</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Hivatkozások megnyitása társított alkalmazásokban</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Letiltásával megakadályozhatod, hogy a hivatkozások automatikusan megnyíljanak más telepített alkalmazásokban.</string>
+    <string name="appLinkDialogTitle">Megnyitás másik alkalmazásban?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Új cím a vágólapra másolva</string>
+    <string name="autofillTooltipUseYourAlias">%1$s használata</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokkolja az e-mail nyomkövetőket</string>
+    <string name="autofillTooltipGenerateAddress">Privát cím létrehozása</string>
+    <string name="autofillTooltipGenerateAddressDescription">Letiltja az e-mail nyomkövetőket, és elrejti a címedet</string>
+    <string name="newEmailAliasMenuTitle">Duck cím létrehozása</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Eltávolítod az e-mail védelmet?</string>
+    <string name="emailSignOutDialogText">Megjegyzés: az e-mail védelem eltávolítása erről az eszközről nem törli a Duck címedet.</string>
+    <string name="emailSignOutDialogCancel">Mégsem</string>
+    <string name="emailSignOutDialogDisable">Eltávolítás</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">E-mail várólista</string>
+    <string name="waitlistNotificationTitle">Megérkezett az e-mail védelmi meghívód!</string>
+    <string name="waitlistNotificationDescription">Feliratkoztál a várólistára, és arra kértél minket, hogy értesítsünk, amikor rád kerül a sor, hogy kipróbálhasd az e-mail védelem funkciót. Koppints a meghívó megtekintéséhez.</string>
+
+    <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
+    <string name="waitlistNotificationDialogNoThanks">NEM, KÖSZÖNÖM</string>
+    <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">E-mail védelem (béta)</string>
+    <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Nem mentjük az e-mailjeidet. <b><a href=\"\">További részletek</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
+    <string name="emailProtectionDuckAddressCta">Már van Duck címem</string>
+    <string name="emailProtectionInviteCodeCta">Van meghívókódom</string>
+    <string name="emailProtectionWaitlistCta">Csatlakozz a privát várólistához</string>
+    <string name="emailProtectionGetStartedCta">Első lépések</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/> anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Értesítést küldünk, amikor<br/> az e-mail védelem készen áll számodra. <a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Meghívód itt jelenik meg, amikor készen állunk. Szeretnél <a href=\"\"><b>értesítést kapni</b></a>, amikor megérkezik?<br/><a href=\"\"><b>További tudnivalók</b></a> az e-mail védelemről.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Meghívót kaptál!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/> anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Személyes Duck cím</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Az e-mail védelem eltávolítása erről az eszközről megszünteti azt a lehetőséget, hogy a webes böngészés során a rendszer automatikusan beírja a személyes Duck címedet vagy egy újonnan létrehozott privát Duck címet az e-mail mezőkbe.<br/><br/>A Duck címeid teljes törléséhez, vagy bármilyen más kérdés vagy visszajelzés esetén fordulj hozzánk a <a href=\"mailto:support@duck.com\">support@duck.com</a> címen.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Eltávolítás az eszközről</string>
 </resources>

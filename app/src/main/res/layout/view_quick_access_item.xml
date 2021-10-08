@@ -22,16 +22,15 @@
     android:orientation="vertical"
     android:paddingTop="15dp"
     android:paddingBottom="15dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:clickable="true"
+    android:focusable="true">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
         app:cardBackgroundColor="?attr/colorPrimary"
@@ -40,8 +39,8 @@
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="@dimen/savedSiteGridItemFavicon"
+            android:layout_height="@dimen/savedSiteGridItemFavicon"
             android:importantForAccessibility="no"/>
 
     </com.google.android.material.card.MaterialCardView>
@@ -57,7 +56,7 @@
         android:paddingStart="11dp"
         android:paddingEnd="11dp"
         android:paddingTop="8dp"
-        android:textColor="?normalTextColor"
+        android:textColor="?quickAccessItemTitleTextColor"
         android:textSize="12sp"
         tools:text="Super long favorite title" />
 

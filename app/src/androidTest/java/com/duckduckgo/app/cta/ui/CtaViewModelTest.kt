@@ -150,17 +150,17 @@ class CtaViewModelTest {
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
 
         testee = CtaViewModel(
-            mockAppInstallStore,
-            mockPixel,
-            mockSurveyDao,
-            mockWidgetCapabilities,
-            mockDismissedCtaDao,
-            mockUserWhitelistDao,
-            mockSettingsDataStore,
-            mockOnboardingStore,
-            mockUserStageStore,
-            mockTabRepository,
-            coroutineRule.testDispatcherProvider
+            appInstallStore = mockAppInstallStore,
+            pixel = mockPixel,
+            surveyDao = mockSurveyDao,
+            widgetCapabilities = mockWidgetCapabilities,
+            dismissedCtaDao = mockDismissedCtaDao,
+            userWhitelistDao = mockUserWhitelistDao,
+            settingsDataStore = mockSettingsDataStore,
+            onboardingStore = mockOnboardingStore,
+            userStageStore = mockUserStageStore,
+            tabRepository = mockTabRepository,
+            dispatchers = coroutineRule.testDispatcherProvider
         )
     }
 
@@ -488,6 +488,12 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaInHomeTabDuringFavoriteOnboardingThenReturnNull() = runBlockingTest {
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, favoritesOnboarding = true)
+        assertTrue(value is BubbleCta.DaxFavoritesOnboardingCta)
     }
 
     @Test

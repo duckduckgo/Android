@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Tyhjennä hakusyöte</string>
     <string name="no_compatible_third_party_app_installed">Yhteensopivaa sovellusta ei ole asennettu</string>
     <string name="addBookmarkMenuTitle">Lisää kirjanmerkki</string>
+    <string name="editBookmarkMenuTitle">Muokkaa kirjanmerkkiä</string>
+    <string name="addFavoriteMenuTitle">Lisää suosikki</string>
+    <string name="removeFavoriteMenuTitle">Poista suosikki</string>
+    <string name="favoriteAddedMessage">Suosikki lisätty</string>
+    <string name="bookmarkAddedMessage">Kirjanmerkki lisätty</string>
     <string name="requestDesktopSiteMenuTitle">Pöytäkonesivusto</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
+    <string name="privacyProtectionTemporarilyDisabled">Yksityisyyden suoja on väliaikaisesti poistettu käytöstä, koska se näyttäisi rikkovan tämän sivun.</string>
 
     <string name="httpsGood">Salattu yhteys</string>
     <string name="httpsMixed">Salaukseltaan vaihteleva yhteys</string>
@@ -147,10 +169,11 @@
     <string name="settingsHeadingGeneral">Yleistä</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Tietosuoja</string>
-    <string name="settingsLightTheme">Vaalea teema</string>
     <string name="settingsAboutDuckduckgo">Tietoa DuckDuckGosta</string>
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
+    <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
+    <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuranta ja piilota osoitteesi.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -199,14 +222,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
     <string name="bookmarksActivityTitle">Kirjanmerkit</string>
-    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Kirjanmerkki lisätty</string>
-    <string name="bookmarkTitleHint">Kirjanmerkin otsikko</string>
-    <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
-    <string name="bookmarkTitleEdit">Muokkaa kirjanmerkkiä</string>
     <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
     <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %1$s</string>
-    <string name="bookmarkEdited">Kirjanmerkki lisätty</string>
     <string name="bookmarkDeleteConfirmationMessage">Poistettiin &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Vie</string>
     <string name="exportBookmarksEmpty">Sinulla ei ole kirjanmerkkejä, mitään ei viedä.</string>
@@ -217,6 +234,13 @@
     <string name="importBookmarksError">Kirjanmerkkejä ei voitu tuoda, jokin meni vikaan</string>
     <string name="importBookmarksEmpty">Tiedostossa ei ole tuotavia kirjanmerkkejä</string>
     <string name="importBookmarksSuccess">%1$d kirjanmerkkiä tuotu</string>
+    <string name="savedSiteDialogTitleHint">Otsikko</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Muokkaa</string>
+    <string name="bookmarksSectionTitle">Kirjanmerkit</string>
+    <string name="favoritesSectionTitle">Suosikit</string>
+    <string name="bookmarksEmptyHint">Kirjanmerkkejä ei ole vielä lisätty</string>
+    <string name="favoritesEmptyHint">Suosikkeja ei ole vielä lisätty</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Vahvista</string>
@@ -229,6 +253,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisää etusivulle</string>
+    <string name="shortcutAddedText">Onnistui! %1$s on lisätty aloitusnäytöllesi.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Auta meitä kehittämään sovellusta!</string>
@@ -508,6 +533,7 @@
     <string name="preciseLocationSystemDialogDeny">Ehkä myöhemmin</string>
     <string name="preciseLocationSystemDialogNeverAllow">Älä kysy uudelleen tälle sivustolle</string>
     <string name="preciseLocationSiteDialogTitle">Annetaanko palvelulle %1$s lupa nähdä sijaintisi?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Käytämme anonyymiä sijaintia pelkästään tarjotaksemme parempia tuloksia lähempää sijaintiasi. Voit aina muuttaa mieltäsi myöhemmin.</string>
     <string name="preciseLocationSiteDialogSubtitle">Voit hallita yksittäisille sivustoille antamiasi sijaintilupia asetuksista.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Aina</string>
     <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>
@@ -537,4 +563,62 @@
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Pois käytöstä</string>
     <string name="enabled">Käytössä</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Avaa linkit liittyvissä sovelluksissa</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Ota pois käytöstä estääksesi linkkejä avautumasta automaattisesti muissa asennetuissa sovelluksissa.</string>
+    <string name="appLinkDialogTitle">Avataanko toisessa sovelluksessa?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Uusi osoite on kopioitu leikepöydälle</string>
+    <string name="autofillTooltipUseYourAlias">Käytä %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Estä sähköpostiseuranta</string>
+    <string name="autofillTooltipGenerateAddress">Luo yksityinen osoite</string>
+    <string name="autofillTooltipGenerateAddressDescription">Estää sähköpostiseurannan ja piilottaa osoitteesi</string>
+    <string name="newEmailAliasMenuTitle">Luo Duck-osoite</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Poistetaanko sähköpostin suojaukset?</string>
+    <string name="emailSignOutDialogText">Huomaa: Sähköpostin suojausten poistaminen tältä laitteelta ei poista Duck-osoitettasi.</string>
+    <string name="emailSignOutDialogCancel">Peruuta</string>
+    <string name="emailSignOutDialogDisable">Poista</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Sähköpostin odotuslista</string>
+    <string name="waitlistNotificationTitle">Kutsusi sähköpostin suojaamiseen on täällä!</string>
+    <string name="waitlistNotificationDescription">Liityit odotuslistalle ja pyysit meitä ilmoittamaan, kun on sinun vuorosi kokeilla sähköpostin suojaustoimintoa. Näytä kutsu napauttamalla.</string>
+
+    <string name="waitlistNotificationDialogDescription">Haluatko saada ilmoituksen, kun on sinun vuorosi?</string>
+    <string name="waitlistNotificationDialogNoThanks">Ei kiitos</string>
+    <string name="waitlistNotificationDialogNotifyMe">HALUAN ILMOITUKSEN</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Sähköpostisuojaus (beta)</string>
+    <string name="emailProtectionActivityTitle">Sähköpostisuojaus (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Emme tallenna sähköpostejasi. <b><a href=\"\">Lue lisää</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Odotuslistalle liityttäessä tapahtui virhe, yritä myöhemmin uudelleen</string>
+    <string name="emailProtectionDuckAddressCta">Minulla on jo Duck-osoite</string>
+    <string name="emailProtectionInviteCodeCta">Minulla on kutsukoodi</string>
+    <string name="emailProtectionWaitlistCta">Liity yksityiselle odotuslistalle</string>
+    <string name="emailProtectionGetStartedCta">Aloita</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi<br/>vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=\"\"><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=\"\"><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Sinut on kutsuttu!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi<br/>vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Yksityinen Duck-osoite</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Sähköpostisuojauksen poistaminen tältä laitteelta poistaa mahdollisuuden kirjoittaa yksityinen Duck-osoitteesi tai juuri luotu yksityinen Duck-osoite sähköpostikenttään verkkoa selatessasi.<br/><br/>Ota yhteyttä osoitteeseen <a href=\"mailto:support@duck.com\">support@duck.com</a>, jos haluat poistaa Duck-osoitteesi kokonaan tai jos sinulla on kysymyksiä tai palautetta.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Poista laitteelta</string>
 </resources>

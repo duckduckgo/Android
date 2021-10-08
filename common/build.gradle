@@ -30,6 +30,9 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
 
+    // Android KTX
+    implementation AndroidX.core.ktx
+
     implementation Google.dagger
 
     implementation JakeWharton.timber
@@ -38,10 +41,4 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     kapt AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
-
-    testImplementation Testing.junit4
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
 }

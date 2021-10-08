@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Vymazať hľadaný výraz</string>
     <string name="no_compatible_third_party_app_installed">Žiadna kompatibilná aplikácia nie je nainštalovaná</string>
     <string name="addBookmarkMenuTitle">Pridať záložku</string>
+    <string name="editBookmarkMenuTitle">Upraviť záložku</string>
+    <string name="addFavoriteMenuTitle">Pridať do obľúbených položiek</string>
+    <string name="removeFavoriteMenuTitle">Odstrániť obľúbenú položku</string>
+    <string name="favoriteAddedMessage">Obľúbená položka bola pridaná</string>
+    <string name="bookmarkAddedMessage">Záložka je pridaná</string>
     <string name="requestDesktopSiteMenuTitle">Stránka pre stolové počítače</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Ovládací panel ochrany súkromia</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ZDOKONALENÉ Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Stupeň ochrany súkromia</string>
+    <string name="privacyProtectionTemporarilyDisabled">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>
 
     <string name="httpsGood">Šifrované pripojenie</string>
     <string name="httpsMixed">Zmiešané šifrované pripojenie</string>
@@ -155,10 +177,11 @@
     <string name="settingsHeadingGeneral">Všeobecné</string>
     <string name="settingsHeadingOther">Iné</string>
     <string name="settingsHeadingPrivacy">Súkromie</string>
-    <string name="settingsLightTheme">Svetlý motív</string>
     <string name="settingsAboutDuckduckgo">Informácie o DuckDuckGo</string>
     <string name="settingsVersion">Verzia</string>
     <string name="leaveFeedback">Zdieľať spätnú väzbu</string>
+    <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
+    <string name="settingsEmailProtectionSubtitle">Zablokujte si e‑mailové trackery a skryte si adresu.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -207,14 +230,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Naozaj chcete odstrániť záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Záložka je pridaná</string>
-    <string name="bookmarkTitleHint">Názov záložky</string>
-    <string name="bookmarkUrlHint">Webová adresa záložky</string>
-    <string name="bookmarkTitleEdit">Upraviť záložku</string>
     <string name="noBookmarks">Zatiaľ neboli pridané žiadne záložky</string>
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %1$s</string>
-    <string name="bookmarkEdited">Záložka je pridaná</string>
     <string name="bookmarkDeleteConfirmationMessage">Vymazané: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportovať</string>
     <string name="exportBookmarksEmpty">Nič sa nevyexportuje, pretože nemáte záložky</string>
@@ -225,6 +242,13 @@
     <string name="importBookmarksError">Nepodarilo sa naimportovať žiadne záložky, pretože došlo k chybe</string>
     <string name="importBookmarksEmpty">Súbor neobsahuje žiadne záložky na importovanie</string>
     <string name="importBookmarksSuccess">Úspešne sa naimportovali záložky (%1$d)</string>
+    <string name="savedSiteDialogTitleHint">Názov</string>
+    <string name="savedSiteDialogUrlHint">URL adresa</string>
+    <string name="savedSiteDialogTitleEdit">Upraviť</string>
+    <string name="bookmarksSectionTitle">Záložky</string>
+    <string name="favoritesSectionTitle">Obľúbené položky</string>
+    <string name="bookmarksEmptyHint">Zatiaľ neboli pridané žiadne záložky</string>
+    <string name="favoritesEmptyHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdiť</string>
@@ -237,6 +261,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridať do časti Domov</string>
+    <string name="shortcutAddedText">Úspech! Na vašej ploche pribudla položka %1$s.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomôžte nám zdokonaliť aplikáciu!</string>
@@ -520,6 +545,7 @@
     <string name="preciseLocationSystemDialogDeny">Možno neskôr</string>
     <string name="preciseLocationSystemDialogNeverAllow">Pre túto stránku sa už nepýtajte</string>
     <string name="preciseLocationSiteDialogTitle">Udeliť %1$s povolenie na prístup k polohe?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Anonymnú polohu používame iba na poskytovanie lepších výsledkov z vášho okolia. Toto nastavenie môžete kedykoľvek zmeniť.</string>
     <string name="preciseLocationSiteDialogSubtitle">Povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, môžete spravovať v Nastaveniach.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Iba pre túto reláciu</string>
@@ -549,4 +575,62 @@
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
     <string name="disabled">Zakázané</string>
     <string name="enabled">Povolené</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Otvárať odkazy v pridružených aplikáciách</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Zakážte a zabráňte tak automatickému otváraniu odkazov v iných nainštalovaných aplikáciách.</string>
+    <string name="appLinkDialogTitle">Otvoriť v inej aplikácii?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Nová adresa bola skopírovaná do schránky</string>
+    <string name="autofillTooltipUseYourAlias">Použiť %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokuje e mailové trackery</string>
+    <string name="autofillTooltipGenerateAddress">Vygenerovať súkromnú adresu</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokuje e mailové trackery a skryje vašu adresu</string>
+    <string name="newEmailAliasMenuTitle">Vytvoriť adresu Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Odstrániť ochranu e‑mailu?</string>
+    <string name="emailSignOutDialogText">Poznámka: Odstránením ochrany e‑mailu z tohto zariadenia sa neodstráni vaša adresa Duck.</string>
+    <string name="emailSignOutDialogCancel">Zrušiť</string>
+    <string name="emailSignOutDialogDisable">Odstrániť</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Zoznam čakateľov na ochranu e‑mailu</string>
+    <string name="waitlistNotificationTitle">Vaše pozvánka na ochranu e‑mailu je tu!</string>
+    <string name="waitlistNotificationDescription">Pridali ste sa na zoznam čakateľov a požiadali ste nás, aby sme vás upozornili, keď na vás príde rad a budete si môcť vyskúšať našu ochranu e‑mailu. Klepnutím zobrazíte pozvánku.</string>
+
+    <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>
+    <string name="waitlistNotificationDialogNoThanks">NIE, ĎAKUJEM</string>
+    <string name="waitlistNotificationDialogNotifyMe">UPOZORNITE MA</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Ochrana e‑mailu (beta)</string>
+    <string name="emailProtectionActivityTitle">Ochrana e‑mailu (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Vaše e‑maily neukladáme. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
+    <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
+    <string name="emailProtectionInviteCodeCta">Mám pozývací kód</string>
+    <string name="emailProtectionWaitlistCta">Pridajte sa do súkromného zoznamu čakateľov</string>
+    <string name="emailProtectionGetStartedCta">Začnite</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte si e‑mailové trackery<br/>bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Keď budete mať pripravenú ochranu e‑mailu,<br/>pošleme vám upozornenie. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu sa zobrazí vaša pozvánka, keď budeme na vás pripravení. Chcete <a href=\"\"><b>dostať upozornenie</b></a>, keď dorazí?<br/><a href=\"\"><b>Zistite viac</b></a> o ochrane e‑mailu.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Dostali ste pozvánku!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte si e‑mailové trackery<br/>bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Osobná adresa Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Odstránením ochrany e‑mailu z tohto zariadenia stratíte možnosť vyplniť svoju osobnú adresu Duck alebo novovygenerovanú súkromnú adresu Duck do e‑mailových polí pri prehliadaní webu.<br/><br/>Ak si chcete úplne odstrániť adresy Duck alebo ak máte iné otázky či pripomienky, obráťte sa na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Odstrániť zo zariadenia</string>
 </resources>

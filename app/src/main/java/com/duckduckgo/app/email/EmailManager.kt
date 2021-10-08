@@ -21,25 +21,36 @@ import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 interface EmailManager : LifecycleObserver {
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
-    fun storeCredentials(token: String, username: String)
+    fun storeCredentials(token: String, username: String, cohort: String)
     fun signOut()
     fun getEmailAddress(): String?
+    fun waitlistState(): AppEmailManager.WaitlistState
+    fun joinWaitlist(timestamp: Int, token: String)
+    fun getInviteCode(): String
+    fun doesCodeAlreadyExist(): Boolean
+    suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
+    fun notifyOnJoinedWaitlist()
+    fun getCohort(): String
+    fun isEmailFeatureSupported(): Boolean
+    fun getLastUsedDate(): String
+    fun setNewLastUsedDate()
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class AppEmailManager(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
@@ -58,7 +69,8 @@ class AppEmailManager(
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
     }
 
-    override fun storeCredentials(token: String, username: String) {
+    override fun storeCredentials(token: String, username: String, cohort: String) {
+        emailDataStore.cohort = cohort
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -78,6 +90,69 @@ class AppEmailManager(
         return emailDataStore.emailUsername?.let {
             "$it$DUCK_EMAIL_DOMAIN"
         }
+    }
+
+    override fun waitlistState(): WaitlistState {
+        if (emailDataStore.waitlistTimestamp != -1 && emailDataStore.inviteCode == null) {
+            return WaitlistState.JoinedQueue(emailDataStore.sendNotification)
+        }
+        emailDataStore.inviteCode?.let {
+            return WaitlistState.InBeta
+        }
+        return WaitlistState.NotJoinedQueue
+    }
+
+    override fun joinWaitlist(timestamp: Int, token: String) {
+        if (emailDataStore.waitlistTimestamp == -1) { emailDataStore.waitlistTimestamp = timestamp }
+        if (emailDataStore.waitlistToken == null) { emailDataStore.waitlistToken = token }
+    }
+
+    override fun getInviteCode(): String {
+        return emailDataStore.inviteCode.orEmpty()
+    }
+
+    override suspend fun fetchInviteCode(): FetchCodeResult {
+        val token = emailDataStore.waitlistToken
+        val timestamp = emailDataStore.waitlistTimestamp
+        if (doesCodeAlreadyExist()) return FetchCodeResult.CodeExisted
+        return withContext(dispatcherProvider.io()) {
+            try {
+                val waitlistTimestamp = emailService.waitlistStatus().timestamp
+                if (waitlistTimestamp >= timestamp && token != null) {
+                    val inviteCode = emailService.getCode(token).code
+                    if (inviteCode.isNotEmpty()) {
+                        emailDataStore.inviteCode = inviteCode
+                        return@withContext FetchCodeResult.Code
+                    }
+                }
+                return@withContext FetchCodeResult.NoCode
+            } catch (e: Exception) {
+                return@withContext FetchCodeResult.NoCode
+            }
+        }
+    }
+
+    override fun doesCodeAlreadyExist(): Boolean = emailDataStore.inviteCode != null
+
+    override fun notifyOnJoinedWaitlist() {
+        emailDataStore.sendNotification = true
+    }
+
+    override fun getCohort(): String {
+        val cohort = emailDataStore.cohort
+        return if (cohort.isNullOrBlank()) UNKNOWN_COHORT else cohort
+    }
+
+    override fun isEmailFeatureSupported(): Boolean = emailDataStore.canUseEncryption()
+
+    override fun getLastUsedDate(): String = emailDataStore.lastUsedDate.orEmpty()
+
+    override fun setNewLastUsedDate() {
+        val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("US/Eastern")
+        }
+        val date = formatter.format(Date())
+        emailDataStore.lastUsedDate = date
     }
 
     private fun consumeAlias(): String? {
@@ -109,8 +184,21 @@ class AppEmailManager(
         }
     }
 
+    sealed class FetchCodeResult {
+        object Code : FetchCodeResult()
+        object NoCode : FetchCodeResult()
+        object CodeExisted : FetchCodeResult()
+    }
+
+    sealed class WaitlistState {
+        object NotJoinedQueue : WaitlistState()
+        data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
+        object InBeta : WaitlistState()
+    }
+
     companion object {
         const val DUCK_EMAIL_DOMAIN = "@duck.com"
+        const val UNKNOWN_COHORT = "unknown"
     }
 
     private fun EmailDataStore.clearEmailData() {

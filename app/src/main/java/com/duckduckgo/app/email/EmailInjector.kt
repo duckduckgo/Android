@@ -22,27 +22,25 @@ import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import com.duckduckgo.app.global.DispatcherProvider
 import java.io.BufferedReader
 
 interface EmailInjector {
     fun injectEmailAutofillJs(webView: WebView, url: String?)
     fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit)
     fun injectAddressInEmailField(webView: WebView, alias: String?)
-    fun resetInjectedJsFlag()
 }
 
-class EmailInjectorJs(private val emailManager: EmailManager, private val urlDetector: DuckDuckGoUrlDetector) : EmailInjector {
+class EmailInjectorJs(private val emailManager: EmailManager, private val urlDetector: DuckDuckGoUrlDetector, private val dispatcherProvider: DispatcherProvider) : EmailInjector {
     private val javaScriptInjector = JavaScriptInjector()
-    private var hasJsBeenInjected = false
 
     override fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit) {
-        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
+        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
     override fun injectEmailAutofillJs(webView: WebView, url: String?) {
-        if (!hasJsBeenInjected && (isDuckDuckGoUrl(url) || emailManager.isSignedIn())) {
-            hasJsBeenInjected = true
+        if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
             webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
         }
     }
@@ -52,11 +50,7 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
         webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
     }
 
-    override fun resetInjectedJsFlag() {
-        hasJsBeenInjected = false
-    }
-
-    private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoDomain(url))
+    private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
 
     private class JavaScriptInjector {
         private lateinit var functions: String

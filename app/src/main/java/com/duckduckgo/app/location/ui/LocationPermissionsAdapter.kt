@@ -20,21 +20,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.PopupMenu
 import androidx.core.view.isGone
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
-import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionEntryDomain
-import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionEntryFavicon
-import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionMenu
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.locationPermissionsSectionTitle
 import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.locationPermissionsToggle
 import kotlinx.coroutines.launch
@@ -116,7 +113,7 @@ class LocationPermissionsAdapter(
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_entry, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(view, viewModel, lifecycleOwner, faviconManager)
+                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(inflater, view, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_empty_hint, parent, false)
@@ -229,6 +226,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
     class LocationPermissionsSimpleViewViewHolder(itemView: View) : LocationPermissionsViewHolder(itemView)
 
     class LocationPermissionsItemViewHolder(
+        private val layoutInflater: LayoutInflater,
         itemView: View,
         private val viewModel: LocationPermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
@@ -239,43 +237,40 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         lateinit var entity: LocationPermissionEntity
 
         fun bind(entity: LocationPermissionEntity) {
+            val singleListItem = itemView as SingleLineListItem
+
             this.entity = entity
             val website = entity.domain.websiteFromGeoLocationsApiOrigin()
 
-            itemView.locationPermissionMenu.contentDescription = itemView.context.getString(
-                R.string.preciseLocationDeleteContentDescription,
-                website
+            singleListItem.setContentDescription(
+                itemView.context.getString(
+                    R.string.preciseLocationDeleteContentDescription,
+                    website
+                )
             )
 
-            itemView.locationPermissionEntryDomain.text = website
+            singleListItem.setTitle(website)
             loadFavicon(entity.domain)
 
-            itemView.locationPermissionMenu.setOnClickListener {
-                showOverFlowMenu(itemView.locationPermissionMenu, entity)
+            singleListItem.setOverflowClickListener { anchor ->
+                showOverFlowMenu(anchor, entity)
             }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.locationPermissionEntryFavicon)
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
-        private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity) {
-            val popup = PopupMenu(overflowMenu.context, overflowMenu)
-            popup.inflate(R.menu.location_permissions_individual_overflow_menu)
-            popup.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.edit -> {
-                        editEntity(entity); true
-                    }
-                    R.id.delete -> {
-                        deleteEntity(entity); true
-                    }
-                    else -> false
-                }
+        private fun showOverFlowMenu(anchor: View, entity: LocationPermissionEntity) {
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editEntity(entity) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             }
-            popup.show()
+            popupMenu.show(itemView, anchor)
         }
 
         private fun editEntity(entity: LocationPermissionEntity) {

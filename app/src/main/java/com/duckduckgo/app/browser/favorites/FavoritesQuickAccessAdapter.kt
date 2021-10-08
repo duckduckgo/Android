@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
-import kotlinx.android.synthetic.main.popup_window_quick_access_menu.view.*
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -67,7 +67,7 @@ class FavoritesQuickAccessAdapter(
     ) : RecyclerView.ViewHolder(itemView), DragDropViewHolderListener {
 
         private var itemState: ItemState = ItemState.Stale
-        private var popupMenu: QuickAccessPopupMenu? = null
+        private var popupMenu: PopupMenu? = null
 
         sealed class ItemState {
             object Stale : ItemState()
@@ -101,7 +101,7 @@ class FavoritesQuickAccessAdapter(
 
         @SuppressLint("ClickableViewAccessibility")
         private fun configureTouchListener() {
-            itemView.quickAccessFaviconCard.setOnTouchListener { v, event ->
+            itemView.setOnTouchListener { _, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_MOVE -> {
                         if (itemState != ItemState.LongPress) return@setOnTouchListener false
@@ -137,22 +137,23 @@ class FavoritesQuickAccessAdapter(
         }
 
         private fun configureClickListeners(item: QuickAccessFavorite) {
-            itemView.quickAccessFaviconCard.setOnLongClickListener {
+            itemView.setOnLongClickListener {
                 itemState = ItemState.LongPress
                 scaleUpFavicon()
                 showOverFlowMenu(inflater, itemView.quickAccessFaviconCard, item)
                 false
             }
-            itemView.quickAccessFaviconCard.setOnClickListener { onItemSelected(item) }
+            itemView.setOnClickListener { onItemSelected(item) }
         }
 
         private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
-            popupMenu = QuickAccessPopupMenu(layoutInflater).apply {
-                val view = this.contentView
-                onMenuItemClicked(view.editSavedSite) { onEditClicked(item) }
-                onMenuItemClicked(view.deleteSavedSite) { onDeleteClicked(item) }
-                this.show(itemView, anchor)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.findViewById(R.id.edit)) { onEditClicked(item) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
+            popupMenu.showAnchoredToView(itemView, anchor)
         }
 
         override fun onDragStarted() {

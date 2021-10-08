@@ -20,9 +20,13 @@
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_broken_sites" />
+    <include
+        android:id="@+id/contentBrokenSites"
+        layout="@layout/content_broken_sites" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

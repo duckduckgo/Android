@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.favicon
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -48,6 +49,10 @@ class DuckDuckGoFaviconManagerTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
     private val mockFaviconPersister: FaviconPersister = mock()
     private val mockBookmarksDao: BookmarksDao = mock()
     private val mockFavoriteRepository: FavoritesRepository = mock()
@@ -62,14 +67,15 @@ class DuckDuckGoFaviconManagerTest {
     @Before
     fun setup() {
         whenever(mockFavoriteRepository.favoritesCountByDomain(any())).thenReturn(0)
+
         testee = DuckDuckGoFaviconManager(
-            mockFaviconPersister,
-            mockBookmarksDao,
-            FireproofWebsiteRepository(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
-            LocationPermissionsRepository(mockLocationPermissionsDao, mock(), coroutineRule.testDispatcherProvider),
-            mockFavoriteRepository,
-            mockFaviconDownloader,
-            coroutineRule.testDispatcherProvider
+            faviconPersister = mockFaviconPersister,
+            bookmarksDao = mockBookmarksDao,
+            fireproofWebsiteRepository = FireproofWebsiteRepository(mockFireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock()),
+            locationPermissionsRepository = LocationPermissionsRepository(mockLocationPermissionsDao, mock(), coroutineRule.testDispatcherProvider),
+            favoritesRepository = mockFavoriteRepository,
+            faviconDownloader = mockFaviconDownloader,
+            dispatcherProvider = coroutineRule.testDispatcherProvider
         )
     }
 
@@ -98,7 +104,8 @@ class DuckDuckGoFaviconManagerTest {
         verify(mockFaviconDownloader, never()).getFaviconFromDisk(any())
     }
 
-    @Test @UiThreadTest
+    @Test
+    @UiThreadTest
     fun whenLoadToViewFromLocalOrFallbackIfCannotFindFaviconThenDownloadFromUrl() = coroutineRule.runBlocking {
         val view = ImageView(context)
         val url = "https://example.com"
@@ -108,7 +115,8 @@ class DuckDuckGoFaviconManagerTest {
         verify(mockFaviconDownloader).getFaviconFromUrl(url.toUri().faviconLocation()!!)
     }
 
-    @Test @UiThreadTest
+    @Test
+    @UiThreadTest
     fun whenLoadToViewFromLocalOrFallbackWithTabIdIfCannotFindFaviconThenDownloadFromUrl() = coroutineRule.runBlocking {
         val view = ImageView(context)
         val url = "https://example.com"

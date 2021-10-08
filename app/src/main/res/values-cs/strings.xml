@@ -33,6 +33,11 @@
     <string name="clearButtonContentDescription">Vymazat vyhledávací vstup</string>
     <string name="no_compatible_third_party_app_installed">Nebyla nainstalována žádná kompatibilní aplikace</string>
     <string name="addBookmarkMenuTitle">Přidat záložku</string>
+    <string name="editBookmarkMenuTitle">Upravit záložku</string>
+    <string name="addFavoriteMenuTitle">Přidat oblíbené</string>
+    <string name="removeFavoriteMenuTitle">Odebrat oblíbenou položku</string>
+    <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
+    <string name="bookmarkAddedMessage">Záložka přidána</string>
     <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
 
     <!-- Downloading files -->
@@ -88,6 +93,7 @@
     <string name="privacyDashboardActivityTitle">Deska ochrany soukromí</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VYLEPŠENO Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Hodnocení ochrany soukromí</string>
+    <string name="privacyProtectionTemporarilyDisabled">Dočasně jsme zakázali ochranu osobních údajů, protože se zdá, že porušuje podmínky této stránky.</string>
 
     <string name="httpsGood">Šifrované připojení</string>
     <string name="httpsMixed">Smíšené šifrovací připojení</string>
@@ -155,10 +161,11 @@
     <string name="settingsHeadingGeneral">Obecné</string>
     <string name="settingsHeadingOther">Jiné</string>
     <string name="settingsHeadingPrivacy">Soukromí</string>
-    <string name="settingsLightTheme">Světlý motiv</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
+    <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
+    <string name="settingsEmailProtectionSubtitle">Blokovat sledování e-mailů a skrýt vaši adresu.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -207,14 +214,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Opravdu chcete smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Záložka přidána</string>
-    <string name="bookmarkTitleHint">Název záložky</string>
-    <string name="bookmarkUrlHint">URL záložky</string>
-    <string name="bookmarkTitleEdit">Upravit záložku</string>
     <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
     <string name="bookmarkOverflowContentDescription">Další možnosti záložky %1$s</string>
-    <string name="bookmarkEdited">Záložka přidána</string>
     <string name="bookmarkDeleteConfirmationMessage">Odstraněno &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Exportovat</string>
     <string name="exportBookmarksEmpty">Nemáte záložky, nic nebude exportováno</string>
@@ -225,6 +226,13 @@
     <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
     <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
     <string name="importBookmarksSuccess">Úspěšně importovaných %1$d záložek</string>
+    <string name="savedSiteDialogTitleHint">Název</string>
+    <string name="savedSiteDialogUrlHint">URL adresa</string>
+    <string name="savedSiteDialogTitleEdit">Upravit</string>
+    <string name="bookmarksSectionTitle">Záložky</string>
+    <string name="favoritesSectionTitle">Oblíbené</string>
+    <string name="bookmarksEmptyHint">Zatím nebyly přidány žádné záložky.</string>
+    <string name="favoritesEmptyHint">Zatím nebyly přidány žádné oblíbené položky</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdit</string>
@@ -237,6 +245,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Přidat na domovskou stránku</string>
+    <string name="shortcutAddedText">Podařilo se! %1$s byla přidána na vaši domovskou obrazovku.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomozte nám vylepšit aplikaci!</string>
@@ -520,6 +529,7 @@
     <string name="preciseLocationSystemDialogDeny">Možná později</string>
     <string name="preciseLocationSystemDialogNeverAllow">Neptat se znovu u těchto stránek</string>
     <string name="preciseLocationSiteDialogTitle">Udělit %1$s povolení k přístupu k poloze?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Vaši anonymní polohu využíváme pouze k dosažení lepších výsledků, blíže k vám. Vždycky si to můžete později rozmyslet.</string>
     <string name="preciseLocationSiteDialogSubtitle">Oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, můžete spravovat v Nastavení.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
     <string name="preciseLocationSiteDialogAllowOnce">Pouze pro tuto relaci</string>
@@ -549,4 +559,62 @@
     <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="disabled">Zakázáno</string>
     <string name="enabled">Povoleno</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Otevřít odkazy v přidružených aplikacích</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Zakažte, chcete-li zabránit automatickému otevírání odkazů v jiných nainstalovaných aplikacích.</string>
+    <string name="appLinkDialogTitle">Otevřít v jiné aplikaci?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Nová adresa zkopírovaná do vaší schránky</string>
+    <string name="autofillTooltipUseYourAlias">Použít %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokuje sledování e-mailů</string>
+    <string name="autofillTooltipGenerateAddress">Vygenerovat soukromou adresu</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokuje sledování e-mailů a skryje vaši adresu</string>
+    <string name="newEmailAliasMenuTitle">Vytvořit adresu Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Odstranit ochranu e-mailů?</string>
+    <string name="emailSignOutDialogText">Poznámka: Odebrání ochrany e-mailů z tohoto zařízení neodstraní vaši adresu Duck.</string>
+    <string name="emailSignOutDialogCancel">Zrušit</string>
+    <string name="emailSignOutDialogDisable">Odstranit</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Pořadník e-mailu</string>
+    <string name="waitlistNotificationTitle">Vaše pozvánka k ochraně e-mailů je zde!</string>
+    <string name="waitlistNotificationDescription">Připojili jste se k pořadníku a požádali nás, abychom vás upozornili, až budete na řadě, abyste vyzkoušeli naši funkci ochrany e-mailů. Klepnutím zobrazíte pozvánku.</string>
+
+    <string name="waitlistNotificationDialogDescription">Chcete, abychom vám poslali upozornění, až na vás bude řada?</string>
+    <string name="waitlistNotificationDialogNoThanks">NE, DÍKY</string>
+    <string name="waitlistNotificationDialogNotifyMe">UPOZORNĚTE MĚ</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Ochrana e-mailů (beta verze)</string>
+    <string name="emailProtectionActivityTitle">Ochrana e-mailů (beta verze)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Vaše e-maily neukládáme. <b><a href=\"\">Více informací</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Při připojení k pořadníku došlo k chybě, zkuste to znovu později</string>
+    <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
+    <string name="emailProtectionInviteCodeCta">Mám zvací kód</string>
+    <string name="emailProtectionWaitlistCta">Připojte se k soukromému pořadníku</string>
+    <string name="emailProtectionGetStartedCta">Začínáme</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">E-mailové soukromí, zjednodušené.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu,<br/>bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Jste na seznamu!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Až pro vás bude služba ochrany<br/> e-mailů připravena, zašleme vám upozornění. <a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše pozvánka se tu objeví, až na vás budeme připraveni. Chcete <a href=\"\"><b>dostat upozornění,</b></a> až dorazí? <br/><a href=\"\"><b>Více informací</b></a> o ochraně e-mailů.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Byli jste pozváni!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu,<br/>bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Osobní adresa Duck</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Odebráním ochrany e-mailů z tohoto zařízení se při procházení webu odstraní možnost vyplnit osobní adresu Duck nebo nově vygenerovanou soukromou adresu Duck do e-mailových polí. <br/><br/>Chcete-li úplně vymazat vaše adresy Duck nebo máte-li jakékoli další dotazy nebo zpětnou vazbu, obraťte se na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Odebrat ze zařízení</string>
 </resources>

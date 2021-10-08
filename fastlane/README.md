@@ -21,6 +21,11 @@ or alternatively using `brew install fastlane`
 fastlane android deploy_playstore
 ```
 Upload APK to Play Store
+### android deploy_dogfood
+```
+fastlane android deploy_dogfood
+```
+Upload APK to Play Store Dogfood track
 ### android deploy_github
 ```
 fastlane android deploy_github

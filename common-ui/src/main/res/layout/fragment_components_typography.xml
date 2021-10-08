@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+~ Copyright (C) 2019 The Android Open Source Project
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~      http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingBottom="@dimen/keyline_5"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingEnd="@dimen/keyline_4">
+
+    <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:text="Typography"
+        app:leadingIcon="@drawable/ic_format_size_24dp"
+        app:linkUrl="https://material.io/design/typography/the-type-system.html#type-scale" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceHeadline1"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance H1"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceHeadline2"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance H2"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceHeadline3"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance H3"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceHeadline4"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance H4"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance H5"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance Body1"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance Body2"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceButton1"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance Button1"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceButton2"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance Button2"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:gravity="start"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="@color/material_on_background_emphasis_high_type"
+        android:text="Text Appearance Caption"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        tools:ignore="HardcodedText"/>
+
+</LinearLayout>

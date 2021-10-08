@@ -18,32 +18,45 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
+@ContributesMultibinding(AppObjectGraph::class)
 class TrackerDataLoader @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val trackerDetector: TrackerDetector,
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
-    private val tempWhitelistDao: TemporaryTrackingWhitelistDao,
     private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
     private val moshi: Moshi
-) {
+) : LifecycleObserver {
 
-    fun loadData() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onApplicationCreated() {
+        appCoroutineScope.launch { loadData() }
+    }
+
+    private fun loadData() {
         Timber.d("Loading tracker data")
         loadTds()
-        loadTemporaryWhitelist()
     }
 
     private fun loadTds() {
@@ -74,14 +87,6 @@ class TrackerDataLoader @Inject constructor(
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
         val client = TdsClient(Client.ClientName.TDS, trackers)
-        trackerDetector.addClient(client)
-    }
-
-    fun loadTemporaryWhitelist() {
-        val whitelist = tempWhitelistDao.getAll()
-        Timber.d("Loaded ${whitelist.size} temporarily whitelisted domains from DB")
-
-        val client = DocumentDomainClient(Client.ClientName.TEMPORARY_WHITELIST, whitelist)
         trackerDetector.addClient(client)
     }
 

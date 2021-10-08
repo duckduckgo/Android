@@ -30,6 +30,12 @@ interface FavoritesDao {
     @Query("select * from favorites order by position")
     fun favorites(): Flow<List<FavoriteEntity>>
 
+    @Query("select * from favorites order by position")
+    fun favoritesSync(): List<FavoriteEntity>
+
+    @Query("select count(1) > 0 from favorites")
+    fun userHasFavorites(): Boolean
+
     @Query("select count(*) from favorites WHERE url LIKE :domain")
     fun favoritesCountByUrl(domain: String): Int
 
@@ -47,6 +53,9 @@ interface FavoritesDao {
 
     @Query("select * from favorites where id = :id")
     fun favorite(id: Long): FavoriteEntity?
+
+    @Query("select * from favorites where url = :url limit 1")
+    fun favoriteByUrl(url: String): FavoriteEntity?
 
     @Transaction
     fun persistChanges(favorites: List<SavedSite.Favorite>) {

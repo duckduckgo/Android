@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -33,6 +49,11 @@
     <string name="clearButtonContentDescription">Išvalyti paieškos įvestį</string>
     <string name="no_compatible_third_party_app_installed">Neįdiegta suderinama programa</string>
     <string name="addBookmarkMenuTitle">Pridėti žymę</string>
+    <string name="editBookmarkMenuTitle">Redaguoti žymę</string>
+    <string name="addFavoriteMenuTitle">Pridėti mėgstamą</string>
+    <string name="removeFavoriteMenuTitle">Šalinti mėgstamą</string>
+    <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
+    <string name="bookmarkAddedMessage">Žymė pridėta</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
 
     <!-- Downloading files -->
@@ -88,6 +109,7 @@
     <string name="privacyDashboardActivityTitle">Privatumo valdymo skydelis</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PATOBULINTA NUO &lt;img src=\"%1$d\" /&gt; IKI &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privatumo laipsnis</string>
+    <string name="privacyProtectionTemporarilyDisabled">Laikinai išjungiame privatumo apsaugą, kadangi atrodo, kad ji trukdo šios svetainės veikimui.</string>
 
     <string name="httpsGood">Šifruotas ryšys</string>
     <string name="httpsMixed">Ryšys su mišriu šifravimu</string>
@@ -155,10 +177,11 @@
     <string name="settingsHeadingGeneral">Bendrieji</string>
     <string name="settingsHeadingOther">Kiti</string>
     <string name="settingsHeadingPrivacy">Privatumas</string>
-    <string name="settingsLightTheme">Šviesus apipavidalinimas</string>
     <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
+    <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
+    <string name="settingsEmailProtectionSubtitle">Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -207,14 +230,8 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymės</string>
     <string name="bookmarksActivityTitle">Žymės</string>
-    <string name="bookmarkDeleteConfirmMessage">Ar tikrai norite ištrinti žymę &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Žymė pridėta</string>
-    <string name="bookmarkTitleHint">Žymės antraštė</string>
-    <string name="bookmarkUrlHint">Žymės URL</string>
-    <string name="bookmarkTitleEdit">Redaguoti žymę</string>
     <string name="noBookmarks">Žymių dar nepridėta</string>
     <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymei %1$s</string>
-    <string name="bookmarkEdited">Žymė pridėta</string>
     <string name="bookmarkDeleteConfirmationMessage">Ištrinta &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportuoti</string>
     <string name="exportBookmarksEmpty">Neturite žymelių, niekas nebus eksportuota</string>
@@ -225,6 +242,13 @@
     <string name="importBookmarksError">Nepavyko importuoti jokių žymelių, įvyko klaida</string>
     <string name="importBookmarksEmpty">Faile nėra jokių importuotinų žymelių</string>
     <string name="importBookmarksSuccess">Sėkmingos importuotos %1$d žymelės</string>
+    <string name="savedSiteDialogTitleHint">Pavadinimas</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Redaguoti</string>
+    <string name="bookmarksSectionTitle">Žymės</string>
+    <string name="favoritesSectionTitle">Mėgstami</string>
+    <string name="bookmarksEmptyHint">Žymių dar nepridėta</string>
+    <string name="favoritesEmptyHint">Mėgstamų dar nepridėta</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Patvirtinti</string>
@@ -237,6 +261,7 @@
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridėti prie pradžios puslapio</string>
+    <string name="shortcutAddedText">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Padėkite mums tobulinti programą!</string>
@@ -520,6 +545,7 @@
     <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
     <string name="preciseLocationSystemDialogNeverAllow">Nebeprašykite šioje svetainėje</string>
     <string name="preciseLocationSiteDialogTitle">Suteikti %1$s leidimą pasiekti vietą?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Jūsų anoniminę vietą naudojame tik norėdami pateikti geresnius rezultatus, esančius arčiau jūsų. Vėliau visada galite tai pakeisti.</string>
     <string name="preciseLocationSiteDialogSubtitle">Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Visada</string>
     <string name="preciseLocationSiteDialogAllowOnce">Tik šiam seansui</string>
@@ -549,4 +575,62 @@
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="disabled">Išjungta</string>
     <string name="enabled">Įjungta</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Atidaryti nuorodas susijusiose programose</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Išjungti, kad nuorodos automatiškai neatsidarytų kitose įdiegtose programose.</string>
+    <string name="appLinkDialogTitle">Atidaryti kitoje programoje?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Naujas adresas nukopijuotas į jūsų iškarpinę</string>
+    <string name="autofillTooltipUseYourAlias">Naudoti %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokuoja el. pašto sekimo priemones</string>
+    <string name="autofillTooltipGenerateAddress">Generuoti privatų adresą</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blokuoja el. pašto sekimo priemones ir slepia jūsų adresą</string>
+    <string name="newEmailAliasMenuTitle">Kurti „Duck“ adresą</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Pašalinti el. pašto apsaugą?</string>
+    <string name="emailSignOutDialogText">Pastaba. Pašalinus el. pašto apsaugą iš šio įrenginio, jūsų „Duck“ adresas nebus ištrintas.</string>
+    <string name="emailSignOutDialogCancel">Atšaukti</string>
+    <string name="emailSignOutDialogDisable">Pašalinti</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">El. pašto laukimo sąrašas</string>
+    <string name="waitlistNotificationTitle">Jūsų el. pašto apsaugos kvietimas jau čia!</string>
+    <string name="waitlistNotificationDescription">Jūs prisijungėte prie laukimo sąrašo ir paprašėte mūsų informuoti jus, kai ateis jūsų eilė išbandyti mūsų el. pašto apsaugos funkciją. Bakstelėkite norėdami peržiūrėti savo kvietimą.</string>
+
+    <string name="waitlistNotificationDialogDescription">Ar norėtumėte, kad atsiųstume jums pranešimą, kai ateis jūsų eilė?</string>
+    <string name="waitlistNotificationDialogNoThanks">NE, DĖKOJU</string>
+    <string name="waitlistNotificationDialogNotifyMe">INFORMUOTI</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">El. pašto apsauga (beta)</string>
+    <string name="emailProtectionActivityTitle">El. pašto apsauga (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Nesaugome jūsų el. laiškų. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>
+    <string name="emailProtectionDuckAddressCta">Jau turiu „Duck“ adresą</string>
+    <string name="emailProtectionInviteCodeCta">Turiu kvietimo kodą</string>
+    <string name="emailProtectionWaitlistCta">Prisijungti prie privataus laukimo sąrašo</string>
+    <string name="emailProtectionGetStartedCta">Pradėti</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą<br />nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=\"\"><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=\"\"><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Esate pakviesti!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą<br />nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Asmeninis „Duck“ adresas</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Pašalinus el. pašto apsaugą iš šio įrenginio, bus pašalinta parinktis įrašyti savo asmeninį „Duck“ adresą arba naujai sukurtą privatų „Duck“ adresą į el. pašto laukelius, kol naršysite svetainėje.<br/><br/>Norėdami visam laikui ištrinti „Duck“ adresus arba turėdami kitų klausimų ar atsiliepimų, susisiekite su mumis el. paštu <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Pašalinti šį įrenginį</string>
 </resources>

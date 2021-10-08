@@ -23,14 +23,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.EmailSetting
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -38,6 +35,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
@@ -63,6 +65,9 @@ class SettingsViewModelTest {
     private lateinit var context: Context
 
     @Mock
+    private lateinit var mockThemeSettingsDataStore: ThemingDataStore
+
+    @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
     @Mock
@@ -78,7 +83,10 @@ class SettingsViewModelTest {
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
     @Mock
-    private lateinit var mockEmailManager: EmailManager
+    private lateinit var mockGpc: Gpc
+
+    @Mock
+    private lateinit var mockFeatureToggle: FeatureToggle
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -89,11 +97,12 @@ class SettingsViewModelTest {
 
         context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockEmailManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockThemeSettingsDataStore, mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockGpc, mockFeatureToggle, mockPixel)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
@@ -103,6 +112,43 @@ class SettingsViewModelTest {
     fun whenViewModelInitialisedThenPixelIsFired() {
         testee // init
         verify(mockPixel).fire(AppPixelName.SETTINGS_OPENED)
+    }
+
+    @Test
+    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(false)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(false)
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = coroutineTestRule.runBlocking {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(expectItem().globalPrivacyControlEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -144,10 +190,29 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeSettingsClickedThenPixelSent() {
+        testee.userRequestedToChangeTheme()
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_OPENED)
+    }
+
+    @Test
+    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = coroutineTestRule.runBlocking {
         testee.commands().test {
-            testee.onLightThemeToggled(true)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
+            testee.userRequestedToChangeTheme()
+
+            assertEquals(Command.LaunchThemeSettings(DuckDuckGoTheme.LIGHT), expectItem())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
+            testee.onThemeSelected(DuckDuckGoTheme.DARK)
+
+            verify(mockThemeSettingsDataStore).theme = DuckDuckGoTheme.DARK
 
             assertEquals(Command.UpdateTheme, expectItem())
 
@@ -156,27 +221,75 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLightThemeToggledOnThenLighThemePixelIsSent() {
-        testee.onLightThemeToggled(true)
+    fun whenThemeChangedToLightThenLightThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.DARK)
+        testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
         verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
     }
 
     @Test
-    fun whenLightThemeTogglesOffThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
-        testee.commands().test {
-            testee.onLightThemeToggled(false)
-            verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.DARK
+    fun whenThemeChangedToDarkThenDarkThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.LIGHT)
+        testee.onThemeSelected(DuckDuckGoTheme.DARK)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
+    }
 
-            assertEquals(Command.UpdateTheme, expectItem())
+    @Test
+    fun whenThemeChangedToSystemDefaultThenSystemDefaultThemePixelIsSent() {
+        givenThemeSelected(DuckDuckGoTheme.LIGHT)
+        testee.onThemeSelected(DuckDuckGoTheme.SYSTEM_DEFAULT)
+        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT)
+    }
+
+    @Test
+    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            givenThemeSelected(DuckDuckGoTheme.LIGHT)
+            testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
+
+            verify(mockPixel, never()).fire(AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+            verify(mockThemeSettingsDataStore, never()).theme = DuckDuckGoTheme.LIGHT
+
+            expectNoEvents()
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
-        testee.onLightThemeToggled(false)
-        verify(mockPixel).fire(AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
+    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(false)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+            testee.onDefaultBrowserToggled(true)
+
+            assertEquals(Command.LaunchDefaultBrowser, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+            testee.onDefaultBrowserToggled(true)
+
+            expectNoEvents()
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -387,75 +500,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserNotSignedInOnEmailThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        testee.viewState().test {
-            givenUserIsNotSignedIn()
-            testee.start()
-
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserSignedInOnEmailAndEmailAddressIsNotNullThenEmailSettingIsOn() = coroutineTestRule.runBlocking {
-        givenUserIsSignedInAndHasAliasAvailable()
-        testee.start()
-
-        testee.viewState().test {
-            assertTrue(expectItem().emailSetting is EmailSetting.EmailSettingOn)
-
-            cancelAndConsumeRemainingEvents()
-        }
-
-    }
-
-    @Test
-    fun whenUserSignedInOnEmailAndEmailAddressIsNullThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        testee.start()
-
-        testee.viewState().test {
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnEmailLogoutThenSignOutIsCalled() {
-        testee.onEmailLogout()
-
-        verify(mockEmailManager).signOut()
-    }
-
-    @Test
-    fun whenOnEmailLogoutThenEmailSettingIsOff() = coroutineTestRule.runBlocking {
-        testee.viewState().test {
-            testee.onEmailLogout()
-
-            assert(expectItem().emailSetting is EmailSetting.EmailSettingOff)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnEmailSettingClickedAndUserIsSignedInThenLaunchEmailDialogCommandSent() = coroutineTestRule.runBlocking {
-        testee.commands().test {
-            givenUserIsSignedInAndHasAliasAvailable()
-
-            testee.onEmailSettingClicked()
-
-            assertEquals(Command.LaunchEmailDialog, expectItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialog() = coroutineTestRule.runBlocking {
         testee.commands().test {
             testee.onAutomaticallyClearWhatClicked()
@@ -477,17 +521,24 @@ class SettingsViewModelTest {
         }
     }
 
-    private fun givenUserIsSignedInAndHasAliasAvailable() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("test@duck.com")
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-    }
+    @Test
+    fun whenOnEmailProtectionSettingClickedThenEmitCommandLaunchEmailProtection() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+            testee.onEmailProtectionSettingClicked()
 
-    private fun givenUserIsNotSignedIn() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
+            assertEquals(Command.LaunchEmailProtection, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
+    }
+
+    private fun givenThemeSelected(theme: DuckDuckGoTheme) {
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
+        whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
     }
 }

@@ -32,7 +32,6 @@ interface Pixel {
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
 
-
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
         COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
@@ -69,9 +68,12 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FAVORITE_MENU_ITEM_STATE = "fmi"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
         const val BOOKMARK_COUNT = "bco"
+        const val COHORT = "cohort"
+        const val LAST_USED_DAY = "duck_address_last_used"
     }
 
     object PixelValues {
@@ -92,7 +94,6 @@ interface Pixel {
         const val FIRE_ANIMATION_AIRSTREAM = "faas"
         const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
         const val FIRE_ANIMATION_NONE = "fann"
-
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

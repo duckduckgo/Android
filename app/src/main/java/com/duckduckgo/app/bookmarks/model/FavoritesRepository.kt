@@ -29,11 +29,14 @@ import java.io.Serializable
 interface FavoritesRepository {
     fun favoritesCountByDomain(domain: String): Int
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
+    fun favoritesSync(): List<SavedSite.Favorite>
     fun insert(title: String, url: String): SavedSite.Favorite
     fun insert(favorite: SavedSite.Favorite)
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
+    fun userHasFavorites(): Boolean
+    fun favorite(url: String): SavedSite.Favorite?
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -52,7 +55,8 @@ sealed class SavedSite(
     data class Bookmark(
         override val id: Long,
         override val title: String,
-        override val url: String
+        override val url: String,
+        val parentId: Long
     ) : SavedSite(id, title, url)
 }
 
@@ -66,6 +70,8 @@ class FavoritesDataRepository(
 
     override fun favoritesObservable() =
         favoritesDao.favoritesObservable().map { favorites -> favorites.mapToSavedSites() }
+
+    override fun favoritesSync() = favoritesDao.favoritesSync().mapToSavedSites()
 
     override fun insert(title: String, url: String): SavedSite.Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
@@ -94,11 +100,22 @@ class FavoritesDataRepository(
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
     }
 
+    override fun userHasFavorites(): Boolean {
+        return favoritesDao.userHasFavorites()
+    }
+
+    override fun favorite(url: String): SavedSite.Favorite? {
+        return favoritesDao.favoriteByUrl(url)?.mapToSavedSite()
+    }
+
     override suspend fun delete(favorite: SavedSite.Favorite) {
         faviconManager.get().deletePersistedFavicon(favorite.url)
         favoritesDao.delete(FavoriteEntity(favorite.id, favorite.title, favorite.url, favorite.position))
     }
 
     private fun SavedSite.Favorite.titleOrFallback(): String = this.title.takeIf { it.isNotEmpty() } ?: this.url
+
+    private fun FavoriteEntity.mapToSavedSite(): SavedSite.Favorite = SavedSite.Favorite(this.id, this.title, this.url, this.position)
+
     private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> = this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
 }

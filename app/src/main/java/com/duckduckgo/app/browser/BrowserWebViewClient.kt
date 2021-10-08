@@ -38,8 +38,8 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
@@ -55,7 +55,7 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -167,10 +167,10 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            emailInjector.resetInjectedJsFlag()
-            globalPrivacyControl.injectDoNotSellToDom(webView)
+            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
+            injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            webViewClientListener?.resetAppLinkState()
+            webViewClientListener?.pageStarted(url)
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
@@ -184,7 +184,6 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageFinished
             webViewClientListener?.run {
                 navigationStateChanged(WebViewNavigationState(navigationList))
                 url?.let { prefetchFavicon(url) }
@@ -194,6 +193,14 @@ class BrowserWebViewClient(
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
+            }
+        }
+    }
+
+    private fun injectGpcToDom(webView: WebView, url: String?) {
+        url?.let {
+            if (gpc.canGpcBeUsedByUrl(url)) {
+                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
             }
         }
     }
