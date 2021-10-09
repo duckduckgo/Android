@@ -48,7 +48,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
 
-    private fun validateInput(newValue: String, existingValue: String) =
+    private fun validateInput(newValue: String, existingValue: String): String =
         if (newValue.isNotBlank()) newValue else existingValue
 
     private fun populateFields(titleInput: EditText, urlInput: EditText) {
