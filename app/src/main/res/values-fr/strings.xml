@@ -621,4 +621,52 @@
         <![CDATA[En supprimant la protection des e-mails de cet appareil, vous ne pourrez plus renseigner d\'adresse Duck personnelle ni de nouvelle adresse privée Duck dans les champs Adresse e-mail lorsque vous naviguez sur le Web.<br/><br/>Pour supprimer intégralement vos adresses Duck ou pour toute autre question ou commentaire, contactez-nous à l\'adresse <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Supprimer de cet appareil</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Ajouter un favori</string>
+    <string name="widgetConfigurationTitleText">Choisissez un thème</string>
+    <string name="widgetConfigurationSystemThemeOption">Par défaut</string>
+    <string name="widgetConfigurationLightThemeOption">Clair</string>
+    <string name="widgetConfigurationDarkThemeOption">Sombre</string>
+    <string name="widgetConfigurationAddWidgetOption">Ajouter un widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Aucun favori ajouté pour l e moment</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Ajouter un favori</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visitez vos sites favoris en un clin d\'oeil!<br/><br/>Allez sur un site que vous aimez. Et tappez l\'icône \" &#x2807;\" puis sélectionnez Ajoutez un favori.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Visitez vos sites favoris en un clin d\'oeil! Allez sur un site que vous aimez. Et tappez l\'icône du navigateur puis sélectionnez Ajoutez un favori.</string>
+    <string name="widgetConfigurationActivityTitle">Configuration du widget</string>
+    <string name="favoritesWidgetLabel">Widget favoris</string>
+    <string name="searchWidgetLabel">Rechercher un widget</string>
+
+    <!-- Email -->
+    <string name="emailNotSupported">Appareil non supporté</string>
+    <string name="emailNotSupportedExplanation">La protection d\'email vous permet de créer une adresse email privée qui supprime les trackers emails. Nous avons besoin de chiffrer et enregistrer sur votre appareil ces adresses créées. La protetion d\'email est désactivée car votre appreil ne supporte pas le stockage chiffré.</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsLightTheme">Clair</string>
+    <string name="settingsTheme">Thème</string>
+    <string name="settingsDarkTheme">Sombre</string>
+    <string name="settingsSystemTheme">Par défaut</string>
+
+    <!-- Theme Settings -->
+    <string name="settingsThemeDialogSave">Définir le thème</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Modifier le signet</string>
+    <string name="favoriteDialogTitleEdit">Modifier le favori</string>
+    <string name="locationLabel">Localisation</string>
+    <string name="folderLocationTitle">Choisir la localisation</string>
+    <string name="addFolder">Ajouter un dossier</string>
+    <string name="editFolder">Modifier le dossier</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Êtes-vous sûr de vouloir supprimer "</string>
+    <string name="bookmarkFolderEmpty">Vide</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%s%s et %d élément?</item>
+        <item quantity="other">%s%s et %d éléments?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%d élément</item>
+        <item quantity="other">%d éléments</item>
+    </plurals>
 </resources>
