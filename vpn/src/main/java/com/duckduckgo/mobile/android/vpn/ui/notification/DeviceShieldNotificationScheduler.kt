@@ -46,9 +46,10 @@ class DeviceShieldNotificationSchedulerModule {
     fun provideDeviceShieldNotificationScheduler(
         @VpnCoroutineScope coroutineScope: CoroutineScope,
         workManager: WorkManager,
-        vpnDatabase: VpnDatabase
+        vpnDatabase: VpnDatabase,
+        deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
     ): LifecycleObserver {
-        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase)
+        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase, deviceShieldAlertNotificationBuilder)
     }
 
     @Provides
@@ -60,6 +61,7 @@ class DeviceShieldNotificationSchedulerModule {
         repository: AppTrackerBlockingStatsRepository,
         notificationManagerCompat: NotificationManagerCompat,
         deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
+        deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
         vpnDatabase: VpnDatabase
     ): WorkerInjectorPlugin {
         return DeviceShieldNotificationWorkerInjectorPlugin(
@@ -69,6 +71,7 @@ class DeviceShieldNotificationSchedulerModule {
             repository,
             notificationManagerCompat,
             deviceShieldNotificationFactory,
+            deviceShieldAlertNotificationBuilder,
             vpnDatabase
         )
     }
@@ -77,7 +80,8 @@ class DeviceShieldNotificationSchedulerModule {
 class DeviceShieldNotificationScheduler(
     private val coroutineScope: CoroutineScope,
     private val workManager: WorkManager,
-    private val vpnDatabase: VpnDatabase
+    private val vpnDatabase: VpnDatabase,
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -144,6 +148,7 @@ class DeviceShieldNotificationScheduler(
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
         lateinit var vpnNotificationsDao: VpnNotificationsDao
+        lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Daily notification worker is now awake")
@@ -173,7 +178,7 @@ class DeviceShieldNotificationScheduler(
 
             if (!deviceShieldNotification.hidden) {
                 val notification =
-                    DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
+                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
                 deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
                 Timber.v("Vpn Daily notification is now shown")
@@ -188,6 +193,7 @@ class DeviceShieldNotificationScheduler(
         lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var notificationManager: NotificationManagerCompat
         lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
+        lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Weekly notification worker is now awake")
@@ -198,7 +204,7 @@ class DeviceShieldNotificationScheduler(
 
             if (!deviceShieldNotification.hidden) {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
-                val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                val notification = deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
                     context, deviceShieldNotification, notificationPressedHandler
                 )
                 deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
@@ -229,6 +235,7 @@ class DeviceShieldNotificationWorkerInjectorPlugin(
     private val repository: AppTrackerBlockingStatsRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {
 
@@ -240,6 +247,7 @@ class DeviceShieldNotificationWorkerInjectorPlugin(
             worker.deviceShieldPixels = deviceShieldPixels
             worker.notificationPressedHandler = dailyNotificationPressedHandler
             worker.vpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
+            worker.deviceShieldAlertNotificationBuilder = deviceShieldAlertNotificationBuilder
             return true
         }
 

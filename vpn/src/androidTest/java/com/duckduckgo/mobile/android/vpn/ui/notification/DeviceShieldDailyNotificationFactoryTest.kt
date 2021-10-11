@@ -76,7 +76,7 @@ class DeviceShieldDailyNotificationFactoryTest {
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(0)
 
-        notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts across 2 apps, including app1 (past day).")
+        notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts across 2 apps, including app2 (past day).")
         assertFalse(notification.hidden)
     }
 
@@ -163,7 +163,7 @@ class DeviceShieldDailyNotificationFactoryTest {
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
 
-        notification.assertTitleEquals("App Tracking Protection blocked Tracking LLC 2 times in app1 and 1 other app (past day).")
+        notification.assertTitleEquals("App Tracking Protection blocked Tracking LLC 2 times in app2 and 1 other app (past day).")
         assertFalse(notification.hidden)
     }
 

@@ -64,7 +64,7 @@
     <string name="atp_NotificationPastDaySuffix">(past day).</string>
     <string name="atp_NotificationSeeMoreSuffix">See More</string>
     <string name="atp_DailyCompanyBlockedNotificationPrefix">App Tracking Protection blocked the most tracking attempts in %s</string>
-    <string name="atp_DailyCompanyBlockedNotificationOptionalSecondApp">and %s</string>
+    <string name="atp_DailyCompanyBlockedNotificationOptionalSecondApp">\u0020and %s</string>
 
     <plurals name="atp_NumberTimes">
         <item quantity="one">%d time</item>
@@ -74,8 +74,8 @@
     <string name="atp_DailyLastCompanyBlockedNotification">App Tracking Protection blocked %s</string>
     <string name="atp_DailyLastCompanyBlockedNotificationInApp">in %s</string>
     <plurals name="atp_DailyLastCompanyBlockedNotificationOptionalOtherApps">
-        <item quantity="one">"and 1 other app"</item>
-        <item quantity="other">"and %d other apps"</item>
+        <item quantity="one">"\u0020and 1 other app"</item>
+        <item quantity="other">"\u0020and %d other apps"</item>
     </plurals>
 
     <!-- App Tracking Protection Weekly Notification -->
@@ -91,7 +91,7 @@
         <item quantity="one">", %s"</item>
         <item quantity="other">", including %s"</item>
     </plurals>
-    <string name="atp_WeeklyCompanyTeaserNotificationSuffix">" (past week)."</string>
+    <string name="atp_WeeklyCompanyTeaserNotificationSuffix">"\u0020(past week)."</string>
 
     <!-- Debug Screens -->
     <string name="atp_DiagnosticsMenuLabel">Diagnostics</string>
@@ -129,7 +129,7 @@
     <string name="atp_EnabledSettings">You can access App Tracking Protection in <annotation type="settings_link">Settings.</annotation></string>
 
     <!-- New Tab Integration -->
-    <string name="atp_NewTabSuffix">" (past hour)."</string>
+    <string name="atp_NewTabSuffix">"\u0020(past hour)."</string>
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 

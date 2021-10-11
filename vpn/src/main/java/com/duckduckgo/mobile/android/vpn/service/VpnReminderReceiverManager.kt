@@ -33,7 +33,11 @@ interface VpnReminderReceiverManager {
 }
 
 @ContributesBinding(AppObjectGraph::class)
-class AndroidVpnReminderReceiverManager @Inject constructor(val deviceShieldPixels: DeviceShieldPixels, val notificationManager: NotificationManagerCompat) : VpnReminderReceiverManager {
+class AndroidVpnReminderReceiverManager @Inject constructor(
+    private val deviceShieldPixels: DeviceShieldPixels,
+    private val notificationManager: NotificationManagerCompat,
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
@@ -41,10 +45,10 @@ class AndroidVpnReminderReceiverManager @Inject constructor(val deviceShieldPixe
         } else {
             Timber.v("Vpn is not running, showing reminder notification")
             val notification = if (wasReminderNotificationShown(context)) {
-                DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
+                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
             } else {
                 notificationWasShown(context)
-                DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
             }
 
             deviceShieldPixels.didShowReminderNotification()

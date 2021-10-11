@@ -43,7 +43,8 @@ import javax.inject.Inject
 class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
-    private val notificationManager: NotificationManagerCompat
+    private val notificationManager: NotificationManagerCompat,
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -97,7 +98,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun showImmediateReminderNotification() {
-        val notification = DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
         notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
     }
 

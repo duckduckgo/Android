@@ -74,7 +74,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp2())
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts in app1 and 1 other app (past week).")
+        notification.assertTitleEquals("App Tracking Protection blocked 2 tracking attempts in app2 and 1 other app (past week).")
         assertFalse(notification.hidden)
     }
 
@@ -86,7 +86,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         trackerFound(trackerDomain, appContainingTracker = trackingApp3())
 
         val notification = factory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(0)
-        notification.assertTitleEquals("App Tracking Protection blocked 3 tracking attempts in app1 and 2 other apps (past week).")
+        notification.assertTitleEquals("App Tracking Protection blocked 3 tracking attempts in app3 and 2 other apps (past week).")
         assertFalse(notification.hidden)
     }
 

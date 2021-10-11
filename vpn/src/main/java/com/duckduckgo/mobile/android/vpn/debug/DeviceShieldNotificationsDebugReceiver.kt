@@ -65,6 +65,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
     private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope
 ) : LifecycleObserver {
 
@@ -85,17 +86,20 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                 val notification = if (weekly != null) {
                     Timber.v("Debug - Sending weekly notification $weekly")
                     weeklyNotificationPressedHandler.notificationVariant = weekly
-                    val deviceShieldNotification = deviceShieldNotificationFactory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(weekly)
+                    val deviceShieldNotification =
+                        deviceShieldNotificationFactory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(weekly)
 
-                    DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
-                        context, deviceShieldNotification, weeklyNotificationPressedHandler
+                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                        context,
+                        deviceShieldNotification,
+                        weeklyNotificationPressedHandler
                     )
                 } else if (daily != null) {
                     Timber.v("Debug - Sending daily notification $daily")
                     dailyNotificationPressedHandler.notificationVariant = daily
                     val deviceShieldNotification = deviceShieldNotificationFactory.dailyNotificationFactory.createDailyDeviceShieldNotification(daily)
 
-                    DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
                         context, deviceShieldNotification, dailyNotificationPressedHandler
                     )
                 } else {

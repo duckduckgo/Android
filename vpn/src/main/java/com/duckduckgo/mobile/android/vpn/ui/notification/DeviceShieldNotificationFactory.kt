@@ -97,7 +97,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 0 -> createDailyTotalTrackersNotification(trackerCount, apps.size, firstAppName)
                 1 -> createDailyTopTrackerCompanyNotification(trackers)
                 2 -> createDailyNotificationTopAppsContainingTrackers(apps)
-                else -> createDailyLastCompanyAttemptNotification(trackerCount, trackers)
+                else -> createDailyLastCompanyAttemptNotification(trackers)
             }.copy(notificationVariant = dailyNotificationType)
         }
 
@@ -143,7 +143,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val suffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
 
-            val textToStyle = "$prefix $optionalSecondApp $suffix"
+            val textToStyle = "$prefix$optionalSecondApp $suffix"
             val wordsToBold = mutableListOf(firstAppName)
             if (second != null) wordsToBold.add(second.appDisplayName)
 
@@ -151,7 +151,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))
         }
 
-        private fun createDailyLastCompanyAttemptNotification(trackerCount: Int, trackers: List<VpnTracker>): DeviceShieldNotification {
+        private fun createDailyLastCompanyAttemptNotification(trackers: List<VpnTracker>): DeviceShieldNotification {
             val lastCompany = trackers.first()
             val latestApp = lastCompany.trackingApp.appDisplayName
             val filteredForLatestTrackerCompany = trackers.filter { it.trackerCompanyId == lastCompany.trackerCompanyId }
@@ -170,7 +170,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             )
             val pastDaySuffix = resources.getString(R.string.atp_DailyNotificationPastDaySuffix)
 
-            val textToStyle = "$prefix $numberOfTimesString $latestAppString $otherAppsCount $pastDaySuffix"
+            val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
             Timber.v("createDailyLastCompanyAttemptNotification. [$textToStyle]")
             return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.companyDisplayName, latestAppString, numberOfTimesString, otherAppsCount)))
         }
@@ -216,7 +216,7 @@ class DeviceShieldNotificationFactory @Inject constructor(
             )
             val pastWeekSuffix = resources.getString(R.string.atp_WeeklyCompanyTeaserNotificationSuffix)
 
-            val textToStyle = "$prefix $totalTrackers $latestAppString $optionalOtherAppsString$pastWeekSuffix"
+            val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
 
             Timber.v("createWeeklyReportNotification. $textToStyle\nTotal apps: ${perApp.size}. Other apps: $otherAppsSize")
 
