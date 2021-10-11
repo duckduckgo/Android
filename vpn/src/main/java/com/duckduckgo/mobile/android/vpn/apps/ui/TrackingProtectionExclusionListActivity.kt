@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.vpn.R
@@ -36,17 +37,22 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TrackingProtectionExclusionListActivity :
     DuckDuckGoActivity(),
     ManuallyEnableAppProtectionDialog.ManuallyEnableAppsProtectionDialogListener,
     ManuallyDisableAppProtectionDialog.ManuallyDisableAppProtectionDialogListener,
     RestoreDefaultProtectionDialog.RestoreDefaultProtectionDialogListener {
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     private val viewModel: ExcludedAppsViewModel by bindViewModel()
 
@@ -139,7 +145,8 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun restartVpn() {
-        lifecycleScope.launch {
+        // we use the app coroutine scope to ensure this call outlives the Activity
+        appCoroutineScope.launch {
             TrackerBlockingVpnService.restartVpnService(applicationContext)
         }
     }
@@ -198,9 +205,7 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onDefaultProtectionRestored() {
         viewModel.restoreProtectedApps()
-        lifecycleScope.launch(Dispatchers.IO) {
-            TrackerBlockingVpnService.restartVpnService(applicationContext)
-        }
+        restartVpn()
         Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG).show()
     }
 
