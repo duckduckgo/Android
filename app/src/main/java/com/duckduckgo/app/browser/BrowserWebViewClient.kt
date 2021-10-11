@@ -170,22 +170,11 @@ class BrowserWebViewClient(
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            webViewClientListener?.pageStarted(url)
-            checkAppLink(url)
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
                 throw e
             }
-        }
-    }
-
-    private fun checkAppLink(url: String?) {
-        val urlType = specialUrlDetector.determineType(url)
-        if (urlType is SpecialUrlDetector.UrlType.AppLink) {
-            webViewClientListener?.updateCachedAppLink(urlType)
-        } else {
-            webViewClientListener?.clearCachedAppLink()
         }
     }
 

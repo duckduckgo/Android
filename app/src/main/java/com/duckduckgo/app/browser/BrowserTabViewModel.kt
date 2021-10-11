@@ -934,6 +934,20 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
+
+        cacheAppLink(url)
+
+        appLinksHandler.setUserQueryState(false)
+        appLinksHandler.updatePreviousUrl(url)
+    }
+
+    private fun cacheAppLink(url: String?) {
+        val urlType = specialUrlDetector.determineType(url)
+        if (urlType is AppLink) {
+            updateCachedAppLink(urlType)
+        } else {
+            clearCachedAppLink()
+        }
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
@@ -1914,28 +1928,23 @@ class BrowserTabViewModel(
         ) { appLinkClicked(appLink) }
     }
 
-    override fun pageStarted(url: String?) {
-        appLinksHandler.updatePreviousUrl(url)
-    }
-
     fun clearCachedUrl() {
         appLinksHandler.updatePreviousUrl(null)
     }
 
-    override fun clearCachedAppLink() {
-        appLinksHandler.setUserQueryState(false)
+    fun clearCachedAppLink() {
         browserViewState.value = currentBrowserViewState().copy(
             previousAppLink = null
         )
     }
 
-    override fun updateCachedAppLink(appLink: AppLink) {
+    private fun updateCachedAppLink(appLink: AppLink) {
         browserViewState.value = currentBrowserViewState().copy(
             previousAppLink = appLink
         )
     }
 
-    fun appLinkClicked(appLink: AppLink) {
+    private fun appLinkClicked(appLink: AppLink) {
         if (appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery()) {
             command.value = ShowAppLinkPrompt(appLink)
             appLinksHandler.setUserQueryState(false)

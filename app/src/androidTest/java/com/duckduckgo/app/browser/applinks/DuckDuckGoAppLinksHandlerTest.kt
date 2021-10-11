@@ -72,4 +72,65 @@ class DuckDuckGoAppLinksHandlerTest {
         testee.updatePreviousUrl("foo.com")
         assertEquals("foo.com", testee.previousUrl)
     }
+
+    @Test
+    fun whenAppLinksDisabledThenReturnFalse() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = false))
+        }
+    }
+
+    @Test
+    fun whenPreviousUrlIsSameThenReturnFalse() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.previousUrl = "example.com"
+            assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = true))
+        }
+    }
+
+    @Test
+    fun whenPreviousUrlIsSubdomainThenReturnFalse() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.previousUrl = "foo.example.com"
+            assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = true))
+        }
+    }
+
+    @Test
+    fun whenNextUrlIsSubdomainThenReturnFalse() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.previousUrl = "example.com"
+            assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "foo.example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = true))
+        }
+    }
+
+    @Test
+    fun whenAppLinkIsUserQueryThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.userQuery = true
+            assertFalse(testee.handleAppLink(isForMainFrame = false, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = true))
+            assertEquals("example.com", testee.previousUrl)
+            verify(mockCallback).invoke()
+        }
+    }
+
+    @Test
+    fun whenShouldOverrideAppLinkThenReturnTrueAndSetPreviousUrlAndLaunchAppLink() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.previousUrl = "foo.com"
+            assertTrue(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = true, appLinksEnabled = true))
+            assertEquals("example.com", testee.previousUrl)
+            verify(mockCallback).invoke()
+        }
+    }
+
+    @Test
+    fun whenShouldNotOverrideAppLinkThenReturnFalseAndSetPreviousUrlAndLaunchAppLink() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            testee.previousUrl = "foo.com"
+            assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldOverride = false, appLinksEnabled = true))
+            assertEquals("example.com", testee.previousUrl)
+            verify(mockCallback).invoke()
+        }
+    }
 }

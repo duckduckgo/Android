@@ -34,12 +34,11 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean {
 
-        if (!appLinksEnabled) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !appLinksEnabled) {
             return false
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-            !isForMainFrame ||
+        if (!isForMainFrame ||
             previousUrl != null && UriString.sameOrSubdomain(previousUrl!!, urlString) ||
             previousUrl != null && UriString.sameOrSubdomain(urlString, previousUrl!!)
         ) {
