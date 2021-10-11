@@ -16,6 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
@@ -34,7 +36,7 @@ import org.robolectric.RobolectricTestRunner
 class RealPrivacyConfigDownloaderTest {
 
     @get:Rule
-    var coroutineRule = PrivacyCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigDownloader
 

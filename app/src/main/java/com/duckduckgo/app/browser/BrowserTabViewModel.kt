@@ -39,8 +39,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -136,7 +134,6 @@ class BrowserTabViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val bookmarksDao: BookmarksDao,
     private val bookmarksRepository: BookmarksRepository,
     private val favoritesRepository: FavoritesRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
@@ -576,7 +573,7 @@ class BrowserTabViewModel(
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
         val currentViewState = currentAutoCompleteViewState()
         val hasBookmarks = withContext(dispatchers.io()) {
-            bookmarksDao.hasBookmarks()
+            bookmarksRepository.hasBookmarks()
         }
         val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
         val params = mapOf(
@@ -1441,9 +1438,7 @@ class BrowserTabViewModel(
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
             }
-            val bookmarkEntity = BookmarkEntity(title = title, url = url, parentId = 0)
-            val id = bookmarksDao.insert(bookmarkEntity)
-            SavedSite.Bookmark(id, title, url, 0)
+            bookmarksRepository.insert(title, url)
         }
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
@@ -1577,7 +1572,7 @@ class BrowserTabViewModel(
 
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
-            bookmarksDao.update(BookmarkEntity(bookmark.id, bookmark.title, bookmark.url, bookmark.parentId))
+            bookmarksRepository.update(bookmark)
         }
     }
 
@@ -2187,7 +2182,6 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
     private val contentBlocking: Provider<ContentBlocking>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
-    private val bookmarksDao: Provider<BookmarksDao>,
     private val bookmarksRepository: Provider<BookmarksRepository>,
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
@@ -2216,7 +2210,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
                 else -> null
             }
         }

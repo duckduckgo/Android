@@ -33,12 +33,11 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
-
     implementation Google.dagger
-
     implementation AndroidX.core.ktx
 
     // Testing dependencies
+    testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
 }
 
