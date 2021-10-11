@@ -38,7 +38,6 @@ class CertificateTrustedStoreModule {
         setOf(
             IsrgRootX1(context),
             IsrgRootX2(context),
-            LetsEncryptAuthorityX3(context),
             LetsEncryptR3(context),
             LetsEncryptE1(context)
         )
