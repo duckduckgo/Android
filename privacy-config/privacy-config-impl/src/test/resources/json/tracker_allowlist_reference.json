@@ -1,0 +1,39 @@
+{
+  "allowlist-tracker-1.com": {
+    "rules" : [
+      {
+        "rule": "allowlist-tracker-1.com/videos.js",
+        "domains": ["testsite.com"],
+        "reason": "match single resource on single site"
+      }
+    ]
+  },
+  "allowlist-tracker-2.com": {
+    "rules" : [
+      {
+        "rule": "videos.allowlist-tracker-2.com/a.js",
+        "domains": ["testsite.com"],
+        "reason": "specific subdomain rule"
+      },
+      {
+        "rule": "allowlist-tracker-2.com/comments/",
+        "domains": ["<all>"],
+        "reason": "match all sites and all paths"
+      },
+      {
+        "rule": "allowlist-tracker-2.com/login.js",
+        "domains": ["<all>"],
+        "reason": "match single resource on all sites"
+      }
+    ]
+  },
+  "allowlist-tracker-3.com": {
+    "rules": [
+      {
+        "rule": "allowlist-tracker-3.com",
+        "domains": ["<all>"],
+        "reason": "match all requests"
+      }
+    ]
+  }
+}

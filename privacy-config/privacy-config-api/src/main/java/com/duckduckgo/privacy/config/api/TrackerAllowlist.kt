@@ -16,14 +16,14 @@
 
 package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.feature.toggles.api.FeatureName
-
 /**
- * List of [FeatureName] that belong to the Privacy Configuration
+ * Public interface for the Tracker Allowlist feature
  */
-sealed class PrivacyFeatureName(override val value: String) : FeatureName {
-    data class ContentBlockingFeatureName(override val value: String = "contentBlocking") : PrivacyFeatureName(value)
-    data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
-    data class HttpsFeatureName(override val value: String = "https") : PrivacyFeatureName(value)
-    data class TrackerAllowlistFeatureName(override val value: String = "trackerAllowlist") : PrivacyFeatureName(value)
+interface TrackerAllowlist {
+    /**
+     * This method takes a [documentURL] and a [url] and returns `true` or `false` depending if the [url]
+     * and [documentURL] match the rules in the allowlist.
+     * @return `true` if the given [url] and [documentURL] match the rules in the allowlist
+     */
+    fun isAnException(documentURL: String, url: String): Boolean
 }

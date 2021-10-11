@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 
 import android.content.Context
 import android.content.res.Resources
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -34,10 +35,9 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayInputStream
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealGpcTest {
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()

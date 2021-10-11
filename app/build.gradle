@@ -219,24 +219,27 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
 
     // Testing dependencies
+    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
-    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation Testing.mockito.android
     androidTestImplementation Testing.mockito.kotlin
     androidTestImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     androidTestImplementation CashApp.turbine
     androidTestImplementation AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     testImplementation Testing.mockito.kotlin
     testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
     testImplementation "androidx.test:runner:_"
 
     androidTestImplementation project(path: ':common-test')

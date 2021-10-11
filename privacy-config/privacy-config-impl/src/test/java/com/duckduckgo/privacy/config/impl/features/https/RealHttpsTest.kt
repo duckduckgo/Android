@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -25,9 +26,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealHttpsTest {
     private val mockHttpsRepository: HttpsRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()

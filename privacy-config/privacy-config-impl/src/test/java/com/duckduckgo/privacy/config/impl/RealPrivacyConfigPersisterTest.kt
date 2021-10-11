@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -41,9 +42,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigPersisterTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -142,7 +142,7 @@ class RealPrivacyConfigPersisterTest {
     class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
-        override fun store(name: String, jsonObject: JSONObject?): Boolean {
+        override fun store(name: String, jsonString: String): Boolean {
             count++
             return true
         }

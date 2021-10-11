@@ -21,6 +21,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,7 +31,7 @@ class TrackerDetectionModule {
 
     @Provides
     @Singleton
-    fun trackerDetector(entityLookup: EntityLookup, userWhitelistDao: UserWhitelistDao, contentBlocking: ContentBlocking): TrackerDetector {
-        return TrackerDetectorImpl(entityLookup, userWhitelistDao, contentBlocking)
+    fun trackerDetector(entityLookup: EntityLookup, userWhitelistDao: UserWhitelistDao, contentBlocking: ContentBlocking, trackerAllowlist: TrackerAllowlist): TrackerDetector {
+        return TrackerDetectorImpl(entityLookup, userWhitelistDao, contentBlocking, trackerAllowlist)
     }
 }

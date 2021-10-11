@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.nhaarman.mockitokotlin2.any
@@ -31,9 +32,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class LocalPrivacyConfigObserverTest {
 
     @get:Rule

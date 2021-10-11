@@ -18,9 +18,38 @@ package com.duckduckgo.privacy.config.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.HttpsException
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+
+@Entity(tableName = "tracker_allowlist")
+data class TrackerAllowlistEntity(
+    @PrimaryKey val domain: String,
+    val rules: List<AllowlistRuleEntity>
+)
+
+class AllowlistRuleEntity(
+    val rule: String,
+    val domains: List<String>,
+    val reason: String
+)
+
+class RuleTypeConverter {
+
+    @TypeConverter
+    fun toRules(value: String): List<AllowlistRuleEntity> {
+        return Adapters.ruleListAdapter.fromJson(value)!!
+    }
+
+    @TypeConverter
+    fun fromRules(value: List<AllowlistRuleEntity>): String {
+        return Adapters.ruleListAdapter.toJson(value)
+    }
+}
 
 @Entity(tableName = "unprotected_temporary")
 data class UnprotectedTemporaryEntity(
@@ -69,3 +98,11 @@ data class PrivacyConfig(
     val version: Long,
     val readme: String
 )
+
+class Adapters {
+    companion object {
+        private val moshi = Moshi.Builder().build()
+        private val ruleListType = Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
+        val ruleListAdapter: JsonAdapter<List<AllowlistRuleEntity>> = moshi.adapter(ruleListType)
+    }
+}

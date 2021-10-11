@@ -14,44 +14,45 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.https
+package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
+import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
+import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
 @ContributesMultibinding(AppObjectGraph::class)
-class HttpsPlugin @Inject constructor(
-    private val httpsRepository: HttpsRepository,
+class TrackerAllowlistPlugin @Inject constructor(
+    private val trackerAllowlistRepository: TrackerAllowlistRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(name: String, jsonString: String): Boolean {
         if (name == featureName.value) {
-            val httpsExceptions = mutableListOf<HttpsExceptionEntity>()
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<HttpsFeature> =
-                moshi.adapter(HttpsFeature::class.java)
+            val jsonAdapter: JsonAdapter<TrackerAllowlistFeature> =
+                moshi.adapter(TrackerAllowlistFeature::class.java)
+            val exceptions = mutableListOf<TrackerAllowlistEntity>()
 
-            val httpsFeature: HttpsFeature? = jsonAdapter.fromJson(jsonString)
-            httpsFeature?.exceptions?.map {
-                httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason))
+            val trackerAllowlistFeature: TrackerAllowlistFeature? = jsonAdapter.fromJson(jsonString)
+
+            trackerAllowlistFeature?.settings?.allowlistedTrackers?.entries?.map { entry ->
+                exceptions.add(TrackerAllowlistEntity(entry.key, entry.value.rules))
             }
-            httpsRepository.updateAll(httpsExceptions)
-            val isEnabled = httpsFeature?.state == "enabled"
+            trackerAllowlistRepository.updateAll(exceptions)
+            val isEnabled = trackerAllowlistFeature?.state == "enabled"
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true
         }
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.HttpsFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackerAllowlistFeatureName()
 }

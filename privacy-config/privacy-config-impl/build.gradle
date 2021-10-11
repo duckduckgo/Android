@@ -60,6 +60,9 @@ dependencies {
     testImplementation Testing.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
 }

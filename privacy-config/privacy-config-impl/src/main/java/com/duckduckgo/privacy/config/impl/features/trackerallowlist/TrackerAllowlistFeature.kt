@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.plugins
+package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 
-interface PrivacyFeaturePlugin {
-    fun store(name: String, jsonString: String): Boolean
-    val featureName: PrivacyFeatureName
-}
+data class TrackerAllowlistFeature(
+    val state: String,
+    val settings: TrackerAllowSettings
+)
 
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures
-    }
-}
+data class TrackerAllowSettings(
+    val allowlistedTrackers: Map<String, AllowListedTrackers>
+)
+
+data class AllowListedTrackers(
+    val rules: List<AllowlistRuleEntity>
+)

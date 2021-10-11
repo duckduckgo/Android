@@ -22,15 +22,11 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class GpcPluginTest {
     lateinit var testee: GpcPlugin
 
@@ -44,47 +40,43 @@ class GpcPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchGpcThenReturnFalse() {
-        assertFalse(testee.store("test", null))
+        assertFalse(testee.store("test", EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesGpcThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, null))
+        assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesGpcAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonObject = getJsonObjectFromFile("json/gpc.json")
+        val jsonString = FileUtilities.loadText("json/gpc.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
     }
 
     @Test
     fun whenFeatureNameMatchesGpcAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonObject = getJsonObjectFromFile("json/gpc_disabled.json")
+        val jsonString = FileUtilities.loadText("json/gpc_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
     }
 
     @Test
     fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptions() {
-        val jsonObject = getJsonObjectFromFile("json/gpc.json")
+        val jsonString = FileUtilities.loadText("json/gpc.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockGpcRepository).updateAll(ArgumentMatchers.anyList())
     }
 
-    private fun getJsonObjectFromFile(filename: String): JSONObject {
-        val json = FileUtilities.loadText(filename)
-        return JSONObject(json)
-    }
-
     companion object {
         private const val FEATURE_NAME = "gpc"
+        private const val EMPTY_JSON_STRING = "{}"
     }
 }
