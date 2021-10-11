@@ -13,6 +13,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
+    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
@@ -119,13 +120,12 @@ android {
         exclude "META-INF/LGPL2.1"
     }
 
-    def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
-    def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"
+    def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
     def propertiesFile = new File(propertiesPath)
     if (propertiesFile.exists()) {
         def props = new Properties()
         props.load(new FileInputStream(propertiesFile))
-        android.signingConfigs.release.storeFile = file("${staticConfigPath}/${props['key.store']}")
+        android.signingConfigs.release.storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
         android.signingConfigs.release.storePassword = props['key.store.password']
         android.signingConfigs.release.keyAlias = props['key.alias']
         android.signingConfigs.release.keyPassword = props['key.alias.password']

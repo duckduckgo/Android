@@ -34,3 +34,12 @@ rootProject.children.each { subproject ->
         subproject.buildFileName = "${subproject.name}-build.gradle"
     }
 }
+
+
+buildCache {
+    local {
+        enabled = true
+        directory = new File(rootDir, 'build-cache')
+        removeUnusedEntriesAfterDays = 7
+    }
+}

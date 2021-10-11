@@ -131,7 +131,7 @@ class DeviceShieldFragment : Fragment() {
         )
         val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
 
-        val textToStyle = if (trackerBlocked.otherAppsSize == 0){
+        val textToStyle = if (trackerBlocked.otherAppsSize == 0) {
             "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
         } else {
             "$prefix $totalTrackers $latestAppString $optionalOtherAppsString$pastWeekSuffix"
