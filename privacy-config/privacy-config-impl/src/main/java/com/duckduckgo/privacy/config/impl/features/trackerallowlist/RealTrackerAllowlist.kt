@@ -16,7 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -25,6 +24,7 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import java.net.URI
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,20 +44,14 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
     }
 
     private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
-        val cleanedUrl = removePortFromUrl(url)
+        val cleanedUrl = removePortFromUrl(URI.create(url))
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()
             cleanedUrl.matches(regex) && (it.domains.contains("<all>") || it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
         }
     }
 
-    private fun removePortFromUrl(url: String): String {
-        val uri = url.toUri()
-        val port = uri.port
-        return if (port != -1) {
-            url.replaceFirst(":$port", "")
-        } else {
-            url
-        }
+    private fun removePortFromUrl(uri: URI): String {
+        return URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
     }
 }

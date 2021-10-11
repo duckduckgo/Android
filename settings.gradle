@@ -19,3 +19,12 @@ project(':privacy-config-api').projectDir = new File('privacy-config/privacy-con
 project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
 project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
 include ':common-test'
+
+
+buildCache {
+    local {
+        enabled = true
+        directory = new File(rootDir, 'build-cache')
+        removeUnusedEntriesAfterDays = 7
+    }
+}

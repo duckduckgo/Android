@@ -50,3 +50,6 @@ bitrise.yml
 
 # NDK files
 **/.cxx
+
+# Local build cache
+build-cache

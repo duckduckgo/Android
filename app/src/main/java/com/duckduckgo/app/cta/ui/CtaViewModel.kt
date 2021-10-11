@@ -218,7 +218,7 @@ class CtaViewModel @Inject constructor(
     private fun surveyCta(locale: Locale): HomePanelCta.Survey? {
         val survey = activeSurvey
 
-        if (survey == null || survey.url == null) {
+        if (survey?.url == null) {
             return null
         }
 
