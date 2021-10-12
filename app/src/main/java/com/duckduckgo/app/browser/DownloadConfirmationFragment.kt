@@ -21,15 +21,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.duckduckgo.app.browser.databinding.DownloadConfirmationBinding
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -41,6 +42,8 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var filenameExtractor: FilenameExtractor
+
+    private val binding: DownloadConfirmationBinding by viewBinding()
 
     private var file: File? = null
 
@@ -72,35 +75,35 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupViews(view: View) {
-        view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, file?.name ?: "")
-        view.replace.setOnClickListener {
+        binding.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, file?.name ?: "")
+        binding.replace.setOnClickListener {
             listener.replaceExistingFile(file, pendingDownload)
             dismiss()
         }
-        view.continueDownload.setOnClickListener {
+        binding.continueDownload.setOnClickListener {
             listener.continueDownload(pendingDownload)
             dismiss()
         }
-        view.openWith.setOnClickListener {
+        binding.openWith.setOnClickListener {
             listener.openExistingFile(file)
             dismiss()
         }
-        view.cancel.setOnClickListener {
+        binding.cancel.setOnClickListener {
             Timber.i("Cancelled download for url ${pendingDownload.url}")
             listener.cancelDownload()
             dismiss()
         }
 
         if (file?.exists() == true) {
-            view.openWith.show()
-            view.replace.show()
-            view.continueDownload.text = getString(R.string.downloadConfirmationKeepBothFilesText)
-            view.continueDownload.leftDrawable(R.drawable.ic_keepboth_brownish_24dp)
+            binding.openWith.show()
+            binding.replace.show()
+            binding.continueDownload.text = getString(R.string.downloadConfirmationKeepBothFilesText)
+            binding.continueDownload.leftDrawable(R.drawable.ic_keepboth_brownish_24dp)
         } else {
-            view.openWith.gone()
-            view.replace.gone()
-            view.continueDownload.text = getString(R.string.downloadConfirmationContinue)
-            view.continueDownload.leftDrawable(R.drawable.ic_file_brownish_24dp)
+            binding.openWith.gone()
+            binding.replace.gone()
+            binding.continueDownload.text = getString(R.string.downloadConfirmationContinue)
+            binding.continueDownload.leftDrawable(R.drawable.ic_file_brownish_24dp)
         }
     }
 

@@ -34,23 +34,27 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentOnboardingDefaultBrowserBinding
+import com.duckduckgo.app.browser.databinding.IncludeDefaultBrowserButtonsBinding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
-import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class DefaultBrowserPage : OnboardingPageFragment() {
+class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    private val binding: ContentOnboardingDefaultBrowserBinding by viewBinding()
+    private val browserDefaultButtonBinding: IncludeDefaultBrowserButtonsBinding by viewBinding()
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
@@ -60,8 +64,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     private val viewModel: DefaultBrowserPageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
-
-    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -113,7 +115,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             }
             statusBarColor = Color.WHITE
         }
-        requestApplyInsets(longDescriptionContainer)
+        requestApplyInsets(binding.longDescriptionContainer)
     }
 
     private fun observeViewModel() {
@@ -155,26 +157,26 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun setUiForDialog() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
-        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        binding.defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
+        binding.browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        binding.browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        browserDefaultButtonBinding.launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
         setButtonsBehaviour()
     }
 
     private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
-        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        binding.defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        binding.browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        binding.browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        browserDefaultButtonBinding.launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
         setButtonsBehaviour()
     }
 
     private fun setButtonsBehaviour() {
-        launchSettingsButton.setOnClickListener {
+        browserDefaultButtonBinding.launchSettingsButton.setOnClickListener {
             viewModel.onDefaultBrowserClicked()
         }
-        continueButton.setOnClickListener {
+        browserDefaultButtonBinding.continueButton.setOnClickListener {
             viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
     }

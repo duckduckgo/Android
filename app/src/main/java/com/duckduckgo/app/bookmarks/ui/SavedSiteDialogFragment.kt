@@ -38,15 +38,14 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
-import kotlinx.android.synthetic.main.include_find_in_page.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
 
-    private var _binding: DialogFragmentSavedSiteBinding? = null
-    protected val binding get() = _binding!!
+    protected val binding: DialogFragmentSavedSiteBinding by viewBinding()
 
     private var initialTitle: String? = null
     private var titleState = ValidationState.UNCHANGED
@@ -80,7 +79,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
+        return inflater.inflate(R.layout.dialog_fragment_saved_site, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
             binding.savedSiteLocation.setText(name)
@@ -91,7 +94,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         initialParentFolderId = arguments?.getLong(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
         addTextWatchers()
         showKeyboard(binding.titleInput)
-        return binding.root
     }
 
     private fun addTextWatchers() {
@@ -124,11 +126,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onPause() {
         super.onPause()
         dialog?.window?.setWindowAnimations(android.R.style.Animation)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun configureUpNavigation(toolbar: Toolbar) {
