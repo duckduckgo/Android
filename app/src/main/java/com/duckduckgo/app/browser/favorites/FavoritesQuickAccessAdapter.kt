@@ -36,7 +36,6 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import kotlinx.android.synthetic.main.view_quick_access_item.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.math.absoluteValue
