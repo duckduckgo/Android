@@ -59,9 +59,8 @@ class DataUriDownloader @Inject constructor(
             val imageByteArray = Base64.decode(data, Base64.DEFAULT)
             file.writeBytes(imageByteArray)
         } catch (e: Exception) {
-            Timber.e(e, "Failed to decode data");
+            Timber.e(e, "Failed to decode data")
         }
-
     }
 
     private fun initialiseFilesOnDisk(pending: FileDownloader.PendingFileDownload, generatedFilename: GeneratedFilename): File {

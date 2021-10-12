@@ -65,7 +65,7 @@ class AndroidFileDownloader @Inject constructor(
                 else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
             }
         } catch (e: Exception) {
-            Timber.e(e, "Failed to download");
+            Timber.e(e, "Failed to download")
         }
     }
 }
