@@ -26,12 +26,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
-import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.savedSiteEmptyHint
-import kotlinx.android.synthetic.main.view_saved_site_section_title.view.savedSiteSectionTitle
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
@@ -66,16 +66,16 @@ class FavoritesAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             FAVORITE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false) as TwoLineListItem
-                return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
+                val binding = ViewSavedSiteEntryBinding.inflate(inflater, parent, false)
+                return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_section_title, parent, false)
-                return FavoritesScreenViewHolders.SectionTitle(view)
+                val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
+                return FavoritesScreenViewHolders.SectionTitle(binding)
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_empty_hint, parent, false)
-                FavoritesScreenViewHolders.EmptyHint(view)
+                val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
+                FavoritesScreenViewHolders.EmptyHint(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -116,30 +116,30 @@ class FavoritesAdapter(
 
 sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(itemView: View) : FavoritesScreenViewHolders(itemView) {
+    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : FavoritesScreenViewHolders(binding.root) {
         fun bind() {
-            itemView.savedSiteSectionTitle.setText(R.string.favoritesSectionTitle)
+            binding.savedSiteSectionTitle.setText(R.string.favoritesSectionTitle)
         }
     }
 
-    class EmptyHint(itemView: View) : FavoritesScreenViewHolders(itemView) {
+    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : FavoritesScreenViewHolders(binding.root) {
         fun bind() {
-            itemView.savedSiteEmptyHint.setText(R.string.favoritesEmptyHint)
+            binding.savedSiteEmptyHint.setText(R.string.favoritesEmptyHint)
         }
     }
 
     class FavoriteViewHolder(
         private val layoutInflater: LayoutInflater,
-        itemView: View,
+        private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) : FavoritesScreenViewHolders(itemView) {
+    ) : FavoritesScreenViewHolders(binding.root) {
 
         lateinit var favorite: Favorite
 
         fun update(favorite: Favorite) {
-            val listItem = itemView as TwoLineListItem
+            val listItem = binding.root
             this.favorite = favorite
 
             listItem.setContentDescription(
@@ -180,7 +180,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
                 onMenuItemClicked(view.findViewById(R.id.edit)) { editFavorite(favorite) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteFavorite(favorite) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.show(binding.root, anchor)
         }
 
         private fun editFavorite(favorite: Favorite) {
