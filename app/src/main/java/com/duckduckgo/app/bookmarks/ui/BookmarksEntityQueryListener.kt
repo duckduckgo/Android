@@ -20,6 +20,7 @@ import androidx.appcompat.widget.SearchView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
+import java.util.*
 
 class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
@@ -43,17 +44,17 @@ class BookmarksEntityQueryListener(
     }
 
     private fun filterBookmarks(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
-        val lowercaseQuery = query.toLowerCase()
+        val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarks.filter {
-            val lowercaseTitle = it.title.toLowerCase()
+            val lowercaseTitle = it.title.lowercase(Locale.getDefault())
             lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
         }.map { BookmarksAdapter.BookmarkItem(it) }
     }
 
     private fun filterBookmarkFolders(query: String, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
-        val lowercaseQuery = query.toLowerCase()
+        val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarkFolders.filter {
-            val lowercaseTitle = it.name.toLowerCase()
+            val lowercaseTitle = it.name.lowercase(Locale.getDefault())
             lowercaseTitle.contains(lowercaseQuery)
         }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
     }
