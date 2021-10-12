@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
+import timber.log.Timber
 
 interface FileDownloader {
 
