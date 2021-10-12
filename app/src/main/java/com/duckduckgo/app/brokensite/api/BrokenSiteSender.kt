@@ -53,7 +53,7 @@ class BrokenSiteSubmitter(
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,
-                UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
+                UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
                 ATB_KEY to atbWithVariant(),
@@ -83,7 +83,7 @@ class BrokenSiteSubmitter(
     companion object {
         private const val CATEGORY_KEY = "category"
         private const val SITE_URL_KEY = "siteUrl"
-        private const val UPDGRADED_HTTPS_KEY = "upgradedHttps"
+        private const val UPGRADED_HTTPS_KEY = "upgradedHttps"
         private const val TDS_ETAG_KEY = "tds"
         private const val BLOCKED_TRACKERS_KEY = "blockedTrackers"
         private const val SURROGATES_KEY = "surrogates"
