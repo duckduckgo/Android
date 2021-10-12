@@ -1,8 +1,16 @@
 {
   "rules": [
     {
+      "rule": "tt.omtrdc.net",
+      "packageNames": [
+        "com.coppi.bestbuy"
+      ]
+    },
+    {
       "rule": "api2.branch.io",
       "packageNames": [
+        "com.airbnb.android",
+        "com.deliveroo.orderapp",
         "com.glovo",
         "com.imdb.mobile",
         "com.marriott.mrt",
@@ -79,6 +87,7 @@
     {
       "rule": "v.fwmrm.net",
       "packageNames": [
+        "com.cnn.mobile.android.phone",
         "com.crunchyroll.crunchyroid"
       ]
     },
@@ -86,6 +95,12 @@
       "rule": "www.facebook.com",
       "packageNames": [
         "com.chefsteps.circulator"
+      ]
+    },
+    {
+      "rule": "www.instagram.com",
+      "packageNames": [
+        "com.timehop"
       ]
     }
   ]

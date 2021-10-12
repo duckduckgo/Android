@@ -38,6 +38,7 @@
     "com.duckduckgo.mobile.android.vpn.debug",
     "com.android.chrome",
     "org.mozilla.firefox",
+    "org.mozilla.focus",
     "com.opera.browser",
     "com.microsoft.emmx",
     "com.brave.browser",
