@@ -28,7 +28,7 @@ class AppVersionCollector @Inject constructor() : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "appInfo"
 
-    override suspend fun collectVpnRelatedState(): JSONObject {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             put("appVersion", BuildConfig.VERSION_NAME)
         }

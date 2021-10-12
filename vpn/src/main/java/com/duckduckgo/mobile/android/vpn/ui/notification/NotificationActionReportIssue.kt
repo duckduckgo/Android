@@ -22,13 +22,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.duckduckgo.mobile.android.vpn.R
-import dummy.ui.VpnControllerActivity
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity
 
 class NotificationActionReportIssue {
 
     companion object {
         fun reportIssueNotificationAction(context: Context): NotificationCompat.Action {
-            val launchIntent = Intent(Intent.ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL).also {
+            val launchIntent = ReportBreakageAppListActivity.intent(context).also {
                 it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             return NotificationCompat.Action(

@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.state
+package com.duckduckgo.mobile.android.vpn.breakage
 
-import org.json.JSONObject
+data class InstalledApp(
+    val packageName: String,
+    val name: String,
+    val isSelected: Boolean = false
+)
 
-interface VpnStateCollector {
-    /**
-     * Collects information about the VPN internal state
-     *
-     * @return returns a map that contains the information that relates to VPN state
-     */
-    suspend fun collectVpnState(appPackageId: String? = null): JSONObject
+object ReportBreakageAppListView {
+    data class State(
+        val installedApps: List<InstalledApp>,
+        val canSubmit: Boolean,
+    )
+
+    sealed class Command {
+        data class LaunchBreakageForm(val selectedApp: InstalledApp) : Command()
+        data class SendBreakageInfo(val issueReport: IssueReport) : Command()
+    }
 }

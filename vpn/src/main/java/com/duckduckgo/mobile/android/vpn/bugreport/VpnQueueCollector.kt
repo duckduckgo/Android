@@ -33,7 +33,7 @@ class VpnQueueCollector @Inject constructor(
     override val collectorName: String
         get() = "VpnQueues"
 
-    override suspend fun collectVpnRelatedState(): JSONObject {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             put("vpnQueueSizes", queueSizeData())
             put("vpnQueueActivity", queueTimingData())

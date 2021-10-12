@@ -37,7 +37,7 @@ class VpnServiceStateCollector @Inject constructor(
     override val collectorName: String
         get() = "vpnServiceState"
 
-    override suspend fun collectVpnRelatedState(): JSONObject {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         val state = JSONObject()
 
         // VPN on/off state
@@ -55,17 +55,10 @@ class VpnServiceStateCollector @Inject constructor(
 
         // VPN open connections per app
         val tcbs = TCB.copyTCBs()
-        val appConnectionState = JSONObject()
-        tcbs
+        val tcpConnections = tcbs
             .filterNot { it.requestingAppPackage.isNullOrBlank() }
-            .groupBy { it.requestingAppPackage }
-            .toList().sortedByDescending { it.second.size }.toMap()
-            .forEach { entry ->
-                val app = entry.key
-                val openConnections = entry.value.size
-                appConnectionState.put(app, openConnections.toString())
-            }
-        state.put("activeTcpConnections", appConnectionState)
+            .size
+        state.put("activeTcpConnections", tcpConnections)
 
         // VPN up time
         state.put("upTimeInMillis", vpnUptimeRecorder.getVpnUpTime())

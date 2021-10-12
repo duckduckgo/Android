@@ -163,6 +163,26 @@
     <string name="atp_ExcludeAppsRestoreDefaultsMessage">Your custom protection settings will update to our latest default protections. You can always change your protection settings again later.</string>
     <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Protection restored to default settings</string>
 
+    <!--  Breakage report app list  -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Report an issue</string>
+    <string name="atp_ReportBreakageAppFeature">Select the app experiencing the issue. Your feedback really help us improve.\n\nHave general feedback about App Tracking Protection? Use <annotation type="use_this_form_link">this form</annotation> instead.</string>
+    <string name="atp_ReportBreakageAppEntry">%s app</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Submit</string>
+    <string name="atp_ReportBreakageAppNextCta">Next</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what happened, what you expected, and what steps led to the issue.</string>
+    <string name="atp_ReportBreakageFormWhereYouLoggedInText">Were you logged in to the app when you noticed the issue?</string>
+    <string name="atp_ReportBreakageChoiceLoggedIn">Yes, I was logged in to the app</string>
+    <string name="atp_ReportBreakageChoiceProblemWhenLogin">The problem happened when loggin in</string>
+    <string name="atp_ReportBreakageChoiceProblemCreatingAccount">I had a problem creating a new account</string>
+    <string name="atp_ReportBreakageChoiceNoLogging">The app doesn\’t require log in</string>
+    <string name="atp_ReportBreakageChoiceHeadingText">Were you logged in to the app when you noticed the issue?</string>
+    <string name="atp_ReportBreakageFormInputHint">Describe what happened (optional)</string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+        <![CDATA[Submissions are 100% anonymous and in addition to the details entered into this form, the report will contain:<br/>&#8226; The app name<br/>&#8226; A list of trackers blocked in the current app<br/>&#8226; Whether whole device tracker blocking is enabled<br/>&#8226; Version information for DuckDuckGo\'s app and blocklist<br/>&#8226; Aggregate performance statistics about DuckDuckGo\'s app<br/>]]>
+    </string>
+    <string name="atp_ReportBreakageSent">Report sent, thanks! Your feedback helps us improve App Tracking Protection for everyone.</string>
+    <string name="atp_ThanksForTheFeedback">Thanks for the feedback!</string>
+
     <!--  Tracker Profiling Info -->
     <string name="atp_ProfilingActivityTitle">About App Trackers</string>
     <string name="atp_ProfilingInfoTitle">What are app trackers?</string>

@@ -24,19 +24,21 @@ import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ExcludedAppsViewModel
-import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.apps.ViewState
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
-import dummy.ui.VpnControllerActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
@@ -54,17 +56,25 @@ class TrackingProtectionExclusionListActivity :
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
+    private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
+
     private val viewModel: ExcludedAppsViewModel by bindViewModel()
 
     lateinit var adapter: TrackingProtectionAppsAdapter
 
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
 
+    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) { result ->
+        if (!result.isEmpty()) {
+            Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_tracking_protection_exclusion_list)
-        setupToolbar(findViewById(R.id.default_toolbar))
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.defaultToolbar)
         setupRecycler()
 
         bindViews()
@@ -113,7 +123,7 @@ class TrackingProtectionExclusionListActivity :
             }
         })
 
-        val recyclerView = findViewById<RecyclerView>(R.id.excludedAppsRecycler)
+        val recyclerView = binding.excludedAppsRecycler
         recyclerView.adapter = adapter
     }
 
@@ -140,7 +150,7 @@ class TrackingProtectionExclusionListActivity :
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(command.excludingReason)
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(command.excludingReason, command.position)
-            is Command.LaunchFeedback -> startActivity(Intent(Intent.ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL))
+            is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
         }
     }
 

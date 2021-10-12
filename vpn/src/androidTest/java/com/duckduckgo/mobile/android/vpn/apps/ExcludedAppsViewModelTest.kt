@@ -17,15 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.apps
 
 import app.cash.turbine.test
-import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -37,7 +37,8 @@ import kotlin.time.ExperimentalTime
 class ExcludedAppsViewModelTest {
 
     @get:Rule
-    var coroutineRule = VpnCoroutineTestRule()
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
@@ -70,7 +71,7 @@ class ExcludedAppsViewModelTest {
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
             verify(deviceShieldPixels).disableAppProtection(packageName, ManuallyDisableAppProtectionDialog.STOPPED_WORKING)
 
-            Assert.assertEquals(Command.LaunchFeedback, expectItem())
+            Assert.assertEquals(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm("com.package.name")), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }

@@ -26,6 +26,6 @@ import org.json.JSONObject
  * to be sent, eg. user unprotects an app or reports breakage.
  */
 interface VpnStateCollectorPlugin {
-    suspend fun collectVpnRelatedState(): JSONObject
+    suspend fun collectVpnRelatedState(appPackageId: String? = null): JSONObject
     val collectorName: String
 }

@@ -32,7 +32,6 @@ import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
@@ -44,13 +43,18 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
 import kotlinx.coroutines.flow.collect
@@ -68,6 +72,8 @@ class DeviceShieldTrackerActivity :
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
+    private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var trackerBlockedCountView: PastWeekTrackerActivityContentView
     private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
@@ -90,11 +96,17 @@ class DeviceShieldTrackerActivity :
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
 
+    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
+        if (!it.isEmpty()) {
+            Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_device_shield_activity)
-        setupToolbar(findViewById(R.id.trackers_toolbar))
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.trackersToolbar)
 
         bindViews()
         showDeviceShieldActivity()
@@ -104,26 +116,26 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun bindViews() {
-        trackerBlockedCountView = findViewById(R.id.trackers_blocked_count)
-        trackingAppsCountView = findViewById(R.id.tracking_apps_count)
-        ctaTrackerFaq = findViewById(R.id.cta_tracker_faq)
-        deviceShieldEnabledLabel = findViewById(R.id.deviceShieldTrackerLabelEnabled)
-        deviceShieldDisabledLabel = findViewById(R.id.deviceShieldTrackerLabelDisabled)
-        ctaShowAll = findViewById(R.id.cta_show_all)
+        trackerBlockedCountView = binding.trackersBlockedCount
+        trackingAppsCountView = binding.trackingAppsCount
+        ctaTrackerFaq = binding.ctaTrackerFaq
+        deviceShieldEnabledLabel = binding.deviceShieldTrackerLabelEnabled
+        deviceShieldDisabledLabel = binding.deviceShieldTrackerLabelDisabled
+        ctaShowAll = binding.ctaShowAll
 
-        findViewById<Button>(R.id.cta_excluded_apps).setOnClickListener {
+        binding.ctaExcludedApps.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
         }
 
-        findViewById<Button>(R.id.cta_tracker_faq).setOnClickListener {
+        binding.ctaTrackerFaq.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
         }
 
-        findViewById<Button>(R.id.cta_beta_instructions).setOnClickListener {
+        binding.ctaBetaInstructions.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
         }
 
-        findViewById<Button>(R.id.cta_what_are_app_trackers).setOnClickListener {
+        binding.ctaWhatAreAppTrackers.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
         }
 
@@ -386,7 +398,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchFeedback() {
-        startActivity(Intent(Intent.ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL))
+        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 
     private sealed class VpnPermissionStatus {

@@ -113,6 +113,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     APP_EXCLUSION_ENABLE_APP("m_apptb_ae_e"),
     APP_EXCLUSION_RESTORE_PROTECTION_LIST("m_apptb_ae_rp"),
     APP_EXCLUSION_LAUNCH_FEEDBACK("m_apptb_ae_lf"),
+
+    ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
     ;
 }
 

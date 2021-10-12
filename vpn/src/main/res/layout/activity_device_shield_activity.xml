@@ -24,7 +24,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity">
 
-    <include layout="@layout/include_trackers_toolbar" />
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_trackers_toolbar" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

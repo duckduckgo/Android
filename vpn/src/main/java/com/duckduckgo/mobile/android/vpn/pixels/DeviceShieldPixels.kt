@@ -238,6 +238,11 @@ interface DeviceShieldPixels {
 
     /** Will fire when the user restores to the default protection list */
     fun launchAppTPFeedback()
+
+    /**
+     * Will fire when the user reports an app breakage
+     */
+    fun sendAppBreakageReport(metadata: Map<String, String>)
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -488,6 +493,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun launchAppTPFeedback() {
         firePixel(DeviceShieldPixelNames.APP_EXCLUSION_LAUNCH_FEEDBACK)
+    }
+
+    override fun sendAppBreakageReport(metadata: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
     }
 
     private fun suddenKill() {

@@ -40,10 +40,11 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
     override val collectorName: String
         get() = "trackersBlockedLastDay"
 
-    override suspend fun collectVpnRelatedState(): JSONObject {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return withContext(dispatcherProvider.io()) {
             val result = mutableMapOf<String, List<String>>()
             vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(dateOfLastDay(), noEndDate())
+                .filter { tracker -> appPackageId?.let { tracker.trackingApp.packageId == it } ?: true }
                 .groupBy { it.trackingApp.packageId }
                 .mapValues { entry -> entry.value.map { it.domain } }
                 .onEach {

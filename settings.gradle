@@ -38,6 +38,7 @@ rootProject.children.each { subproject ->
 
 buildCache {
     local {
+        // configure local build cache directory so that it is local to the project dir
         enabled = true
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7

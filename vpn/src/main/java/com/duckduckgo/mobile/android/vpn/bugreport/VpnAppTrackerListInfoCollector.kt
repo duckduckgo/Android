@@ -31,7 +31,7 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
     override val collectorName: String
         get() = "vpnTrackerLists"
 
-    override suspend fun collectVpnRelatedState(): JSONObject {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             put(APP_TRACKER_BLOCKLIST, vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag.orEmpty())
             put(APP_EXCLUSION_LIST, vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag.orEmpty())

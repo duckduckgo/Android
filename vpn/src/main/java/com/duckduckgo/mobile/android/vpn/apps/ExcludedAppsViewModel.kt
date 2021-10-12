@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
@@ -53,7 +54,7 @@ class ExcludedAppsViewModel(
         viewModelScope.launch {
             excludedApps.manuallyExcludedApp(packageName)
             if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING) {
-                command.send(Command.LaunchFeedback)
+                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(packageName)))
             }
         }
     }
@@ -125,7 +126,7 @@ class ExcludedAppsViewModel(
     fun launchFeedback() {
         pixel.launchAppTPFeedback()
         viewModelScope.launch {
-            command.send(Command.LaunchFeedback)
+            command.send(Command.LaunchFeedback(ReportBreakageScreen.ListOfInstalledApps))
         }
     }
 }
@@ -133,10 +134,8 @@ class ExcludedAppsViewModel(
 internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
 internal sealed class Command {
     object RestartVpn : Command()
-    object LaunchFeedback : Command()
-    data class ShowEnableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) :
-        Command()
-
+    data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
+    data class ShowEnableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) : Command()
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
 }
 

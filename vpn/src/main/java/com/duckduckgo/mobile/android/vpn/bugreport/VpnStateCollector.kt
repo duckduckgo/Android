@@ -39,13 +39,13 @@ class RealVpnStateCollector @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateCollector {
 
-    override suspend fun collectVpnState(): JSONObject {
+    override suspend fun collectVpnState(appPackageId: String?): JSONObject {
         return withContext(dispatcherProvider.io()) {
             val vpnState = JSONObject()
             // other VPN metrics
             vpnStateCollectors.getPlugins().forEach {
                 Timber.v("collectVpnState from ${it.collectorName}")
-                vpnState.put(it.collectorName, it.collectVpnRelatedState())
+                vpnState.put(it.collectorName, it.collectVpnRelatedState(appPackageId))
             }
 
             return@withContext vpnState

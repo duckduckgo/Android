@@ -52,6 +52,4 @@ bitrise.yml
 **/.cxx
 app/play/release/output-metadata.json
 
-
-# Local build cache
 build-cache
