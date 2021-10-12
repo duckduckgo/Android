@@ -22,6 +22,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 
 class SystemLocationPermissionDialog : DialogFragment() {
@@ -38,19 +39,17 @@ class SystemLocationPermissionDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
 
-        val rootView = layoutInflater.inflate(R.layout.content_system_location_permission_dialog, null)
+        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
-        val subtitle = rootView.findViewById<TextView>(R.id.systemPermissionDialogSubtitle)
-        val allowLocationPermission = rootView.findViewById<TextView>(R.id.allowLocationPermission)
-        val denyLocationPermission = rootView.findViewById<TextView>(R.id.denyLocationPermission)
-        val neverAllowLocationPermission = rootView.findViewById<TextView>(R.id.neverAllowLocationPermission)
-
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+        val alertBuilder = AlertDialog.Builder(requireActivity()).setView(binding.root)
 
         validateBundleArguments()
-        populateSubtitle(subtitle)
-        configureListeners(allowLocationPermission, denyLocationPermission, neverAllowLocationPermission)
+        populateSubtitle(binding.systemPermissionDialogSubtitle)
+        configureListeners(
+            binding.allowLocationPermission,
+            binding.denyLocationPermission,
+            binding.neverAllowLocationPermission
+        )
 
         return alertBuilder.create()
     }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,9 +28,8 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.view_bookmark_folder_entry.view.*
-import kotlinx.android.synthetic.main.view_saved_site_entry.view.*
-import kotlinx.android.synthetic.main.view_saved_site_section_title.view.*
+import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
@@ -64,12 +64,12 @@ class BookmarkFoldersAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_FOLDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_bookmark_folder_entry, parent, false)
-                BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, view, viewModel)
+                val binding = ViewBookmarkFolderEntryBinding.inflate(inflater, parent, false)
+                BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, binding, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_section_title, parent, false)
-                BookmarkFolderScreenViewHolders.SectionTitle(view)
+                val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
+                BookmarkFolderScreenViewHolders.SectionTitle(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -98,41 +98,43 @@ class BookmarkFoldersAdapter(
 
 sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(itemView: View) : BookmarkFolderScreenViewHolders(itemView) {
+    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : BookmarkFolderScreenViewHolders(binding.root) {
         fun bind() {
-            itemView.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
+            binding.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
         }
     }
 
     class BookmarkFoldersViewHolder(
         private val layoutInflater: LayoutInflater,
-        itemView: View,
+        private val binding: ViewBookmarkFolderEntryBinding,
         private val viewModel: BookmarksViewModel
-    ) : BookmarkFolderScreenViewHolders(itemView) {
+    ) : BookmarkFolderScreenViewHolders(binding.root) {
+
+        private val context: Context = binding.root.context
 
         fun update(bookmarkFolder: BookmarkFolder) {
-            itemView.overflowMenu.contentDescription = itemView.context.getString(
+            binding.overflowMenu.contentDescription = context.getString(
                 R.string.bookmarkOverflowContentDescription,
                 bookmarkFolder.name
             )
 
-            itemView.title.text = bookmarkFolder.name
+            binding.title.text = bookmarkFolder.name
 
             val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
 
             if (totalItems == 0) {
-                itemView.subtitle.text = itemView.context.getString(R.string.bookmarkFolderEmpty)
+                binding.subtitle.text = context.getString(R.string.bookmarkFolderEmpty)
             } else {
-                itemView.subtitle.text = itemView.context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+                binding.subtitle.text = context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
 
-            itemView.icon.setImageResource(R.drawable.ic_folder)
+            binding.icon.setImageResource(R.drawable.ic_folder)
 
-            itemView.overflowMenu.setOnClickListener {
-                showOverFlowMenu(itemView.overflowMenu, bookmarkFolder)
+            binding.overflowMenu.setOnClickListener {
+                showOverFlowMenu(binding.overflowMenu, bookmarkFolder)
             }
 
-            itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 viewModel.onBookmarkFolderSelected(bookmarkFolder)
             }
         }
@@ -144,7 +146,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
                 onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmarkFolder(bookmarkFolder) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmarkFolder(bookmarkFolder) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.show(binding.root, anchor)
         }
 
         private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
