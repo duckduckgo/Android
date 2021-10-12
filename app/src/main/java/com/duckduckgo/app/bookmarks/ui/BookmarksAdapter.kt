@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -111,11 +112,13 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val faviconManager: FaviconManager
     ) : BookmarkScreenViewHolders(binding.root) {
 
+        private val context: Context = binding.root.context
+
         fun update(bookmark: SavedSite.Bookmark) {
             val twoListItem = binding.root
 
             twoListItem.setContentDescription(
-                itemView.context.getString(
+                context.getString(
                     R.string.bookmarkOverflowContentDescription,
                     bookmark.title
                 )

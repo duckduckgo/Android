@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -136,6 +137,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val faviconManager: FaviconManager
     ) : FavoritesScreenViewHolders(binding.root) {
 
+        private val context: Context = binding.root.context
         lateinit var favorite: Favorite
 
         fun update(favorite: Favorite) {
@@ -143,7 +145,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             this.favorite = favorite
 
             listItem.setContentDescription(
-                itemView.context.getString(
+                context.getString(
                     R.string.bookmarkOverflowContentDescription,
                     favorite.title
                 )
