@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.UriString
 import javax.inject.Inject
 
 interface AppLinksHandler {
-    fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean
+    fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean
     fun updatePreviousUrl(urlString: String?)
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
@@ -30,27 +30,27 @@ interface AppLinksHandler {
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null
-    var userQuery = false
+    var isAUserQuery = false
 
-    override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldOverride: Boolean, launchAppLink: () -> Unit): Boolean {
+    override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !appLinksEnabled) {
+        if (!appLinksEnabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !isForMainFrame) {
             return false
         }
 
-        if (!isForMainFrame ||
-            previousUrl != null && UriString.sameOrSubdomain(previousUrl!!, urlString) ||
-            previousUrl != null && UriString.sameOrSubdomain(urlString, previousUrl!!)
-        ) {
-            if (userQuery) {
-                previousUrl = urlString
-                launchAppLink()
+        previousUrl?.let {
+            if (UriString.sameOrSubdomain(it, urlString) || UriString.sameOrSubdomain(urlString, it)) {
+                if (isAUserQuery) {
+                    previousUrl = urlString
+                    launchAppLink()
+                }
+                return false
             }
-            return false
         }
+
         previousUrl = urlString
         launchAppLink()
-        return shouldOverride
+        return shouldHaltWebNavigation
     }
 
     override fun updatePreviousUrl(urlString: String?) {
@@ -58,10 +58,10 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
     }
 
     override fun setUserQueryState(state: Boolean) {
-        userQuery = state
+        isAUserQuery = state
     }
 
     override fun isUserQuery(): Boolean {
-        return userQuery
+        return isAUserQuery
     }
 }

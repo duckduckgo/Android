@@ -1152,7 +1152,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnteringAppLinkQueryAndShouldShowAppLinksPromptThenNavigateInBrowserAndClearPreviousUrl() {
+    fun whenEnteringAppLinkQueryAndShouldShowAppLinksPromptThenNavigateInBrowserAndSetPreviousUrlToNull() {
         whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
@@ -3382,7 +3382,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndResetUserQueryState() {
+    fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
@@ -3394,7 +3394,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndResetUserQueryState() {
+    fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
@@ -3560,14 +3560,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageChangedThenUpdateCachedUrlAndResetUserQueryState() {
+    fun whenPageChangedThenUpdatePreviousUrlAndUserQueryStateSetToFalse() {
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         verify(mockAppLinksHandler).updatePreviousUrl("www.example.com")
         verify(mockAppLinksHandler).setUserQueryState(false)
     }
 
     @Test
-    fun whenPageChangedAndIsAppLinkThenUpdateCachedAppLink() {
+    fun whenPageChangedAndIsAppLinkThenUpdatePreviousAppLink() {
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = "www.example.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(appLink)
         loadUrl(url = "www.example.com", isBrowserShowing = true)
@@ -3575,10 +3575,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageChangedAndIsNotAppLinkThenClearCachedAppLink() {
+    fun whenPageChangedAndIsNotAppLinkThenSetPreviousAppLinkToNull() {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("www.example.com"))
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         assertNull(browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenOpenAppLinkThenOpenPreviousAppLink() {
+        testee.browserViewState.value = browserViewState().copy(previousAppLink = SpecialUrlDetector.UrlType.AppLink(uriString = "example.com"))
+        testee.openAppLink()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenOpenAppLinkAndPreviousAppLinkIsNullThenDoNotOpenAppLink() {
+        testee.openAppLink()
+        assertCommandNotIssued<Command.OpenAppLink>()
     }
 
     private fun givenUrlCanUseGpc() {

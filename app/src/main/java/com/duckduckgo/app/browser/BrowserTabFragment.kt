@@ -550,7 +550,7 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        viewModel.clearCachedAppLink()
+        viewModel.clearPreviousAppLink()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newTabLayout.show()
@@ -892,7 +892,7 @@ class BrowserTabFragment :
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
             startActivity(chooserIntent)
         }
-        viewModel.clearCachedUrl()
+        viewModel.clearPreviousUrl()
     }
 
     private fun dismissAppLinkSnackBar() {
@@ -1488,6 +1488,7 @@ class BrowserTabFragment :
     }
 
     override fun onDestroy() {
+        dismissAppLinkSnackBar()
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
@@ -1843,9 +1844,7 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
-                    viewModel.browserViewState.value?.previousAppLink?.let {
-                        openAppLink(it)
-                    }
+                    viewModel.openAppLink()
                 }
             }
             browserMenu.setOnClickListener {

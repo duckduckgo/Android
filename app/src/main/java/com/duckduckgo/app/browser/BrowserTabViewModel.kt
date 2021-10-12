@@ -624,7 +624,7 @@ class BrowserTabViewModel(
                 appLinksHandler.updatePreviousUrl(urlToNavigate)
                 appLinksHandler.setUserQueryState(true)
             } else {
-                clearCachedUrl()
+                clearPreviousUrl()
             }
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
@@ -941,9 +941,9 @@ class BrowserTabViewModel(
     private fun cacheAppLink(url: String?) {
         val urlType = specialUrlDetector.determineType(url)
         if (urlType is AppLink) {
-            updateCachedAppLink(urlType)
+            updatePreviousAppLink(urlType)
         } else {
-            clearCachedAppLink()
+            clearPreviousAppLink()
         }
     }
 
@@ -1923,17 +1923,23 @@ class BrowserTabViewModel(
         ) { appLinkClicked(appLink) }
     }
 
-    fun clearCachedUrl() {
+    fun openAppLink() {
+        browserViewState.value?.previousAppLink?.let { appLink ->
+            command.value = OpenAppLink(appLink)
+        }
+    }
+
+    fun clearPreviousUrl() {
         appLinksHandler.updatePreviousUrl(null)
     }
 
-    fun clearCachedAppLink() {
+    fun clearPreviousAppLink() {
         browserViewState.value = currentBrowserViewState().copy(
             previousAppLink = null
         )
     }
 
-    private fun updateCachedAppLink(appLink: AppLink) {
+    private fun updatePreviousAppLink(appLink: AppLink) {
         browserViewState.value = currentBrowserViewState().copy(
             previousAppLink = appLink
         )
