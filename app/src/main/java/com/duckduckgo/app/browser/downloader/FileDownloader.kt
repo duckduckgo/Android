@@ -58,10 +58,14 @@ class AndroidFileDownloader @Inject constructor(
 
     @WorkerThread
     override fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
-        when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
-            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
+        try {
+            when {
+                pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
+                pending.isDataUrl -> dataUriDownloader.download(pending, callback)
+                else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to download");
         }
     }
 }
