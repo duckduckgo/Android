@@ -151,7 +151,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmark(bookmark) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmark(bookmark) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.show(binding.root, anchor)
         }
 
         private fun editBookmark(bookmark: SavedSite.Bookmark) {
