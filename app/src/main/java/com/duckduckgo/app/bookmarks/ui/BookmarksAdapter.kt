@@ -26,11 +26,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
-import kotlinx.android.synthetic.main.view_saved_site_empty_hint.view.*
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(
@@ -65,12 +65,12 @@ class BookmarksAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_entry, parent, false)
-                return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, view, viewModel, lifecycleOwner, faviconManager)
+                val binding = ViewSavedSiteEntryBinding.inflate(inflater, parent, false)
+                return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_saved_site_empty_hint, parent, false)
-                BookmarkScreenViewHolders.EmptyHint(view)
+                val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
+                BookmarkScreenViewHolders.EmptyHint(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -97,22 +97,22 @@ class BookmarksAdapter(
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class EmptyHint(itemView: View) : BookmarkScreenViewHolders(itemView) {
+    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : BookmarkScreenViewHolders(binding.root) {
         fun bind() {
-            itemView.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
+            binding.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
         }
     }
 
     class BookmarksViewHolder(
         private val layoutInflater: LayoutInflater,
-        itemView: View,
+        private val binding: ViewSavedSiteEntryBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) : BookmarkScreenViewHolders(itemView) {
+    ) : BookmarkScreenViewHolders(binding.root) {
 
         fun update(bookmark: SavedSite.Bookmark) {
-            val twoListItem = itemView as TwoLineListItem
+            val twoListItem = binding.root
 
             twoListItem.setContentDescription(
                 itemView.context.getString(
