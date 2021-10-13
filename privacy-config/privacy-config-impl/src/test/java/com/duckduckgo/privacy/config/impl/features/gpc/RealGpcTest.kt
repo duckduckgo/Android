@@ -19,6 +19,8 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 import android.content.Context
 import android.content.res.Resources
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -31,14 +33,22 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.ByteArrayInputStream
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class RealGpcTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
@@ -80,7 +90,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsInExceptionsThenReturnEmptyMap() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         val result = testee.getHeaders(EXCEPTION_URL)
@@ -89,7 +99,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsNotInExceptionsThenReturnMapWithHeaders() {
+    fun whenGetHeadersIfFeatureAndGpcAreEnabledAndUrlIsNotInExceptionsThenReturnMapWithHeaders() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         val result = testee.getHeaders("test.com")
@@ -99,7 +109,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() = coroutinesTestRule.runBlocking {
         givenFeatureIsEnabledButGpcIsNot()
 
         val result = testee.getHeaders("test.com")
@@ -108,7 +118,7 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenGetHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() {
+    fun whenGetHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndUrlIsNotInExceptionsThenReturnEmptyMap() = coroutinesTestRule.runBlocking {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         val result = testee.getHeaders("test.com")
@@ -117,35 +127,35 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInExceptionsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInExceptionsThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders(EXCEPTION_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListsAndHeaderAlreadyExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListsAndHeaderAlreadyExistsThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, mapOf(GPC_HEADER to GPC_HEADER_VALUE)))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnTrue() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnTrue() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertTrue(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInNotInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInNotInConsumersListAndHeaderDoNotExistsThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders("test.com", emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() = coroutinesTestRule.runBlocking {
         whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(VALID_CONSUMER_URL)))
         givenFeatureAndGpcAreEnabled()
 
@@ -153,66 +163,66 @@ class RealGpcTest {
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureIsNotEnabledAndGpcIsEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanUrlAddHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() {
+    fun whenCanUrlAddHeadersIfFeatureIsEnabledAndGpcIsNotEnabledAndAndUrlIsInConsumersListAndHeaderDoNotExistsThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureIsEnabledButGpcIsNot()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsNotAnExceptionThenReturnTrue() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsNotAnExceptionThenReturnTrue() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertTrue(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsAnExceptionThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canGpcBeUsedByUrl(EXCEPTION_URL))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureIsEnabledAndGpcIsNotEnabledAnUrlIsNotAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureIsEnabledAndGpcIsNotEnabledAnUrlIsNotAnExceptionThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureIsEnabledButGpcIsNot()
 
         assertFalse(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureIsNotEnabledAndGpcIsEnabledAnUrlIsNotAnExceptionThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureIsNotEnabledAndGpcIsEnabledAnUrlIsNotAnExceptionThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureIsNotEnabledButGpcIsEnabled()
 
         assertFalse(testee.canGpcBeUsedByUrl("test.com"))
     }
 
     @Test
-    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsInUnprotectedTemporaryThenReturnFalse() {
+    fun whenCanGpcBeUsedByUrlIfFeatureAndGpcAreEnabledAnUrlIsInUnprotectedTemporaryThenReturnFalse() = coroutinesTestRule.runBlocking {
         givenFeatureAndGpcAreEnabled()
         whenever(mockUnprotectedTemporary.isAnException(VALID_CONSUMER_URL)).thenReturn(true)
 
         assertFalse(testee.canGpcBeUsedByUrl(VALID_CONSUMER_URL))
     }
 
-    private fun givenFeatureAndGpcAreEnabled() {
+    private suspend fun givenFeatureAndGpcAreEnabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }
 
-    private fun givenFeatureIsEnabledButGpcIsNot() {
+    private suspend fun givenFeatureIsEnabledButGpcIsNot() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
     }
 
-    private fun givenFeatureIsNotEnabledButGpcIsEnabled() {
+    private suspend fun givenFeatureIsNotEnabledButGpcIsEnabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(false)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }
