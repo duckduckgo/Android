@@ -34,7 +34,7 @@ import javax.inject.Singleton
 @Singleton
 class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
 
-    override fun isAnException(documentURL: String, url: String): Boolean {
+    override suspend fun isAnException(documentURL: String, url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }

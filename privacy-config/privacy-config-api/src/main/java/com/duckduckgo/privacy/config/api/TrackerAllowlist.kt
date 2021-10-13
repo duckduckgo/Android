@@ -25,5 +25,5 @@ interface TrackerAllowlist {
      * and [documentURL] match the rules in the allowlist.
      * @return `true` if the given [url] and [documentURL] match the rules in the allowlist
      */
-    fun isAnException(documentURL: String, url: String): Boolean
+    suspend fun isAnException(documentURL: String, url: String): Boolean
 }

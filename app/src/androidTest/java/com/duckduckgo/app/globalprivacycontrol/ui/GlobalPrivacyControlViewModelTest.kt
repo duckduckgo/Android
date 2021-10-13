@@ -18,9 +18,11 @@ package com.duckduckgo.app.globalprivacycontrol.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel.Companion.LEARN_MORE_URL
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -28,6 +30,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -35,6 +38,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 
+@ExperimentalCoroutinesApi
 class GlobalPrivacyControlViewModelTest {
 
     @get:Rule
@@ -42,6 +46,10 @@ class GlobalPrivacyControlViewModelTest {
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val mockPixel: Pixel = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
@@ -66,7 +74,8 @@ class GlobalPrivacyControlViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
+    fun whenViewModelCreateThenInitialisedWithDefaultViewState() = coroutineRule.runBlocking {
+        testee.initialise()
         val defaultViewState = GlobalPrivacyControlViewModel.ViewState()
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertEquals(defaultViewState, viewStateCaptor.value)
@@ -74,6 +83,7 @@ class GlobalPrivacyControlViewModelTest {
 
     @Test
     fun whenViewModelCreateThenPixelSent() {
+        testee.initialise()
         verify(mockPixel).fire(AppPixelName.SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
@@ -116,7 +126,8 @@ class GlobalPrivacyControlViewModelTest {
     }
 
     @Test
-    fun whenOnUserToggleGlobalPrivacyControlSwitchedOnThenViewStateUpdatedToTrue() {
+    fun whenOnUserToggleGlobalPrivacyControlSwitchedOnThenViewStateUpdatedToTrue() = coroutineRule.runBlocking {
+        testee.initialise()
         testee.onUserToggleGlobalPrivacyControl(true)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
@@ -124,7 +135,8 @@ class GlobalPrivacyControlViewModelTest {
     }
 
     @Test
-    fun whenOnUserToggleGlobalPrivacyControlSwitchedOnThenViewStateUpdatedToFalse() {
+    fun whenOnUserToggleGlobalPrivacyControlSwitchedOnThenViewStateUpdatedToFalse() = coroutineRule.runBlocking {
+        testee.initialise()
         testee.onUserToggleGlobalPrivacyControl(false)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())

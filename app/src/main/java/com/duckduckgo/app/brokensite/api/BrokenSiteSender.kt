@@ -47,9 +47,8 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
-
         appCoroutineScope.launch(Dispatchers.IO) {
+            val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,

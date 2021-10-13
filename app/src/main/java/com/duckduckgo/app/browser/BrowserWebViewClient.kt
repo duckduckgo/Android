@@ -38,6 +38,7 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.app.global.utils.ConflatedJob
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.*
@@ -64,6 +65,8 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+
+    private val gpcInjectorJob = ConflatedJob()
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -168,7 +171,9 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
-            injectGpcToDom(webView, url)
+            gpcInjectorJob += appCoroutineScope.launch {
+                injectGpcToDom(webView, url)
+            }
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
             appCoroutineScope.launch {
@@ -196,10 +201,12 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun injectGpcToDom(webView: WebView, url: String?) {
+    private suspend fun injectGpcToDom(webView: WebView, url: String?) {
         url?.let {
             if (gpc.canGpcBeUsedByUrl(url)) {
-                webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
+                }
             }
         }
     }

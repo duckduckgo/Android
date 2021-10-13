@@ -58,7 +58,12 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         configureUiEventHandlers()
         configureClickableLink()
+        initialiseViewModel()
         observeViewModel()
+    }
+
+    private fun initialiseViewModel() {
+        viewModel.initialise()
     }
 
     private fun configureClickableLink() {

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.FileUtilities
@@ -27,7 +29,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -35,6 +38,10 @@ import java.lang.reflect.ParameterizedType
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class RealTrackerAllowlistTest(private val testCase: TestCase) {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val mockTrackerAllowlistRepository: TrackerAllowlistRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
@@ -53,7 +60,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() {
+    fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() = coroutineRule.runBlocking {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true)).thenReturn(true)
         mockAllowlist()
 
@@ -63,7 +70,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() {
+    fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() = coroutineRule.runBlocking {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true)).thenReturn(false)
         mockAllowlist()
 

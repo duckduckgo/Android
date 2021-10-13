@@ -43,7 +43,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         return gpcRepository.isGpcEnabled()
     }
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override suspend fun getHeaders(url: String): Map<String, String> {
         return if (canGpcBeUsedByUrl(url)) {
             mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         } else {
@@ -51,7 +51,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         }
     }
 
-    override fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean {
+    override suspend fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean {
         return if (canGpcBeUsedByUrl(url) && !containsGpcHeader(existingHeaders)) {
             headerConsumers.any { sameOrSubdomain(url, it) }
         } else {
@@ -67,11 +67,11 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         gpcRepository.disableGpc()
     }
 
-    override fun canGpcBeUsedByUrl(url: String): Boolean {
+    override suspend fun canGpcBeUsedByUrl(url: String): Boolean {
         return isFeatureEnabled() && isEnabled() && !isAnException(url)
     }
 
-    private fun isFeatureEnabled(): Boolean {
+    private suspend fun isFeatureEnabled(): Boolean {
         return featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true
     }
 

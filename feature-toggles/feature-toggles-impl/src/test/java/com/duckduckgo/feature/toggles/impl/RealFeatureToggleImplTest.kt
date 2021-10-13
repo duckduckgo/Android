@@ -14,33 +14,42 @@
  * limitations under the License.
  */
 
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.duckduckgo.feature.toggles.impl
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 
 class RealFeatureToggleImplTest {
 
     private val testee: RealFeatureToggleImpl = RealFeatureToggleImpl(FakeFeatureTogglePluginPoint())
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     @Test
-    fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {
+    fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() = coroutineRule.runBlocking {
         val result = testee.isFeatureEnabled(TrueFeatureName(), false)
         assertNotNull(result)
         assertTrue(result!!)
     }
 
     @Test
-    fun whenFeatureNameCannotBeHandledByAnyPluginThenReturnNull() {
+    fun whenFeatureNameCannotBeHandledByAnyPluginThenReturnNull() = coroutineRule.runBlocking {
         val result = testee.isFeatureEnabled(NullFeatureName(), false)
         assertNull(result)
     }
 
     class FakeTruePlugin : FeatureTogglesPlugin {
-        override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
+        override suspend fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
             return if (featureName is TrueFeatureName) {
                 true
             } else {

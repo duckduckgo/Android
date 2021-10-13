@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.feature.toggles.api
+package com.duckduckgo.app.global.utils
+
+import kotlinx.coroutines.Job
 
 /**
- * Any feature toggles implemented in any module should implement [FeatureToggle]
+ * Job util class that will cancel the previous job if a new one is set.
+ *
+ * Assign the new job with the += operator.
  */
-interface FeatureToggle {
-    /**
-     * This method takes a [featureName] and optionally a default value.
-     * @return `true` if the feature is enabled, `false` is is not and `null` if the feature does not exist.
-     */
-    suspend fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean = true): Boolean?
-}
+class ConflatedJob {
 
-/**
- * Each feature toggle created needs a [FeatureName] which can be implemented using this interface
- */
-interface FeatureName {
-    val value: String
+    private var job: Job? = null
+
+    val isActive get() = job?.isActive ?: false
+
+    @Synchronized
+    operator fun plusAssign(newJob: Job) {
+        cancel()
+        job = newJob
+    }
+
+    fun cancel() {
+        job?.cancel()
+    }
+
+    fun start() {
+        job?.start()
+    }
 }

@@ -135,7 +135,7 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, null)
     }
 
-    private fun getWebResourceResponse(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): WebResourceResponse? {
+    private suspend fun getWebResourceResponse(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.blocked == true) {
             trackingEvent.surrogateId?.let { surrogateId ->
@@ -155,13 +155,13 @@ class WebViewRequestInterceptor(
         return null
     }
 
-    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
+    private suspend fun getHeaders(request: WebResourceRequest): Map<String, String> {
         return request.requestHeaders.apply {
             putAll(gpc.getHeaders(request.url.toString()))
         }
     }
 
-    private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
+    private suspend fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val existingHeaders = request.requestHeaders
         return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }
@@ -194,10 +194,10 @@ class WebViewRequestInterceptor(
         }
     }
 
-    private fun shouldUpgrade(request: WebResourceRequest) =
+    private suspend fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun trackingEvent(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): TrackingEvent? {
+    private suspend fun trackingEvent(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): TrackingEvent? {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {

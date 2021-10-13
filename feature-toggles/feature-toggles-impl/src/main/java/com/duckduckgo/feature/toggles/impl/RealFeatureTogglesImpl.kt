@@ -30,7 +30,7 @@ import javax.inject.Singleton
 class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPluginPoint: PluginPoint<FeatureTogglesPlugin>) :
     FeatureToggle {
 
-    override fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
+    override suspend fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
         featureTogglesPluginPoint.getPlugins().forEach { plugin ->
             plugin.isEnabled(featureName, defaultValue)?.let { return it }
         }

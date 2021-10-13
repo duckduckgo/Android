@@ -25,6 +25,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
@@ -33,7 +34,6 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -41,6 +41,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class WebViewRequestInterceptorTest {
 
     @ExperimentalCoroutinesApi
@@ -75,10 +76,14 @@ class WebViewRequestInterceptorTest {
             gpc = mockGpc,
             userAgentProvider = userAgentProvider
         )
+
+        coroutinesTestRule.runBlocking {
+            whenever(mockGpc.getHeaders(any())).thenReturn(emptyMap())
+        }
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         testee.shouldIntercept(
             request = mockRequest,
@@ -91,7 +96,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -104,7 +109,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         testee.shouldIntercept(
@@ -118,7 +123,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         whenever(mockRequest.url).thenReturn(null)
         testee.shouldIntercept(
@@ -132,7 +137,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runBlocking<Unit> {
+    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = coroutinesTestRule.runBlocking {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
@@ -145,7 +150,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -157,7 +162,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -170,7 +175,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -183,7 +188,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -196,7 +201,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -209,7 +214,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -222,7 +227,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -235,7 +240,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpRequestThenHttpRequestListenerCalled() = runBlocking<Unit> {
+    fun whenIsHttpRequestThenHttpRequestListenerCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("http://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -252,7 +257,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() = runBlocking<Unit> {
+    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("https://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -269,7 +274,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
+    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = coroutinesTestRule.runBlocking {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
@@ -285,7 +290,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
+    fun whenRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = coroutinesTestRule.runBlocking {
         val availableSurrogate = SurrogateResponse(
             scriptId = "testId",
             responseAvailable = true,
@@ -307,7 +312,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThenCallSurrogateDetected() = runBlocking<Unit> {
+    fun whenRequestShouldBlockButThereIsASurrogateThenCallSurrogateDetected() = coroutinesTestRule.runBlocking {
         val availableSurrogate = SurrogateResponse(
             scriptId = "testId",
             responseAvailable = true,
@@ -330,7 +335,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenNotifyWebViewClientListener() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenNotifyWebViewClientListener() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -344,7 +349,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = coroutinesTestRule.runBlocking {
         configureShouldUpgrade()
         configureShouldAddGpcHeader()
         val mockWebViewClientListener: WebViewClientListener = mock()
@@ -360,7 +365,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
@@ -377,7 +382,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
@@ -394,7 +399,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersButUrlExistsInTheStackThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersButUrlExistsInTheStackThenLoadUrlNotCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlExistsInTheStack()
@@ -411,9 +416,10 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersButAlreadyContainsHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersButAlreadyContainsHeadersThenLoadUrlNotCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureRequestContainsGcpHeader()
+        whenever(mockGpc.canUrlAddHeaders(any(), anyOrNull())).thenReturn(true)
 
         val mockWebViewClientListener: WebViewClientListener = mock()
 
@@ -428,7 +434,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureShouldNotAddGpcHeader()
         val mockWebViewClientListener: WebViewClientListener = mock()
@@ -444,7 +450,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentShouldChangeThenReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentShouldChangeThenReloadUrl() = coroutinesTestRule.runBlocking {
         configureUserAgentShouldChange()
         configureUrlDoesNotExistInTheStack()
 
@@ -460,7 +466,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = coroutinesTestRule.runBlocking {
         configureUserAgentShouldChange()
         configureUrlExistsInTheStack()
 
@@ -476,7 +482,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = coroutinesTestRule.runBlocking {
         configureShouldNotUpgrade()
         configureUrlDoesNotExistInTheStack()
 
@@ -492,7 +498,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = coroutinesTestRule.runBlocking {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
@@ -506,32 +512,33 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
-        val availableSurrogate = SurrogateResponse(
-            scriptId = "testId",
-            responseAvailable = true,
-            mimeType = "application/javascript",
-            jsFunction = "javascript replacement function goes here"
-        )
-        whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() =
+        coroutinesTestRule.runBlocking {
+            val availableSurrogate = SurrogateResponse(
+                scriptId = "testId",
+                responseAvailable = true,
+                mimeType = "application/javascript",
+                jsFunction = "javascript replacement function goes here"
+            )
+            whenever(mockResourceSurrogates.get(any())).thenReturn(availableSurrogate)
 
-        configureShouldNotUpgrade()
-        configureShouldBlock()
-        val response = testee.shouldInterceptFromServiceWorker(
-            request = mockRequest,
-            documentUrl = "foo.com"
-        )
+            configureShouldNotUpgrade()
+            configureShouldBlock()
+            val response = testee.shouldInterceptFromServiceWorker(
+                request = mockRequest,
+                documentUrl = "foo.com"
+            )
 
-        assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
-    }
+            assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
+        }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = coroutinesTestRule.runBlocking {
         assertNull(testee.shouldInterceptFromServiceWorker(request = null, documentUrl = "foo.com"))
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = coroutinesTestRule.runBlocking {
         assertNull(testee.shouldInterceptFromServiceWorker(request = mockRequest, documentUrl = null))
     }
 
@@ -539,7 +546,7 @@ class WebViewRequestInterceptorTest {
         assertNull(response)
     }
 
-    private fun configureShouldBlock() {
+    private suspend fun configureShouldBlock() {
         val blockTrackingEvent = TrackingEvent(
             blocked = true,
             documentUrl = "",
@@ -570,47 +577,47 @@ class WebViewRequestInterceptorTest {
         configureUrlExistsInTheStack()
     }
 
-    private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
+    private fun configureRequestContainsGcpHeader() = coroutinesTestRule.runBlocking {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
         whenever(mockRequest.requestHeaders).thenReturn(mapOf(GPC_HEADER to "test"))
 
     }
 
-    private fun configureShouldAddGpcHeader() = runBlocking<Unit> {
+    private fun configureShouldAddGpcHeader() = coroutinesTestRule.runBlocking {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
         whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
+    private fun configureShouldNotAddGpcHeader() = coroutinesTestRule.runBlocking {
         whenever(mockGpc.isEnabled()).thenReturn(false)
         whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
         whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(false)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureUserAgentShouldChange() = runBlocking<Unit> {
+    private fun configureUserAgentShouldChange() = coroutinesTestRule.runBlocking {
         whenever(mockRequest.url).thenReturn(Uri.parse("https://m.facebook.com"))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureShouldChangeToMobileUrl() = runBlocking<Unit> {
+    private fun configureShouldChangeToMobileUrl() = coroutinesTestRule.runBlocking {
         whenever(mockRequest.url).thenReturn((Uri.parse("https://facebook.com")))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureShouldUpgrade() = runBlocking<Unit> {
+    private fun configureShouldUpgrade() = coroutinesTestRule.runBlocking {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(true)
         whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }
 
-    private fun configureShouldNotUpgrade() = runBlocking<Unit> {
+    private fun configureShouldNotUpgrade() = coroutinesTestRule.runBlocking {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
 
         whenever(mockRequest.url).thenReturn(validUri())

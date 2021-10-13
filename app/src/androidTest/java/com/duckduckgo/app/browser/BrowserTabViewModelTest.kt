@@ -367,7 +367,8 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
-        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
+
+        coroutineRule.runBlocking { whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false) }
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
@@ -3052,7 +3053,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() = coroutineRule.runBlocking {
         givenUrlCanUseGpc()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
@@ -3064,7 +3065,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         val url = "foo.com"
         givenUrlCannotUseGpc(url)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
@@ -3077,7 +3078,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         givenGpcIsDisabled()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
 
@@ -3089,7 +3090,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() = coroutineRule.runBlocking {
         givenUrlCanUseGpc()
         loadUrl("http://m.example.com")
 
@@ -3101,7 +3102,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         givenUrlCannotUseGpc("example.com")
         loadUrl("http://m.example.com")
 
@@ -3113,7 +3114,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         givenGpcIsDisabled()
         loadUrl("http://m.example.com")
 
@@ -3125,7 +3126,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() = coroutineRule.runBlocking {
         givenUrlCanUseGpc()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
@@ -3137,7 +3138,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() {
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         givenUrlCanUseGpc()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
 
@@ -3149,7 +3150,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         val url = "fallback"
         givenUrlCannotUseGpc(url)
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), url)
@@ -3162,7 +3163,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() = coroutineRule.runBlocking {
         givenGpcIsDisabled()
         val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
 
@@ -3459,21 +3460,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() {
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() = coroutineRule.runBlocking {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertTrue(browserViewState().isWhitelisted)
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() = coroutineRule.runBlocking {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertFalse(loadingViewState().privacyOn)
     }
 
     @Test
-    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() {
+    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() = coroutineRule.runBlocking {
         whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
         loadUrl("https://example.com")
         assertNull(privacyGradeState().privacyGrade)
@@ -3594,19 +3595,19 @@ class BrowserTabViewModelTest {
         assertCommandNotIssued<Command.OpenAppLink>()
     }
 
-    private fun givenUrlCanUseGpc() {
+    private suspend fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
         whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf())
     }
 
-    private fun givenUrlCannotUseGpc(url: String) {
+    private suspend fun givenUrlCannotUseGpc(url: String) {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
         whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(url)))
     }
 
-    private fun givenGpcIsDisabled() {
+    private suspend fun givenGpcIsDisabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
     }

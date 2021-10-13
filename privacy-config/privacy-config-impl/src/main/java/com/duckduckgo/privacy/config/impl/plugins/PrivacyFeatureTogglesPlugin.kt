@@ -24,23 +24,24 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(AppObjectGraph::class)
 class PrivacyFeatureTogglesPlugin @Inject constructor(private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository, private val dispatcherProvider: DispatcherProvider) :
     FeatureTogglesPlugin {
 
-    override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
-        return runBlocking(dispatcherProvider.io()) {
+    override suspend fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
+        return withContext(dispatcherProvider.io()) {
+
             if (featureName is PrivacyFeatureName) {
                 val privacyFeature: PrivacyFeatureToggles? = privacyFeatureTogglesRepository.get(featureName.value)
                 privacyFeature?.let {
-                    return@runBlocking privacyFeature.enabled
+                    return@withContext privacyFeature.enabled
                 }
-                return@runBlocking defaultValue
+                return@withContext defaultValue
             }
-            return@runBlocking null
+            return@withContext null
         }
     }
 

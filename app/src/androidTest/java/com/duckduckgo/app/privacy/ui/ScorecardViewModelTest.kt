@@ -27,9 +27,11 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,6 +65,10 @@ class ScorecardViewModelTest {
     @Before
     fun before() {
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
+
+        coroutineRule.runBlocking {
+            whenever(contentBlocking.isAnException(anyOrNull())).thenReturn(false)
+        }
     }
 
     @After
@@ -167,7 +173,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() = coroutineRule.runBlocking {
         whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
@@ -175,7 +181,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
         whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
@@ -184,7 +190,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
         whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
@@ -193,7 +199,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() {
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() = coroutineRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
         whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)

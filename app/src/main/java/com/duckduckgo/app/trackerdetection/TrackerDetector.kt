@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackerDetector {
     fun addClient(client: Client)
-    fun evaluate(url: String, documentUrl: String): TrackingEvent?
+    suspend fun evaluate(url: String, documentUrl: String): TrackingEvent?
 }
 
 class TrackerDetectorImpl(
@@ -47,7 +47,7 @@ class TrackerDetectorImpl(
         clients.add(client)
     }
 
-    override fun evaluate(url: String, documentUrl: String): TrackingEvent? {
+    override suspend fun evaluate(url: String, documentUrl: String): TrackingEvent? {
 
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
@@ -74,7 +74,7 @@ class TrackerDetectorImpl(
         return null
     }
 
-    private fun isSiteAContentBlockingException(documentUrl: String): Boolean {
+    private suspend fun isSiteAContentBlockingException(documentUrl: String): Boolean {
         return contentBlocking.isAnException(documentUrl)
     }
 

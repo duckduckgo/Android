@@ -38,19 +38,19 @@ interface Gpc {
      * allows for them to be added.
      * @return a [Map] with the GPC headers or an empty [Map] if the above conditions are not met
      */
-    fun getHeaders(url: String): Map<String, String>
+    suspend fun getHeaders(url: String): Map<String, String>
     /**
      * This method takes a [url] and a map with its [existingHeaders] and it then returns `true` if the given [url]
      * can add the GPC headers
      * @return a `true` if the given [url] and [existingHeaders] permit the GPC headers to be added
      */
-    fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean
+    suspend fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean
     /**
      * This method takes a [url] and returns `true` or `false` depending if the given [url]
      * can use the GPC feature
      * @return a `true` if the given [url] can use the GPC feature.
      */
-    fun canGpcBeUsedByUrl(url: String): Boolean
+    suspend fun canGpcBeUsedByUrl(url: String): Boolean
     /**
      * This method is used to enable GPC.
      * Note: The remote configuration will take precedence over this value.

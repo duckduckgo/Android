@@ -19,6 +19,7 @@ package com.duckduckgo.app.globalprivacycontrol.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -28,6 +29,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -50,14 +52,6 @@ class GlobalPrivacyControlViewModel(
     val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    init {
-        _viewState.value = ViewState(
-            globalPrivacyControlEnabled = gpc.isEnabled(),
-            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
-        )
-        pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
-    }
-
     fun onUserToggleGlobalPrivacyControl(enabled: Boolean) {
         val pixelName = if (enabled) {
             gpc.enableGpc()
@@ -75,6 +69,16 @@ class GlobalPrivacyControlViewModel(
         command.value = Command.OpenLearnMore()
     }
 
+    fun initialise() {
+        viewModelScope.launch {
+            _viewState.value = ViewState(
+                globalPrivacyControlEnabled = gpc.isEnabled(),
+                globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
+            )
+            pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
+        }
+    }
+
     companion object {
         const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/"
     }
@@ -89,7 +93,13 @@ class GlobalPrivacyControlViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), featureToggle.get(), gpc.get()) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (
+                    GlobalPrivacyControlViewModel(
+                        pixel.get(),
+                        featureToggle.get(),
+                        gpc.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

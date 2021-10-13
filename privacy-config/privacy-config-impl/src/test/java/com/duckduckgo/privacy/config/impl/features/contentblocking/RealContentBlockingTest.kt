@@ -17,6 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -26,6 +28,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -38,6 +41,10 @@ class RealContentBlockingTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     @Before
     fun before() {
         givenFeatureIsEnabled()
@@ -46,28 +53,28 @@ class RealContentBlockingTest {
     }
 
     @Test
-    fun whenIsAnExceptionAndDomainIsListedInTheExceptionsListThenReturnTrue() {
+    fun whenIsAnExceptionAndDomainIsListedInTheExceptionsListThenReturnTrue() = coroutineRule.runBlocking {
         givenThereAreExceptions()
 
         assertTrue(testee.isAnException("http://www.example.com"))
     }
 
     @Test
-    fun whenIsAnExceptionWithSubdomainAndDomainIsListedInTheExceptionsListThenReturnTrue() {
+    fun whenIsAnExceptionWithSubdomainAndDomainIsListedInTheExceptionsListThenReturnTrue() = coroutineRule.runBlocking {
         givenThereAreExceptions()
 
         assertTrue(testee.isAnException("http://test.example.com"))
     }
 
     @Test
-    fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
+    fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() = coroutineRule.runBlocking {
         whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
 
     @Test
-    fun whenIsAnExceptionAndDomainIsInTheUnprotectedTemporaryListThenReturnTrue() {
+    fun whenIsAnExceptionAndDomainIsInTheUnprotectedTemporaryListThenReturnTrue() = coroutineRule.runBlocking {
         val url = "http://test.example.com"
         whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
         whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
@@ -76,7 +83,7 @@ class RealContentBlockingTest {
     }
 
     @Test
-    fun whenIsAnExceptionAndFeatureIsDisabledThenReturnFalse() {
+    fun whenIsAnExceptionAndFeatureIsDisabledThenReturnFalse() = coroutineRule.runBlocking {
         givenThereAreExceptions()
         givenFeatureIsDisabled()
 
@@ -91,11 +98,11 @@ class RealContentBlockingTest {
         )
     }
 
-    private fun givenFeatureIsEnabled() {
+    private fun givenFeatureIsEnabled() = coroutineRule.runBlocking {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(true)
     }
 
-    private fun givenFeatureIsDisabled() {
+    private fun givenFeatureIsDisabled() = coroutineRule.runBlocking {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(false)
     }
 }

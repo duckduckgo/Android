@@ -22,6 +22,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -33,8 +34,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,6 +46,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyDashboardViewModelTest {
 
     @get:Rule
@@ -68,7 +70,14 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(
+            mockUserWhitelistDao,
+            mockContentBlocking,
+            networkLeaderboardDao,
+            mockPixel,
+            TestCoroutineScope(),
+            coroutineRule.testDispatcherProvider
+        )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -80,6 +89,7 @@ class PrivacyDashboardViewModelTest {
         whenever(networkLeaderboardLiveData.value).thenReturn(emptyList())
         whenever(networkLeaderboardDao.sitesVisited()).thenReturn(sitesVisitedLiveData)
         whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaderboardLiveData)
+        coroutineRule.runBlocking { whenever(mockContentBlocking.isAnException(anyOrNull())).thenReturn(false) }
     }
 
     @After
@@ -108,7 +118,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenSitePrivacySwitchedOffThenShouldReloadIsTrue() {
+    fun whenSitePrivacySwitchedOffThenShouldReloadIsTrue() = coroutineRule.runBlocking {
         givenSiteWithPrivacyOn()
         testee.onPrivacyToggled(false)
         assertTrue(testee.viewState.value!!.shouldReloadPage)
@@ -239,7 +249,7 @@ class PrivacyDashboardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInTContentBlockingExceptionsListThenReturnTrue() {
+    fun whenOnSiteChangedAndSiteIsInTContentBlockingExceptionsListThenReturnTrue() = coroutineRule.runBlocking {
         whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)

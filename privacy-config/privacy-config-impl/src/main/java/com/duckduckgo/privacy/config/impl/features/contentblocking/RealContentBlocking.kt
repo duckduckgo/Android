@@ -31,7 +31,7 @@ import javax.inject.Singleton
 @Singleton
 class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
 
-    override fun isAnException(url: String): Boolean {
+    override suspend fun isAnException(url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
             unprotectedTemporary.isAnException(url) || matches(url)
         } else {

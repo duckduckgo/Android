@@ -19,6 +19,7 @@ package com.duckduckgo.app.integration
 import android.net.Uri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
@@ -27,6 +28,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.duckduckgo.privacy.config.api.Https
@@ -34,13 +36,20 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class HttpsEmbeddedDataIntegrationTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private lateinit var httpsUpgrader: HttpsUpgrader
     private lateinit var db: AppDatabase
@@ -53,7 +62,9 @@ class HttpsEmbeddedDataIntegrationTest {
 
     @Before
     fun before() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName())).thenReturn(true)
+        coroutineRule.runBlocking {
+            whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName())).thenReturn(true)
+        }
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -83,17 +94,17 @@ class HttpsEmbeddedDataIntegrationTest {
     }
 
     @Test
-    fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenUpdgraded() {
+    fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenUpdgraded() = coroutineRule.runBlocking {
         assertTrue(httpsUpgrader.shouldUpgrade(Uri.parse("http://facebook.com")))
     }
 
     @Test
-    fun whenUpgraderLoadedWithEmbeddedDataAndItemInFalsePositivesListThenNotUpdgraded() {
+    fun whenUpgraderLoadedWithEmbeddedDataAndItemInFalsePositivesListThenNotUpdgraded() = coroutineRule.runBlocking {
         assertFalse(httpsUpgrader.shouldUpgrade(Uri.parse("http://www.dppps.sc.gov")))
     }
 
     @Test
-    fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenNotUpdgraded() {
+    fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenNotUpdgraded() = coroutineRule.runBlocking {
         assertFalse(httpsUpgrader.shouldUpgrade(Uri.parse("http://fjdsfhdksjfhdsfhdjsfhdsjfhdsjkfhdsjja.com")))
     }
 }

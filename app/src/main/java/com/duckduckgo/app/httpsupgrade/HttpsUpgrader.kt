@@ -43,7 +43,7 @@ import kotlin.concurrent.thread
 interface HttpsUpgrader {
 
     @WorkerThread
-    fun shouldUpgrade(uri: Uri): Boolean
+    suspend fun shouldUpgrade(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
         return uri.toHttps
@@ -75,7 +75,7 @@ class HttpsUpgraderImpl @Inject constructor(
     }
 
     @WorkerThread
-    override fun shouldUpgrade(uri: Uri): Boolean {
+    override suspend fun shouldUpgrade(uri: Uri): Boolean {
         val host = uri.host ?: return false
 
         if (toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()) != true) {

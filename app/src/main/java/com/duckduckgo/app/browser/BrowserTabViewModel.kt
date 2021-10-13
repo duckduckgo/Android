@@ -626,7 +626,10 @@ class BrowserTabViewModel(
             } else {
                 clearPreviousUrl()
             }
-            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+
+            viewModelScope.launch {
+                command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+            }
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -636,7 +639,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> {
+    private suspend fun getUrlHeaders(url: String?): Map<String, String> {
         url?.let {
             return gpc.getHeaders(url)
         }
@@ -1714,7 +1717,9 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            viewModelScope.launch {
+                command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            }
         } else {
             command.value = Refresh
         }
@@ -1960,7 +1965,9 @@ class BrowserTabViewModel(
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+        viewModelScope.launch {
+            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+        }
     }
 
     override fun openMessageInNewTab(message: Message) {
