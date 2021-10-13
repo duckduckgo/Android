@@ -144,6 +144,11 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
     androidTestImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy

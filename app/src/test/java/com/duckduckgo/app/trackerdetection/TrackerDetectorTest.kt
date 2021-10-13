@@ -17,28 +17,47 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class TrackerDetectorTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val mockEntityLookup: EntityLookup = mock()
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist)
+
+    @Before
+    fun setupTest() {
+        coroutineRule.runBlocking {
+            whenever(mockContentBlocking.isAnException(anyOrNull())).thenReturn(false)
+            whenever(mockTrackerAllowlist.isAnException(anyOrNull(), anyOrNull())).thenReturn(false)
+        }
+    }
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {
@@ -59,7 +78,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenTwoClientsWithSameNameAddedThenClientIsReplacedAndCountIsStillOne() {
+    fun whenTwoClientsWithSameNameAddedThenClientIsReplacedAndCountIsStillOne() = coroutineRule.runBlocking {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertEquals(1, trackerDetector.clientCount)
         assertNotNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
@@ -70,19 +89,19 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenThereAreNoClientsThenEvaluateReturnsNull() {
+    fun whenThereAreNoClientsThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenAllClientsFailToMatchThenEvaluateReturnsNull() {
+    fun whenAllClientsFailToMatchThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(neverMatchingClient(CLIENT_B))
         assertNull(trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenSiteIsNotUserWhitelistedAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
+    fun whenSiteIsNotUserWhitelistedAndAllClientsMatchThenEvaluateReturnsBlockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
@@ -92,7 +111,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsUserWhitelistedAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+    fun whenSiteIsUserWhitelistedAndAllClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
@@ -102,7 +121,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() {
+    fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsBlockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
         trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
@@ -112,7 +131,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+    fun whenSiteIsUserWhitelistedAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(true)
         trackerDetector.addClient(neverMatchingClient(CLIENT_A))
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_B))
@@ -122,7 +141,7 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsInContentBlockingExceptionsListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+    fun whenSiteIsInContentBlockingExceptionsListAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
@@ -131,16 +150,17 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate() {
-        whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
-        trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
-        val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true, "testId")
-        val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
-        assertEquals(expected, actual)
-    }
+    fun whenSiteIsNotUserWhitelistedAndSomeClientsMatchWithSurrogateThenEvaluateReturnsBlockedTrackingEventWithSurrogate() =
+        coroutineRule.runBlocking {
+            whenever(mockUserWhitelistDao.contains("example.com")).thenReturn(false)
+            trackerDetector.addClient(alwaysMatchingClientWithSurrogate(CLIENT_A))
+            val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, true, "testId")
+            val actual = trackerDetector.evaluate("http://thirdparty.com/update.js", "http://example.com/index.com")
+            assertEquals(expected, actual)
+        }
 
     @Test
-    fun whenRequestIsInAllowlistAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() {
+    fun whenRequestIsInAllowlistAndSomeClientsMatchThenEvaluateReturnsUnblockedTrackingEvent() = coroutineRule.runBlocking {
         whenever(mockTrackerAllowlist.isAnException(anyString(), anyString())).thenReturn(true)
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         val expected = TrackingEvent("http://example.com/index.com", "http://thirdparty.com/update.js", null, null, false, null)
@@ -149,19 +169,19 @@ class TrackerDetectorTest {
     }
 
     @Test
-    fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
+    fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() {
+    fun whenUrlIsSubdomainOfDocumentThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertNull(trackerDetector.evaluate("http://mobile.example.com/update.js", "http://example.com/index.com"))
     }
 
     @Test
-    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() {
+    fun whenUrlIsParentOfDocumentThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
         assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://mobile.example.com/index.com"))
     }

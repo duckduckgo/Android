@@ -17,22 +17,28 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class TrackerDetectorClientTypeTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private var mockEntityLookup: EntityLookup = mock()
     private var mockBlockingClient: Client = mock()
@@ -50,17 +56,22 @@ class TrackerDetectorClientTypeTest {
         whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any())).thenReturn(Client.Result(false))
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
+
+        coroutineRule.runBlocking {
+            whenever(mockContentBlocking.isAnException(anyOrNull())).thenReturn(false)
+            whenever(mockTrackerAllowlist.isAnException(anyOrNull(), anyOrNull())).thenReturn(false)
+        }
     }
 
     @Test
-    fun whenUrlMatchesOnlyInBlockingClientThenEvaluateReturnsTrackingEvent() {
+    fun whenUrlMatchesOnlyInBlockingClientThenEvaluateReturnsTrackingEvent() = coroutineRule.runBlocking {
         val url = Url.BLOCKED
         val expected = TrackingEvent(documentUrl, url, null, null, true, null)
         assertEquals(expected, testee.evaluate(url, documentUrl))
     }
 
     @Test
-    fun whenUrlDoesNotMatchInAnyClientsThenEvaluateReturnsNull() {
+    fun whenUrlDoesNotMatchInAnyClientsThenEvaluateReturnsNull() = coroutineRule.runBlocking {
         val url = Url.UNLISTED
         assertNull(testee.evaluate(url, documentUrl))
     }
