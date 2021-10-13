@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -45,15 +44,11 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var mockPackageManager: PackageManager
 
-    @Mock
-    lateinit var mockSettingsDataStore: SettingsDataStore
-
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = SpecialUrlDetectorImpl(mockPackageManager, mockSettingsDataStore)
+        testee = SpecialUrlDetectorImpl(mockPackageManager)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
     }
 
     @Test
@@ -83,34 +78,22 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenAppLinksEnabledAndNoNonBrowserActivitiesFoundThenReturnWebType() {
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
+    fun whenNoNonBrowserActivitiesFoundThenReturnWebType() {
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildBrowserResolveInfo()))
         val type = testee.determineType("https://example.com")
         assertTrue(type is Web)
     }
 
     @Test
-    fun whenAppLinksDisabledThenReturnWebType() {
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(false)
-        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo()))
-        val type = testee.determineType("https://example.com")
-        verifyZeroInteractions(mockPackageManager)
-        assertTrue(type is Web)
-    }
-
-    @Test
     fun whenAppLinkThrowsURISyntaxExceptionThenReturnWebType() {
-        whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
         given(mockPackageManager.queryIntentActivities(any(), anyInt())).willAnswer { throw URISyntaxException("", "") }
         val type = testee.determineType("https://example.com")
         assertTrue(type is Web)
     }
 
     @Test
-    fun whenAppLinksEnabledAndOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+    fun whenOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
             whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
@@ -124,9 +107,8 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenAppLinksEnabledAndMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
+    fun whenMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
             whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
             val type = testee.determineType("https://example.com")
             verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
@@ -143,7 +125,6 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenAppLinkCheckedOnApiLessThan24ThenReturnWebType() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            whenever(mockSettingsDataStore.appLinksEnabled).thenReturn(true)
             val type = testee.determineType("https://example.com")
             verifyZeroInteractions(mockPackageManager)
             assertTrue(type is Web)
