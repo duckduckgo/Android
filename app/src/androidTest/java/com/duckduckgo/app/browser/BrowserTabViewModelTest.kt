@@ -155,6 +155,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
 import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -3597,13 +3598,14 @@ class BrowserTabViewModelTest {
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList())
     }
 
     private fun givenUrlCannotUseGpc(url: String) {
+        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(url)))
+        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
     }
 
     private fun givenGpcIsDisabled() {

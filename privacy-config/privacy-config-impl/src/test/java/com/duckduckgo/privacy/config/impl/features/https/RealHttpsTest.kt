@@ -26,6 +26,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealHttpsTest {
@@ -54,7 +55,7 @@ class RealHttpsTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        whenever(mockHttpsRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList())
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
@@ -63,16 +64,13 @@ class RealHttpsTest {
     fun whenIsAnExceptionAndDomainIsListedInTheUnprotectedTemporaryListThenReturnTrue() {
         val url = "http://example.com"
         whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
-        whenever(mockHttpsRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList())
 
         assertTrue(testee.isAnException(url))
     }
 
     private fun givenThereAreExceptions() {
-        whenever(mockHttpsRepository.exceptions).thenReturn(
-            arrayListOf(
-                HttpsException("example.com", "my reason here")
-            )
-        )
+        val exceptions = CopyOnWriteArrayList<HttpsException>().apply { add(HttpsException("example.com", "my reason here")) }
+        whenever(mockHttpsRepository.exceptions).thenReturn(exceptions)
     }
 }

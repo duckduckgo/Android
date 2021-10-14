@@ -23,20 +23,21 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toGpcException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface GpcRepository {
     fun updateAll(exceptions: List<GpcExceptionEntity>)
     fun enableGpc()
     fun disableGpc()
     fun isGpcEnabled(): Boolean
-    val exceptions: ArrayList<GpcException>
+    val exceptions: CopyOnWriteArrayList<GpcException>
 }
 
 class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
     GpcRepository {
 
     private val gpcDao: GpcDao = database.gpcDao()
-    override val exceptions = ArrayList<GpcException>()
+    override val exceptions = CopyOnWriteArrayList<GpcException>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
