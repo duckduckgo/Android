@@ -1,0 +1,609 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo&#160;</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="duckDuckGoPrivacySimplified">プライバシー保護をシンプルに。</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="open">開く</string>
+    <string name="cancel">キャンセル</string>
+    <string name="search">検索</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">常にDuckDuckGoで検索・閲覧するようにするには、「設定」をご覧ください。</string>
+    <string name="onboardingDefaultBrowserTitle">DuckDuckGoをデフォルトに設定する</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">デフォルトアプリ設定画面を開けませんでした</string>
+    <string name="settingsDefaultBrowserEnabled">規定のブラウザに設定</string>
+    <string name="defaultBrowserMaybeLater">後で</string>
+    <string name="defaultBrowserLetsDoIt">規定のブラウザに設定</string>
+    <string name="defaultBrowserDescriptionNoDefault">いつでも安心してリンクを開くことができます。</string>
+    <string name="defaultBrowserInstructions">DuckDuckGoを選択して<font color='#678fff'>常時</font>をタップしてください。</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">ブラウザメニュー</string>
+    <string name="refresh">更新</string>
+    <string name="back">戻る</string>
+    <string name="forward">進む</string>
+
+    <string name="omnibarInputHint">検索またはURLを入力</string>
+    <string name="clearButtonContentDescription">入力内容を消去</string>
+    <string name="no_compatible_third_party_app_installed">互換性のあるアプリがインストールされていません</string>
+    <string name="addBookmarkMenuTitle">ブックマークに追加</string>
+    <string name="editBookmarkMenuTitle">ブックマークを編集</string>
+    <string name="addFavoriteMenuTitle">お気に入りに追加</string>
+    <string name="removeFavoriteMenuTitle">お気に入りから削除</string>
+    <string name="favoriteAddedMessage">お気に入りが追加されました</string>
+    <string name="bookmarkAddedMessage">ブックマークが追加されました</string>
+    <string name="requestDesktopSiteMenuTitle">デスクトップ版</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">画像をダウンロード</string>
+    <string name="permissionRequiredToDownload">ダウンロードにストレージへのアクセス権限が必要です</string>
+    <string name="downloadComplete">ダウンロード完了</string>
+    <string name="downloadFailed">ダウンロード失敗</string>
+    <string name="downloadInProgress">ダウンロード中</string>
+
+    <!-- Sharing options -->
+    <string name="options">設定</string>
+    <string name="shareLink">リンクを共有</string>
+    <string name="shareMenuTitle">共有…</string>
+    <string name="copyUrl">リンクアドレスをコピー</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">ページ内検索</string>
+    <string name="nextSearchTermDescription">次を検索</string>
+    <string name="previousSearchTermDescription">前を検索</string>
+    <string name="closeFindInPageButtonDescription">ページ内検索を閉じる</string>
+    <string name="findInPageHint">ページ内検索</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">検索前に入力内容を編集</string>
+    <string name="settingsAutocompleteEnabled">自動補完の提案</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">外部アプリで開く</string>
+    <string name="launchingExternalApp">外部アプリで開く</string>
+    <string name="confirmOpenExternalApp">このコンテンツをDuckDuckGo外で表示しても宜しいですか？</string>
+    <string name="unableToOpenLink">このタイプのリンクを表示できませんでした</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">タブ</string>
+    <string name="tabsMenuItem">タブ</string>
+    <string name="newTabMenuItem">新しいタブ</string>
+    <string name="openInNewTab">新しいタブで開く</string>
+    <string name="openInNewBackgroundTab">バックグラウンドタブで開く</string>
+    <string name="openImageInNewTab">画像をバックグラウンドタブで開く</string>
+    <string name="faviconContentDescription">アイコン</string>
+    <string name="closeContentDescription">閉じる</string>
+    <string name="closeAllTabsMenuItem">全てのタブを閉じる</string>
+    <string name="closeTab">タブを閉じる</string>
+    <string name="tabClosed">タブは閉じられました</string>
+    <string name="tabClosedUndo">もとに戻す</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">オンラインプライバシー保護</string>
+    <string name="privacyProtectionEnabled">プライバシー保護は有効です</string>
+    <string name="privacyProtectionDisabled">プライバシー保護は無効です</string>
+    <string name="privacyDashboardActivityTitle">プライバシーダッシュボード</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src="%d" /> から &lt;img src="%d" /> に改善されました</string>
+    <string name="privacyGradeContentDescription">プライバシー評価</string>
+    <string name="privacyProtectionTemporarilyDisabled">プライバシー保護機能がこのサイトで問題が発生しているため、一時的に無効にしました。</string>
+
+    <string name="httpsGood">暗号化された通信</string>
+    <string name="httpsMixed">一部暗号化された通信</string>
+    <string name="httpsBad">暗号化されていない通信</string>
+
+    <string name="networksActivityTitle">トラッカーネットワーク</string>
+    <string name="networksContentDescription">トラッカーネットワーク</string>
+    <string name="networksOverview">トラッカーネットワークは、あなたのウェブ履歴を集約して、あなたに関するデータプロファイルを作成します。主要なトラッカーネットワークは、より多くのインターネット上であなたを追跡し、ターゲットにすることができるため、より有害です。</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">%s 個のトラッカーが見つかりました</item>
+        <item quantity="other">%s 個のトラッカーが見つかりました</item>
+    </plurals>
+
+    <plurals name="trackerBlocked">
+        <item quantity="one">%s 個のトラッカーをブロックしました</item>
+        <item quantity="other">%s 個のトラッカーをブロックしました</item>
+    </plurals>
+
+    <plurals name="majorNetworksFound">
+        <item quantity="one">%s 個の主要トラッカーネットワークが見つかりました</item>
+        <item quantity="other">%s 個の主要トラッカーネットワークが見つかりました</item>
+    </plurals>
+
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">%s 個の主要トラッカーネットワークをブロックしました</item>
+        <item quantity="other">%s 個の主要トラッカーネットワークをブロックしました</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">プライバシー評価</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">サイトは主要トラッカーネットワークです</string>
+    <string name="scorecardPrivacyGrade">プライバシー評価</string>
+    <string name="scorecardEnhancedGrade">改善された評価</string>
+
+    <string name="privacyTermsActivityTitle">プライバシーポリシー</string>
+    <string name="practicesGood">良いプライバシーポリシー</string>
+    <string name="practicesMixed">混合プライバシーポリシー</string>
+    <string name="practicesBad">悪いプライバシーポリシー</string>
+    <string name="practicesUnknown">不明なプライバシーポリシー</string>
+    <string name="practicesOverview">プライバシーポリシーとは、あなたがウェブサイトで共有した個人情報がどの程度保護されているかを示すものです。</string>
+    <string name="practicesTosdrLink"><b><u>ToS;DR</u></b>によってプライバシーポリシーの評価が提供されています</string>
+    <string name="practicesIconContentGood">良いポリシーアイコン</string>
+    <string name="practicesIconContentBad">悪いポリシーアイコン</string>
+
+    <string name="networkTrackerSummaryHeader">最も検出されたトラッカーネットワーク</string>
+    <string name="networkTrackerSummaryNotReady">どれだけのトラッカーをブロックしたかを示すデータを収集中しています。</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">データーをクリア</string>
+    <string name="fireClearAll">全てのタブとデーターをクリア</string>
+    <string name="fireCancel">キャンセル</string>
+    <string name="fireDataCleared">データーは消去されました</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">設定</string>
+    <string name="settingsMenuItemTitle">設定</string>
+    <string name="settingsHeadingGeneral">基本</string>
+    <string name="settingsHeadingOther">その他</string>
+    <string name="settingsHeadingPrivacy">プライバシー</string>
+    <string name="settingsAboutDuckduckgo">DuckDuckGoについて</string>
+    <string name="settingsVersion">バージョンn</string>
+    <string name="leaveFeedback">フィードバックを共有</string>
+    <string name="settingsEmailProtectionTitle">メール保護</string>
+    <string name="settingsEmailProtectionSubtitle">メールのトラッカーをブロックして、あなたのメールアドレスを隠します</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">保存</string>
+
+    <string name="settingsAutomaticallyClearWhat">自動クリア</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">自動クリア</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">なし</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">タブ</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">タブとデーター</string>
+
+    <string name="settingsAutomaticallyClearWhen">自動消去のタイミング</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">自動消去のタイミング</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">アプリの終了時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">アプリ終了から５秒後</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">アプリ終了から５分後</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">アプリ終了から１５分後</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">アプリ終了から３０分後</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">アプリ終了から１時間後</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">DuckDuckGoについて</string>
+    <string name="aboutDescription">
+        DuckDuckGoは、オンラインでの信頼の新しい基準を提供します。\n\n
+        DuckDuckGo Privacy Browserは、トラッカーブロック、よりスマートな暗号化、DuckDuckGoプライベート検索など、ウェブを検索したり閲覧したりする際に自分自身を守るために必要なすべてのプライバシーエッセンスを提供します。\n\n
+        オンラインでプライバシーを確保することは、家のカーテンを閉めるのと同じくらい簡単であるべきです。</string>
+    <string name="aboutMoreLink">duckduckgo.com/about で詳細を確認</string>
+    <string name="no_suggestions">提案がありません</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">破損したサイトを報告</string>
+    <string name="brokenSiteHeading">破損したサイトを報告</string>
+    <string name="brokenSiteSubmitted">ありがとうございます！フィードバックが送信されました。</string>
+    <string name="brokenSitesCategoriesTitle">問題の詳細を入力</string>
+    <string name="brokenSitesCategoriesHint">問題の詳細を入力してください</string>
+    <string name="brokenSiteSubmitButton">レポートを送信</string>
+    <string name="brokenSiteDescription">匿名の破損したサイトのレポートを提出することで、これらの問題をデバッグし、アプリを改善することができます。</string>
+
+    <string name="brokenSiteCategoryImages">画像が読み込まれません</string>
+    <string name="brokenSiteCategoryPaywall">このサイトは広告ブロッカーを無効にするよう要求します</string>
+    <string name="brokenSiteCategoryComments">コメントが読み込まれません</string>
+    <string name="brokenSiteCategoryVideos">動画が再生されません</string>
+    <string name="brokenSiteCategoryLinks">リンクやボタンが動作しません</string>
+    <string name="brokenSiteCategoryContent">コンテンツは不十分です</string>
+    <string name="brokenSiteCategoryLogin">このサイトにログインできません</string>
+    <string name="brokenSiteCategoryUnsupported">ブラウザに互換性がありません</string>
+    <string name="brokenSiteCategoryOther">その他の問題</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">ブックマーク</string>
+    <string name="bookmarksActivityTitle">ブックマーク</string>
+    <string name="noBookmarks">ブックマークが追加されていません</string>
+    <string name="bookmarkOverflowContentDescription">ブックマーク %s のその他のオプション</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b>%s&lt;/b> は削除されました</string>
+    <string name="exportBookmarksMenu">エクスポート</string>
+    <string name="exportBookmarksEmpty">ブックマークがありません。何もエクスポートされませんでした。</string>
+    <string name="exportBookmarksError">なにか問題が発生したためブックマークをエクスポートできませんでした</string>
+    <string name="exportBookmarksSuccess">全てのブックマークは正常にエクスポートされました</string>
+    <string name="importBookmarksMenu">インポート</string>
+    <string name="importBookmarksFileTitle">ブックマークファイルを選択してインポートします</string>
+    <string name="importBookmarksError">なにか問題が発生したためブックマークをインポートできませんでした</string>
+    <string name="importBookmarksEmpty">このファイルにはインポートできるブックマークがありません</string>
+    <string name="importBookmarksSuccess">正常に %1$d 件のブックマークがインポートされました</string>
+    <string name="savedSiteDialogTitleHint">タイトル</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">編集</string>
+    <string name="bookmarksSectionTitle">ブックマーク</string>
+    <string name="favoritesSectionTitle">お気に入り</string>
+    <string name="bookmarksEmptyHint">ブックマークが追加されていません</string>
+    <string name="favoritesEmptyHint">お気に入りが追加されていません</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">確認</string>
+    <string name="dialogSave">保存</string>
+    <string name="delete">削除</string>
+    <string name="edit">編集</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">DuckDuckGoで検索</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">ホーム画面に追加</string>
+    <string name="shortcutAddedText">成功! %s はホーム画面に追加されました</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">このアプリの改善に貢献する</string>
+    <string name="surveyCtaDescription">短い匿名の調査に協力してフィードバックを共有する</string>
+    <string name="surveyCtaLaunchButton">調査に協力する</string>
+    <string name="surveyCtaDismissButton">いいえ</string>
+    <string name="surveyActivityTitle">ユーザー調査</string>
+    <string name="surveyTitle">DUCKDUCKGO SURVEY</string>
+    <string name="surveyDismissContentDescription">調査を拒否</string>
+    <string name="surveyLoadingErrorTitle">おっと!</string>
+    <string name="surveyLoadingErrorText">アンケートが読み込まれませんでした\nあとで再度お試しください。</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">検索ウィジェットをお試しください！</string>
+    <string name="addWidgetCtaDescription">DuckDuckGoのウィジェットを追加してホーム画面からすぐに安全にインターネットにアクセスしましょう！</string>
+    <string name="addWidgetCtaAutoLaunchButton">ウィジェットを追加</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">表示</string>
+    <string name="addWidgetCtaDismissButton">いいえ</string>
+    <string name="addWidgetInstructionsActivityTitle">ウィジェットを追加</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">ホーム画面で長押ししてウィジェット追加メニューを表示します</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">DuckDuckGoのウィジェットを探します</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">ホーム画面にウィジェットをドラッグして追加します</string>
+    <string name="addWidgetInstructionsButtonGoHome">ホーム画面を表示</string>
+    <string name="addWidgetInstructionsButtonClose">閉じる</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">DuckDuckGoに満足していますか？</string>
+    <string name="appEnjoymentDialogMessage">ご満足いただけて幸いです。</string>
+    <string name="appEnjoymentDialogPositiveButton">はい、満足しています</string>
+    <string name="appEnjoymentDialogNegativeButton">改善が必要です</string>
+
+    <string name="rateAppDialogTitle">アプリを評価</string>
+    <string name="rateAppDialogMessage">あなたのレビューはとても重要です。ぜひレビューでこのアプリを伝えてください</string>
+    <string name="rateAppDialogPositiveButton">アプリを評価</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">ご迷惑をおかけして申し訳ありません</string>
+    <string name="giveFeedbackDialogMessage">このアプリをより良くするためにぜひご意見をお寄せください</string>
+    <string name="giveFeedbackDialogPositiveButton">フィードバックを共有</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">いいえ</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">ファイルをダウンロード中</string>
+    <string name="notificationChannelFileDownloaded">ファイルのダウンロードが完了</string>
+    <string name="notificationChannelTutorials">チュートリアル</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">データの消去は手動に設定されています</string>
+    <string name="clearNotificationDescription">DuckDuckGoをカスタマイズして、毎セッションごとに自動で閲覧データを消去できます。</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">DuckDuckGoはあなたのプライバシーを保護しています</string>
+    <string name="privacyProtectionNotificationReportTitle">あなたのプライバシーレポート</string>
+    <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGoアプリを使うことでトラッカーをブロックし、通信を暗号化することであなたのデータを保護します</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGoによって%d 件の暗号化されていない通信をアップグレードすることによってデーターを保護しています</string>
+    <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGoによって%d 件のトラッカーをブロックすることでデーターを保護しています</string>
+    <string name="privacyProtectionNotificationBothDescription">DuckDuckGoによって %d 件のトラッカーをブロックし、 %d 件の暗号化されていない通信をアップグレードすることによってデーターを保護しています</string>
+    <string name="privacyProtectionNotificationLaunchButton">ブラウジングを再開</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">サインイン</string>
+    <string name="authenticationDialogMessage">%s はユーザー名とパスワードを要求しています</string>
+    <string name="authenticationDialogPositiveButton">サインイン</string>
+    <string name="authenticationDialogNegativeButton">キャンセル</string>
+    <string name="authenticationDialogUsernameHint">ユーザー名</string>
+    <string name="authenticationDialogPasswordHint">パスワード</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">DuckDuckGoで検索</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">フィードバックを共有</string>
+    <string name="missingBrowserFeaturesTitleLong">ブラウザの機能が不十分か問題があります</string>
+    <string name="missingBrowserFeaturesTitleShort">ブラウザの機能の問題</string>
+    <string name="missingBrowserFeaturesSubtitle">どのような機能を追加したり改善すべきですか？</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">進む、戻る、リロードなどのナビゲーション機能</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">タブの作成と管理</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">広告・ポップアップのブロック</string>
+    <string name="missingBrowserFeatureSubReasonVideos">動画の再生</string>
+    <string name="missingBrowserFeatureSubReasonImages">画像の表示</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">ブックマークの作成と管理</string>
+    <string name="missingBrowserFeatureSubReasonOther">その他</string>
+
+    <string name="websiteNotLoadingTitleLong">ウェブサイトの読み込みに関する問題</string>
+    <string name="websiteNotLoadingTitleShort">ウェブサイトの読み込みに関する問題</string>
+    <string name="websiteNotLoadingSubtitle">どのサイトが正常に表示できませんか？</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGoの検索は不十分です</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo検索の問題</string>
+    <string name="searchNotGoodEnoughSubtitle">どのような検索機能を追加したり改善すべきですか?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">プログラミング・技術的な内容の検索</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">レイアウトをさらにGoogleのようにすべきです</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">読み込み時間の速度</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">言語や地域を指定した検索</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">自動補完の精度</string>
+    <string name="searchNotGoodEnoughSubReasonOther">その他</string>
+
+    <string name="needMoreCustomizationTitleLong">アプリのカスタマイズが少ないです</string>
+    <string name="needMoreCustomizationTitleShort">カスタマイズの問題</string>
+    <string name="needMoreCustomizationSubtitle">どのようなカスタマイズ設定を追加したり改善すべきですか？</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">ホーム画面の構成</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">タブの表示方法</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">アプリのインタフェース</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">どのデーターを消去するか</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">いつデーターを消去するか</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">ブックマークの表示方法</string>
+    <string name="needMoreCustomizationSubReasonOther">その他</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">アプリが遅い、バグが発生する、またはクラッシュする</string>
+    <string name="appIsSlowOrBuggyTitleShort">パフォーマンスの問題</string>
+    <string name="appIsSlowOrBuggySubtitle">どのような問題がありますか？</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">ウェブサイトや検索結果の読み込みが遅い</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">アプリがクラッシュやフリーズする</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">動画やメディアの再生に関するバグ</string>
+    <string name="appIsSlowOrBuggySubReasonOther">その他</string>
+
+    <string name="otherMainReasonTitleLong">その他</string>
+    <string name="otherMainReasonTitleShort">その他の問題</string>
+
+    <string name="openEndedInputHint">できるだけ詳細に記述してください</string>
+    <string name="submitFeedback">送信</string>
+
+    <string name="tellUsHowToImprove">何を改善すればいいかご意見をお寄せください！</string>
+    <string name="thanksForTheFeedback">ご協力いただきありがとうございます</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">どのような不満がありますか？</string>
+    <string name="feedbackNegativeMainReasonPageTitle">申し訳ありません</string>
+    <string name="feedbackShareDetails">詳細を共有</string>
+    <string name="sharePositiveFeedbackWithTheTeam">なにか開発チームに伝えたいことはありますか？</string>
+    <string name="whatHaveYouBeenEnjoying">どのような点を気に入っていますか？</string>
+    <string name="awesomeToHear">ご愛用ありがとうございます！</string>
+    <string name="shareTheLoveWithARating">Playストアで評価してこのアプリの良さを伝えてください</string>
+    <string name="rateTheApp">アプリを評価</string>
+    <string name="declineFurtherFeedback">いいえ/もう評価済みです</string>
+    <string name="whichBrokenSites">どのサイトに問題がありますか？</string>
+    <string name="whichBrokenSitesHint">どのサイトに問題がありますか？</string>
+    <string name="feedbackSpecificAsPossible">できるだけ詳細に記述してください</string>
+    <string name="feedbackInitialDisambiguationTitle">さあ始めましょう!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">どのようなフィードバックですか？</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">満足しています</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">不満があります</string>
+    <string name="feedbackIsImportantToUs">あなたのフィードバックはとても重要です</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"ウェブサイトは表示されませんでした"</string>
+    <string name="crashedWebViewErrorAction">"再読込"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">このデバイスから</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">検索またはURLを入力</font></string>
+    <string name="systemSearchAppNotFound">アプリケーションは見つかりませんでした</string>
+    <string name="systemSearchOnboardingText">DuckDuckGoをお選びいただきありがとうございます!\nこのアプリを使うことであなたの検索のプライバシーは保護されます。</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGoアプリはさらに</string>
+    <string name="systemSearchOnboardingFeatureOneText">安全でないトラッカーをブロックします</string>
+    <string name="systemSearchOnboardingFeatureTwoText">ウェブサイトに暗号化を強制します</string>
+    <string name="systemSearchOnboardingFeatureThreeText">ワンタップでデーターをクリアします</string>
+    <string name="systemSearchOnboardingButtonMore">更に表示</string>
+    <string name="systemSearchOnboardingButtonLess">隠す</string>
+    <string name="systemSearchOnboardingButtonOk">了解しました</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">隠す</string>
+    <string name="daxDialogPhew">Phew!</string>
+    <string name="daxDialogNext">次へ</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">了解しました</string>
+    <string name="hideTipsTitle">他の豆知識を表示しないようにしますか？</string>
+    <string name="hideTipsText">数は少ないですが、参考になるように心がけました。</string>
+    <string name="hideTipsButton">永久に豆知識を表示しない</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"DuckDuckGoへようこそ！"</string>
+    <string name="onboardingDaxText"><![CDATA[インターネットはちょっと不気味なものです。<br/><br/>でも、心配はいりません。 プライベートにインターネットで検索したり閲覧したりするのは思ったより簡単なことです。]]></string>
+    <string name="onboardingLetsDoItButton">さあ始めましょう！</string>
+    <string name="daxIntroCtaText"><![CDATA[次に、お気に入りのサイトにアクセスしてみてください。<br/><br/>トラッカーがあなたを監視できないようにブロックします。また、可能であれば、あなたの接続のセキュリティをアップグレードします。🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[覚えておいてください。あなたが私と一緒にブラウズするたびに、厄介な広告はその翼を失います。👍]]></string>
+    <string name="daxSerpCtaText">あなたのDuckDuckGo検索は匿名で、検索履歴を保存することは決してありません。🙌</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[&#160;と <b>%d このトラッカーが</b> あなたを追跡しようとしていました。 <br/><br/>それらはブロックされました！<br/><br/> ☝️新しいサイトを訪れたときに、誰があなたを追跡しようとしているかをアドレスバーで確認することができます。]]></item>
+        <item quantity="other"><![CDATA[&#160;と <b>%d このトラッカーが</b> あなたを追跡しようとしていました。 <br/><br/>それらはブロックされました！<br/><br/> ☝️新しいサイトを訪れたときに、誰があなたを追跡しようとしているかをアドレスバーで確認することができます。]]></item>
+    </plurals>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[&#160;はあなたを追跡しようとしていました。 <br/><br/>それらはブロックされました！<br/><br/> ☝️新しいサイトを訪れたときに、誰があなたを追跡しようとしているかをアドレスバーで確認することができます。]]></item>
+        <item quantity="other"><![CDATA[&#160;はあなたを追跡しようとしていました。 <br/><br/>それらはブロックされました！<br/><br/> ☝️新しいサイトを訪れたときに、誰があなたを追跡しようとしているかをアドレスバーで確認することができます。]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[あなたがタップやスクロールするようにトラッカーをブロックします。<br/><br/>ブラウジングを始めましょう!]]></string>
+    <string name="daxMainNetworkCtaText">ご注意ください! %s でのあなたの活動を %s に見られないようにすることはできません。&lt;br/&gt;&lt;br/&gt;しかし、私と一緒にブラウズすれば、他の多くのサイトのトラッカーをブロックすることで、 %s があなたについて全体的に知っていることを減らすことができます。.</string>
+    <string name="daxMainNetworkOwnedCtaText">ご注意ください! %s でのあなたの活動を %s に見られないようにすることはできません。&lt;br/&gt;&lt;br/&gt;しかし、私と一緒にブラウズすれば、他の多くのサイトのトラッカーをブロックすることで、 %s があなたについて全体的に知っていることを減らすことができます。</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">続行</string>
+    <string name="downloadConfirmationSaveFileTitle">%1$s を保存</string>
+    <string name="downloadConfirmationKeepBothFilesText">両方とも保持</string>
+    <string name="downloadConfirmationReplaceOldFileText">置き換え</string>
+    <string name="downloadConfirmationOpenFileText">開く</string>
+    <string name="downloadConfirmationUnableToOpenFileText">ファイルを開けませんでした</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">古いファイルを削除できませんでした</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">アプリアイコン</string>
+    <string name="changeIconCtaLabel">アプリアイコン</string>
+    <string name="changeIconCtaAccept">適用</string>
+    <string name="changeIconCtaCancel">キャンセル</string>
+    <string name="changeIconDialogTitle">新しいアイコンを反映しますか？</string>
+    <string name="changeIconDialogMessage">変更を反映するためにアプリを一旦終了することがあります。</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">保護されないサイト</string>
+    <string name="reportBrokenSite">破損したサイトを報告</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">追加</string>
+    <string name="dialogEditTitle">編集</string>
+    <string name="dialogSaveAction">保存</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">保護されないサイト</string>
+    <string name="enablePrivacyProtection">プライバシー保護を有効化</string>
+    <string name="disablePrivacyProtection">プライバシー保護を無効化</string>
+    <string name="whitelistEntryOverflowContentDescription">保護されないサイト %s の他のオプション</string>
+    <string name="whitelistEntryDeleteConfirmMessage">&lt;b>%s&lt;/b> をホワイトリストから削除しても宜しいですか？</string>
+    <string name="whitelistExplanation">これらのサイトではプライバシー保護機能は無効になります。</string>
+    <string name="whitelistNoEntries">プライバシー保護機能は全てのサイトで有効です</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError"><b>example.com</b>のような形式でドメイン名を指定し、再試行してください。</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">保護されないサイト</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Fireproofを有効にしたサイト</string>
+    <string name="settingsFireproofWebsites">Fireproofを有効にしたサイト</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Fireproofを有効にしたサイト</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> でFireproofが有効になりました! 設定画面から管理できます。</string>
+    <string name="fireproofWebsiteSnackbarAction">もとに戻す</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b>%s&lt;/b>を削除しても宜しいですか?</string>
+    <string name="fireproofWebsiteEmptyListHint">Fireproofを有効にしたサイトはありません</string>
+    <string name="fireproofWebsiteFeatureDescription">ウェブサイトでは、あなたのログイン状態を保持するためにCookieを使用しています。Fireproofを適用すると、Fireボタンを使用した後でも、Cookieは消去されず、ログイン状態が維持されます。Fireproofサイトにある第三者のトラッカーは引き続きブロックされます。</string>
+    <string name="fireproofWebsiteOverflowContentDescription">ウェブサイト %s の他のFireproofオプション</string>
+    <string name="fireproofWebsiteLoginDialogTitle">%s にFireproofを適用しますか?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">このサイトにFireproofを適用することでFireボタンを押してもログイン状態が保持されます。</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
+    <string name="fireproofWebsiteLoginDialogNegative">今はしない</string>
+    <string name="fireproofWebsiteItemsSectionTitle">ウェブサイト</string>
+    <string name="fireproofWebsiteToogleText">ログイン時に尋ねる</string>
+    <string name="disableLoginDetectionDialogTitle">サイトへのサインイン時にFireproof通知を無効にしますか？</string>
+    <string name="disableLoginDetectionDialogDescription">これは設定画面からいつでも変更できます。</string>
+    <string name="disableLoginDetectionDialogPositive">無効化</string>
+    <string name="disableLoginDetectionDialogNegative">キャンセル</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b>%s&lt;/b> でFireproofは無効になりました。</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Fireボタンのアニメーション</string>
+    <string name="settingsHeroFireAnimation">インフェルノ</string>
+    <string name="settingsHeroWaterAnimation">渦巻き</string>
+    <string name="settingsHeroAbstractAnimation">エアストリーム</string>
+    <string name="settingsNoneAnimation">なし</string>
+    <string name="settingsSelectFireAnimationDialog">Fireボタンのアニメーション</string>
+    <string name="settingsSelectFireAnimationDialogSave">保存</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">接続が中断されました。このウェブサイトは、あなたのデバイスに有害である可能性があります。</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">ダウンロードマネージャが無効です</string>
+    <string name="downloadManagerIncompatible">この端末でダウンロードマネージャが利用できません</string>
+    <string name="enable">有効化</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">DuckDuckGoプライベートブラウザで位置情報を有効にしますか?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s はあなたの端末の位置情報を要求しています。 まずこのアプリに位置情報の権限を許可すると、%sは権限を要求できます。</string>
+    <string name="preciseLocationSystemDialogAllow">有効化</string>
+    <string name="preciseLocationSystemDialogDeny">後で</string>
+    <string name="preciseLocationSystemDialogNeverAllow">このサイトでは二度と尋ねない</string>
+    <string name="preciseLocationSiteDialogTitle">%s 権限を許可して位置情報にアクセスしますか?</string>
+    <string name="preciseLocationDDGDialogSubtitle">匿名の位置情報は、より良い結果をあなたの近くでお届けするためにのみ使用します。あとでいつでも変更することができます。</string>
+    <string name="preciseLocationSiteDialogSubtitle">個々のサイトに付与した位置情報の権限は、設定画面で管理できます。</string>
+    <string name="preciseLocationSiteDialogAllowAlways">常に許可</string>
+    <string name="preciseLocationSiteDialogAllowOnce">このセッションのみ許可</string>
+    <string name="preciseLocationSiteDialogDenyAlways">常に拒否</string>
+    <string name="preciseLocationSiteDialogDenyOnce">このセッションで拒否</string>
+    <string name="settingsPreciseLocation">位置情報</string>
+    <string name="preciseLocationFeatureDescription">あなたが訪れたサイトで、デバイスの位置情報を求められることがあります。あなたが明示的に許可しない限り、これらのサイトは位置情報にアクセスすることはできません。DuckDuckGoは、あなたの位置情報を匿名で使用し、ローカル検索結果を提供します。</string>
+    <string name="preciseLocationToggleText">サイトは位置情報を尋ねることができます</string>
+    <string name="preciseLocationEmptyListHint">位置情報へのアクセスを許可されたウェブサイトはありません</string>
+    <string name="preciseLocationNoSystemPermission">個々のサイトに付与した位置情報アクセスの権限を管理するには、Androidの設定画面でこのアプリの位置情報を有効にする必要があります。</string>
+    <string name="preciseLocationActivityTitle">位置情報</string>
+    <string name="preciseLocationDeleteConfirmMessage">&lt;b>%s&lt;/b>を削除しても宜しいですか?</string>
+    <string name="preciseLocationDeleteContentDescription">ドメイン %s の他の位置権限オプション</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">許可</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">拒否</string>
+    <string name="preciseLocationSnackbarMessage">%s に端末の位置情報にアクセスする権限を許可しました。</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">個人情報がブラウザに蓄積されてしまうことがあります。Fireボタンで燃やしてしまいましょう。今すぐお試しください。 &#128071;</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        <![CDATA[DuckDuckGoは、多くのトラッカーを自動的にブロックします。グローバル・プライバシー・コントロール（GPC）では、参加しているウェブサイトに、あなたの個人データの他社への販売や共有を制限するよう求めることもできます。<u><a href="">詳細はこちら</a><u/>]]>
+    </string>
+    <string name="globalPrivacyControlSetting">グローバル・プライバシー・コントロール (GPC)</string>
+    <string name="globalPrivacyControlToggle">グローバル・プライバシー・コントロール (GPC)</string>
+    <string name="disabled">無効</string>
+    <string name="enabled">有効</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">対応アプリでリンクを開く</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">インストールされている他のアプリでリンクが自動的に開かないようにするには無効にしてください</string>
+    <string name="appLinkDialogTitle">外部アプリで開きますか</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">新規アドレスはクリップボードにコピーされました</string>
+    <string name="autofillTooltipUseYourAlias">%1$s を使用</string>
+    <string name="autofillTooltipUseYourAliasDescription">eメールのトラッカーをブロック</string>
+    <string name="autofillTooltipGenerateAddress">プライベートアドレスを生成</string>
+    <string name="autofillTooltipGenerateAddressDescription">eメールのトラッカーをブロックしあなたのアドレスを隠します。</string>
+    <string name="newEmailAliasMenuTitle">匿名化されたアドレスを生成</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">eメール保護を無効にしますか?</string>
+    <string name="emailSignOutDialogText">注意：この端末のeメール保護を解除しても、アドレスのエイリアスは削除されません。</string>
+    <string name="emailSignOutDialogCancel">キャンセル</string>
+    <string name="emailSignOutDialogDisable">解除</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">eメール保護のウェイトリスト</string>
+    <string name="waitlistNotificationTitle">eメール保護の招待はこちらです!</string>
+    <string name="waitlistNotificationDescription">メール保護機能の試用を希望される方は、待機リストに登録されていますので、その旨をお知らせします。タップすると招待状が表示されます。</string>
+
+    <string name="waitlistNotificationDialogDescription">あなたの番になったら通知を希望しますか？</string>
+    <string name="waitlistNotificationDialogNoThanks">いいえ</string>
+    <string name="waitlistNotificationDialogNotifyMe">通知してください</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">eメール保護 (Beta)</string>
+    <string name="emailProtectionActivityTitle">eメール保護 (Beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[私達はあなたのメールを保存しません。 <b><a href="">詳細はこちら</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">ウェイトリストへの登録にエラーが発生しました。再試行してください。</string>
+    <string name="emailProtectionDuckAddressCta">既に匿名化されたアドレスを持っています</string>
+    <string name="emailProtectionInviteCodeCta">招待コードがあります</string>
+    <string name="emailProtectionWaitlistCta">ウェイトリストに追加</string>
+    <string name="emailProtectionGetStartedCta">始める</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">eメールのプライバシー保護をシンプルに。</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[メールプロバイダを変更することなく<br/>eメールのトラッカーをブロックしあなたのアドレスを隠します。<a href=""><b>詳細はこちら</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">リストに追加されました</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[あなたのためにeメール保護が準備できた際<br/> 通知を送信します。 <a href=""><b>詳細はこちら</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[あなたの招待状は、準備が整うとここに表示されます。準備ができたら <a href=""><b>通知を受け取りたい</b></a> ですか?<br/><a href="">eメール保護の<b>詳細はこちら</b></a>]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">あなたは招待されました!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[メールプロバイダを変更することなく<br/>eメールのトラッカーをブロックしあなたのアドレスを隠します。 <a href=""><b>詳細はこちら</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">あなたの匿名化されたアドレス</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[この端末のメール保護機能を解除すると、ウェブ閲覧時にメール欄に匿名化されたアドレスを入力するオプションがなくなります。<br/><br/>Duckアドレスを完全に削除したい場合、またはその他のご質問やご意見がございましたら、<a href="mailto:support@duck.com">support@duck.com</a>までご連絡ください。]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">デバイスから解除</string>
+</resources>
