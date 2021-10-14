@@ -27,9 +27,12 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePluginPoint
+import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDataStore
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesSharedPreferences
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -99,6 +102,7 @@ class DatabaseModule {
         return Room.databaseBuilder(context, PrivacyConfigDatabase::class.java, "privacy_config.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
             .build()
     }
 
@@ -128,6 +132,12 @@ class DatabaseModule {
 
     @Singleton
     @Provides
+    fun providePrivacyFeatureTogglesDataStore(context: Context): PrivacyFeatureTogglesDataStore {
+        return PrivacyFeatureTogglesSharedPreferences(context)
+    }
+
+    @Singleton
+    @Provides
     fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
         return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
     }
@@ -146,7 +156,7 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun providePrivacyFeatureTogglesRepository(database: PrivacyConfigDatabase): PrivacyFeatureTogglesRepository {
-        return RealPrivacyFeatureTogglesRepository(database)
+    fun providePrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore): PrivacyFeatureTogglesRepository {
+        return RealPrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore)
     }
 }

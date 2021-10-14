@@ -27,16 +27,17 @@ import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -49,9 +50,9 @@ class RealPrivacyConfigPersisterTest {
     var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigPersister
+    private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
 
     private lateinit var db: PrivacyConfigDatabase
-    private lateinit var togglesRepository: PrivacyFeatureTogglesRepository
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint()
@@ -60,24 +61,27 @@ class RealPrivacyConfigPersisterTest {
     fun before() {
         prepareDb()
 
-        testee = RealPrivacyConfigPersister(pluginPoint, togglesRepository, unprotectedTemporaryRepository, privacyRepository, db)
+        testee = RealPrivacyConfigPersister(pluginPoint, mockTogglesRepository, unprotectedTemporaryRepository, privacyRepository, db)
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     private fun prepareDb() {
         db = Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        togglesRepository = RealPrivacyFeatureTogglesRepository(db)
         privacyRepository = RealPrivacyConfigRepository(db)
         unprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenPersistPrivacyConfigThenDeleteAllTogglesPreviouslyStored() = coroutineRule.runBlocking {
-        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        assertNull(togglesRepository.get("feature"))
+        verify(mockTogglesRepository).deleteAll()
     }
 
     @Test
@@ -99,24 +103,22 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
-        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
         privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertEquals(3, privacyRepository.get()!!.version)
-        assertNotNull(togglesRepository.get("feature"))
+        verify(mockTogglesRepository, never()).deleteAll()
     }
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() = coroutineRule.runBlocking {
-        togglesRepository.insert(PrivacyFeatureToggles("feature", true))
         privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
 
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertEquals(2, privacyRepository.get()!!.version)
-        assertNotNull(togglesRepository.get("feature"))
+        verify(mockTogglesRepository, never()).deleteAll()
     }
 
     @Test

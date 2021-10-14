@@ -86,12 +86,6 @@ fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlocking
     return ContentBlockingException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "toggles")
-data class PrivacyFeatureToggles(
-    @PrimaryKey val featureName: String,
-    val enabled: Boolean
-)
-
 @Entity(tableName = "privacy_config")
 data class PrivacyConfig(
     @PrimaryKey val id: Int = 1,
