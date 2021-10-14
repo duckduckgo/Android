@@ -25,6 +25,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -34,6 +35,7 @@ import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -64,7 +66,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
 
         viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { viewState ->
             render(viewState)
-        }
+        }.launchIn(lifecycleScope)
 
         repository.retrieveSiteData(intent.tabId!!).observe(
             this,

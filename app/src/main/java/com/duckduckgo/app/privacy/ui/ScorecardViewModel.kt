@@ -65,7 +65,7 @@ class ScorecardViewModel(
     fun onSiteChanged(site: Site?) {
         this.site = site
         if (site == null) {
-            resetViewState()
+            viewModelScope.launch { resetViewState() }
         } else {
             viewModelScope.launch { updateSite(site) }
         }
@@ -75,8 +75,8 @@ class ScorecardViewModel(
         return viewState
     }
 
-    private fun resetViewState() {
-        viewState.value = ViewState()
+    private suspend fun resetViewState() {
+        viewState.emit(ViewState())
     }
 
     private fun currentViewState(): ViewState {
