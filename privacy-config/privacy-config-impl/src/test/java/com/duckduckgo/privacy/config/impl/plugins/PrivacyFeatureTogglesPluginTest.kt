@@ -20,7 +20,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -39,7 +38,7 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Before
     fun before() {
-        testee = PrivacyFeatureTogglesPlugin(mockFeatureTogglesRepository, coroutineRule.testDispatcherProvider)
+        testee = PrivacyFeatureTogglesPlugin(mockFeatureTogglesRepository)
     }
 
     @Test
@@ -67,8 +66,8 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnDefaultValueIfFeatureDoesNotExist() = coroutineRule.runBlocking {
-        givenPrivacyFeatureDoesNotExist()
         val defaultValue = true
+        givenPrivacyFeatureReturnsDefaultValue(defaultValue)
 
         val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), defaultValue)
 
@@ -76,19 +75,19 @@ class PrivacyFeatureTogglesPluginTest {
     }
 
     private fun givenPrivacyFeatureIsEnabled() {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value)).thenReturn(
-            PrivacyFeatureToggles(PrivacyFeatureName.ContentBlockingFeatureName().value, true)
+        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, true)).thenReturn(
+            true
         )
     }
 
     private fun givenPrivacyFeatureIsDisabled() {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value)).thenReturn(
-            PrivacyFeatureToggles(PrivacyFeatureName.ContentBlockingFeatureName().value, false)
+        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, true)).thenReturn(
+            false
         )
     }
 
-    private fun givenPrivacyFeatureDoesNotExist() {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value)).thenReturn(null)
+    private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
+        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue)).thenReturn(defaultValue)
     }
 
     data class NonPrivacyFeature(override val value: String = "test") : FeatureName
