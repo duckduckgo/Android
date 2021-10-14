@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 
 import android.content.Context
 import android.content.res.Resources
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -34,10 +35,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayInputStream
+import java.util.concurrent.CopyOnWriteArrayList
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealGpcTest {
     private val mockGpcRepository: GpcRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
@@ -48,9 +49,10 @@ class RealGpcTest {
 
     @Before
     fun setup() {
+        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(EXCEPTION_URL)) }
         whenever(mockContext.resources).thenReturn(mockResources)
         whenever(mockResources.openRawResource(any())).thenReturn(ByteArrayInputStream("".toByteArray()))
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(EXCEPTION_URL)))
+        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
 
         testee = RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
     }
@@ -146,7 +148,8 @@ class RealGpcTest {
 
     @Test
     fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() {
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(VALID_CONSUMER_URL)))
+        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(VALID_CONSUMER_URL)) }
+        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, emptyMap()))

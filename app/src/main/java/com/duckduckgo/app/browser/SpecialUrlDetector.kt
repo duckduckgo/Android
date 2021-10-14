@@ -24,7 +24,6 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -45,8 +44,7 @@ interface SpecialUrlDetector {
 }
 
 class SpecialUrlDetectorImpl(
-    private val packageManager: PackageManager,
-    private val settingsDataStore: SettingsDataStore
+    private val packageManager: PackageManager
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
@@ -78,7 +76,7 @@ class SpecialUrlDetectorImpl(
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     private fun checkForAppLink(uriString: String): UrlType {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && settingsDataStore.appLinksEnabled) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)
                 val nonBrowserActivities = keepNonBrowserActivities(activities)

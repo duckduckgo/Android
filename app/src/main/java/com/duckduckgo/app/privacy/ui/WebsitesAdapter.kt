@@ -16,18 +16,23 @@
 
 package com.duckduckgo.app.privacy.ui
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
+import com.duckduckgo.app.browser.databinding.ViewListItemDividerBinding
+import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewListItemSectionTitleBinding
+import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -94,34 +99,33 @@ class WebsitesAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_item_description, parent, false)
-                val description = view.findViewById<TextView>(R.id.websiteDescription)
-                description.setText(R.string.whitelistExplanation)
-                WebsiteViewHolder.SimpleViewHolder(view)
+                val binding = ViewListItemDescriptionBinding.inflate(inflater, parent, false)
+                binding.websiteDescription.setText(R.string.whitelistExplanation)
+                WebsiteViewHolder.SimpleViewHolder(binding)
             }
             DIVIDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_item_divider, parent, false)
-                WebsiteViewHolder.SimpleViewHolder(view)
+                val binding = ViewListItemDividerBinding.inflate(inflater, parent, false)
+                WebsiteViewHolder.SimpleViewHolder(binding)
             }
             SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_item_section_title, parent, false)
-                view.findViewById<TextView>(R.id.listItemSectionTitle).setText(R.string.fireproofWebsiteItemsSectionTitle)
-                WebsiteViewHolder.SimpleViewHolder(view)
+                val binding = ViewListItemSectionTitleBinding.inflate(inflater, parent, false)
+                binding.listItemSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                WebsiteViewHolder.SimpleViewHolder(binding)
             }
             SITE_ENTRY -> {
-                val view = inflater.inflate(R.layout.view_list_single_item_entry, parent, false)
+                val binding = ViewListSingleItemEntryBinding.inflate(inflater, parent, false)
                 WebsiteViewHolder.WebsiteItemViewHolder(
                     inflater,
-                    view,
+                    binding,
                     viewModel,
                     lifecycleOwner,
                     faviconManager
                 )
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_item_empty_hint, parent, false)
-                view.findViewById<TextView>(R.id.listItemEmptyHintTitle).setText(R.string.whitelistNoEntries)
-                WebsiteViewHolder.SimpleViewHolder(view)
+                val binding = ViewListItemEmptyHintBinding.inflate(inflater, parent, false)
+                binding.listItemEmptyHintTitle.setText(R.string.whitelistNoEntries)
+                WebsiteViewHolder.SimpleViewHolder(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -138,26 +142,25 @@ class WebsitesAdapter(
 
 sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SimpleViewHolder(itemView: View) : WebsiteViewHolder(itemView)
+    class SimpleViewHolder(binding: ViewBinding) : WebsiteViewHolder(binding.root)
     class WebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
-        itemView: View,
+        private val binding: ViewListSingleItemEntryBinding,
         private val viewModel: WhitelistViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) : WebsiteViewHolder(itemView) {
+    ) : WebsiteViewHolder(binding.root) {
 
-        lateinit var entity: UserWhitelistedDomain
+        private val context: Context = binding.root.context
+        private lateinit var entity: UserWhitelistedDomain
 
         fun bind(entity: UserWhitelistedDomain) {
-            val listItem = itemView as SingleLineListItem
+            val listItem = binding.root
             this.entity = entity
 
-            listItem.setContentDescription(
-                itemView.context.getString(
-                    R.string.fireproofWebsiteOverflowContentDescription,
-                    entity.domain
-                )
+            listItem.contentDescription = context.getString(
+                R.string.fireproofWebsiteOverflowContentDescription,
+                entity.domain
             )
 
             listItem.setTitle(entity.domain)
@@ -180,7 +183,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
                 onMenuItemClicked(view.findViewById(R.id.edit)) { viewModel.onEditRequested(entity) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteRequested(entity) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.show(binding.root, anchor)
         }
     }
 }

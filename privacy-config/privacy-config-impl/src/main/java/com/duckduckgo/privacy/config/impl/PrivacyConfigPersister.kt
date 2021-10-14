@@ -56,8 +56,10 @@ class RealPrivacyConfigPersister @Inject constructor(
                 privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
-                    privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
-                        plugin.store(feature.key, feature.value)
+                    feature.value?.let { jsonObject ->
+                        privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
+                            plugin.store(feature.key, jsonObject.toString())
+                        }
                     }
                 }
             }

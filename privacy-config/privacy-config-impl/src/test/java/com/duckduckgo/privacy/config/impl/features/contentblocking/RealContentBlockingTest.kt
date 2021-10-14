@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -27,9 +28,9 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
+import java.util.concurrent.CopyOnWriteArrayList
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class RealContentBlockingTest {
 
     lateinit var testee: RealContentBlocking
@@ -61,7 +62,7 @@ class RealContentBlockingTest {
 
     @Test
     fun whenIsAnExceptionAndDomainIsNotListedInTheExceptionsListThenReturnFalse() {
-        whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockContentBlockingRepository.exceptions).thenReturn(CopyOnWriteArrayList())
 
         assertFalse(testee.isAnException("http://test.example.com"))
     }
@@ -70,7 +71,7 @@ class RealContentBlockingTest {
     fun whenIsAnExceptionAndDomainIsInTheUnprotectedTemporaryListThenReturnTrue() {
         val url = "http://test.example.com"
         whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
-        whenever(mockContentBlockingRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockContentBlockingRepository.exceptions).thenReturn(CopyOnWriteArrayList())
 
         assertTrue(testee.isAnException(url))
     }
@@ -84,11 +85,8 @@ class RealContentBlockingTest {
     }
 
     private fun givenThereAreExceptions() {
-        whenever(mockContentBlockingRepository.exceptions).thenReturn(
-            arrayListOf(
-                ContentBlockingException("example.com", "my reason here")
-            )
-        )
+        val exceptions = CopyOnWriteArrayList<ContentBlockingException>().apply { add(ContentBlockingException("example.com", "my reason here")) }
+        whenever(mockContentBlockingRepository.exceptions).thenReturn(exceptions)
     }
 
     private fun givenFeatureIsEnabled() {

@@ -19,7 +19,6 @@ package com.duckduckgo.app.privacy.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.BrowserActivity
@@ -56,6 +55,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()
+        setupClickListeners()
 
         viewModel.viewState.observe(
             this,
@@ -86,9 +86,11 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onTosdrLinkClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        startActivity(BrowserActivity.intent(this, Url.TOSDR))
-        finish()
+    private fun setupClickListeners() {
+        privacyPractices.tosdrLink.setOnClickListener {
+            startActivity(BrowserActivity.intent(this, Url.TOSDR))
+            finish()
+        }
     }
 
     companion object {

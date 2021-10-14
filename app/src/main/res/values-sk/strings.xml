@@ -460,10 +460,10 @@
     <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Keďže spoločnosť %1$s vlastní službu %2$s, nemôžem jej zabrániť v tom, aby videla vašu aktivitu.&lt;br/&gt;&lt;br/&gt;Prehliadajte so mnou a môžem obmedziť to, čo o vás %3$s celkovo vie, zablokovaním jej sledovacích zariadení na mnohých ďalších stránkach.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Ďalej</string>
-    <string name="downloadConfirmationSaveFileTitle">Ušetrite %1$s</string>
+    <string name="downloadConfirmationContinue">Pokračovať</string>
+    <string name="downloadConfirmationSaveFileTitle">Uložiť %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Nechať si oboje</string>
-    <string name="downloadConfirmationReplaceOldFileText">Vymeniť</string>
+    <string name="downloadConfirmationReplaceOldFileText">Nahradiť</string>
     <string name="downloadConfirmationOpenFileText">Otvoriť</string>
     <string name="downloadConfirmationUnableToOpenFileText">Súbor sa nepodarilo otvoriť</string>
     <string name="downloadConfirmationUnableToDeleteFileText">Starý súbor sa nepodarilo odstrániť</string>
