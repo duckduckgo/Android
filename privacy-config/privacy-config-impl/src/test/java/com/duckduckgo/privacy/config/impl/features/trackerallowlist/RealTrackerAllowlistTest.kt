@@ -32,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 import java.lang.reflect.ParameterizedType
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class RealTrackerAllowlistTest(private val testCase: TestCase) {
@@ -75,7 +76,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
     private fun mockAllowlist() {
         val jsonAdapter: JsonAdapter<TrackerAllowlistEntity> =
             moshi.adapter(TrackerAllowlistEntity::class.java)
-        val exceptions = arrayListOf<TrackerAllowlistEntity>()
+        val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("json/tracker_allowlist_reference.json")
 
         jsonObject.keys().forEach {

@@ -21,17 +21,18 @@ import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackerAllowlistRepository {
     fun updateAll(exceptions: List<TrackerAllowlistEntity>)
-    val exceptions: ArrayList<TrackerAllowlistEntity>
+    val exceptions: CopyOnWriteArrayList<TrackerAllowlistEntity>
 }
 
 class RealTrackerAllowlistRepository(database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
     TrackerAllowlistRepository {
 
     private val trackerAllowlistDao: TrackerAllowlistDao = database.trackerAllowlistDao()
-    override val exceptions = ArrayList<TrackerAllowlistEntity>()
+    override val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
