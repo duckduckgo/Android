@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
@@ -32,6 +31,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,26 +45,22 @@ class ScorecardViewModel(
 ) : ViewModel() {
 
     data class ViewState(
-        val domain: String,
-        val beforeGrade: PrivacyGrade,
-        val afterGrade: PrivacyGrade,
-        val httpsStatus: HttpsStatus,
-        val trackerCount: Int,
-        val majorNetworkCount: Int,
-        val allTrackersBlocked: Boolean,
-        val practices: PrivacyPractices.Summary,
-        val privacyOn: Boolean,
-        val showIsMemberOfMajorNetwork: Boolean,
-        val showEnhancedGrade: Boolean,
-        val isSiteInTempAllowedList: Boolean
+        val domain: String = "",
+        val beforeGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val afterGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val httpsStatus: HttpsStatus = HttpsStatus.SECURE,
+        val trackerCount: Int = 0,
+        val majorNetworkCount: Int = 0,
+        val allTrackersBlocked: Boolean = true,
+        val practices: PrivacyPractices.Summary = UNKNOWN,
+        val privacyOn: Boolean = true,
+        val showIsMemberOfMajorNetwork: Boolean = false,
+        val showEnhancedGrade: Boolean = false,
+        val isSiteInTempAllowedList: Boolean = false
     )
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    private val viewState = MutableStateFlow(ViewState())
     private var site: Site? = null
-
-    init {
-        resetViewState()
-    }
 
     fun onSiteChanged(site: Site?) {
         this.site = site
@@ -74,21 +71,16 @@ class ScorecardViewModel(
         }
     }
 
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
+    }
+
     private fun resetViewState() {
-        viewState.value = ViewState(
-            domain = "",
-            beforeGrade = PrivacyGrade.UNKNOWN,
-            afterGrade = PrivacyGrade.UNKNOWN,
-            httpsStatus = HttpsStatus.SECURE,
-            trackerCount = 0,
-            majorNetworkCount = 0,
-            allTrackersBlocked = true,
-            practices = UNKNOWN,
-            privacyOn = true,
-            showIsMemberOfMajorNetwork = false,
-            showEnhancedGrade = false,
-            isSiteInTempAllowedList = false
-        )
+        viewState.value = ViewState()
+    }
+
+    private fun currentViewState(): ViewState {
+        return viewState.value
     }
 
     private suspend fun updateSite(site: Site) {
@@ -101,19 +93,21 @@ class ScorecardViewModel(
         val isSiteAContentBlockingException = withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
 
         withContext(dispatchers.main()) {
-            viewState.value = viewState.value?.copy(
-                domain = domain,
-                beforeGrade = grade,
-                afterGrade = improvedGrade,
-                trackerCount = site.trackerCount,
-                majorNetworkCount = site.majorNetworkCount,
-                httpsStatus = site.https,
-                allTrackersBlocked = site.allTrackersBlocked,
-                practices = site.privacyPractices.summary,
-                privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
-                showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-                showEnhancedGrade = grade != improvedGrade,
-                isSiteInTempAllowedList = isSiteAContentBlockingException
+            viewState.emit(
+                currentViewState().copy(
+                    domain = domain,
+                    beforeGrade = grade,
+                    afterGrade = improvedGrade,
+                    trackerCount = site.trackerCount,
+                    majorNetworkCount = site.majorNetworkCount,
+                    httpsStatus = site.https,
+                    allTrackersBlocked = site.allTrackersBlocked,
+                    practices = site.privacyPractices.summary,
+                    privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
+                    showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
+                    showEnhancedGrade = grade != improvedGrade,
+                    isSiteInTempAllowedList = isSiteAContentBlockingException
+                )
             )
         }
     }
