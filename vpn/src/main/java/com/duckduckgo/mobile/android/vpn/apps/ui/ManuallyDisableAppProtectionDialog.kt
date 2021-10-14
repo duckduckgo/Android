@@ -31,7 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(answer: Int, packageName: String)
+        fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String)
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -102,7 +102,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     ) {
         submitCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getPackageName())
+            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), appName = getAppName(), packageName = getPackageName())
         }
 
         radioGroup.setOnCheckedChangeListener { _, _ ->

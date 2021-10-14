@@ -168,7 +168,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     private fun processCommand(command: ReportBreakageAppListView.Command) {
         when (command) {
             is ReportBreakageAppListView.Command.LaunchBreakageForm -> {
-                reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm(command.selectedApp.packageName))
+                reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm(appName = command.selectedApp.name, appPackageId = command.selectedApp.packageName))
             }
             is ReportBreakageAppListView.Command.SendBreakageInfo -> {
                 val intent = Intent().apply {

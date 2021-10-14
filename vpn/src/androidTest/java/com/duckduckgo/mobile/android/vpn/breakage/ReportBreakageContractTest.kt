@@ -26,7 +26,7 @@ class ReportBreakageContractTest {
 
     @Test
     fun whenCreateIntentForIssueDescriptionFormThenReturnCorrectIntent() {
-        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.IssueDescriptionForm("my.package.com"))
+        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.IssueDescriptionForm("myApp", "my.package.com"))
         assertEquals(ReportBreakageTextFormActivity::class.java.canonicalName, intent.component?.className)
     }
 
@@ -38,7 +38,7 @@ class ReportBreakageContractTest {
 
     @Test
     fun whenCreateIntentForLoginInformationThenReturnCorrectIntent() {
-        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.LoginInformation("my.package.com"))
+        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.LoginInformation("myApp", "my.package.com"))
         assertEquals(ReportBreakageSingleChoiceFormActivity::class.java.canonicalName, intent.component?.className)
     }
 }

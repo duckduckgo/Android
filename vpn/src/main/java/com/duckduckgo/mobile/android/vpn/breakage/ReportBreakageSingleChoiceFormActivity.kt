@@ -46,12 +46,12 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.defaultToolbar
 
-    private var appPackageId: String? = null
+    private var brokenApp: BrokenApp? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appPackageId = intent.getStringExtra(APP_PACKAGE_ID_EXTRA)
+        brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA)
 
         setContentView(binding.root)
         setupToolbar(toolbar)
@@ -87,7 +87,7 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
 
     private fun submitChoice(choice: Choice) {
         val intent = Intent().apply {
-            IssueReport(appPackageId = appPackageId, loginInfo = getString(choice.questionStringRes)).addToIntent(this)
+            IssueReport(appName = brokenApp?.appName, appPackageId = brokenApp?.appPackageId, loginInfo = getString(choice.questionStringRes)).addToIntent(this)
         }
         setResult(RESULT_OK, intent)
         finish()
@@ -101,9 +101,9 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     companion object {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
-        fun intent(context: Context, appPackageId: String?): Intent {
+        fun intent(context: Context, brokenApp: BrokenApp): Intent {
             return Intent(context, ReportBreakageSingleChoiceFormActivity::class.java).apply {
-                appPackageId?.let { putExtra(APP_PACKAGE_ID_EXTRA, it) }
+                putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }
         }
     }

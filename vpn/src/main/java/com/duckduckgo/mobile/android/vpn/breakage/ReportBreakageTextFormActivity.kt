@@ -43,13 +43,14 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.defaultToolbar
 
-    private lateinit var appPackageId: String
+    private lateinit var brokenApp: BrokenApp
 
     private val reportBreakageLoginInfo = registerForActivityResult(ReportBreakageContract()) { issueReport ->
         if (!issueReport.isEmpty()) {
             lifecycleScope.launch {
                 val issue = issueReport.copy(
-                    appPackageId = appPackageId,
+                    appName = brokenApp.appName,
+                    appPackageId = brokenApp.appPackageId,
                     description = binding.appBreakageFormFeedbackInput.text.toString(),
                     customMetadata = Base64.encodeToString(metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(), Base64.NO_WRAP)
                 )
@@ -64,8 +65,8 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // The value should never be "unknown" we just do this because getStringExtra returns nullable
-        appPackageId = intent.getStringExtra(APP_PACKAGE_ID_EXTRA) ?: "unknown"
+        // The value should never be "unknown" we just do this because getParcelableExtra returns nullable
+        brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
 
         setContentView(binding.root)
         setupToolbar(toolbar)
@@ -75,16 +76,16 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     fun setupViews() {
         binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.ctaNextFormText.setOnClickListener {
-            reportBreakageLoginInfo.launch(ReportBreakageScreen.LoginInformation(appPackageId))
+            reportBreakageLoginInfo.launch(ReportBreakageScreen.LoginInformation(brokenApp.appName, brokenApp.appPackageId))
         }
     }
 
     companion object {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
-        fun intent(context: Context, appPackageId: String): Intent {
+        fun intent(context: Context, brokenApp: BrokenApp): Intent {
             return Intent(context, ReportBreakageTextFormActivity::class.java).apply {
-                putExtra(APP_PACKAGE_ID_EXTRA, appPackageId)
+                putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }
         }
     }
