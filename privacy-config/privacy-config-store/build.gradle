@@ -51,3 +51,7 @@ dependencies {
 
     testImplementation project(path: ':common-test')
 }
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testDebugUnitTest'
+}
