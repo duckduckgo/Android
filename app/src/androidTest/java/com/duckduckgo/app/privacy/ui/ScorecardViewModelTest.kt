@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -27,18 +27,20 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 @ExperimentalCoroutinesApi
 class ScorecardViewModelTest {
 
@@ -50,155 +52,185 @@ class ScorecardViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private var viewStateObserver: Observer<ScorecardViewModel.ViewState> = mock()
     private var userWhitelistDao: UserWhitelistDao = mock()
     private var contentBlocking: ContentBlocking = mock()
 
-    private val testee: ScorecardViewModel by lazy {
-        val model = ScorecardViewModel(userWhitelistDao, contentBlocking, coroutineRule.testDispatcherProvider)
-        model.viewState.observeForever(viewStateObserver)
-        model
-    }
+    private lateinit var testee: ScorecardViewModel
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
+        testee = ScorecardViewModel(userWhitelistDao, contentBlocking, coroutineRule.testDispatcherProvider)
+
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
     }
 
-    @After
-    fun after() {
-        testee.viewState.removeObserver(viewStateObserver)
+    @Test
+    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertEquals("", viewState.domain)
+            assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
+            assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
+            assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
+            assertEquals(0, viewState.trackerCount)
+            assertEquals(0, viewState.majorNetworkCount)
+            assertTrue(viewState.allTrackersBlocked)
+            assertFalse(viewState.showIsMemberOfMajorNetwork)
+            assertFalse(viewState.showEnhancedGrade)
+            assertEquals(PrivacyPractices.Summary.UNKNOWN, viewState.practices)
+            assertFalse(viewState.isSiteInTempAllowedList)
+        }
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() {
-        val viewState = testee.viewState.value!!
-        assertEquals("", viewState.domain)
-        assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
-        assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
-        assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
-        assertEquals(0, viewState.trackerCount)
-        assertEquals(0, viewState.majorNetworkCount)
-        assertTrue(viewState.allTrackersBlocked)
-        assertFalse(viewState.showIsMemberOfMajorNetwork)
-        assertFalse(viewState.showEnhancedGrade)
-        assertEquals(PrivacyPractices.Summary.UNKNOWN, viewState.practices)
-        assertFalse(viewState.isSiteInTempAllowedList)
-    }
-
-    @Test
-    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() {
+    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() = coroutineTestRule.runBlocking {
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
-        assertEquals(PrivacyGrade.D, testee.viewState.value?.beforeGrade)
-        assertEquals(PrivacyGrade.B, testee.viewState.value?.afterGrade)
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertEquals(PrivacyGrade.D, viewState.beforeGrade)
+            assertEquals(PrivacyGrade.B, viewState.afterGrade)
+        }
     }
 
     @Test
-    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() {
+    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
         testee.onSiteChanged(site(https = HttpsStatus.MIXED))
-        assertEquals(HttpsStatus.MIXED, testee.viewState.value?.httpsStatus)
+        testee.viewState().test {
+            assertEquals(HttpsStatus.MIXED, awaitItem().httpsStatus)
+        }
     }
 
     @Test
-    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() {
+    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
         testee.onSiteChanged(site(trackerCount = 10))
-        assertEquals(10, testee.viewState.value!!.trackerCount)
+        testee.viewState().test {
+            assertEquals(10, awaitItem().trackerCount)
+        }
     }
 
     @Test
-    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() {
+    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
         testee.onSiteChanged(site(majorNetworkCount = 10))
-        assertEquals(10, testee.viewState.value!!.majorNetworkCount)
+        testee.viewState().test {
+            assertEquals(10, awaitItem().majorNetworkCount)
+        }
     }
 
     @Test
-    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() {
+    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
         testee.onSiteChanged(site(allTrackersBlocked = false))
-        assertEquals(false, testee.viewState.value!!.allTrackersBlocked)
+        testee.viewState().test {
+            assertEquals(false, awaitItem().allTrackersBlocked)
+        }
     }
 
     @Test
-    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() {
+    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
         testee.onSiteChanged(site(allTrackersBlocked = true))
-        assertEquals(true, testee.viewState.value!!.allTrackersBlocked)
+        testee.viewState().test {
+            assertEquals(true, awaitItem().allTrackersBlocked)
+        }
     }
 
     @Test
-    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() {
+    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() = coroutineTestRule.runBlocking {
         val privacyPractices = Practices(0, GOOD, listOf("good"), listOf())
         testee.onSiteChanged(site(privacyPractices = privacyPractices))
-        assertEquals(GOOD, testee.viewState.value!!.practices)
+        testee.viewState().test {
+            assertEquals(GOOD, awaitItem().practices)
+        }
     }
 
     @Test
-    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() {
+    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() = coroutineTestRule.runBlocking {
         val site = site(entity = TestEntity("", "", 10.0))
         testee.onSiteChanged(site)
-        assertTrue(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+        testee.viewState().test {
+            assertTrue(awaitItem().showIsMemberOfMajorNetwork)
+        }
     }
 
     @Test
-    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
+    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
         val site = site(entity = TestEntity("", "", 0.0))
         testee.onSiteChanged(site)
-        assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+        testee.viewState().test {
+            assertFalse(awaitItem().showIsMemberOfMajorNetwork)
+        }
     }
 
     @Test
-    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() {
+    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
         val site = site(entity = null)
         testee.onSiteChanged(site)
-        assertFalse(testee.viewState.value!!.showIsMemberOfMajorNetwork)
+        testee.viewState().test {
+            assertFalse(awaitItem().showIsMemberOfMajorNetwork)
+        }
     }
 
     @Test
-    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() {
+    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() = coroutineTestRule.runBlocking {
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.A)
         testee.onSiteChanged(site)
-        assertTrue(testee.viewState.value!!.showEnhancedGrade)
+        testee.viewState().test {
+            assertTrue(awaitItem().showEnhancedGrade)
+        }
     }
 
     @Test
-    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() {
+    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() = coroutineTestRule.runBlocking {
         val site = site(allTrackersBlocked = true, trackerCount = 0)
         testee.onSiteChanged(site)
-        assertFalse(testee.viewState.value!!.showEnhancedGrade)
+        testee.viewState().test {
+            assertFalse(awaitItem().showEnhancedGrade)
+        }
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() = coroutineTestRule.runBlocking {
         whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
-        assertTrue(testee.viewState.value!!.isSiteInTempAllowedList)
+        testee.viewState().test {
+            assertTrue(awaitItem().isSiteInTempAllowedList)
+        }
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
         whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
-        assertFalse(testee.viewState.value!!.privacyOn)
+        testee.viewState().test {
+            assertFalse(awaitItem().privacyOn)
+        }
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() {
+    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
         whenever(contentBlocking.isAnException(any())).thenReturn(true)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
-        assertFalse(testee.viewState.value!!.privacyOn)
+        testee.viewState().test {
+            assertFalse(awaitItem().privacyOn)
+        }
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() {
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() = coroutineTestRule.runBlocking {
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
         whenever(contentBlocking.isAnException(any())).thenReturn(false)
         val site = site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B)
         testee.onSiteChanged(site)
-        assertTrue(testee.viewState.value!!.privacyOn)
+        testee.viewState().test {
+            assertTrue(awaitItem().privacyOn)
+        }
     }
 
     private fun site(
