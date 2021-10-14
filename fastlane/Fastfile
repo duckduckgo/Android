@@ -53,7 +53,7 @@ platform :android do
     end
 
 
-  desc "Upload APK to Play Store"
+  desc "Upload APK to Play Store, in pre-production staging track"
   lane :deploy_playstore do
 
     update_fastlane_release_notes()
@@ -64,7 +64,7 @@ platform :android do
 
     upload_to_play_store(
       apk: apkPath,
-      track: 'internal',
+      track: 'Staging',
       skip_upload_screenshots: true,
       skip_upload_images: true,
       validate_only: false
@@ -87,13 +87,13 @@ platform :android do
 
  end
 
- desc "Upload APK to Play Store Dogfood track"
+ desc "Upload APK to Play Store internal testing track"
  lane :deploy_dogfood do |options|
 
    UI.message("Apk path: #{options[:apk_path]}")
    upload_to_play_store(
      apk: options[:apk_path],
-     track: 'Dogfood',
+     track: 'internal',
      skip_upload_screenshots: true,
      skip_upload_images: true,
      validate_only: false
