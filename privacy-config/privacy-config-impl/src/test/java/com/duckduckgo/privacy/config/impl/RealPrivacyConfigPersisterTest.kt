@@ -85,7 +85,7 @@ class RealPrivacyConfigPersisterTest {
     fun whenPersistPrivacyConfigThenDeleteAllTogglesPreviouslyStored() = coroutineRule.runBlocking {
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
-        verify(togglesRepository.deleteAll())
+        verify(togglesRepository).deleteAll()
     }
 
     @Test
@@ -112,7 +112,7 @@ class RealPrivacyConfigPersisterTest {
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertEquals(3, privacyRepository.get()!!.version)
-        verify(togglesRepository.deleteAll(), never())
+        verify(togglesRepository, never()).deleteAll()
     }
 
     @Test
@@ -122,7 +122,7 @@ class RealPrivacyConfigPersisterTest {
         testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
         assertEquals(2, privacyRepository.get()!!.version)
-        verify(togglesRepository.deleteAll(), never())
+        verify(togglesRepository, never()).deleteAll()
     }
 
     @Test
