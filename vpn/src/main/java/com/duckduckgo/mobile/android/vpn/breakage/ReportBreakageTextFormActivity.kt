@@ -52,7 +52,7 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
                     description = binding.appBreakageFormFeedbackInput.text.toString(),
-                    customMetadata = Base64.encodeToString(metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(), Base64.NO_WRAP)
+                    customMetadata = Base64.encodeToString(metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(), Base64.NO_WRAP or Base64.URL_SAFE)
                 )
                 deviceShieldPixels.sendAppBreakageReport(issue.toMap())
 
