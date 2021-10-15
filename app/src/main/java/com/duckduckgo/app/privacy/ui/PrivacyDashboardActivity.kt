@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View.GONE
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -28,10 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyDashboardBinding
 import com.duckduckgo.app.browser.databinding.ContentPrivacyDashboardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
@@ -41,8 +39,12 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.android.synthetic.main.content_privacy_dashboard.*
 import javax.inject.Inject
 
 class PrivacyDashboardActivity : DuckDuckGoActivity() {
@@ -93,6 +95,12 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             this,
             {
                 viewModel.onSiteChanged(it)
+                if (it != null && it.url.equals("null://null", true)) {
+                    // show brokenSiteButton as disabled
+//                    brokenSiteButton.setTextColor(Color.GRAY)
+                    // or hide  brokenSiteButton
+                    brokenSiteButton.visibility = GONE
+                }
             }
         )
     }

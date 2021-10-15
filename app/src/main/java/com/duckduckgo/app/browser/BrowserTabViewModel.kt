@@ -891,6 +891,11 @@ class BrowserTabViewModel(
         val domain = site?.domain
         val canWhitelist = domain != null
         val canFireproofSite = domain != null
+        val canReportSite = if (site == null) {
+            false
+        } else {
+            !(site?.url.equals("null://null", true))
+        }
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
             HighlightableButton.Visible(enabled = true)
         } else {
@@ -906,7 +911,7 @@ class BrowserTabViewModel(
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
-            canReportSite = true,
+            canReportSite = canReportSite,
             canWhitelist = canWhitelist,
             isWhitelisted = false,
             showSearchIcon = false,

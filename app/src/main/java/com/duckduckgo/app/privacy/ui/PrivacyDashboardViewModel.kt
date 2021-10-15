@@ -203,8 +203,18 @@ class PrivacyDashboardViewModel(
     }
 
     fun onReportBrokenSiteSelected() {
-        pixel.fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
-        command.value = LaunchReportBrokenSite(BrokenSiteData.fromSite(site))
+        if (isSiteUrlNotNull(site)) {
+            pixel.fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
+            command.value = LaunchReportBrokenSite(BrokenSiteData.fromSite(site))
+        }
+    }
+
+    private fun isSiteUrlNotNull(site: Site?): Boolean {
+        return if (site == null) {
+            false
+        } else {
+            !(site.url.equals("null://null", true))
+        }
     }
 
     private companion object {
