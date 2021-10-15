@@ -305,7 +305,7 @@ class BrowserTabFragment :
     private var webView: DuckDuckGoWebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
-        Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+        browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
 
@@ -748,7 +748,7 @@ class BrowserTabFragment :
             is DownloadCommand.ShowDownloadFailedNotification -> {
                 fileDownloadNotificationManager.showDownloadFailedNotification()
 
-                val snackbar = Snackbar.make(toolbar, R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
+                val snackbar = toolbar.makeSnackbarWithNoBottomInset(R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
                 if (it.reason == DownloadFailReason.DownloadManagerDisabled) {
                     snackbar.setText(it.message)
                     snackbar.setAction(getString(R.string.enable)) {
@@ -810,7 +810,7 @@ class BrowserTabFragment :
 
     private fun showDomainHasLocationPermission(domain: String) {
         val snackbar =
-            Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+            rootView.makeSnackbarWithNoBottomInset(getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -858,8 +858,7 @@ class BrowserTabFragment :
                 action = getString(R.string.appLinkMultipleSnackBarAction)
             }
 
-            appLinksSnackBar = Snackbar.make(
-                view,
+            appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
@@ -1340,7 +1339,7 @@ class BrowserTabFragment :
             is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
             is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
-        Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
+        browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 editSavedSite(savedSite)
             }
@@ -1356,8 +1355,7 @@ class BrowserTabFragment :
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         viewModel.deleteQuickAccessItem(savedSite)
-        Snackbar.make(
-            rootView,
+        rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
@@ -1366,15 +1364,12 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        Snackbar.make(
-            rootView,
+        rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        )
-            .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-            }
-            .show()
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
+        }.show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -1588,7 +1583,7 @@ class BrowserTabFragment :
                     downloadFile(requestUserConfirmation = false)
                 } else {
                     Timber.i("Write external storage permission refused")
-                    Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                    toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
             PERMISSION_REQUEST_GEO_LOCATION -> {
@@ -2342,7 +2337,7 @@ class BrowserTabFragment :
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Could not open DownloadManager settings")
-            Snackbar.make(toolbar, R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+            toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
         }
     }
 
