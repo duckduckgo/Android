@@ -24,7 +24,8 @@
     tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <include layout="@layout/include_default_browser_buttons"/>
+    <include android:id="@+id/default_browser_buttons"
+        layout="@layout/include_default_browser_buttons"/>
 
     <ImageView
         android:id="@+id/defaultBrowserImage"

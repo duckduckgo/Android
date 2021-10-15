@@ -54,7 +54,9 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
     lateinit var variantManager: VariantManager
 
     private val binding: ContentOnboardingDefaultBrowserBinding by viewBinding()
-    private val browserDefaultButtonBinding: IncludeDefaultBrowserButtonsBinding by viewBinding()
+    private val browserDefaultButtonBinding: IncludeDefaultBrowserButtonsBinding by lazy {
+        binding.defaultBrowserButtons!!
+    }
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false

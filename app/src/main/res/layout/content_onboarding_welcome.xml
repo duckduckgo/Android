@@ -58,6 +58,7 @@
     </LinearLayout>
 
     <include
+        android:id="@+id/include_dax_dialog_cta"
         layout="@layout/include_dax_dialog_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

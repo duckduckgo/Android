@@ -49,9 +49,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     @Inject
     lateinit var viewModelFactory: WelcomePageViewModelFactory
 
-    private val binding: ContentOnboardingWelcomeBinding by viewBinding()
-    private val includeDaxDialogBinding: IncludeDaxDialogCtaBinding by viewBinding()
-
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
@@ -59,6 +56,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     // we use a BroadcastChannel because we don't want to emit the last value upon subscription
     private val events = BroadcastChannel<WelcomePageView.Event>(1)
+
+    private val binding: ContentOnboardingWelcomeBinding by viewBinding()
+    private val daxDialogCtaBinding: IncludeDaxDialogCtaBinding by lazy {
+        binding.includeDaxDialogCta!!
+    }
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
@@ -148,17 +150,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     private fun configureDaxCta() {
         context?.let {
             ctaText = it.getString(R.string.onboardingDaxText)
-            includeDaxDialogBinding.hiddenTextCta.text = ctaText.html(it)
-            includeDaxDialogBinding.dialogTextCta.textInDialog = ctaText.html(it)
-            includeDaxDialogBinding.dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
-            includeDaxDialogBinding.cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
+            daxDialogCtaBinding.hiddenTextCta.text = ctaText.html(it)
+            daxDialogCtaBinding.dialogTextCta.textInDialog = ctaText.html(it)
+            daxDialogCtaBinding.dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
+            daxDialogCtaBinding.cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
         }
-        includeDaxDialogBinding.triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
+        daxDialogCtaBinding.triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }
 
     private fun setSkipAnimationListener() {
         binding.longDescriptionContainer.setOnClickListener {
-            if (includeDaxDialogBinding.dialogTextCta.hasAnimationStarted()) {
+            if (daxDialogCtaBinding.dialogTextCta.hasAnimationStarted()) {
                 finishTypingAnimation()
             } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
@@ -174,12 +176,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(includeDaxDialogBinding.daxCtaContainer)
+                typingAnimation = ViewCompat.animate(daxDialogCtaBinding.daxCtaContainer)
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
                         welcomeAnimationFinished = true
-                        includeDaxDialogBinding.dialogTextCta.startTypingAnimation(ctaText)
+                        daxDialogCtaBinding.dialogTextCta.startTypingAnimation(ctaText)
                         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
             }
@@ -187,12 +189,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     private fun finishTypingAnimation() {
         welcomeAnimation?.cancel()
-        includeDaxDialogBinding.dialogTextCta.finishAnimation()
+        daxDialogCtaBinding.dialogTextCta.finishAnimation()
         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
     }
 
     private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {
-        includeDaxDialogBinding.primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
+        daxDialogCtaBinding.primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
     }
 
     companion object {

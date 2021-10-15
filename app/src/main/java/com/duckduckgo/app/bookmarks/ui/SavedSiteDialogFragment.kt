@@ -20,9 +20,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -40,7 +38,7 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-abstract class SavedSiteDialogFragment : DialogFragment() {
+abstract class SavedSiteDialogFragment : DialogFragment(R.layout.dialog_fragment_saved_site) {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
@@ -76,10 +74,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_fragment_saved_site, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
