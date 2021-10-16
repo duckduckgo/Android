@@ -53,3 +53,4 @@ bitrise.yml
 
 # Local build cache
 build-cache
+report
