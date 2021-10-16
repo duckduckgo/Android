@@ -21,8 +21,8 @@ android {
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android.vpn"
-        minSdkVersion min_sdk
-        targetSdkVersion target_sdk
+        minSdk min_sdk
+        targetSdk target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -52,9 +52,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
     signingConfigs {
         release
@@ -161,7 +158,6 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
     androidTestImplementation(KotlinX.coroutines.test) {
@@ -247,20 +243,28 @@ dependencies {
 
     // Testing dependencies
     testImplementation "junit:junit:_"
-
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
-    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation Testing.mockito.android
     androidTestImplementation Testing.mockito.kotlin
     androidTestImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-    androidTestImplementation 'app.cash.turbine:turbine:_'
+    androidTestImplementation CashApp.turbine
     androidTestImplementation AndroidX.test.orchestrator
-
-    androidTestImplementation "androidx.test.ext:junit:_"
+    androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation "androidx.test:runner:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
@@ -273,4 +277,8 @@ tasks.register('fastlaneVersionCode') {
     doLast {
         print buildVersionCode()
     }
+}
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest', 'connectedPlayDebugAndroidTest'
 }

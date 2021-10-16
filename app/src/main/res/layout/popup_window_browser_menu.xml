@@ -109,6 +109,12 @@
                 android:text="@string/findInPageMenuTitle" />
 
             <TextView
+                android:id="@+id/openInAppMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
+                android:visibility="gone"
+                android:text="@string/appLinkMenuItemTitle" />
+
+            <TextView
                 android:id="@+id/addToHome"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/addToHome" />

@@ -18,13 +18,12 @@ package com.duckduckgo.app.privacy.ui
 
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkElementBinding
+import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkHeaderBinding
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
@@ -33,8 +32,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.Theming
-import kotlinx.android.synthetic.main.item_tracker_network_element.view.*
-import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -51,30 +48,26 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     data class Row(val tracker: TrackingEvent) : ViewData
 
     class HeaderViewHolder(
-        val root: View,
-        val network: TextView,
-        val icon: ImageView,
-        val unknownIcon: TextView
-    ) : RecyclerView.ViewHolder(root)
+        val binding: ItemTrackerNetworkHeaderBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
     class RowViewHolder(
-        val root: View,
-        val host: TextView,
-        val category: TextView
-    ) : RecyclerView.ViewHolder(root)
+        val binding: ItemTrackerNetworkElementBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             HEADER -> {
-                val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_header, parent, false)
-                HeaderViewHolder(root, root.network, root.icon, root.unknownIcon)
+                val binding = ItemTrackerNetworkHeaderBinding.inflate(inflater, parent, false)
+                HeaderViewHolder(binding)
             }
             else -> {
-                val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_element, parent, false)
-                RowViewHolder(root, root.host, root.category)
+                val binding = ItemTrackerNetworkElementBinding.inflate(inflater, parent, false)
+                RowViewHolder(binding)
             }
         }
     }
@@ -89,27 +82,38 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
-        holder.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
+        holder.binding.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
         viewElement.tracker.categories?.let { categories ->
-            holder.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
+            holder.binding.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
         }
     }
 
     private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
-        val iconResource = networkRenderer.networkLogoIcon(holder.icon.context, viewElement.networkName)
-        if (iconResource != null) {
-            val drawable = Theming.getThemedDrawable(holder.icon.context, iconResource, DuckDuckGoTheme.LIGHT)
-            holder.icon.setImageDrawable(drawable)
-            holder.icon.show()
-            holder.unknownIcon.gone()
-        } else {
-            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_privacy_dashboard_bg, DuckDuckGoTheme.LIGHT)
-            holder.unknownIcon.text = viewElement.networkDisplayName.take(1)
-            holder.unknownIcon.background = drawable
-            holder.unknownIcon.show()
-            holder.icon.gone()
+        holder.apply {
+            val context = binding.root.context
+            val iconResource = networkRenderer.networkLogoIcon(context, viewElement.networkName)
+            if (iconResource != null) {
+                val drawable = Theming.getThemedDrawable(
+                    context,
+                    iconResource,
+                    DuckDuckGoTheme.LIGHT
+                )
+                binding.icon.setImageDrawable(drawable)
+                binding.icon.show()
+                binding.unknownIcon.gone()
+            } else {
+                val drawable = Theming.getThemedDrawable(
+                    context,
+                    R.drawable.other_tracker_privacy_dashboard_bg,
+                    DuckDuckGoTheme.LIGHT
+                )
+                binding.unknownIcon.text = viewElement.networkDisplayName.take(1)
+                binding.unknownIcon.background = drawable
+                binding.unknownIcon.show()
+                binding.icon.gone()
+            }
+            binding.network.text = viewElement.networkDisplayName
         }
-        holder.network.text = viewElement.networkDisplayName
     }
 
     override fun getItemCount(): Int {

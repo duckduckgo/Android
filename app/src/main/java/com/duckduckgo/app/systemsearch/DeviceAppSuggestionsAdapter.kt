@@ -18,15 +18,11 @@ package com.duckduckgo.app.systemsearch
 
 import android.content.pm.PackageManager.NameNotFoundException
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemDeviceAppSuggestionBinding
 import com.duckduckgo.app.systemsearch.DeviceAppSuggestionsAdapter.DeviceAppViewHolder
-import kotlinx.android.synthetic.main.item_device_app_suggestion.view.*
 
 class DeviceAppSuggestionsAdapter(
     private val clickListener: (DeviceApp) -> Unit
@@ -34,21 +30,24 @@ class DeviceAppSuggestionsAdapter(
     private var deviceApps: List<DeviceApp> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceAppViewHolder {
-        val root = LayoutInflater.from(parent.context).inflate(R.layout.item_device_app_suggestion, parent, false)
-        return DeviceAppViewHolder(root, root.icon, root.title)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemDeviceAppSuggestionBinding.inflate(inflater, parent, false)
+        return DeviceAppViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: DeviceAppViewHolder, position: Int) {
-        val app = deviceApps[position]
-        holder.title.text = app.shortName
-        holder.root.setOnClickListener {
-            clickListener(app)
-        }
-        try {
-            val drawable = app.retrieveIcon(holder.icon.context.packageManager)
-            holder.icon.setImageDrawable(drawable)
-        } catch (e: NameNotFoundException) {
-            holder.icon.setImageDrawable(null)
+        holder.apply {
+            val app = deviceApps[position]
+            binding.title.text = app.shortName
+            binding.root.setOnClickListener {
+                clickListener(app)
+            }
+            try {
+                val drawable = app.retrieveIcon(binding.icon.context.packageManager)
+                binding.icon.setImageDrawable(drawable)
+            } catch (e: NameNotFoundException) {
+                binding.icon.setImageDrawable(null)
+            }
         }
     }
 
@@ -64,9 +63,7 @@ class DeviceAppSuggestionsAdapter(
     }
 
     class DeviceAppViewHolder(
-        val root: View,
-        var icon: ImageView,
-        val title: TextView
-    ) : RecyclerView.ViewHolder(root)
+        val binding: ItemDeviceAppSuggestionBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
 }

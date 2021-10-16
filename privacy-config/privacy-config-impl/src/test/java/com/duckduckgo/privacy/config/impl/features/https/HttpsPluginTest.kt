@@ -22,15 +22,11 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.robolectric.RobolectricTestRunner
+import org.mockito.ArgumentMatchers.anyList
 
-@RunWith(RobolectricTestRunner::class)
 class HttpsPluginTest {
     lateinit var testee: HttpsPlugin
 
@@ -44,47 +40,43 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchHttpsThenReturnFalse() {
-        assertFalse(testee.store("test", null))
+        assertFalse(testee.store("test", EMPTY_JSON_STRING))
     }
 
     @Test
-    fun whenFeatureNameMatchesContentBlockingThenReturnTrue() {
-        assertTrue(testee.store(FEATURE_NAME, null))
+    fun whenFeatureNameMatchesHttpsThenReturnTrue() {
+        assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonObject = getJsonObjectFromFile("json/https.json")
+        val jsonString = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonObject = getJsonObjectFromFile("json/https_disabled.json")
+        val jsonString = FileUtilities.loadText("json/https_disabled.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
         verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
     }
 
     @Test
     fun whenFeatureNameMatchesHttpsThenUpdateAllExistingExceptions() {
-        val jsonObject = getJsonObjectFromFile("json/https.json")
+        val jsonString = FileUtilities.loadText("json/https.json")
 
-        testee.store(FEATURE_NAME, jsonObject)
+        testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockHttpsRepository).updateAll(ArgumentMatchers.anyList())
-    }
-
-    private fun getJsonObjectFromFile(filename: String): JSONObject {
-        val json = FileUtilities.loadText(filename)
-        return JSONObject(json)
+        verify(mockHttpsRepository).updateAll(anyList())
     }
 
     companion object {
         private const val FEATURE_NAME = "https"
+        private const val EMPTY_JSON_STRING = "{}"
     }
 }

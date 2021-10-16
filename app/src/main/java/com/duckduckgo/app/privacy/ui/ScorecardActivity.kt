@@ -22,6 +22,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -31,6 +35,8 @@ import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class ScorecardActivity : DuckDuckGoActivity() {
@@ -58,12 +64,9 @@ class ScorecardActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        viewModel.viewState.observe(
-            this,
-            {
-                it?.let { render(it) }
-            }
-        )
+        viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { viewState ->
+            render(viewState)
+        }.launchIn(lifecycleScope)
 
         repository.retrieveSiteData(intent.tabId!!).observe(
             this,
@@ -119,7 +122,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
         if (resource == 0) {
             return
         }
-        val drawable = getDrawable(resource)
+        val drawable = AppCompatResources.getDrawable(this@ScorecardActivity, resource)
         setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
     }
 

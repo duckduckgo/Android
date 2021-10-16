@@ -47,7 +47,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
             .authority(Url.HOST)
 
-        vertical?.let {
+        if (vertical != null && majorVerticals.contains(vertical)) {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)
         }
 
@@ -63,6 +63,10 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         }
 
         return uri.toString()
+    }
+
+    companion object {
+        val majorVerticals = listOf("images", "videos", "news", "shopping")
     }
 
 }

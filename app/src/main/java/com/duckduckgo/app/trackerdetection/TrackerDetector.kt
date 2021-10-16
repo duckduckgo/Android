@@ -24,6 +24,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
@@ -42,6 +43,7 @@ class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
+    private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao
 ) : TrackerDetector {
 
@@ -68,14 +70,16 @@ class TrackerDetectorImpl @Inject constructor(
             .firstOrNull { it.matches }
 
         if (result != null) {
-            Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
             val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || isSiteAContentBlockingException(documentUrl)
+            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
+            val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList
 
             val trackerCompany = entity?.displayName ?: "Undefined"
             webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
 
-            val isBlocked = !isDocumentInAllowedList
+            Timber.v("$documentUrl resource $url WAS identified as a tracker and isBlocked=$isBlocked")
+
             return TrackingEvent(documentUrl, url, result.categories, entity, isBlocked, result.surrogate)
         }
 

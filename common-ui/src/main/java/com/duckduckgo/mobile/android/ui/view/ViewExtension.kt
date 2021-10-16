@@ -22,7 +22,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
+import androidx.annotation.StringRes
 import androidx.core.view.children
+import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
+import com.google.android.material.snackbar.Snackbar
 
 /*
  * Common view operations, simplified as Kotlin extensions
@@ -117,4 +120,16 @@ fun CompoundButton.quietlySetIsChecked(newCheckedState: Boolean, changeListener:
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState
     setOnCheckedChangeListener(changeListener)
+}
+
+fun View.makeSnackbarWithNoBottomInset(text: CharSequence, @Duration duration: Int): Snackbar {
+    val snackbar = Snackbar.make(this, text, duration)
+    snackbar.isGestureInsetBottomIgnored = true
+    return snackbar
+}
+
+fun View.makeSnackbarWithNoBottomInset(@StringRes resId: Int, @Duration duration: Int): Snackbar {
+    val snackbar = Snackbar.make(this, resId, duration)
+    snackbar.isGestureInsetBottomIgnored = true
+    return snackbar
 }

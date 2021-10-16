@@ -82,7 +82,7 @@ class SettingsViewModel(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val appLinksEnabled: Boolean = true,
+        val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val deviceShieldEnabled: Boolean = false,
         val deviceShieldOnboardingShown: Boolean = false
     )
@@ -103,6 +103,7 @@ class SettingsViewModel(
         object LaunchAppIcon : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
+        data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
         object LaunchGlobalPrivacyControl : Command()
         object LaunchDeviceShieldReport : Command()
         object LaunchDeviceShieldOnboarding : Command()
@@ -140,7 +141,7 @@ class SettingsViewModel(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksEnabled = settingsDataStore.appLinksEnabled,
+                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
                     deviceShieldOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
                 )
@@ -191,6 +192,10 @@ class SettingsViewModel(
         pixel.fire(SETTINGS_THEME_OPENED)
     }
 
+    fun userRequestedToChangeAppLinkSetting() {
+        viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
+    }
+
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
     }
@@ -239,10 +244,36 @@ class SettingsViewModel(
         viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
     }
 
-    fun onAppLinksSettingChanged(enabled: Boolean) {
-        Timber.i("User changed app links setting, is now enabled: $enabled")
-        settingsDataStore.appLinksEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksEnabled = enabled)) }
+    fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
+        Timber.i("User changed app links setting, is now: ${appLinkSettingType.name}")
+
+        when (appLinkSettingType) {
+            AppLinkSettingType.ASK_EVERYTIME -> {
+                settingsDataStore.appLinksEnabled = true
+                settingsDataStore.showAppLinksPrompt = true
+            }
+            AppLinkSettingType.ALWAYS -> {
+                settingsDataStore.appLinksEnabled = true
+                settingsDataStore.showAppLinksPrompt = false
+            }
+            AppLinkSettingType.NEVER -> {
+                settingsDataStore.appLinksEnabled = false
+                settingsDataStore.showAppLinksPrompt = false
+            }
+        }
+        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
+    }
+
+    private fun getAppLinksSettingsState(appLinksEnabled: Boolean, showAppLinksPrompt: Boolean): AppLinkSettingType {
+        return if (appLinksEnabled) {
+            if (showAppLinksPrompt) {
+                AppLinkSettingType.ASK_EVERYTIME
+            } else {
+                AppLinkSettingType.ALWAYS
+            }
+        } else {
+            AppLinkSettingType.NEVER
+        }
     }
 
     private fun obtainVersion(variantKey: String): String {
@@ -361,6 +392,12 @@ class SettingsViewModel(
             else -> null
         }
     }
+}
+
+enum class AppLinkSettingType {
+    ASK_EVERYTIME,
+    ALWAYS,
+    NEVER
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
