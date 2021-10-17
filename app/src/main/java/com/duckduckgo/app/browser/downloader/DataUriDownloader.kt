@@ -26,7 +26,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class DataUriDownloader @Inject constructor(
-    private val dataUriParser: DataUriParser
+        private val dataUriParser: DataUriParser
 ) {
 
     @WorkerThread
@@ -48,10 +48,9 @@ class DataUriDownloader @Inject constructor(
                         writeBytesToFiles(parsedDataUri.data, file)
                     }
                             .onSuccess {
-                                Timber.v("Succeeded to decode")
+                                Timber.v("Succeeded decoded")
                                 callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
                             }
-
                             .onFailure {
                                 Timber.e(e, "Failed to decode")
                                 callback?.downloadFailed("Failed to download data URI", DownloadFailReason.DataUriParseException)
