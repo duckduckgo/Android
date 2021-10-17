@@ -47,14 +47,14 @@ class DataUriDownloader @Inject constructor(
                     runCatching {
                         writeBytesToFiles(parsedDataUri.data, file)
                     }
-                            .onSuccess {
-                                Timber.v("Succeeded decoded")
-                                callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
-                            }
-                            .onFailure {
-                                Timber.e(e, "Failed to decode")
-                                callback?.downloadFailed("Failed to download data URI", DownloadFailReason.DataUriParseException)
-                            }
+                    .onSuccess {
+                        Timber.v("Succeeded decoded")
+                        callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
+                    }
+                    .onFailure {
+                        Timber.e(e, "Failed to decode")
+                        callback?.downloadFailed("Failed to download data URI", DownloadFailReason.DataUriParseException)
+                    }
                 }
             }
         } catch (e: IOException) {
