@@ -50,7 +50,7 @@ class DeviceShieldTileService : TileService() {
         if (waitlistManager.isFeatureEnabled()) {
             respondToTile()
         } else {
-            launchSettings()
+            launchActivity(Class.forName("com.duckduckgo.app.settings.SettingsActivity"))
         }
     }
 
@@ -63,16 +63,16 @@ class DeviceShieldTileService : TileService() {
             if (hasVpnPermission()) {
                 startDeviceShield()
             } else {
-                val intent = Intent(this, VpnPermissionRequesterActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                startActivityAndCollapse(intent)
+                launchActivity(VpnPermissionRequesterActivity::class.java)
             }
         }
     }
 
-    private fun launchSettings() {
-        startActivity(Intent(this, Class.forName("com.duckduckgo.app.settings.SettingsActivity")))
+    private fun launchActivity(activityClass: Class<*>) {
+        val intent = Intent(this, activityClass).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivityAndCollapse(intent)
     }
 
     override fun onStartListening() {

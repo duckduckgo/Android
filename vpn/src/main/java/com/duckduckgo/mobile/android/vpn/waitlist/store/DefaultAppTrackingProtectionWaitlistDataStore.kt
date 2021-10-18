@@ -22,12 +22,16 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
+import com.squareup.anvil.annotations.ContributesBinding
 import java.io.IOException
 import java.security.GeneralSecurityException
+import javax.inject.Inject
 
-class AppTrackingProtectionEncryptedSharedPreferences(
+@ContributesBinding(AppObjectGraph::class)
+class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
 ) : AppTrackingProtectionWaitlistDataStore {
@@ -101,7 +105,6 @@ class AppTrackingProtectionEncryptedSharedPreferences(
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.apptp.settings"
-        const val KEY_APP_TP_TOKEN = "KEY_EMAIL_TOKEN"
         const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
         const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
         const val KEY_INVITE_CODE = "KEY_INVITE_CODE"

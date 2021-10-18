@@ -180,7 +180,6 @@ class SettingsActivity :
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    viewsPrivacy.appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                 }
             }.launchIn(lifecycleScope)

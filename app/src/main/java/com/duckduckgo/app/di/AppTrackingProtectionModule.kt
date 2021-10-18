@@ -16,13 +16,11 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
 import androidx.lifecycle.LifecycleObserver
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.AppTrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.trackerprotection.TrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -30,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistD
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AppTrackingProtectionEncryptedSharedPreferences
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -50,14 +47,6 @@ class AppTrackingProtectionModule {
         dispatcherProvider: DispatcherProvider
     ): TrackingProtectionWaitlistManager {
         return AppTrackingProtectionWaitlistManager(service, dataStore, dispatcherProvider)
-    }
-
-    @Provides
-    fun providesAppTrackingProtectionWaitlistDataStore(
-        context: Context,
-        pixel: Pixel
-    ): AppTrackingProtectionWaitlistDataStore {
-        return AppTrackingProtectionEncryptedSharedPreferences(context, pixel)
     }
 
     @Singleton
