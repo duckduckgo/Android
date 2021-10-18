@@ -42,6 +42,7 @@ class FireActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
         startActivity(intent, fadeTransitionConfig())
+        overridePendingTransition(0, 0)
         finish()
         killProcess()
     }
@@ -64,6 +65,7 @@ class FireActivity : AppCompatActivity() {
 
             context.startActivity(intent, context.fadeTransitionConfig())
             if (context is Activity) {
+                context.overridePendingTransition(0, 0)
                 context.finish()
             }
             killProcess()

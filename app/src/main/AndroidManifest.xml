@@ -57,6 +57,7 @@
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
             android:icon="${appIcon}"
             android:roundIcon="${appIconRound}"
+            android:theme="@style/SplashScreen"
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

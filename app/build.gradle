@@ -283,3 +283,7 @@ tasks.register('fastlaneVersionCode') {
         print buildVersionCode()
     }
 }
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest', 'connectedPlayDebugAndroidTest'
+}
