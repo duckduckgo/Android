@@ -539,6 +539,10 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="DeviceShield.Button.Blue.Lowercase">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
     <style name="DeviceShield.Button.Border">
         <item name="android:textColor">@color/cornflowerBlue</item>
         <item name="android:background">@drawable/background_transparent_button_rounded_corners</item>

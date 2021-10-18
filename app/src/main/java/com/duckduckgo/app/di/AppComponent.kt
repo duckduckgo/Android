@@ -73,7 +73,7 @@ import javax.inject.Singleton
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
         FormatterModule::class,
-        EmailModule::class
+        EmailModule::class,
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

@@ -38,7 +38,7 @@ import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.ADDR
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.GET_STARTED_URL
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.PRIVACY_GUARANTEE
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.SIGN_UP_URL
-import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
+import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -62,7 +62,7 @@ class EmailProtectionSignInViewModelTest {
 
     private val mockEmailManager: EmailManager = mock()
     private var mockEmailService: EmailService = mock()
-    private val waitlistBuilder: WaitlistWorkRequestBuilder = WaitlistWorkRequestBuilder()
+    private val waitlistBuilder: EmailWaitlistWorkRequestBuilder = EmailWaitlistWorkRequestBuilder()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private lateinit var workManager: WorkManager
@@ -234,7 +234,7 @@ class EmailProtectionSignInViewModelTest {
 
     private fun getScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(WaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
+            .getWorkInfosByTag(EmailWaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }

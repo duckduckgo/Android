@@ -20,8 +20,8 @@ import android.content.Context
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
-import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -38,6 +38,7 @@ import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -164,6 +165,10 @@ class NetworkModule {
     @Provides
     fun surrogatesService(@Named("api") retrofit: Retrofit): ResourceSurrogateListService =
         retrofit.create(ResourceSurrogateListService::class.java)
+
+    @Provides
+    fun appTrackingProtectionWaitlistService(@Named("api") retrofit: Retrofit): AppTrackingProtectionWaitlistService =
+        retrofit.create(AppTrackingProtectionWaitlistService::class.java)
 
     @Provides
     fun brokenSiteSender(

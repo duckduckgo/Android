@@ -17,8 +17,6 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -37,21 +35,24 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -63,7 +64,7 @@ class SettingsViewModel(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val appTPWaitlistManager: TrackingProtectionWaitlistManager,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel
@@ -82,9 +83,9 @@ class SettingsViewModel(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
-        val deviceShieldEnabled: Boolean = false,
-        val deviceShieldOnboardingShown: Boolean = false
+        val appLinksEnabled: Boolean = true,
+        val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
+        val appTrackingProtectionEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -105,8 +106,8 @@ class SettingsViewModel(
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
         object LaunchGlobalPrivacyControl : Command()
-        object LaunchDeviceShieldReport : Command()
-        object LaunchDeviceShieldOnboarding : Command()
+        object LaunchAppTPTrackersScreen : Command()
+        object LaunchAppTPWaitlist : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
@@ -141,18 +142,18 @@ class SettingsViewModel(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    deviceShieldOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
+                    appLinksEnabled = settingsDataStore.appLinksEnabled,
+                    appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
                 )
             )
 
             viewModelScope.launch {
                 while (isActive) {
                     val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
-                    if (currentViewState().deviceShieldEnabled != isDeviceShieldEnabled) {
+                    if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                         viewState.value = currentViewState().copy(
-                            deviceShieldEnabled = isDeviceShieldEnabled
+                            appTrackingProtectionEnabled = isDeviceShieldEnabled
                         )
                     }
                     delay(1_000)
@@ -230,11 +231,11 @@ class SettingsViewModel(
         }
     }
 
-    fun onDeviceShieldSettingClicked() {
-        if (viewState.value.deviceShieldOnboardingShown) {
-            viewModelScope.launch { command.send(Command.LaunchDeviceShieldReport) }
+    fun onAppTPSettingClicked() {
+        if (appTPWaitlistManager.isFeatureEnabled()) {
+            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
         } else {
-            viewModelScope.launch { command.send(Command.LaunchDeviceShieldOnboarding) }
+            viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
         }
     }
 
@@ -411,7 +412,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val gpc: Provider<Gpc>,
     private val featureToggle: Provider<FeatureToggle>,
     private val pixel: Provider<Pixel>,
-    private val deviceShieldOnboarding: Provider<DeviceShieldOnboardingStore>
+    private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -424,7 +425,7 @@ class SettingsViewModelFactory @Inject constructor(
                         defaultWebBrowserCapability.get(),
                         variantManager.get(),
                         fireAnimationLoader.get(),
-                        deviceShieldOnboarding.get(),
+                        appTPWaitlistManager.get(),
                         gpc.get(),
                         featureToggle.get(),
                         pixel.get()

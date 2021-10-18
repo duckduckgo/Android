@@ -19,26 +19,26 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.EMAIL_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import timber.log.Timber
 
-class WaitlistCodeNotification(
+class AppTPWaitlistCodeNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
-    private val emailDataStore: EmailDataStore
+    private val dataStore: AppTrackingProtectionWaitlistDataStore
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.email.waitlist"
-    override val launchIntent = WAITLIST_CODE
+    override val id = "com.duckduckgo.vpn.waitlist"
+    override val launchIntent = EMAIL_WAITLIST_CODE
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
 
-        if (notificationDao.exists(id) || !emailDataStore.sendNotification) {
+        if (notificationDao.exists(id) || !dataStore.sendNotification) {
             Timber.v("Notification already seen")
             return false
         }
@@ -47,20 +47,20 @@ class WaitlistCodeNotification(
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
-        return WaitlistCodeSpecification(context, emailDataStore.inviteCode)
+        return AppTPWaitlistCodeSpecification(context)
     }
 }
 
-class WaitlistCodeSpecification(context: Context, code: String?) : NotificationSpec {
+class AppTPWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.EMAIL_WAITLIST
     override val systemId = NotificationRegistrar.NotificationId.EmailWaitlist
-    override val name = context.getString(R.string.waitlistNotificationTitle)
+    override val name = context.getString(R.string.atp_WaitlistNotificationTitle)
     override val icon = R.drawable.notification_logo
-    override val title: String = context.getString(R.string.waitlistNotificationTitle)
-    override val description: String = context.getString(R.string.waitlistNotificationDescription)
+    override val title: String = context.getString(R.string.atp_WaitlistNotificationTitle)
+    override val description: String = context.getString(R.string.atp_WaitlistNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
-    override val pixelSuffix = "ec"
+    override val pixelSuffix = "atpc"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = R.color.ic_launcher_red_background

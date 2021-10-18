@@ -31,20 +31,24 @@ import com.duckduckgo.app.job.TestWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.runBlocking
-import org.junit.Assert.*
-import org.junit.Rule
+import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
+import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
+import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
-class AppWaitlistCodeFetcherTest {
+class AppEmailWaitlistCodeFetcherTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -55,12 +59,12 @@ class AppWaitlistCodeFetcherTest {
     private val mockNotificationSender: NotificationSender = mock()
 
     private lateinit var workManager: WorkManager
-    private lateinit var testee: AppWaitlistCodeFetcher
+    private lateinit var testee: EmailWaitlistCodeFetcher
 
     @Before
     fun before() {
         initializeWorkManager()
-        testee = AppWaitlistCodeFetcher(workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        testee = AppEmailWaitlistCodeFetcher(workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test
@@ -108,7 +112,7 @@ class AppWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = coroutineRule.runBlocking {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.NotJoinedQueue)
 
-        testee.executeWaitlistCodeFetcher()
+        testee.fetchInviteCode()
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }
@@ -117,7 +121,7 @@ class AppWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = coroutineRule.runBlocking {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
 
-        testee.executeWaitlistCodeFetcher()
+        testee.fetchInviteCode()
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }
@@ -150,7 +154,7 @@ class AppWaitlistCodeFetcherTest {
     private fun enqueueWaitlistWorker() {
         val requestBuilder = OneTimeWorkRequestBuilder<TestWorker>()
         val request = requestBuilder
-            .addTag(WaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
+            .addTag(EmailWaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
             .setInitialDelay(10, TimeUnit.SECONDS)
             .build()
         workManager.enqueue(request)
@@ -168,7 +172,7 @@ class AppWaitlistCodeFetcherTest {
 
     private fun getScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(WaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
+            .getWorkInfosByTag(EmailWaitlistWorkRequestBuilder.EMAIL_WAITLIST_SYNC_WORK_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }

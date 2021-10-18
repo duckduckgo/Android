@@ -31,7 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class WaitlistCodeNotificationTest {
+class EmailWaitlistCodeNotificationTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -40,11 +40,11 @@ class WaitlistCodeNotificationTest {
     private val mockNotificationsDao: NotificationDao = mock()
     private val mockEmailDataStore: EmailDataStore = mock()
 
-    private lateinit var testee: WaitlistCodeNotification
+    private lateinit var testee: EmailWaitlistCodeNotification
 
     @Before
     fun before() {
-        testee = WaitlistCodeNotification(context, mockNotificationsDao, mockEmailDataStore)
+        testee = EmailWaitlistCodeNotification(context, mockNotificationsDao, mockEmailDataStore)
     }
 
     @Test

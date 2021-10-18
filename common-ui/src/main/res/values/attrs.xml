@@ -80,5 +80,7 @@
     <attr name="savedSiteEditTextUnderlineColor" format="color" />
     <attr name="listItemBackgroundColor" format="color" />
     <attr name="listItemSeparatorColor" format="color" />
+    <attr name="textInputOutlinedBoxColor" format="color" />
+    <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
 </resources>

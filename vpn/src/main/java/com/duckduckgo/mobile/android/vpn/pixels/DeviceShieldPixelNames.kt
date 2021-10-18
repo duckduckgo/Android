@@ -115,6 +115,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     APP_EXCLUSION_LAUNCH_FEEDBACK("m_apptb_ae_lf"),
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
+
+    ENCRYPTED_IO_EXCEPTION("m_atp_encrypted_io_exception"),
+    ENCRYPTED_GENERAL_EXCEPTION("m_atp_encrypted_general_exception")
     ;
 }
 

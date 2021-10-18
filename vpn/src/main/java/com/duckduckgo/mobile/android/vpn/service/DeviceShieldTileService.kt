@@ -25,6 +25,7 @@ import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
 import kotlinx.coroutines.*
@@ -35,6 +36,7 @@ import javax.inject.Inject
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var waitlistManager: TrackingProtectionWaitlistManager
 
     private var deviceShieldStatePollingJob: Job? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -45,6 +47,14 @@ class DeviceShieldTileService : TileService() {
     }
 
     override fun onClick() {
+        if (waitlistManager.isFeatureEnabled()) {
+            respondToTile()
+        } else {
+            launchSettings()
+        }
+    }
+
+    private fun respondToTile() {
         if (TrackerBlockingVpnService.isServiceRunning(this)) {
             deviceShieldPixels.disableFromQuickSettingsTile()
             TrackerBlockingVpnService.stopService(this)
@@ -59,6 +69,10 @@ class DeviceShieldTileService : TileService() {
                 startActivityAndCollapse(intent)
             }
         }
+    }
+
+    private fun launchSettings() {
+        startActivity(Intent(this, Class.forName("com.duckduckgo.app.settings.SettingsActivity")))
     }
 
     override fun onStartListening() {

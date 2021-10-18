@@ -25,7 +25,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -50,13 +53,14 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -133,7 +137,7 @@ class SettingsActivity :
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
-            deviceShieldSetting.setOnClickListener { viewModel.onDeviceShieldSettingClicked() }
+            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
 
         with(viewsOther) {
@@ -176,7 +180,8 @@ class SettingsActivity :
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    updateDeviceShieldSettings(it.deviceShieldEnabled, it.deviceShieldOnboardingShown)
+                    viewsPrivacy.appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
+                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -254,8 +259,8 @@ class SettingsActivity :
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is Command.LaunchDeviceShieldReport -> launchDeviceShieldReport()
-            is Command.LaunchDeviceShieldOnboarding -> launchDeviceShieldOnboarding()
+            is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
+            is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
@@ -278,12 +283,12 @@ class SettingsActivity :
         }
     }
 
-    private fun updateDeviceShieldSettings(deviceShieldEnabled: Boolean, deviceShieldOnboardingShown: Boolean) {
+    private fun updateDeviceShieldSettings(appTPEnabled: Boolean, waitlistState: WaitlistState) {
         with(viewsPrivacy) {
-            if (!deviceShieldOnboardingShown) {
+            if (waitlistState != WaitlistState.InBeta) {
                 deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
-                if (deviceShieldEnabled) {
+                if (appTPEnabled) {
                     deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
                     deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
@@ -350,13 +355,19 @@ class SettingsActivity :
         startActivity(EmailProtectionActivity.intent(this), options)
     }
 
-    private fun launchDeviceShieldReport() {
+    private fun launchAppTPTrackersScreen() {
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }
 
-    private fun launchDeviceShieldOnboarding() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivityForResult(DeviceShieldOnboardingActivity.intent(this), REQUEST_DEVICE_SHIELD_ONBOARDING, options)
+    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            startActivity(DeviceShieldOnboardingActivity.intent(this))
+        }
+    }
+
+    private fun launchAppTPWaitlist() {
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
+        startForResult.launch(AppTPWaitlistActivity.intent(this), options)
     }
 
     override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
@@ -383,7 +394,6 @@ class SettingsActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
-            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboardingResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -392,15 +402,6 @@ class SettingsActivity :
     private fun handleFeedbackResult(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
             Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun handleDeviceShieldOnboardingResult(resultCode: Int) {
-        if (resultCode == Activity.RESULT_OK) {
-            Timber.i("VPN enabled during App Tracking Protection onboarding")
-            startActivity(DeviceShieldEnabledActivity.intent(this))
-        } else {
-            Timber.i("VPN NOT enabled during App Tracking Protection onboarding")
         }
     }
 
@@ -432,7 +433,6 @@ class SettingsActivity :
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
-        private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 102
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

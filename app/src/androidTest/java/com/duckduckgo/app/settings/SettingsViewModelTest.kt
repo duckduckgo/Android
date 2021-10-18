@@ -37,14 +37,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -85,7 +85,7 @@ class SettingsViewModelTest {
     lateinit var mockContext: Context
 
     @Mock
-    private lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+    private lateinit var appTPWaitlistManager: TrackingProtectionWaitlistManager
 
     @Mock
     private lateinit var mockGpc: Gpc
@@ -109,7 +109,7 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockFireAnimationLoader,
-            deviceShieldOnboardingStore,
+            appTPWaitlistManager,
             mockGpc,
             mockFeatureToggle,
             mockPixel,
@@ -538,28 +538,42 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDeviceShieldOnboardingHasNotBeenShownThenClickingOnDeviceShieldOpensDeviceShieldOnboarding() = coroutineTestRule.runBlocking {
+    fun whenUserInAppTPBetaThenClickingOnSettingOpensTrackersScreen() = coroutineTestRule.runBlocking {
         testee.commands().test {
 
-            whenever(deviceShieldOnboardingStore.hasOnboardingBeenShown()).thenReturn(false)
+            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.InBeta)
 
-            testee.onDeviceShieldSettingClicked()
+            testee.onAppTPSettingClicked()
 
-            assertEquals(Command.LaunchDeviceShieldOnboarding, expectItem())
+            assertEquals(Command.LaunchAppTPTrackersScreen, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenDeviceShieldOnboardingHasBeenShownThenClickingOnDeviceShieldOpensDeviceShieldTracker() = coroutineTestRule.runBlocking {
+    fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = coroutineTestRule.runBlocking {
         testee.commands().test {
 
-            whenever(deviceShieldOnboardingStore.hasOnboardingBeenShown()).thenReturn(true)
+            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
 
-            testee.onDeviceShieldSettingClicked()
+            testee.onAppTPSettingClicked()
 
-            assertEquals(Command.LaunchDeviceShieldReport, expectItem())
+            assertEquals(Command.LaunchAppTPWaitlist, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = coroutineTestRule.runBlocking {
+        testee.commands().test {
+
+            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.JoinedQueue(false))
+
+            testee.onAppTPSettingClicked()
+
+            assertEquals(Command.LaunchAppTPWaitlist, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }

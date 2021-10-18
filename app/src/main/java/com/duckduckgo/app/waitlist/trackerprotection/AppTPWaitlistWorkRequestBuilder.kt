@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.email.waitlist
+package com.duckduckgo.app.waitlist.trackerprotection
 
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
-import com.duckduckgo.app.email.AppEmailManager
-import com.duckduckgo.app.email.EmailManager
+import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
-import com.duckduckgo.app.notification.model.WaitlistCodeNotification
+import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
+import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class WaitlistWorkRequestBuilder @Inject constructor() {
+class AppTPWaitlistWorkRequestBuilder @Inject constructor() {
 
     fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest {
-        val requestBuilder = OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
+        val requestBuilder = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>()
             .setConstraints(networkAvailable())
-            .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
+            .addTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
 
         if (withBigDelay) {
             requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
@@ -54,30 +47,29 @@ class WaitlistWorkRequestBuilder @Inject constructor() {
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     companion object {
-        const val EMAIL_WAITLIST_SYNC_WORK_TAG = "EmailWaitlistWorker"
+        const val APP_TP_WAITLIST_SYNC_WORK_TAG = "AppTPWaitlistWorker"
     }
 }
 
-class EmailWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     @Inject
-    lateinit var emailManager: EmailManager
+    lateinit var waitlistManager: TrackingProtectionWaitlistManager
 
     @Inject
     lateinit var notificationSender: NotificationSender
 
     @Inject
-    lateinit var notification: WaitlistCodeNotification
+    lateinit var notification: AppTPWaitlistCodeNotification
 
     @Inject
-    lateinit var waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder
+    lateinit var workRequestBuilder: AppTPWaitlistWorkRequestBuilder
 
     override suspend fun doWork(): Result {
-
-        when (emailManager.fetchInviteCode()) {
-            AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
-            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(notification)
-            AppEmailManager.FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(waitlistWorkRequestBuilder.waitlistRequestWork())
+        when (waitlistManager.fetchInviteCode()) {
+            FetchCodeResult.CodeExisted -> Result.success()
+            FetchCodeResult.Code -> notificationSender.sendNotification(notification)
+            FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(workRequestBuilder.waitlistRequestWork())
         }
 
         return Result.success()
@@ -86,18 +78,18 @@ class EmailWaitlistWorker(private val context: Context, workerParams: WorkerPara
 
 @ContributesMultibinding(AppObjectGraph::class)
 class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val emailManager: EmailManager,
+    private val waitlistManager: TrackingProtectionWaitlistManager,
     private val notificationSender: NotificationSender,
-    private val notification: WaitlistCodeNotification,
-    private val waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder,
+    private val notification: AppTPWaitlistCodeNotification,
+    private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is EmailWaitlistWorker) {
-            worker.emailManager = emailManager
+        if (worker is AppTPWaitlistWorker) {
+            worker.waitlistManager = waitlistManager
             worker.notificationSender = notificationSender
             worker.notification = notification
-            worker.waitlistWorkRequestBuilder = waitlistWorkRequestBuilder
+            worker.workRequestBuilder = workRequestBuilder
             return true
         }
         return false

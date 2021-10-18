@@ -16,6 +16,7 @@ include ':app-store'
 
 include ':feature-toggles-api'
 include ':feature-toggles-impl'
+
 include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'

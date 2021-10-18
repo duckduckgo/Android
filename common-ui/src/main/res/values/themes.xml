@@ -118,6 +118,8 @@
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="listItemBackgroundColor">@color/almostBlack</item>
         <item name="listItemSeparatorColor">@color/charcoalGrey</item>
+        <item name="textInputOutlinedBoxColor">@color/grayish</item>
+        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -194,7 +196,7 @@
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
 
         <item name="brokenSiteSelectionTextColor">@color/almostBlackDark</item>
-        <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
+        <item name="brokenSiteOutlinedColor">@color/grayishThree</item>
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
         <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
@@ -218,6 +220,8 @@
         <item name="listItemSubtitleColor">@color/warmerGray</item>
         <item name="listItemBackgroundColor">@color/whiteFive</item>
         <item name="listItemSeparatorColor">@color/whiteSix</item>
+        <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
+        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.email.waitlist
 
+import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import org.junit.Assert.*
 import org.junit.Test
 
-class WaitlistWorkRequestBuilderTest {
+class EmailWaitlistWorkRequestBuilderTest {
 
-    private val testee = WaitlistWorkRequestBuilder()
+    private val testee = EmailWaitlistWorkRequestBuilder()
 
     @Test
     fun whenWithBigDelayIsFalseThenDelayIsFiveMins() {
