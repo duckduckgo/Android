@@ -74,6 +74,7 @@ class DeviceShieldFragment : Fragment() {
         deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
         deviceShieldCtaImageView = view.findViewById(R.id.deviceShieldCtaImage)
         deviceShieldCtaLayout.setOnClickListener {
+            deviceShieldPixels.didPressNewTabSummary()
             val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity()).toBundle()
             startActivity(DeviceShieldTrackerActivity.intent(requireActivity()), options)
         }
