@@ -31,4 +31,6 @@
         <item name="colorOnSurface">@color/white</item>
         <item name="colorOnError">@color/brownishGrayTwo</item>
     </style>
+
+    <style name="SplashScreen" parent="AppTheme.Dark" />
 </resources>
