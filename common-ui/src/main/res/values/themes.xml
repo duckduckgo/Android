@@ -305,7 +305,7 @@
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
         <item name="android:textColorSecondary">?attr/normalTextColor</item>
-        <item name="android:windowBackground">?attr/dialogBgColor</item>
+        <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
