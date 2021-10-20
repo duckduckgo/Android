@@ -17,13 +17,13 @@
 package com.duckduckgo.app
 
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
+@ContributesMultibinding(AppObjectGraph::class)
 class AppVersionCollector @Inject constructor() : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "appInfo"
