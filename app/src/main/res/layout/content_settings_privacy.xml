@@ -80,15 +80,12 @@
         android:text="@string/settingsPrivacyProtectionWhitelist"
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
 
-    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
-        android:id="@+id/appLinksToggle"
-        android:layout_width="0dp"
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/appLinksSetting"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:toggleTitle="@string/settingTitleOpenLinksInAssociatedApps"
-        app:toggleSubTitle="@string/settingSubtitleOpenLinksInAssociatedApps"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/whitelist" />
+        app:layout_constraintTop_toBottomOf="@id/whitelist"
+        app:title="@string/settingsTitleAppLinks" />
 
     <com.duckduckgo.app.settings.SettingsPillWithSubtitle
         android:id="@+id/emailSetting"
@@ -96,7 +93,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appLinksToggle"
+        app:layout_constraintTop_toBottomOf="@id/appLinksSetting"
         app:pillDrawable="@drawable/ic_beta_pill"
         app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
         app:pillTitle="@string/settingsEmailProtectionTitle" />

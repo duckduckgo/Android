@@ -199,7 +199,8 @@ class BrowserTabViewModel(
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
         val showDaxIcon: Boolean = false,
-        val isEmailSignedIn: Boolean = false
+        val isEmailSignedIn: Boolean = false,
+        var previousAppLink: AppLink? = null
     )
 
     sealed class HighlightableButton {
@@ -289,7 +290,8 @@ class BrowserTabViewModel(
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
-        class HandleAppLink(val appLink: AppLink, val headers: Map<String, String>) : Command()
+        class ShowAppLinkPrompt(val appLink: AppLink) : Command()
+        class OpenAppLink(val appLink: AppLink) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -618,7 +620,12 @@ class BrowserTabViewModel(
 
             fireQueryChangedPixel(trimmedInput)
 
-            appLinksHandler.userEnteredBrowserState(urlToNavigate)
+            if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                appLinksHandler.updatePreviousUrl(urlToNavigate)
+                appLinksHandler.setUserQueryState(true)
+            } else {
+                clearPreviousUrl()
+            }
             command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
         }
 
@@ -924,6 +931,20 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
+
+        cacheAppLink(url)
+
+        appLinksHandler.setUserQueryState(false)
+        appLinksHandler.updatePreviousUrl(url)
+    }
+
+    private fun cacheAppLink(url: String?) {
+        val urlType = specialUrlDetector.determineType(url)
+        if (urlType is AppLink) {
+            updatePreviousAppLink(urlType)
+        } else {
+            clearPreviousAppLink()
+        }
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
@@ -1893,29 +1914,49 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
-    override fun handleAppLink(appLink: AppLink, isRedirect: Boolean, isForMainFrame: Boolean): Boolean {
-        return appLinksHandler.handleAppLink(isRedirect, isForMainFrame, appLink.uriString) { appLinkClicked(appLink) }
+    override fun handleAppLink(appLink: AppLink, isForMainFrame: Boolean): Boolean {
+        return appLinksHandler.handleAppLink(
+            isForMainFrame,
+            appLink.uriString,
+            appSettingsPreferencesStore.appLinksEnabled,
+            !appSettingsPreferencesStore.showAppLinksPrompt
+        ) { appLinkClicked(appLink) }
     }
 
-    fun resetAppLinkState() {
-        appLinksHandler.reset()
+    fun openAppLink() {
+        browserViewState.value?.previousAppLink?.let { appLink ->
+            command.value = OpenAppLink(appLink)
+        }
     }
 
-    override fun pageStarted(url: String?) {
-        appLinksHandler.updatePreviousUrl(url)
+    fun clearPreviousUrl() {
+        appLinksHandler.updatePreviousUrl(null)
     }
 
-    fun navigateToAppLinkInBrowser(url: String, headers: Map<String, String>) {
-        appLinksHandler.enterBrowserState(url)
-        command.value = Navigate(url, headers)
+    fun clearPreviousAppLink() {
+        browserViewState.value = currentBrowserViewState().copy(
+            previousAppLink = null
+        )
     }
 
-    fun appLinkClicked(appLink: AppLink) {
-        command.value = HandleAppLink(appLink, getUrlHeaders(appLink.uriString))
+    private fun updatePreviousAppLink(appLink: AppLink) {
+        browserViewState.value = currentBrowserViewState().copy(
+            previousAppLink = appLink
+        )
     }
 
-    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink, isRedirect: Boolean): Boolean {
-        return appLinksHandler.handleNonHttpAppLink(isRedirect) { nonHttpAppLinkClicked(nonHttpAppLink) }
+    private fun appLinkClicked(appLink: AppLink) {
+        if (appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery()) {
+            command.value = ShowAppLinkPrompt(appLink)
+            appLinksHandler.setUserQueryState(false)
+        } else {
+            command.value = OpenAppLink(appLink)
+        }
+    }
+
+    override fun handleNonHttpAppLink(nonHttpAppLink: NonHttpAppLink): Boolean {
+        nonHttpAppLinkClicked(nonHttpAppLink)
+        return true
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {

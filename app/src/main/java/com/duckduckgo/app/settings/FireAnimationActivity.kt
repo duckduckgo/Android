@@ -23,6 +23,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireAnimationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -60,6 +61,7 @@ class FireAnimationActivity : DuckDuckGoActivity() {
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
                 finish()
+                overridePendingTransition(0, R.anim.tab_anim_fade_out)
             }
         })
     }

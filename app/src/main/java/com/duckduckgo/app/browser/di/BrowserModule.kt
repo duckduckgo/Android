@@ -175,7 +175,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(packageManager: PackageManager, settingsDataStore: SettingsDataStore): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, settingsDataStore)
+    fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
 
     @Provides
     @Singleton

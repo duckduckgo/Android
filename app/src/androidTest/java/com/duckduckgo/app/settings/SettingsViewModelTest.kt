@@ -306,13 +306,13 @@ class SettingsViewModelTest {
 
     @Test
     fun whenAppLinksSwitchedOnThenDataStoreIsUpdated() {
-        testee.onAppLinksSettingChanged(true)
+        testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
         verify(mockAppSettingsDataStore).appLinksEnabled = true
     }
 
     @Test
     fun whenAppLinksSwitchedOffThenDataStoreIsUpdated() {
-        testee.onAppLinksSettingChanged(false)
+        testee.onAppLinksSettingChanged(AppLinkSettingType.NEVER)
         verify(mockAppSettingsDataStore).appLinksEnabled = false
     }
 

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,15 +24,19 @@ import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
+import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
+import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteToggleBinding
+import com.duckduckgo.app.browser.databinding.ViewListItemDividerBinding
+import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import kotlinx.android.synthetic.main.view_fireproof_title.view.*
-import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -68,13 +73,13 @@ class FireproofWebsiteAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+                val binding = ViewFireproofWebsiteDescriptionBinding.inflate(inflater, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             TOGGLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
+                val binding = ViewFireproofWebsiteToggleBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(
-                    view,
+                    binding,
                     CompoundButton.OnCheckedChangeListener { _, isChecked ->
                         viewModel.onUserToggleLoginDetection(
                             isChecked
@@ -83,27 +88,27 @@ class FireproofWebsiteAdapter(
                 )
             }
             DIVIDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_item_divider, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+                val binding = ViewListItemDividerBinding.inflate(inflater, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_title, parent, false)
-                view.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+                val binding = ViewFireproofTitleBinding.inflate(inflater, parent, false)
+                binding.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             FIREPROOF_WEBSITE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_list_single_item_entry, parent, false)
+                val binding = ViewListSingleItemEntryBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(
                     inflater,
-                    view,
+                    binding,
                     viewModel,
                     lifecycleOwner,
                     faviconManager
                 )
             }
             EMPTY_STATE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+                val binding = ViewFireproofWebsiteEmptyHintBinding.inflate(inflater, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -158,36 +163,35 @@ class FireproofWebsiteAdapter(
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     class FireproofWebsiteToggleViewHolder(
-        itemView: View,
+        private val binding: ViewFireproofWebsiteToggleBinding,
         private val listener: CompoundButton.OnCheckedChangeListener
     ) :
-        FireproofWebSiteViewHolder(itemView) {
+        FireproofWebSiteViewHolder(binding.root) {
         fun bind(loginDetectionEnabled: Boolean) {
-            itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
+            binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }
 
-    class FireproofWebsiteSimpleViewViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
+    class FireproofWebsiteSimpleViewViewHolder(binding: ViewBinding) : FireproofWebSiteViewHolder(binding.root)
 
     class FireproofWebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
-        itemView: View,
+        private val binding: ViewListSingleItemEntryBinding,
         private val viewModel: FireproofWebsitesViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) : FireproofWebSiteViewHolder(itemView) {
+    ) : FireproofWebSiteViewHolder(binding.root) {
 
-        lateinit var entity: FireproofWebsiteEntity
+        private val context: Context = binding.root.context
+        private lateinit var entity: FireproofWebsiteEntity
 
         fun bind(entity: FireproofWebsiteEntity) {
-            val listItem = itemView as SingleLineListItem
+            val listItem = binding.root
             this.entity = entity
 
-            listItem.setContentDescription(
-                itemView.context.getString(
-                    R.string.fireproofWebsiteOverflowContentDescription,
-                    entity.website()
-                )
+            listItem.contentDescription = context.getString(
+                R.string.fireproofWebsiteOverflowContentDescription,
+                entity.website()
             )
 
             listItem.setTitle(entity.website())
@@ -209,7 +213,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             }
-            popupMenu.show(itemView, anchor)
+            popupMenu.show(binding.root, anchor)
 
         }
 

@@ -114,13 +114,16 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
             "chase.com",
             "tirerack.com",
             "sovietgames.su",
-            "thesun.co.uk"
+            "thesun.co.uk",
+            "accounts.google.com",
+            "mail.google.com"
         )
 
         val sitesThatOmitVersion = listOf(
             "ing.nl",
             "chase.com",
-            "digid.nl"
+            "digid.nl",
+            "accounts.google.com"
         )
 
         val sitesThatShouldUseDesktopAgent = listOf(
