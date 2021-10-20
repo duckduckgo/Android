@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.store
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -27,27 +26,25 @@ class RealPrivacyFeatureTogglesRepositoryTest {
 
     lateinit var testee: RealPrivacyFeatureTogglesRepository
 
-    private val mockDatabase: PrivacyConfigDatabase = mock()
-    private val mockPrivacyFeatureTogglesDao: PrivacyFeatureTogglesDao = mock()
+    private val mockPrivacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore = mock()
 
     @Before
     fun before() {
-        whenever(mockDatabase.privacyFeatureTogglesDao()).thenReturn(mockPrivacyFeatureTogglesDao)
-        testee = RealPrivacyFeatureTogglesRepository(mockDatabase)
+        testee = RealPrivacyFeatureTogglesRepository(mockPrivacyFeatureTogglesDataStore)
     }
 
     @Test
     fun whenDeleteAllThenDeleteAllCalled() {
         testee.deleteAll()
 
-        verify(mockPrivacyFeatureTogglesDao).deleteAll()
+        verify(mockPrivacyFeatureTogglesDataStore).deleteAll()
     }
 
     @Test
     fun whenGetThenGetCalled() {
-        testee.get("test")
+        testee.get("test", true)
 
-        verify(mockPrivacyFeatureTogglesDao).get("test")
+        verify(mockPrivacyFeatureTogglesDataStore).get("test", true)
     }
 
     @Test
@@ -55,6 +52,6 @@ class RealPrivacyFeatureTogglesRepositoryTest {
         val privacyFeatureToggle = PrivacyFeatureToggles("feature", true)
         testee.insert(privacyFeatureToggle)
 
-        verify(mockPrivacyFeatureTogglesDao).insert(privacyFeatureToggle)
+        verify(mockPrivacyFeatureTogglesDataStore).insert(privacyFeatureToggle)
     }
 }

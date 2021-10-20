@@ -37,7 +37,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
@@ -127,7 +126,6 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.whenever
 import dagger.Lazy
 import io.reactivex.Observable
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -157,6 +155,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
 import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -382,7 +381,6 @@ class BrowserTabViewModelTest {
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksDao = mockBookmarksDao,
             bookmarksRepository = mockBookmarksRepository,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
@@ -554,9 +552,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(Bookmark(0, "A title", "www.example.com", 0))
-        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
+    fun whenBookmarkEditedThenRepositoryIsUpdated() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
+        testee.onSavedSiteEdited(bookmark)
+        verify(mockBookmarksRepository).update(bookmark)
     }
 
     @Test
@@ -567,11 +566,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
-        loadUrl("www.example.com", "A title")
+    fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
+        val url = "http://www.example.com"
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com", parentId = 0))
+        verify(mockBookmarksRepository).insert(title = title, url = url)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
@@ -1092,7 +1095,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(emptyList()))
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
@@ -1151,11 +1153,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnteringAppLinkQueryThenNavigateInBrowser() {
+    fun whenEnteringAppLinkQueryAndShouldShowAppLinksPromptThenNavigateInBrowserAndSetPreviousUrlToNull() {
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+        verify(mockAppLinksHandler).updatePreviousUrl(null)
+    }
+
+    @Test
+    fun whenEnteringAppLinkQueryAndShouldNotShowAppLinksPromptThenNavigateInBrowserAndSetUserQueryState() {
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+        verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
+        verify(mockAppLinksHandler).setUserQueryState(true)
     }
 
     @Test
@@ -1495,21 +1510,26 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = coroutineRule.runBlocking {
-        loadUrl("foo.com")
-        testee.titleReceived("Foo Title")
+        val url = "http://foo.com"
+        val title = "Foo Title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
-        assertEquals("foo.com", command.savedSite.url)
-        assertEquals("Foo Title", command.savedSite.title)
+        assertEquals(url, command.savedSite.url)
+        assertEquals(title, command.savedSite.title)
     }
 
     @Test
     fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
-        whenever(mockBookmarksDao.insert(any<BookmarkEntity>())).thenReturn(1)
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
+        whenever(mockBookmarksRepository.insert(anyString(), anyString(), anyLong())).thenReturn(bookmark)
 
         testee.onBookmarkMenuClicked()
 
-        verify(mockBookmarksDao, times(0)).insert(any<BookmarkEntity>())
+        verify(mockBookmarksRepository, times(0)).insert(bookmark)
     }
 
     @Test
@@ -1803,7 +1823,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -1812,7 +1832,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
         val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
@@ -1822,7 +1842,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
@@ -2970,7 +2990,10 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkAddedThenPersistFavicon() = coroutineRule.runBlocking {
         val url = "http://example.com"
-        loadUrl(url, "A title")
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
 
         testee.onBookmarkMenuClicked()
 
@@ -3360,35 +3383,64 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleAppLinkCalledThenHandleAppLink() {
+    fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
-        testee.handleAppLink(urlType, isRedirect = false, isForMainFrame = true)
-        verify(mockAppLinksHandler).handleAppLink(isRedirect = eq(false), isForMainFrame = eq(true), urlString = eq("http://example.com"), capture(appLinkCaptor))
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
         appLinkCaptor.value.invoke()
-        assertCommandIssued<Command.HandleAppLink>()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledAndIsNotUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
     }
 
     @Test
     fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), "http://example.com")
-        testee.handleNonHttpAppLink(urlType, false)
-        verify(mockAppLinksHandler).handleNonHttpAppLink(isRedirect = eq(false), capture(appLinkCaptor))
-        appLinkCaptor.value.invoke()
+        assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandIssued<Command.HandleNonHttpAppLink>()
     }
 
     @Test
-    fun whenResetAppLinkStateCalledThenResetAppLinkState() {
-        testee.resetAppLinkState()
-        verify(mockAppLinksHandler).reset()
+    fun whenUserSubmittedQueryIsAppLinkAndShouldShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrlToNull() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.onUserSubmittedQuery("foo")
+        verify(mockAppLinksHandler).updatePreviousUrl(null)
+        assertCommandIssued<Navigate>()
     }
 
     @Test
-    fun whenUserSubmittedQueryIsAppLinkThenOpenAppLinkInBrowser() {
+    fun whenUserSubmittedQueryIsAppLinkAndShouldNotShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
         testee.onUserSubmittedQuery("foo")
-        verify(mockAppLinksHandler).userEnteredBrowserState("foo.com")
+        verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
         assertCommandIssued<Navigate>()
     }
 
@@ -3429,13 +3481,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEditBookmarkRequestedThenDaoIsNotUpdated() = coroutineRule.runBlocking {
-        val bookmark = Bookmark(id = 1L, title = "", url = "www.example.com", parentId = 0L)
-        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+    fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = coroutineRule.runBlocking {
+        val url = "http://www.example.com"
+        val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark(url = url)).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
-        loadUrl("www.example.com", isBrowserShowing = true)
+        loadUrl(url = url, isBrowserShowing = true)
         testee.onBookmarkMenuClicked()
-        verify(mockBookmarksDao, never()).insert(any())
+        verify(mockBookmarksRepository, never()).insert(title = anyString(), url = anyString(), parentId = anyLong())
     }
 
     @Test
@@ -3507,16 +3560,52 @@ class BrowserTabViewModelTest {
         assertEquals("title", command.savedSite.title)
     }
 
+    @Test
+    fun whenPageChangedThenUpdatePreviousUrlAndUserQueryStateSetToFalse() {
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        verify(mockAppLinksHandler).updatePreviousUrl("www.example.com")
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenPageChangedAndIsAppLinkThenUpdatePreviousAppLink() {
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = "www.example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(appLink)
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertEquals(appLink, browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenPageChangedAndIsNotAppLinkThenSetPreviousAppLinkToNull() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("www.example.com"))
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertNull(browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenOpenAppLinkThenOpenPreviousAppLink() {
+        testee.browserViewState.value = browserViewState().copy(previousAppLink = SpecialUrlDetector.UrlType.AppLink(uriString = "example.com"))
+        testee.openAppLink()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenOpenAppLinkAndPreviousAppLinkIsNullThenDoNotOpenAppLink() {
+        testee.openAppLink()
+        assertCommandNotIssued<Command.OpenAppLink>()
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf())
+        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList())
     }
 
     private fun givenUrlCannotUseGpc(url: String) {
+        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
-        whenever(mockGpcRepository.exceptions).thenReturn(arrayListOf(GpcException(url)))
+        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
     }
 
     private fun givenGpcIsDisabled() {

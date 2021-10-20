@@ -31,6 +31,7 @@ dependencies {
     implementation AndroidX.core.ktx
 
     implementation JakeWharton.timber
+    implementation Square.moshi
 
     // Room
     implementation AndroidX.room.runtime
@@ -47,4 +48,10 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+
+    testImplementation project(path: ':common-test')
+}
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testDebugUnitTest'
 }

@@ -73,7 +73,7 @@ class BrowserWebViewClient(
     @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        return shouldOverride(view, url, request.isForMainFrame, request.isRedirect)
+        return shouldOverride(view, url, request.isForMainFrame)
     }
 
     /**
@@ -82,13 +82,13 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url, isForMainFrame = true, isRedirect = false)
+        return shouldOverride(view, url, isForMainFrame = true)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean, isRedirect: Boolean): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
 
         Timber.v("shouldOverride $url")
         try {
@@ -114,14 +114,14 @@ class BrowserWebViewClient(
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
-                        return listener.handleAppLink(urlType, isRedirect, isForMainFrame)
+                        return listener.handleAppLink(urlType, isForMainFrame)
                     }
                     false
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
-                        return listener.handleNonHttpAppLink(urlType, isRedirect)
+                        return listener.handleNonHttpAppLink(urlType)
                     }
                     true
                 }
@@ -172,7 +172,6 @@ class BrowserWebViewClient(
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            webViewClientListener?.pageStarted(url)
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)

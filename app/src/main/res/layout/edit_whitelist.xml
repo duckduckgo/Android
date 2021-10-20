@@ -30,6 +30,8 @@
         android:layout_marginEnd="20dp"
         android:hint="@string/whitelistDomainHint"
         android:inputType="textUri"
+        android:textColor="?attr/normalTextColor"
+        android:textColorHint="?attr/secondaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

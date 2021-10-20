@@ -17,15 +17,12 @@
 package com.duckduckgo.app.feedback.ui.negative.mainreason
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemFeedbackReasonBinding
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
-import kotlinx.android.synthetic.main.item_feedback_reason.view.*
 
 class MainReasonAdapter(private val itemClickListener: (FeedbackTypeMainReasonDisplay) -> Unit) :
     ListAdapter<FeedbackTypeMainReasonDisplay, MainReasonAdapter.ViewHolder>(DiffCallback()) {
@@ -42,19 +39,19 @@ class MainReasonAdapter(private val itemClickListener: (FeedbackTypeMainReasonDi
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val root = inflater.inflate(R.layout.item_feedback_reason, parent, false)
-        return ViewHolder(root, root.reason)
+        val binding = ItemFeedbackReasonBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), itemClickListener)
     }
 
-    data class ViewHolder(val root: View, val reasonTextView: TextView) : RecyclerView.ViewHolder(root) {
+    data class ViewHolder(val binding: ItemFeedbackReasonBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(reason: FeedbackTypeMainReasonDisplay, clickListener: (FeedbackTypeMainReasonDisplay) -> Unit) {
-            reasonTextView.text = root.context.getString(reason.listDisplayResId)
-            itemView.setOnClickListener { clickListener(reason) }
+            binding.reason.text = binding.root.context.getString(reason.listDisplayResId)
+            binding.root.setOnClickListener { clickListener(reason) }
         }
     }
 

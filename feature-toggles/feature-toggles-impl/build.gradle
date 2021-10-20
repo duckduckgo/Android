@@ -33,15 +33,18 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
-
     implementation Google.dagger
-
     implementation AndroidX.core.ktx
 
     // Testing dependencies
+    testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
 }
 
 anvil {
     generateDaggerFactories = true // default is false
+}
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testDebugUnitTest'
 }

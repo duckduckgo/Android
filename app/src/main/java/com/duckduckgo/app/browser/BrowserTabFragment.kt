@@ -157,6 +157,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import android.content.pm.ApplicationInfo
 
 class BrowserTabFragment :
     Fragment(),
@@ -309,7 +310,7 @@ class BrowserTabFragment :
     private var webView: DuckDuckGoWebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
-        Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+        browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
 
@@ -332,6 +333,8 @@ class BrowserTabFragment :
     }
 
     private var alertDialog: AlertDialog? = null
+
+    private var appLinksSnackBar: Snackbar? = null
 
     private var loginDetectionDialog: AlertDialog? = null
 
@@ -559,6 +562,8 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
+        viewModel.clearPreviousAppLink()
+        dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newTabLayout.show()
         browserLayout.gone()
@@ -614,12 +619,15 @@ class BrowserTabFragment :
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
+                dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
             is Command.NavigateBack -> {
+                dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
             is Command.NavigateForward -> {
+                dismissAppLinkSnackBar()
                 webView?.goForward()
             }
             is Command.ResetHistory -> {
@@ -670,8 +678,11 @@ class BrowserTabFragment :
                     addHomeShortcut(it, context)
                 }
             }
-            is Command.HandleAppLink -> {
-                openAppLinkDialog(it.appLink.appIntent, it.appLink.excludedComponents, it.appLink.uriString, it.headers)
+            is Command.ShowAppLinkPrompt -> {
+                showAppLinkSnackBar(it.appLink)
+            }
+            is Command.OpenAppLink -> {
+                openAppLink(it.appLink)
             }
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
@@ -749,7 +760,7 @@ class BrowserTabFragment :
             is DownloadCommand.ShowDownloadFailedNotification -> {
                 fileDownloadNotificationManager.showDownloadFailedNotification()
 
-                val snackbar = Snackbar.make(toolbar, R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
+                val snackbar = toolbar.makeSnackbarWithNoBottomInset(R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
                 if (it.reason == DownloadFailReason.DownloadManagerDisabled) {
                     snackbar.setText(it.message)
                     snackbar.setAction(getString(R.string.enable)) {
@@ -811,7 +822,7 @@ class BrowserTabFragment :
 
     private fun showDomainHasLocationPermission(domain: String) {
         val snackbar =
-            Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+            rootView.makeSnackbarWithNoBottomInset(getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -844,19 +855,60 @@ class BrowserTabFragment :
         decorator.incrementTabs()
     }
 
-    private fun openAppLinkDialog(
-        appIntent: Intent?,
-        excludedComponents: List<ComponentName>?,
-        url: String,
-        headers: Map<String, String> = emptyMap()
-    ) {
-        if (appIntent != null) {
-            launchAppLinkDialog(requireContext(), url, headers) { startActivity(appIntent) }
-        } else if (excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val title = getString(R.string.openExternalApp)
-            val chooserIntent = getChooserIntent(url, title, excludedComponents)
-            launchAppLinkDialog(requireContext(), url, headers) { startActivity(chooserIntent) }
+    private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
+        view?.let { view ->
+
+            val message: String?
+            val action: String?
+
+            if (appLink.appIntent != null) {
+                val packageName = appLink.appIntent.component?.packageName ?: return
+                message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
+                action = getString(R.string.appLinkSnackBarAction)
+            } else {
+                message = getString(R.string.appLinkMultipleSnackBarMessage)
+                action = getString(R.string.appLinkMultipleSnackBarAction)
+            }
+
+            appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
+                message,
+                Snackbar.LENGTH_LONG
+            ).setAction(action) {
+                openAppLink(appLink)
+            }
+
+            appLinksSnackBar?.setDuration(6000)?.show()
         }
+    }
+
+    private fun getAppName(packageName: String): String? {
+        val packageManager: PackageManager? = context?.packageManager
+        val applicationInfo: ApplicationInfo? = try {
+            packageManager?.getApplicationInfo(packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
+        }
+        return if (applicationInfo != null) {
+            packageManager?.getApplicationLabel(applicationInfo).toString()
+        } else {
+            null
+        }
+    }
+
+    private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
+        if (appLink.appIntent != null) {
+            startActivity(appLink.appIntent)
+        } else if (appLink.excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val title = getString(R.string.appLinkIntentChooserTitle)
+            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
+            startActivity(chooserIntent)
+        }
+        viewModel.clearPreviousUrl()
+    }
+
+    private fun dismissAppLinkSnackBar() {
+        appLinksSnackBar?.dismiss()
+        appLinksSnackBar = null
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -896,7 +948,6 @@ class BrowserTabFragment :
                 }
             }
         }
-        viewModel.resetAppLinkState()
     }
 
     private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {
@@ -958,24 +1009,6 @@ class BrowserTabFragment :
                 }
                 .show()
         }
-    }
-
-    private fun launchAppLinkDialog(context: Context, url: String, headers: Map<String, String>, launchApp: () -> Unit) {
-        alertDialog?.dismiss()
-
-        alertDialog = AlertDialog.Builder(context)
-            .setTitle(R.string.appLinkDialogTitle)
-            .setMessage(getString(R.string.confirmOpenExternalApp))
-            .setPositiveButton(R.string.yes) { dialog, _ ->
-                launchApp()
-                viewModel.resetAppLinkState()
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.no) { dialog, _ ->
-                viewModel.navigateToAppLinkInBrowser(url, headers)
-                dialog.dismiss()
-            }
-            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -1198,6 +1231,7 @@ class BrowserTabFragment :
                 if (omnibarTextInput.isFocused) {
                     focusDummy.requestFocus()
                 }
+                dismissAppLinkSnackBar()
                 false
             }
 
@@ -1319,7 +1353,7 @@ class BrowserTabFragment :
             is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
             is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
-        Snackbar.make(browserLayout, snackbarMessage, Snackbar.LENGTH_LONG)
+        browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 editSavedSite(savedSite)
             }
@@ -1335,8 +1369,7 @@ class BrowserTabFragment :
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         viewModel.deleteQuickAccessItem(savedSite)
-        Snackbar.make(
-            rootView,
+        rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
@@ -1345,15 +1378,12 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        Snackbar.make(
-            rootView,
+        rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        )
-            .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-            }
-            .show()
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
+        }.show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -1467,6 +1497,7 @@ class BrowserTabFragment :
     }
 
     override fun onDestroy() {
+        dismissAppLinkSnackBar()
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
@@ -1566,7 +1597,7 @@ class BrowserTabFragment :
                     downloadFile(requestUserConfirmation = false)
                 } else {
                     Timber.i("Write external storage permission refused")
-                    Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                    toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
             PERMISSION_REQUEST_GEO_LOCATION -> {
@@ -1671,7 +1702,6 @@ class BrowserTabFragment :
 
         private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
-        private const val LAYOUT_TRANSITION_MS = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -1690,8 +1720,6 @@ class BrowserTabFragment :
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
-
-        private const val URI_NO_FLAG = 0
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1824,6 +1852,9 @@ class BrowserTabFragment :
                     viewModel.onPinPageToHomeSelected()
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(view.openInAppMenuItem) {
+                    viewModel.openAppLink()
+                }
             }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
@@ -2103,6 +2134,10 @@ class BrowserTabFragment :
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
                     it.isEnabled = viewState.addToHomeEnabled
                 }
+
+                openInAppMenuItem?.let {
+                    it.visibility = if (viewState.previousAppLink != null) VISIBLE else GONE
+                }
             }
         }
 
@@ -2330,7 +2365,7 @@ class BrowserTabFragment :
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Could not open DownloadManager settings")
-            Snackbar.make(toolbar, R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+            toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
         }
     }
 

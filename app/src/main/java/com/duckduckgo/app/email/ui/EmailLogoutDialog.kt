@@ -18,23 +18,17 @@ package com.duckduckgo.app.email.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.google.android.material.textview.MaterialTextView
 
 class EmailLogoutDialog : DialogFragment() {
 
     var onLogout: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val rootView = View.inflate(activity, R.layout.email_dialog_fragment, null)
-        val message = rootView.findViewById<MaterialTextView>(R.id.emailDialogText)
-        message.text = getString(R.string.emailSignOutDialogText)
-
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setMessage(R.string.emailSignOutDialogText)
             .setTitle(getString(R.string.emailSignOutDialogTitle))
             .setNegativeButton(R.string.emailSignOutDialogCancel) { _, _ ->
                 dismiss()

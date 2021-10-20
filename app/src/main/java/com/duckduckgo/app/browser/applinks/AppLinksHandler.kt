@@ -21,57 +21,47 @@ import com.duckduckgo.app.global.UriString
 import javax.inject.Inject
 
 interface AppLinksHandler {
-    fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean
-    fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean
-    fun enterBrowserState(urlString: String?)
-    fun userEnteredBrowserState(url: String?)
+    fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean
     fun updatePreviousUrl(urlString: String?)
-    fun reset()
+    fun setUserQueryState(state: Boolean)
+    fun isUserQuery(): Boolean
 }
 
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null
-    var appLinkOpenedInBrowser = false
-    var userEnteredLink = false
+    var isAUserQuery = false
 
-    override fun handleAppLink(isRedirect: Boolean, isForMainFrame: Boolean, urlString: String, launchAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-            isRedirect && appLinkOpenedInBrowser ||
-            !isForMainFrame ||
-            UriString.sameOrSubdomain(previousUrl ?: "", urlString)
-        ) {
+    override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean {
+
+        if (!appLinksEnabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !isForMainFrame) {
             return false
         }
-        launchAppLink()
-        return true
-    }
 
-    override fun handleNonHttpAppLink(isRedirect: Boolean, launchNonHttpAppLink: () -> Unit): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isRedirect && appLinkOpenedInBrowser && !userEnteredLink) {
-            return true
+        previousUrl?.let {
+            if (UriString.sameOrSubdomain(it, urlString) || UriString.sameOrSubdomain(urlString, it)) {
+                if (isAUserQuery) {
+                    previousUrl = urlString
+                    launchAppLink()
+                }
+                return false
+            }
         }
-        launchNonHttpAppLink()
-        return true
-    }
 
-    override fun enterBrowserState(urlString: String?) {
-        appLinkOpenedInBrowser = true
         previousUrl = urlString
-    }
-
-    override fun userEnteredBrowserState(url: String?) {
-        userEnteredLink = true
-        enterBrowserState(url)
+        launchAppLink()
+        return shouldHaltWebNavigation
     }
 
     override fun updatePreviousUrl(urlString: String?) {
         previousUrl = urlString
-        reset()
     }
 
-    override fun reset() {
-        appLinkOpenedInBrowser = false
-        userEnteredLink = false
+    override fun setUserQueryState(state: Boolean) {
+        isAUserQuery = state
+    }
+
+    override fun isUserQuery(): Boolean {
+        return isAUserQuery
     }
 }

@@ -65,6 +65,7 @@ class SettingsActivity :
     SettingsAutomaticallyClearWhatFragment.Listener,
     SettingsAutomaticallyClearWhenFragment.Listener,
     SettingsThemeSelectorFragment.Listener,
+    SettingsAppLinksSelectorFragment.Listener,
     SettingsFireAnimationSelectorFragment.Listener {
 
     private val viewModel: SettingsViewModel by bindViewModel()
@@ -96,10 +97,6 @@ class SettingsActivity :
     private val viewsOther
         get() = binding.includeSettings.contentSettingsOther
 
-    private val appLinksToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAppLinksSettingChanged(isChecked)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -107,7 +104,7 @@ class SettingsActivity :
 
         configureUiEventHandlers()
         configureInternalFeatures()
-        configureAppLinksToggle()
+        configureAppLinksSettingVisibility()
         observeViewModel()
     }
 
@@ -134,6 +131,7 @@ class SettingsActivity :
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
+            appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
         with(viewsOther) {
@@ -156,11 +154,9 @@ class SettingsActivity :
         }
     }
 
-    private fun configureAppLinksToggle() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            viewsPrivacy.appLinksToggle.setOnCheckedChangeListener(appLinksToggleListener)
-        } else {
-            viewsPrivacy.appLinksToggle.visibility = View.GONE
+    private fun configureAppLinksSettingVisibility() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            viewsPrivacy.appLinksSetting.visibility = View.GONE
         }
     }
 
@@ -177,7 +173,7 @@ class SettingsActivity :
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
-                    viewsPrivacy.appLinksToggle.quietlySetIsChecked(it.appLinksEnabled, appLinksToggleListener)
+                    updateAppLinkBehavior(it.appLinksSettingType)
                 }
             }.launchIn(lifecycleScope)
 
@@ -210,6 +206,17 @@ class SettingsActivity :
             }
         )
         viewsGeneral.selectedThemeSetting.setSubtitle(subtitle)
+    }
+
+    private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
+        val subtitle = getString(
+            when (appLinkSettingType) {
+                AppLinkSettingType.ASK_EVERYTIME -> R.string.settingsAppLinksAskEveryTime
+                AppLinkSettingType.ALWAYS -> R.string.settingsAppLinksAlways
+                AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
+            }
+        )
+        viewsPrivacy.appLinksSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
@@ -248,6 +255,7 @@ class SettingsActivity :
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
+            is Command.LaunchAppLinkSettings -> launchAppLinksSettingSelector(it.appLinksSettingType)
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
@@ -314,6 +322,11 @@ class SettingsActivity :
         dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
     }
 
+    private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
+        val dialog = SettingsAppLinksSelectorFragment.create(appLinkSettingType)
+        dialog.show(supportFragmentManager, THEME_SELECTOR_TAG)
+    }
+
     private fun launchGlobalPrivacyControl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
@@ -326,6 +339,10 @@ class SettingsActivity :
 
     override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
         viewModel.onThemeSelected(selectedTheme)
+    }
+
+    override fun onAppLinkSettingSelected(selectedSetting: AppLinkSettingType) {
+        viewModel.onAppLinksSettingChanged(selectedSetting)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {

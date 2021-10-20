@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -28,7 +29,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
@@ -114,6 +117,22 @@ class QueryUrlConverterTest {
         val input = "foo"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
         assertDuckDuckGoSearchQuery("foo", result)
+    }
+
+    @Test
+    fun whenConvertQueryToUrlContainsAMajorVerticalThenVerticalAddedToUrl() {
+        val input = "foo"
+        val vertical = QueryUrlConverter.majorVerticals.random()
+        val result = testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
+        assertTrue(result.contains("iar=$vertical"))
+    }
+
+    @Test
+    fun whenConvertQueryToUrlContainsANonMajorVerticalThenVerticalNotAddedToUrl() {
+        val input = "foo"
+        val vertical = "nonMajor"
+        val result = testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
+        assertFalse(result.contains("iar=$vertical"))
     }
 
     private fun assertDuckDuckGoSearchQuery(query: String, url: String) {

@@ -24,7 +24,6 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -35,14 +34,14 @@ class GpcPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonObject: JSONObject?): Boolean {
+    override fun store(name: String, jsonString: String): Boolean {
         if (name == featureName.value) {
             val gpcExceptions = mutableListOf<GpcExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<GpcFeature> =
                 moshi.adapter(GpcFeature::class.java)
 
-            val gpcFeature: GpcFeature? = jsonAdapter.fromJson(jsonObject.toString())
+            val gpcFeature: GpcFeature? = jsonAdapter.fromJson(jsonString)
             gpcFeature?.exceptions?.map {
                 gpcExceptions.add(GpcExceptionEntity(it.domain))
             }

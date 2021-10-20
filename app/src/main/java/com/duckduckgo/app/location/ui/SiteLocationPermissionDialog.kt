@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
@@ -67,27 +68,26 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
+        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
-        val title = rootView.findViewById<TextView>(R.id.sitePermissionDialogTitle)
-        val subtitle = rootView.findViewById<TextView>(R.id.sitePermissionDialogSubtitle)
-        val favicon = rootView.findViewById<ImageView>(R.id.sitePermissionDialogFavicon)
-        val allowAlways = rootView.findViewById<TextView>(R.id.siteAllowAlwaysLocationPermission)
-        val allowOnce = rootView.findViewById<TextView>(R.id.siteAllowOnceLocationPermission)
-        val denyOnce = rootView.findViewById<TextView>(R.id.siteDenyOnceLocationPermission)
-        val denyAlways = rootView.findViewById<TextView>(R.id.siteDenyAlwaysLocationPermission)
-        val extraDivider = rootView.findViewById<View>(R.id.siteAllowOnceLocationPermissionDivider)
-        val anotherDivider = rootView.findViewById<View>(R.id.siteDenyLocationPermissionDivider)
-
-        val alertDialog = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
-            .setView(rootView)
+        val alertDialog = AlertDialog.Builder(requireActivity()).setView(binding.root)
 
         validateBundleArguments()
-        populateTitle(title)
-        populateSubtitle(subtitle)
-        populateFavicon(favicon)
-        configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
-        hideExtraViews(allowOnce, denyOnce, extraDivider, anotherDivider)
+        populateTitle(binding.sitePermissionDialogTitle)
+        populateSubtitle(binding.sitePermissionDialogSubtitle)
+        populateFavicon(binding.sitePermissionDialogFavicon)
+        configureListeners(
+            binding.siteAllowAlwaysLocationPermission,
+            binding.siteAllowOnceLocationPermission,
+            binding.siteDenyOnceLocationPermission,
+            binding.siteDenyAlwaysLocationPermission
+        )
+        hideExtraViews(
+            binding.siteAllowOnceLocationPermission,
+            binding.siteDenyOnceLocationPermission,
+            binding.siteAllowOnceLocationPermissionDivider,
+            binding.siteDenyLocationPermissionDivider
+        )
         makeCancellable()
 
         return alertDialog.create()
