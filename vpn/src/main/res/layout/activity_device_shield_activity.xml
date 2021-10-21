@@ -162,9 +162,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="24dp"
                 android:text="@string/atp_FAQCta" />
-
 
             <Button
                 android:id="@+id/cta_beta_instructions"
@@ -175,7 +173,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
-                android:visibility="gone"
                 android:text="@string/atp_ActivityBetaInstructions" />
 
         </LinearLayout>

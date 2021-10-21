@@ -66,6 +66,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
@@ -235,7 +236,10 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchBetaInstructions() {
-        startActivity(DeviceShieldFAQActivity.intent(this))
+        val intent = Intent(this, Class.forName("com.duckduckgo.app.browser.webview.WebViewActivity"))
+        intent.putExtra("URL_EXTRA", getString(R.string.atp_WaitlistBetaBlogPost))
+        intent.putExtra("TITLE_EXTRA", getString(R.string.atp_ActivityBetaInstructions))
+        startActivity(intent)
     }
 
     private fun launchAppTrackersFAQ() {

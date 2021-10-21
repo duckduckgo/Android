@@ -192,8 +192,8 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun openWebsite(url: String) {
-        startActivity(WebViewActivity.intent(this, url, getString(R.string.atp_WaitlistActivityTitle)))
+    private fun openWebsite() {
+        startActivity(WebViewActivity.intent(this, getString(R.string.atp_WaitlistBetaBlogPost), getString(R.string.atp_WaitlistActivityTitle)))
     }
 
     companion object {

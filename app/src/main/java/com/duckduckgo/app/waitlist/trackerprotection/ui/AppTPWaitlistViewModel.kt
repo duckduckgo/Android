@@ -116,7 +116,7 @@ class AppTPWaitlistViewModel(
     }
 
     companion object {
-        const val ADDRESS_BLOG_POST = "https://duckduckgo.com/email/learn-more"
+        const val ADDRESS_BLOG_POST = "https://spreadprivacy.com/introducing-app-tracking-protection"
     }
 
 }
