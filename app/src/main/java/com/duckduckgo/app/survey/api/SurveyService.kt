@@ -21,6 +21,6 @@ import retrofit2.http.GET
 
 interface SurveyService {
 
-    @GET("https://staticcdn.duckduckgo.com/survey/v2/survey-mobile.json")
+    @GET("http://ddg-sandbox.s3.amazonaws.com/survey/v2/survey-mobile.json")
     fun survey(): Call<SurveyGroup?>
 }
