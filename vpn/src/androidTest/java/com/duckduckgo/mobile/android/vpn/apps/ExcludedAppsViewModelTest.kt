@@ -87,11 +87,20 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenPackageNameIsEnabledThenProtectedAppsEnablesIt() = coroutineRule.runBlocking {
+    fun whenPackageNameIsEnabledAndAppHasNoIssuesThenProtectedAppsEnablesIt() = coroutineRule.runBlocking {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 0)
 
-        verify(deviceShieldPixels).enableAppProtection(packageName, 0)
+        verifyZeroInteractions(deviceShieldPixels)
+        verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
+    }
+
+    @Test
+    fun whenPackageNameIsEnabledAndAppHasIssuesThenProtectedAppsEnablesItAndSendsPixel() = coroutineRule.runBlocking {
+        val packageName = "com.package.name"
+        viewModel.onAppProtectionEnabled(packageName, 1, true)
+
+        verify(deviceShieldPixels).enableAppProtection(packageName, 1)
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.safeGetApplicationIcon
+import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import kotlinx.android.synthetic.main.view_device_shield_report_app_breakage_entry.view.*
 
 class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {
@@ -87,6 +88,7 @@ class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view
     fun bind(installedApp: InstalledApp, position: Int, listener: ReportBreakageAppListAdapter.Listener) {
         itemView.deviceShieldInstalledAppEntryName.text =
             String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)
+                .applyBoldSpanTo(listOf(installedApp.name))
 
         itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
             listener.onInstalledAppSelected(installedApp, position)

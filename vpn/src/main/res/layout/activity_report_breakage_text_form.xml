@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/atp_ReportBreakageFormWhatHappenedText"
                 android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
                 android:textColor="?attr/normalTextColor"/>
 
             <com.google.android.material.textfield.TextInputLayout

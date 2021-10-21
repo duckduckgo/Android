@@ -36,7 +36,7 @@
 
     <item
         android:id="@+id/deviceShieldSwitch"
-        android:title="@string/atp_Enable"
+        android:title="@string/atp_EnableCTA"
         app:showAsAction="always"
         app:actionLayout="@layout/menu_item_device_tracker_switch"/>
 

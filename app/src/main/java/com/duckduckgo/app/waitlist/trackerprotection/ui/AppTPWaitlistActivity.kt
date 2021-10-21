@@ -66,8 +66,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            setResult(RESULT_OK)
-            finish()
+            renderCodeRedeemed()
         }
     }
 
@@ -120,7 +119,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.inviteCodeButton.gone()
         binding.footerInviteCodeButton.gone()
         binding.footerDescription.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
             viewModel.learnMore()
         }
     }
@@ -152,7 +151,20 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.getStartedButton.gone()
         binding.inviteCodeButton.show()
         binding.footerInviteCodeButton.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
+            viewModel.learnMore()
+        }
+    }
+
+    private fun renderCodeRedeemed(){
+        binding.statusTitle.text = getString(R.string.atp_WaitlistRedeemedCodeStatus)
+        binding.headerImage.setImageResource(R.drawable.ic_dragon)
+        binding.waitListButton.gone()
+        binding.getStartedButton.show()
+        binding.inviteCodeButton.gone()
+        binding.footerInviteCodeButton.gone()
+        binding.footerDescription.gone()
+        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
             viewModel.learnMore()
         }
     }

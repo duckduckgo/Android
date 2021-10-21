@@ -91,7 +91,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .addAction(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
-                    context.getString(R.string.atp_Enable),
+                    context.getString(R.string.atp_EnableCTA),
                     restartVpnIntent
                 )
             )

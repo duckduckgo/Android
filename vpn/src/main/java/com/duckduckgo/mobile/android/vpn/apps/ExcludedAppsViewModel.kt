@@ -59,9 +59,11 @@ class ExcludedAppsViewModel(
         }
     }
 
-    fun onAppProtectionEnabled(packageName: String, excludingReason: Int) {
+    fun onAppProtectionEnabled(packageName: String, excludingReason: Int, needsPixel: Boolean = false) {
         recordManualChange(packageName)
-        pixel.enableAppProtection(packageName, excludingReason)
+        if (needsPixel && excludingReason > 0) {
+            pixel.enableAppProtection(packageName, excludingReason)
+        }
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }
@@ -153,11 +155,11 @@ class ExcludedAppsViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
-                    ExcludedAppsViewModel(
-                        deviceShieldExcludedApps.get(),
-                        deviceShieldPixels.get()
-                    ) as T
-                    )
+                        ExcludedAppsViewModel(
+                            deviceShieldExcludedApps.get(),
+                            deviceShieldPixels.get()
+                        ) as T
+                        )
                 else -> null
             }
         }
