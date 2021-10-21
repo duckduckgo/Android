@@ -117,6 +117,7 @@
         <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
+        <item name="lightContainerBackground">@color/almostBlack</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -215,6 +216,7 @@
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+        <item name="lightContainerBackground">@color/whiteThree</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

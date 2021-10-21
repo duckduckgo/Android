@@ -87,7 +87,7 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:background="@color/whiteThree"
+            android:background="?lightContainerBackground"
             android:layout_gravity="bottom"
             android:ellipsize="end"
             android:padding="@dimen/keyline_2"
