@@ -156,6 +156,7 @@
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">I don\'t use this app often</string>
     <string name="atp_ExcludeAppsManuallyCTASubmit">Submit</string>
+    <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100% anonymous and only includes your selection above.</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>

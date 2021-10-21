@@ -56,7 +56,8 @@ class DeviceShieldFragment : Fragment() {
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaImageView: ImageView
 
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() =
+        lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
@@ -124,19 +125,21 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
-        val latestAppString = resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
+        val latestAppString =
+            resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
         val prefix = resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationPrefix)
-        val totalTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, trackerBlocked.trackers, trackerBlocked.trackers)
+        val totalTrackers = resources.getQuantityString(
+            R.plurals.atp_TrackingAttempts,
+            trackerBlocked.trackers,
+            trackerBlocked.trackers
+        )
         val optionalOtherAppsString = if (trackerBlocked.otherAppsSize == 0) "" else resources.getQuantityString(
-            R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps, trackerBlocked.otherAppsSize, trackerBlocked.otherAppsSize
+            R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps,
+            trackerBlocked.otherAppsSize,
+            trackerBlocked.otherAppsSize
         )
         val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
-
-        val textToStyle = if (trackerBlocked.otherAppsSize == 0) {
-            "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
-        } else {
-            "$prefix $totalTrackers $latestAppString $optionalOtherAppsString$pastWeekSuffix"
-        }
+        val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
 
         deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
             listOf(

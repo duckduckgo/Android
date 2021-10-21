@@ -230,6 +230,9 @@ interface DeviceShieldPixels {
     /** Will fire when the user disables protection for a specific app */
     fun disableAppProtection(packageName: String, excludingReason: Int)
 
+    /** Will fire when the user dismisses the dialog that disabled app protection for a specific app */
+    fun disableAppProtectionDialogDismissed()
+
     /** Will fire when the user enables protection for a specific app */
     fun enableAppProtection(packageName: String, excludingReason: Int)
 
@@ -475,6 +478,10 @@ class RealDeviceShieldPixels @Inject constructor(
                 DeviceShieldPixelParameter.EXCLUDING_REASON to excludingReason.toString(),
             )
         )
+    }
+
+    override fun disableAppProtectionDialogDismissed() {
+        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DIALOG_DISMISSED)
     }
 
     override fun enableAppProtection(packageName: String, excludingReason: Int) {

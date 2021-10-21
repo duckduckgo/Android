@@ -32,6 +32,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
         fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String)
+        fun onDisableProtectionDialogDismissed(position: Int)
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -55,6 +56,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val disableLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
         val submitCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSubmit)
+        val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
         val radioGroup = rootView.findViewById<RadioGroup>(R.id.trackingProtectionAppRadioGroup)
 
         val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
@@ -65,7 +67,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
         populateAppIcon(appIcon)
         populateLabel(disableLabel)
-        configureListeners(submitCTA, radioGroup)
+        configureListeners(submitCTA, skipCTA, radioGroup)
 
         return alertDialog.create()
     }
@@ -96,13 +98,23 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         return requireArguments().getString(KEY_APP_NAME)!!
     }
 
+    private fun getPosition(): Int {
+        return requireArguments().getInt(KEY_POSITION)
+    }
+
     private fun configureListeners(
         submitCTA: Button,
+        skipCTA: Button,
         radioGroup: RadioGroup
     ) {
         submitCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), appName = getAppName(), packageName = getPackageName())
+            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName())
+        }
+
+        skipCTA.setOnClickListener {
+            dismiss()
+            listener.onDisableProtectionDialogDismissed(getPosition())
         }
 
         radioGroup.setOnCheckedChangeListener { _, _ ->
@@ -126,17 +138,19 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         const val TAG_MANUALLY_EXCLUDE_APPS_DISABLE = "ManuallyExcludedAppsDialogDisable"
         private const val KEY_APP_PACKAGE_NAME = "KEY_APP_PACKAGE_NAME"
         private const val KEY_APP_NAME = "KEY_APP_NAME"
+        private const val KEY_POSITION = "KEY_POSITION"
 
         const val NO_REASON_NEEDED = 0
         const val STOPPED_WORKING = 1
         const val TRACKING_OK = 2
         const val DONT_USE = 3
 
-        fun instance(appInfo: TrackingProtectionAppInfo): ManuallyDisableAppProtectionDialog {
+        fun instance(appInfo: TrackingProtectionAppInfo, position: Int): ManuallyDisableAppProtectionDialog {
             return ManuallyDisableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)
                 bundle.putString(KEY_APP_NAME, appInfo.name)
+                bundle.putInt(KEY_POSITION, position)
                 fragment.arguments = bundle
             }
         }

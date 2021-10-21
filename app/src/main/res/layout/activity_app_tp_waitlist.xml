@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
-        app:srcCompat="@drawable/ic_shield"/>
+        app:srcCompat="@drawable/ic_apptp_icon"/>
 
     <TextView
             android:id="@+id/statusTitle"
@@ -86,7 +86,7 @@
 
     <Button
             android:id="@+id/inviteCodeButton"
-            style="@style/DeviceShield.Button.Borderless"
+            style="@style/DeviceShield.Button.Border"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta" app:layout_constraintTop_toBottomOf="@+id/getStartedButton"
@@ -95,7 +95,7 @@
 
     <Button
             android:id="@+id/footerInviteCodeButton"
-            style="@style/DeviceShield.Button.Borderless"
+            style="@style/DeviceShield.Button.Border"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta"

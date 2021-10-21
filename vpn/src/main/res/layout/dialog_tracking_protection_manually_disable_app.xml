@@ -54,6 +54,7 @@
 
     <TextView
         android:id="@+id/trackingProtectionAppLabel"
+        style="@style/TextAppearance.DuckDuckGo.Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -62,7 +63,6 @@
         android:orientation="vertical"
         android:text="@string/atp_ExcludeAppsManuallyDisableAppLabel"
         android:textAlignment="center"
-        style="@style/TextAppearance.DuckDuckGo.Body2"
         android:textColor="?secondaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -87,39 +87,39 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppSplitter">
 
         <RadioButton
             android:id="@+id/trackingProtectionAppRadioOne"
+            style="@style/TextAppearance.DuckDuckGo.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/keyline_2"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:textColor="?attr/normalTextColor"
-            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerOne"/>
+            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerOne"
+            android:textColor="?attr/normalTextColor"/>
 
         <RadioButton
             android:id="@+id/trackingProtectionAppRadioTwo"
+            style="@style/TextAppearance.DuckDuckGo.Body2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:paddingStart="@dimen/keyline_2"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:textColor="?attr/normalTextColor"
-            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerTwo"/>
+            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerTwo"
+            android:textColor="?attr/normalTextColor"/>
 
         <RadioButton
             android:id="@+id/trackingProtectionAppRadioThree"
             style="@style/TextAppearance.DuckDuckGo.Body2"
-            android:textColor="?attr/normalTextColor"
-            android:paddingStart="@dimen/keyline_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
-            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerThree"/>
+            android:paddingStart="@dimen/keyline_2"
+            android:text="@string/atp_ExcludeAppsManuallyDisableAnswerThree"
+            android:textColor="?attr/normalTextColor"/>
 
     </RadioGroup>
 
@@ -156,14 +156,37 @@
         style="@style/DeviceShield.Button.Blue"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialogButtonHeight"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:enabled="false"
         android:layout_marginBottom="16dp"
+        android:enabled="false"
         android:gravity="center|center_horizontal"
         android:text="@string/atp_ExcludeAppsManuallyCTASubmit"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppDescription"/>
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppDescription"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <Button
+        android:id="@+id/trackingProtectionExcludeAppDialogSkip"
+        style="@style/DeviceShield.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dialogButtonHeight"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center|center_horizontal"
+        android:text="@string/atp_ExcludeAppsManuallyCTASkip"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppDescription"
+        app:layout_constraintVertical_bias="0.0"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent ="0.5"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

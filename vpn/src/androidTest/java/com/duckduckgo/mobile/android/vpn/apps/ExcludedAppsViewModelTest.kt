@@ -176,7 +176,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, false)
-            Assert.assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues), expectItem())
+            Assert.assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -194,7 +194,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, false)
-            Assert.assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded), expectItem())
+            Assert.assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }

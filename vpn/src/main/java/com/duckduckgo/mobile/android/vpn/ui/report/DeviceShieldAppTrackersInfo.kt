@@ -20,15 +20,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityAppTrackersInfoBinding
 
 class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
+
+    private val binding: ActivityAppTrackersInfoBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_app_trackers_info)
-        setupToolbar(findViewById(R.id.default_toolbar))
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.defaultToolbar)
     }
 
     override fun onSupportNavigateUp(): Boolean {

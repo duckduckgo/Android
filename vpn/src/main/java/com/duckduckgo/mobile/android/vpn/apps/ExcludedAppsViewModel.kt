@@ -99,7 +99,7 @@ class ExcludedAppsViewModel(
             if (enabled) {
                 checkForAppProtectionEnabled(excludedAppInfo, position)
             } else {
-                checkForAppProtectionDisabled(excludedAppInfo)
+                checkForAppProtectionDisabled(excludedAppInfo, position)
             }
         }
     }
@@ -112,9 +112,9 @@ class ExcludedAppsViewModel(
         }
     }
 
-    private suspend fun checkForAppProtectionDisabled(excludedAppInfo: TrackingProtectionAppInfo) {
+    private suspend fun checkForAppProtectionDisabled(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
         if (!excludedAppInfo.isProblematic()) {
-            command.send(Command.ShowDisableProtectionDialog(excludedAppInfo))
+            command.send(Command.ShowDisableProtectionDialog(excludedAppInfo, position))
         } else {
             onAppProtectionDisabled(
                 ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED,
@@ -130,6 +130,10 @@ class ExcludedAppsViewModel(
             command.send(Command.LaunchFeedback(ReportBreakageScreen.ListOfInstalledApps))
         }
     }
+
+    fun onDisableProtectionDialogDismissed() {
+        pixel.disableAppProtectionDialogDismissed()
+    }
 }
 
 internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
@@ -137,7 +141,7 @@ internal sealed class Command {
     object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
     data class ShowEnableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) : Command()
-    data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
+    data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) : Command()
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
