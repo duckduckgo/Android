@@ -34,6 +34,7 @@ class AccessibilitySettingsViewModel constructor(
 ) : ViewModel() {
 
     data class ViewState(
+        val overrideSystemFontSize: Boolean = false,
         val fontSize: Float = 100f,
         val forceZoom: Boolean = false
     )
@@ -44,6 +45,7 @@ class AccessibilitySettingsViewModel constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
+                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     fontSize = accessibilitySettings.fontSize,
                     forceZoom = accessibilitySettings.forceZoom
                 )
@@ -65,8 +67,19 @@ class AccessibilitySettingsViewModel constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    fontSize = accessibilitySettings.fontSize,
                     forceZoom = accessibilitySettings.forceZoom
+                )
+            )
+        }
+    }
+
+    fun onOverrideSystemFontSizeChanged(checked: Boolean) {
+        Timber.i("Accessibility: onOverrideSystemFontSizeChanged $checked")
+        accessibilitySettings.overrideSystemFontSize = checked
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    overrideSystemFontSize = checked
                 )
             )
         }
@@ -78,8 +91,7 @@ class AccessibilitySettingsViewModel constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    fontSize = accessibilitySettings.fontSize,
-                    forceZoom = accessibilitySettings.forceZoom
+                    fontSize = accessibilitySettings.fontSize
                 )
             )
         }

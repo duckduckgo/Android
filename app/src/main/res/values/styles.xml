@@ -77,7 +77,7 @@
         <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/settings_section_title_color_selector</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textAllCaps">true</item>

@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface AccessibilitySettingsDataStore {
+    var overrideSystemFontSize: Boolean
     var fontSize: Float
     var forceZoom: Boolean
     fun settingsFlow(): StateFlow<AccessibilitySettings>
@@ -39,7 +40,7 @@ class AccessibilitySettingsSharedPreferences(
     private val appCoroutineScope: CoroutineScope
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(fontSize, forceZoom))
+    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -58,17 +59,25 @@ class AccessibilitySettingsSharedPreferences(
             emitNewValues()
         }
 
+    override var overrideSystemFontSize: Boolean
+        get() = preferences.getBoolean(KEY_SYSTEM_FONT_SIZE, false)
+        set(enabled) {
+            preferences.edit { putBoolean(KEY_SYSTEM_FONT_SIZE, enabled) }
+            emitNewValues()
+        }
+
     override fun settingsFlow() = accessibilityStateFlow.asStateFlow()
 
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            accessibilityStateFlow.emit(AccessibilitySettings(fontSize, forceZoom))
-            Timber.i("Accessibility: new value emitted ${AccessibilitySettings(fontSize, forceZoom)}")
+            accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+            Timber.i("Accessibility: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
         }
     }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.accessibility.settings"
+        const val KEY_SYSTEM_FONT_SIZE = "SYSTEM_FONT_SIZE"
         const val KEY_FORCE_ZOOM = "FORCE_ZOOM"
         const val KEY_FONT_SIZE = "FONT_SIZE"
         const val FONT_SIZE_DEFAULT = 100f
@@ -76,6 +85,7 @@ class AccessibilitySettingsSharedPreferences(
 }
 
 data class AccessibilitySettings(
+    val overrideSystemFontSize: Boolean,
     val fontSize: Float,
     val forceZoom: Boolean
 )

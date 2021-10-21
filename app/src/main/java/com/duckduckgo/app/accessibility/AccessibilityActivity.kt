@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.quietlySetValue
+import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.flow.launchIn
@@ -40,6 +41,10 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
+
+    private val systemFontSizeChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onOverrideSystemFontSizeChanged(isChecked)
+    }
 
     private val forceZoomChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onForceZoomChanged(isChecked)
@@ -67,21 +72,27 @@ class AccessibilityActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 Timber.i("Accessibility: newViewState $viewState")
-                renderFontSize(viewState.fontSize)
+                renderFontSize(viewState.fontSize, viewState.overrideSystemFontSize)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
+                binding.overrideSystemFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
             }.launchIn(lifecycleScope)
     }
 
-    private fun renderFontSize(fontSize: Float) {
+    private fun renderFontSize(fontSize: Float, overrideSystemFontSize: Boolean) {
         Timber.i("Accessibility: renderFontSize $fontSize")
+        val enableFontSizeSettings = overrideSystemFontSize
+
         binding.accessibilitySlider.quietlySetValue(fontSize, fontSizeChangeListener)
         val newValue = fontSize / 100
         val formatter = NumberFormat.getPercentInstance()
         binding.accessibilitySliderValue.text = formatter.format(newValue)
         binding.accessibilityHint.textSize = 16 * newValue
+
+        binding.fontSizeSettingsGroup.recursiveEnable(enableFontSizeSettings)
     }
 
     private fun configureListener() {
+        binding.overrideSystemFontSizeToggle.setOnCheckedChangeListener(systemFontSizeChangeListener)
         binding.accessibilitySlider.addOnChangeListener(fontSizeChangeListener)
         binding.forceZoomToggle.setOnCheckedChangeListener(forceZoomChangeListener)
     }

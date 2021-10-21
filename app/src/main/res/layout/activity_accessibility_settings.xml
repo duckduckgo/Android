@@ -25,60 +25,75 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_toolbar" />
 
-    <TextView
-        style="@style/SettingsSectionTitle"
+    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+        android:id="@+id/overrideSystemFontSizeToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:padding="@dimen/keyline_4"
-        android:text="@string/accessibilityFontSizeTitle"
-        tools:text="Text goes here" />
+        app:toggleSubTitle="@string/accessibilityForceZoomSubtitle"
+        app:toggleTitle="@string/accessibilityForceZoomTitle" />
 
     <LinearLayout
+        android:id="@+id/fontSizeSettingsGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_4">
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/accessibilitySlider"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_4"
-            android:stepSize="10"
-            android:valueFrom="70"
-            android:valueTo="170"
-            app:labelBehavior="gone"
-            app:tickVisible="false"/>
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/accessibilitySliderValue"
-            style="@style/TextAppearance.DuckDuckGo.Body1"
-            android:layout_width="45dp"
+            style="@style/SettingsSectionTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="?normalTextColor"
-            android:gravity="center_vertical|end"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:text="100%" />
+            android:padding="@dimen/keyline_4"
+            android:text="@string/accessibilityFontSizeTitle"
+            tools:text="Text goes here" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_4">
+
+            <TextView
+                android:id="@+id/accessibilitySliderValue"
+                style="@style/TextAppearance.DuckDuckGo.Body1"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/keyline_2"
+                android:gravity="center_vertical|end"
+                android:text="100%"
+                android:textColor="@color/normal_text_color_selector" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/accessibilitySlider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_4"
+                android:stepSize="10"
+                android:valueFrom="70"
+                android:valueTo="170"
+                app:labelBehavior="gone"
+                app:tickVisible="false" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/accessibilityHint"
+            style="@style/TextAppearance.DuckDuckGo.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:background="@color/whiteThree"
+            android:layout_gravity="bottom"
+            android:ellipsize="end"
+            android:padding="@dimen/keyline_2"
+            android:text="@string/accessibilityFontSizeHint"
+            android:textColor="@color/normal_text_color_selector" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/accessibilityHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/whiteThree"
-        android:ellipsize="end"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:padding="@dimen/keyline_2"
-        style="@style/TextAppearance.DuckDuckGo.Body1"
-        android:text="@string/accessibilityFontSizeHint"/>
 
     <View
         android:id="@+id/accessitilityDivider"

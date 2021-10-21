@@ -85,6 +85,7 @@
         <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
+        <item name="sectionItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="settingsDividerColor">@color/almostBlack</item>
@@ -182,6 +183,7 @@
         <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
+        <item name="sectionItemTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="settingsMinorTextColor">@color/warmerGray</item>
         <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
         <item name="settingsDividerColor">@color/whiteSix</item>
