@@ -90,6 +90,7 @@
             android:background="?lightContainerBackground"
             android:layout_gravity="bottom"
             android:ellipsize="end"
+
             android:padding="@dimen/keyline_2"
             android:text="@string/accessibilityFontSizeHint"
             android:textColor="@color/normal_text_color_selector" />

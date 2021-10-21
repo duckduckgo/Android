@@ -28,8 +28,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface AccessibilitySettingsDataStore {
+    val systemFontSize: Float
     var overrideSystemFontSize: Boolean
-    var fontSize: Float
+    val fontSize: Float
+    var appFontSize: Float
     var forceZoom: Boolean
     fun settingsFlow(): StateFlow<AccessibilitySettings>
 }
@@ -45,7 +47,13 @@ class AccessibilitySettingsSharedPreferences(
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-    override var fontSize: Float
+    override val fontSize: Float
+        get() = if (overrideSystemFontSize) appFontSize else systemFontSize
+
+    override val systemFontSize: Float
+        get() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
+
+    override var appFontSize: Float
         get() = preferences.getFloat(KEY_FONT_SIZE, FONT_SIZE_DEFAULT)
         set(value) {
             preferences.edit { putFloat(KEY_FONT_SIZE, value) }

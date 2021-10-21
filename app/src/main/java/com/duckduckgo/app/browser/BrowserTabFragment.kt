@@ -1219,8 +1219,11 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
-                textZoom = accessibilitySettingsDataStore.fontSize.toInt()
-                Timber.i("Font size: ${this.textZoom}")
+                Timber.i("Accessibility: Webview recreate")
+                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
+                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
+                    Timber.i("Accessibility: Webview Font size: ${this.textZoom}")
+                }
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->

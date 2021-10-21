@@ -19,6 +19,7 @@ package com.duckduckgo.app.accessibility
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -72,7 +73,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 Timber.i("Accessibility: newViewState $viewState")
-                renderFontSize(viewState.fontSize, viewState.overrideSystemFontSize)
+                renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
                 binding.overrideSystemFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
             }.launchIn(lifecycleScope)
@@ -86,7 +87,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         val newValue = fontSize / 100
         val formatter = NumberFormat.getPercentInstance()
         binding.accessibilitySliderValue.text = formatter.format(newValue)
-        binding.accessibilityHint.textSize = 16 * newValue
+        // Avoids scaling our Sample Text when overriding system font size
+        binding.accessibilityHint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16 * newValue)
 
         binding.fontSizeSettingsGroup.recursiveEnable(enableFontSizeSettings)
     }
