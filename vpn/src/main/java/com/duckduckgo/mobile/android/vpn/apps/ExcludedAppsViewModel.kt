@@ -160,11 +160,11 @@ class ExcludedAppsViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
-                        ExcludedAppsViewModel(
-                            deviceShieldExcludedApps.get(),
-                            deviceShieldPixels.get()
-                        ) as T
-                        )
+                    ExcludedAppsViewModel(
+                        deviceShieldExcludedApps.get(),
+                        deviceShieldPixels.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

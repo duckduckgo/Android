@@ -50,7 +50,7 @@ class AppTPWaitlistViewModel(
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
-        data class OpenUrl(val url: String) : Command()
+        object LaunchBetaInstructions : Command()
         object EnterInviteCode : Command()
         object ShowErrorMessage : Command()
         object ShowNotificationDialog : Command()
@@ -99,7 +99,7 @@ class AppTPWaitlistViewModel(
 
     fun learnMore() {
         viewModelScope.launch {
-            commandChannel.send(Command.OpenUrl(url = ADDRESS_BLOG_POST))
+            commandChannel.send(Command.LaunchBetaInstructions)
         }
     }
 
@@ -114,11 +114,6 @@ class AppTPWaitlistViewModel(
             viewStateFlow.emit(ViewState(waitlistManager.waitlistState()))
         }
     }
-
-    companion object {
-        const val ADDRESS_BLOG_POST = "https://spreadprivacy.com/introducing-app-tracking-protection"
-    }
-
 }
 
 @ContributesMultibinding(AppObjectGraph::class)

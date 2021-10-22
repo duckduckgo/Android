@@ -103,7 +103,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun executeCommand(command: AppTPWaitlistViewModel.Command) {
         when (command) {
-            is AppTPWaitlistViewModel.Command.OpenUrl -> openWebsite()
+            is AppTPWaitlistViewModel.Command.LaunchBetaInstructions -> openWebsite()
             is AppTPWaitlistViewModel.Command.ShowErrorMessage -> renderErrorMessage()
             is AppTPWaitlistViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
             is AppTPWaitlistViewModel.Command.ShowOnboarding -> showOnboarding()
@@ -156,7 +156,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderCodeRedeemed(){
+    private fun renderCodeRedeemed() {
         binding.statusTitle.text = getString(R.string.atp_WaitlistRedeemedCodeStatus)
         binding.headerImage.setImageResource(R.drawable.ic_dragon)
         binding.waitListButton.gone()

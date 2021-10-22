@@ -32,7 +32,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -126,7 +125,7 @@ class AppTPWaitlistViewModelTest {
     fun whenUserWantsToLearnMoreThenOpenUrlCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.learnMore()
-            Assert.assertEquals(AppTPWaitlistViewModel.Command.OpenUrl(url = AppTPWaitlistViewModel.ADDRESS_BLOG_POST), expectItem())
+            assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, expectItem())
         }
     }
 
