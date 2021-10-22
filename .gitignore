@@ -50,8 +50,8 @@ bitrise.yml
 
 # NDK files
 **/.cxx
-app/play/release/output-metadata.json
-app/release/output-metadata.json
-app/internal/release/output-metadata.json
+app/play/release/
+app/release/
+app/internal/
 
 build-cache

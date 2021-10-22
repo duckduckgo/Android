@@ -83,6 +83,11 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
         observeViewModel()
     }
 
+    override fun onStart() {
+        super.onStart()
+        deviceShieldPixels.didShowReportBreakageAppList()
+    }
+
     override fun onBackPressed() {
         onSupportNavigateUp()
     }

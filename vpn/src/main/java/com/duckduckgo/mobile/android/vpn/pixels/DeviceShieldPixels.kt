@@ -228,13 +228,13 @@ interface DeviceShieldPixels {
     fun vpnMemoryRunningCritical(payload: Map<String, String>)
 
     /** Will fire when the user disables protection for a specific app */
-    fun disableAppProtection(packageName: String, excludingReason: Int)
+    fun disableAppProtection(payload: Map<String, String>)
 
     /** Will fire when the user dismisses the dialog that disabled app protection for a specific app */
     fun disableAppProtectionDialogDismissed()
 
     /** Will fire when the user enables protection for a specific app */
-    fun enableAppProtection(packageName: String, excludingReason: Int)
+    fun enableAppProtection(payload: Map<String, String>)
 
     /** Will fire when the user restores to the default protection list */
     fun restoreDefaultProtectionList()
@@ -246,6 +246,12 @@ interface DeviceShieldPixels {
      * Will fire when the user reports an app breakage
      */
     fun sendAppBreakageReport(metadata: Map<String, String>)
+
+    fun didShowReportBreakageAppList()
+
+    fun didShowReportBreakageTextForm()
+
+    fun didShowReportBreakageSingleChoiceForm()
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -470,28 +476,18 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL, payload)
     }
 
-    override fun disableAppProtection(packageName: String, excludingReason: Int) {
-        firePixel(
-            DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP,
-            mapOf(
-                DeviceShieldPixelParameter.PACKAGE_NAME to packageName,
-                DeviceShieldPixelParameter.EXCLUDING_REASON to excludingReason.toString(),
-            )
-        )
+    override fun disableAppProtection(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP, payload)
     }
 
     override fun disableAppProtectionDialogDismissed() {
         firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DIALOG_DISMISSED)
     }
 
-    override fun enableAppProtection(packageName: String, excludingReason: Int) {
-        firePixel(
-            DeviceShieldPixelNames.APP_EXCLUSION_ENABLE_APP,
-            mapOf(
-                DeviceShieldPixelParameter.PACKAGE_NAME to packageName,
-                DeviceShieldPixelParameter.EXCLUDING_REASON to excludingReason.toString(),
-            )
-        )
+    override fun enableAppProtection(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.APP_EXCLUSION_ENABLE_APP_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_ENABLE_APP, payload)
     }
 
     override fun restoreDefaultProtectionList() {
@@ -504,6 +500,21 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
+    }
+
+    override fun didShowReportBreakageAppList() {
+        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_APP_LIST)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY)
+    }
+
+    override fun didShowReportBreakageTextForm() {
+        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_TEXT_FORM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY)
+    }
+
+    override fun didShowReportBreakageSingleChoiceForm() {
+        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
     }
 
     private fun suddenKill() {

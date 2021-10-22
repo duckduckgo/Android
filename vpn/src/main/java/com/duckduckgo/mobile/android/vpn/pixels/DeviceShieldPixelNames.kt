@@ -110,9 +110,13 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     VPN_PROCESS_MEMORY_CRITICAL_DAILY("m_apptb_m_cd"),
 
     APP_EXCLUSION_DISABLE_APP("m_apptb_ae_d"),
+    APP_EXCLUSION_DISABLE_APP_DAILY("m_apptb_ae_dd"),
     APP_EXCLUSION_ENABLE_APP("m_apptb_ae_e"),
+    APP_EXCLUSION_ENABLE_APP_DAILY("m_apptb_ae_ed"),
     APP_EXCLUSION_RESTORE_PROTECTION_LIST("m_apptb_ae_rp"),
+    APP_EXCLUSION_RESTORE_PROTECTION_LIST_DAILY("m_apptb_ae_rpd"),
     APP_EXCLUSION_LAUNCH_FEEDBACK("m_apptb_ae_lf"),
+    APP_EXCLUSION_LAUNCH_FEEDBACK_DAILY("m_apptb_ae_lfd"),
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
 
@@ -120,10 +124,12 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ENCRYPTED_GENERAL_EXCEPTION("m_atp_encrypted_general_exception"),
 
     APP_EXCLUSION_DIALOG_DISMISSED("m_atp_exclusion_dialog_dismissed"),
-    ;
-}
 
-object DeviceShieldPixelParameter {
-    const val PACKAGE_NAME = "packageName"
-    const val EXCLUDING_REASON = "reason"
+    DID_SHOW_REPORT_BREAKAGE_APP_LIST("m_atp_did_show_report_breakage_app_list"),
+    DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY("m_atp_did_show_report_breakage_app_list_d"),
+    DID_SHOW_REPORT_BREAKAGE_TEXT_FORM("m_atp_did_show_report_breakage_text_form"),
+    DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY("m_atp_did_show_report_breakage_text_form_d"),
+    DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM("m_atp_did_show_report_breakage_single_choice"),
+    DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY("m_atp_did_show_report_breakage_single_choice_d"),
+    ;
 }

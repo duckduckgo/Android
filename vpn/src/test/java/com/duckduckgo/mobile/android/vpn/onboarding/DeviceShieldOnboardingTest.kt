@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.onboarding
+package com.duckduckgo.mobile.android.vpn.onboarding
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingImpl
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingPreferencesModule
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 
+@RunWith(AndroidJUnit4::class)
 class DeviceShieldOnboardingTest {
     @Mock
     lateinit var sharedPreferences: SharedPreferences

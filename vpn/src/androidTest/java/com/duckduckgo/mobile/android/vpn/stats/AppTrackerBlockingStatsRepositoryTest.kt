@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -41,7 +41,7 @@ class AppTrackerBlockingStatsRepositoryTest {
 
     @get:Rule
     @Suppress("unused")
-    val coroutineRule = VpnCoroutineTestRule()
+    val coroutineRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnRunningStatsDao: VpnRunningStatsDao

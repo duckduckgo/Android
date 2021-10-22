@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -53,7 +53,7 @@ class DeviceShieldActivityFeedViewModelTest {
 
         viewModel = DeviceShieldActivityFeedViewModel(
             AppTrackerBlockingStatsRepository(db),
-            VpnCoroutineTestRule().testDispatcherProvider,
+            CoroutineTestRule().testDispatcherProvider,
             TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
         )
     }

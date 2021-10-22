@@ -27,12 +27,17 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageTextSingleChoiceBinding
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private val binding: ActivityReportBreakageTextSingleChoiceBinding by viewBinding()
     private val viewModel: ReportBreakageSingleChoiceFormViewModel by bindViewModel()
@@ -57,6 +62,11 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupViews()
         observeViewModel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        deviceShieldPixels.didShowReportBreakageSingleChoiceForm()
     }
 
     fun setupViews() {

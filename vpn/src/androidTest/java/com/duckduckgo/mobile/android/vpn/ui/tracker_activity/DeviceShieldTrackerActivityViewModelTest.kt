@@ -22,7 +22,7 @@ import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -80,7 +80,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             deviceShieldPixels,
             vpnPreferences,
             appTrackerBlockingStatsRepository,
-            VpnCoroutineTestRule().testDispatcherProvider
+            CoroutineTestRule().testDispatcherProvider
         )
     }
 

@@ -151,10 +151,12 @@ dependencies {
 
     // Testing dependencies
     testImplementation Testing.mockito.kotlin
-    testImplementation Testing.mockito.android
-    testImplementation "junit:junit:_"
+    testImplementation Testing.mockito.core
+    testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
     testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation Testing.robolectric
 
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation 'app.cash.turbine:turbine:_'

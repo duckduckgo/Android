@@ -73,6 +73,11 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
         setupViews()
     }
 
+    override fun onStart() {
+        super.onStart()
+        deviceShieldPixels.didShowReportBreakageTextForm()
+    }
+
     fun setupViews() {
         binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.ctaNextFormText.setOnClickListener {

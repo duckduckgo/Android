@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context.MODE_PRIVATE
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels.Companion.DS_PIXELS_PREF_FILE
@@ -26,8 +27,10 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.*
 
+@RunWith(AndroidJUnit4::class)
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()

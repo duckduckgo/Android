@@ -46,7 +46,7 @@ class ExcludedAppsViewModel(
 
     fun onAppProtectionDisabled(answer: Int = 0, appName: String, packageName: String) {
         if (answer > ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED) {
-            pixel.disableAppProtection(packageName, answer)
+            pixel.disableAppProtection(mapOf(PACKAGE_NAME to packageName, EXCLUDING_REASON to answer.toString()))
         }
 
         recordManualChange(packageName)
@@ -62,7 +62,7 @@ class ExcludedAppsViewModel(
     fun onAppProtectionEnabled(packageName: String, excludingReason: Int, needsPixel: Boolean = false) {
         recordManualChange(packageName)
         if (needsPixel && excludingReason > 0) {
-            pixel.enableAppProtection(packageName, excludingReason)
+            pixel.enableAppProtection(mapOf(PACKAGE_NAME to packageName, EXCLUDING_REASON to excludingReason.toString()))
         }
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
@@ -135,6 +135,11 @@ class ExcludedAppsViewModel(
 
     fun onDisableProtectionDialogDismissed() {
         pixel.disableAppProtectionDialogDismissed()
+    }
+
+    companion object DeviceShieldPixelParameter {
+        private const val PACKAGE_NAME = "packageName"
+        private const val EXCLUDING_REASON = "reason"
     }
 }
 
