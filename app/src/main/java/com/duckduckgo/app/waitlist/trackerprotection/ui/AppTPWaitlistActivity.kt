@@ -103,7 +103,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun executeCommand(command: AppTPWaitlistViewModel.Command) {
         when (command) {
-            is AppTPWaitlistViewModel.Command.OpenUrl -> openWebsite(command.url)
+            is AppTPWaitlistViewModel.Command.OpenUrl -> openWebsite()
             is AppTPWaitlistViewModel.Command.ShowErrorMessage -> renderErrorMessage()
             is AppTPWaitlistViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
             is AppTPWaitlistViewModel.Command.ShowOnboarding -> showOnboarding()
