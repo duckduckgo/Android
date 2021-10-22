@@ -117,8 +117,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -238,7 +237,8 @@ class BrowserTabViewModel(
 
     data class AccessibilityViewState(
         val fontSize: Float,
-        val forceZoom: Boolean
+        val forceZoom: Boolean,
+        val refreshWebView: Boolean
     )
 
     data class FindInPageViewState(
@@ -351,6 +351,7 @@ class BrowserTabViewModel(
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private var refreshOnViewVisible = MutableStateFlow(true)
 
     val url: String?
         get() = site?.url
@@ -446,6 +447,8 @@ class BrowserTabViewModel(
         }
     }
 
+    private var accessibilityObserver: Job? = null
+
     init {
         initializeViewStates()
         configureAutoComplete()
@@ -464,10 +467,7 @@ class BrowserTabViewModel(
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
         }.launchIn(viewModelScope)
 
-        accessibilitySettingsDataStore.settingsFlow().onEach { settings ->
-            Timber.i("Accessibility: newSettings $settings")
-            accessibilityViewState.value = currentAccessibilityViewState().copy(fontSize = settings.fontSize, forceZoom = settings.forceZoom)
-        }.launchIn(viewModelScope)
+        observeAccessibilitySettings()
 
         favoritesRepository.favorites().onEach { favoriteSites ->
             val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
@@ -498,6 +498,23 @@ class BrowserTabViewModel(
         url?.let {
             onUserSubmittedQuery(it)
         }
+    }
+
+    fun onViewRecreated() {
+        observeAccessibilitySettings()
+    }
+
+    fun observeAccessibilitySettings() {
+        accessibilityObserver?.cancel()
+        accessibilityObserver = accessibilitySettingsDataStore.settingsFlow()
+            .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
+            .onEach { (settings, viewVisible) ->
+                Timber.i("Accessibility: current ${currentAccessibilityViewState()}")
+                Timber.i("Accessibility: newSettings $settings, $viewVisible, ${this@BrowserTabViewModel}")
+                val shouldRefreshWebview = (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
+                accessibilityViewState.value =
+                    currentAccessibilityViewState().copy(fontSize = settings.fontSize, forceZoom = settings.forceZoom, refreshWebView = shouldRefreshWebview)
+            }.launchIn(viewModelScope)
     }
 
     fun onMessageProcessed() {
@@ -545,6 +562,7 @@ class BrowserTabViewModel(
 
     @VisibleForTesting
     public override fun onCleared() {
+        Timber.i("Cris: onCleared")
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
@@ -562,6 +580,7 @@ class BrowserTabViewModel(
     }
 
     fun onViewResumed() {
+        Timber.i("Cris: onViewResumed")
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -577,10 +596,18 @@ class BrowserTabViewModel(
         } else {
             command.value = HideKeyboard
         }
+        viewModelScope.launch {
+            Timber.i("Accessibility: onViewVisible, ${this@BrowserTabViewModel}")
+            refreshOnViewVisible.emit(true)
+        }
     }
 
     fun onViewHidden() {
         skipHome = false
+        viewModelScope.launch {
+            Timber.i("Accessibility: onViewHidden, ${this@BrowserTabViewModel}")
+            refreshOnViewVisible.emit(false)
+        }
     }
 
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
@@ -1735,6 +1762,7 @@ class BrowserTabViewModel(
     }
 
     private fun initializeViewStates() {
+        Timber.i("Accessibility: initializeViewStates")
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
         loadingViewState.value = LoadingViewState()
@@ -1745,7 +1773,8 @@ class BrowserTabViewModel(
         privacyGradeViewState.value = PrivacyGradeViewState()
         accessibilityViewState.value = AccessibilityViewState(
             fontSize = accessibilitySettingsDataStore.fontSize,
-            forceZoom = accessibilitySettingsDataStore.forceZoom
+            forceZoom = accessibilitySettingsDataStore.forceZoom,
+            refreshWebView = false
         )
     }
 
@@ -2183,6 +2212,10 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             favoritesRepository.updateWithPosition(newList.map { it.favorite })
         }
+    }
+
+    fun onWebViewRefreshed() {
+        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
     }
 
     companion object {
