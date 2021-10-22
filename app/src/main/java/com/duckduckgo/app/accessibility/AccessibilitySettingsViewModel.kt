@@ -34,7 +34,7 @@ class AccessibilitySettingsViewModel constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val overrideSystemFontSize: Boolean = false,
+        val useSystemFontSize: Boolean = false,
         val appFontSize: Float = 100f,
         val forceZoom: Boolean = false
     )
@@ -45,7 +45,7 @@ class AccessibilitySettingsViewModel constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
+                    useSystemFontSize = accessibilitySettings.useSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom
                 )
@@ -62,7 +62,7 @@ class AccessibilitySettingsViewModel constructor(
     }
 
     fun onForceZoomChanged(checked: Boolean) {
-        Timber.i("Accessibility: onForceZoomChanged $checked")
+        Timber.i("AccessibilityActSettings: onForceZoomChanged $checked")
         accessibilitySettings.forceZoom = checked
         viewModelScope.launch {
             viewState.emit(
@@ -73,20 +73,20 @@ class AccessibilitySettingsViewModel constructor(
         }
     }
 
-    fun onOverrideSystemFontSizeChanged(checked: Boolean) {
-        Timber.i("Accessibility: onOverrideSystemFontSizeChanged $checked")
-        accessibilitySettings.overrideSystemFontSize = checked
+    fun onSystemFontSizeChanged(checked: Boolean) {
+        Timber.i("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
+        accessibilitySettings.useSystemFontSize = checked
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    overrideSystemFontSize = checked
+                    useSystemFontSize = accessibilitySettings.useSystemFontSize
                 )
             )
         }
     }
 
     fun onFontSizeChanged(newValue: Float) {
-        Timber.i("Accessibility: onFontSizeChanged $newValue")
+        Timber.i("AccessibilityActSettings: onFontSizeChanged $newValue")
         accessibilitySettings.appFontSize = newValue
         viewModelScope.launch {
             viewState.emit(

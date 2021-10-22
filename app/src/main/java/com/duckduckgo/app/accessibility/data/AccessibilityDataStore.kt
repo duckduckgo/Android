@@ -21,19 +21,17 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface AccessibilitySettingsDataStore {
     val systemFontSize: Float
-    var overrideSystemFontSize: Boolean
+    var useSystemFontSize: Boolean
     val fontSize: Float
     var appFontSize: Float
     var forceZoom: Boolean
-    fun settingsFlow(): StateFlow<AccessibilitySettings>
+    fun settingsFlow(): Flow<AccessibilitySettings>
 }
 
 class AccessibilitySettingsSharedPreferences(
@@ -42,13 +40,13 @@ class AccessibilitySettingsSharedPreferences(
     private val appCoroutineScope: CoroutineScope
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(useSystemFontSize, fontSize, forceZoom))
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override val fontSize: Float
-        get() = if (overrideSystemFontSize) appFontSize else systemFontSize
+        get() = if (useSystemFontSize) systemFontSize else appFontSize
 
     override val systemFontSize: Float
         get() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
@@ -67,19 +65,22 @@ class AccessibilitySettingsSharedPreferences(
             emitNewValues()
         }
 
-    override var overrideSystemFontSize: Boolean
-        get() = preferences.getBoolean(KEY_SYSTEM_FONT_SIZE, false)
+    override var useSystemFontSize: Boolean
+        get() = preferences.getBoolean(KEY_SYSTEM_FONT_SIZE, true)
         set(enabled) {
             preferences.edit { putBoolean(KEY_SYSTEM_FONT_SIZE, enabled) }
             emitNewValues()
         }
 
-    override fun settingsFlow() = accessibilityStateFlow.asStateFlow()
+    override fun settingsFlow() = accessibilityStateFlow.asStateFlow().onSubscription {
+        Timber.i("AccessibilityActSettings: newSubscription")
+        emitNewValues()
+    }
 
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
-            Timber.i("Accessibility: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
+            accessibilityStateFlow.emit(AccessibilitySettings(useSystemFontSize, fontSize, forceZoom))
+            Timber.i("AccessibilityActSettings: new value emitted ${AccessibilitySettings(useSystemFontSize, fontSize, forceZoom)}")
         }
     }
 
@@ -93,7 +94,7 @@ class AccessibilitySettingsSharedPreferences(
 }
 
 data class AccessibilitySettings(
-    val overrideSystemFontSize: Boolean,
+    val useSystemFontSize: Boolean,
     val fontSize: Float,
     val forceZoom: Boolean
 )

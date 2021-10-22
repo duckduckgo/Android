@@ -44,7 +44,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         get() = binding.includeToolbar.toolbar
 
     private val systemFontSizeChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onOverrideSystemFontSizeChanged(isChecked)
+        viewModel.onSystemFontSizeChanged(isChecked)
     }
 
     private val forceZoomChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -72,16 +72,16 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                Timber.i("Accessibility: newViewState $viewState")
-                renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
+                Timber.i("AccessibilityActSettings: newViewState $viewState")
+                renderFontSize(viewState.appFontSize, viewState.useSystemFontSize)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
-                binding.overrideSystemFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
+                binding.appFontSizeToggle.quietlySetIsChecked(viewState.useSystemFontSize, systemFontSizeChangeListener)
             }.launchIn(lifecycleScope)
     }
 
-    private fun renderFontSize(fontSize: Float, overrideSystemFontSize: Boolean) {
-        Timber.i("Accessibility: renderFontSize $fontSize")
-        val enableFontSizeSettings = overrideSystemFontSize
+    private fun renderFontSize(fontSize: Float, useSystemFontSize: Boolean) {
+        Timber.i("AccessibilityActSettings: renderFontSize $fontSize")
+        val enableFontSizeSettings = !useSystemFontSize
 
         binding.accessibilitySlider.quietlySetValue(fontSize, fontSizeChangeListener)
         val newValue = fontSize / 100
@@ -94,7 +94,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListener() {
-        binding.overrideSystemFontSizeToggle.setOnCheckedChangeListener(systemFontSizeChangeListener)
+        Timber.i("AccessibilityActSettings: configureListener")
+        binding.appFontSizeToggle.setOnCheckedChangeListener(systemFontSizeChangeListener)
         binding.accessibilitySlider.addOnChangeListener(fontSizeChangeListener)
         binding.forceZoomToggle.setOnCheckedChangeListener(forceZoomChangeListener)
     }
