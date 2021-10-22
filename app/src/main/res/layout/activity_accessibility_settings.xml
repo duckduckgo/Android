@@ -26,12 +26,12 @@
         layout="@layout/include_toolbar" />
 
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
-        android:id="@+id/overrideSystemFontSizeToggle"
+        android:id="@+id/appFontSizeToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        app:toggleSubTitle="@string/accessibilityForceZoomSubtitle"
-        app:toggleTitle="@string/accessibilityForceZoomTitle" />
+        app:toggleSubTitle="@string/accessibilityTextSizeOverrideSubtitle"
+        app:toggleTitle="@string/accessibilityTextSizeOverrideTitle" />
 
     <LinearLayout
         android:id="@+id/fontSizeSettingsGroup"
@@ -57,7 +57,8 @@
             <TextView
                 android:id="@+id/accessibilitySliderValue"
                 style="@style/TextAppearance.DuckDuckGo.Body1"
-                android:layout_width="48dp"
+                android:layout_width="wrap_content"
+                android:minWidth="48dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/keyline_2"
