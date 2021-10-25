@@ -252,4 +252,14 @@
     <string name="atp_WaitlistRedeemCodeActivityTitle">Enter Your Invite Code</string>
     <string name="atp_WaitlistRedeemedCodeStatus">Success! You\'re in</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
+
+    <!--  App Tracking Company Details -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">"%d attempt"</item>
+        <item quantity="other">%d attempts"</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">"%d tracking attempt blocked"</item>
+        <item quantity="other">%d tracking attempts blocked"</item>
+    </plurals>
 </resources>

@@ -24,8 +24,7 @@
     android:orientation="vertical"
     android:paddingStart="16dp"
     android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:background="?selectableItemBackground">
+    android:paddingEnd="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,7 +34,7 @@
         android:paddingBottom="10dp">
 
         <ImageView
-            android:id="@+id/tracking_app_icon"
+            android:id="@+id/tracking_company_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -51,25 +50,18 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/activity_message"
-                style="@style/DeviceShield.PrivacyReport.TrackerEntry"
+                android:id="@+id/tracking_company_name"
+                style="@style/TextAppearance.DuckDuckGo.Body1"
+                android:textStyle="bold"
+                android:textColor="?normalTextColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="10 trackers blocked in Uber app" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tracker_badges"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="4dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listItem="@layout/view_device_shield_activity_tracker_entry" />
-
             <TextView
-                android:id="@+id/activity_time_since"
-                style="@style/DeviceShield.PrivacyReport.Time"
+                android:id="@+id/tracking_company_attempts"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:textColor="?secondaryTextColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="2m ago" />

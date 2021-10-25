@@ -67,9 +67,11 @@ class DeviceShieldActivityFeedFragment : Fragment() {
                 config.showTimeWindowHeadings
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect {
+                .collect { it ->
                     feedListener?.onTrackerListShowed(it.size)
-                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows))
+                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
+                        startActivity(AppTPCompanyTrackersActivity.intent(requireContext(), trackerFeedData.trackingApp.packageId, trackerFeedData.trackingApp.appDisplayName, trackerFeedData.bucket))
+                    }
                 }
         }
     }

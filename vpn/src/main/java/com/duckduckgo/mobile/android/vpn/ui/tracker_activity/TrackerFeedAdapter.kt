@@ -43,14 +43,15 @@ import org.threeten.bp.LocalDateTime
 import javax.inject.Inject
 
 class TrackerFeedAdapter @Inject constructor(
-    private val timeDiffFormatter: TimeDiffFormatter
+    private val timeDiffFormatter: TimeDiffFormatter,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), StickyHeaders {
 
     private val trackerFeedItems = mutableListOf<TrackerFeedItem>()
+    private lateinit var onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData)
+            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
@@ -80,7 +81,8 @@ class TrackerFeedAdapter @Inject constructor(
         return trackerFeedItems[position] is TrackerFeedItem.TrackerFeedItemHeader
     }
 
-    suspend fun updateData(data: List<TrackerFeedItem>) {
+    suspend fun updateData(data: List<TrackerFeedItem>, onAppClickListener: (TrackerFeedItem.TrackerFeedData) -> Unit) {
+        onAppClick = onAppClickListener
         val newData = data
         val oldData = trackerFeedItems
         val diffResult = withContext(Dispatchers.IO) {
@@ -154,7 +156,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         var packageManager: PackageManager = view.context.packageManager
 
-        fun bind(tracker: TrackerFeedItem.TrackerFeedData?) {
+        fun bind(tracker: TrackerFeedItem.TrackerFeedData?, onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit) {
             tracker?.let { item ->
                 with(activityMessage) {
                     val styledText = HtmlCompat
@@ -178,6 +180,9 @@ class TrackerFeedAdapter @Inject constructor(
                     .into(trackingAppIcon)
 
                 (trackerBadgesView.adapter as TrackerBadgeAdapter).updateData(tracker.trackers)
+                itemView.setOnClickListener {
+                    onAppClick(item)
+                }
             }
         }
 

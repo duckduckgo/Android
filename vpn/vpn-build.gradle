@@ -19,7 +19,6 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'kotlin-android-extensions'
-
 }
 
 apply from: "$rootDir/spotless.gradle"
@@ -143,7 +142,6 @@ dependencies {
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
-    implementation "com.squareup.moshi:moshi:1.8.0"
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
 

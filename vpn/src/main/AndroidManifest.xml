@@ -90,6 +90,11 @@
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+                android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
+                android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+                android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"

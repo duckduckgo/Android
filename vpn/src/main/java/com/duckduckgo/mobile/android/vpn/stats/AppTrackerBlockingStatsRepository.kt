@@ -52,12 +52,20 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
 
     @WorkerThread
     fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTracker> {
-        return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker -> tracker.timestamp >= startTime() }
+        return trackerDao.getTrackersBetweenSync(startTime(), endTime)
+            .filter { tracker -> tracker.timestamp >= startTime() }
     }
 
     @WorkerThread
     fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>> {
         return trackerDao.getPagedTrackersSince(startTime())
+            .conflate()
+            .distinctUntilChanged()
+    }
+
+    @WorkerThread
+    fun getTrackersForAppFromDate(date: String, packageName: String): Flow<List<VpnTracker>> {
+        return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
             .distinctUntilChanged()
     }
