@@ -40,6 +40,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
@@ -66,7 +67,8 @@ class SettingsViewModel(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val appTPWaitlistManager: TrackingProtectionWaitlistManager,
+    private val waitlistManager: TrackingProtectionWaitlistManager,
+    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel
@@ -82,12 +84,16 @@ class SettingsViewModel(
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(
+            ClearWhatOption.CLEAR_NONE,
+            ClearWhenOption.APP_EXIT_ONLY
+        ),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
-        val appTrackingProtectionEnabled: Boolean = false
+        val appTrackingProtectionEnabled: Boolean = false,
+        val appTPOnboardingShown: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -110,6 +116,7 @@ class SettingsViewModel(
         object LaunchGlobalPrivacyControl : Command()
         object LaunchAppTPTrackersScreen : Command()
         object LaunchAppTPWaitlist : Command()
+        object LaunchAppTPOnboarding : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
@@ -140,13 +147,21 @@ class SettingsViewModel(
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                     version = obtainVersion(variant.key),
-                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
+                    automaticallyClearData = AutomaticallyClearData(
+                        automaticallyClearWhat,
+                        automaticallyClearWhen,
+                        automaticallyClearWhenEnabled
+                    ),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appLinksSettingType = getAppLinksSettingsState(
+                        settingsDataStore.appLinksEnabled,
+                        settingsDataStore.showAppLinksPrompt
+                    ),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
+                    appTrackingProtectionWaitlistState = waitlistManager.waitlistState(),
+                    appTPOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
                 )
             )
 
@@ -234,8 +249,12 @@ class SettingsViewModel(
     }
 
     fun onAppTPSettingClicked() {
-        if (appTPWaitlistManager.isFeatureEnabled()) {
-            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
+        if (waitlistManager.isFeatureEnabled()) {
+            if (viewState.value.appTPOnboardingShown) {
+                viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
+            } else {
+                viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+            }
         } else {
             viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
         }
@@ -414,7 +433,8 @@ class SettingsViewModelFactory @Inject constructor(
     private val gpc: Provider<Gpc>,
     private val featureToggle: Provider<FeatureToggle>,
     private val pixel: Provider<Pixel>,
-    private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>
+    private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>,
+    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -428,6 +448,7 @@ class SettingsViewModelFactory @Inject constructor(
                         variantManager.get(),
                         fireAnimationLoader.get(),
                         appTPWaitlistManager.get(),
+                        deviceShieldOnboardingStore.get(),
                         gpc.get(),
                         featureToggle.get(),
                         pixel.get()

@@ -71,7 +71,9 @@ class AppTrackingProtectionWaitlistManager(
         }
     }
 
-    override fun isFeatureEnabled(): Boolean = dataStore.inviteCode != null
+    // We only do this until the Waitlist is enabled
+    override fun isFeatureEnabled(): Boolean = true
+    // override fun isFeatureEnabled(): Boolean = dataStore.inviteCode != null
 
     override fun notifyOnJoinedWaitlist() {
         dataStore.sendNotification = true
