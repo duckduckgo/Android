@@ -56,7 +56,7 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
-    private val deviceShieldPixels = mock<DeviceShieldPixels>()
+    private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val onboardingStore = mock<DeviceShieldOnboardingStore>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -97,7 +97,7 @@ class PrivacyReportViewModelTest {
         trackerFound("dax.com")
 
         testee.getReport().test {
-            val result = expectItem()
+            val result = awaitItem()
             assertEquals(3, result.trackers)
             cancelAndConsumeRemainingEvents()
         }
@@ -111,7 +111,7 @@ class PrivacyReportViewModelTest {
         trackerFoundYesterday("dax.com")
 
         testee.getReport().test {
-            val result = expectItem()
+            val result = awaitItem()
             assertEquals(0, result.trackers)
             cancelAndConsumeRemainingEvents()
         }
@@ -120,7 +120,7 @@ class PrivacyReportViewModelTest {
     @Test
     fun whenNoTrackersBlockedThenReportIsEmpty() = runBlocking {
         testee.getReport().test {
-            val result = expectItem()
+            val result = awaitItem()
             assertEquals(0, result.trackers)
             cancelAndConsumeRemainingEvents()
         }
@@ -138,11 +138,6 @@ class PrivacyReportViewModelTest {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", companyDisplayName = "", trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
-    }
-
-    private fun dateOfLastWeek(): String {
-        val midnight = LocalDateTime.now().minusDays(7)
-        return DatabaseDateFormatter.timestamp(midnight)
     }
 
     private fun yesterday(): String {

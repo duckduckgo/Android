@@ -19,14 +19,16 @@ package com.duckduckgo.mobile.android.vpn.apps
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.mobile.android.vpn.apps.Command.LaunchFeedback
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog.Companion.STOPPED_WORKING
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen.IssueDescriptionForm
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -67,12 +69,12 @@ class ExcludedAppsViewModelTest {
         viewModel.commands().test {
             val packageName = "com.package.name"
             val appName = "name"
-            viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.STOPPED_WORKING, appName, packageName)
+            viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName)
 
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-            verify(deviceShieldPixels).disableAppProtection(packageName, ManuallyDisableAppProtectionDialog.STOPPED_WORKING)
+            verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to "com.package.name", "reason" to STOPPED_WORKING.toString()))
 
-            Assert.assertEquals(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm("name", "com.package.name")), expectItem())
+            assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -82,7 +84,7 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName)
 
-        verify(deviceShieldPixels).disableAppProtection(packageName, ManuallyDisableAppProtectionDialog.DONT_USE)
+        verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to packageName, "reason" to ManuallyDisableAppProtectionDialog.DONT_USE.toString()))
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
@@ -100,7 +102,7 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 1, true)
 
-        verify(deviceShieldPixels).enableAppProtection(packageName, 1)
+        verify(deviceShieldPixels).enableAppProtection(mapOf("packageName" to packageName, "reason" to 1.toString()))
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
@@ -108,7 +110,7 @@ class ExcludedAppsViewModelTest {
     fun whenUserWantsToRestoreDefaultThenDefaultListIsRestoredAndVpnRestarted() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.restoreProtectedApps()
-            Assert.assertEquals(Command.RestartVpn, expectItem())
+            assertEquals(Command.RestartVpn, expectItem())
             verify(trackingProtectionAppsRepository).restoreDefaultProtectedList()
             verify(deviceShieldPixels).restoreDefaultProtectionList()
             cancelAndConsumeRemainingEvents()
@@ -122,7 +124,7 @@ class ExcludedAppsViewModelTest {
 
         viewModel.commands().test {
             viewModel.onLeavingScreen()
-            Assert.assertEquals(Command.RestartVpn, expectItem())
+            assertEquals(Command.RestartVpn, expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -140,7 +142,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithKnownIssuesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithKnownIssues, 0, true)
-            Assert.assertEquals(Command.ShowEnableProtectionDialog(appWithKnownIssues, 0), expectItem())
+            assertEquals(Command.ShowEnableProtectionDialog(appWithKnownIssues, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -158,7 +160,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppLoadsWebsitesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appLoadsWebsites, 0, true)
-            Assert.assertEquals(Command.ShowEnableProtectionDialog(appLoadsWebsites, 0), expectItem())
+            assertEquals(Command.ShowEnableProtectionDialog(appLoadsWebsites, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -185,7 +187,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, false)
-            Assert.assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues, 0), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -203,7 +205,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, false)
-            Assert.assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded, 0), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded, 0), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
