@@ -260,6 +260,7 @@ class SettingsActivity :
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
             is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
+            is Command.LaunchAppTPOnboarding -> launchAppTPOnboarding()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
@@ -358,7 +359,7 @@ class SettingsActivity :
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }
 
-    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    private val appTPWaitlistActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             startActivity(DeviceShieldOnboardingActivity.intent(this))
         }
@@ -366,7 +367,17 @@ class SettingsActivity :
 
     private fun launchAppTPWaitlist() {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
-        startForResult.launch(AppTPWaitlistActivity.intent(this), options)
+        appTPWaitlistActivityResult.launch(AppTPWaitlistActivity.intent(this), options)
+    }
+
+    private val appTPOnboardingActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            startActivity(DeviceShieldTrackerActivity.intent(this))
+        }
+    }
+
+    private fun launchAppTPOnboarding() {
+        appTPOnboardingActivityResult.launch(DeviceShieldOnboardingActivity.intent(this))
     }
 
     override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
