@@ -95,7 +95,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     fun onSubmitPressed(webViewVersion: String) {
-        if (!url.equals("null://null", true)) {
+        if (url.isNotEmpty()) {
             val brokenSite = getBrokenSite(url, webViewVersion)
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
