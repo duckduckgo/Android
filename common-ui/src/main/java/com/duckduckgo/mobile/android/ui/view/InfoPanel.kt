@@ -19,8 +19,17 @@
 package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
+import android.text.Annotation
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewInfoPanelBinding
@@ -60,6 +69,43 @@ class InfoPanel : FrameLayout {
      */
     fun setText(text: String) {
         binding.infoPanelText.text = text
+    }
+
+    fun setClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit) {
+        val fullText = text as SpannedString
+        val spannableString = SpannableString(fullText)
+        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                onClick()
+            }
+        }
+
+        annotations?.find { it.value == annotation }?.let {
+            spannableString.apply {
+                setSpan(
+                    clickableSpan,
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                setSpan(
+                    UnderlineSpan(),
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(context, R.color.almostBlackDark)
+                    ),
+                    fullText.getSpanStart(it),
+                    fullText.getSpanEnd(it),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+        binding.infoPanelText.text = spannableString
     }
 
     /**

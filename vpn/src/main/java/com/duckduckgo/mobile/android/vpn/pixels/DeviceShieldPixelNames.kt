@@ -131,5 +131,10 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY("m_atp_did_show_report_breakage_text_form_d"),
     DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM("m_atp_did_show_report_breakage_single_choice"),
     DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY("m_atp_did_show_report_breakage_single_choice_d"),
+
+    DID_SHOW_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_did_show_disable_tracking_protection_dialog"),
+    DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_did_choose_disable_tracking_protection_dialog"),
+    DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG("m_atp_did_choose_disable_one_app_tracking_protection_dialog"),
+    DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG("m_atp_did_choose_cancel_app_tracking_protection_dialog"),
     ;
 }

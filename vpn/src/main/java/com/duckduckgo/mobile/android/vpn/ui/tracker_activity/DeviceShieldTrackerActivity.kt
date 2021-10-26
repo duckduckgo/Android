@@ -68,7 +68,8 @@ import javax.inject.Inject
 
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
-    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
+    DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
+    AppTPDisableConfirmationDialog.AppTPDisableConfirmationDialogListener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -91,7 +92,7 @@ class DeviceShieldTrackerActivity :
     )
 
     private val deviceShieldToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onDeviceShieldSettingChanged(isChecked)
+        viewModel.onAppTPToggleSwitched(isChecked)
     }
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
@@ -152,7 +153,7 @@ class DeviceShieldTrackerActivity :
                     return
                 }
                 else -> {
-                    deviceShieldSwitch.quietlySetIsChecked(false, deviceShieldToggleListener)
+                    deviceShieldSwitch.quietlySetIsChecked(false, null)
                     Timber.d("Permission not granted")
                 }
             }
@@ -221,17 +222,42 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
-            is DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps -> launchExcludedApps()
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps -> launchExcludedApps(it.shouldListBeEnabled)
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
         }
     }
 
-    private fun launchExcludedApps() {
-        startActivity(TrackingProtectionExclusionListActivity.intent(this))
+    private fun launchExcludedApps(shouldListBeEnabled: Boolean) {
+        startActivity(TrackingProtectionExclusionListActivity.intent(this, shouldListBeEnabled))
     }
 
     private fun launchDeviceShieldFAQ() {
         startActivity(DeviceShieldFAQActivity.intent(this))
+    }
+
+    private fun launchDisableConfirmationDialog() {
+        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
+        val dialog = AppTPDisableConfirmationDialog.instance()
+        dialog.show(
+            supportFragmentManager,
+            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+        )
+    }
+
+    override fun onOpenAppProtection() {
+        deviceShieldPixels.didChooseToDisableOneAppFromDialog()
+        launchExcludedApps(viewModel.vpnRunningState.value.isRunning)
+    }
+
+    override fun onTurnAppTrackingProtectionOff() {
+        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
+        viewModel.onAppTpManuallyDisabled()
+    }
+
+    override fun onDisableDialogCancelled() {
+        deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
+        deviceShieldSwitch.quietlySetIsChecked(true, null)
     }
 
     private fun launchBetaInstructions() {
@@ -261,7 +287,7 @@ class DeviceShieldTrackerActivity :
     private fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
         // is there a better way to do this?
         if (::deviceShieldSwitch.isInitialized) {
-            deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, deviceShieldToggleListener)
+            deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, null)
         }
 
         updateCounts(state.trackerCountInfo)
@@ -355,6 +381,14 @@ class DeviceShieldTrackerActivity :
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
         deviceShieldSwitch = switchMenuItem?.actionView as SwitchCompat
+        deviceShieldSwitch.setOnClickListener {
+            viewModel.onAppTPToggleSwitched(deviceShieldSwitch.isChecked)
+            if (!deviceShieldSwitch.isChecked) {
+                // because we now show a dialog before shutting the vpn down, we want to reset to a positive value
+                // until the user decides to stop it.
+                deviceShieldSwitch.quietlySetIsChecked(true, null)
+            }
+        }
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -423,4 +457,5 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
+
 }

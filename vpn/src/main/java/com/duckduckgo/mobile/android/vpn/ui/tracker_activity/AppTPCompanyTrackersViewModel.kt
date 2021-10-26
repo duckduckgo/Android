@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -31,7 +32,7 @@ import javax.inject.Provider
 
 class AppTPCompanyTrackersViewModel constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
@@ -39,7 +40,7 @@ class AppTPCompanyTrackersViewModel constructor(
     suspend fun getTrackersForAppFromDate(
         date: String,
         packageName: String
-    ): Flow<ViewState> = withContext(dispatcherProvider.io()) {
+    ): Flow<ViewState> = withContext(dispatchers.io()) {
         return@withContext statsRepository.getTrackersForAppFromDate(date, packageName)
             .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
             .map { aggregateDataPerApp(it) }
@@ -76,12 +77,14 @@ class AppTPCompanyTrackersViewModel constructor(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class AppTPCompanyTrackersViewModelFactory @Inject constructor(
-    private val deviceShieldActivityFeedViewModel: Provider<AppTPCompanyTrackersViewModel>
+    private val repositopryProvider: Provider<AppTrackerBlockingStatsRepository>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) -> (deviceShieldActivityFeedViewModel.get() as T)
+                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) -> AppTPCompanyTrackersViewModel(
+                    repositopryProvider.get()
+                ) as T
                 else -> null
             }
         }

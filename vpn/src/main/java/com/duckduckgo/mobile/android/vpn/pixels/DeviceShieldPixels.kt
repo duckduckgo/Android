@@ -252,6 +252,17 @@ interface DeviceShieldPixels {
     fun didShowReportBreakageTextForm()
 
     fun didShowReportBreakageSingleChoiceForm()
+
+    /**
+     * Will fire when the user wants to disable the VPN
+     */
+    fun didShowDisableTrackingProtectionDialog()
+
+    fun didChooseToDisableTrackingProtectionFromDialog()
+
+    fun didChooseToDisableOneAppFromDialog()
+
+    fun didChooseToCancelTrackingProtectionDialog()
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -515,6 +526,22 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didShowReportBreakageSingleChoiceForm() {
         firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
         tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
+    }
+
+    override fun didShowDisableTrackingProtectionDialog() {
+        firePixel(DeviceShieldPixelNames.DID_SHOW_DISABLE_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didChooseToDisableTrackingProtectionFromDialog() {
+        firePixel(DeviceShieldPixelNames.DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didChooseToDisableOneAppFromDialog() {
+        firePixel(DeviceShieldPixelNames.DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didChooseToCancelTrackingProtectionDialog() {
+        firePixel(DeviceShieldPixelNames.DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
     }
 
     private fun suddenKill() {

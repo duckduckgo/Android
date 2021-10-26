@@ -35,12 +35,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
-    private val defaultConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
-        maxRows = Int.MAX_VALUE,
-        timeWindow = 5,
-        timeWindowUnits = TimeUnit.DAYS,
-        showTimeWindowHeadings = true
-    )
 
     private val itemsAdapter = AppTPCompanyDetailsAdapter()
 

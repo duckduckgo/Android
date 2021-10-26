@@ -32,15 +32,11 @@ import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -82,19 +78,24 @@ class DeviceShieldTrackerActivityViewModel(
         }
     }
 
-    internal fun onDeviceShieldSettingChanged(enabled: Boolean) {
+    internal fun onAppTPToggleSwitched(enabled: Boolean) {
         if (enabled) {
             deviceShieldPixels.enableFromSummaryTrackerActivity()
-        } else {
-            deviceShieldPixels.disableFromSummaryTrackerActivity()
         }
 
         viewModelScope.launch {
             if (enabled) {
                 command.send(Command.StartDeviceShield)
             } else {
-                command.send(Command.StopDeviceShield)
+                command.send(Command.ShowDisableConfirmationDialog)
             }
+        }
+    }
+
+    internal fun onAppTpManuallyDisabled() {
+        deviceShieldPixels.disableFromSummaryTrackerActivity()
+        viewModelScope.launch {
+            command.send(Command.StopDeviceShield)
         }
     }
 
@@ -107,7 +108,7 @@ class DeviceShieldTrackerActivityViewModel(
                 }
                 ViewEvent.LaunchBetaInstructions -> command.send(Command.LaunchBetaInstructions)
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
-                ViewEvent.LaunchExcludedApps -> command.send(Command.LaunchExcludedApps)
+                ViewEvent.LaunchExcludedApps -> command.send(Command.LaunchExcludedApps(vpnRunningState.value.isRunning))
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
             }
         }
@@ -139,11 +140,12 @@ class DeviceShieldTrackerActivityViewModel(
     sealed class Command {
         object StartDeviceShield : Command()
         object StopDeviceShield : Command()
-        object LaunchExcludedApps : Command()
+        data class LaunchExcludedApps(val shouldListBeEnabled: Boolean) : Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
+        object ShowDisableConfirmationDialog : Command()
     }
 }
 

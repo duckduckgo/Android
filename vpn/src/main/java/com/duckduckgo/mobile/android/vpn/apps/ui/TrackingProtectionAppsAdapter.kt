@@ -36,9 +36,11 @@ import kotlinx.android.synthetic.main.view_device_shield_excluded_app_entry.view
 class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     RecyclerView.Adapter<TrackingProtectionAppViewHolder>() {
 
+    private var isListEnabled: Boolean = false
     private val excludedApps: MutableList<TrackingProtectionAppInfo> = mutableListOf()
 
-    fun update(newList: List<TrackingProtectionAppInfo>) {
+    fun update(newList: List<TrackingProtectionAppInfo>, isListStateEnabled: Boolean) {
+        isListEnabled = isListStateEnabled
         val oldData = excludedApps
         val diffResult = DiffCallback(oldData, newList).run { DiffUtil.calculateDiff(this) }
         excludedApps.clear().also { excludedApps.addAll(newList) }
@@ -57,7 +59,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     override fun onBindViewHolder(holder: TrackingProtectionAppViewHolder, position: Int) {
         val excludedAppInfo = excludedApps[position]
-        holder.bind(excludedAppInfo, position, listener)
+        holder.bind(isListEnabled, excludedAppInfo, position, listener)
     }
 
     override fun getItemCount(): Int {
@@ -93,7 +95,7 @@ interface AppProtectionListener {
 }
 
 class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(excludedAppInfo: TrackingProtectionAppInfo, position: Int, listener: AppProtectionListener) {
+    fun bind(isListEnabled: Boolean, excludedAppInfo: TrackingProtectionAppInfo, position: Int, listener: AppProtectionListener) {
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
         itemView.deviceShieldAppEntryName.text =
@@ -121,8 +123,13 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
             }
         }
 
-        itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
-            listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
+        if (isListEnabled){
+            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
+                listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
+            }
+        } else {
+            itemView.deviceShieldAppEntryShieldEnabled.isClickable = false
+            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
         }
     }
 

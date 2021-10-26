@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
@@ -27,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
@@ -36,6 +38,7 @@ import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -109,6 +112,15 @@ class TrackingProtectionExclusionListActivity :
 
     private fun bindViews() {
         shimmerLayout.startShimmer()
+        binding.excludedAppsDisabledVPNLabel.apply {
+            setClickableLink(
+                REPORT_ISSUES_ANNOTATION,
+                getText(R.string.atp_ActivityDisabledLabel)
+            ) { launchFeedback() }
+            setOnClickListener {
+                launchFeedback()
+            }
+        }
         setupRecycler()
     }
 
@@ -124,6 +136,17 @@ class TrackingProtectionExclusionListActivity :
         })
 
         val recyclerView = binding.excludedAppsRecycler
+        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
+
+        if (isListEnabled) {
+            binding.excludedAppsEnabledVPNLabel.show()
+            binding.excludedAppsDisabledVPNLabel.gone()
+        } else {
+            binding.excludedAppsEnabledVPNLabel.gone()
+            binding.excludedAppsDisabledVPNLabel.show()
+            recyclerView.alpha = 0.45f
+        }
+
         recyclerView.adapter = adapter
     }
 
@@ -141,15 +164,22 @@ class TrackingProtectionExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState.excludedApps)
+        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
+        adapter.update(viewState.excludedApps, isListEnabled)
         shimmerLayout.gone()
     }
 
     private fun processCommand(command: Command) {
         when (command) {
             is Command.RestartVpn -> restartVpn()
-            is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(command.excludingReason, command.position)
-            is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(command.excludingReason, command.position)
+            is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
+                command.excludingReason,
+                command.position
+            )
+            is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
+                command.excludingReason,
+                command.position
+            )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
         }
     }
@@ -213,15 +243,20 @@ class TrackingProtectionExclusionListActivity :
     }
 
     companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, TrackingProtectionExclusionListActivity::class.java)
+        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
+        fun intent(context: Context, isRunning: Boolean): Intent {
+            val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
+            intent.putExtra(KEY_LIST_ENABLED, isRunning)
+            return intent
         }
     }
 
     override fun onDefaultProtectionRestored() {
         viewModel.restoreProtectedApps()
         restartVpn()
-        Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG).show()
+        Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG)
+            .show()
     }
 
 }

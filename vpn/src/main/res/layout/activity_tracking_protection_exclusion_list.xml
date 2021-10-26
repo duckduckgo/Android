@@ -56,11 +56,18 @@
                     app:layout_constraintTop_toBottomOf="@+id/include_toolbar"/>
 
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
-                    android:id="@+id/excludedAppsLabel"
+                    android:id="@+id/excludedAppsEnabledVPNLabel"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     app:panelBackground="@drawable/background_blue_tooltip"
                     app:panelDrawable="@drawable/ic_link_color_24"
-                    app:panelText="@string/atp_ExcludedAppsKnownIssuesLabel"
+                    app:panelText="@string/atp_ExcludedAppsEnabledLabel"
+                    android:layout_margin="16dp"/>
+
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                    android:id="@+id/excludedAppsDisabledVPNLabel"
+                    style="@style/Widget.DuckDuckGo.InfoPanel"
+                    app:panelBackground="@drawable/background_yellow_tooltip"
+                    app:panelDrawable="@drawable/ic_alert_color_24"
                     android:layout_margin="16dp"/>
 
             <View

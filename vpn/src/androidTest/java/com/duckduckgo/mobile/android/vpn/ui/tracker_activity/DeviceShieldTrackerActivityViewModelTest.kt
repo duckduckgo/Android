@@ -30,6 +30,8 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
@@ -51,7 +53,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     private lateinit var db: VpnDatabase
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
-    private lateinit var deviceShieldTrackerActivityViewModel: DeviceShieldTrackerActivityViewModel
+    private lateinit var viewModel: DeviceShieldTrackerActivityViewModel
     private lateinit var defaultTracker: VpnTracker
     private lateinit var vpnPreferences: VpnPreferences
 
@@ -75,7 +77,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         vpnPreferences = VpnPreferences(context)
 
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
-        deviceShieldTrackerActivityViewModel = DeviceShieldTrackerActivityViewModel(
+        viewModel = DeviceShieldTrackerActivityViewModel(
             InstrumentationRegistry.getInstrumentation().context,
             deviceShieldPixels,
             vpnPreferences,
@@ -102,7 +104,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         )
         db.vpnTrackerDao().insert(tracker.copy(domain = "facebook.com"))
 
-        val count = deviceShieldTrackerActivityViewModel.getTrackingAppsCount().take(1).toList()
+        val count = viewModel.getTrackingAppsCount().take(1).toList()
         assertEquals(TrackingAppCount(2), count.first())
     }
 
@@ -113,14 +115,14 @@ class DeviceShieldTrackerActivityViewModelTest {
         db.vpnTrackerDao().insert(defaultTracker.copy(domain = "facebook.com"))
         db.vpnTrackerDao().insert(defaultTracker.copy(trackingApp = TrackingApp("app.bar.com", "Bar app")))
 
-        val count = deviceShieldTrackerActivityViewModel.getBlockedTrackersCount().take(1).toList()
+        val count = viewModel.getBlockedTrackersCount().take(1).toList()
         assertEquals(TrackerCount(4), count.first())
     }
 
     @Test
     fun whenLaunchAppTrackersViewEventThenCommandIsLaunchAppTrackers() = runBlocking {
-        deviceShieldTrackerActivityViewModel.commands().test {
-            deviceShieldTrackerActivityViewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
+        viewModel.commands().test {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, expectItem())
 
@@ -130,8 +132,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenLaunchBetaInstructionsViewEventThenCommandIsLaunchBetaInstructions() = runBlocking {
-        deviceShieldTrackerActivityViewModel.commands().test {
-            deviceShieldTrackerActivityViewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
+        viewModel.commands().test {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, expectItem())
 
@@ -141,8 +143,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenLaunchDeviceShieldFAQViewEventThenCommandIsLaunchDeviceShieldFAQ() = runBlocking {
-        deviceShieldTrackerActivityViewModel.commands().test {
-            deviceShieldTrackerActivityViewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
+        viewModel.commands().test {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ, expectItem())
 
@@ -152,8 +154,8 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenLaunchExcludedAppsViewEventThenCommandIsLaunchExcludedApps() = runBlocking {
-        deviceShieldTrackerActivityViewModel.commands().test {
-            deviceShieldTrackerActivityViewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        viewModel.commands().test {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps, expectItem())
 
@@ -163,10 +165,46 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenLaunchMostRecentActivityViewEventThenCommandIsLaunchMostRecentActivity() = runBlocking {
-        deviceShieldTrackerActivityViewModel.commands().test {
-            deviceShieldTrackerActivityViewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
+        viewModel.commands().test {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
 
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleIsSwitchedOnThenTrackingProtectionIsEnabled() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onAppTPToggleSwitched(true)
+
+            verify(deviceShieldPixels).enableFromSummaryTrackerActivity()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleIsSwitchedOffThenConfirmationDialogIsShown() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onAppTPToggleSwitched(false)
+
+            verifyZeroInteractions(deviceShieldPixels)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, expectItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAppTPIsManuallyDisabledThenTrackingProtectionIsStopped() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onAppTpManuallyDisabled()
+
+            verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield, expectItem())
 
             cancelAndConsumeRemainingEvents()
         }
