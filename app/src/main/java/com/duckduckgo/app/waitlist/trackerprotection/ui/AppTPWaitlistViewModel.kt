@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.waitlist.trackerprotection.ui
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
@@ -112,6 +113,14 @@ class AppTPWaitlistViewModel(
     fun onDialogDismissed() {
         viewModelScope.launch {
             viewStateFlow.emit(ViewState(waitlistManager.waitlistState()))
+        }
+    }
+
+    fun onCodeRedeemed(resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            viewModelScope.launch {
+                viewStateFlow.emit(ViewState(WaitlistState.CodeRedeemed))
+            }
         }
     }
 }

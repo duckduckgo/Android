@@ -140,4 +140,5 @@ sealed class WaitlistState {
     object NotJoinedQueue : WaitlistState()
     data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
     object InBeta : WaitlistState()
+    object CodeRedeemed : WaitlistState()
 }

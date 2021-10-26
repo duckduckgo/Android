@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.waitlist.trackerprotection.ui
 
+import android.app.Activity
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import app.cash.turbine.Event
@@ -151,6 +152,28 @@ class AppTPWaitlistViewModelTest {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onDialogDismissed()
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(waitlistState)), awaitEvent())
+        }
+    }
+
+    @Test
+    fun whenCodeRedeemSuccessThenWaitlistStateIsCodeRedeemed() = coroutineRule.runBlocking {
+        val waitlistState = WaitlistState.CodeRedeemed
+        whenever(manager.waitlistState()).thenReturn(waitlistState)
+        viewModel.viewState.test {
+            assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
+            viewModel.onCodeRedeemed(Activity.RESULT_OK)
+            assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(waitlistState)), awaitEvent())
+        }
+    }
+
+    @Test
+    fun whenCodeRedeemFailsThenWaitlistStateIsCodeRedeemed() = coroutineRule.runBlocking {
+        val waitlistState = WaitlistState.CodeRedeemed
+        whenever(manager.waitlistState()).thenReturn(waitlistState)
+        viewModel.viewState.test {
+            assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
+            viewModel.onCodeRedeemed(Activity.RESULT_CANCELED)
+            expectNoEvents()
         }
     }
 

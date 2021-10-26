@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.waitlist.trackerprotection.ui
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -65,9 +64,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            renderCodeRedeemed()
-        }
+        viewModel.onCodeRedeemed(result.resultCode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +95,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
             is WaitlistState.NotJoinedQueue -> renderNotJoinedQueue()
             is WaitlistState.JoinedQueue -> renderJoinedQueue(state.notify)
             is WaitlistState.InBeta -> renderInBeta()
+            is WaitlistState.CodeRedeemed -> renderCodeRedeemed()
         }
     }
 
