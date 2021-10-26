@@ -123,7 +123,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
             }
         }
 
-        if (isListEnabled){
+        if (isListEnabled) {
             itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
                 listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
             }
