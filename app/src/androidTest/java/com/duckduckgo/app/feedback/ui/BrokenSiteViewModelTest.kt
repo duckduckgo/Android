@@ -12,13 +12,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 
 class BrokenSiteViewModelTest {
@@ -118,6 +116,28 @@ class BrokenSiteViewModelTest {
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenSiteAndUrlIsEmptyAndSubmitPressedThenDoNotSubmit() {
+        val nullUrl = ""
+        testee.setInitialBrokenSite(nullUrl, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = nullUrl,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
