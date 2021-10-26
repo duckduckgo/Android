@@ -171,8 +171,7 @@ class TrackingProtectionExclusionListActivity :
         when (command) {
             is Command.RestartVpn -> restartVpn()
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
-                command.excludingReason,
-                command.position
+                command.excludingReason
             )
             is Command.ShowEnableProtectionDialog -> showEnableProtectionDialog(
                 command.excludingReason,
@@ -189,8 +188,8 @@ class TrackingProtectionExclusionListActivity :
         }
     }
 
-    private fun showDisableProtectionDialog(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
-        val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo, position)
+    private fun showDisableProtectionDialog(excludedAppInfo: TrackingProtectionAppInfo) {
+        val dialog = ManuallyDisableAppProtectionDialog.instance(excludedAppInfo)
         dialog.show(
             supportFragmentManager,
             ManuallyDisableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_DISABLE
@@ -227,13 +226,8 @@ class TrackingProtectionExclusionListActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String) {
-        viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName)
-    }
-
-    override fun onDisableProtectionDialogDismissed(position: Int) {
-        adapter.notifyItemChanged(position)
-        viewModel.onDisableProtectionDialogDismissed()
+    override fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String, skippedReport: Boolean) {
+        viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName, skippedReport = skippedReport)
     }
 
     private fun launchFeedback() {

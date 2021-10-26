@@ -123,7 +123,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ENCRYPTED_IO_EXCEPTION("m_atp_encrypted_io_exception"),
     ENCRYPTED_GENERAL_EXCEPTION("m_atp_encrypted_general_exception"),
 
-    APP_EXCLUSION_DIALOG_DISMISSED("m_atp_exclusion_dialog_dismissed"),
+    APP_EXCLUSION_DIALOG_REPORTING_SKIPPED("m_atp_exclusion_dialog_reporting_skipped"),
 
     DID_SHOW_REPORT_BREAKAGE_APP_LIST("m_atp_did_show_report_breakage_app_list"),
     DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY("m_atp_did_show_report_breakage_app_list_d"),

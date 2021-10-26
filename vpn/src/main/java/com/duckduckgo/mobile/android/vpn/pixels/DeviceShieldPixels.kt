@@ -230,8 +230,8 @@ interface DeviceShieldPixels {
     /** Will fire when the user disables protection for a specific app */
     fun disableAppProtection(payload: Map<String, String>)
 
-    /** Will fire when the user dismisses the dialog that disabled app protection for a specific app */
-    fun disableAppProtectionDialogDismissed()
+    /** Will fire when the user skips submitting the reason that made them disable app protection for a specific app */
+    fun disableAppProtectionReportingSkipped()
 
     /** Will fire when the user enables protection for a specific app */
     fun enableAppProtection(payload: Map<String, String>)
@@ -492,8 +492,8 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP, payload)
     }
 
-    override fun disableAppProtectionDialogDismissed() {
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DIALOG_DISMISSED)
+    override fun disableAppProtectionReportingSkipped() {
+        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DIALOG_REPORTING_SKIPPED)
     }
 
     override fun enableAppProtection(payload: Map<String, String>) {

@@ -157,7 +157,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), expectItem())
 
             cancelAndConsumeRemainingEvents()
         }

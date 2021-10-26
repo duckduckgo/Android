@@ -31,8 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String)
-        fun onDisableProtectionDialogDismissed(position: Int)
+        fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String, skippedReport: Boolean = false)
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -98,10 +97,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         return requireArguments().getString(KEY_APP_NAME)!!
     }
 
-    private fun getPosition(): Int {
-        return requireArguments().getInt(KEY_POSITION)
-    }
-
     private fun configureListeners(
         submitCTA: Button,
         skipCTA: Button,
@@ -114,7 +109,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
         skipCTA.setOnClickListener {
             dismiss()
-            listener.onDisableProtectionDialogDismissed(getPosition())
+            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName(), skippedReport = true)
         }
 
         radioGroup.setOnCheckedChangeListener { _, _ ->
@@ -138,19 +133,17 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         const val TAG_MANUALLY_EXCLUDE_APPS_DISABLE = "ManuallyExcludedAppsDialogDisable"
         private const val KEY_APP_PACKAGE_NAME = "KEY_APP_PACKAGE_NAME"
         private const val KEY_APP_NAME = "KEY_APP_NAME"
-        private const val KEY_POSITION = "KEY_POSITION"
 
         const val NO_REASON_NEEDED = 0
         const val STOPPED_WORKING = 1
         const val TRACKING_OK = 2
         const val DONT_USE = 3
 
-        fun instance(appInfo: TrackingProtectionAppInfo, position: Int): ManuallyDisableAppProtectionDialog {
+        fun instance(appInfo: TrackingProtectionAppInfo): ManuallyDisableAppProtectionDialog {
             return ManuallyDisableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)
                 bundle.putString(KEY_APP_NAME, appInfo.name)
-                bundle.putInt(KEY_POSITION, position)
                 fragment.arguments = bundle
             }
         }

@@ -37,6 +37,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
@@ -93,6 +94,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFeatureToggle: FeatureToggle
 
+    @Mock
+    private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboardingStore
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -110,6 +114,7 @@ class SettingsViewModelTest {
             mockVariantManager,
             mockFireAnimationLoader,
             appTPWaitlistManager,
+            mockDeviceShieldOnboarding,
             mockGpc,
             mockFeatureToggle,
             mockPixel,
@@ -196,7 +201,6 @@ class SettingsViewModelTest {
     fun whenStartCalledThenVersionSetCorrectly() = coroutineTestRule.runBlocking {
         testee.start()
         testee.viewState().test {
-
             val value = expectItem()
             val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
             assertTrue(value.version.startsWith(expectedStartString))
@@ -297,16 +301,17 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() = coroutineTestRule.runBlocking {
-        testee.commands().test {
-            whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-            testee.onDefaultBrowserToggled(true)
+    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() =
+        coroutineTestRule.runBlocking {
+            testee.commands().test {
+                whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+                testee.onDefaultBrowserToggled(true)
 
-            expectNoEvents()
+                expectNoEvents()
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
