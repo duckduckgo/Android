@@ -193,14 +193,11 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUsersUpdatesWithAutoCompleteDisabledThenAutoCompleteSuggestionsIsEmpty() = coroutineRule.runBlocking {
+    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = coroutineRule.runBlocking {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryEmptyResult, newViewState.autocompleteResults)
+        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
     }
 
     @Test
@@ -405,7 +402,6 @@ class SystemSearchViewModelTest {
         const val AUTOCOMPLETE_RESULT = "autocomplete result"
         val deviceApp = DeviceApp("", "", Intent())
         val autocompleteQueryResult = AutoCompleteResult(QUERY, listOf(AutoCompleteSearchSuggestion(QUERY, false)))
-        val autocompleteQueryEmptyResult = AutoCompleteResult(QUERY, emptyList())
         val autocompleteBlankResult = AutoCompleteResult(BLANK_QUERY, emptyList())
         val appQueryResult = listOf(deviceApp)
         val appBlankResult = emptyList<DeviceApp>()

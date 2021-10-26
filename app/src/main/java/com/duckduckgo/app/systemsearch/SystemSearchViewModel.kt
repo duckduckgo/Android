@@ -195,8 +195,10 @@ class SystemSearchViewModel(
             return
         }
 
-        val trimmedQuery = query.trim()
-        resultsPublishSubject.accept(trimmedQuery)
+        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+            val trimmedQuery = query.trim()
+            resultsPublishSubject.accept(trimmedQuery)
+        }
     }
 
     private fun updateResults(results: SystemSearchResult) {
@@ -204,17 +206,9 @@ class SystemSearchViewModel(
 
         val suggestions = results.autocomplete.suggestions
         val appResults = results.deviceApps
+        val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
-        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
-        val hasMultiResults = (autoCompleteSuggestionsEnabled && suggestions.isNotEmpty()) && appResults.isNotEmpty()
-
-        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else {
-            if (autoCompleteSuggestionsEnabled) {
-                suggestions
-            } else {
-                emptyList()
-            }
-        }
+        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
         resultsViewState.postValue(
             when (val currentResultsState = currentResultsState()) {
@@ -233,7 +227,9 @@ class SystemSearchViewModel(
     }
 
     private fun inputCleared() {
-        resultsPublishSubject.accept("")
+        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+            resultsPublishSubject.accept("")
+        }
         resetResultsState()
     }
 
