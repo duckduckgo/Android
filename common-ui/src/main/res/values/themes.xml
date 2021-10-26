@@ -327,6 +327,8 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
         <item name="trackHeight">6dp</item>
         <item name="trackColorInactive">@color/slider_inactive_track</item>
+        <item name="trackColorActive">@color/accentBlue</item>
+        <item name="thumbColor">@color/accentBlue</item>
     </style>
 
     <style name="ThemeOverlay.App.Slider" parent="">

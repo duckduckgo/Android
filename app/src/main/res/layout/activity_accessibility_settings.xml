@@ -44,6 +44,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/keyline_4"
+            android:paddingStart="@dimen/settingsItemHorizontalPadding"
+            android:paddingEnd="@dimen/settingsItemHorizontalPadding"
             android:text="@string/accessibilityFontSizeTitle"
             tools:text="Text goes here" />
 
@@ -51,19 +53,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/keyline_2"
-            android:paddingEnd="@dimen/keyline_4">
+            android:paddingStart="@dimen/settingsItemHorizontalPadding"
+            android:paddingEnd="@dimen/settingsItemHorizontalPadding">
 
             <TextView
                 android:id="@+id/accessibilitySliderValue"
                 style="@style/TextAppearance.DuckDuckGo.Body1"
                 android:layout_width="wrap_content"
-                android:minWidth="48dp"
+                android:minWidth="50dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="@dimen/keyline_2"
-                android:gravity="center_vertical|end"
-                android:text="100%"
+                android:gravity="center_vertical|start"
                 android:textColor="@color/normal_text_color_selector" />
 
             <com.google.android.material.slider.Slider
@@ -85,13 +85,12 @@
             style="@style/TextAppearance.DuckDuckGo.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
             android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
             android:background="?lightContainerBackground"
             android:layout_gravity="bottom"
             android:ellipsize="end"
-
             android:padding="@dimen/keyline_2"
             android:text="@string/accessibilityFontSizeHint"
             android:textColor="@color/normal_text_color_selector" />

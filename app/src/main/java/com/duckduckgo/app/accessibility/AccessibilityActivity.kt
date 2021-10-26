@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.quietlySetValue
-import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.flow.launchIn
@@ -90,7 +89,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         // Avoids scaling our Sample Text when overriding system font size
         binding.accessibilityHint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16 * newValue)
 
-        binding.fontSizeSettingsGroup.recursiveEnable(enableFontSizeSettings)
+        binding.fontSizeSettingsGroup.alpha = if (useSystemFontSize) 0.40f else 1.0f
+        binding.accessibilitySlider.isEnabled = !useSystemFontSize
     }
 
     private fun configureListener() {
