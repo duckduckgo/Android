@@ -32,7 +32,6 @@ import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
@@ -77,6 +76,7 @@ class DeviceShieldTrackerActivity :
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var trackerBlockedCountView: PastWeekTrackerActivityContentView
+
     private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
     private lateinit var ctaTrackerFaq: View
     private lateinit var deviceShieldEnabledLabel: TextView
@@ -84,16 +84,15 @@ class DeviceShieldTrackerActivity :
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
+    // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
+    private var deviceShieldCachedState: Boolean? = null
+
     private val feedConfig = DeviceShieldActivityFeedFragment.ActivityFeedConfig(
         maxRows = 6,
         timeWindow = 5,
         timeWindowUnits = TimeUnit.DAYS,
         showTimeWindowHeadings = false
     )
-
-    private val deviceShieldToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAppTPToggleSwitched(isChecked)
-    }
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
 
@@ -288,6 +287,9 @@ class DeviceShieldTrackerActivity :
         // is there a better way to do this?
         if (::deviceShieldSwitch.isInitialized) {
             deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, null)
+        } else {
+            Timber.v("switch view reference not yet initialized; cache value until menu populated")
+            deviceShieldCachedState = state.runningState.isRunning
         }
 
         updateCounts(state.trackerCountInfo)
@@ -367,6 +369,18 @@ class DeviceShieldTrackerActivity :
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_device_tracker_activity, menu)
+
+        val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
+        deviceShieldSwitch = switchMenuItem?.actionView as SwitchCompat
+        deviceShieldSwitch.setOnClickListener {
+            viewModel.onAppTPToggleSwitched(deviceShieldSwitch.isChecked)
+            if (!deviceShieldSwitch.isChecked) {
+                // because we now show a dialog before shutting the vpn down, we want to reset to a positive value
+                // until the user decides to stop it.
+                deviceShieldSwitch.quietlySetIsChecked(true, null)
+            }
+        }
+
         return true
     }
 
@@ -379,15 +393,9 @@ class DeviceShieldTrackerActivity :
         menu.findItem(R.id.dataScreen).isVisible = BuildConfig.DEBUG
         menu.findItem(R.id.customDnsServer).isVisible = BuildConfig.DEBUG
 
-        val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        deviceShieldSwitch = switchMenuItem?.actionView as SwitchCompat
-        deviceShieldSwitch.setOnClickListener {
-            viewModel.onAppTPToggleSwitched(deviceShieldSwitch.isChecked)
-            if (!deviceShieldSwitch.isChecked) {
-                // because we now show a dialog before shutting the vpn down, we want to reset to a positive value
-                // until the user decides to stop it.
-                deviceShieldSwitch.quietlySetIsChecked(true, null)
-            }
+        deviceShieldCachedState?.let { checked ->
+            deviceShieldSwitch.quietlySetIsChecked(checked, null)
+            deviceShieldCachedState = null
         }
 
         return super.onPrepareOptionsMenu(menu)
