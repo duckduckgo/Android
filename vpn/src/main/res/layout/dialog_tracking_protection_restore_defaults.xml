@@ -16,11 +16,11 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingBottom="28dp"
     android:background="?dialogBgColor">
 
     <ImageView
@@ -32,7 +32,7 @@
         android:src="@drawable/ic_apptb_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/trackingProtectionRestoreDefaultsTitle"
@@ -49,7 +49,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon"
-        android:text="@string/atp_ExcludeAppsRestoreDefaultsTitle"/>
+        android:text="@string/atp_ExcludeAppsRestoreDefaultsTitle" />
 
     <TextView
         android:id="@+id/trackingProtectionRestoreDefaultsMessage"
@@ -65,14 +65,14 @@
         android:textColor="?secondaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsTitle" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/trackingProtectionRestoreDefaultsGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.50"/>
+        app:layout_constraintGuide_percent="0.50" />
 
     <Button
         android:id="@+id/trackingProtectionRestoreDefaultsRestore"
@@ -85,7 +85,7 @@
         android:text="@string/atp_ExcludeAppsManuallyCTARestore"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/trackingProtectionRestoreDefaultsGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage"/>
+        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage" />
 
     <Button
         android:id="@+id/trackingProtectionRestoreDefaultsCancel"
@@ -99,6 +99,21 @@
         android:textColor="@color/cornflowerBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trackingProtectionRestoreDefaultsGuideline"
-        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage"/>
+        app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage" />
+
+    <TextView
+        android:id="@+id/trackingProtectionRestoreDefaultsDisclaimer"
+        android:layout_width="0dp"
+        android:textSize="12sp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:textColor="?secondaryTextColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/trackingProtectionRestoreDefaultsRestore"
+        android:text="@string/atp_ExcludeAppsRestoreDefaultsDisclaimer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

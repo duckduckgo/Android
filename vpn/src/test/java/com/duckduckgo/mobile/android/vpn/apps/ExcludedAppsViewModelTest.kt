@@ -58,7 +58,7 @@ class ExcludedAppsViewModelTest {
     @Test
     fun whenPackageNameIsExcludedThenProtectedAppsExcludesIt() = coroutineRule.runBlocking {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName)
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport = false)
 
         verifyZeroInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
@@ -69,7 +69,7 @@ class ExcludedAppsViewModelTest {
         viewModel.commands().test {
             val packageName = "com.package.name"
             val appName = "name"
-            viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName)
+            viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName, skippedReport = false)
 
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
             verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to "com.package.name", "reason" to STOPPED_WORKING.toString()))
@@ -82,7 +82,7 @@ class ExcludedAppsViewModelTest {
     @Test
     fun whenPackageNameIsExcludedAndWasPreviouslyExcludedThenProtectedAppsExcludesItAndPixelIsSent() = coroutineRule.runBlocking {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName)
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName, skippedReport = false)
 
         verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to packageName, "reason" to ManuallyDisableAppProtectionDialog.DONT_USE.toString()))
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
@@ -120,7 +120,7 @@ class ExcludedAppsViewModelTest {
     @Test
     fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = coroutineRule.runBlocking {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(0, packageName, packageName)
+        viewModel.onAppProtectionDisabled(0, packageName, packageName, skippedReport = true)
 
         viewModel.commands().test {
             viewModel.onLeavingScreen()
@@ -187,7 +187,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, false)
-            assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues, 0), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -205,7 +205,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, false)
-            assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded, 0), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded), expectItem())
             cancelAndConsumeRemainingEvents()
         }
     }

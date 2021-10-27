@@ -142,7 +142,7 @@
     <string name="atp_ExcludeAppsManuallyCTAEnable">Enable</string>
     <string name="atp_ExcludeAppsManuallyCTARestore">Restore</string>
     <string name="atp_ExcludeAppsManuallyEnableAppName">Manually enable protection for %s app?</string>
-    <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience problems when tracking attempts fail.</string>
+    <string name="atp_ExcludeAppsManuallyEnableAppLabel">This app is known to experience issues when tracking attempts fail.</string>
     <string name="atp_ExcludeAppsManuallyEnableLoadWebsitesAppLabel">Site content in this app may not appear properly when protection is enabled.</string>
     <string name="atp_ExcludeAppsManuallyEnableFooter">Enabling protection sends the app\'s name to DuckDuckGo.</string>
     <string name="atp_ExcludeAppsManuallyDisableAppName">Privacy Protection Disabled</string>
@@ -152,23 +152,24 @@
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
     <string name="atp_ExcludeAppsManuallyCTASubmit">Submit</string>
     <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
-    <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100% anonymous and only include your selection above and the app name</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100% anonymous and only include your selection above and the app name.</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="atp_ExcludeAppsManuallyMenuReport">Report an Issue With an App</string>
     <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restore default protection?</string>
     <string name="atp_ExcludeAppsRestoreDefaultsMessage">Your custom protection settings will update to our latest default protections. You can always change your protection settings again later.</string>
     <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Protection restored to default settings</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
     <!--  Breakage report app list  -->
     <string name="atp_ReportBreakageAppListActivityTitle">Report an Issue</string>
-    <string name="atp_ReportBreakageAppFeature"><b>Select the app experiencing the issue</b>. Your feedback really help us improve.\n\nHave general feedback about App Tracking Protection? Use <annotation type="use_this_form_link">this form</annotation> instead.</string>
+    <string name="atp_ReportBreakageAppFeature"><b>Select the app experiencing the issue</b>. Your feedback really helps us improve!\n\nHave general feedback about App Tracking Protection? Use <annotation type="use_this_form_link">this form</annotation> instead.</string>
     <string name="atp_ReportBreakageAppEntry">%s app</string>
     <string name="atp_ReportBreakageAppSubmitCta">Submit</string>
     <string name="atp_ReportBreakageAppNextCta">Next</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Please describe what happened, what you expected, and what steps led to the issue.</string>
     <string name="atp_ReportBreakageFormWhereYouLoggedInText">Were you logged in to the app when you noticed the issue?</string>
     <string name="atp_ReportBreakageChoiceLoggedIn">Yes, I was logged in to the app</string>
-    <string name="atp_ReportBreakageChoiceProblemWhenLogin">The problem happened when loggin in</string>
+    <string name="atp_ReportBreakageChoiceProblemWhenLogin">The problem happened when logging in</string>
     <string name="atp_ReportBreakageChoiceProblemCreatingAccount">I had a problem creating a new account</string>
     <string name="atp_ReportBreakageChoiceNoLogging">The app doesn\’t require log in</string>
     <string name="atp_ReportBreakageChoiceHeadingText"><b>Were you logged in to the app when you noticed the issue?</b></string>
@@ -219,9 +220,9 @@
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
     <string name="atp_FAQFirstHeader">How does App Tracking Protection work?</string>
-    <string name="atp_FAQFirstText"><b>App Tracking Protection blocks know app trackers from other companies, like when Facebook tries to track you in a health app</b> Companies may still track you in apps they own.</string>
+    <string name="atp_FAQFirstText"><b>App Tracking Protection blocks known app trackers from other companies, like when Facebook tries to track you in a health app.</b> Companies may still track you in apps they own.</string>
     <string name="atp_FAQSecondHeader">Does App Tracking Protection block trackers in all my apps?</string>
-    <string name="atp_FAQSecondText"><b>Protection may be automatically disabled for certain apps, like those that load websites, so that content appears normally</b>. For apps with known issues, this is mostly temporary as we work to improve App Tracking Protection. You can manage this protection for each app on your device in the settings.\n\nIn addition, some trackers may not be blocked because we haven\'t yet detected and added them to your blocklist. We are continually working to identify and protect against new trackers, so you can rest easy knowing you\'re getting the most up-to-date protection.\n\nYou can expect updates to our tracker list every few months. These updates will get applied on your device automatically</string>
+    <string name="atp_FAQSecondText"><b>Protection may be automatically disabled for certain apps, like those that load websites, so that content appears normally</b>. For apps with known issues, this is mostly temporary as we work to improve App Tracking Protection. You can manage this protection for each app on your device in the settings.\n\nIn addition, some trackers may not be blocked because we haven\'t yet detected and added them to our blocklist. We are continually working to identify and protect against new trackers, so you can rest easy knowing you\'re getting the most up-to-date protection.\n\nYou can expect updates to our tracker list every few months. These updates will get applied on your device automatically</string>
     <string name="atp_FAQThirdHeader">Why does App Tracking Protection use a VPN connection?</string>
     <string name="atp_FAQThirdText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for App Tracking Protection to work.</b>\n\nThis permission allows App Tracking Protection, which works locally on your device, to monitor network traffic <b>so that it can block known trackers.</b></string>
     <string name="atp_FAQFourthHeader">How is App Tracking Protection different from a VPN?</string>

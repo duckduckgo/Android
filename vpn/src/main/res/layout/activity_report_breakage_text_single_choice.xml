@@ -69,13 +69,13 @@
                 android:text="@string/atp_ReportBreakageFormDisclaimerText"
                 android:textColor="?attr/settingsMinorTextColor"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/splitterGray"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/splitterGray"/>
 
     <Button
         android:id="@+id/ctaNextFormSubmit"
