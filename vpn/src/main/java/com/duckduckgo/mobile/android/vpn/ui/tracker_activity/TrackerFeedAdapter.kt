@@ -179,7 +179,12 @@ class TrackerFeedAdapter @Inject constructor(
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
                     .into(trackingAppIcon)
 
-                (trackerBadgesView.adapter as TrackerBadgeAdapter).updateData(tracker.trackers)
+                with(trackerBadgesView) {
+                    // click through recyvlerview
+                    suppressLayout(false)
+                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackers)
+                    suppressLayout(true)
+                }
                 itemView.setOnClickListener {
                     onAppClick(item)
                 }
