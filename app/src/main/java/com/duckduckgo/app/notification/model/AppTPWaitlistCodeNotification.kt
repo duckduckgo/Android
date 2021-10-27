@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.EMAIL_WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
@@ -33,7 +33,7 @@ class AppTPWaitlistCodeNotification(
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.vpn.waitlist"
-    override val launchIntent = EMAIL_WAITLIST_CODE
+    override val launchIntent = APPTP_WAITLIST_CODE
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
