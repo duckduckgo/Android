@@ -246,13 +246,13 @@
     <string name="atp_WaitlistRedeemCodeCta">Continue</string>
     <string name="atp_WaitlistRedeemCodeLabel">Invite Code</string>
     <string name="atp_WaitlistRedeemCodeTitle">Almost there…</string>
-    <string name="atp_WaitlistRedeemCodeError">We didn\'t recognise this Invite Code</string>
+    <string name="atp_WaitlistRedeemCodeError">We didn\'t recognise this Invite Code.</string>
     <string name="atp_WaitlistFooterDescription">You won’t need to share any personal information to join the waitlist. You’ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it’s your turn.</string>
     <string name="atp_WaitlistErrorJoining">An error happened while joining the Waitlist, please try again later</string>
-    <string name="atp_WaitlistJoinedWithNotification">We\'ll send you a notification when App Tracking Protection is ready for you\n\n<annotation type="beta_link">Learn more about the beta</annotation></string>
+    <string name="atp_WaitlistJoinedWithNotification">We\'ll send you a notification when App Tracking Protection is ready for you.\n\n<annotation type="beta_link">Learn more about the beta</annotation></string>
     <string name="atp_WaitlistJoinedWithoutNotification">Your invite to try App Tracking Protection will arrive here. Check back soon, or we can send you a notification when it’s your turn\n\n<annotation type="notify_me_link">Notify me</annotation>\n\n<annotation type="beta_link">Learn more about the beta</annotation></string>
     <string name="atp_WaitlistRedeemCodeActivityTitle">Enter Your Invite Code</string>
-    <string name="atp_WaitlistRedeemedCodeStatus">Success! You\'re in</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Success! You\'re in.</string>
     <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection</string>
 
     <!--  App Tracking Company Details -->

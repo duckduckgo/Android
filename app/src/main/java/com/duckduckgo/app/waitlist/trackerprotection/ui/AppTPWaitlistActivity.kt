@@ -110,7 +110,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderInBeta() {
-        binding.headerImage.setImageResource(R.drawable.ic_shield)
+        binding.headerImage.setImageResource(R.drawable.ic_apptp_icon)
         binding.statusTitle.text = getString(R.string.atp_WaitlistStatusInBeta)
         binding.waitListButton.gone()
         binding.getStartedButton.show()
@@ -144,12 +144,12 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderNotJoinedQueue() {
-        binding.headerImage.setImageResource(R.drawable.ic_shield)
+        binding.headerImage.setImageResource(R.drawable.ic_apptp_icon)
         binding.waitListButton.show()
         binding.getStartedButton.gone()
         binding.inviteCodeButton.show()
         binding.footerInviteCodeButton.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
             viewModel.learnMore()
         }
     }
