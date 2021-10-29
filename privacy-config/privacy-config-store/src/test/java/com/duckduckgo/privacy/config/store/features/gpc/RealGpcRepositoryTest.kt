@@ -16,10 +16,10 @@
 
 package com.duckduckgo.privacy.config.store.features.gpc
 
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyStoreCoroutineTestRule
-import com.duckduckgo.privacy.config.store.runBlocking
 import com.duckduckgo.privacy.config.store.toGpcException
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
@@ -34,7 +34,7 @@ import org.mockito.ArgumentMatchers.anyList
 
 class RealGpcRepositoryTest {
     @get:Rule
-    var coroutineRule = PrivacyStoreCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealGpcRepository
 

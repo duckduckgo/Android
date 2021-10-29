@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
@@ -65,6 +66,7 @@ class SystemSearchViewModelTest {
     private val mockFavoritesRepository: FavoritesRepository = mock()
     private val mockFaviconManager: FaviconManager = mock()
     private val mockPixel: Pixel = mock()
+    private val mockSettingsStore: SettingsDataStore = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -78,7 +80,8 @@ class SystemSearchViewModelTest {
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -111,7 +114,7 @@ class SystemSearchViewModelTest {
     fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() = coroutineRule.runBlocking {
         (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
         testee =
-            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
+            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
         testee.resetViewState()
         testee.userUpdatedQuery("test")
 
@@ -176,6 +179,25 @@ class SystemSearchViewModelTest {
         assertNotNull(newViewState)
         assertEquals(appQueryResult, newViewState.appResults)
         assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+    }
+
+    @Test
+    fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = coroutineRule.runBlocking {
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.userUpdatedQuery(QUERY)
+
+        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
+        assertNotNull(newViewState)
+        assertEquals(appQueryResult, newViewState.appResults)
+        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+    }
+
+    @Test
+    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = coroutineRule.runBlocking {
+        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.userUpdatedQuery(QUERY)
+
+        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
     }
 
     @Test
@@ -354,7 +376,7 @@ class SystemSearchViewModelTest {
     fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf(listOf(savedSite)))
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
         assertEquals(1, viewState.favorites.size)

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
 
@@ -31,4 +32,8 @@ object FileUtilities {
         return javaClass.classLoader!!.getResource(resourceName).openStream()
     }
 
+    fun getJsonObjectFromFile(filename: String): JSONObject {
+        val json = loadText(filename)
+        return JSONObject(json)
+    }
 }

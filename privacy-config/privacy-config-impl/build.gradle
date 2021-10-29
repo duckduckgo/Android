@@ -46,25 +46,23 @@ dependencies {
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
-
     implementation Google.dagger
-
     implementation AndroidX.core.ktx
-
-    // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    testImplementation AndroidX.room.testing
-
-    // WorkManager
     implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
 
     // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation AndroidX.work.testing
+    testImplementation AndroidX.room.testing
     testImplementation Testing.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
 }
@@ -73,4 +71,8 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+}
+
+tasks.register('checks') {
+    dependsOn 'spotlessCheck', 'testDebugUnitTest'
 }

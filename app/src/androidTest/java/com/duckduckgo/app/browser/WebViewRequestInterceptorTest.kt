@@ -20,6 +20,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import android.webkit.*
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
@@ -407,7 +408,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView, never()).loadUrl(any())
+        verify(webView, never()).loadUrl(any(), any())
     }
 
     @Test
@@ -462,7 +463,7 @@ class WebViewRequestInterceptorTest {
     @Test
     fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runBlocking<Unit> {
         configureUserAgentShouldChange()
-        configureUrlExistsInTheStack()
+        configureUrlExistsInTheStack("https://m.facebook.com".toUri())
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -472,7 +473,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView, never()).loadUrl(any())
+        verify(webView, never()).loadUrl(any(), any())
     }
 
     @Test
@@ -488,7 +489,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView, never()).loadUrl(any())
+        verify(webView, never()).loadUrl(any(), any())
     }
 
     @Test
@@ -552,9 +553,9 @@ class WebViewRequestInterceptorTest {
         whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
     }
 
-    private fun configureUrlExistsInTheStack() {
+    private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {
         val mockWebHistoryItem: WebHistoryItem = mock()
-        whenever(mockWebHistoryItem.url).thenReturn(validUri().toString())
+        whenever(mockWebHistoryItem.url).thenReturn(uri.toString())
         whenever(mockWebBackForwardList.currentItem).thenReturn(mockWebHistoryItem)
         whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
@@ -593,12 +594,6 @@ class WebViewRequestInterceptorTest {
 
     private fun configureUserAgentShouldChange() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn(Uri.parse("https://m.facebook.com"))
-        whenever(mockRequest.isForMainFrame).thenReturn(true)
-        whenever(mockRequest.method).thenReturn("GET")
-    }
-
-    private fun configureShouldChangeToMobileUrl() = runBlocking<Unit> {
-        whenever(mockRequest.url).thenReturn((Uri.parse("https://facebook.com")))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }

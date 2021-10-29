@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -114,6 +113,24 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
             brokenSiteButton.setOnClickListener {
                 viewModel.onReportBrokenSiteSelected()
+            }
+
+            httpsContainer.setOnClickListener {
+                pixel.fire(PRIVACY_DASHBOARD_ENCRYPTION)
+            }
+
+            networksContainer.setOnClickListener {
+                pixel.fire(PRIVACY_DASHBOARD_NETWORKS)
+                startActivity(TrackerNetworksActivity.intent(this@PrivacyDashboardActivity, intent.tabId!!))
+            }
+
+            practicesContainer.setOnClickListener {
+                pixel.fire(PRIVACY_DASHBOARD_PRIVACY_PRACTICES)
+                startActivity(PrivacyPracticesActivity.intent(this@PrivacyDashboardActivity, intent.tabId!!))
+            }
+
+            trackerNetworkLeaderboard.setOnClickListener {
+                pixel.fire(PRIVACY_DASHBOARD_GLOBAL_STATS)
             }
 
             privacyToggle.setOnCheckedChangeListener(privacyToggleListener)
@@ -218,24 +235,6 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     private fun launchWhitelistActivity() {
         startActivity(WhitelistActivity.intent(this))
-    }
-
-    fun onEncryptionClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        pixel.fire(PRIVACY_DASHBOARD_ENCRYPTION)
-    }
-
-    fun onNetworksClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        pixel.fire(PRIVACY_DASHBOARD_NETWORKS)
-        startActivity(TrackerNetworksActivity.intent(this, intent.tabId!!))
-    }
-
-    fun onPracticesClicked(@Suppress("UNUSED_PARAMETER") view: View) {
-        pixel.fire(PRIVACY_DASHBOARD_PRIVACY_PRACTICES)
-        startActivity(PrivacyPracticesActivity.intent(this, intent.tabId!!))
-    }
-
-    fun onLeaderboardClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        pixel.fire(PRIVACY_DASHBOARD_GLOBAL_STATS)
     }
 
     private fun updateActivityResult(shouldReload: Boolean) {

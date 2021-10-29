@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.*
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
     suspend fun insert(bookmark: Bookmark)
+    suspend fun insert(title: String, url: String, parentId: Long = 0): Bookmark
     suspend fun update(bookmarkFolder: BookmarkFolder)
     suspend fun update(bookmark: Bookmark)
     suspend fun delete(bookmark: Bookmark)
@@ -40,6 +41,7 @@ interface BookmarksRepository {
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
     fun bookmarks(): Flow<List<Bookmark>>
     fun getBookmark(url: String): Bookmark?
+    suspend fun hasBookmarks(): Boolean
 }
 
 class BookmarksDataRepository(
@@ -54,6 +56,11 @@ class BookmarksDataRepository(
 
     override suspend fun insert(bookmark: Bookmark) {
         bookmarksDao.insert(BookmarkEntity(title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId))
+    }
+
+    override suspend fun insert(title: String, url: String, parentId: Long): Bookmark {
+        val id = bookmarksDao.insert(BookmarkEntity(title = title, url = url, parentId = 0))
+        return Bookmark(id = id, title = title, url = url, parentId = parentId)
     }
 
     override suspend fun update(bookmarkFolder: BookmarkFolder) {
@@ -86,6 +93,10 @@ class BookmarksDataRepository(
 
     override fun getBookmark(url: String): Bookmark? {
         return bookmarksDao.getBookmarkByUrl(url)?.mapToSavedSite()
+    }
+
+    override suspend fun hasBookmarks(): Boolean {
+        return bookmarksDao.hasBookmarks()
     }
 
     @VisibleForTesting

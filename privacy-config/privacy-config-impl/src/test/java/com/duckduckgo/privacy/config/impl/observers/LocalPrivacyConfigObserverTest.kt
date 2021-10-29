@@ -18,27 +18,26 @@ package com.duckduckgo.privacy.config.impl.observers
 
 import android.content.Context
 import android.content.res.Resources
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
-import com.duckduckgo.privacy.config.impl.PrivacyCoroutineTestRule
-import com.duckduckgo.privacy.config.impl.runBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.TestCoroutineScope
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class LocalPrivacyConfigObserverTest {
 
     @get:Rule
-    var coroutineRule = PrivacyCoroutineTestRule()
+    var coroutineRule = CoroutineTestRule()
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
     private val mockContext: Context = mock()
