@@ -35,6 +35,8 @@ import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
@@ -43,7 +45,8 @@ import timber.log.Timber
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    private val faviconManager: FaviconManager
+    private val faviconManager: FaviconManager,
+    private val variantManager: VariantManager
 ) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
 
     companion object {
@@ -84,7 +87,8 @@ class FireproofWebsiteAdapter(
                         viewModel.onUserToggleLoginDetection(
                             isChecked
                         )
-                    }
+                    },
+                    variantManager
                 )
             }
             DIVIDER_TYPE -> {
@@ -164,10 +168,16 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
     class FireproofWebsiteToggleViewHolder(
         private val binding: ViewFireproofWebsiteToggleBinding,
-        private val listener: CompoundButton.OnCheckedChangeListener
+        private val listener: CompoundButton.OnCheckedChangeListener,
+        private val variantManager: VariantManager
     ) :
         FireproofWebSiteViewHolder(binding.root) {
         fun bind(loginDetectionEnabled: Boolean) {
+
+            if (variantManager.isFireproofExperimentEnabled()) {
+                binding.fireproofWebsiteToggle.text = binding.root.context.getString(R.string.daxFireproofSettingsToggle)
+            }
+
             binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }

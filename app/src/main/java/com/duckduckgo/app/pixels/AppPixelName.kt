@@ -39,6 +39,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
+    ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
+    ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
+    ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
+
     PRIVACY_DASHBOARD_OPENED("mp"),
     PRIVACY_DASHBOARD_SCORECARD("mp_c"),
     PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),

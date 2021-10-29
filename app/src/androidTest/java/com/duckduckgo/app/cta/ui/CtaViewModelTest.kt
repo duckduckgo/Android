@@ -160,7 +160,8 @@ class CtaViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager
         )
     }
 
@@ -472,13 +473,13 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenFireproofCtaShown() = coroutineRule.runBlocking {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
+        assertTrue(value is DaxBubbleCta.DaxFireproofCta)
     }
 
     @Test

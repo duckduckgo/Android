@@ -355,7 +355,8 @@ class BrowserTabViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -407,7 +408,8 @@ class BrowserTabViewModelTest {
             favoritesRepository = mockFavoritesRepository,
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
-            contentBlocking = mockContentBlocking
+            contentBlocking = mockContentBlocking,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false, false)

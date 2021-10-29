@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -36,6 +37,9 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     lateinit var adapter: FireproofWebsiteAdapter
 
@@ -57,7 +61,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
+        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager, variantManager)
         binding.recycler.adapter = adapter
     }
 

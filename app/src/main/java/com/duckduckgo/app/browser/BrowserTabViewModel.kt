@@ -97,7 +97,9 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -157,7 +159,8 @@ class BrowserTabViewModel(
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val appLinksHandler: AppLinksHandler
+    private val appLinksHandler: AppLinksHandler,
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -432,7 +435,13 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    if (variantManager.isFireproofExperimentEnabled() && userEventsStore.getUserEvent(UserEventKey.FIREPROOF_DAX_DIALOG_DISMISSED) != null) {
+                        if (appSettingsPreferencesStore.appLoginDetection) {
+                            onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                        }
+                    } else {
+                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    }
                 }
             }
         }
@@ -1854,7 +1863,7 @@ class BrowserTabViewModel(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxFireproofCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -1903,6 +1912,21 @@ class BrowserTabViewModel(
                 is HomePanelCta -> refreshCta()
                 else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
+        }
+    }
+
+    fun userSelectedFireproofSetting(isAutoFireproofingEnabled: Boolean) {
+        appSettingsPreferencesStore.appLoginDetection = isAutoFireproofingEnabled
+
+        viewModelScope.launch(dispatchers.io()) {
+            userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DAX_DIALOG_DISMISSED)
+        }
+
+        val cta = currentCtaViewState().cta ?: return
+
+        viewModelScope.launch {
+            ctaViewModel.onUserClickFireproofExperimentButton(isAutoFireproofingEnabled, cta)
+            refreshCta()
         }
     }
 
@@ -2211,12 +2235,13 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
     private val appCoroutineScope: Provider<CoroutineScope>,
-    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>
+    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
+    private val variantManager: Provider<VariantManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
                 else -> null
             }
         }
