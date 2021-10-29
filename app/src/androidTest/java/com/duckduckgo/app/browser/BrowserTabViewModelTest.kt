@@ -356,7 +356,8 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            userEventsStore = mockUserEventsStore
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)

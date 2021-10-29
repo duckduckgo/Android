@@ -24,6 +24,8 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
@@ -64,7 +66,8 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val userEventsStore: UserEventsStore
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -278,6 +281,7 @@ class CtaViewModel @Inject constructor(
         !daxDialogFireproofShown() &&
         daxDialogIntroShown() &&
         !settingsDataStore.hideTips &&
+        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null &&
         variantManager.isFireproofExperimentEnabled()
 
     @WorkerThread

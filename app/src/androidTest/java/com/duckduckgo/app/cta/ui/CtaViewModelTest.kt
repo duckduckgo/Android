@@ -161,7 +161,8 @@ class CtaViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            userEventsStore = mockUserEventsStore
         )
     }
 
