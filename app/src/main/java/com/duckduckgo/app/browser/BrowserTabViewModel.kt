@@ -435,7 +435,7 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    if (variantManager.isFireproofExperimentEnabled() && userEventsStore.getUserEvent(UserEventKey.FIREPROOF_DAX_DIALOG_DISMISSED) != null) {
+                    if (variantManager.isFireproofExperimentEnabled()) {
                         if (appSettingsPreferencesStore.appLoginDetection) {
                             onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
                         }
@@ -1917,10 +1917,6 @@ class BrowserTabViewModel(
 
     fun userSelectedFireproofSetting(isAutoFireproofingEnabled: Boolean) {
         appSettingsPreferencesStore.appLoginDetection = isAutoFireproofingEnabled
-
-        viewModelScope.launch(dispatchers.io()) {
-            userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DAX_DIALOG_DISMISSED)
-        }
 
         val cta = currentCtaViewState().cta ?: return
 

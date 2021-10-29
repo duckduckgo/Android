@@ -25,6 +25,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 
 interface SettingsDataStore {
 
@@ -83,8 +84,16 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
-        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
-        set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
+        get() = if (variantManager.isFireproofExperimentEnabled()) {
+            preferences.getBoolean(KEY_AUTO_LOGIN_DETECTION_ENABLED, false)
+        } else {
+            preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
+        }
+        set(enabled) = if (variantManager.isFireproofExperimentEnabled()) {
+            preferences.edit { putBoolean(KEY_AUTO_LOGIN_DETECTION_ENABLED, enabled) }
+        } else {
+            preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
+        }
 
     override var appLocationPermission: Boolean
         get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
@@ -188,6 +197,7 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_LOGIN_DETECTION_ENABLED = "KEY_LOGIN_DETECTION_ENABLED"
+        const val KEY_AUTO_LOGIN_DETECTION_ENABLED = "KEY_AUTO_LOGIN_DETECTION_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
