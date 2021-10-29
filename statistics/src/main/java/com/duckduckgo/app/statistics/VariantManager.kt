@@ -173,7 +173,9 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
+// Enable experiment for testing
+// fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
+fun VariantManager.isFireproofExperimentEnabled() = true
 
 /**
  * A variant which can be used for experimentation.
