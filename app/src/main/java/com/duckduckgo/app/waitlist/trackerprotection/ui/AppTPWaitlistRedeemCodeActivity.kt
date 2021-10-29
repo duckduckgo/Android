@@ -19,6 +19,8 @@ package com.duckduckgo.app.waitlist.trackerprotection.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -60,6 +62,18 @@ class AppTPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
         binding.redeemCode.editText?.doOnTextChanged { inputText, _, _, _ ->
             binding.redeemCode.error = null
             binding.redeemButton.isEnabled = !inputText.isNullOrEmpty()
+        }
+        binding.redeemCode.editText?.setOnEditorActionListener { textView, actionId, keyEvent ->
+            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (binding.redeemButton.isEnabled) {
+                    val code = binding.redeemCode.editText?.text.toString()
+                    textView.hideKeyboard()
+                    viewModel.redeemCode(code)
+                }
+                return@setOnEditorActionListener true
+            } else {
+                return@setOnEditorActionListener false
+            }
         }
     }
 
