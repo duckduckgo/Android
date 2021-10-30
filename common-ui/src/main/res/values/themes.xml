@@ -115,6 +115,9 @@
         <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
+        <item name="android:textColorPrimary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/normalTextColor</item>
+        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
