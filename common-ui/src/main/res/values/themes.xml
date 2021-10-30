@@ -116,7 +116,7 @@
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
     </style>
 
@@ -307,7 +307,7 @@
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
