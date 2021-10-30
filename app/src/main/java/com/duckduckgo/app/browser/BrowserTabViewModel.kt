@@ -39,6 +39,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -187,6 +188,7 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
+        val bookmarkFolder: BookmarkFolder? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
         val canFireproofSite: Boolean = false,
@@ -277,8 +279,8 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
-        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite) : Command()
-        class ShowEditSavedSiteDialog(val savedSite: SavedSite) : Command()
+        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite, val bookmarkFolder: BookmarkFolder?) : Command()
+        class ShowEditSavedSiteDialog(val savedSite: SavedSite, val bookmarkFolder: BookmarkFolder?) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
@@ -975,14 +977,28 @@ class BrowserTabViewModel(
     private suspend fun updateBookmarkAndFavoriteState(url: String) {
         val bookmark = getBookmark(url)
         val favorite = getFavorite(url)
+        val bookmarkFolder = getBookmarkFolder(bookmark)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark, favorite = favorite)
+            browserViewState.value = currentBrowserViewState().copy(
+                bookmark = bookmark,
+                favorite = favorite,
+                bookmarkFolder = bookmarkFolder
+            )
         }
     }
 
     private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
         return withContext(dispatchers.io()) {
             bookmarksRepository.getBookmark(url)
+        }
+    }
+
+    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+        return if (bookmark == null) null
+        else {
+            withContext(dispatchers.io()) {
+                bookmarksRepository.getBookmarkFolderById(bookmark.parentId)
+            }
         }
     }
 
@@ -1423,9 +1439,10 @@ class BrowserTabViewModel(
         val url = url ?: return
         viewModelScope.launch {
             val bookmark = currentBrowserViewState().bookmark
+            val bookmarkFolder = currentBrowserViewState().bookmarkFolder
             if (bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
-                onEditSavedSiteRequested(bookmark)
+                onEditSavedSiteRequested(bookmark, bookmarkFolder)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                 saveSiteBookmark(url, title ?: "")
@@ -1440,8 +1457,11 @@ class BrowserTabViewModel(
             }
             bookmarksRepository.insert(title, url)
         }
+        val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
-            command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
+            command.value = ShowSavedSiteAddedConfirmation(savedBookmark, bookmarkFolder)
+            browserViewState.value =
+                currentBrowserViewState().copy(bookmark = savedBookmark, bookmarkFolder = bookmarkFolder)
         }
     }
 
@@ -1482,7 +1502,7 @@ class BrowserTabViewModel(
             }
             favorite?.let {
                 withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(it)
+                    command.value = ShowSavedSiteAddedConfirmation(it, null)
                 }
             }
         }
@@ -1547,32 +1567,46 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSavedSiteEdited(savedSite: SavedSite) {
-        when (savedSite) {
-            is SavedSite.Bookmark -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editBookmark(savedSite)
-                }
-            }
-            is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    editFavorite(savedSite)
-                }
-            }
+
+    override fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            editFavorite(favorite)
         }
     }
 
-    fun onEditSavedSiteRequested(savedSite: SavedSite) {
-        command.value = ShowEditSavedSiteDialog(savedSite)
+    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            editBookmark(bookmark, parentFolderName)
+        }
+    }
+
+    fun onEditSavedSiteRequested(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
+        command.value = ShowEditSavedSiteDialog(savedSite, bookmarkFolder)
     }
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
         command.value = DeleteSavedSiteConfirmation(savedSite)
     }
 
-    private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
+    private suspend fun editBookmark(bookmark: SavedSite.Bookmark, parentFolderName: String) {
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
+            bookmarksRepository.update(
+                BookmarkFolder(
+                    name = parentFolderName,
+                    parentId = bookmark.parentId
+                )
+            )
+        }
+        updateBookmarkAndFavoriteState(bookmark.url)
+        withContext(dispatchers.main()) {
+            command.value = ShowSavedSiteAddedConfirmation(
+                bookmark,
+                BookmarkFolder(
+                    name = parentFolderName,
+                    parentId = bookmark.parentId
+                )
+            )
         }
     }
 

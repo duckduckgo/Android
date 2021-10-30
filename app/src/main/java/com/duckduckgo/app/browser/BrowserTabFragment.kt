@@ -1326,14 +1326,8 @@ class BrowserTabFragment :
 
     private fun savedSiteAdded(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
         val snackbarMessage = when (savedSite) {
-            is SavedSite.Bookmark -> {
-                if (bookmarkFolder != null) {
-                    getString(R.string.bookmarkAddedMessage) + " : ${bookmarkFolder.name}"
-                } else {
-                    getString(R.string.bookmarkAddedMessage) + " : " + getString(R.string.bookmarksSectionTitle)
-                }
-            }
-            is SavedSite.Favorite -> getString(R.string.favoriteAddedMessage)
+            is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
+            is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
         browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
