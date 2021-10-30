@@ -1567,7 +1567,6 @@ class BrowserTabViewModel(
         }
     }
 
-
     override fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite) {
         viewModelScope.launch(dispatchers.io()) {
             editFavorite(favorite)
