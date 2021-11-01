@@ -67,7 +67,7 @@ class BookmarkFoldersViewModel(
         }
     }
 
-    private fun saveCurrentFolderAndSelectedFolderId(currentFolder: BookmarkFolder?, selectedFolderId : Long) {
+    private fun saveCurrentFolderAndSelectedFolderId(currentFolder: BookmarkFolder?, selectedFolderId: Long) {
         viewState.value = currentViewState().copy(currentFolder = currentFolder, selectedFolderId = selectedFolderId)
     }
 
