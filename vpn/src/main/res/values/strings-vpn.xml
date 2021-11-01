@@ -238,8 +238,8 @@
     <string name="atp_WaitlistStatusNotJoined">One easy step for better app privacy!</string>
     <string name="atp_WaitlistStatusJoined">You\'re on the list!</string>
     <string name="atp_WaitlistStatusInBeta">You\'re invited!</string>
-    <string name="atp_WaitlistDescription">Block trackers we find hiding in your other apps and see who we catch trying to track you.\n<annotation type="beta_link">Learn more</annotation></string>
-    <string name="atp_WaitlistInBetaDescription">Block trackers we find hiding in your other apps and see who we catch trying to track you.\n\n<annotation type="beta_link">Learn more about the beta</annotation></string>
+    <string name="atp_WaitlistDescription">Block trackers we find hiding in your other apps and see who was trying to track you.\n<annotation type="beta_link">Learn more</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Block trackers we find hiding in your other apps and see who was trying to track you.\n\n<annotation type="beta_link">Learn more about the beta</annotation></string>
     <string name="atp_WaitlistJoin">Join the Private Waitlist</string>
     <string name="atp_WaitlistCodeCta">I Have An Invite Code</string>
     <string name="atp_WaitlistGetStartedCta">Get Started</string>
