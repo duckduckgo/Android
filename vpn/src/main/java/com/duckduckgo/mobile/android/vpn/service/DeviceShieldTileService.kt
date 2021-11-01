@@ -47,7 +47,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     override fun onClick() {
-        if (waitlistManager.isFeatureEnabled()) {
+        if (waitlistManager.didJoinBeta()) {
             respondToTile()
         } else {
             launchActivity(Class.forName("com.duckduckgo.app.settings.SettingsActivity"))

@@ -24,10 +24,7 @@ import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.trackerprotection.TrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
-import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -38,16 +35,6 @@ import javax.inject.Singleton
 @Module
 @ContributesTo(AppObjectGraph::class)
 class AppTrackingProtectionModule {
-
-    @Singleton
-    @Provides
-    fun providesAppTrackingProtectionWaitlistManager(
-        service: AppTrackingProtectionWaitlistService,
-        dataStore: AppTrackingProtectionWaitlistDataStore,
-        dispatcherProvider: DispatcherProvider
-    ): TrackingProtectionWaitlistManager {
-        return AppTrackingProtectionWaitlistManager(service, dataStore, dispatcherProvider)
-    }
 
     @Singleton
     @Provides

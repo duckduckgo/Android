@@ -63,7 +63,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         }
     }
 
-    val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         viewModel.onCodeRedeemed(result.resultCode)
     }
 

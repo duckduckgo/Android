@@ -19,14 +19,11 @@ package com.duckduckgo.mobile.android.vpn.onboarding
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingImpl
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingPreferencesModule
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,11 +40,7 @@ class DeviceShieldOnboardingTest {
     @Mock
     lateinit var mockContext: Context
 
-    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-
     lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
-
-    lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     @Before
     fun setup() {
@@ -57,21 +50,6 @@ class DeviceShieldOnboardingTest {
 
         val preferences = DeviceShieldOnboardingPreferencesModule().provideDeviceShieldOnboardingPreferences(mockContext)
         deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(preferences)
-        deviceShieldOnboarding = DeviceShieldOnboardingImpl(preferences)
-    }
-
-    @Test
-    fun whenPrepareAndDidNotShowOnboardingThenReturnIntent() {
-        whenever(sharedPreferences.getBoolean(eq("KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"), anyBoolean())).thenReturn(false)
-
-        assertNotNull(deviceShieldOnboarding.prepare(context))
-    }
-
-    @Test
-    fun whenPrepareAndDidShowOnboardingThenReturnNull() {
-        whenever(sharedPreferences.getBoolean(eq("KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"), anyBoolean())).thenReturn(true)
-
-        assertNull(deviceShieldOnboarding.prepare(context))
     }
 
     @Test

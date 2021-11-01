@@ -407,10 +407,6 @@
                 android:resource="@xml/search_favorites_widget_info" />
         </receiver>
 
-        <meta-data
-            android:name="firebase_performance_collection_enabled"
-            android:value="false" />
-
     </application>
 
 </manifest>

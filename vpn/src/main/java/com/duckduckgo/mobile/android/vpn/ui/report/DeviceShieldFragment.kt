@@ -34,7 +34,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
@@ -45,9 +44,6 @@ class DeviceShieldFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels

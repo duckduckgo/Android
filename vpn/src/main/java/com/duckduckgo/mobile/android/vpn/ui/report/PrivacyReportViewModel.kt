@@ -51,7 +51,7 @@ class PrivacyReportViewModel(
     )
 
     val viewStateFlow = vpnRunningState.combine(getReport()) { runningState, trackersBlocked ->
-        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked, deviceShieldOnboarding.hasOnboardingBeenShown())
+        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
     }
 
     fun pollDeviceShieldState() {

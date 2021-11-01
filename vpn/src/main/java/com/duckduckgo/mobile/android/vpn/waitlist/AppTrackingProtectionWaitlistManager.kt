@@ -17,23 +17,29 @@
 package com.duckduckgo.mobile.android.vpn.waitlist
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface TrackingProtectionWaitlistManager {
     fun waitlistState(): WaitlistState
     suspend fun fetchInviteCode(): FetchCodeResult
-    fun isFeatureEnabled(): Boolean
+    fun didJoinBeta(): Boolean
     fun notifyOnJoinedWaitlist()
     fun joinWaitlist(timestamp: Int, token: String)
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
-class AppTrackingProtectionWaitlistManager(
+@Singleton
+@ContributesBinding(AppObjectGraph::class)
+class AppTrackingProtectionWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
     private val dispatcherProvider: DispatcherProvider
@@ -43,7 +49,7 @@ class AppTrackingProtectionWaitlistManager(
         if (dataStore.waitlistTimestamp != -1 && dataStore.inviteCode == null) {
             return WaitlistState.JoinedQueue(dataStore.sendNotification)
         }
-        if (isFeatureEnabled()) {
+        if (didJoinBeta()) {
             return WaitlistState.InBeta
         }
         return WaitlistState.NotJoinedQueue
@@ -52,7 +58,7 @@ class AppTrackingProtectionWaitlistManager(
     override suspend fun fetchInviteCode(): FetchCodeResult {
         val token = dataStore.waitlistToken
         val timestamp = dataStore.waitlistTimestamp
-        if (isFeatureEnabled()) return FetchCodeResult.CodeExisted
+        if (didJoinBeta()) return FetchCodeResult.CodeExisted
         return withContext(dispatcherProvider.io()) {
             try {
                 val waitlistTimestamp = service.waitlistStatus().timestamp
@@ -71,9 +77,7 @@ class AppTrackingProtectionWaitlistManager(
         }
     }
 
-    // We only do this until the Waitlist is enabled
-    override fun isFeatureEnabled(): Boolean = true
-    // override fun isFeatureEnabled(): Boolean = dataStore.inviteCode != null
+    override fun didJoinBeta(): Boolean = dataStore.inviteCode != null
 
     override fun notifyOnJoinedWaitlist() {
         dataStore.sendNotification = true

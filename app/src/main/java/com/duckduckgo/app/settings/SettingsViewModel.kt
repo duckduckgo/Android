@@ -67,8 +67,8 @@ class SettingsViewModel(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val waitlistManager: TrackingProtectionWaitlistManager,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val appTPWaitlistManager: TrackingProtectionWaitlistManager,
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel
@@ -84,16 +84,12 @@ class SettingsViewModel(
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(
-            ClearWhatOption.CLEAR_NONE,
-            ClearWhenOption.APP_EXIT_ONLY
-        ),
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
-        val appTrackingProtectionEnabled: Boolean = false,
-        val appTPOnboardingShown: Boolean = false
+        val appTrackingProtectionEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -147,21 +143,13 @@ class SettingsViewModel(
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                     version = obtainVersion(variant.key),
-                    automaticallyClearData = AutomaticallyClearData(
-                        automaticallyClearWhat,
-                        automaticallyClearWhen,
-                        automaticallyClearWhenEnabled
-                    ),
+                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksSettingType = getAppLinksSettingsState(
-                        settingsDataStore.appLinksEnabled,
-                        settingsDataStore.showAppLinksPrompt
-                    ),
+                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = waitlistManager.waitlistState(),
-                    appTPOnboardingShown = deviceShieldOnboarding.hasOnboardingBeenShown()
+                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
                 )
             )
 
@@ -249,8 +237,8 @@ class SettingsViewModel(
     }
 
     fun onAppTPSettingClicked() {
-        if (waitlistManager.isFeatureEnabled()) {
-            if (viewState.value.appTPOnboardingShown) {
+        if (appTPWaitlistManager.didJoinBeta()) {
+            if (deviceShieldOnboardingStore.didShowOnboarding()) {
                 viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
             } else {
                 viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
@@ -434,7 +422,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val featureToggle: Provider<FeatureToggle>,
     private val pixel: Provider<Pixel>,
     private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>,
-    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>
+    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {

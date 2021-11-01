@@ -135,7 +135,6 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     }
 
     private fun close() {
-        setResult(RESULT_CANCELED)
         viewModel.onClose()
         finish()
     }
@@ -182,7 +181,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     private fun startVpn() {
         TrackerBlockingVpnService.startService(this)
         viewModel.onDeviceShieldEnabled()
-        setResult(RESULT_OK)
+        startActivity(DeviceShieldEnabledActivity.intent(this))
         finish()
     }
 

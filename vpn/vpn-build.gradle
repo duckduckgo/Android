@@ -65,7 +65,6 @@ android {
 
 ext {
     workManager = "2.5.0-beta01"
-    firebase = "26.0.0"
 }
 
 dependencies {
@@ -84,9 +83,6 @@ dependencies {
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
-
-    implementation platform("com.google.firebase:firebase-bom:$firebase")
-    implementation "com.google.firebase:firebase-crashlytics-ktx"
 
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtimeKtx

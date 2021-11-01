@@ -19,12 +19,10 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Thread.UncaughtExceptionHandler
@@ -40,20 +38,11 @@ class VpnUncaughtExceptionHandler(
         if (throwable is OutOfMemoryError) {
             Timber.e("Out of memory; triggering a VPN restart")
 
-            recordInFirebase(throwable)
             restartVpn()
 
         } else {
             Timber.e(throwable, "VPN uncaughtException")
             originalHandler?.uncaughtException(thread, throwable)
-        }
-    }
-
-    private fun recordInFirebase(throwable: Throwable) {
-        coroutineScope.launch(Dispatchers.IO) {
-            FirebaseCrashlytics.getInstance().run {
-                this.recordException(throwable)
-            }
         }
     }
 

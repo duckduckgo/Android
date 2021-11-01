@@ -37,8 +37,6 @@ import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
-import com.google.firebase.FirebaseApp
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
@@ -96,7 +94,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         if (appIsRestarting()) return
 
         configureDependencyInjection()
-        configureFirebaseExceptionHandling()
         configureUncaughtExceptionHandler(currentProcess)
         initializeDateLibrary()
 
@@ -119,12 +116,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
         }
-    }
-
-    // vtodo Temporary inclusion of Firebase while in internal testing
-    private fun configureFirebaseExceptionHandling() {
-        FirebaseApp.initializeApp(this)
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
     }
 
     private fun configureUncaughtExceptionHandler(currentProcess: DuckDuckGoProcess) {
