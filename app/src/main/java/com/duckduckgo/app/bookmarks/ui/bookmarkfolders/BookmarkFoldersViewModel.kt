@@ -23,7 +23,7 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedSetChecked
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -47,7 +47,7 @@ class BookmarkFoldersViewModel(
 
     sealed class Command {
         class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
-        object NewFolderCreatedSetChecked : BookmarkFoldersViewModel.Command()
+        object NewFolderCreatedUpdateTheStructure : BookmarkFoldersViewModel.Command()
     }
 
     private fun currentViewState() = viewState.value ?: ViewState()
@@ -94,7 +94,7 @@ class BookmarkFoldersViewModel(
         viewModelScope.launch(dispatcherProvider.io()) {
             bookmarksRepository.insert(bookmarkFolder)
         }
-        command.value = NewFolderCreatedSetChecked
+        command.value = NewFolderCreatedUpdateTheStructure
     }
 }
 

@@ -72,7 +72,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             {
                 when (it) {
                     is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
-                    is BookmarkFoldersViewModel.Command.NewFolderCreatedSetChecked -> setNewlyCreatedSelectedFolderResult()
+                    is BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure -> setNewlyCreatedSelectedFolderResult()
                 }
             }
         )
