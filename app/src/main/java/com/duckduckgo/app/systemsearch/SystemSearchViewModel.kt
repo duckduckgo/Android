@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
@@ -311,7 +312,7 @@ class SystemSearchViewModel(
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
     }
 
-    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String) {
+    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
         throw IllegalArgumentException("Illegal SavedSite to edit received")
     }
 

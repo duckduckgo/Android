@@ -88,7 +88,7 @@ class BookmarksViewModel(
         }
     }
 
-    override fun onSavedSiteBookmarkEdited(bookmark: Bookmark, parentFolderName: String) {
+    override fun onSavedSiteBookmarkEdited(bookmark: Bookmark, bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
             editBookmark(bookmark)
         }

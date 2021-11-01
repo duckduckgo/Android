@@ -38,6 +38,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
@@ -554,14 +555,15 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkEditedThenRepositoryIsUpdated() = coroutineRule.runBlocking {
         val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
-        testee.onSavedSiteEdited(bookmark)
+        val bookmarkFolder = BookmarkFolder(id = 0, name = "Bookmark Folder Name", parentId = 0)
+        testee.onSavedSiteBookmarkEdited(bookmark, bookmarkFolder)
         verify(mockBookmarksRepository).update(bookmark)
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
         val favorite = Favorite(0, "A title", "www.example.com", 1)
-        testee.onSavedSiteEdited(favorite)
+        testee.onSavedSiteFavoriteEdited(favorite)
         verify(mockFavoritesRepository).update(favorite)
     }
 

@@ -72,7 +72,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             {
                 when (it) {
                     is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
-                    is BookmarkFoldersViewModel.Command.NewFolderCreatedSetChecked -> setNewlyCreatedSelectedFolderResult(it.newCreatedFolder)
+                    is BookmarkFoldersViewModel.Command.NewFolderCreatedSetChecked -> setNewlyCreatedSelectedFolderResult()
                 }
             }
         )
@@ -108,11 +108,9 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setNewlyCreatedSelectedFolderResult(bookmarkFolder: BookmarkFolder) {
-        viewModel.fetchBookmarkFolders(
-            selectedFolderId = bookmarkFolder.id,
-            rootFolderName = getString(R.string.bookmarksSectionTitle),
-            currentFolder = viewModel.getCurrentFolder()
+    private fun setNewlyCreatedSelectedFolderResult() {
+        viewModel.newFolderAdded(
+            rootFolderName = getString(R.string.bookmarksSectionTitle)
         )
     }
 

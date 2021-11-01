@@ -997,7 +997,7 @@ class BrowserTabViewModel(
         return if (bookmark == null) null
         else {
             withContext(dispatchers.io()) {
-                bookmarksRepository.getBookmarkFolderById(bookmark.parentId)
+                bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
             }
         }
     }
@@ -1573,9 +1573,9 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String) {
+    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatchers.io()) {
-            editBookmark(bookmark, parentFolderName)
+            editBookmark(bookmark, bookmarkFolder)
         }
     }
 
@@ -1587,24 +1587,16 @@ class BrowserTabViewModel(
         command.value = DeleteSavedSiteConfirmation(savedSite)
     }
 
-    private suspend fun editBookmark(bookmark: SavedSite.Bookmark, parentFolderName: String) {
+    private suspend fun editBookmark(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
-            bookmarksRepository.update(
-                BookmarkFolder(
-                    name = parentFolderName,
-                    parentId = bookmark.parentId
-                )
-            )
+//            bookmarksRepository.update(bookmarkFolder)
         }
         updateBookmarkAndFavoriteState(bookmark.url)
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(
                 bookmark,
-                BookmarkFolder(
-                    name = parentFolderName,
-                    parentId = bookmark.parentId
-                )
+                bookmarkFolder
             )
         }
     }

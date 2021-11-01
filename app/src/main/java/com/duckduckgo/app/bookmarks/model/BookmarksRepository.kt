@@ -34,7 +34,7 @@ interface BookmarksRepository {
     suspend fun delete(bookmark: Bookmark)
     fun getBookmarkFoldersByParentId(parentId: Long): List<BookmarkFolder>
     fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity>
-    suspend fun getBookmarkFolderById(parentId: Long): BookmarkFolder?
+    suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder?
     suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
@@ -83,7 +83,7 @@ class BookmarksDataRepository(
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
     }
 
-    override suspend fun getBookmarkFolderById(parentId: Long): BookmarkFolder? {
+    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder? {
         return bookmarkFoldersDao.getBookmarkFolders().firstOrNull()?.find { it.id == parentId }
     }
 

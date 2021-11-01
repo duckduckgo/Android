@@ -31,7 +31,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite)
-        fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, parentFolderName: String)
+        fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder)
     }
 
     var listener: EditSavedSiteListener? = null
@@ -74,7 +74,10 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 val parentFolderName = binding.savedSiteLocation.text.toString()
                 listener?.onSavedSiteBookmarkEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
-                    parentFolderName
+                    BookmarkFolder(
+                        name = parentFolderName,
+                        parentId = parentId
+                    )
                 )
             }
             is SavedSite.Favorite -> {
