@@ -170,6 +170,13 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", -1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        assertTrue(value is HomePanelCta.Survey)
+    }
+
+    @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUsThenCtaIsSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
@@ -177,9 +184,23 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUkThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.UK)
+        assertTrue(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsCanadaThenCtaIsSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
+        assertTrue(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsCanadaOrUkThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.FRANCE)
         assertFalse(value is HomePanelCta.Survey)
     }
 

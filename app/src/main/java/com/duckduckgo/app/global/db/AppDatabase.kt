@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 39,
+    exportSchema = true, version = 40,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -452,6 +452,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_39_TO_40: Migration = object : Migration(39, 40) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM survey")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -512,7 +518,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_35_TO_36,
             MIGRATION_36_TO_37,
             MIGRATION_37_TO_38,
-            MIGRATION_38_TO_39
+            MIGRATION_38_TO_39,
+            MIGRATION_39_TO_40,
         )
 
     @Deprecated(

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.survey.api
 
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
@@ -31,8 +32,9 @@ import retrofit2.Response
 class SurveyDownloaderTest {
     private var mockDao: SurveyDao = mock()
     private var mockService: SurveyService = mock()
+    private var mockEmailManager: EmailManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao)
+    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager)
 
     @get:Rule
     @Suppress("unused")
@@ -81,23 +83,51 @@ class SurveyDownloaderTest {
         testee.download().blockingAwait()
     }
 
+    @Test
+    fun whenSurveyForEmailReceivedAndUserIsSignedInThenCreateSurveyWithCorrectCohort() {
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+        testee.download().blockingAwait()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL_WITH_COHORT, -1, SCHEDULED))
+    }
+
+    @Test
+    fun whenSurveyForEmailReceivedAndUserIsNotSignedInThenDoNotCreateSurvey() {
+        whenever(mockEmailManager.isSignedIn()).thenReturn(false)
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+        testee.download().blockingAwait()
+        verify(mockDao, never()).insert(any())
+    }
+
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0)
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0)
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, emptyList())
+        )
+        return SurveyGroup(id, surveyOptions)
+    }
+
+    private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
+        val surveyOptions = listOf(
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     companion object {
         const val SURVEY_URL = "https://survey.com"
+        const val SURVEY_URL_WITH_COHORT = "https://survey.com?cohort=cohort"
     }
 }
