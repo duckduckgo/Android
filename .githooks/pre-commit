@@ -1,3 +1,3 @@
 ./gradlew spotlessApply
-git add `git diff --name-only`
+git add `git diff --name-only --cached`
 exit 0
