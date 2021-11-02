@@ -45,7 +45,7 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Fireproof experiment
-            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
         )
 
@@ -173,9 +173,7 @@ class ExperimentationVariantManager(
     }
 }
 
-// Enable experiment for testing
-// fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
-fun VariantManager.isFireproofExperimentEnabled() = true
+fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
 /**
  * A variant which can be used for experimentation.
