@@ -83,8 +83,8 @@
     <string name="accessibilityActivityTitle">Accessibility</string>
     <string name="accessibilityFontSizeTitle">Text size</string>
     <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in DuckDuckGo will adjust to it.</string>
-    <string name="accessibilityForceZoomTitle">Zoom on all websites</string>
-    <string name="accessibilityForceZoomSubtitle">Overwrite website\'s own zoom setting</string>
+    <string name="accessibilityForceZoomTitle">Enforce manual page zoom</string>
+    <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
     <string name="accessibilityTextSizeOverrideTitle">Automatically scale text size</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Disable to manually adjust how website text scales in DuckDuckGo using the slider below</string>
 
