@@ -77,7 +77,7 @@ class FireproofWebsiteAdapter(
         return when (viewType) {
             DESCRIPTION_TYPE -> {
                 val binding = ViewFireproofWebsiteDescriptionBinding.inflate(inflater, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
+                FireproofWebSiteViewHolder.FireproofInfoViewHolder(binding, variantManager)
             }
             TOGGLE_TYPE -> {
                 val binding = ViewFireproofWebsiteToggleBinding.inflate(inflater, parent, false)
@@ -138,6 +138,7 @@ class FireproofWebsiteAdapter(
                     )
                 ]
             )
+            is FireproofWebSiteViewHolder.FireproofInfoViewHolder -> holder.bind()
         }
     }
 
@@ -179,6 +180,17 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             }
 
             binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
+        }
+    }
+
+    class FireproofInfoViewHolder(
+        private val binding: ViewFireproofWebsiteDescriptionBinding,
+        private val variantManager: VariantManager
+    ) : FireproofWebSiteViewHolder(binding.root) {
+        fun bind() {
+            if (variantManager.isFireproofExperimentEnabled()) {
+                binding.fireproofWebsiteDescription.text = binding.root.context.getString(R.string.daxFireproofSettingsInfo)
+            }
         }
     }
 
