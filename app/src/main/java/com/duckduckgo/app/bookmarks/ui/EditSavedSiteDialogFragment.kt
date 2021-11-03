@@ -90,20 +90,24 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     override fun configureClickListeners() {
         binding.savedSiteLocation.setOnClickListener {
-            context?.let { context ->
-                arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
-                    if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
-                        launcher.launch(
-                            BookmarkFoldersActivity.intent(
-                                context,
-                                it,
-                                arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
-                                showAddFolderMenu = true
-                            )
+            arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
+                if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
+                    launcher.launch(
+                        BookmarkFoldersActivity.intent(
+                            requireContext(),
+                            it,
+                            arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
+                            showAddFolderMenu = true
                         )
-                    } else {
-                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = true))
-                    }
+                    )
+                } else {
+                    launcher.launch(
+                        BookmarkFoldersActivity.intent(
+                            requireContext(),
+                            it,
+                            showAddFolderMenu = true
+                        )
+                    )
                 }
             }
         }
