@@ -51,9 +51,9 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         } catch (e: IOException) {
-            pixel.enqueueFire(DeviceShieldPixelNames.ENCRYPTED_IO_EXCEPTION)
+            pixel.enqueueFire(DeviceShieldPixelNames.ATP_ENCRYPTED_IO_EXCEPTION)
         } catch (e: GeneralSecurityException) {
-            pixel.enqueueFire(DeviceShieldPixelNames.ENCRYPTED_GENERAL_EXCEPTION)
+            pixel.enqueueFire(DeviceShieldPixelNames.ATP_ENCRYPTED_GENERAL_EXCEPTION)
         }
         return null
     }

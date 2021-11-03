@@ -276,88 +276,88 @@ class RealDeviceShieldPixels @Inject constructor(
         get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
 
     override fun deviceShieldInstalled() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.DS_INSTALLED_UNIQUE)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_INSTALLED_UNIQUE)
     }
 
     override fun deviceShieldEnabledOnSearch() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_UPON_SEARCH_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
     }
 
     override fun deviceShieldDisabledOnSearch() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_UPON_SEARCH_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY)
     }
 
     override fun deviceShieldEnabledOnAppLaunch() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_UPON_APP_LAUNCH_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_ENABLE_UPON_APP_LAUNCH)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH)
     }
 
     override fun deviceShieldDisabledOnAppLaunch() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_UPON_APP_LAUNCH_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_DISABLE_UPON_APP_LAUNCH)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_APP_LAUNCH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DISABLE_UPON_APP_LAUNCH)
     }
 
     override fun reportEnabled() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.DS_ENABLE_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_ENABLE_DAILY)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_ENABLE_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_DAILY)
     }
 
     override fun reportDisabled() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_DISABLE_DAILY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_DAILY)
     }
 
     override fun reportLastDayEnableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_LAST_DAY_ENABLE_COUNT_DAILY, mapOf("count" to count.toString()))
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_ENABLE_COUNT_DAILY, mapOf("count" to count.toString()))
     }
 
     override fun reportLastDayDisableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_LAST_DAY_DISABLE_COUNT_DAILY, mapOf("count" to count.toString()))
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_DISABLE_COUNT_DAILY, mapOf("count" to count.toString()))
     }
 
     override fun enableFromReminderNotification() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_UNIQUE,
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION)
     }
 
     override fun enableFromOnboarding() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_UNIQUE,
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
     }
 
     override fun enableFromQuickSettingsTile() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_UNIQUE,
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
     }
 
     override fun enableFromSummaryTrackerActivity() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE,
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
-        firePixel(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
     }
 
     override fun disableFromQuickSettingsTile() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE_DAILY)
-        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_FROM_SETTINGS_TILE_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DISABLE_FROM_SETTINGS_TILE)
     }
 
     override fun disableFromSummaryTrackerActivity() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
-        firePixel(DeviceShieldPixelNames.DISABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DISABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
     }
 
     override fun didShowDailyNotification(variant: Int) {
@@ -423,90 +423,92 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun startError() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_START_ERROR_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_START_ERROR)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_START_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_START_ERROR)
     }
 
     override fun automaticRestart() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_AUTOMATIC_RESTART_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_AUTOMATIC_RESTART)
     }
 
     override fun suddenKillBySystem() {
         suddenKill()
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_KILLED_BY_SYSTEM_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_KILLED_BY_SYSTEM)
     }
 
     override fun suddenKillByVpnRevoked() {
         suddenKill()
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED)
     }
 
     override fun trackerBlocked() {
-        firePixel(DeviceShieldPixelNames.DS_TRACKER_BLOCKED)
+        firePixel(DeviceShieldPixelNames.ATP_TRACKER_BLOCKED)
     }
 
     override fun privacyReportArticleDisplayed() {
-        firePixel(DeviceShieldPixelNames.DS_PRIVACY_REPORT_ARTICLE_SHOWED)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
     }
 
     override fun vpnTunInterfaceIsDown() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.DS_TUN_INTERFACE_DOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.DS_TUN_INTERFACE_DOWN)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN)
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_LOW_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_LOW, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_LOW_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_LOW, payload)
     }
 
     override fun vpnProcessExpendableModerate(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_MODERATE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_MODERATE, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_MODERATE_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_MODERATE, payload)
     }
 
     override fun vpnProcessExpendableComplete(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_COMPLETE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_EXPENDABLE_COMPLETE, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_COMPLETE_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_COMPLETE, payload)
     }
 
     override fun vpnMemoryRunningLow(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_LOW_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_LOW, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_LOW_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_LOW, payload)
     }
 
     override fun vpnMemoryRunningModerate(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_MODERATE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_MODERATE, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_MODERATE_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_MODERATE, payload)
     }
 
     override fun vpnMemoryRunningCritical(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.VPN_PROCESS_MEMORY_CRITICAL, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL, payload)
     }
 
     override fun disableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DISABLE_APP, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION, payload)
     }
 
     override fun disableAppProtectionReportingSkipped() {
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_DIALOG_REPORTING_SKIPPED)
+        firePixel(DeviceShieldPixelNames.ATP_APP_PROTECTION_DIALOG_REPORTING_SKIPPED)
     }
 
     override fun enableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.APP_EXCLUSION_ENABLE_APP_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_ENABLE_APP, payload)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP_DAILY, payload)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP, payload)
     }
 
     override fun restoreDefaultProtectionList() {
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_RESTORE_PROTECTION_LIST)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_RESTORE_APP_PROTECTION_LIST_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_RESTORE_APP_PROTECTION_LIST)
     }
 
     override fun launchAppTPFeedback() {
-        firePixel(DeviceShieldPixelNames.APP_EXCLUSION_LAUNCH_FEEDBACK)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK)
     }
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
@@ -514,38 +516,38 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didShowReportBreakageAppList() {
-        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_APP_LIST)
-        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY)
     }
 
     override fun didShowReportBreakageTextForm() {
-        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_TEXT_FORM)
-        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_TEXT_FORM_DAILY)
     }
 
     override fun didShowReportBreakageSingleChoiceForm() {
-        firePixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
-        tryToFireDailyPixel(DeviceShieldPixelNames.DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
     }
 
     override fun didShowDisableTrackingProtectionDialog() {
-        firePixel(DeviceShieldPixelNames.DID_SHOW_DISABLE_TRACKING_PROTECTION_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_DISABLE_TRACKING_PROTECTION_DIALOG)
     }
 
     override fun didChooseToDisableTrackingProtectionFromDialog() {
-        firePixel(DeviceShieldPixelNames.DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
     }
 
     override fun didChooseToDisableOneAppFromDialog() {
-        firePixel(DeviceShieldPixelNames.DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
     }
 
     override fun didChooseToCancelTrackingProtectionDialog() {
-        firePixel(DeviceShieldPixelNames.DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
     }
 
     private fun suddenKill() {
-        firePixel(DeviceShieldPixelNames.DS_KILLED)
+        firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
 
     private fun firePixel(p: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
