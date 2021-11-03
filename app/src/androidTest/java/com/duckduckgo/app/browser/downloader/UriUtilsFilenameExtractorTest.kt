@@ -71,7 +71,7 @@ class UriUtilsFilenameExtractorTest {
 
     @Test
     fun whenUrlContainsFilenameButContainsPathSegmentsWhichLookLikeAFilenameThenFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/images.com/b/b1/realFilename.jpg"
+        val url = "https://foo.example.com/path/images.example/b/b1/realFilename.jpg"
         val mimeType: String? = null
         val contentDisposition: String? = null
 
