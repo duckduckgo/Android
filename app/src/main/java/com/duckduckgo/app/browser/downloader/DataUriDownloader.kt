@@ -44,8 +44,17 @@ class DataUriDownloader @Inject constructor(
                 is ParseResult.ParsedDataUri -> {
                     val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
 
-                    writeBytesToFiles(parsedDataUri.data, file)
-                    callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
+                    runCatching {
+                        writeBytesToFiles(parsedDataUri.data, file)
+                    }
+                        .onSuccess {
+                            Timber.v("Succeeded to decode Base64")
+                            callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
+                        }
+                        .onFailure {
+                            Timber.e(it, "Failed to decode Base64")
+                            callback?.downloadFailed("Failed to download data uri", DownloadFailReason.DataUriParseException)
+                        }
                 }
             }
         } catch (e: IOException) {

@@ -2350,7 +2350,7 @@ class BrowserTabFragment :
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
-        Timber.i("Continuing to download $pendingFileDownload")
+        Timber.i("Continuing to download %s", pendingFileDownload)
         viewModel.download(pendingFileDownload)
     }
 

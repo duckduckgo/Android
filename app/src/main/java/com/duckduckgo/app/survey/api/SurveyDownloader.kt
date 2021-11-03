@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.survey.api
 
+import android.net.Uri
+import androidx.core.net.toUri
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -29,7 +32,8 @@ import javax.inject.Inject
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
-    private val surveyDao: SurveyDao
+    private val surveyDao: SurveyDao,
+    private val emailManager: EmailManager
 ) {
 
     fun download(): Completable {
@@ -62,11 +66,48 @@ class SurveyDownloader @Inject constructor(
             Timber.d("New survey received. Unused surveys cleared and new survey saved")
             surveyDao.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
+
             val newSurvey = when {
-                surveyOption != null -> Survey(surveyGroup.id, surveyOption.url, surveyOption.installationDay, SCHEDULED)
+                surveyOption != null ->
+                    when {
+                        canSurveyBeScheduled(surveyOption) -> Survey(surveyGroup.id, calculateUrlWithParameters(surveyOption), surveyOption.installationDay, SCHEDULED)
+                        else -> null
+                    }
                 else -> Survey(surveyGroup.id, null, null, NOT_ALLOCATED)
             }
-            surveyDao.insert(newSurvey)
+
+            newSurvey?.let {
+                surveyDao.insert(newSurvey)
+            }
+        }
+    }
+
+    private fun calculateUrlWithParameters(surveyOption: SurveyOption): String {
+        val uri = surveyOption.url.toUri()
+
+        val builder = Uri.Builder()
+            .authority(uri.authority)
+            .scheme(uri.scheme)
+            .path(uri.path)
+            .fragment(uri.fragment)
+
+        surveyOption.urlParameters?.map {
+            when {
+                (SurveyUrlParameter.EmailCohortParam.parameter == it) -> builder.appendQueryParameter(it, emailManager.getCohort())
+                else -> {
+                    // NO OP
+                }
+            }
+        }
+
+        return builder.build().toString()
+    }
+
+    private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
+        return if (surveyOption.isEmailSignedInRequired == true) {
+            emailManager.isSignedIn()
+        } else {
+            true
         }
     }
 
