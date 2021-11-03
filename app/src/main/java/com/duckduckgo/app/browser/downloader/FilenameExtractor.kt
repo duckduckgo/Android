@@ -52,8 +52,8 @@ class FilenameExtractor @Inject constructor(
         val latestGuess = guesses.latestGuess
         val bestGuess = guesses.bestGuess ?: ""
 
-        // if it contains a '.' then it's a good chance of a filetype and we can update our best guess
-        // (only if our best guess does not already contain a '.')
+        // if it contains a '.', and the best guess does not, then it's a good chance of a filetype
+        // and we can update our best guess
         if (latestGuess.contains(".") && !bestGuess.contains(".")) {
             guesses.bestGuess = latestGuess
         }
