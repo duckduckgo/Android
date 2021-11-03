@@ -123,14 +123,14 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(bookmark)
+        testee.onSavedSiteBookmarkEdited(bookmark, bookmarkFolder)
 
         verify(bookmarksRepository).update(bookmark)
     }
 
     @Test
     fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
-        testee.onSavedSiteEdited(favorite)
+        testee.onSavedSiteFavoriteEdited(favorite)
 
         verify(favoritesRepository).update(favorite)
     }

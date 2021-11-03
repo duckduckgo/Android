@@ -1590,7 +1590,6 @@ class BrowserTabViewModel(
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
-//            bookmarksRepository.update(bookmarkFolder)
         }
         updateBookmarkAndFavoriteState(bookmark.url)
         withContext(dispatchers.main()) {
