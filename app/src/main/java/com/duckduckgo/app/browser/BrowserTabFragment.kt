@@ -2260,11 +2260,13 @@ class BrowserTabFragment :
 
             daxCtaContainer.fireproofButtons.fireproofKeepMeSignedIn.setOnClickListener {
                 daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
                 viewModel.userSelectedFireproofSetting(true)
             }
 
             daxCtaContainer.fireproofButtons.fireproofBurnEverything.setOnClickListener {
                 daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
                 viewModel.userSelectedFireproofSetting(false)
             }
         }
