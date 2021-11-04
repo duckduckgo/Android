@@ -2166,7 +2166,6 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta.DaxFireproofCta -> showDaxFireproofCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
@@ -2195,15 +2194,11 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
-            viewModel.onCtaShown()
-        }
 
-        private fun showDaxFireproofCta(configuration: DaxBubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxCtaContainer)
-            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
-            configureFireproofButtons()
+            if (configuration is DaxBubbleCta.DaxFireproofCta) {
+                configureFireproofButtons()
+            }
+
             viewModel.onCtaShown()
         }
 
