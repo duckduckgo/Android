@@ -416,6 +416,8 @@ class BrowserTabViewModelTest {
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
+
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @ExperimentalCoroutinesApi

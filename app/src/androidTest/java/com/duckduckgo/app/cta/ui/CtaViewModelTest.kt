@@ -165,6 +165,8 @@ class CtaViewModelTest {
             variantManager = mockVariantManager,
             userEventsStore = mockUserEventsStore
         )
+
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @After
