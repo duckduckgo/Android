@@ -44,6 +44,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -475,12 +476,39 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenFireproofCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxFireproofCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndFireproofCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIREPROOF)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxEndCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
+
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
     @Test
