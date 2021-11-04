@@ -276,13 +276,13 @@ class CtaViewModel @Inject constructor(
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private suspend fun canShowDaxFireproofCta(): Boolean = daxOnboardingActive() &&
+    private suspend fun canShowDaxFireproofCta(): Boolean = variantManager.isFireproofExperimentEnabled() &&
+        daxOnboardingActive() &&
         !daxDialogEndShown() &&
         !daxDialogFireproofShown() &&
         daxDialogIntroShown() &&
         !settingsDataStore.hideTips &&
-        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null &&
-        variantManager.isFireproofExperimentEnabled()
+        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
