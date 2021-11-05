@@ -147,9 +147,26 @@
         android:textColor="@color/white"
         android:letterSpacing="0.0"
         app:cornerRadius="22dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/returningUserCta"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/returningUserCta"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:letterSpacing="0.0"
+        android:text="@string/returningUsersReturningUserButton"
+        android:textAllCaps="false"
+        android:textColor="@color/cornflowerBlue"
+        android:visibility="gone"
+        app:backgroundTint="@color/white"
+        app:cornerRadius="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/cardView"
+        app:layout_constraintStart_toStartOf="@id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/primaryCta" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

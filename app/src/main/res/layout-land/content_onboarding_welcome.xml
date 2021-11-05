@@ -61,10 +61,10 @@
         layout="@layout/include_dax_dialog_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="93dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintWidth_max="600dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
