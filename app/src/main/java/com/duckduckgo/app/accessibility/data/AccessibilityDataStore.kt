@@ -46,7 +46,13 @@ class AccessibilitySettingsSharedPreferences(
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override val fontSize: Float
-        get() = if (useSystemFontSize) systemFontSize else appFontSize
+        get() {
+            return if (useSystemFontSize) {
+                systemFontSize
+            } else {
+                if (appFontSize <= FONT_SIZE_DEFAULT) appFontSize else (appFontSize - (appFontSize - FONT_SIZE_DEFAULT) * SCALE_FACTOR)
+            }
+        }
 
     override val systemFontSize: Float
         get() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
@@ -90,6 +96,7 @@ class AccessibilitySettingsSharedPreferences(
         const val KEY_FORCE_ZOOM = "FORCE_ZOOM"
         const val KEY_FONT_SIZE = "FONT_SIZE"
         const val FONT_SIZE_DEFAULT = 100f
+        const val SCALE_FACTOR = 0.2f
     }
 }
 
