@@ -80,6 +80,48 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fireproofButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/hiddenTextCta"
+                app:layout_constraintTop_toBottomOf="@id/dialogTextCta"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fireproofKeepMeSignedIn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:backgroundTint="@color/cornflowerBlue"
+                    android:text="@string/daxFireproofKeepMeSignedInButton"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:letterSpacing="0.0"
+                    app:cornerRadius="22dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fireproofBurnEverything"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="24dp"
+                    app:backgroundTint="@color/cornflowerBlue"
+                    android:text="@string/daxFireproofBurnEverythingButton"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:letterSpacing="0.0"
+                    app:cornerRadius="22dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
