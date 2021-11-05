@@ -156,6 +156,8 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.google.android.material.snackbar.BaseTransientBottomBar
 
 class BrowserTabFragment :
     Fragment(),
@@ -1364,12 +1366,28 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        rootView.makeSnackbarWithNoBottomInset(
+        val snackbar = rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+        )
+
+        snackbar.setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-        }.show()
+        }
+
+        if (variantManager.isFireproofExperimentEnabled()) {
+            snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.FIREPROOF_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
+        }
+        snackbar.show()
     }
 
     private fun launchSharePageChooser(url: String) {
