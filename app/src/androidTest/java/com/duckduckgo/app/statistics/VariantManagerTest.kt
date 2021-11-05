@@ -65,7 +65,7 @@ class VariantManagerTest {
     @Test
     fun automaticFireproofingControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "mi" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
         assertEquals(0, variant.features.size)
     }
