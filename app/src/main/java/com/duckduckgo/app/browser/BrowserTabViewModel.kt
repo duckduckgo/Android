@@ -391,6 +391,7 @@ class BrowserTabViewModel(
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
+    private var accessibilityObserver: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -446,8 +447,6 @@ class BrowserTabViewModel(
             }
         }
     }
-
-    private var accessibilityObserver: Job? = null
 
     init {
         initializeViewStates()
