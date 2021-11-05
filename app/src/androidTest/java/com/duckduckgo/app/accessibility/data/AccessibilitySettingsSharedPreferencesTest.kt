@@ -109,18 +109,21 @@ class AccessibilitySettingsSharedPreferencesTest {
         var accessibilitySetting = AccessibilitySettings(true, 100f, false)
 
         testee.settingsFlow().test {
-            testee.useSystemFontSize = false
-            testee.appFontSize = 150f
-            testee.forceZoom = true
-            testee.useSystemFontSize = true
-
             assertEquals(accessibilitySetting, awaitItem())
+
+            testee.useSystemFontSize = false
             accessibilitySetting = accessibilitySetting.copy(useSystemFontSize = false)
             assertEquals(accessibilitySetting, awaitItem())
+
+            testee.appFontSize = 150f
             accessibilitySetting = accessibilitySetting.copy(fontSize = 140f)
             assertEquals(accessibilitySetting, awaitItem())
+
+            testee.forceZoom = true
             accessibilitySetting = accessibilitySetting.copy(forceZoom = true)
             assertEquals(accessibilitySetting, awaitItem())
+
+            testee.useSystemFontSize = true
             accessibilitySetting = accessibilitySetting.copy(useSystemFontSize = true, fontSize = 100f)
             assertEquals(accessibilitySetting, awaitItem())
 
