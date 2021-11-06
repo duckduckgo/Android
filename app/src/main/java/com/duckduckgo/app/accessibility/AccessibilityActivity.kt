@@ -78,9 +78,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
             }.launchIn(lifecycleScope)
     }
 
-    private fun renderFontSize(fontSize: Float, useSystemFontSize: Boolean) {
+    private fun renderFontSize(fontSize: Float, overrideSystemFontSize: Boolean) {
         Timber.i("AccessibilityActSettings: renderFontSize $fontSize")
-        val enableFontSizeSettings = !useSystemFontSize
 
         binding.accessibilitySlider.quietlySetValue(fontSize, fontSizeChangeListener)
         val newValue = fontSize / 100
@@ -89,8 +88,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         // Avoids scaling our Sample Text when overriding system font size
         binding.accessibilityHint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16 * newValue)
 
-        binding.fontSizeSettingsGroup.alpha = if (useSystemFontSize) 0.40f else 1.0f
-        binding.accessibilitySlider.isEnabled = !useSystemFontSize
+        binding.fontSizeSettingsGroup.alpha = if (overrideSystemFontSize) 1.0f else 0.40f
+        binding.accessibilitySlider.isEnabled = overrideSystemFontSize
     }
 
     private fun configureListener() {
