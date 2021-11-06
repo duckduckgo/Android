@@ -101,6 +101,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -360,7 +361,9 @@ class BrowserTabViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager,
+            userEventsStore = mockUserEventsStore
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -415,11 +418,14 @@ class BrowserTabViewModelTest {
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
-            accessibilitySettingsDataStore = accessibilitySettingsDataStore
+            accessibilitySettingsDataStore = accessibilitySettingsDataStore,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
+
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @ExperimentalCoroutinesApi
@@ -2320,10 +2326,34 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenLoginDetectedThenAskToFireproofWebsite() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
+
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
         }
+    }
+
+    @Test
+    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionEnabledThenFireproofWebsite() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+        whenever(mockSettingsStore.appLoginDetection).thenReturn(true)
+
+        loginEventLiveData.value = givenLoginDetected("example.com")
+
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        verify(fireproofDialogsEventHandler).onUserConfirmedFireproofDialog("example.com")
+    }
+
+    @Test
+    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionDisabledThenDoNothing() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+        whenever(mockSettingsStore.appLoginDetection).thenReturn(false)
+
+        loginEventLiveData.value = givenLoginDetected("example.com")
+
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        verify(fireproofDialogsEventHandler, never()).onUserConfirmedFireproofDialog("example.com")
     }
 
     @Test

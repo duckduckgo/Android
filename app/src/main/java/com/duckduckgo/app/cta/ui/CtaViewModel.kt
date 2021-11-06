@@ -24,6 +24,8 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
@@ -33,6 +35,8 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -61,7 +65,9 @@ class CtaViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val variantManager: VariantManager,
+    private val userEventsStore: UserEventsStore
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -163,6 +169,28 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun onUserClickFireproofExperimentButton(isAutoFireproofingEnabled: Boolean, cta: Cta) {
+
+        if (cta !is DaxBubbleCta.DaxFireproofCta) return
+
+        withContext(dispatchers.io()) {
+
+            if (isAutoFireproofingEnabled) {
+                cta.okPixel?.let {
+                    pixel.fire(it, cta.pixelOkParameters())
+                }
+            } else {
+                cta.cancelPixel?.let {
+                    pixel.fire(it, cta.pixelCancelParameters())
+                }
+            }
+
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+
+            completeStageIfDaxOnboardingCompleted()
+        }
+    }
+
     suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, favoritesOnboarding: Boolean = false, locale: Locale = Locale.getDefault()): Cta? {
         surveyCta(locale)?.let {
             return it
@@ -195,6 +223,9 @@ class CtaViewModel @Inject constructor(
         return when {
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+            }
+            canShowDaxFireproofCta() -> {
+                DaxBubbleCta.DaxFireproofCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -245,6 +276,15 @@ class CtaViewModel @Inject constructor(
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
+    private suspend fun canShowDaxFireproofCta(): Boolean = variantManager.isFireproofExperimentEnabled() &&
+        daxOnboardingActive() &&
+        !daxDialogEndShown() &&
+        !daxDialogFireproofShown() &&
+        daxDialogIntroShown() &&
+        !settingsDataStore.hideTips &&
+        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null
+
+    @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
         !daxDialogEndShown() &&
         daxDialogIntroShown() &&
@@ -293,6 +333,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
+
+    private fun daxDialogFireproofShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIREPROOF)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
