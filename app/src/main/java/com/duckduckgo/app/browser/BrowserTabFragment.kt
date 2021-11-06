@@ -1232,11 +1232,8 @@ class BrowserTabFragment :
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
                 Timber.i("Accessibility: Webview recreate")
-                if (!accessibilitySettingsDataStore.useSystemFontSize) {
-                    // defaultFontSize = (accessibilitySettingsDataStore.fontSize.toInt() * 16) / 100
+                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
-                    Timber.i("Accessibility: Webview Font zoom: ${this.textZoom}")
-                    Timber.i("Accessibility: Webview Font size: ${this.defaultFontSize}")
                 }
             }
 
@@ -2113,10 +2110,7 @@ class BrowserTabFragment :
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
                 Timber.i("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
-                // webView.settings.defaultFontSize = (viewState.fontSize.toInt() * 16) / 100
                 webView.settings.textZoom = viewState.fontSize.toInt()
-                Timber.i("Accessibility: Webview Font zoom: ${webView.settings.textZoom}")
-                Timber.i("Accessibility: Webview Font size: ${webView.settings.defaultFontSize}")
             }
 
             if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
