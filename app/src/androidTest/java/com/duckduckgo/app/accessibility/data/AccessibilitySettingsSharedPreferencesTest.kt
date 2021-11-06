@@ -49,14 +49,14 @@ class AccessibilitySettingsSharedPreferencesTest {
 
     @Test
     fun whenDefaultAccessibilitySettingsThenUseSystemFontSize() {
-        assertTrue(testee.useSystemFontSize)
+        assertFalse(testee.overrideSystemFontSize)
     }
 
     @Test
     fun whenAppFontSizeEnabledThenUseSystemFontSizeDisabled() {
-        testee.useSystemFontSize = false
+        testee.overrideSystemFontSize = false
 
-        assertFalse(testee.useSystemFontSize)
+        assertFalse(testee.overrideSystemFontSize)
     }
 
     @Test
@@ -73,13 +73,13 @@ class AccessibilitySettingsSharedPreferencesTest {
 
     @Test
     fun whenUsingSystemFontSizeThenFontSizeIsSystemFontSize() {
-        testee.useSystemFontSize = true
+        testee.overrideSystemFontSize = true
         assertEquals(testee.systemFontSize, testee.fontSize)
     }
 
     @Test
     fun whenUsingAppFontSizeThenFontSizeIsAppFontSize() {
-        testee.useSystemFontSize = false
+        testee.overrideSystemFontSize = false
         assertEquals(testee.appFontSize, testee.fontSize)
     }
 
@@ -91,7 +91,7 @@ class AccessibilitySettingsSharedPreferencesTest {
     @Test
     fun whenUsingAppFontSizeIfBiggerThanDefaultThenApplyScaleFactor() {
         testee.appFontSize = 150f
-        testee.useSystemFontSize = false
+        testee.overrideSystemFontSize = true
 
         assertEquals(140f, testee.fontSize)
     }
@@ -99,20 +99,20 @@ class AccessibilitySettingsSharedPreferencesTest {
     @Test
     fun whenUsingAppFontSizeIfLessOrEqualsThanDefaultThenDoNotScale() {
         testee.appFontSize = 100f
-        testee.useSystemFontSize = false
+        testee.overrideSystemFontSize = false
 
         assertEquals(100f, testee.fontSize)
     }
 
     @Test
     fun whenValuesChangedThenNewChangesEmitted() = coroutineRule.runBlocking {
-        var accessibilitySetting = AccessibilitySettings(true, 100f, false)
+        var accessibilitySetting = AccessibilitySettings(false, 100f, false)
 
         testee.settingsFlow().test {
             assertEquals(accessibilitySetting, awaitItem())
 
-            testee.useSystemFontSize = false
-            accessibilitySetting = accessibilitySetting.copy(useSystemFontSize = false)
+            testee.overrideSystemFontSize = true
+            accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = true)
             assertEquals(accessibilitySetting, awaitItem())
 
             testee.appFontSize = 150f
@@ -123,8 +123,8 @@ class AccessibilitySettingsSharedPreferencesTest {
             accessibilitySetting = accessibilitySetting.copy(forceZoom = true)
             assertEquals(accessibilitySetting, awaitItem())
 
-            testee.useSystemFontSize = true
-            accessibilitySetting = accessibilitySetting.copy(useSystemFontSize = true, fontSize = 100f)
+            testee.overrideSystemFontSize = false
+            accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = false, fontSize = 100f)
             assertEquals(accessibilitySetting, awaitItem())
 
             cancelAndConsumeRemainingEvents()

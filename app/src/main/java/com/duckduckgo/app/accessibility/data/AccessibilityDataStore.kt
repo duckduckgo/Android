@@ -27,7 +27,7 @@ import timber.log.Timber
 
 interface AccessibilitySettingsDataStore {
     val systemFontSize: Float
-    var useSystemFontSize: Boolean
+    var overrideSystemFontSize: Boolean
     val fontSize: Float
     var appFontSize: Float
     var forceZoom: Boolean
@@ -40,17 +40,17 @@ class AccessibilitySettingsSharedPreferences(
     private val appCoroutineScope: CoroutineScope
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(useSystemFontSize, fontSize, forceZoom))
+    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override val fontSize: Float
         get() {
-            return if (useSystemFontSize) {
-                systemFontSize
-            } else {
+            return if (overrideSystemFontSize) {
                 if (appFontSize <= FONT_SIZE_DEFAULT) appFontSize else (appFontSize - (appFontSize - FONT_SIZE_DEFAULT) * SCALE_FACTOR)
+            } else {
+                systemFontSize
             }
         }
 
@@ -71,10 +71,10 @@ class AccessibilitySettingsSharedPreferences(
             emitNewValues()
         }
 
-    override var useSystemFontSize: Boolean
-        get() = preferences.getBoolean(KEY_SYSTEM_FONT_SIZE, true)
+    override var overrideSystemFontSize: Boolean
+        get() = preferences.getBoolean(KEY_OVERRIDE_SYSTEM_FONT_SIZE, false)
         set(enabled) {
-            preferences.edit { putBoolean(KEY_SYSTEM_FONT_SIZE, enabled) }
+            preferences.edit { putBoolean(KEY_OVERRIDE_SYSTEM_FONT_SIZE, enabled) }
             emitNewValues()
         }
 
@@ -85,14 +85,14 @@ class AccessibilitySettingsSharedPreferences(
 
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            accessibilityStateFlow.emit(AccessibilitySettings(useSystemFontSize, fontSize, forceZoom))
-            Timber.i("AccessibilityActSettings: new value emitted ${AccessibilitySettings(useSystemFontSize, fontSize, forceZoom)}")
+            accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+            Timber.i("AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
         }
     }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.accessibility.settings"
-        const val KEY_SYSTEM_FONT_SIZE = "SYSTEM_FONT_SIZE"
+        const val KEY_OVERRIDE_SYSTEM_FONT_SIZE = "OVERRIDE_SYSTEM_FONT_SIZE"
         const val KEY_FORCE_ZOOM = "FORCE_ZOOM"
         const val KEY_FONT_SIZE = "FONT_SIZE"
         const val FONT_SIZE_DEFAULT = 100f
@@ -101,7 +101,7 @@ class AccessibilitySettingsSharedPreferences(
 }
 
 data class AccessibilitySettings(
-    val useSystemFontSize: Boolean,
+    val overrideSystemFontSize: Boolean,
     val fontSize: Float,
     val forceZoom: Boolean
 )

@@ -3625,7 +3625,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenFontSizeChangedThenEmitNewState() {
         accessibilitySettingsDataStore.appFontSize = 150f
-        accessibilitySettingsDataStore.useSystemFontSize = false
+        accessibilitySettingsDataStore.overrideSystemFontSize = false
 
         assertFalse(accessibilityViewState().refreshWebView)
         assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)

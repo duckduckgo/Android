@@ -34,31 +34,25 @@ class AccessibilitySettingsViewModel constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val useSystemFontSize: Boolean = false,
+        val overrideSystemFontSize: Boolean = false,
         val appFontSize: Float = 100f,
         val forceZoom: Boolean = false
     )
 
     private val viewState = MutableStateFlow(ViewState())
 
+    fun viewState(): StateFlow<ViewState> = viewState
+
     fun start() {
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    useSystemFontSize = accessibilitySettings.useSystemFontSize,
+                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom
                 )
             )
         }
-    }
-
-    fun viewState(): StateFlow<ViewState> {
-        return viewState
-    }
-
-    private fun currentViewState(): ViewState {
-        return viewState.value
     }
 
     fun onForceZoomChanged(checked: Boolean) {
@@ -75,11 +69,11 @@ class AccessibilitySettingsViewModel constructor(
 
     fun onSystemFontSizeChanged(checked: Boolean) {
         Timber.i("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
-        accessibilitySettings.useSystemFontSize = checked
+        accessibilitySettings.overrideSystemFontSize = checked
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    useSystemFontSize = accessibilitySettings.useSystemFontSize
+                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize
                 )
             )
         }
@@ -96,6 +90,8 @@ class AccessibilitySettingsViewModel constructor(
             )
         }
     }
+
+    private fun currentViewState() = viewState.value
 }
 
 @ContributesMultibinding(AppObjectGraph::class)

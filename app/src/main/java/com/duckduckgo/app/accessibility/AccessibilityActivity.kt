@@ -72,9 +72,9 @@ class AccessibilityActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 Timber.i("AccessibilityActSettings: newViewState $viewState")
-                renderFontSize(viewState.appFontSize, viewState.useSystemFontSize)
+                renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
-                binding.appFontSizeToggle.quietlySetIsChecked(viewState.useSystemFontSize, systemFontSizeChangeListener)
+                binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
             }.launchIn(lifecycleScope)
     }
 
