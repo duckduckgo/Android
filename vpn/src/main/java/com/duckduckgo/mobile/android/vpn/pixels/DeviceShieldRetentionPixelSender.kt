@@ -17,35 +17,23 @@
 package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
-import com.duckduckgo.app.statistics.api.StatisticsRequester
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-/**
- * This is a temporary implementation of the [StatisticsUpdater] that replaces the
- * real [StatisticsRequester].
- * Why?
- *  For AppTB F&F release we need to disable atb to avoid privacy issues with small cohorts
- *  In addition, we also need to send pixels instead of calling atb endpoints so that we can get
- *  some retention-like metrics.
- *
- *  THIS CLASS WILL BE REMOVED AFTER appTB F&F RELEASE
- */
-class VpnStatisticsRequester(
+@ContributesMultibinding(AppObjectGraph::class)
+class DeviceShieldRetentionPixelSender @Inject constructor(
     private val context: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
-) : StatisticsUpdater {
+    vpnDatabase: VpnDatabase
+) : RefreshRetentionAtbPlugin {
 
-    override fun initializeAtb() {
-        deviceShieldPixels.deviceShieldInstalled()
-        if (TrackerBlockingVpnService.isServiceRunning(context)) {
-            deviceShieldPixels.deviceShieldEnabledOnAppLaunch()
-        } else {
-            deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
-        }
-    }
+    private val serviceStateStatsDao = vpnDatabase.vpnServiceStateDao()
 
-    override fun refreshSearchRetentionAtb() {
+    override fun onSearchRetentionAtbRefreshed() {
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
             deviceShieldPixels.deviceShieldEnabledOnSearch()
         } else {
@@ -53,7 +41,15 @@ class VpnStatisticsRequester(
         }
     }
 
-    override fun refreshAppRetentionAtb() {
-        // noop
+    override fun onAppRetentionAtbRefreshed() {
+        if (TrackerBlockingVpnService.isServiceRunning(context)) {
+            deviceShieldPixels.deviceShieldEnabledOnAppLaunch()
+        } else {
+            if (serviceStateStatsDao.getEnableCount() == 0) {
+                deviceShieldPixels.deviceShieldNeverEnabledOnAppLaunch()
+            } else {
+                deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
+            }
+        }
     }
 }

@@ -27,21 +27,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
  * - _u -> when the pixel is a once-ever pixel
  * - _d -> when the pixel is a first-in-day pixel
  * - _c -> when the pixel is a every-occurrence pixel
- *
- * Give pixels readable names but try to abbreviate, eg:
- * - enable -> ena
- * - disable -> dis
- * - ...
- *
- * Good source to check for abbrev. is this website https://www.allacronyms.com/
  */
 enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelName {
-    ATP_INSTALLED_UNIQUE("m_atp_install_u"),
-
     ATP_ENABLE_UPON_SEARCH_DAILY("m_atp_ev_enabled_on_search_d"),
     ATP_DISABLE_UPON_SEARCH_DAILY("m_atp_ev_disabled_on_search_d"),
     ATP_ENABLE_UPON_APP_LAUNCH("m_atp_ev_enabled_on_launch_c"),
     ATP_ENABLE_UPON_APP_LAUNCH_DAILY("m_atp_ev_enabled_on_launch_d"),
+    ATP_NEVER_ENABLED_UPON_APP_LAUNCH("m_atp_ev_never-enabled_on_launch_c"),
+    ATP_NEVER_ENABLED_UPON_APP_LAUNCH_DAILY("m_atp_ev_never-enabled_on_launch_d"),
     ATP_DISABLE_UPON_APP_LAUNCH("m_atp_ev_disabled_on_launch_c"),
     ATP_DISABLE_UPON_APP_LAUNCH_DAILY("m_atp_ev_disabled_on_launch_d"),
     ATP_ENABLE_DAILY("m_atp_ev_enabled_d"),

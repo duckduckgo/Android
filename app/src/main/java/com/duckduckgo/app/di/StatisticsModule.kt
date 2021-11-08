@@ -32,8 +32,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.pixels.VpnStatisticsRequester
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -53,15 +51,14 @@ class StatisticsModule {
 
     @Provides
     fun statisticsUpdater(
-        context: Context,
-        deviceShieldPixels: DeviceShieldPixels,
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        plugins: Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>,
     ): StatisticsUpdater {
-        // vtodo -> temporary replacement of StatisticsUpdater for appTB F&F release
-        return VpnStatisticsRequester(context, deviceShieldPixels)
-//        return StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
+        return StatisticsRequester(
+            statisticsDataStore, statisticsService, variantManager, RefreshRetentionAtbPluginPoint(plugins)
+        )
     }
 
     @Provides

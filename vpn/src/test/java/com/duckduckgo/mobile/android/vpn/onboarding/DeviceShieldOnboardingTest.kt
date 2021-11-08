@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingImpl
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingPreferencesModule
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -48,8 +47,7 @@ class DeviceShieldOnboardingTest {
 
         whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences)
 
-        val preferences = DeviceShieldOnboardingPreferencesModule().provideDeviceShieldOnboardingPreferences(mockContext)
-        deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(preferences)
+        deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(mockContext)
     }
 
     @Test

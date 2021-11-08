@@ -44,20 +44,11 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenDeviceShieldInstalledIsCalledThenFireUniquePixel() {
-        deviceShieldPixels.deviceShieldInstalled()
-        deviceShieldPixels.deviceShieldInstalled()
-
-        verify(pixel).fire(DeviceShieldPixelNames.DS_INSTALLED_UNIQUE)
-        verifyNoMoreInteractions(pixel)
-    }
-
-    @Test
     fun whenDeviceShieldEnabledOnSearchThenFireDailyPixel() {
         deviceShieldPixels.deviceShieldEnabledOnSearch()
         deviceShieldPixels.deviceShieldEnabledOnSearch()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_ENABLE_UPON_SEARCH_DAILY.pixelName)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -66,7 +57,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldDisabledOnSearch()
         deviceShieldPixels.deviceShieldDisabledOnSearch()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_DISABLE_UPON_SEARCH_DAILY.pixelName)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -75,8 +66,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.reportEnabled()
         deviceShieldPixels.reportEnabled()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_ENABLE_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.DS_ENABLE_DAILY.pixelName)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_DAILY.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -85,7 +76,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.reportDisabled()
         deviceShieldPixels.reportDisabled()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_DISABLE_DAILY.pixelName)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_DAILY.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -94,9 +85,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromReminderNotification()
         deviceShieldPixels.enableFromReminderNotification()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_REMINDER_NOTIFICATION)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -105,9 +96,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromOnboarding()
         deviceShieldPixels.enableFromOnboarding()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_ONBOARDING)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -116,9 +107,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromQuickSettingsTile()
         deviceShieldPixels.enableFromQuickSettingsTile()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SETTINGS_TILE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -127,9 +118,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromSummaryTrackerActivity()
         deviceShieldPixels.enableFromSummaryTrackerActivity()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ENABLE_DS_FROM_SUMMARY_TRACKER_ACTIVITY)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -138,8 +129,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.disableFromQuickSettingsTile()
         deviceShieldPixels.disableFromQuickSettingsTile()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DISABLE_DS_FROM_SETTINGS_TILE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -261,8 +252,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.startError()
         deviceShieldPixels.startError()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_START_ERROR_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_START_ERROR)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_START_ERROR_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_START_ERROR)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -271,8 +262,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.automaticRestart()
         deviceShieldPixels.automaticRestart()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_AUTOMATIC_RESTART)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_AUTOMATIC_RESTART_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_AUTOMATIC_RESTART)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -281,9 +272,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.suddenKillBySystem()
         deviceShieldPixels.suddenKillBySystem()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_KILLED_BY_SYSTEM)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_KILLED)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_KILLED_BY_SYSTEM_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_KILLED_BY_SYSTEM)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_KILLED)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -292,9 +283,9 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.suddenKillByVpnRevoked()
         deviceShieldPixels.suddenKillByVpnRevoked()
 
-        verify(pixel).fire(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_KILLED_VPN_REVOKED)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_KILLED)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_KILLED)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -303,7 +294,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.trackerBlocked()
         deviceShieldPixels.trackerBlocked()
 
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_TRACKER_BLOCKED)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_TRACKER_BLOCKED)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -312,7 +303,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.privacyReportArticleDisplayed()
         deviceShieldPixels.privacyReportArticleDisplayed()
 
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.DS_PRIVACY_REPORT_ARTICLE_SHOWED)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
         verifyNoMoreInteractions(pixel)
     }
 

@@ -31,9 +31,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface DeviceShieldPixels {
-    /** This pixel is fired only once, no matter how many times we call this fun */
-    fun deviceShieldInstalled()
-
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun deviceShieldEnabledOnSearch()
 
@@ -46,6 +43,15 @@ interface DeviceShieldPixels {
      * count -> fire a pixel on every call
      */
     fun deviceShieldEnabledOnAppLaunch()
+
+    /**
+     * This fun will fire pixels when the app is launched and AppTP has never been enabled.
+     *
+     * The app will fire two types of pixels:
+     * - daily -> first-in-day pixel
+     * - count -> fired on every occurrence
+     */
+    fun deviceShieldNeverEnabledOnAppLaunch()
 
     /**
      * This fun will fire two pixels
@@ -275,10 +281,6 @@ class RealDeviceShieldPixels @Inject constructor(
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
 
-    override fun deviceShieldInstalled() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_INSTALLED_UNIQUE)
-    }
-
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
     }
@@ -290,6 +292,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun deviceShieldEnabledOnAppLaunch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH)
+    }
+
+    override fun deviceShieldNeverEnabledOnAppLaunch() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_NEVER_ENABLED_UPON_APP_LAUNCH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_NEVER_ENABLED_UPON_APP_LAUNCH)
     }
 
     override fun deviceShieldDisabledOnAppLaunch() {
