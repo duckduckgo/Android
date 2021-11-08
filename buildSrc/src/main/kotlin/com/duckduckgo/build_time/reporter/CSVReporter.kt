@@ -27,7 +27,6 @@ class CSVReporter(
     override fun report(input: BuildTimeReport) {
         saveBuildTime(input.buildDuration)
 
-        // call super to plot build time in console
         ConsoleReporter(ext).report(input)
     }
 
