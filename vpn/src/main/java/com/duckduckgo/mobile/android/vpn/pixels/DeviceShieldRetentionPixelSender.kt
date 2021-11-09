@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -28,10 +27,7 @@ import javax.inject.Inject
 class DeviceShieldRetentionPixelSender @Inject constructor(
     private val context: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
-    vpnDatabase: VpnDatabase
 ) : RefreshRetentionAtbPlugin {
-
-    private val serviceStateStatsDao = vpnDatabase.vpnServiceStateDao()
 
     override fun onSearchRetentionAtbRefreshed() {
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
@@ -45,11 +41,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
             deviceShieldPixels.deviceShieldEnabledOnAppLaunch()
         } else {
-            if (serviceStateStatsDao.getEnableCount() == 0) {
-                deviceShieldPixels.deviceShieldNeverEnabledOnAppLaunch()
-            } else {
-                deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
-            }
+            deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
         }
     }
 }

@@ -29,6 +29,7 @@ import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel

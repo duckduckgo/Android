@@ -129,8 +129,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.disableFromQuickSettingsTile()
         deviceShieldPixels.disableFromQuickSettingsTile()
 
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_FROM_SETTINGS_TILE_DAILY.pixelName)
+        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DISABLE_FROM_SETTINGS_TILE)
         verifyNoMoreInteractions(pixel)
     }
 

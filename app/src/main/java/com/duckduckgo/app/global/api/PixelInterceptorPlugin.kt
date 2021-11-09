@@ -17,23 +17,19 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import okhttp3.Interceptor
 import javax.inject.Singleton
-
-interface PixelInterceptorPlugin {
-    fun getInterceptor(): Interceptor
-}
 
 private class PixelInterceptorPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards PixelInterceptorPlugin>
 ) : PluginPoint<PixelInterceptorPlugin> {
     override fun getPlugins(): Collection<PixelInterceptorPlugin> {
-        return plugins
+        return plugins.sortedBy { it.javaClass.simpleName }
     }
 }
 

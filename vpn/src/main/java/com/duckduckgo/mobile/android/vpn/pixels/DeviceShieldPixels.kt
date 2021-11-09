@@ -45,15 +45,6 @@ interface DeviceShieldPixels {
     fun deviceShieldEnabledOnAppLaunch()
 
     /**
-     * This fun will fire pixels when the app is launched and AppTP has never been enabled.
-     *
-     * The app will fire two types of pixels:
-     * - daily -> first-in-day pixel
-     * - count -> fired on every occurrence
-     */
-    fun deviceShieldNeverEnabledOnAppLaunch()
-
-    /**
      * This fun will fire two pixels
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
@@ -292,11 +283,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun deviceShieldEnabledOnAppLaunch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_APP_LAUNCH)
-    }
-
-    override fun deviceShieldNeverEnabledOnAppLaunch() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_NEVER_ENABLED_UPON_APP_LAUNCH_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_NEVER_ENABLED_UPON_APP_LAUNCH)
     }
 
     override fun deviceShieldDisabledOnAppLaunch() {

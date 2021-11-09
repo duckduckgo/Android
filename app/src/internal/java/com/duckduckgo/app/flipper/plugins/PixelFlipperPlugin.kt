@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.flipper.plugins
 
-import com.duckduckgo.app.global.api.PixelInterceptorPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject

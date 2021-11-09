@@ -14,27 +14,36 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
+import okhttp3.Protocol
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppObjectGraph::class,
     boundType = PixelInterceptorPlugin::class
 )
-class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
+class CohortPixelInterceptor @Inject constructor(
+    private val cohortCalculator: CohortCalculator,
+    private val cohortStore: CohortStore,
+) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
+
         val url = if (pixel.startsWith(PIXEL_PREFIX)) {
-            chain.request().url.newBuilder().removeAllQueryParameters(AppUrl.ParamKey.ATB).removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION).build()
+            // IF there is no cohort for ATP we just drop the pixel request
+            // ELSE we add the cohort param
+            cohortStore.getCohortStoredLocalDate()?.let {
+                chain.request().url.newBuilder().addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(it)).build()
+            } ?: return dummyResponse(chain)
         } else {
             chain.request().url
         }
@@ -42,11 +51,24 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
         return chain.proceed(request.url(url).build())
     }
 
-    companion object {
-        private const val PIXEL_PREFIX = "m_atp_"
+    private fun dummyResponse(chain: Interceptor.Chain): Response {
+        Timber.v("Pixel URL request dropped: ${chain.request()}")
+
+        return Response.Builder()
+            .code(200)
+            .protocol(Protocol.HTTP_2)
+            .body("ATP pixel dropped".toResponseBody())
+            .message("Dropped ATP pixel because no cohort is assigned")
+            .request(chain.request())
+            .build()
     }
 
     override fun getInterceptor(): Interceptor {
         return this
+    }
+
+    companion object {
+        private const val COHORT_PARAM = "atp_cohort"
+        private const val PIXEL_PREFIX = "m_atp_"
     }
 }
