@@ -18,6 +18,7 @@ package com.duckduckgo.app.privacy.ui
 
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
@@ -25,6 +26,8 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.POOR
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,16 +48,20 @@ class PrivacyPracticesViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
+    private val tabRepository: TabRepository = mock()
+
     private lateinit var testee: PrivacyPracticesViewModel
 
     @Before
     fun before() {
-        testee = PrivacyPracticesViewModel()
+        testee = PrivacyPracticesViewModel(tabRepository)
     }
 
     @Test
     fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
-        testee.viewState().test {
+        whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+
+        testee.privacyPractices("1").test {
             val viewState = awaitItem()
             assertEquals("", viewState.domain)
             assertEquals(UNKNOWN, viewState.practices)
@@ -65,8 +72,12 @@ class PrivacyPracticesViewModelTest {
 
     @Test
     fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = coroutineTestRule.runBlocking {
-        testee.onSiteChanged(site(url = "http://example.com/path"))
-        testee.viewState().test {
+        val siteData = MutableLiveData<Site>()
+        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+
+        siteData.postValue(site(url = "http://example.com/path"))
+
+        testee.privacyPractices("1").test {
             assertEquals("example.com", awaitItem().domain)
         }
     }
@@ -74,9 +85,12 @@ class PrivacyPracticesViewModelTest {
     @Test
     fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() = coroutineTestRule.runBlocking {
         val privacyPractices = PrivacyPractices.Practices(0, POOR, listOf("good", "also good"), listOf("bad"))
+        val siteData = MutableLiveData<Site>()
+        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        testee.onSiteChanged(site(privacyPractices = privacyPractices))
-        testee.viewState().test {
+        siteData.postValue(site(privacyPractices = privacyPractices))
+
+        testee.privacyPractices("1").test {
             val viewState = awaitItem()
             assertEquals(POOR, viewState.practices)
             assertEquals(2, viewState.goodTerms.size)
