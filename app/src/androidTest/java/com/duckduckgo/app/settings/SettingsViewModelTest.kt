@@ -305,15 +305,36 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenAppLinksSwitchedOnThenDataStoreIsUpdated() {
+    fun whenAppLinksSetToAskEverytimeThenDataStoreIsUpdatedAndPixelIsSent() {
         testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
         verify(mockAppSettingsDataStore).appLinksEnabled = true
+        verify(mockAppSettingsDataStore).showAppLinksPrompt = true
+
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+        )
     }
 
     @Test
-    fun whenAppLinksSwitchedOffThenDataStoreIsUpdated() {
+    fun whenAppLinksSetToAlwaysThenDataStoreIsUpdatedAndPixelIsSent() {
+        testee.onAppLinksSettingChanged(AppLinkSettingType.ALWAYS)
+        verify(mockAppSettingsDataStore).appLinksEnabled = true
+        verify(mockAppSettingsDataStore).showAppLinksPrompt = false
+
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APP_LINKS_ALWAYS_SELECTED
+        )
+    }
+
+    @Test
+    fun whenAppLinksSetToNeverThenDataStoreIsUpdatedAndPixelIsSent() {
         testee.onAppLinksSettingChanged(AppLinkSettingType.NEVER)
         verify(mockAppSettingsDataStore).appLinksEnabled = false
+        verify(mockAppSettingsDataStore).showAppLinksPrompt = false
+
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
+        )
     }
 
     @Test
