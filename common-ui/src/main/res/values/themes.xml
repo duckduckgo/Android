@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="SplashScreen" parent="AppTheme.Light"/>
 
@@ -115,9 +115,10 @@
         <item name="quickAccessItemTitleTextColor">@color/white</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/whiteSemiTransparent</item>
+        <item name="android:textColorPrimary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
+        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
 
-        <item name="listItemTitleColor">@color/white</item>
-        <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="listItemBackgroundColor">@color/almostBlack</item>
         <item name="listItemSeparatorColor">@color/charcoalGrey</item>
         <item name="textInputOutlinedBoxColor">@color/grayish</item>
@@ -352,10 +353,10 @@
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
-        <item name="android:textColorSecondary">?attr/normalTextColor</item>
+        <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>

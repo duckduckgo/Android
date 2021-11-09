@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.survey.api
-
-data class SurveyGroup(val id: String, val surveyOptions: List<SurveyOption>) {
-
-    data class SurveyOption(
-        val url: String,
-        val installationDay: Int?,
-        val ratioOfUsersToShow: Double,
-        val isEmailSignedInRequired: Boolean?,
-        val urlParameters: List<String>?
-    )
+plugins {
+    `kotlin-dsl`
 }
 
-sealed class SurveyUrlParameter(val parameter: String) {
-    object EmailCohortParam : SurveyUrlParameter("cohort")
+repositories {
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    /* Depend on the android gradle plugin, since we want to access it in our plugin */
+    implementation("com.android.tools.build:gradle:4.1.3")
+
+    /* Depend on the default Gradle API's since we want to build a custom plugin */
+    implementation(gradleApi())
+    implementation(localGroovy())
 }
