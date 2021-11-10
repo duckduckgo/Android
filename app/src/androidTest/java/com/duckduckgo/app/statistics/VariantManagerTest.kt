@@ -60,4 +60,21 @@ class VariantManagerTest {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }
+
+    // AUTOMATIC FIREPROOFING EXPERIMENT
+    @Test
+    fun automaticFireproofingControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "mi" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun automaticFireproofingExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "mj" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(FireproofExperiment))
+    }
 }

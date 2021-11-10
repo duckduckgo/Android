@@ -156,6 +156,8 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.google.android.material.snackbar.BaseTransientBottomBar
 
 class BrowserTabFragment :
     Fragment(),
@@ -862,8 +864,18 @@ class BrowserTabFragment :
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
+                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                 openAppLink(appLink)
-            }
+            }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }
@@ -1364,12 +1376,28 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        rootView.makeSnackbarWithNoBottomInset(
+        val snackbar = rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+        )
+
+        snackbar.setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-        }.show()
+        }
+
+        if (variantManager.isFireproofExperimentEnabled()) {
+            snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.FIREPROOF_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
+        }
+        snackbar.show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -1839,6 +1867,7 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
             }
@@ -2194,6 +2223,11 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+
+            if (configuration is DaxBubbleCta.DaxFireproofCta) {
+                configureFireproofButtons()
+            }
+
             viewModel.onCtaShown()
         }
 
@@ -2243,6 +2277,22 @@ class BrowserTabFragment :
 
         private fun hideHomeCta() {
             ctaContainer.gone()
+        }
+
+        private fun configureFireproofButtons() {
+            daxCtaContainer.fireproofButtons.show()
+
+            daxCtaContainer.fireproofButtons.fireproofKeepMeSignedIn.setOnClickListener {
+                daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
+                viewModel.userSelectedFireproofSetting(true)
+            }
+
+            daxCtaContainer.fireproofButtons.fireproofBurnEverything.setOnClickListener {
+                daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
+                viewModel.userSelectedFireproofSetting(false)
+            }
         }
 
         fun renderHomeCta() {
@@ -2350,7 +2400,7 @@ class BrowserTabFragment :
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
-        Timber.i("Continuing to download $pendingFileDownload")
+        Timber.i("Continuing to download %s", pendingFileDownload)
         viewModel.download(pendingFileDownload)
     }
 
