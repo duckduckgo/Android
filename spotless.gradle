@@ -21,3 +21,16 @@ spotless {
         trimTrailingWhitespace()
     }
 }
+
+task createSpotlessPreCommitHook() {
+    def gitHooksDirectory = new File("$project.rootDir/.githooks/")
+    if (!gitHooksDirectory.exists()) gitHooksDirectory.mkdirs()
+    new File("$project.rootDir/.githooks", "pre-commit").text = """
+    #!/bin/bash
+    echo "Running spotless check"
+    ./gradlew spotlessApply
+    git add `git diff --name-only --cached`
+    exit 0
+"""
+    "chmod +x .githooks/pre-commit".execute()
+}
