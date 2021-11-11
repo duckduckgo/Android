@@ -38,9 +38,7 @@ abstract class HttpsDao {
     @Query("select * from https_exceptions where domain = :domain")
     abstract fun get(domain: String): HttpsExceptionEntity
 
-    @Query("select * from https_exceptions")
-    abstract fun getAll(): List<HttpsExceptionEntity>
+    @Query("select * from https_exceptions") abstract fun getAll(): List<HttpsExceptionEntity>
 
-    @Query("delete from https_exceptions")
-    abstract fun deleteAll()
+    @Query("delete from https_exceptions") abstract fun deleteAll()
 }

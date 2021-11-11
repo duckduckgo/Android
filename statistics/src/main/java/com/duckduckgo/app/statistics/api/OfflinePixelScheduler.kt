@@ -24,14 +24,13 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppObjectGraph::class)
-class OfflinePixelScheduler @Inject constructor(
-    private val workManager: WorkManager
-) : LifecycleObserver {
+class OfflinePixelScheduler @Inject constructor(private val workManager: WorkManager) :
+    LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleOfflinePixels() {
@@ -39,28 +38,27 @@ class OfflinePixelScheduler @Inject constructor(
         Timber.v("Scheduling offline pixels to be sent")
         workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        val constraints =
+            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-        val request = PeriodicWorkRequestBuilder<OfflinePixelWorker>(SERVICE_INTERVAL, SERVICE_TIME_UNIT)
-            .addTag(WORK_REQUEST_TAG)
-            .setConstraints(constraints)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_INTERVAL, BACKOFF_TIME_UNIT)
-            .build()
+        val request =
+            PeriodicWorkRequestBuilder<OfflinePixelWorker>(SERVICE_INTERVAL, SERVICE_TIME_UNIT)
+                .addTag(WORK_REQUEST_TAG)
+                .setConstraints(constraints)
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_INTERVAL, BACKOFF_TIME_UNIT)
+                .build()
 
         workManager.enqueue(request)
     }
 
-    open class OfflinePixelWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    open class OfflinePixelWorker(val context: Context, params: WorkerParameters) :
+        CoroutineWorker(context, params) {
 
         lateinit var offlinePixelSender: OfflinePixelSender
 
         override suspend fun doWork(): Result {
             return try {
-                offlinePixelSender
-                    .sendOfflinePixels()
-                    .blockingAwait()
+                offlinePixelSender.sendOfflinePixels().blockingAwait()
                 Result.success()
             } catch (e: Exception) {
                 Result.failure()
@@ -78,9 +76,9 @@ class OfflinePixelScheduler @Inject constructor(
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
-class OfflinePixelWorkerInjectorPlugin @Inject constructor(
-    private val offlinePixelSender: OfflinePixelSender
-) : WorkerInjectorPlugin {
+class OfflinePixelWorkerInjectorPlugin
+@Inject
+constructor(private val offlinePixelSender: OfflinePixelSender) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is OfflinePixelScheduler.OfflinePixelWorker) {

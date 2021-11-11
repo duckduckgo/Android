@@ -27,7 +27,12 @@ import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealHttps @Inject constructor(private val httpsRepository: HttpsRepository, private val unprotectedTemporary: UnprotectedTemporary) : Https {
+class RealHttps
+@Inject
+constructor(
+    private val httpsRepository: HttpsRepository,
+    private val unprotectedTemporary: UnprotectedTemporary
+) : Https {
 
     override fun isAnException(url: String): Boolean {
         return unprotectedTemporary.isAnException(url) || matches(url)

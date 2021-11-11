@@ -19,11 +19,14 @@ import android.net.Uri
 import android.net.Uri.parse
 import com.duckduckgo.app.global.UrlScheme.Companion.http
 
-val IP_REGEX = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$")
+val IP_REGEX =
+    Regex(
+        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$")
 
 fun Uri.withScheme(): Uri {
     // Uri.parse function falsely parses IP:PORT string.
-    // For example if input is "255.255.255.255:9999", it falsely flags 255.255.255.255 as the scheme.
+    // For example if input is "255.255.255.255:9999", it falsely flags 255.255.255.255 as the
+    // scheme.
     // Therefore in the withScheme method, we need to parse it after manually inserting "http".
     if (scheme == null || scheme!!.matches(IP_REGEX)) {
         return parse("$http://${toString()}")
@@ -33,8 +36,8 @@ fun Uri.withScheme(): Uri {
 }
 
 /**
- * Tries to resolve a host (even if the scheme is missing), returning
- * a basic host without the "www" subdomain.
+ * Tries to resolve a host (even if the scheme is missing), returning a basic host without the "www"
+ * subdomain.
  */
 val Uri.baseHost: String?
     get() = withScheme().host?.removePrefix("www.")
@@ -77,9 +80,8 @@ val Uri.isMobileSite: Boolean
 fun Uri.toDesktopUri(): Uri {
     if (!isMobileSite) return this
 
-    val newUrl = MOBILE_URL_PREFIXES.fold(toString()) { url, prefix ->
-        url.replaceFirst(prefix, "")
-    }
+    val newUrl =
+        MOBILE_URL_PREFIXES.fold(toString()) { url, prefix -> url.replaceFirst(prefix, "") }
 
     return parse(newUrl)
 }
@@ -112,8 +114,4 @@ fun Uri.getValidUrl(): ValidUrl? {
     return ValidUrl(validBaseHost, validHost, path)
 }
 
-data class ValidUrl(
-    val baseHost: String,
-    val host: String,
-    val path: String?
-)
+data class ValidUrl(val baseHost: String, val host: String, val path: String?)

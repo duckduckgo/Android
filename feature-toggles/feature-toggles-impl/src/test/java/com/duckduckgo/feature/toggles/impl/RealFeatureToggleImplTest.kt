@@ -24,7 +24,8 @@ import org.junit.Test
 
 class RealFeatureToggleImplTest {
 
-    private val testee: RealFeatureToggleImpl = RealFeatureToggleImpl(FakeFeatureTogglePluginPoint())
+    private val testee: RealFeatureToggleImpl =
+        RealFeatureToggleImpl(FakeFeatureTogglePluginPoint())
 
     @Test
     fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {

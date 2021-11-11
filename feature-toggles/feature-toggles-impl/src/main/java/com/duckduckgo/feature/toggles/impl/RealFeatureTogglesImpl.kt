@@ -18,21 +18,25 @@ package com.duckduckgo.feature.toggles.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
-import com.duckduckgo.feature.toggles.api.FeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPluginPoint: PluginPoint<FeatureTogglesPlugin>) :
+class RealFeatureToggleImpl
+@Inject
+constructor(private val featureTogglesPluginPoint: PluginPoint<FeatureTogglesPlugin>) :
     FeatureToggle {
 
     override fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
         featureTogglesPluginPoint.getPlugins().forEach { plugin ->
-            plugin.isEnabled(featureName, defaultValue)?.let { return it }
+            plugin.isEnabled(featureName, defaultValue)?.let {
+                return it
+            }
         }
         return null
     }

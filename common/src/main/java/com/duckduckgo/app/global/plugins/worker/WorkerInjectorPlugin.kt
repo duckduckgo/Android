@@ -22,16 +22,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface WorkerInjectorPlugin {
-    /**
-     * @return whether the worker has been injected
-     */
+    /** @return whether the worker has been injected */
     fun inject(worker: ListenableWorker): Boolean
 }
 
 @Singleton
-class WorkerInjectorPluginPoint @Inject constructor(
-    private val injectorPlugins: Set<@JvmSuppressWildcards WorkerInjectorPlugin>
-) : PluginPoint<WorkerInjectorPlugin> {
+class WorkerInjectorPluginPoint
+@Inject
+constructor(private val injectorPlugins: Set<@JvmSuppressWildcards WorkerInjectorPlugin>) :
+    PluginPoint<WorkerInjectorPlugin> {
     override fun getPlugins(): List<WorkerInjectorPlugin> {
         return injectorPlugins.toList()
     }

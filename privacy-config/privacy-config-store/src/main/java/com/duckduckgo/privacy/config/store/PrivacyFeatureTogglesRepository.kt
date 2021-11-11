@@ -22,7 +22,9 @@ interface PrivacyFeatureTogglesRepository {
     fun insert(toggle: PrivacyFeatureToggles)
 }
 
-class RealPrivacyFeatureTogglesRepository(private val privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore) : PrivacyFeatureTogglesRepository {
+class RealPrivacyFeatureTogglesRepository(
+    private val privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
+) : PrivacyFeatureTogglesRepository {
 
     override fun deleteAll() {
         privacyFeatureTogglesDataStore.deleteAll()

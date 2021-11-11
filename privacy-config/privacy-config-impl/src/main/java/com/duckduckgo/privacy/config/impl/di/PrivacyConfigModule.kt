@@ -52,20 +52,20 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
+import javax.inject.Named
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 abstract class PrivacyFeaturesBindingModule {
 
     @Multibinds
-    abstract fun providePrivacyFeatureStorePlugins(): Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
-
+    abstract fun providePrivacyFeatureStorePlugins():
+        Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
 }
 
 @Module
@@ -76,18 +76,21 @@ class NetworkModule {
     @Singleton
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): PrivacyConfigService {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(AppUrl.Url.API)
-            .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
+        val retrofit =
+            Retrofit.Builder()
+                .baseUrl(AppUrl.Url.API)
+                .client(okHttpClient)
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .build()
 
         return retrofit.create(PrivacyConfigService::class.java)
     }
 
     @Provides
     @Singleton
-    fun providePrivacyFeaturePluginPoint(customConfigs: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
+    fun providePrivacyFeaturePluginPoint(
+        customConfigs: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
+    ): PluginPoint<PrivacyFeaturePlugin> {
         return PrivacyFeaturePluginPoint(customConfigs)
     }
 }
@@ -114,13 +117,21 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun providePTrackerAllowlistRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackerAllowlistRepository {
+    fun providePTrackerAllowlistRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): TrackerAllowlistRepository {
         return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
     @Provides
-    fun provideContentBlockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
+    fun provideContentBlockingRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): ContentBlockingRepository {
         return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
     }
 
@@ -138,25 +149,40 @@ class DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
+    fun provideGpcRepository(
+        gpcDataStore: GpcDataStore,
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): GpcRepository {
         return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
     @Provides
-    fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
+    fun provideHttpsRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): HttpsRepository {
         return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
     @Provides
-    fun provideUnprotectedTemporaryRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): UnprotectedTemporaryRepository {
+    fun provideUnprotectedTemporaryRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): UnprotectedTemporaryRepository {
         return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @Singleton
     @Provides
-    fun providePrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore): PrivacyFeatureTogglesRepository {
+    fun providePrivacyFeatureTogglesRepository(
+        privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
+    ): PrivacyFeatureTogglesRepository {
         return RealPrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore)
     }
 }

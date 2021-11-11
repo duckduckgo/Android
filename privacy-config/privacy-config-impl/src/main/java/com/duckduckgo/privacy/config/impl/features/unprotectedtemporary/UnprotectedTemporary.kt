@@ -29,13 +29,18 @@ interface UnprotectedTemporary {
 
 @ContributesBinding(AppObjectGraph::class)
 @Singleton
-class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
+class RealUnprotectedTemporary
+@Inject
+constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) :
+    UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return unprotectedTemporaryRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+        return unprotectedTemporaryRepository.exceptions.any {
+            UriString.sameOrSubdomain(url, it.domain)
+        }
     }
 }

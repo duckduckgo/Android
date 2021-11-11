@@ -23,13 +23,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
-) : ViewModelProvider.NewInstanceFactory() {
+class ViewModelFactory
+@Inject
+constructor(private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint) :
+    ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
-        return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }
-            .first()
+        return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }.first()
     }
 }

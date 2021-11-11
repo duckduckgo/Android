@@ -32,11 +32,7 @@ data class TrackerAllowlistEntity(
     val rules: List<AllowlistRuleEntity>
 )
 
-class AllowlistRuleEntity(
-    val rule: String,
-    val domains: List<String>,
-    val reason: String
-)
+class AllowlistRuleEntity(val rule: String, val domains: List<String>, val reason: String)
 
 class RuleTypeConverter {
 
@@ -52,51 +48,36 @@ class RuleTypeConverter {
 }
 
 @Entity(tableName = "unprotected_temporary")
-data class UnprotectedTemporaryEntity(
-    @PrimaryKey val domain: String,
-    val reason: String
-)
+data class UnprotectedTemporaryEntity(@PrimaryKey val domain: String, val reason: String)
 
 @Entity(tableName = "https_exceptions")
-data class HttpsExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String
-)
+data class HttpsExceptionEntity(@PrimaryKey val domain: String, val reason: String)
 
 fun HttpsExceptionEntity.toHttpsException(): HttpsException {
     return HttpsException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "gpc_exceptions")
-data class GpcExceptionEntity(
-    @PrimaryKey val domain: String
-)
+@Entity(tableName = "gpc_exceptions") data class GpcExceptionEntity(@PrimaryKey val domain: String)
 
 fun GpcExceptionEntity.toGpcException(): GpcException {
     return GpcException(domain = this.domain)
 }
 
 @Entity(tableName = "content_blocking_exceptions")
-data class ContentBlockingExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String
-)
+data class ContentBlockingExceptionEntity(@PrimaryKey val domain: String, val reason: String)
 
 fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
     return ContentBlockingException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "privacy_config")
-data class PrivacyConfig(
-    @PrimaryKey val id: Int = 1,
-    val version: Long,
-    val readme: String
-)
+data class PrivacyConfig(@PrimaryKey val id: Int = 1, val version: Long, val readme: String)
 
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
-        private val ruleListType = Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
+        private val ruleListType =
+            Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
         val ruleListAdapter: JsonAdapter<List<AllowlistRuleEntity>> = moshi.adapter(ruleListType)
     }
 }

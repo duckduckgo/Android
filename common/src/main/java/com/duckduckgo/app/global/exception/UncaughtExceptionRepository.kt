@@ -35,7 +35,10 @@ class UncaughtExceptionRepositoryDb(
 
     private var lastSeenException: Throwable? = null
 
-    override suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource) {
+    override suspend fun recordUncaughtException(
+        e: Throwable?,
+        exceptionSource: UncaughtExceptionSource
+    ) {
         return withContext(Dispatchers.IO) {
             if (e == lastSeenException) {
                 return@withContext
@@ -44,11 +47,11 @@ class UncaughtExceptionRepositoryDb(
             Timber.e(e, "Uncaught exception - $exceptionSource")
 
             val rootCause = rootExceptionFinder.findRootException(e)
-            val exceptionEntity = UncaughtExceptionEntity(
-                message = rootCause.extractExceptionCause(),
-                exceptionSource = exceptionSource,
-                version = deviceInfo.appVersion
-            )
+            val exceptionEntity =
+                UncaughtExceptionEntity(
+                    message = rootCause.extractExceptionCause(),
+                    exceptionSource = exceptionSource,
+                    version = deviceInfo.appVersion)
             uncaughtExceptionDao.add(exceptionEntity)
 
             lastSeenException = e
@@ -56,14 +59,10 @@ class UncaughtExceptionRepositoryDb(
     }
 
     override suspend fun getExceptions(): List<UncaughtExceptionEntity> {
-        return withContext(Dispatchers.IO) {
-            uncaughtExceptionDao.all()
-        }
+        return withContext(Dispatchers.IO) { uncaughtExceptionDao.all() }
     }
 
     override suspend fun deleteException(id: Long) {
-        return withContext(Dispatchers.IO) {
-            uncaughtExceptionDao.delete(id)
-        }
+        return withContext(Dispatchers.IO) { uncaughtExceptionDao.delete(id) }
     }
 }

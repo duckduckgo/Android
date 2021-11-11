@@ -26,9 +26,10 @@ interface ViewModelFactoryPlugin {
 }
 
 @Singleton
-class ViewModelFactoryPluginPoint @Inject constructor(
-    private val injectorPlugins: Set<@JvmSuppressWildcards ViewModelFactoryPlugin>
-) : PluginPoint<ViewModelFactoryPlugin> {
+class ViewModelFactoryPluginPoint
+@Inject
+constructor(private val injectorPlugins: Set<@JvmSuppressWildcards ViewModelFactoryPlugin>) :
+    PluginPoint<ViewModelFactoryPlugin> {
     override fun getPlugins(): List<ViewModelFactoryPlugin> {
         return injectorPlugins.toList()
     }

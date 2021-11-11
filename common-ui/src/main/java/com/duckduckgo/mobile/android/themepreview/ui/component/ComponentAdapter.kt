@@ -33,13 +33,14 @@ class ComponentAdapter() : ListAdapter<Component, ComponentViewHolder>(DIFF_CALL
     }
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Component>() {
-            override fun areItemsTheSame(oldItem: Component, newItem: Component): Boolean {
-                return oldItem == newItem
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<Component>() {
+                override fun areItemsTheSame(oldItem: Component, newItem: Component): Boolean {
+                    return oldItem == newItem
+                }
+                override fun areContentsTheSame(oldItem: Component, newItem: Component): Boolean {
+                    return oldItem == newItem
+                }
             }
-            override fun areContentsTheSame(oldItem: Component, newItem: Component): Boolean {
-                return oldItem == newItem
-            }
-        }
     }
 }

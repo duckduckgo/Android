@@ -37,7 +37,9 @@ interface PrivacyConfigPersister {
 @WorkerThread
 @Singleton
 @ContributesBinding(AppObjectGraph::class)
-class RealPrivacyConfigPersister @Inject constructor(
+class RealPrivacyConfigPersister
+@Inject
+constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
@@ -53,7 +55,9 @@ class RealPrivacyConfigPersister @Inject constructor(
         if (newVersion > previousVersion) {
             database.runInTransaction {
                 privacyFeatureTogglesRepository.deleteAll()
-                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
+                privacyConfigRepository.insert(
+                    PrivacyConfig(
+                        version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
@@ -65,5 +69,4 @@ class RealPrivacyConfigPersister @Inject constructor(
             }
         }
     }
-
 }

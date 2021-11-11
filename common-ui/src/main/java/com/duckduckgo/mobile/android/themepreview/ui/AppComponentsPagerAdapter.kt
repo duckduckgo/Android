@@ -28,13 +28,9 @@ import com.duckduckgo.mobile.android.themepreview.ui.component.system.ComponentS
 import com.duckduckgo.mobile.android.themepreview.ui.palette.ColorPaletteFragment
 import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragment
 
-/**
- * View pager to show all tabbed destinations - Instructions, Theme Summary and Components.
- */
-class AppComponentsPagerAdapter(
-    private val context: Context,
-    fragmentManager: FragmentManager
-) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+/** View pager to show all tabbed destinations - Instructions, Theme Summary and Components. */
+class AppComponentsPagerAdapter(private val context: Context, fragmentManager: FragmentManager) :
+    FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     enum class MainFragments(val titleRes: Int) {
         PALETTE(R.string.tab_title_color_palette),

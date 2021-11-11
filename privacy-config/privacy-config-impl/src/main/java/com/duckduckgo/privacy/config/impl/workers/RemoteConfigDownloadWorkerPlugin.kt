@@ -22,11 +22,13 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppObjectGraph::class)
-class RemoteConfigDownloadWorkerPlugin @Inject constructor(
+class RemoteConfigDownloadWorkerPlugin
+@Inject
+constructor(
     private val privacyConfigDownloader: PrivacyConfigDownloader,
     private val dispatcherProvider: DispatcherProvider
 ) : WorkerInjectorPlugin {

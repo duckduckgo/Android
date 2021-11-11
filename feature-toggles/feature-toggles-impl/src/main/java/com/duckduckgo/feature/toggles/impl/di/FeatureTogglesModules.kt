@@ -32,7 +32,6 @@ abstract class FeatureTogglesBindingModule {
 
     @Multibinds
     abstract fun provideFeatureTogglesPlugins(): Set<@JvmSuppressWildcards FeatureTogglesPlugin>
-
 }
 
 @Module
@@ -41,7 +40,9 @@ class FeatureTogglesModule {
 
     @Provides
     @Singleton
-    fun provideFeatureTogglesPluginPoint(toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
+    fun provideFeatureTogglesPluginPoint(
+        toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>
+    ): PluginPoint<FeatureTogglesPlugin> {
         return FeatureCustomConfigPluginPoint(toggles)
     }
 }

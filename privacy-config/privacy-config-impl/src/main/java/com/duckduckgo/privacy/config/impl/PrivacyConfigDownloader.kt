@@ -20,8 +20,8 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface PrivacyConfigDownloader {
     suspend fun download(): Boolean
@@ -29,17 +29,19 @@ interface PrivacyConfigDownloader {
 
 @WorkerThread
 @ContributesBinding(AppObjectGraph::class)
-class RealPrivacyConfigDownloader @Inject constructor(private val privacyConfigService: PrivacyConfigService, private val privacyConfigPersister: PrivacyConfigPersister) : PrivacyConfigDownloader {
+class RealPrivacyConfigDownloader
+@Inject
+constructor(
+    private val privacyConfigService: PrivacyConfigService,
+    private val privacyConfigPersister: PrivacyConfigPersister
+) : PrivacyConfigDownloader {
 
     override suspend fun download(): Boolean {
         Timber.d("Downloading privacy config")
-        val response = runCatching {
-            privacyConfigService.privacyConfig()
-        }.onSuccess {
-            privacyConfigPersister.persistPrivacyConfig(it)
-        }.onFailure {
-            Timber.w(it.localizedMessage)
-        }
+        val response =
+            runCatching { privacyConfigService.privacyConfig() }
+                .onSuccess { privacyConfigPersister.persistPrivacyConfig(it) }
+                .onFailure { Timber.w(it.localizedMessage) }
         return response.isSuccess
     }
 }
