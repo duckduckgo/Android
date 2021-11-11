@@ -22,6 +22,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.nhaarman.mockitokotlin2.*
 import okhttp3.ResponseBody
 import org.junit.Rule
@@ -33,8 +34,9 @@ class SurveyDownloaderTest {
     private var mockDao: SurveyDao = mock()
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()
+    private var mockAtpCohortManager: AtpCohortManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager)
+    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager)
 
     @get:Rule
     @Suppress("unused")
@@ -103,25 +105,41 @@ class SurveyDownloaderTest {
         verify(mockDao, never()).insert(any())
     }
 
+    @Test
+    fun whenSurveyForAtpReceivedThenCreateSurvey() {
+        whenever(mockAtpCohortManager.getCohort()).thenReturn("cohort")
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForAtp("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+        testee.download().blockingAwait()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL_WITH_ATP_COHORT, -1, SCHEDULED))
+    }
+
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
+        )
+        return SurveyGroup(id, surveyOptions)
+    }
+
+    private fun surveyWithAllocationForAtp(id: String): SurveyGroup {
+        val surveyOptions = listOf(
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -129,5 +147,6 @@ class SurveyDownloaderTest {
     companion object {
         const val SURVEY_URL = "https://survey.com"
         const val SURVEY_URL_WITH_COHORT = "https://survey.com?cohort=cohort"
+        const val SURVEY_URL_WITH_ATP_COHORT = "https://survey.com?atp_cohort=cohort"
     }
 }
