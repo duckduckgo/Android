@@ -2,15 +2,18 @@ apply plugin: 'com.diffplug.spotless'
 
 spotless {
     java {
-        target '**/*.java'
-        googleJavaFormat().aosp()
+        target 'src/*/java/**/*.java'
+        googleJavaFormat().reflowLongStrings().groupArtifact('com.google.googlejavaformat:google-java-format')
         removeUnusedImports()
         trimTrailingWhitespace()
         indentWithSpaces()
+        endWithNewline()
     }
     kotlin {
-        target '**/*.kt'
-        ktfmt().dropboxStyle()
+        ktfmt('0.29').dropboxStyle()
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
     }
     format 'xml', {
         target '**/*.xml'
