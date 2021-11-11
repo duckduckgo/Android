@@ -123,7 +123,8 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
             "ing.nl",
             "chase.com",
             "digid.nl",
-            "accounts.google.com"
+            "accounts.google.com",
+            "xfinity.com"
         )
 
         val sitesThatShouldUseDesktopAgent = listOf(
