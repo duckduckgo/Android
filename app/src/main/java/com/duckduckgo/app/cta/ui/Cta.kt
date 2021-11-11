@@ -249,6 +249,17 @@ sealed class DaxBubbleCta(
         appInstallStore
     )
 
+    class DaxFireproofCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+        CtaId.DAX_FIREPROOF,
+        R.string.daxFireproofCtaText,
+        AppPixelName.ONBOARDING_FIREPROOF_CTA_SHOWN,
+        AppPixelName.ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON,
+        AppPixelName.ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON,
+        Pixel.PixelValues.DAX_FIREPROOF_CTA,
+        onboardingStore,
+        appInstallStore
+    )
+
     class DaxEndCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_END,
         R.string.daxEndCtaText,

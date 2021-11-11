@@ -39,6 +39,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
+    ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
+    ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
+    ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
+
     PRIVACY_DASHBOARD_OPENED("mp"),
     PRIVACY_DASHBOARD_SCORECARD("mp_c"),
     PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
@@ -113,6 +117,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
     SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
     SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),
+    SETTINGS_APP_LINKS_PRESSED("ms_app_links_setting_pressed"),
+    SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED("ms_app_links_ask_every_time_setting_selected"),
+    SETTINGS_APP_LINKS_ALWAYS_SELECTED("ms_app_links_always_setting_selected"),
+    SETTINGS_APP_LINKS_NEVER_SELECTED("ms_app_links_never_setting_selected"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -152,6 +160,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK("mrp_f_d%d_n"),
     APP_FEEDBACK_DIALOG_USER_CANCELLED("mrp_f_d%d_c"),
 
+    APP_LINKS_SNACKBAR_SHOWN("m_app_links_snackbar_shown"),
+    APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED("m_app_links_snackbar_open_action_pressed"),
+
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
@@ -180,6 +191,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED("m_nav_dsd_p"),
     MENU_ACTION_REPORT_BROKEN_SITE_PRESSED("m_nav_rbs_p"),
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
+    MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
 
     COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
     COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
@@ -196,6 +208,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
+    FIREPROOF_SNACKBAR_SHOWN("m_fireproof_snackbar_shown"),
 
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),

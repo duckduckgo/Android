@@ -162,6 +162,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeAppLinkSetting() {
         viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
+        pixel.fire(SETTINGS_APP_LINKS_PRESSED)
     }
 
     fun onFireproofWebsitesClicked() {
@@ -207,21 +208,27 @@ class SettingsViewModel @Inject constructor(
     fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
         Timber.i("User changed app links setting, is now: ${appLinkSettingType.name}")
 
-        when (appLinkSettingType) {
-            AppLinkSettingType.ASK_EVERYTIME -> {
-                settingsDataStore.appLinksEnabled = true
-                settingsDataStore.showAppLinksPrompt = true
+        val pixelName =
+            when (appLinkSettingType) {
+                AppLinkSettingType.ASK_EVERYTIME -> {
+                    settingsDataStore.appLinksEnabled = true
+                    settingsDataStore.showAppLinksPrompt = true
+                    SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
+                }
+                AppLinkSettingType.ALWAYS -> {
+                    settingsDataStore.appLinksEnabled = true
+                    settingsDataStore.showAppLinksPrompt = false
+                    SETTINGS_APP_LINKS_ALWAYS_SELECTED
+                }
+                AppLinkSettingType.NEVER -> {
+                    settingsDataStore.appLinksEnabled = false
+                    settingsDataStore.showAppLinksPrompt = false
+                    SETTINGS_APP_LINKS_NEVER_SELECTED
+                }
             }
-            AppLinkSettingType.ALWAYS -> {
-                settingsDataStore.appLinksEnabled = true
-                settingsDataStore.showAppLinksPrompt = false
-            }
-            AppLinkSettingType.NEVER -> {
-                settingsDataStore.appLinksEnabled = false
-                settingsDataStore.showAppLinksPrompt = false
-            }
-        }
         viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
+
+        pixel.fire(pixelName)
     }
 
     private fun getAppLinksSettingsState(appLinksEnabled: Boolean, showAppLinksPrompt: Boolean): AppLinkSettingType {
