@@ -206,12 +206,15 @@ class BrowserWebViewClient(
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
                 withContext(Dispatchers.Main) {
                     loginDetector.onEvent(
-                        WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                        WebNavigationEvent.ShouldInterceptRequest(webView, request)
+                    )
                 }
                 Timber.v(
-                    "Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+                    "Intercepting resource ${request.url} type:${request.method} on page $documentUrl"
+                )
                 requestInterceptor.shouldIntercept(
-                    request, webView, documentUrl, webViewClientListener)
+                    request, webView, documentUrl, webViewClientListener
+                )
             } catch (e: Throwable) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
                 throw e
@@ -243,12 +246,14 @@ class BrowserWebViewClient(
             Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
             if (handler != null) {
                 Timber.v(
-                    "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+                    "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]"
+                )
                 if (handler.useHttpAuthUsernamePassword()) {
                     val credentials =
                         view?.let {
                             webViewHttpAuthStore.getHttpAuthUsernamePassword(
-                                it, host.orEmpty(), realm.orEmpty())
+                                it, host.orEmpty(), realm.orEmpty()
+                            )
                         }
 
                     if (credentials != null) {
@@ -275,7 +280,8 @@ class BrowserWebViewClient(
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
                 Timber.d(
-                    "The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                    "The certificate authority ${error.certificate.issuedBy.dName} is not trusted"
+                )
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
             else -> Timber.d("SSL error ${error.primaryError}")
@@ -303,7 +309,8 @@ class BrowserWebViewClient(
                     handler = handler,
                     host = host.orEmpty(),
                     realm = realm.orEmpty(),
-                    site = siteURL)
+                    site = siteURL
+                )
 
             it.requiresAuthentication(request)
         }
