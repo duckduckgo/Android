@@ -888,8 +888,18 @@ class BrowserTabFragment :
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
+                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                 openAppLink(appLink)
-            }
+            }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }
@@ -1887,6 +1897,7 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
             }

@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,20 +27,14 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyPracticesBinding
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var repository: TabRepository
 
     private val binding: ActivityPrivacyPracticesBinding by viewBinding()
 
@@ -62,16 +55,11 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         configureRecycler()
         setupClickListeners()
 
-        viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { viewState ->
-            render(viewState)
-        }.launchIn(lifecycleScope)
-
-        repository.retrieveSiteData(intent.tabId!!).observe(
-            this,
-            Observer<Site> {
-                viewModel.onSiteChanged(it)
-            }
-        )
+        lifecycleScope.launch {
+            viewModel.privacyPractices(intent.tabId!!)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { render(it) }
+        }
     }
 
     private fun configureRecycler() {
