@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -30,7 +30,7 @@ import dagger.multibindings.IntoMap
 
 @VpnScope
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = VpnObjectGraph::class
 )
 interface DeviceShieldFAQActivityComponent : AndroidInjector<DeviceShieldFAQActivity> {
     @Subcomponent.Factory

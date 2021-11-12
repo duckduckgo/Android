@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -33,7 +34,7 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (pixel.startsWith(PIXEL_PREFIX)) {
+        val url = if (pixel.startsWith(PIXEL_PREFIX) && !PIXEL_EXCEPTIONS.contains(pixel)) {
             chain.request().url.newBuilder().removeAllQueryParameters(AppUrl.ParamKey.ATB).removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION).build()
         } else {
             chain.request().url
@@ -44,6 +45,10 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
 
     companion object {
         private const val PIXEL_PREFIX = "m_atp_"
+        // pixel listed in exceptions are the ones sent before the user gets the chance to enable AppTP
+        private val PIXEL_EXCEPTIONS = listOf(
+            DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ.pixelName
+        )
     }
 
     override fun getInterceptor(): Interceptor {

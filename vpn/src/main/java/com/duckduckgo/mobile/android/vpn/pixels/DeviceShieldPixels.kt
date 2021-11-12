@@ -204,6 +204,11 @@ interface DeviceShieldPixels {
     /** Will fire a pixel on every call */
     fun privacyReportArticleDisplayed()
 
+    /**
+     * Will fire a pixel on every call
+     */
+    fun privacyReportOnboardingFAQDisplayed()
+
     fun vpnTunInterfaceIsDown()
 
     /** Will fire when the process has gone to the expendable list */
@@ -443,6 +448,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun privacyReportArticleDisplayed() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
+    }
+
+    override fun privacyReportOnboardingFAQDisplayed() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ)
     }
 
     override fun vpnTunInterfaceIsDown() {

@@ -100,6 +100,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE("m_atp_imp_article_c"),
 
+    ATP_DID_SHOW_ONBOARDING_FAQ("m_atp_imp_onboarding_faq_c"),
+
     ATP_TUN_INTERFACE_DOWN_DAILY("m_atp_ev_tun_down_d"),
     ATP_TUN_INTERFACE_DOWN("m_atp_ev_tun_down_c"),
 

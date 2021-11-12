@@ -21,14 +21,21 @@ import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import javax.inject.Inject
 
 class DeviceShieldFAQActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_device_shield_faq)
         setupToolbar(findViewById(R.id.default_toolbar))
+
+        deviceShieldPixels.privacyReportOnboardingFAQDisplayed()
     }
 
     override fun onSupportNavigateUp(): Boolean {
