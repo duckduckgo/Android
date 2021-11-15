@@ -82,75 +82,75 @@ class UriUtilsFilenameExtractorTest {
         assertEquals("realFilename.jpg", extractionResult.filename)
     }
 
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
-    fun whenUrlHasNoMimeOrContentDispositionAndEndsWithFilenameAndContainsPathSegmentsWhichLookLikeAFilenameThenFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/dotted.path/other/realFilename.jpg"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
-        assertEquals("realFilename.jpg", extractionResult.filename)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
-    fun whenUrlHasNoMimeOrContentDispositionAndEndsWithPathSegmentWhichLooksLikeAFilenameAndContainsFilenameThenFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/realFilename.jpg/other/dotted.path"
-        val mimeType: String? = null
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
-        assertEquals("realFilename.jpg", extractionResult.filename)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
-    fun whenUrlHasMimeAndEndsWithFilenameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/dotted.path/other/realFilename.jpg"
-        val mimeType: String? = "image/jpeg"
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
-        assertEquals("realFilename.jpg", extractionResult.filename)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
-    fun whenUrlHasMimeAndEndsWithPathSegmentWhichLooksLikeAFilenameThenModifiedFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/other/dotted.path"
-        val mimeType: String? = "image/jpeg"
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
-        assertEquals("dotted-path.jpg", extractionResult.filename)
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = 22)
-    fun whenUrlHasMimeAndEndsWithAmbiguousNameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
-        val url = "https://foo.example.com/path/dotted.path/other/realFilename"
-        val mimeType: String? = "image/jpeg"
-        val contentDisposition: String? = null
-
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
-
-        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
-        assertEquals("realFilename.jpg", extractionResult.filename)
-    }
+//    @Test
+//    @SdkSuppress(minSdkVersion = 22)
+//    fun whenUrlHasNoMimeOrContentDispositionAndEndsWithFilenameAndContainsPathSegmentsWhichLookLikeAFilenameThenFilenameShouldBeExtracted() {
+//        val url = "https://foo.example.com/path/dotted.path/other/realFilename.jpg"
+//        val mimeType: String? = null
+//        val contentDisposition: String? = null
+//
+//        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+//        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+//
+//        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+//        assertEquals("realFilename.jpg", extractionResult.filename)
+//    }
+//
+//    @Test
+//    @SdkSuppress(minSdkVersion = 22)
+//    fun whenUrlHasNoMimeOrContentDispositionAndEndsWithPathSegmentWhichLooksLikeAFilenameAndContainsFilenameThenFilenameShouldBeExtracted() {
+//        val url = "https://foo.example.com/path/realFilename.jpg/other/dotted.path"
+//        val mimeType: String? = null
+//        val contentDisposition: String? = null
+//
+//        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+//        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+//
+//        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+//        assertEquals("realFilename.jpg", extractionResult.filename)
+//    }
+//
+//    @Test
+//    @SdkSuppress(minSdkVersion = 22)
+//    fun whenUrlHasMimeAndEndsWithFilenameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
+//        val url = "https://foo.example.com/path/dotted.path/other/realFilename.jpg"
+//        val mimeType: String? = "image/jpeg"
+//        val contentDisposition: String? = null
+//
+//        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+//        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+//
+//        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+//        assertEquals("realFilename.jpg", extractionResult.filename)
+//    }
+//
+//    @Test
+//    @SdkSuppress(minSdkVersion = 22)
+//    fun whenUrlHasMimeAndEndsWithPathSegmentWhichLooksLikeAFilenameThenModifiedFilenameShouldBeExtracted() {
+//        val url = "https://foo.example.com/path/other/dotted.path"
+//        val mimeType: String? = "image/jpeg"
+//        val contentDisposition: String? = null
+//
+//        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+//        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+//
+//        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+//        assertEquals("dotted-path.jpg", extractionResult.filename)
+//    }
+//
+//    @Test
+//    @SdkSuppress(minSdkVersion = 22)
+//    fun whenUrlHasMimeAndEndsWithAmbiguousNameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
+//        val url = "https://foo.example.com/path/dotted.path/other/realFilename"
+//        val mimeType: String? = "image/jpeg"
+//        val contentDisposition: String? = null
+//
+//        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+//        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+//
+//        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+//        assertEquals("realFilename.jpg", extractionResult.filename)
+//    }
 
     @Test
     fun whenUrlContainsFilenameButContentDispositionSaysOtherwiseThenExtractFromContentDisposition() {
