@@ -274,7 +274,6 @@ class BrowserWebViewClientTest {
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         whenever(listener.handleAppLink(any(), any())).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
@@ -285,7 +284,6 @@ class BrowserWebViewClientTest {
     fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() = coroutinesTestRule.runBlocking {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         whenever(listener.handleAppLink(any(), any())).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
@@ -304,7 +302,6 @@ class BrowserWebViewClientTest {
     fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).handleNonHttpAppLink(urlType)
@@ -314,7 +311,6 @@ class BrowserWebViewClientTest {
     fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() = coroutinesTestRule.runBlocking {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
         verify(listener).handleNonHttpAppLink(urlType)
