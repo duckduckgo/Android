@@ -30,7 +30,7 @@ open class ConsoleReporter(
 
     override fun report(input: BuildTimeReport) {
         val filteredDurations = input.taskDurations.filter { it.second >= ext.minTaskDuration.get().seconds }
-        out.println("== Build time summary ==")
+        out.println("\n\n== Build time summary ==")
         out.println("Total build time ${input.buildDuration}s\n")
         if (filteredDurations.isEmpty()) {
             val extra = (ext as ExtensionAware).extensions.getByType(object : TypeOf<Map<String, Any>>() {})
