@@ -109,6 +109,7 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlHasMimeAndEndsWithFilenameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/dotted.path/other/realFilename.jpg"
         val mimeType: String? = "image/jpeg"
@@ -122,6 +123,7 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlHasMimeAndEndsWithPathSegmentWhichLooksLikeAFilenameThenModifiedFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/other/dotted.path"
         val mimeType: String? = "image/jpeg"
@@ -135,6 +137,7 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlHasMimeAndEndsWithAmbiguousNameAndContainsPathSegmentWhichLooksLikeAFilenameThenFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/dotted.path/other/realFilename"
         val mimeType: String? = "image/jpeg"
