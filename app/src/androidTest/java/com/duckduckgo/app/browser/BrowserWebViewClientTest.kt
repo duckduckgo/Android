@@ -271,14 +271,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldOverrideThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
-        val exception = RuntimeException()
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
-        testee.shouldOverrideUrlLoading(webView, "")
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
-    }
-
-    @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
@@ -325,15 +317,6 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.isRedirect).thenReturn(false)
         whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleNonHttpAppLink(urlType)
-    }
-
-    @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() = coroutinesTestRule.runBlocking {
-        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-        whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
-        assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
         verify(listener).handleNonHttpAppLink(urlType)
     }
 
