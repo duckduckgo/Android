@@ -50,10 +50,9 @@ class FilenameExtractor @Inject constructor(
 
     private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
         val latestGuess = guesses.latestGuess
-        val bestGuess = guesses.bestGuess
 
         // if it contains a '.' then it's a good chance of a filetype and we can update our best guess
-        if (latestGuess.contains(".") && bestGuess.isNullOrEmpty()) {
+        if (latestGuess.contains(".")) {
             guesses.bestGuess = latestGuess
         }
 
@@ -65,14 +64,6 @@ class FilenameExtractor @Inject constructor(
     private fun guessFilename(url: String, contentDisposition: String?, mimeType: String?): String {
         val tidiedUrl = url.removeSuffix("/")
         var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
-        val validFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, DEFAULT_MIME_TYPE)
-
-        // validates whether a '.' character is a file extension or just a '.' in the path. If it's
-        // a '.' in the path, it replaces the '.' and guesses again.
-        if (!validFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {
-            val validUrl = tidiedUrl + "/" + guessedFilename.replace(".", "-")
-            guessedFilename = URLUtil.guessFileName(validUrl, contentDisposition, mimeType)
-        }
 
         // we only want to keep the default .bin filetype on the guess if the URL actually has that too
         if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {
@@ -102,7 +93,6 @@ class FilenameExtractor @Inject constructor(
 
     companion object {
         private const val DEFAULT_FILE_TYPE = ".bin"
-        private const val DEFAULT_MIME_TYPE = "application/octet-stream"
     }
 
     sealed class GuessQuality {
