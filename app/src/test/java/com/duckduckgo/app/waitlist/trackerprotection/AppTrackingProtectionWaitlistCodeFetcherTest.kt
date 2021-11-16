@@ -33,11 +33,8 @@ import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
 class AppTrackingProtectionWaitlistCodeFetcherTest {
 
     @get:Rule
@@ -65,6 +62,7 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
     @Test
     fun whenFetchingInviteCodeAndCodeAlreadyExistedThenWorkIsCancelled() = coroutineRule.runBlocking {
         whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.CodeExisted)
+        whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
         testee.fetchInviteCode()
         verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
     }
@@ -73,6 +71,7 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
     fun whenCodeIsFetchedThenWorkIsCancelledAndNotificationIsSent() = coroutineRule.runBlocking {
         whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.Code)
         testee.fetchInviteCode()
+        whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
         verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
         verify(mockNotificationSender).sendNotification(any())
     }

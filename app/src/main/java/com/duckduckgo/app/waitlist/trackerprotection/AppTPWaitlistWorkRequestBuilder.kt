@@ -21,16 +21,27 @@ import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
+import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class AppTPWaitlistWorkRequestBuilder @Inject constructor() {
+interface AppTPWaitlistWorkRequestBuilder {
+    fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest
 
-    fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest {
+    companion object {
+        const val APP_TP_WAITLIST_SYNC_WORK_TAG = "AppTPWaitlistWorker"
+    }
+}
+
+@ContributesBinding(AppObjectGraph::class)
+class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistWorkRequestBuilder {
+
+    override fun waitlistRequestWork(withBigDelay: Boolean): OneTimeWorkRequest {
         val requestBuilder = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>()
             .setConstraints(networkAvailable())
             .addTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
@@ -45,10 +56,6 @@ class AppTPWaitlistWorkRequestBuilder @Inject constructor() {
     }
 
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-
-    companion object {
-        const val APP_TP_WAITLIST_SYNC_WORK_TAG = "AppTPWaitlistWorker"
-    }
 }
 
 class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {

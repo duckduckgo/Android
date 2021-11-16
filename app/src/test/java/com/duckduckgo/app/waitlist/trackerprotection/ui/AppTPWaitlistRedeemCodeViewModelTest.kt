@@ -18,7 +18,6 @@ package com.duckduckgo.app.waitlist.trackerprotection.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
@@ -46,7 +45,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
 
     @Before
     fun before() {
-        viewModel = AppTPWaitlistRedeemCodeViewModel(manager, DefaultDispatcherProvider())
+        viewModel = AppTPWaitlistRedeemCodeViewModel(manager, coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -55,7 +54,9 @@ class AppTPWaitlistRedeemCodeViewModelTest {
 
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
-            assertEquals(expectMostRecentItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeemed)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeemed)
         }
     }
 
@@ -64,7 +65,9 @@ class AppTPWaitlistRedeemCodeViewModelTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.InvalidCode)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
-            assertEquals(expectMostRecentItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
         }
     }
 
@@ -73,7 +76,9 @@ class AppTPWaitlistRedeemCodeViewModelTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.AlreadyRedeemed)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
-            assertEquals(expectMostRecentItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
         }
     }
 
@@ -82,7 +87,9 @@ class AppTPWaitlistRedeemCodeViewModelTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Failure)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
-            assertEquals(expectMostRecentItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.ErrorRedeeming)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.ErrorRedeeming)
         }
     }
 

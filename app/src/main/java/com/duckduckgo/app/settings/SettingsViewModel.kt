@@ -152,17 +152,23 @@ class SettingsViewModel(
                     appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
                 )
             )
+        }
+    }
 
-            viewModelScope.launch {
-                while (isActive) {
-                    val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
-                    if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
-                        viewState.value = currentViewState().copy(
-                            appTrackingProtectionEnabled = isDeviceShieldEnabled
-                        )
-                    }
-                    delay(1_000)
+    // FIXME
+    // We need to fix this. This logic as inside the start method but it messes with the unit tests
+    // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
+    // becomes a while(true) without any delay
+    fun startPollingAppTpEnableState() {
+        viewModelScope.launch {
+            while (isActive) {
+                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
+                    viewState.value = currentViewState().copy(
+                        appTrackingProtectionEnabled = isDeviceShieldEnabled
+                    )
                 }
+                delay(1_000)
             }
         }
     }

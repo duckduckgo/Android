@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
@@ -25,14 +25,14 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 
-@RunWith(AndroidJUnit4::class)
 class TrackerDetectorTest {
 
     private val mockEntityLookup: EntityLookup = mock()
@@ -41,6 +41,11 @@ class TrackerDetectorTest {
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
     private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+
+    @Before
+    fun setup() {
+        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
+    }
 
     @Test
     fun whenThereAreNoClientsThenClientCountIsZero() {

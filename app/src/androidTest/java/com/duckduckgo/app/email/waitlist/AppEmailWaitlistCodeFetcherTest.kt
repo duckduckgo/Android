@@ -112,7 +112,7 @@ class AppEmailWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = coroutineRule.runBlocking {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.NotJoinedQueue)
 
-        testee.fetchInviteCode()
+        (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }
@@ -121,7 +121,7 @@ class AppEmailWaitlistCodeFetcherTest {
     fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = coroutineRule.runBlocking {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
 
-        testee.fetchInviteCode()
+        (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
 
         verify(mockEmailManager, never()).fetchInviteCode()
     }

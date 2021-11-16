@@ -18,8 +18,8 @@ android {
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
-        minSdkVersion min_sdk
-        targetSdkVersion target_sdk
+        minSdk min_sdk
+        targetSdk target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -50,14 +50,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
     signingConfigs {
         release
     }
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -102,19 +100,12 @@ android {
     lintOptions {
         abortOnError false
     }
-     testOptions {
+    testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
         if (USE_ORCHESTRATOR) {
             execution 'ANDROID_TEST_ORCHESTRATOR'
         }
-    }
-
-    packagingOptions {
-        exclude "**/attach_hotspot_windows.dll"
-        exclude "META-INF/licenses/**"
-        exclude "META-INF/AL2.0"
-        exclude "META-INF/LGPL2.1"
     }
 
     def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
@@ -136,7 +127,6 @@ dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
     implementation project(path: ':app-store')
-
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
     implementation project(path: ':vpn-main')
@@ -153,7 +143,6 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
     androidTestImplementation(KotlinX.coroutines.test) {
@@ -207,9 +196,6 @@ dependencies {
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
@@ -225,44 +211,51 @@ dependencies {
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
     kapt "com.github.bumptech.glide:compiler:_"
 
+    // Lottie
+    implementation "com.airbnb.android:lottie:_"
+
+    // Security crypto
+    implementation AndroidX.security.crypto
+
     // Play Store referrer library
     playImplementation("com.android.installreferrer:installreferrer:_")
 
     // HTML
     implementation 'org.jsoup:jsoup:_'
 
-    // Security crypto
-    implementation AndroidX.security.crypto
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
     internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation Testing.mockito.android
+    androidTestImplementation Testing.mockito.kotlin
+    androidTestImplementation Square.okHttp3.mockWebServer
+    androidTestImplementation CashApp.turbine
+    androidTestImplementation AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation "androidx.test.ext:junit-ktx:_"
+    androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+
     testImplementation Testing.mockito.kotlin
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
-    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation "androidx.test:runner:_"
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation Testing.robolectric
-
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation Testing.mockito.android
-    androidTestImplementation Testing.mockito.kotlin
-    androidTestImplementation Square.okHttp3.mockWebServer
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-    androidTestImplementation 'app.cash.turbine:turbine:_'
-    androidTestImplementation AndroidX.test.orchestrator
-
-    androidTestImplementation "androidx.test.ext:junit:_"
-    androidTestImplementation "androidx.test.ext:junit-ktx:_"
-    androidTestImplementation "androidx.test.espresso:espresso-core:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')

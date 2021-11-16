@@ -17,13 +17,14 @@
 package com.duckduckgo.app.waitlist.trackerprotection.ui
 
 import android.app.Activity
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
+import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorker
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.*
@@ -47,7 +48,7 @@ class AppTPWaitlistViewModelTest {
     private val manager: TrackingProtectionWaitlistManager = mock()
     private var service: AppTrackingProtectionWaitlistService = mock()
     private var workManager: WorkManager = mock()
-    private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = AppTPWaitlistWorkRequestBuilder()
+    private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = mock()
 
     private lateinit var viewModel: AppTPWaitlistViewModel
 
@@ -65,11 +66,14 @@ class AppTPWaitlistViewModelTest {
         val success = WaitlistResponse("token", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
+        val expectedWorkRequest = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>().build()
+        whenever(waitlistBuilder.waitlistRequestWork(false)).thenReturn(expectedWorkRequest)
+
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
 
             verify(manager).joinWaitlist(any(), any())
-            verify(workManager).enqueue(any<WorkRequest>())
+            verify(workManager).enqueue(expectedWorkRequest)
 
             assert(expectItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
         }

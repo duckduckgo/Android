@@ -45,6 +45,6 @@ anvil {
     generateDaggerFactories = true // default is false
 }
 
-tasks.register('checks') {
-    dependsOn 'spotlessCheck', 'testDebugUnitTest'
-}
+//tasks.register('checks') {
+//    dependsOn 'spotlessCheck', 'testDebugUnitTest'
+//}

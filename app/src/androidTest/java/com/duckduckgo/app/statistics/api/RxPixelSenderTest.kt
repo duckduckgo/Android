@@ -27,6 +27,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -73,7 +74,12 @@ class RxPixelSenderTest {
             .build()
         pendingPixelDao = db.pixelDao()
 
-        testee = RxPixelSender(api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo, null)
+        testee = RxPixelSender(
+            api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo,
+            object : StatisticsLibraryConfig {
+                override fun shouldFirePixelsAsDev() = true
+            }
+        )
     }
 
     @After

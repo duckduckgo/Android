@@ -117,6 +117,7 @@ class SettingsActivity :
     override fun onStart() {
         super.onStart()
         viewModel.start()
+        viewModel.startPollingAppTpEnableState()
     }
 
     private fun configureUiEventHandlers() {
