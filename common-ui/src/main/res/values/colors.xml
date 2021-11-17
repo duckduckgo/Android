@@ -16,6 +16,10 @@
 
 <resources>
 
+    <!-- Colors common to old styles and new Design System  -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
     <!-- Dark theme primary colors -->
     <color name="darkThemePrimaryDark">@color/black</color>
     <color name="darkThemePrimary">@color/newBlack</color>
@@ -27,12 +31,11 @@
     <!-- Widget colors -->
     <color name="divider">@color/subtleGrayTwo</color>
     <color name="slightlyTransparentDivider">#1A000000</color>
-    <color name="webViewScrollbarTrackColor">#ff333333</color>ñ
+    <color name="webViewScrollbarTrackColor">#ff333333</color>
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
-    <!-- Universal -->
+    <!-- Legacy -->
     <color name="dimmed">#99000000</color>
-    <color name="white">#FFFFFF</color>
     <color name="whiteSemiTransparent">#d6ffffff</color>
     <color name="whiteTwo">#e4e4e4</color>
     <color name="whiteThree">#f5f5f5</color>
@@ -42,7 +45,6 @@
     <color name="midnight">#161616</color>
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
-    <color name="black">#000000</color>
     <color name="newBlack">#111111</color>
 
     <color name="charcoalGrey">#383838</color>

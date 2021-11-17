@@ -21,33 +21,40 @@
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textStyle">normal</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.0</item>
     </style>
 
     <!-- Migrate colors to ?attr/primaryTextColor once the migration is done -->
     <style name="TextAppearance.DuckDuckGo.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
         <item name="android:textSize">32sp</item>
-        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
-        <item name="android:textSize">20sp</item>
-        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="TextAppearance.DuckDuckGo.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textSize">16sp</item>
         <item name="android:lineSpacingExtra">5sp</item>
     </style>
 
-    <style name="TextAppearance.DuckDuckGo.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">3sp</item>
+    <style name="TextAppearance.DuckDuckGo.Headline5" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingExtra">5sp</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="TextAppearance.DuckDuckGo.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
-        <item name="android:textSize">13sp</item>
-        <item name="android:lineSpacingExtra">2sp</item>
+    <style name="TextAppearance.DuckDuckGo.Headline6" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Body1" parent="TextAppearance.MaterialComponents.Body1">
@@ -67,7 +74,8 @@
 
     <style name="TextAppearance.DuckDuckGo.Button2" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textSize">14sp</item>
-        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+        <item name="android:letterSpacing">0.8</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
