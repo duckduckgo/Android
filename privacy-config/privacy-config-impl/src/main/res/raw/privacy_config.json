@@ -302,6 +302,54 @@
           "reason": "Breaks images on deezer"
         }
       ]
+    },
+    "trackingLinks": {
+      "state": "enabled",
+      "exceptions": [],
+      "settings": {
+        "ampLinkFormats": [
+          "https?:\\/\\/(?:w{3}\\.)?google\\.\\w{2,}\\/amp\\/s\\/(\\S+)",
+          "https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)"
+        ],
+        "ampKeywords": [
+          "=amp",
+          "amp=",
+          "&amp",
+          "amp&",
+          "/amp",
+          "amp/",
+          ".amp",
+          "amp.",
+          "%amp",
+          "amp%",
+          "_amp",
+          "amp_",
+          "?amp"
+        ],
+        "trackingParameters": [
+          "utm_[a-zA-Z]*",
+          "gclid",
+          "fbclid",
+          "fb_action_ids",
+          "fb_action_types",
+          "fb_source",
+          "fb_ref",
+          "ga_source",
+          "ga_medium",
+          "ga_term",
+          "ga_content",
+          "ga_campaign",
+          "ga_place",
+          "action_object_map",
+          "action_type_map",
+          "action_ref_map",
+          "gs_l",
+          "mkt_tok",
+          "hmb_campaign",
+          "hmb_source",
+          "hmb_medium"
+        ]
+      }
     }
   },
   "version": 1634121326614,
