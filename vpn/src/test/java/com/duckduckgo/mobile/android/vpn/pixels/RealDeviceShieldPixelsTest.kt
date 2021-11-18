@@ -290,15 +290,6 @@ class RealDeviceShieldPixelsTest {
     }
 
     @Test
-    fun whenTrackersBlockedThenFireCountPixel() {
-        deviceShieldPixels.trackerBlocked()
-        deviceShieldPixels.trackerBlocked()
-
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_TRACKER_BLOCKED)
-        verifyNoMoreInteractions(pixel)
-    }
-
-    @Test
     fun whenPrivacyReportArticleDisplayedThenFireCountPixel() {
         deviceShieldPixels.privacyReportArticleDisplayed()
         deviceShieldPixels.privacyReportArticleDisplayed()

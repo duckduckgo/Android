@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ContentTypeExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
@@ -47,7 +46,6 @@ interface VpnTrackerDetector {
 }
 
 class DomainBasedTrackerDetector(
-    private val deviceShieldPixels: DeviceShieldPixels,
     private val hostnameExtractor: HostnameExtractor,
     private val appTrackerRepository: AppTrackerRepository,
     private val appTrackerRecorder: AppTrackerRecorder,
@@ -150,7 +148,6 @@ class DomainBasedTrackerDetector(
             tcb.ipAndPort
         )
         insertTracker(trackerType.tracker, requestingApp)
-        deviceShieldPixels.trackerBlocked()
     }
 
     private fun isTrackerInExceptionRules(tracker: RequestTrackerType.Tracker, originatingApp: OriginatingApp): Boolean {
