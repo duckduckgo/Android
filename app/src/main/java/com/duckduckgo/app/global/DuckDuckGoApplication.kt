@@ -25,28 +25,30 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
+import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
+import com.duckduckgo.app.process.ProcessDetector
+import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess
+import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
+import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
-open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleObserver {
-
-    @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleObserver {
 
     @Inject
     lateinit var pixel: Pixel
@@ -58,6 +60,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
     @Inject
+    lateinit var vpnUncaughtExceptionHandler: VpnUncaughtExceptionHandler
+
+    @Inject
     lateinit var referralStateListener: AppInstallationReferrerStateListener
 
     @Inject
@@ -66,6 +71,11 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
+
+    private val processDetector = ProcessDetector()
 
     private var launchedByFireAction: Boolean = false
 
@@ -77,12 +87,21 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         super.onCreate()
 
         configureLogging()
-        Timber.i("Application Started")
+
+        val currentProcess = processDetector.detectProcess(this)
+        Timber.i("Creating DuckDuckGoApplication. Process %s", currentProcess)
+
         if (appIsRestarting()) return
 
-        Timber.i("Creating DuckDuckGoApplication")
         configureDependencyInjection()
-        configureUncaughtExceptionHandler()
+        configureUncaughtExceptionHandler(currentProcess)
+        initializeDateLibrary()
+
+        if (appIsRestarting()) return
+        if (currentProcess is VpnProcess) {
+            Timber.i("VPN process, no further logic executed in application onCreate()")
+            return
+        }
 
         ProcessLifecycleOwner.get().lifecycle.apply {
             addObserver(this@DuckDuckGoApplication)
@@ -99,7 +118,16 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         }
     }
 
-    private fun configureUncaughtExceptionHandler() {
+    private fun configureUncaughtExceptionHandler(currentProcess: DuckDuckGoProcess) {
+        when (currentProcess) {
+            is VpnProcess -> configureUncaughtExceptionHandlerVpn()
+            is DuckDuckGoProcess.BrowserProcess -> configureUncaughtExceptionHandlerBrowser()
+            else -> Timber.w("Unknown process: Not configuring uncaught exception handler for %s", currentProcess)
+
+        }
+    }
+
+    private fun configureUncaughtExceptionHandlerBrowser() {
         Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
@@ -108,6 +136,10 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
                 alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
         }
+    }
+
+    private fun configureUncaughtExceptionHandlerVpn() {
+        Thread.setDefaultUncaughtExceptionHandler(vpnUncaughtExceptionHandler)
     }
 
     private fun appIsRestarting(): Boolean {
@@ -130,6 +162,45 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         daggerAppComponent.inject(this)
     }
 
+    // vtodo - Work around for https://crbug.com/558377
+    // AndroidInjection.inject(this) creates a new instance of the DuckDuckGoApplication (because we are in a new process)
+    // This has several disadvantages:
+    //   1. our app is of massive size, because we are duplicating our Dagger graph
+    //   2. we are hitting this bug in https://crbug.com/558377, because some of the injected dependencies may eventually
+    //      depend in something webview-related
+    //
+    // We need to override getDir and getCacheDir so that the webview does not share the same data dir across processes
+    // This is hacky hacky but should be OK for now as we don't use the webview in the VPN, it is just an issue with
+    // injecting/creating dependencies
+    //
+    // A proper fix should be to create a VpnServiceComponent that just provide the dependencies needed by the VPN, which would
+    // also help with memory
+    override fun getDir(name: String?, mode: Int): File {
+        val dir = super.getDir(name, mode)
+        if (name == "webview" && processDetector.detectProcess(this) is VpnProcess) {
+            return File("${dir.absolutePath}/vpn").apply {
+                Timber.d(":vpn process getDir = $absolutePath")
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+        }
+        return dir
+    }
+
+    override fun getCacheDir(): File {
+        val dir = super.getCacheDir()
+        if (processDetector.detectProcess(this) is VpnProcess) {
+            return File("${dir.absolutePath}/vpn").apply {
+                Timber.d(":vpn process getCacheDir = $absolutePath")
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+        }
+        return dir
+    }
+
     private fun submitUnsentFirePixels() {
         val count = unsentForgetAllPixelStore.pendingPixelCountClearData
         Timber.i("Found $count unsent clear data pixels")
@@ -146,8 +217,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         }
     }
 
-    override fun androidInjector(): AndroidInjector<Any> {
-        return androidInjector
+    private fun initializeDateLibrary() {
+        AndroidThreeTen.init(this)
+        // Query the ZoneRulesProvider so that it is loaded on a background coroutine
+        GlobalScope.launch(Dispatchers.IO) {
+            ZoneRulesProvider.getAvailableZoneIds()
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -164,4 +239,21 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
 
+    /**
+     * Implementation of [HasDaggerInjector.daggerFactoryFor].
+     * Similar to what dagger-android does, The [DuckDuckGoApplication] gets the [DuckDuckGoApplication.injectorFactoryMap]
+     * from DI. This holds all the Dagger factories for Android types, like Activities that we create. See [BookmarksActivityComponent.Factory]
+     * as an example.
+     *
+     * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
+     */
+    override fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*> {
+        return injectorFactoryMap[key]
+            ?: throw RuntimeException(
+                """
+                Could not find the dagger component for ${key::class.simpleName}.
+                You probably forgot to create the ${key::class.simpleName}Component
+                """.trimIndent()
+            )
+    }
 }

@@ -23,6 +23,8 @@
     <TextView
         android:id="@+id/settingsPrivacyTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingPrivacy"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -97,5 +99,16 @@
         app:pillDrawable="@drawable/ic_beta_pill"
         app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
         app:pillTitle="@string/settingsEmailProtectionTitle" />
+
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+            android:id="@+id/deviceShieldSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emailSetting"
+            app:pillDrawable="@drawable/ic_beta_pill"
+            app:pillSubtitle="@string/atp_SettingsDeviceShieldDisabled"
+            app:pillTitle="@string/atp_SettingsTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

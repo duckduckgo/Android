@@ -50,7 +50,9 @@ bitrise.yml
 
 # NDK files
 **/.cxx
+app/play/release/
+app/release/
+app/internal/
 
-# Local build cache
 build-cache
 report

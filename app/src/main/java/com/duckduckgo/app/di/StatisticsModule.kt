@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -52,9 +53,13 @@ class StatisticsModule {
     fun statisticsUpdater(
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
-        variantManager: VariantManager
-    ): StatisticsUpdater =
-        StatisticsRequester(statisticsDataStore, statisticsService, variantManager)
+        variantManager: VariantManager,
+        plugins: Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>,
+    ): StatisticsUpdater {
+        return StatisticsRequester(
+            statisticsDataStore, statisticsService, variantManager, RefreshRetentionAtbPluginPoint(plugins)
+        )
+    }
 
     @Provides
     fun pixelService(@Named("nonCaching") retrofit: Retrofit): PixelService {
@@ -74,9 +79,11 @@ class StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         variantManager: VariantManager,
         deviceInfo: DeviceInfo,
-        pendingPixelDao: PendingPixelDao
-    ): PixelSender =
-        RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo)
+        pendingPixelDao: PendingPixelDao,
+        statisticsLibraryConfig: StatisticsLibraryConfig
+    ): PixelSender {
+        return RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo, statisticsLibraryConfig)
+    }
 
     @Provides
     @Singleton

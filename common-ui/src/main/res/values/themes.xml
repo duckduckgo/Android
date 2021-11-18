@@ -118,6 +118,11 @@
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
         <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+
+        <item name="listItemBackgroundColor">@color/almostBlack</item>
+        <item name="listItemSeparatorColor">@color/charcoalGrey</item>
+        <item name="textInputOutlinedBoxColor">@color/grayish</item>
+        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -174,8 +179,6 @@
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/almostBlackDark</item>
-        <item name="listItemTitleColor">@color/almostBlackDark</item>
-        <item name="listItemSubtitleColor">@color/warmerGray</item>
         <item name="savedSiteEmptyTextColor">@color/almostBlackDark</item>
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
@@ -196,7 +199,7 @@
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
 
         <item name="brokenSiteSelectionTextColor">@color/almostBlackDark</item>
-        <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
+        <item name="brokenSiteOutlinedColor">@color/grayishThree</item>
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
         <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
@@ -215,11 +218,22 @@
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+
+        <item name="listItemTitleColor">@color/almostBlackDark</item>
+        <item name="listItemSubtitleColor">@color/warmerGray</item>
+        <item name="listItemBackgroundColor">@color/whiteFive</item>
+        <item name="listItemSeparatorColor">@color/whiteSix</item>
+        <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
+        <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
         <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
         <item name="android:statusBarColor">@color/almostBlack</item>
+    </style>
+
+    <style name="AppTheme.Light.ATPOnboarding">
+        <item name="android:statusBarColor">@color/atp_onboardingHeaderBg</item>
     </style>
 
     <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -238,6 +252,13 @@
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
+    <style name="ToolbarTheme.Green">
+        <item name="colorAccent">@color/cornflowerGreen</item>
+        <item name="colorControlActivated">@color/cornflowerGreen</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="OmnibarToolbarTheme">
@@ -287,16 +308,41 @@
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
 
+    <style name="Theme.AndroidVpn" parent="Theme.MaterialComponents.Light.Bridge">
+        <item name="colorPrimary">@color/whiteFive</item>
+        <item name="colorPrimaryDark">@color/whiteFive</item>
+        <item name="colorAccent">@color/warmBlue</item>
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="normalTextColor">@color/almostBlackDark</item>
+        <item name="secondaryTextColor">@color/brownishGrayTwo</item>
+        <item name="settingsMinorTextColor">@color/brownishGrayTwo</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.Onboarding" parent="Theme.AndroidVpn.NoActionBar">
+        <item name="android:statusBarColor">@color/grey</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.Trackers">
+        <item name="colorAccent">@color/cornflowerGreen</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
+
+    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
     <style name="BottomSheetDialog" parent="Theme.Design.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
     </style>
 
     <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="behavior_peekHeight">512dp</item>
-    </style>
-
-    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
     <style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">

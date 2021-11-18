@@ -4,6 +4,11 @@ buildscript {
     ext.spotless = "5.14.0"
     ext.anvil_version = "2.3.3"
 
+    // vtodo VPN
+    ext.google_services = "4.3.4"
+    ext.gradle_plugin = "4.1.0"
+    ext.google_crashlytics_plugin = "2.2.1"
+
     ext.min_sdk = 21
     ext.target_sdk = 30
     ext.compile_sdk = 31
@@ -27,6 +32,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    configurations.all {
+        resolutionStrategy.force 'org.objenesis:objenesis:2.6'
     }
 }
 

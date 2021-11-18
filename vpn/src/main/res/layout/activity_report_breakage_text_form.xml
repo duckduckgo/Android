@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".breakage.ReportBreakageTextFormActivity">
+
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_default_toolbar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/appBreakageFormHeading"
+                style="@style/TextAppearance.DuckDuckGo.Headline3"
+                android:padding="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_ReportBreakageFormWhatHappenedText"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="?attr/normalTextColor"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/appBreakageFormFeedbackContainer"
+                style="@style/FeedbackInputBoxStyle"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:hint="@string/atp_ReportBreakageFormInputHint"
+                app:hintTextAppearance="@android:style/TextAppearance"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/subtitle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/appBreakageFormFeedbackInput"
+                    style="@style/FeedbackEditTextInputStyle"
+                    android:gravity="top" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <TextView
+                android:id="@+id/appBreakageFormDisclaimer"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:padding="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_ReportBreakageFormDisclaimerText"
+                android:textColor="?attr/settingsMinorTextColor"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/splitterGray"/>
+
+    <Button
+        android:id="@+id/ctaNextFormText"
+        style="@style/DeviceShield.Button.Blue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        android:text="@string/atp_ReportBreakageAppNextCta"/>
+
+</LinearLayout>

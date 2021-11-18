@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.global.extensions.extractETag
 import okhttp3.Headers
 import org.junit.Assert.*
 import org.junit.Test
