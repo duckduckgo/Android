@@ -41,8 +41,20 @@ class DetectOriginatingAppPackageModern(
     }
 
     private fun getPackageIdForUid(uid: Int): String {
-        return packageManager.getNameForUid(uid) ?: OriginatingAppPackageIdentifierStrategy.UNKNOWN.also {
-            Timber.i("Failed to get package ID for UID: $uid")
+        val packages = packageManager.getPackagesForUid(uid)
+        if (packages.isNullOrEmpty()) {
+            Timber.w("Failed to get package ID for UID: $uid")
+            return OriginatingAppPackageIdentifierStrategy.UNKNOWN
         }
+
+        if (packages.size > 1) {
+            val sb = StringBuilder(String.format("Found %d packages for uid:%d", packages.size, uid))
+            packages.forEach {
+                sb.append(String.format("\npackage: %s", it))
+            }
+            Timber.d(sb.toString())
+        }
+
+        return packages.first()
     }
 }
