@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.notification
 
-import android.app.Notification
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.*
@@ -159,7 +159,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     private fun configureMockNotification() {
         whenever(notificationBuilder.buildReminderNotification(any(), any())).thenReturn(
-            Notification.Builder(context, "")
+            NotificationCompat.Builder(context, "")
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .build()
         )
