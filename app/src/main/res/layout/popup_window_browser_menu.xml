@@ -70,7 +70,6 @@
             <TextView
                 android:id="@+id/newTabPopupMenuItem"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
                 android:text="@string/newTabMenuItem" />
 
             <TextView

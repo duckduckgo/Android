@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget"/>
+
     <style name="Widget.DuckDuckGo"/>
 
     <style name="Widget.DuckDuckGo.SingleLineListItem">
@@ -38,6 +39,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.ListItem"/>
+
     <style name="Widget.DuckDuckGo.ListItem.Description" parent="TextAppearance.DuckDuckGo.Body2">
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAlignment">viewStart</item>
@@ -123,6 +125,7 @@
         <item name="android:paddingStart">@dimen/keyline_4</item>
         <item name="android:gravity">center</item>
         <item name="android:textAlignment">viewStart</item>
+        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Body1</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox">
