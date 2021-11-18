@@ -22,18 +22,16 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.notification.AppNotificationSender
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.WaitlistCodeNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -82,8 +80,8 @@ class NotificationModule {
         context: Context,
         notificationDao: NotificationDao,
         emailDataStore: EmailDataStore
-    ): WaitlistCodeNotification {
-        return WaitlistCodeNotification(context, notificationDao, emailDataStore)
+    ): EmailWaitlistCodeNotification {
+        return EmailWaitlistCodeNotification(context, notificationDao, emailDataStore)
     }
 
     @Provides
@@ -117,4 +115,14 @@ class NotificationModule {
     ): NotificationSender {
         return AppNotificationSender(context, pixel, manager, factory, notificationDao)
     }
+
+    @Provides
+    fun provideAppTpWaitlistCodeNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        dataStore: AppTrackingProtectionWaitlistDataStore
+    ): AppTPWaitlistCodeNotification {
+        return AppTPWaitlistCodeNotification(context, notificationDao, dataStore)
+    }
+
 }

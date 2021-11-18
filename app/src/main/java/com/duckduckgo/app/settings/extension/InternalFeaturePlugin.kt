@@ -44,7 +44,7 @@ private class SettingsInternalFeaturePluginPoint(
     private val plugins: Set<@JvmSuppressWildcards InternalFeaturePlugin>
 ) : PluginPoint<InternalFeaturePlugin> {
     override fun getPlugins(): Collection<InternalFeaturePlugin> {
-        return plugins.sortedByDescending { it.internalFeatureTitle() }
+        return plugins.sortedBy { it.internalFeatureTitle() }
     }
 }
 

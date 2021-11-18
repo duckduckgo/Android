@@ -34,4 +34,11 @@
         <attr name="twoLineItemDrawable" format="reference" />
         <attr name="twoLineItemImageVisible" format="boolean" />
     </declare-styleable>
+
+    <!--Panel view-->
+    <declare-styleable name="InfoPanel">
+        <attr name="panelBackground" format="reference" />
+        <attr name="panelDrawable" format="reference" />
+        <attr name="panelText" format="string" />
+    </declare-styleable>
 </resources>

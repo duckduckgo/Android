@@ -83,11 +83,13 @@
     <color name="cornflowerDark">#5078e9</color>
     <color name="cornflowerBorder">#3969EF</color>
     <color name="cornflowerDisabled">#A1BAFF</color>
+    <color name="cornflowerGreen">#6BBC5A</color>
     <color name="skyBlue">#42bffe</color>
     <color name="carolinaBlue">#94b0ff</color>
 
     <color name="midGreen">#3fa140</color>
-    <color name="lightGreen">#161DB954</color>
+    <color name="lightBlue">#E7EDFF</color>
+    <color name="lightYellow">#FFF2BF</color>
 
     <color name="translucentDark">#b000</color>
     <color name="gunmetal">#494d56</color>
@@ -108,6 +110,7 @@
     <color name="accentBlue">#678FFF</color>
     <color name="splitterGray">#E5E5E5</color>
     <color name="red">#DE5833</color>
+    <color name="atp_onboardingHeaderBg">#F3F5F9</color>
 
     <color name="magenta">#A64FD1</color>
     <color name="purple">#D4A1EE</color>

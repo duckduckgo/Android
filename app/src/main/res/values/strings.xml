@@ -156,7 +156,7 @@
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
-    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address.</string>
+    <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>

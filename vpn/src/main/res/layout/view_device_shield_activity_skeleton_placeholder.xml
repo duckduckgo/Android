@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tracker_entry_skeleton_one"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_top_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_second_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="100dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_top_text" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_first_tracker"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_second_tracker"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_first_tracker"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_third_tracker"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_second_tracker"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
+
+    <TextView
+        android:id="@+id/tracker_entry_skeleton_one_fourth_tracker"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/background_skeleton_ui"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_third_tracker"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

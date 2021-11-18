@@ -86,6 +86,11 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelEmailWaitlist,
             NotificationManagerCompat.IMPORTANCE_HIGH
         )
+        val APP_TP_WAITLIST = Channel(
+            "com.duckduckgo.apptp",
+            R.string.atp_WaitlistActivityWaitlistTitle,
+            NotificationManagerCompat.IMPORTANCE_HIGH
+        )
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
