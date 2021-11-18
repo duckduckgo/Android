@@ -129,7 +129,7 @@ platform :android do
 
       releaseNotes = release_notes_playstore()
 
-      flversion=gradle(task: '-q fastlaneVersionCode')
+      flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
       UI.message("App version for fastlane is #{flversion}.\nRelease notes for Play Store:\n\n#{releaseNotes}")
 
       releaseNotesLocales.each do |locale|
@@ -141,7 +141,7 @@ platform :android do
     desc "Clean up local changelist metadata"
         private_lane :cleanup_fastlane_release_notes do
 
-          flversion=gradle(task: '-q fastlaneVersionCode')
+          flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
 
           releaseNotesLocales.each do |locale|
             sh("rm '../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt'")
