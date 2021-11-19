@@ -25,6 +25,8 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.nhaarman.mockitokotlin2.*
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import retrofit2.Call
@@ -41,6 +43,41 @@ class SurveyDownloaderTest {
     @get:Rule
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @Before
+    fun setup() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.error(404, "error".toResponseBody()))
+
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsSurveyThenReturnAppTpSurvey() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsEmptySurveyThenCallV2Survey() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(null))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+
+        testee.download().blockingAwait()
+
+        verify(mockService).survey()
+    }
 
     @Test
     fun whenNewSurveyAllocatedThenSavedAsScheduledAndUnusedSurveysDeleted() {
