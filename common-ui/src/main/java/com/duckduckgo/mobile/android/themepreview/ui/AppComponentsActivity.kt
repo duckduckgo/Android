@@ -18,11 +18,15 @@ package com.duckduckgo.mobile.android.themepreview.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.applyTheme
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.tabs.TabLayout
 
@@ -33,6 +37,10 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var darkThemeSwitch: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val themePreferences = AppComponentsSharedPreferences(this)
+        val selectedTheme = themePreferences.selectedTheme
+        applyTheme(selectedTheme)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_components)
         viewPager = findViewById(R.id.view_pager)
@@ -43,12 +51,15 @@ class AppComponentsActivity : AppCompatActivity() {
         val adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
         viewPager.adapter = adapter
 
-        darkThemeSwitch.setOnCheckedChangeListener { _, checked ->
-            if (checked) {
-                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
-            }
+        darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+            themePreferences.selectedTheme =
+                if (enabled) {
+                    DuckDuckGoTheme.DARK
+                } else {
+                    DuckDuckGoTheme.LIGHT
+                }
+            startActivity(intent(this))
+            finish()
         }
     }
 
@@ -56,5 +67,26 @@ class AppComponentsActivity : AppCompatActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, AppComponentsActivity::class.java)
         }
+    }
+}
+
+class AppComponentsSharedPreferences(private val context: Context) {
+    var selectedTheme: DuckDuckGoTheme
+        get() {
+            return if (preferences.getBoolean(KEY_SELECTED_DARK_THEME, false)) {
+                DuckDuckGoTheme.DARK
+            } else {
+                DuckDuckGoTheme.LIGHT
+            }
+        }
+        set(theme) =
+            preferences.edit { putBoolean(KEY_SELECTED_DARK_THEME, theme == DuckDuckGoTheme.DARK) }
+
+    private val preferences: SharedPreferences
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.app.dev_settings_activity.theme_settings"
+        const val KEY_SELECTED_DARK_THEME = "KEY_SELECTED_DARK_THEME"
     }
 }
