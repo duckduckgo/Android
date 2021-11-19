@@ -96,8 +96,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_KILLED_VPN_REVOKED_DAILY("m_atp_ev_revoke_kill_d"),
     ATP_KILLED_VPN_REVOKED("m_atp_ev_revoke_kill_c"),
 
-    ATP_TRACKER_BLOCKED("m_atp_ev_tracker_blocked_c"),
-
     ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE("m_atp_imp_article_c"),
 
     ATP_DID_SHOW_ONBOARDING_FAQ("m_atp_imp_onboarding_faq_c"),

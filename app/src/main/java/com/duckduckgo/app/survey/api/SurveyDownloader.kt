@@ -26,6 +26,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import io.reactivex.Completable
+import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
@@ -38,14 +39,29 @@ class SurveyDownloader @Inject constructor(
     private val atpCohortManager: AtpCohortManager
 ) {
 
+    private fun getSurveyResponse(): Response<SurveyGroup?> {
+        val callAppTP = service.surveyAppTp()
+        val responseAppTP = callAppTP.execute()
+
+        // FIXME see https://app.asana.com/0/414730916066338/1201395604254213/f
+        // check temporary AppTP survey endpoint else fallback to v2 survey endpoint
+        if (responseAppTP.isSuccessful && responseAppTP.body()?.id != null) {
+            Timber.v("Returning AppTP response")
+            return responseAppTP
+        }
+
+        val call = service.survey()
+        Timber.v("Returning v2 response")
+        return call.execute()
+    }
+
     fun download(): Completable {
 
         return Completable.fromAction {
 
             Timber.d("Downloading user survey data")
 
-            val call = service.survey()
-            val response = call.execute()
+            val response = getSurveyResponse()
 
             Timber.d("Response received, success=${response.isSuccessful}")
 
