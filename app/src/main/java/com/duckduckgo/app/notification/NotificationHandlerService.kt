@@ -27,18 +27,20 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.EMAIL_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
-import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
+import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -75,7 +77,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
-            WAITLIST_CODE -> onWaitlistCodeReceived(pixelSuffix)
+            EMAIL_WAITLIST_CODE -> onEmailWaitlistCodeReceived(pixelSuffix)
+            APPTP_WAITLIST_CODE -> onAppTPWaitlistCodeReceived(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -85,9 +88,18 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         }
     }
 
-    private fun onWaitlistCodeReceived(pixelSuffix: String) {
+    private fun onEmailWaitlistCodeReceived(pixelSuffix: String) {
         Timber.i("Email waitlist code received launched!")
         val intent = EmailProtectionActivity.intent(context)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+    }
+
+    private fun onAppTPWaitlistCodeReceived(pixelSuffix: String) {
+        Timber.i("App Tracking Protection waitlist code received launched!")
+        val intent = AppTPWaitlistActivity.intent(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intent)
             .startActivities()
@@ -147,7 +159,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
         const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
-        const val WAITLIST_CODE = "com.duckduckgo.notification.email.waitlist.code"
+        const val EMAIL_WAITLIST_CODE = "com.duckduckgo.notification.email.waitlist.code"
+        const val APPTP_WAITLIST_CODE = "com.duckduckgo.notification.apptp.waitlist.code"
     }
 
     companion object {

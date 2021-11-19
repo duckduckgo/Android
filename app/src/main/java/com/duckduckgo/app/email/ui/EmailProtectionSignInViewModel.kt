@@ -22,7 +22,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
-import com.duckduckgo.app.email.waitlist.WaitlistWorkRequestBuilder
+import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -39,7 +39,7 @@ class EmailProtectionSignInViewModel(
     private val emailManager: EmailManager,
     private val emailService: EmailService,
     private val workManager: WorkManager,
-    private val waitlistWorkRequestBuilder: WaitlistWorkRequestBuilder,
+    private val emailWaitlistWorkRequestBuilder: EmailWaitlistWorkRequestBuilder,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(ViewState(waitlistState = emailManager.waitlistState()))
@@ -120,7 +120,7 @@ class EmailProtectionSignInViewModel(
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
             commandChannel.send(Command.ShowNotificationDialog)
-            workManager.enqueue(waitlistWorkRequestBuilder.waitlistRequestWork(withBigDelay = false))
+            workManager.enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork(withBigDelay = false))
         }
     }
 
@@ -139,12 +139,12 @@ class EmailProtectionSignViewModelFactory @Inject constructor(
     private val emailManager: Provider<EmailManager>,
     private val emailService: Provider<EmailService>,
     private val workManager: Provider<WorkManager>,
-    private val waitlistWorkRequestBuilder: Provider<WaitlistWorkRequestBuilder>,
+    private val emailWaitlistWorkRequestBuilder: Provider<EmailWaitlistWorkRequestBuilder>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(EmailProtectionSignInViewModel::class.java) -> (EmailProtectionSignInViewModel(emailManager.get(), emailService.get(), workManager.get(), waitlistWorkRequestBuilder.get()) as T)
+                isAssignableFrom(EmailProtectionSignInViewModel::class.java) -> (EmailProtectionSignInViewModel(emailManager.get(), emailService.get(), workManager.get(), emailWaitlistWorkRequestBuilder.get()) as T)
                 else -> null
             }
         }

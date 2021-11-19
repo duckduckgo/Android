@@ -126,8 +126,12 @@ android {
 dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
+    implementation project(path: ':app-store')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
+    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn-store')
+    internalImplementation project(path: ':vpn-internal')
 
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':feature-toggles-impl')
@@ -159,11 +163,13 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
+    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
-    implementation Google.dagger.android
-    implementation Google.dagger.android.support
+
+    // ThreeTenABP
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
@@ -192,11 +198,13 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
     // Dagger
     kapt Google.dagger.compiler
+    implementation Google.dagger
 
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
@@ -214,6 +222,11 @@ dependencies {
 
     // HTML
     implementation 'org.jsoup:jsoup:_'
+
+
+    // Flipper
+    internalImplementation "com.facebook.flipper:flipper:_"
+    internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
@@ -238,6 +251,11 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation "androidx.test:runner:_"
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')

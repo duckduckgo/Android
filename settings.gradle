@@ -2,27 +2,44 @@ plugins {
     id("de.fayard.refreshVersions") version "0.21.0"
 }
 
+include ':vpn'
+include ':vpn-store'
+include ':vpn-main'
+include ':vpn-api'
+include ':vpn-internal'
 include ':di'
 include ':app'
 include ':statistics'
 include ':common'
 include ':common-ui'
+include ':app-store'
+
 include ':feature-toggles-api'
 include ':feature-toggles-impl'
+
 include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'
+
+include ':common-test'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
 project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
 project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
 project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
-include ':common-test'
+
+rootProject.children.each { subproject ->
+
+    if (subproject.name == "vpn") {
+        subproject.buildFileName = "${subproject.name}-build.gradle"
+    }
+}
 
 
 buildCache {
     local {
+        // configure local build cache directory so that it is local to the project dir
         enabled = true
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7
