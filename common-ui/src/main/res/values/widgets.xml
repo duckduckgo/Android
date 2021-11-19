@@ -166,4 +166,20 @@
         <item name="android:textColor">@color/almostBlackDark</item>
     </style>
 
+    <!-- Styles for App Components -->
+    <style name="Widget.DuckDuckGo.SectionHeader">
+        <item name="android:paddingTop">32dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:textAppearance">@style/Widget.DuckDuckGo.SectionHeader.TextAppearance</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.SectionHeader.TextAppearance" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/blue50</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>
