@@ -198,9 +198,6 @@ interface DeviceShieldPixels {
      */
     fun suddenKillByVpnRevoked()
 
-    /** This fun will fire a pixel on every call */
-    fun trackerBlocked()
-
     /** Will fire a pixel on every call */
     fun privacyReportArticleDisplayed()
 
@@ -440,10 +437,6 @@ class RealDeviceShieldPixels @Inject constructor(
         suddenKill()
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_KILLED_VPN_REVOKED)
-    }
-
-    override fun trackerBlocked() {
-        firePixel(DeviceShieldPixelNames.ATP_TRACKER_BLOCKED)
     }
 
     override fun privacyReportArticleDisplayed() {
