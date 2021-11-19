@@ -115,6 +115,26 @@ class UncaughtExceptionDaoTest {
         }
     }
 
+    @Test
+    fun whenGetLatestExceptionThenReturnLatestExceptionFromDatabase() {
+        val exception1 = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo", "version")
+        val exception2 = UncaughtExceptionEntity(id = 2, exceptionSource = GLOBAL, message = "bar", "version")
+        dao.add(exception1)
+        dao.add(exception2)
+        val latestException = dao.getLatestException()
+        assertEquals(exception2, latestException)
+    }
+
+    @Test
+    fun whenUpdateExceptionThenUpdateExceptionInDatabase() {
+        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo", "version", timestamp = 1000)
+        dao.add(exception)
+        val updatedException = exception.copy(timestamp = 2000)
+        dao.update(updatedException)
+        val latestException = dao.getLatestException()
+        assertEquals(updatedException, latestException)
+    }
+
     private fun anUncaughtExceptionEntity(id: Long? = null) =
         UncaughtExceptionEntity(id = id ?: 0, exceptionSource = GLOBAL, message = "foo", "version")
 }
