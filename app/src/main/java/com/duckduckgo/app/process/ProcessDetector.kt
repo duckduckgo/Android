@@ -43,8 +43,8 @@ class ProcessDetector {
             return Application.getProcessName()
         }
 
-        val am = context.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager
-        return am.runningAppProcesses.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
+        val am = context.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
+        return am?.runningAppProcesses?.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
     }
 
     sealed class DuckDuckGoProcess(open val processName: String) {
