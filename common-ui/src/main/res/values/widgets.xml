@@ -182,4 +182,22 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.PrimaryButton">
+        <item name="android:background">@drawable/background_blue_button_rounded_corners</item>
+        <item name="android:textAppearance">@style/Widget.DuckDuckGo.PrimaryButton.TextAppearance</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.PrimaryButton.TextAppearance" parent="TextAppearance.DuckDuckGo.Button1">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/primary_button_color_selector</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.PrimaryMaterialButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="backgroundTint">@color/broken_sites_button_background</item>
+        <item name="android:textColor">@color/broken_sites_button_text</item>
+        <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+    </style>
+
 </resources>

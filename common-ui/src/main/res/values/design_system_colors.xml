@@ -19,6 +19,12 @@
     <!-- Day / Light theme colors -->
     <color name="primaryTextColor">@color/gray90</color>
     <color name="secondaryTextColor">@color/gray70</color>
+    <color name="disabledColor">#59000000</color>
+
+    <color name="primaryButtonDefaultTextColor">@color/white</color>
+    <color name="primaryButtonHoverTextColor">@color/white</color>
+    <color name="primaryButtonPressedTextColor">@color/white</color>
+    <color name="primaryButtonDisabledTextColor">@color/disabledColor</color>
 
     <color name="red50">#DE5833</color>
 
@@ -33,5 +39,7 @@
     <color name="gray20">#EEEEEE</color>
 
     <color name="blue50">#3969EF</color>
+    <color name="blue60">#2B55CA</color>
+    <color name="blue70">#1E42A4</color>
 
 </resources>

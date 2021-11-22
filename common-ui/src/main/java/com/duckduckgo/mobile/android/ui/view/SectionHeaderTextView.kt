@@ -31,15 +31,20 @@ constructor(
     defStyleAttr: Int = R.style.Widget_DuckDuckGo_SectionHeader
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
-  init {
-    val typedArray =
-        context.obtainStyledAttributes(
-            attrs, R.styleable.SectionHeaderTextView, 0, R.style.Widget_DuckDuckGo_SectionHeader)
+    init {
+        val typedArray =
+            context.obtainStyledAttributes(
+                attrs,
+                R.styleable.SectionHeaderTextView,
+                0,
+                R.style.Widget_DuckDuckGo_SectionHeader)
 
-    val textAppearanceId =
-        typedArray.getResourceId(
-            R.styleable.SectionHeaderTextView_android_textAppearance,
-            android.R.style.TextAppearance)
-    setTextAppearance(context, textAppearanceId)
-  }
+        val textAppearanceId =
+            typedArray.getResourceId(
+                R.styleable.SectionHeaderTextView_android_textAppearance,
+                android.R.style.TextAppearance)
+        setTextAppearance(context, textAppearanceId)
+
+        typedArray.recycle()
+    }
 }

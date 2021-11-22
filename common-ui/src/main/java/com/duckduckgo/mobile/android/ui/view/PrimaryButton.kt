@@ -24,20 +24,30 @@ import com.duckduckgo.mobile.android.R
 class PrimaryButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    defStyleRes: Int = 0
-) : Button(context, attrs, defStyleAttr, defStyleRes) {
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_PrimaryButton
+) : Button(context, attrs, defStyleAttr) {
+
+    private var background: Int = R.drawable.background_blue_button_rounded_corners
+        set(value) {
+            setBackgroundResource(value)
+            field = value
+        }
 
     init {
         val typedArray =
             context.obtainStyledAttributes(
-                attrs, R.styleable.SectionHeaderTextView, 0, R.style.Widget_DuckDuckGo_SectionHeader)
+                attrs, R.styleable.PrimaryButton, 0, R.style.Widget_DuckDuckGo_PrimaryButton)
+
+        background = typedArray.getResourceId(R.styleable.PrimaryButton_android_background, R.drawable.background_blue_button_rounded_corners)
 
         val textAppearanceId =
             typedArray.getResourceId(
-                R.styleable.SectionHeaderTextView_android_textAppearance,
+                R.styleable.PrimaryButton_android_textAppearance,
                 android.R.style.TextAppearance)
+
         setTextAppearance(context, textAppearanceId)
+
+        typedArray.recycle()
     }
 
 }

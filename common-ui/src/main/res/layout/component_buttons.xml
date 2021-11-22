@@ -34,6 +34,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <com.duckduckgo.mobile.android.ui.view.PrimaryButton
+        android:text="Primary Button"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submitButton"
+        style="@style/Widget.DuckDuckGo.PrimaryMaterialButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Primary Material Button"/>
+
     <Button
         android:id="@+id/primary_button"
         android:text="Primary Button"
