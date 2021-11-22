@@ -103,18 +103,12 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_TUN_INTERFACE_DOWN_DAILY("m_atp_ev_tun_down_d"),
     ATP_TUN_INTERFACE_DOWN("m_atp_ev_tun_down_c"),
 
-    ATP_PROCESS_EXPENDABLE_LOW("m_atp_ev_expen_memory_low_c"),
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
-    ATP_PROCESS_EXPENDABLE_MODERATE("m_atp_ev_expen_memory_moderate_c"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
-    ATP_PROCESS_EXPENDABLE_COMPLETE("m_atp_ev_expen_memory_complete_c"),
     ATP_PROCESS_EXPENDABLE_COMPLETE_DAILY("m_atp_ev_expen_memory_complete_d"),
 
-    ATP_PROCESS_MEMORY_LOW("m_atp_ev_memory_low_c"),
     ATP_PROCESS_MEMORY_LOW_DAILY("m_atp_ev_memory_low_d"),
-    ATP_PROCESS_MEMORY_MODERATE("m_atp_ev_memory_moderate_c"),
     ATP_PROCESS_MEMORY_MODERATE_DAILY("m_atp_ev_memory_moderate_d"),
-    ATP_PROCESS_MEMORY_CRITICAL("m_atp_ev_memory_critical_c"),
     ATP_PROCESS_MEMORY_CRITICAL_DAILY("m_atp_ev_memory_critical_d"),
 
     ATP_DISABLE_APP_PROTECTION("m_atp_ev_disabled_protection_c"),
