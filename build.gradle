@@ -4,10 +4,7 @@ buildscript {
     ext.spotless = "5.14.0"
     ext.anvil_version = "2.3.3"
 
-    // vtodo VPN
-    ext.google_services = "4.3.4"
-    ext.gradle_plugin = "4.1.0"
-    ext.google_crashlytics_plugin = "2.2.1"
+    ext.gradle_plugin = "7.0.3"
 
     ext.min_sdk = 21
     ext.target_sdk = 30
@@ -19,8 +16,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+<<<<<<< HEAD
         classpath 'com.android.tools.build:gradle:7.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+=======
+        classpath "com.android.tools.build:gradle:$gradle_plugin"
+>>>>>>> 155f1729... updated plugin to new gradle version
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
 
