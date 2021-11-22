@@ -20,6 +20,14 @@
     <color name="primaryTextColor">@color/gray90</color>
     <color name="secondaryTextColor">@color/gray70</color>
 
+    <color name="red50">#DE5833</color>
+
+    <color name="purple50">#5132A9</color>
+
+    <color name="yellow50">#FFCC33</color>
+
+    <color name="green50">#4CBA3C</color>
+
     <color name="gray90">#222222</color>
     <color name="gray70">#666666</color>
     <color name="gray20">#EEEEEE</color>
