@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.system
+package com.duckduckgo.mobile.android.ui.view
 
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
-
-class ComponentSystemFragment : ComponentFragment() {
-    override fun getComponents(): List<Component> {
-        return listOf(Component.SNACKBAR)
-    }
+class PrimaryButton {
 }

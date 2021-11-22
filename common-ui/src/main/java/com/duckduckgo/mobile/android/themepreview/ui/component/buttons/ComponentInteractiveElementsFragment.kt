@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.controls
+package com.duckduckgo.mobile.android.themepreview.ui.component.buttons
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentControlsFragment : ComponentFragment() {
+class ComponentInteractiveElementsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX)
+        return listOf(Component.BUTTON, Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX)
     }
 }

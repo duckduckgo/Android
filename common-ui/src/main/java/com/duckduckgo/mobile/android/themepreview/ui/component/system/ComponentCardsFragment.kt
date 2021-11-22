@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.buttons
+package com.duckduckgo.mobile.android.themepreview.ui.component.system
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentButtonsFragment : ComponentFragment() {
+class ComponentCardsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.BUTTON)
+        return listOf(Component.SNACKBAR)
     }
 }
