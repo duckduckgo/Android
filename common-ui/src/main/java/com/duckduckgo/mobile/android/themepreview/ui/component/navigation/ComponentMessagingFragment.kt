@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.themepreview.ui.component.navigation
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentNavigationFragment : ComponentFragment() {
+class ComponentMessagingFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.TOP_APP_BAR)
+        return listOf(Component.INFO_PANEL, Component.SNACKBAR)
     }
 }

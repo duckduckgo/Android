@@ -23,7 +23,7 @@
     <string name="tab_title_typography">Typography</string>
     <string name="tab_title_component_interactive">Interactive</string>
     <string name="tab_title_component_cards">Cards</string>
-    <string name="tab_title_component_navigation">Navigation</string>
+    <string name="tab_title_component_messaging">Messaging</string>
     <string name="tab_title_component_system">System</string>
 
     <!--Components-->

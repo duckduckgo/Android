@@ -16,5 +16,28 @@
 
 package com.duckduckgo.mobile.android.ui.view
 
-class PrimaryButton {
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.Button
+import com.duckduckgo.mobile.android.R
+
+class PrimaryButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
+) : Button(context, attrs, defStyleAttr, defStyleRes) {
+
+    init {
+        val typedArray =
+            context.obtainStyledAttributes(
+                attrs, R.styleable.SectionHeaderTextView, 0, R.style.Widget_DuckDuckGo_SectionHeader)
+
+        val textAppearanceId =
+            typedArray.getResourceId(
+                R.styleable.SectionHeaderTextView_android_textAppearance,
+                android.R.style.TextAppearance)
+        setTextAppearance(context, textAppearanceId)
+    }
+
 }
