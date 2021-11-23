@@ -49,33 +49,7 @@
     <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
 
-    <!-- Theme defaults -->
-    <dimen name="keyline_empty">0dp</dimen>
-    <dimen name="keyline_0">2dp</dimen>
-    <dimen name="keyline_1">4dp</dimen>
-    <dimen name="keyline_2">8dp</dimen>
-    <dimen name="keyline_3">12dp</dimen>
-    <dimen name="keyline_4">16dp</dimen>
-    <dimen name="keyline_5">24dp</dimen>
-
     <dimen name="component_label_horizontal_margin">@dimen/keyline_4</dimen>
     <dimen name="elevation_default_top_app_bar">4dp</dimen>
-
-    <!-- App Components -->
-
-    <!-- Toolbar -->
-    <dimen name="toolbarIconSize">24dp</dimen>
-    <dimen name="toolbarIconContainerSize">48dp</dimen>
-    <dimen name="toolbarOverflowPadding">10dp</dimen>
-
-    <!-- List Items -->
-    <dimen name="listItemImageContainerSize">40dp</dimen>
-    <dimen name="listItemImageSize">22dp</dimen>
-
-    <!-- PopupMenu -->
-    <dimen name="popupMenuItemHeight">48dp</dimen>
-
-    <!-- Dialogs -->
-    <dimen name="dialogButtonHeight">40dp</dimen>
 
 </resources>
