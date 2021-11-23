@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:orientation="horizontal"
+                                                   android:paddingStart="16dp"
+                                                   android:paddingTop="8dp"
+                                                   android:paddingEnd="16dp"
+                                                   android:paddingBottom="8dp"
+                                                   android:gravity="center">
+
+    <ImageView
+        android:id="@+id/deviceShieldAppEntryIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_globe_gray_16dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/deviceShieldAppEntryName"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:ellipsize="end" android:maxLines="1"
+        android:orientation="vertical" android:singleLine="true"
+        android:textColor="?normalTextColor" app:layout_constraintBottom_toTopOf="@+id/deviceShieldAppExclusionReason"
+        app:layout_constraintEnd_toStartOf="@+id/verticalSplitter"
+        app:layout_constraintStart_toEndOf="@+id/deviceShieldAppEntryIcon" app:layout_constraintTop_toTopOf="parent" tools:text="Facebook"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/deviceShieldAppEntryShieldEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:theme="@style/Widget.DuckDuckGo.Switch.Green"
+        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:id="@+id/verticalSplitter"
+        android:layout_width="1dp"
+        android:layout_height="0dp" android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/splitterGray" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deviceShieldAppEntryShieldEnabled" app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/deviceShieldAppExclusionReason"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_alert_yellow_16"
+        android:drawablePadding="@dimen/keyline_1"
+        android:textColor="@color/brownishGrayTwo" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName" app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
+        app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

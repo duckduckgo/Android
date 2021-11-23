@@ -22,6 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
@@ -68,7 +69,12 @@ class StatisticsRequesterJsonTest {
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager)
+        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
+            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+                return listOf()
+            }
+        }
+        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins)
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
     }
 

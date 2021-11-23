@@ -275,7 +275,11 @@
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+            android:parentActivityName=".BrowserActivity" >
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
             android:label="@string/feedbackActivityTitle"
@@ -338,10 +342,20 @@
             android:label="@string/emailProtectionWebViewActivityTitle"
             android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity" />
         <activity
-            android:name="com.duckduckgo.app.settings.FireAnimationActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-
+                android:name="com.duckduckgo.app.settings.FireAnimationActivity"
+                android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+        <activity
+                android:name="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity"
+                android:label="@string/atp_WaitlistActivityTitle"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+        <activity
+                android:name="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistRedeemCodeActivity"
+                android:label="@string/atp_WaitlistRedeemCodeActivityTitle"
+                android:parentActivityName="com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity"/>
+        <activity
+                android:name="com.duckduckgo.app.browser.webview.WebViewActivity"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
         <activity
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:label="@string/widgetConfigurationActivityTitle"

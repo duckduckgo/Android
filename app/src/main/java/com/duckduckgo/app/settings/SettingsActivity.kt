@@ -25,7 +25,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -51,10 +54,14 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -111,6 +118,7 @@ class SettingsActivity :
     override fun onStart() {
         super.onStart()
         viewModel.start()
+        viewModel.startPollingAppTpEnableState()
     }
 
     private fun configureUiEventHandlers() {
@@ -132,6 +140,7 @@ class SettingsActivity :
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
+            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
 
         with(viewsOther) {
@@ -174,6 +183,7 @@ class SettingsActivity :
                     viewsGeneral.changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
+                    updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -252,6 +262,9 @@ class SettingsActivity :
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
+            is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
+            is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
+            is Command.LaunchAppTPWaitlist -> launchAppTPWaitlist()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
@@ -270,6 +283,20 @@ class SettingsActivity :
                 visibility = View.VISIBLE
             } else {
                 visibility = View.GONE
+            }
+        }
+    }
+
+    private fun updateDeviceShieldSettings(appTPEnabled: Boolean, waitlistState: WaitlistState) {
+        with(viewsPrivacy) {
+            if (waitlistState != WaitlistState.InBeta) {
+                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+            } else {
+                if (appTPEnabled) {
+                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                } else {
+                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                }
             }
         }
     }
@@ -337,6 +364,25 @@ class SettingsActivity :
         startActivity(EmailProtectionActivity.intent(this), options)
     }
 
+    private fun launchAppTPTrackersScreen() {
+        startActivity(DeviceShieldTrackerActivity.intent(this))
+    }
+
+    private fun launchAppTPOnboardingScreen() {
+        startActivity(DeviceShieldOnboardingActivity.intent(this))
+    }
+
+    private val appTPWaitlistActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            startActivity(DeviceShieldOnboardingActivity.intent(this))
+        }
+    }
+
+    private fun launchAppTPWaitlist() {
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
+        appTPWaitlistActivityResult.launch(AppTPWaitlistActivity.intent(this), options)
+    }
+
     override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
         viewModel.onThemeSelected(selectedTheme)
     }
@@ -357,9 +403,11 @@ class SettingsActivity :
         viewModel.onFireAnimationSelected(selectedFireAnimation)
     }
 
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == FEEDBACK_REQUEST_CODE) {
-            handleFeedbackResult(resultCode)
+        when (requestCode) {
+            FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }

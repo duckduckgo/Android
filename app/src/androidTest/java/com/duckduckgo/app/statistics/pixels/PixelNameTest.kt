@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -33,6 +34,11 @@ class PixelNameTest {
         Pixel.StatisticsPixelName.values().forEach {
             if (!existingNames.add(it.pixelName)) {
                 fail("Duplicate pixel name in StatisticsPixelName: ${it.pixelName}")
+            }
+        }
+        DeviceShieldPixelNames.values().forEach {
+            if (!existingNames.add(it.pixelName)) {
+                fail("Duplicate pixel name in DeviceShieldPixelNames: ${it.pixelName}")
             }
         }
     }
