@@ -269,5 +269,13 @@ tasks.register('fastlaneVersionCode') {
 }
 
 tasks.register('checks') {
-    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest', 'connectedPlayDebugAndroidTest'
+    dependsOn 'jvm_checks', 'android_checks'
+}
+
+tasks.register('android_checks') {
+    dependsOn 'connectedPlayDebugAndroidTest'
+}
+
+tasks.register('jvm_checks') {
+    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
 }
