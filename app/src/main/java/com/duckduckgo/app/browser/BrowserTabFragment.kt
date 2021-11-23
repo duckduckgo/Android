@@ -2125,7 +2125,8 @@ class BrowserTabFragment :
             val webView = webView ?: return
 
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
-            if (fontSizeChanged) {Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+            if (fontSizeChanged) {
+                Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
 
                 webView.settings.textZoom = viewState.fontSize.toInt()
             }
