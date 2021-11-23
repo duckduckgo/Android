@@ -79,14 +79,13 @@ class AccessibilitySettingsSharedPreferences(
         }
 
     override fun settingsFlow() = accessibilityStateFlow.asStateFlow().onSubscription {
-        Timber.i("AccessibilityActSettings: newSubscription")
         emitNewValues()
     }
 
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
-            Timber.i("AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
+            Timber.v("AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
         }
     }
 

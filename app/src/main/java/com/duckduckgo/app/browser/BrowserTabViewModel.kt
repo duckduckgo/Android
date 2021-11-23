@@ -517,8 +517,7 @@ class BrowserTabViewModel(
         accessibilityObserver = accessibilitySettingsDataStore.settingsFlow()
             .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
             .onEach { (settings, viewVisible) ->
-                Timber.i("Accessibility: current ${currentAccessibilityViewState()}")
-                Timber.i("Accessibility: newSettings $settings, $viewVisible, ${this@BrowserTabViewModel}")
+                Timber.v("Accessibility: newSettings $settings, $viewVisible")
                 val shouldRefreshWebview = (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
                 accessibilityViewState.value =
                     currentAccessibilityViewState().copy(fontSize = settings.fontSize, forceZoom = settings.forceZoom, refreshWebView = shouldRefreshWebview)
@@ -570,7 +569,6 @@ class BrowserTabViewModel(
 
     @VisibleForTesting
     public override fun onCleared() {
-        Timber.i("Cris: onCleared")
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
@@ -588,7 +586,6 @@ class BrowserTabViewModel(
     }
 
     fun onViewResumed() {
-        Timber.i("Cris: onViewResumed")
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -605,7 +602,6 @@ class BrowserTabViewModel(
             command.value = HideKeyboard
         }
         viewModelScope.launch {
-            Timber.i("Accessibility: onViewVisible, ${this@BrowserTabViewModel}")
             refreshOnViewVisible.emit(true)
         }
     }
@@ -613,7 +609,6 @@ class BrowserTabViewModel(
     fun onViewHidden() {
         skipHome = false
         viewModelScope.launch {
-            Timber.i("Accessibility: onViewHidden, ${this@BrowserTabViewModel}")
             refreshOnViewVisible.emit(false)
         }
     }
@@ -1770,7 +1765,6 @@ class BrowserTabViewModel(
     }
 
     private fun initializeViewStates() {
-        Timber.i("Accessibility: initializeViewStates")
         globalLayoutState.value = Browser()
         browserViewState.value = BrowserViewState().copy(addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported())
         loadingViewState.value = LoadingViewState()

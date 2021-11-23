@@ -79,7 +79,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     private fun renderFontSize(fontSize: Float, overrideSystemFontSize: Boolean) {
-        Timber.i("AccessibilityActSettings: renderFontSize $fontSize")
+        Timber.v("AccessibilityActSettings: renderFontSize $fontSize")
 
         binding.accessibilitySlider.quietlySetValue(fontSize, fontSizeChangeListener)
         val newValue = fontSize / 100
@@ -93,7 +93,6 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListener() {
-        Timber.i("AccessibilityActSettings: configureListener")
         binding.appFontSizeToggle.setOnCheckedChangeListener(systemFontSizeChangeListener)
         binding.accessibilitySlider.addOnChangeListener(fontSizeChangeListener)
         binding.forceZoomToggle.setOnCheckedChangeListener(forceZoomChangeListener)

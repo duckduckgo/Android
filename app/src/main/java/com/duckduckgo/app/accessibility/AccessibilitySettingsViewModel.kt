@@ -56,7 +56,7 @@ class AccessibilitySettingsViewModel constructor(
     }
 
     fun onForceZoomChanged(checked: Boolean) {
-        Timber.i("AccessibilityActSettings: onForceZoomChanged $checked")
+        Timber.v("AccessibilityActSettings: onForceZoomChanged $checked")
         accessibilitySettings.forceZoom = checked
         viewModelScope.launch {
             viewState.emit(
@@ -68,7 +68,7 @@ class AccessibilitySettingsViewModel constructor(
     }
 
     fun onSystemFontSizeChanged(checked: Boolean) {
-        Timber.i("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
+        Timber.v("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
         accessibilitySettings.overrideSystemFontSize = checked
         viewModelScope.launch {
             viewState.emit(
@@ -80,7 +80,7 @@ class AccessibilitySettingsViewModel constructor(
     }
 
     fun onFontSizeChanged(newValue: Float) {
-        Timber.i("AccessibilityActSettings: onFontSizeChanged $newValue")
+        Timber.v("AccessibilityActSettings: onFontSizeChanged $newValue")
         accessibilitySettings.appFontSize = newValue
         viewModelScope.launch {
             viewState.emit(

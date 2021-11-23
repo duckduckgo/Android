@@ -331,7 +331,6 @@ class BrowserTabFragment :
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
-        Timber.i("Cris: ctaViewState $it")
         it?.let { renderer.renderCtaViewState(it) }
     }
 
@@ -351,7 +350,6 @@ class BrowserTabFragment :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.i("Cris: onCreate")
         super.onCreate(savedInstanceState)
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -363,7 +361,6 @@ class BrowserTabFragment :
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        Timber.i("Cris: onActivityCreated")
         super.onActivityCreated(savedInstanceState)
 
         configureObservers()
@@ -449,14 +446,12 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        Timber.i("Cris: onPause")
         dismissDownloadFragment()
         dismissAuthenticationDialog()
         super.onPause()
     }
 
     override fun onStop() {
-        Timber.i("Cris: onStop")
         alertDialog?.dismiss()
         super.onStop()
     }
@@ -478,7 +473,6 @@ class BrowserTabFragment :
     }
 
     private fun configureObservers() {
-        Timber.i("Cris: configureObservers")
         viewModel.autoCompleteViewState.observe(
             viewLifecycleOwner,
             Observer<AutoCompleteViewState> {
@@ -517,7 +511,6 @@ class BrowserTabFragment :
         viewModel.findInPageViewState.observe(
             viewLifecycleOwner,
             Observer<FindInPageViewState> {
-                Timber.i("Cris: findInPageViewState")
                 it?.let { renderer.renderFindInPageState(it) }
             }
         )
@@ -525,7 +518,6 @@ class BrowserTabFragment :
         viewModel.accessibilityViewState.observe(
             viewLifecycleOwner,
             Observer {
-                Timber.i("Cris: accessibilityViewState $it")
                 it?.let { renderer.applyAccessibilitySettings(it) }
             }
         )
@@ -612,7 +604,6 @@ class BrowserTabFragment :
     }
 
     private fun processCommand(it: Command?) {
-        Timber.i("Cris: processCommand $it")
         if (it !is Command.DaxCommand) {
             renderer.cancelTrackersAnimation()
         }
@@ -1243,7 +1234,6 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
-                Timber.i("Accessibility: Webview recreate")
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
@@ -1506,7 +1496,6 @@ class BrowserTabFragment :
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        Timber.i("Cris: onHiddenChanged $hidden")
         if (hidden) {
             viewModel.onViewHidden()
             webView?.onPause()
@@ -1520,7 +1509,6 @@ class BrowserTabFragment :
      * We don't destroy the activity on config changes like orientation, so we need to ensure we update resources which might change based on config
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
-        Timber.i("Accessibility: onConfigurationChanged")
         super.onConfigurationChanged(newConfig)
         ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
@@ -2133,18 +2121,18 @@ class BrowserTabFragment :
         }
 
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
-            Timber.i("Accessibility: render state applyAccessibilitySettings $viewState")
+            Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
             val webView = webView ?: return
 
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
-            if (fontSizeChanged) {
-                Timber.i("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+            if (fontSizeChanged) {Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+
                 webView.settings.textZoom = viewState.fontSize.toInt()
             }
 
             if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
             if (viewState.refreshWebView) {
-                Timber.i("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
+                Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
                 refresh()
             }
         }
@@ -2384,7 +2372,6 @@ class BrowserTabFragment :
             }
 
             if (viewState.showNumberMatches) {
-                Timber.i("Cris: showNumberMatches")
                 findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
                 findInPageMatches.show()
             } else {

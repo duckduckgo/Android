@@ -77,7 +77,7 @@
                         android:layout_gravity="center"
                         android:gravity="center_vertical|start"
                         android:minWidth="50dp"
-                        android:textColor="@color/normal_text_color_selector" />
+                        android:textColor="?attr/normalTextColor" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/accessibilitySlider"
@@ -106,7 +106,7 @@
                     android:ellipsize="end"
                     android:padding="@dimen/keyline_2"
                     android:text="@string/accessibilityFontSizeHint"
-                    android:textColor="@color/normal_text_color_selector" />
+                    android:textColor="?attr/normalTextColor" />
             </LinearLayout>
 
             <View
