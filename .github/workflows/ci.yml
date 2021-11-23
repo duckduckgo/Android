@@ -72,10 +72,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Spotless
-        run: ./gradlew spotlessCheck --stacktrace
-
-      - name: Unit and Integration Tests
+      - name: Running CI checks
+        uses: reactiveCircus/android-emulator-runner@v2.19.1
         with:
           api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
