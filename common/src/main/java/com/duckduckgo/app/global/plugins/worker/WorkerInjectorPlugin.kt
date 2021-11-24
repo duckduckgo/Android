@@ -18,8 +18,9 @@ package com.duckduckgo.app.global.plugins.worker
 
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface WorkerInjectorPlugin {
     /**
@@ -28,7 +29,7 @@ interface WorkerInjectorPlugin {
     fun inject(worker: ListenableWorker): Boolean
 }
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class WorkerInjectorPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards WorkerInjectorPlugin>
 ) : PluginPoint<WorkerInjectorPlugin> {

@@ -17,13 +17,13 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface ApiInterceptorPlugin {
     fun getInterceptor(): Interceptor
@@ -38,16 +38,16 @@ private class ApiInterceptorPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class ApiInterceptorPluginModule {
     @Multibinds
     abstract fun bindEmptyApiInterceptorPlugins(): Set<@JvmSuppressWildcards ApiInterceptorPlugin>
 
     @Module
-    @ContributesTo(AppObjectGraph::class)
+    @ContributesTo(AppScope::class)
     class ApiInterceptorPluginModuleExt {
         @Provides
-        @Singleton
+        @SingleInstanceIn(AppScope::class)
         fun provideApiInterceptorPlugins(
             plugins: Set<@JvmSuppressWildcards ApiInterceptorPlugin>
         ): PluginPoint<ApiInterceptorPlugin> {

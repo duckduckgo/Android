@@ -20,11 +20,11 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
@@ -51,10 +51,10 @@ private class ActivityLifecycleCallbacksPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class ActivityLifecycleCallbacksModule {
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun provideActivityLifecycleCallbacksPluginPoint(
         plugins: Set<@JvmSuppressWildcards ActivityLifecycleCallbacks>
     ): PluginPoint<ActivityLifecycleCallbacks> = ActivityLifecycleCallbacksPluginPoint(plugins)

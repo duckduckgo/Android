@@ -28,7 +28,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Module
 import kotlinx.coroutines.flow.*
@@ -90,7 +90,7 @@ class TrackerNetworksViewModel @Inject constructor(
 }
 
 @Module
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TrackerNetworksViewModelFactory @Inject constructor(
     private val viewModel: Provider<TrackerNetworksViewModel>
 ) : ViewModelFactoryPlugin {

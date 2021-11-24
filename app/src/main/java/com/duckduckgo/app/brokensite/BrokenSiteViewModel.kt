@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -130,7 +130,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BrokenSiteViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val brokenSiteSender: Provider<BrokenSiteSender>

@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = FragmentScope::class
 )
 interface BrokenSiteNegativeFeedbackFragmentComponent : AndroidInjector<BrokenSiteNegativeFeedbackFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<BrokenSiteNegativeFeedbackFragment>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface BrokenSiteNegativeFeedbackFragmentComponentProvider {
     fun provideBrokenSiteNegativeFeedbackFragmentComponentFactory(): BrokenSiteNegativeFeedbackFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class BrokenSiteNegativeFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrokenSiteNegativeFeedbackFragment::class)
-    abstract fun bindBrokenSiteNegativeFeedbackFragmentComponentFactory(factory: BrokenSiteNegativeFeedbackFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrokenSiteNegativeFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

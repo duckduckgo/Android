@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.api
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
@@ -27,7 +27,7 @@ import okhttp3.Response
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class
 )
 class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {

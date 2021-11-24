@@ -17,15 +17,16 @@
 package com.duckduckgo.app.global.plugins.migrations
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface MigrationPlugin {
     fun run()
     val version: Int
 }
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class MigrationPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards MigrationPlugin>
 ) : PluginPoint<MigrationPlugin> {

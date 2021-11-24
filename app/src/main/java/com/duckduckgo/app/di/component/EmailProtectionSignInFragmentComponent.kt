@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = FragmentScope::class
 )
 interface EmailProtectionSignInFragmentComponent : AndroidInjector<EmailProtectionSignInFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailProtectionSignInFragment>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface EmailProtectionSignInFragmentComponentProvider {
     fun provideEmailProtectionSignInFragmentComponentFactory(): EmailProtectionSignInFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class EmailProtectionSignInFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionSignInFragment::class)
-    abstract fun bindEmailProtectionSignInFragmentComponentFactory(factory: EmailProtectionSignInFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionSignInFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

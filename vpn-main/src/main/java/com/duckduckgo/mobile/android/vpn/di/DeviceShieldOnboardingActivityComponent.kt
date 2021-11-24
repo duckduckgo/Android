@@ -16,37 +16,38 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ActivityScope::class
 )
 interface DeviceShieldOnboardingActivityComponent : AndroidInjector<DeviceShieldOnboardingActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldOnboardingActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface DeviceShieldOnboardingActivityComponentProvider {
     fun provideDeviceShieldOnboardingActivityComponentFactory(): DeviceShieldOnboardingActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class DeviceShieldOnboardingActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldOnboardingActivity::class)
-    abstract fun bindDeviceShieldOnboardingActivityComponentFactory(factory: DeviceShieldOnboardingActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldOnboardingActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

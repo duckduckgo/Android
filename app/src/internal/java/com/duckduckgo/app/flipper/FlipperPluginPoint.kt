@@ -17,13 +17,13 @@
 package com.duckduckgo.app.flipper
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 private class FlipperPluginPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards FlipperPlugin>
@@ -34,16 +34,16 @@ private class FlipperPluginPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class FlipperPluginModule {
     @Multibinds
     abstract fun bindEmptySettingInternalFeaturePlugins(): Set<@JvmSuppressWildcards FlipperPlugin>
 
     @Module
-    @ContributesTo(AppObjectGraph::class)
+    @ContributesTo(AppScope::class)
     class SettingInternalFeaturePluginModuleExt {
         @Provides
-        @Singleton
+        @SingleInstanceIn(AppScope::class)
         fun provideSettingInternalFeaturePlugins(
             plugins: Set<@JvmSuppressWildcards FlipperPlugin>
         ): PluginPoint<FlipperPlugin> {

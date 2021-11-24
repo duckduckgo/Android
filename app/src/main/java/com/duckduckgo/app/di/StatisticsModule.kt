@@ -32,7 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -40,10 +40,10 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class StatisticsModule {
 
     @Provides
@@ -73,7 +73,7 @@ class StatisticsModule {
         RxBasedPixel(pixelSender)
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun pixelSender(
         pixelService: PixelService,
         statisticsDataStore: StatisticsDataStore,
@@ -86,7 +86,7 @@ class StatisticsModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun pixelSenderObserver(pixelSender: PixelSender): LifecycleObserver = pixelSender
 
@@ -102,7 +102,7 @@ class StatisticsModule {
 
     @Provides
     @IntoSet
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun atbInitializer(
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
@@ -112,7 +112,7 @@ class StatisticsModule {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun pixelDao(database: AppDatabase): PendingPixelDao {
         return database.pixelDao()

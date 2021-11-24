@@ -16,38 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.email.ui.EmailWebViewActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface EmailWebViewActivityComponent : AndroidInjector<EmailWebViewActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailWebViewActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface EmailWebViewActivityComponentComponentProvider {
     fun provideEmailWebViewActivityComponentFactory(): EmailWebViewActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class EmailWebViewActivityComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailWebViewActivity::class)
-    abstract fun bindEmailWebViewActivityComponentFactory(factory: EmailWebViewActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailWebViewActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

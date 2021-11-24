@@ -21,13 +21,13 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@ContributesMultibinding(AppObjectGraph::class)
-@Singleton
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class BrowserApplicationStateInfo @Inject constructor(
     private val observers: Set<@JvmSuppressWildcards BrowserLifecycleObserver>
 ) : ActivityLifecycleCallbacks {

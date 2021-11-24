@@ -17,7 +17,7 @@
 package com.duckduckgo.vpn.internal.feature.bugreport
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -28,7 +28,7 @@ interface VpnBugReporter {
     suspend fun generateBugReport(): String
 }
 
-@ContributesBinding(VpnObjectGraph::class)
+@ContributesBinding(VpnScope::class)
 class RealVpnBugReporter @Inject constructor(
     private val vpnStateCollector: VpnStateCollector,
     private val dispatcherProvider: DispatcherProvider,

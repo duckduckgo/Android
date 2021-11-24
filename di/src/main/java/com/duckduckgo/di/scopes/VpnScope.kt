@@ -15,4 +15,4 @@
  */
 package com.duckduckgo.di.scopes
 
-abstract class ActivityObjectGraph private constructor()
+abstract class VpnScope private constructor()

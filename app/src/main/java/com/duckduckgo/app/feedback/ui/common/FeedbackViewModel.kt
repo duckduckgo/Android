@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -305,7 +305,7 @@ data class UpdateViewCommand(
     val subReason: SubReason? = null
 )
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FeedbackViewModelFactory @Inject constructor(
     private val playStoreUtils: Provider<PlayStoreUtils>,
     private val feedbackSubmitter: Provider<FeedbackSubmitter>,
