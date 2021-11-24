@@ -56,30 +56,30 @@ class UncaughtExceptionRepositoryDbTest {
     @Test
     fun whenLatestExceptionIsNullThenReturnTrue() = runBlocking {
         whenever(uncaughtExceptionDao.getLatestException()).thenReturn(null)
-        assertTrue(testee.isOverTimeThreshold(entity.copy(timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(timestamp = 1500)))
     }
 
     @Test
     fun whenIsBelowTimeThresholdAndSameExceptionThenReturnFalseAndUpdateTimestamp() = runBlocking {
-        assertFalse(testee.isOverTimeThreshold(entity.copy(timestamp = 1500)))
+        assertFalse(testee.isNotDuplicate(entity.copy(timestamp = 1500)))
         verify(uncaughtExceptionDao).update(entity.copy(timestamp = 1500))
     }
 
     @Test
     fun whenIsAboveTimeThresholdAndSameExceptionThenReturnTrue() = runBlocking {
-        assertTrue(testee.isOverTimeThreshold(entity.copy(timestamp = 2001)))
+        assertTrue(testee.isNotDuplicate(entity.copy(timestamp = 2001)))
     }
 
     @Test
     fun whenIsDifferentExceptionThenReturnTrue() = runBlocking {
-        assertTrue(testee.isOverTimeThreshold(entity.copy(message = "different message", timestamp = 1500)))
-        assertTrue(testee.isOverTimeThreshold(entity.copy(version = "different version", timestamp = 1500)))
-        assertTrue(testee.isOverTimeThreshold(entity.copy(exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
 
-        assertTrue(testee.isOverTimeThreshold(entity.copy(message = "different message", version = "different version", timestamp = 1500)))
-        assertTrue(testee.isOverTimeThreshold(entity.copy(message = "different message", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
-        assertTrue(testee.isOverTimeThreshold(entity.copy(version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
 
-        assertTrue(testee.isOverTimeThreshold(entity.copy(message = "different message", version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
     }
 }

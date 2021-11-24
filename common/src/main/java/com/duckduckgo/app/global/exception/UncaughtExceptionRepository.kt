@@ -51,7 +51,7 @@ class UncaughtExceptionRepositoryDb(
                 version = deviceInfo.appVersion
             )
 
-            if (isOverTimeThreshold(exceptionEntity)) {
+            if (isNotDuplicate(exceptionEntity)) {
                 uncaughtExceptionDao.add(exceptionEntity)
             }
 
@@ -60,7 +60,7 @@ class UncaughtExceptionRepositoryDb(
     }
 
     @VisibleForTesting
-    fun isOverTimeThreshold(incomingException: UncaughtExceptionEntity): Boolean {
+    fun isNotDuplicate(incomingException: UncaughtExceptionEntity): Boolean {
 
         val lastRecordedException = uncaughtExceptionDao.getLatestException() ?: return true
 
