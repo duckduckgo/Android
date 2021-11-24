@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     /* Depend on the android gradle plugin, since we want to access it in our plugin */
-    implementation("com.android.tools.build:gradle:4.2.0")
+    implementation("com.android.tools.build:gradle:4.1.3")
 
     /* Depend on the default Gradle API's since we want to build a custom plugin */
     implementation(gradleApi())
