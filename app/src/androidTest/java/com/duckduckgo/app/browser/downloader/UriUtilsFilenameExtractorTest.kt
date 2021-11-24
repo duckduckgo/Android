@@ -86,7 +86,7 @@ class UriUtilsFilenameExtractorTest {
     @SdkSuppress(minSdkVersion = 22)
     fun whenUrlContainsAmbiguousFilenameButContainsPathSegmentsWhichLookLikeAFilenameAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/dotted.path/b/b1/realFilename"
-        val mimeType: String? = "image/jpeg"
+        val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
         val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
@@ -97,10 +97,9 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = 22)
     fun whenUrlContainsFilenameAndContainsMultiplePathSegmentsAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg"
-        val mimeType: String? = "image/jpeg"
+        val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
         val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
