@@ -58,7 +58,6 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(toolbar)
-        configureListener()
         observeViewModel()
     }
 
@@ -73,8 +72,8 @@ class AccessibilityActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 Timber.i("AccessibilityActSettings: newViewState $viewState")
                 renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
-                binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
                 binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
+                binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
             }.launchIn(lifecycleScope)
     }
 
@@ -90,12 +89,6 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
         binding.fontSizeSettingsGroup.alpha = if (overrideSystemFontSize) 1.0f else 0.40f
         binding.accessibilitySlider.isEnabled = overrideSystemFontSize
-    }
-
-    private fun configureListener() {
-        binding.appFontSizeToggle.setOnCheckedChangeListener(systemFontSizeChangeListener)
-        binding.accessibilitySlider.addOnChangeListener(fontSizeChangeListener)
-        binding.forceZoomToggle.setOnCheckedChangeListener(forceZoomChangeListener)
     }
 
     companion object {
