@@ -51,4 +51,8 @@
 
     <dimen name="component_label_horizontal_margin">@dimen/keyline_4</dimen>
     <dimen name="elevation_default_top_app_bar">4dp</dimen>
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/david/design_system_templates_complete
 </resources>

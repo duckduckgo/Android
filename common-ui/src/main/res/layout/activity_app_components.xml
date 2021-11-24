@@ -16,25 +16,28 @@
 
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent">
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.appbar.AppBarLayout
         style="@style/Widget.MaterialComponents.AppBarLayout.Surface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="@style/ToolbarTheme"
         android:translationZ="@dimen/elevation_default_top_app_bar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:theme="@style/ToolbarTheme"
+            android:background="?attr/toolbarBgColor"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
@@ -45,15 +48,14 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
+                    android:textAlignment="viewStart"
                     android:paddingTop="42dp"
-                    android:text="DuckDuckGo App Components"
+                    android:text="App Components"
+                    android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
                     android:drawableStart="@drawable/ic_dax_icon"
-                    android:drawablePadding="@dimen/keyline_2"
-                    android:textAppearance="?textAppearanceHeadline1" />
+                    android:drawablePadding="@dimen/keyline_2"/>
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -66,14 +68,13 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
                         android:text="Enable Dark Theme"
-                        android:textAppearance="?attr/textAppearanceBody1"
-                        android:textColor="@color/material_on_background_emphasis_medium"/>
+                        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"/>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/dark_theme_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical" />
+                        android:layout_gravity="end|center_vertical"/>
 
                 </FrameLayout>
 
@@ -86,11 +87,11 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:layout_gravity="bottom"
-            android:background="@android:color/transparent"
-            app:tabIndicatorColor="?colorPrimary"
+            android:background="?attr/toolbarBgColor"
+            app:tabIndicatorColor="?normalTextColor"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="?colorPrimary"
-            app:tabTextColor="?colorOnSurface" />
+            app:tabSelectedTextColor="?normalTextColor"
+            app:tabTextColor="?secondaryTextColor"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

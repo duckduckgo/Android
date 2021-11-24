@@ -14,16 +14,13 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.mobile.android">
+<resources>
 
-    <application>
+    <!--Panel view-->
+    <declare-styleable name="InfoPanel">
+        <attr name="panelBackground" format="reference" />
+        <attr name="panelDrawable" format="reference" />
+        <attr name="panelText" format="string" />
+    </declare-styleable>
 
-        <activity
-            android:theme="@style/AppTheme"
-            android:name=".themepreview.ui.AppComponentsActivity"
-            android:exported="true" />
-
-    </application>
-
-</manifest>
+</resources>

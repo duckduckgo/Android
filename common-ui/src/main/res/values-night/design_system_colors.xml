@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,10 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.mobile.android">
+<resources>
 
-    <application>
+    <!-- Night / Dark theme colors -->
+    <color name="primaryTextColor">@color/white</color>
+    <color name="secondaryTextColor">@color/gray20</color>
 
-        <activity
-            android:theme="@style/AppTheme"
-            android:name=".themepreview.ui.AppComponentsActivity"
-            android:exported="true" />
-
-    </application>
-
-</manifest>
+</resources>

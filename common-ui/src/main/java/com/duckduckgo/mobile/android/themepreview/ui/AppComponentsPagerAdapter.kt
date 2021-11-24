@@ -21,10 +21,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentButtonsFragment
-import com.duckduckgo.mobile.android.themepreview.ui.component.controls.ComponentControlsFragment
-import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentNavigationFragment
-import com.duckduckgo.mobile.android.themepreview.ui.component.system.ComponentSystemFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentInteractiveElementsFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentMessagingFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.system.ComponentCardsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.palette.ColorPaletteFragment
 import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragment
 
@@ -39,10 +38,8 @@ class AppComponentsPagerAdapter(
     enum class MainFragments(val titleRes: Int) {
         PALETTE(R.string.tab_title_color_palette),
         TYPOGRAPHY(R.string.tab_title_typography),
-        BUTTONS(R.string.tab_title_component_buttons),
-        NAVIGATION(R.string.tab_title_component_navigation),
-        CONTROLS(R.string.tab_title_component_controls),
-        SYSTEM(R.string.tab_title_component_system),
+        INTERACTIVE_ELEMENTS(R.string.tab_title_component_interactive),
+        MESSAGING(R.string.tab_title_component_messaging),
     }
 
     override fun getCount(): Int = MainFragments.values().size
@@ -59,10 +56,8 @@ class AppComponentsPagerAdapter(
         return when (getItemType(position)) {
             MainFragments.PALETTE -> ColorPaletteFragment()
             MainFragments.TYPOGRAPHY -> TypographyFragment()
-            MainFragments.NAVIGATION -> ComponentNavigationFragment()
-            MainFragments.BUTTONS -> ComponentButtonsFragment()
-            MainFragments.CONTROLS -> ComponentControlsFragment()
-            MainFragments.SYSTEM -> ComponentSystemFragment()
+            MainFragments.INTERACTIVE_ELEMENTS -> ComponentInteractiveElementsFragment()
+            MainFragments.MESSAGING -> ComponentMessagingFragment()
         }
     }
 }
