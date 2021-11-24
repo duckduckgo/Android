@@ -37,12 +37,14 @@ constructor(
                 attrs,
                 R.styleable.SectionHeaderTextView,
                 0,
-                R.style.Widget_DuckDuckGo_SectionHeader)
+                R.style.Widget_DuckDuckGo_SectionHeader
+            )
 
         val textAppearanceId =
             typedArray.getResourceId(
                 R.styleable.SectionHeaderTextView_android_textAppearance,
-                android.R.style.TextAppearance)
+                android.R.style.TextAppearance
+            )
         setTextAppearance(context, textAppearanceId)
 
         typedArray.recycle()
