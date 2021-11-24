@@ -22,13 +22,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
@@ -93,6 +93,6 @@ class RealCohortStore @Inject constructor(
 abstract class CohortStoreModule {
     @Binds
     @IntoSet
-    @VpnScope
+    @SingleIn(VpnObjectGraph::class)
     abstract fun bindCohortStore(realCohortStore: RealCohortStore): VpnServiceCallbacks
 }

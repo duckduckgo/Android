@@ -19,13 +19,13 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleIn
 import dagger.multibindings.Multibinds
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -33,7 +33,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesBinding(VpnObjectGraph::class)
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 class RealVpnStateCollector @Inject constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
     private val dispatcherProvider: DispatcherProvider,
@@ -66,14 +66,14 @@ private class VpnStateCollectorPluginPoint(
 abstract class VpnStateCollectorProviderModule {
 
     @Multibinds
-    @VpnScope
+    @SingleIn(VpnObjectGraph::class)
     abstract fun bindVpnStateCollectorEmptyPlugins(): Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
 
     @Module
     @ContributesTo(VpnObjectGraph::class)
     class VpnStateCollectorProviderModuleExt {
         @Provides
-        @VpnScope
+        @SingleIn(VpnObjectGraph::class)
         fun bindVpnMemoryCollectorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
         ): PluginPoint<VpnStateCollectorPlugin> {

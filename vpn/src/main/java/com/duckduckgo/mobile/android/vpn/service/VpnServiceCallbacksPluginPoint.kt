@@ -18,10 +18,10 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleIn
 import dagger.multibindings.Multibinds
 
 private class VpnServiceCallbacksPluginPoint(
@@ -37,14 +37,14 @@ private class VpnServiceCallbacksPluginPoint(
 @ContributesTo(VpnObjectGraph::class)
 abstract class VpnServiceCallbacksProviderModule {
     @Multibinds
-    @VpnScope
+    @SingleIn(VpnObjectGraph::class)
     abstract fun provideVpnServiceCallbacksPlugins(): Set<@JvmSuppressWildcards VpnServiceCallbacks>
 
     @Module
     @ContributesTo(VpnObjectGraph::class)
     class VpnServiceCallbacksProviderModuleExt {
         @Provides
-        @VpnScope
+        @SingleIn(VpnObjectGraph::class)
         fun bindVpnServiceCallbacksPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnServiceCallbacks>
         ): PluginPoint<VpnServiceCallbacks> {

@@ -18,19 +18,19 @@ package com.duckduckgo.app.di.component
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 
 import com.duckduckgo.vpn.internal.feature.VpnInternalSettingsActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )

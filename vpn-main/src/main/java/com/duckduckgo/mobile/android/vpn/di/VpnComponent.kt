@@ -24,6 +24,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
@@ -40,14 +41,14 @@ import dummy.ui.VpnControllerActivity
  * The following dagger-android code:
  *
  * ```
- *     @VpnScope
+ *     @SingleIn(VpnObjectGraph::class)
  *     @ContributesAndroidInjector
  *     abstract fun launchMyOtherVpnActivity(): MyOtherVpnActivity
  * ```
  * Will now require the following three steps
  * 1. Define the factory for MyActivity sub-component
  *```
- *      @VpnScope
+ *      @SingleIn(VpnObjectGraph::class)
  *      @MergeSubcomponent(
  *          scope = VpnObjectGraph::class
  *      )
@@ -97,7 +98,7 @@ import dummy.ui.VpnControllerActivity
 /* ======================================
  Step 1. Factory definition
  ====================================== */
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )
@@ -106,7 +107,7 @@ interface VpnControllerActivityComponent : AndroidInjector<VpnControllerActivity
     interface Factory : AndroidInjector.Factory<VpnControllerActivity>
 }
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )
@@ -115,7 +116,7 @@ interface DeviceShieldFragmentComponent : AndroidInjector<DeviceShieldFragment> 
     interface Factory : AndroidInjector.Factory<DeviceShieldFragment>
 }
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )
@@ -124,7 +125,7 @@ interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivi
     interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
 }
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )

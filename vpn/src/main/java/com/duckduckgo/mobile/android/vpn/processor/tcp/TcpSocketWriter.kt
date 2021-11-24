@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
@@ -27,6 +26,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
@@ -45,7 +45,7 @@ interface TcpSocketWriter {
     fun removeFromWriteQueue(tcb: TCB)
 }
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @ContributesBinding(
     scope = VpnObjectGraph::class,
     boundType = TcpSocketWriter::class

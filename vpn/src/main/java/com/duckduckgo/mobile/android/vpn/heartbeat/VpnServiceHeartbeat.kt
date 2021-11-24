@@ -21,11 +21,11 @@ import android.os.Process
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -35,7 +35,7 @@ import javax.inject.Inject
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class
 )
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 class VpnServiceHeartbeatImpl @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,

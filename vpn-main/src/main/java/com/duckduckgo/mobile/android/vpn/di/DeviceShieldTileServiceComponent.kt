@@ -23,13 +23,14 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.binding.TileServiceBingingKey
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )

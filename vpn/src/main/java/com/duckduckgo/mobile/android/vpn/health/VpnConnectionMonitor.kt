@@ -18,12 +18,12 @@ package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
 import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.NetworkInterface
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-@VpnScope
+@SingleIn(VpnObjectGraph::class)
 @ContributesMultibinding(VpnObjectGraph::class)
 class VpnConnectionMonitor @Inject constructor(
     private val context: Context,
