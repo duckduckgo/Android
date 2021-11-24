@@ -156,7 +156,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
@@ -249,9 +248,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var themingDataStore: ThemingDataStore
-
-    @Inject
-    lateinit var onboardingStore: OnboardingStore
 
     @Inject
     @AppCoroutineScope
