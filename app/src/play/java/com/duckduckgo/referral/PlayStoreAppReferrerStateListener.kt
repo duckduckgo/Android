@@ -31,12 +31,13 @@ import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.di.scopes.AppObjectGraph
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class PlayStoreAppReferrerStateListener @Inject constructor(
     val context: Context,
     private val packageManager: PackageManager,

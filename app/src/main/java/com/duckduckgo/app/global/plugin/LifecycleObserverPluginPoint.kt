@@ -24,7 +24,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.Multibinds
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -34,13 +34,13 @@ abstract class LifecycleObserverPluginProviderModule {
     abstract fun provideLifecycleObserverPlugins(): Set<@JvmSuppressWildcards LifecycleObserver>
 
     @Binds
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     abstract fun provideLifecycleObserverPluginProvider(
         lifecycleObserverPluginPoint: LifecycleObserverPluginPoint
     ): PluginPoint<LifecycleObserver>
 }
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class LifecycleObserverPluginPoint @Inject constructor(
     private val plugins: Set<@JvmSuppressWildcards LifecycleObserver>
 ) : PluginPoint<LifecycleObserver> {

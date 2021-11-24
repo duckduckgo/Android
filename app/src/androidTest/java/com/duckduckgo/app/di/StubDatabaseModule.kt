@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module(includes = [DaoModule::class])
 @ContributesTo(
@@ -34,13 +34,13 @@ import javax.inject.Singleton
 class StubDatabaseModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideWebviewDatabase(context: Context): WebViewDatabase {
         return WebViewDatabase.getInstance(context)
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideDatabase(context: Context): AppDatabase {
         return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()

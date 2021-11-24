@@ -37,7 +37,7 @@ import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
@@ -53,7 +53,7 @@ interface HttpsUpgrader {
     fun reloadData()
 }
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @ContributesBinding(
     scope = AppObjectGraph::class,
     boundType = HttpsUpgrader::class
@@ -137,7 +137,7 @@ class HttpsUpgraderImpl @Inject constructor(
 @ContributesTo(AppObjectGraph::class)
 abstract class HttpsUpgraderModule {
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Binds
     @IntoSet
     abstract fun bindHttpsUpgraderLifecycleObserver(

@@ -21,14 +21,14 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 interface UnprotectedTemporary {
     fun isAnException(url: String): Boolean
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {

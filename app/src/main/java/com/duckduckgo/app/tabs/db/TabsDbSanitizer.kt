@@ -20,14 +20,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository
 ) : LifecycleObserver {

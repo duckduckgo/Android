@@ -41,9 +41,9 @@ import dagger.android.AndroidInjector
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleIn
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @MergeComponent(
     scope = AppObjectGraph::class,
     modules = [

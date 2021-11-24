@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleIn
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
@@ -57,7 +57,7 @@ interface WebViewHttpAuthStore {
     scope = AppObjectGraph::class,
     boundType = LifecycleObserver::class
 )
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
@@ -109,7 +109,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
 @ContributesTo(AppObjectGraph::class)
 abstract class WebViewHttpAuthStoreModule {
     @Binds
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     abstract fun bindWebViewHttpAuthStore(
         realWebViewHttpAuthStore: RealWebViewHttpAuthStore
     ): WebViewHttpAuthStore

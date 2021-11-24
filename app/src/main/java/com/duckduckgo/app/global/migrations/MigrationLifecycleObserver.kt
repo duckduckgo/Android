@@ -24,10 +24,10 @@ import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @ContributesMultibinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class MigrationLifecycleObserver @Inject constructor(
     private val migrationPluginPoint: PluginPoint<MigrationPlugin>,
     private val migrationStore: MigrationStore

@@ -34,16 +34,17 @@ import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class EmailModule {
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Provides
     fun providesEmailManager(
         emailService: EmailService,
@@ -68,7 +69,7 @@ class EmailModule {
         return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope)
     }
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Provides
     fun providesWaitlistCodeFetcher(
         workManager: WorkManager,
@@ -82,7 +83,7 @@ class EmailModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @IntoSet
     fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
 }

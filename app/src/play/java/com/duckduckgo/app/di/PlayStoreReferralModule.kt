@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(
@@ -34,7 +34,7 @@ import javax.inject.Singleton
 class PlayStoreReferralModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun appInstallationReferrerStateListener(
         playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener

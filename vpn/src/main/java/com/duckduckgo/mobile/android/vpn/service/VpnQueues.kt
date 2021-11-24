@@ -26,7 +26,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 import kotlin.math.min
 
 interface VpnQueuesTimeLogger {
@@ -48,7 +48,7 @@ interface VpnQueuesTimeLogger {
 
 // This is in the App object graph because we need to share it
 // in more than one dagger subcomponent
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @ContributesBinding(AppObjectGraph::class)
 class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LoggingLinkedBlockingDeque()

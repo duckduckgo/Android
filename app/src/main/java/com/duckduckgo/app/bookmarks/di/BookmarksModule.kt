@@ -41,14 +41,14 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class BookmarksModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun savedSitesImporter(
         context: Context,
         bookmarksDao: BookmarksDao,
@@ -60,13 +60,13 @@ class BookmarksModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun savedSitesParser(): SavedSitesParser {
         return RealSavedSitesParser()
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun savedSitesExporter(
         context: Context,
         savedSitesParser: SavedSitesParser,
@@ -78,7 +78,7 @@ class BookmarksModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun bookmarkManager(
         savedSitesImporter: SavedSitesImporter,
         savedSitesExporter: SavedSitesExporter,
@@ -88,13 +88,13 @@ class BookmarksModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }

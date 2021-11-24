@@ -28,7 +28,7 @@ import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -265,7 +265,7 @@ interface DeviceShieldPixels {
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val context: Context,
     private val pixel: Pixel

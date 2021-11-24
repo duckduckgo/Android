@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(
@@ -31,7 +31,7 @@ import javax.inject.Singleton
 )
 class InternalStatisticsLibraryConfigModule {
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideStatisticsLibraryConfig(): StatisticsLibraryConfig {
         return object : StatisticsLibraryConfig {
             override fun shouldFirePixelsAsDev(): Boolean {

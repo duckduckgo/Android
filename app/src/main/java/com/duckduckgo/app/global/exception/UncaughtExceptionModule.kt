@@ -21,16 +21,17 @@ import com.duckduckgo.app.global.AlertingUncaughtExceptionHandler
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class UncaughtExceptionModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun uncaughtWebViewExceptionRepository(
         uncaughtExceptionDao: UncaughtExceptionDao,
         rootExceptionFinder: RootExceptionFinder,
@@ -40,7 +41,7 @@ class UncaughtExceptionModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun alertingUncaughtExceptionHandler(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,

@@ -22,17 +22,18 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class AppUsageModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @IntoSet
     fun appDaysUsedRecorderObserver(
         appDaysUsedRepository: AppDaysUsedRepository,
@@ -42,7 +43,7 @@ class AppUsageModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun appDaysUsedRespository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
         return AppDaysUsedDatabaseRepository(appDaysUsedDao)
     }

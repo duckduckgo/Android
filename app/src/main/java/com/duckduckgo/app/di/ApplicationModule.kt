@@ -18,14 +18,15 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import android.content.Context
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Binds
 import dagger.Module
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 abstract class ApplicationModule {
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Binds
     abstract fun bindContext(application: Application): Context
 

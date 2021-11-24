@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
+import dagger.SingleIn
 
 private class FlipperPluginPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards FlipperPlugin>
@@ -43,7 +43,7 @@ abstract class FlipperPluginModule {
     @ContributesTo(AppObjectGraph::class)
     class SettingInternalFeaturePluginModuleExt {
         @Provides
-        @Singleton
+        @SingleIn(AppObjectGraph::class)
         fun provideSettingInternalFeaturePlugins(
             plugins: Set<@JvmSuppressWildcards FlipperPlugin>
         ): PluginPoint<FlipperPlugin> {

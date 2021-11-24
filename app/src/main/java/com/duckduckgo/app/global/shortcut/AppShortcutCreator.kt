@@ -39,7 +39,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -64,7 +64,7 @@ class AppShortcutCreatorLifecycleObserver(
     }
 }
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class AppShortcutCreator @Inject constructor(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

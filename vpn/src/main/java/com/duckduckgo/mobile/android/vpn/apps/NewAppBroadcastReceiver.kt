@@ -23,6 +23,7 @@ import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -34,9 +35,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @ContributesMultibinding(
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class

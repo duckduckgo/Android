@@ -18,20 +18,21 @@ package com.duckduckgo.app.browser.certificates
 
 import android.content.Context
 import com.duckduckgo.app.browser.certificates.rootstore.*
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class CertificateTrustedStoreModule {
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun trustedCertificateStore(
         letsEncryptCertificateProvider: LetsEncryptCertificateProvider
     ): TrustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun letsEncryptCertificateProvider(
         context: Context
     ): LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(

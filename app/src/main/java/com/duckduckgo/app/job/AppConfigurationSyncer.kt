@@ -34,13 +34,13 @@ import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class AppConfigurationSyncerModule {
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @IntoSet
     fun provideAppConfigurationSyncer(
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,

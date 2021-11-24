@@ -18,14 +18,15 @@ package com.duckduckgo.app.surrogates.di
 
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class ResourceSurrogateModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun analyticsSurrogates(): ResourceSurrogates = ResourceSurrogatesImpl()
 }

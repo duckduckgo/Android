@@ -27,10 +27,10 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @ContributesBinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository, private val unprotectedTemporary: UnprotectedTemporary) : Gpc {
 
     private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }

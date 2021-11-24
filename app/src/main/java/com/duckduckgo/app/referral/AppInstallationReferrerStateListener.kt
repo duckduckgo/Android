@@ -17,9 +17,10 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.di.scopes.AppObjectGraph
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 interface AppInstallationReferrerStateListener {
 
@@ -32,7 +33,7 @@ interface AppInstallationReferrerStateListener {
 
 }
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private var referralResult: ParsedReferrerResult = ParsedReferrerResult.ReferrerInitialising

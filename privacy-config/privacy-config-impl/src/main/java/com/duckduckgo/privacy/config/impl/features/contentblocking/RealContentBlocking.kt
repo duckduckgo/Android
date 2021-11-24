@@ -25,10 +25,10 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @ContributesBinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {

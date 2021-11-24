@@ -28,14 +28,14 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
 }
 
 @WorkerThread
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @ContributesBinding(AppObjectGraph::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,

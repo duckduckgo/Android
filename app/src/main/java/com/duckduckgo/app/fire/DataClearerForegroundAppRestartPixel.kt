@@ -29,9 +29,10 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.di.scopes.AppObjectGraph
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
@@ -39,7 +40,7 @@ import javax.inject.Singleton
  *
  * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
  */
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel

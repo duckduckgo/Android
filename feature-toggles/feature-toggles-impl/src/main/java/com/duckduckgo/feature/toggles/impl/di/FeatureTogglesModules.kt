@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -40,7 +40,7 @@ abstract class FeatureTogglesBindingModule {
 class FeatureTogglesModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideFeatureTogglesPluginPoint(toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
         return FeatureCustomConfigPluginPoint(toggles)
     }

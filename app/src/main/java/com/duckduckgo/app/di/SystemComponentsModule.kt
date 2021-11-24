@@ -37,21 +37,21 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class SystemComponentsModule {
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Provides
     fun packageManager(context: Context): PackageManager = context.packageManager
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Provides
     fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
 
     @Provides

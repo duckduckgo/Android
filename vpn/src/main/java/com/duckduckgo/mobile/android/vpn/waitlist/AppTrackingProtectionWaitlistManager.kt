@@ -22,11 +22,11 @@ import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dagger.SingleIn
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface TrackingProtectionWaitlistManager {
     fun waitlistState(): WaitlistState
@@ -37,7 +37,7 @@ interface TrackingProtectionWaitlistManager {
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
-@Singleton
+@SingleIn(AppObjectGraph::class)
 @ContributesBinding(AppObjectGraph::class)
 class AppTrackingProtectionWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
@@ -111,7 +111,7 @@ class AppTrackingProtectionWaitlistManager @Inject constructor(
 
     private fun parseRedeemCodeError(e: HttpException): RedeemCodeResult {
         return try {
-            val error = Moshi.Builder().build().adapter(AppTPRedeemCodeError::class.java).fromJson(e.response()?.errorBody()?.string())
+            val error = Moshi.Builder().build().adapter(AppTPRedeemCodeError::class.java).fromJson(e.response()?.errorBody()?.string().orEmpty())
             when (error?.error) {
                 AppTPRedeemCodeError.INVALID -> RedeemCodeResult.InvalidCode
                 AppTPRedeemCodeError.ALREADY_REDEEMED -> RedeemCodeResult.AlreadyRedeemed

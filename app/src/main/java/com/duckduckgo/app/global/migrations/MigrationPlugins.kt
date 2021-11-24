@@ -23,10 +23,10 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @ContributesMultibinding(AppObjectGraph::class)
-@Singleton
+@SingleIn(AppObjectGraph::class)
 class GpcMigrationPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val gpc: Gpc

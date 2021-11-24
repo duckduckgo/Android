@@ -22,9 +22,10 @@ import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
+import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 class OnboardingModule {
@@ -39,7 +40,7 @@ class OnboardingModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun onboardingPageBuilder(): OnboardingPageBuilder {
         return OnboardingFragmentPageBuilder()
     }

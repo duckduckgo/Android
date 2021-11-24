@@ -30,13 +30,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class AppTrackingProtectionModule {
 
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @Provides
     fun providesAppTrackingProtectionWaitlistCodeFetcher(
         workManager: WorkManager,
@@ -50,7 +50,7 @@ class AppTrackingProtectionModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     @IntoSet
     fun providesAppTrackingProtectionCodeFetcherObserver(codeFetcher: TrackingProtectionWaitlistCodeFetcher): LifecycleObserver = codeFetcher
 }

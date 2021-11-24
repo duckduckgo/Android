@@ -31,28 +31,29 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleIn
 
 @Module(includes = [DaoModule::class])
 class NotificationModule {
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideNotificationManager(context: Context): NotificationManager {
         return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideNotificationManagerCompat(context: Context): NotificationManagerCompat {
         return NotificationManagerCompat.from(context)
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun provideLocalBroadcastManager(context: Context): LocalBroadcastManager {
         return LocalBroadcastManager.getInstance(context)
     }
@@ -85,7 +86,7 @@ class NotificationModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
@@ -99,13 +100,13 @@ class NotificationModule {
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun providesNotificationFactory(context: Context, manager: NotificationManagerCompat): NotificationFactory {
         return NotificationFactory(context, manager)
     }
 
     @Provides
-    @Singleton
+    @SingleIn(AppObjectGraph::class)
     fun providesNotificationSender(
         context: Context,
         pixel: Pixel,
