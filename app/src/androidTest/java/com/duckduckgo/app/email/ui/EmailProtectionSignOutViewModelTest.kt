@@ -50,7 +50,7 @@ class EmailProtectionSignOutViewModelTest {
     fun whenOnSignOutButtonClickedThenEmitSignOutCommand() = coroutineRule.runBlocking {
         testee.commands.test {
             testee.onSignOutButtonClicked()
-            assertEquals(SignOut, expectItem())
+            assertEquals(SignOut, awaitItem())
         }
     }
 
