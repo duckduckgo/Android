@@ -16,26 +16,9 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import timber.log.Timber
+import retrofit2.http.GET
 
-interface RemoteMessagingConfigDownloader {
-    suspend fun download(): Boolean
-}
-
-class RealRemoteMessagingConfigDownloader constructor(
-    private val remoteConfig: RemoteMessagingService,
-    private val remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
-) : RemoteMessagingConfigDownloader {
-    override suspend fun download(): Boolean {
-        Timber.v("RMF: downloading config")
-        kotlin.runCatching {
-            remoteConfig.config()
-        }.onSuccess {
-            remoteMessagingConfigProcessor.process(it)
-        }.onFailure {
-            throw it
-        }
-
-        return true
-    }
+interface RemoteMessagingService {
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/config/v1/android-config.json")
+    suspend fun config(): JsonRemoteMessagingConfig
 }

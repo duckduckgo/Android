@@ -22,7 +22,7 @@ interface RemoteMessagingConfigRepository {
     fun delete()
 }
 
-class LocalRemoteMessagingConfigRepository() : RemoteMessagingConfigRepository {
+class LocalRemoteMessagingConfigRepository : RemoteMessagingConfigRepository {
     private var currentVersion: Long = 0
 
     override fun insert(remoteMessagingConfig: RemoteMessagingConfig) {
