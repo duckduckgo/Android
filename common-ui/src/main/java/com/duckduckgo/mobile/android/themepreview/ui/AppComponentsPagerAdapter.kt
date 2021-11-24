@@ -23,7 +23,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentInteractiveElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentMessagingFragment
-import com.duckduckgo.mobile.android.themepreview.ui.component.system.ComponentCardsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.palette.ColorPaletteFragment
 import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragment
 
