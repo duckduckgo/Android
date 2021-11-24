@@ -22,18 +22,19 @@ interface RemoteMessagingConfigRepository {
     fun delete()
 }
 
-class LocalRemoteMessagingConfigRepository : RemoteMessagingConfigRepository {
-    private var currentVersion: Long = 0
+class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : RemoteMessagingConfigRepository {
+
+    private val dao: RemoteMessagingConfigDao = database.remoteMessagingConfigDao()
 
     override fun insert(remoteMessagingConfig: RemoteMessagingConfig) {
-        currentVersion = remoteMessagingConfig.version
+        dao.insert(remoteMessagingConfig)
     }
 
     override fun get(): RemoteMessagingConfig {
-        return RemoteMessagingConfig(version = currentVersion)
+        return dao.get() ?: RemoteMessagingConfig(version = 0)
     }
 
     override fun delete() {
-        currentVersion = 0
+        dao.delete()
     }
 }

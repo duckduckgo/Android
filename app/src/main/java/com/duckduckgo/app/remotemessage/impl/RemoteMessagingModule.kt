@@ -16,9 +16,13 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
+import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.remotemessage.store.ALL_MIGRATIONS
 import com.duckduckgo.app.remotemessage.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
+import com.duckduckgo.app.remotemessage.store.RemoteMessagingDatabase
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesTo
@@ -65,7 +69,6 @@ class NetworkModule {
 @Module
 @ContributesTo(AppObjectGraph::class)
 class DataSourceModule {
-
     @Singleton
     @Provides
     fun providesRemoteMessagingConfigProcessor(
@@ -76,7 +79,17 @@ class DataSourceModule {
 
     @Singleton
     @Provides
-    fun providesRemoteMessagingConfigRepository(): RemoteMessagingConfigRepository {
-        return LocalRemoteMessagingConfigRepository()
+    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
+        return LocalRemoteMessagingConfigRepository(database)
+    }
+
+    @Singleton
+    @Provides
+    fun providesRemoteMessagingDatabase(context: Context): RemoteMessagingDatabase {
+        return Room.databaseBuilder(context, RemoteMessagingDatabase::class.java, "remote_messaging.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
     }
 }
