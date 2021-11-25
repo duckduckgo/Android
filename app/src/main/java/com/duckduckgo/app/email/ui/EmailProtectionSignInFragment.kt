@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
@@ -97,6 +98,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     private fun executeCommand(command: EmailProtectionSignInViewModel.Command) {
         when (command) {
             is EmailProtectionSignInViewModel.Command.OpenUrl -> openWebsite(command.url)
+            is EmailProtectionSignInViewModel.Command.OpenUrlInBrowserTab -> openBrowserTab(command.url)
             is EmailProtectionSignInViewModel.Command.ShowErrorMessage -> renderErrorMessage()
             is EmailProtectionSignInViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
         }
@@ -171,6 +173,13 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
                 text = spannableString
                 movementMethod = LinkMovementMethod.getInstance()
             }
+        }
+    }
+
+    private fun openBrowserTab(url: String) {
+        context?.let {
+            startActivity(BrowserActivity.intent(it, url))
+            activity?.finish()
         }
     }
 
