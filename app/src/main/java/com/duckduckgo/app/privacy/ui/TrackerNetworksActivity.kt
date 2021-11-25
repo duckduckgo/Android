@@ -19,21 +19,19 @@ package com.duckduckgo.app.privacy.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.databinding.ActivityTrackerNetworksBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var repository: TabRepository
 
     private val binding: ActivityTrackerNetworksBinding by viewBinding()
 
@@ -54,19 +52,11 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         configureRecycler()
 
-        viewModel.viewState.observe(
-            this,
-            Observer<TrackerNetworksViewModel.ViewState> {
-                it?.let { render(it) }
-            }
-        )
-
-        repository.retrieveSiteData(intent.tabId!!).observe(
-            this,
-            Observer<Site> {
-                viewModel.onSiteChanged(it)
-            }
-        )
+        lifecycleScope.launch {
+            viewModel.trackers(intent.tabId!!)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { render(it) }
+        }
     }
 
     private fun configureRecycler() {
