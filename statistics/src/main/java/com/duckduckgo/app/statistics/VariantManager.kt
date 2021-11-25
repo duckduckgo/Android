@@ -48,8 +48,8 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Fireproof experiment
-            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
+            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
             // Returning users
             Variant(key = "zk", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
