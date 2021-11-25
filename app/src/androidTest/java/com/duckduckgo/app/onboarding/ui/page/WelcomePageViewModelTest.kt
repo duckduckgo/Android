@@ -223,28 +223,6 @@ class WelcomePageViewModelTest {
     @Test
     fun whenOnPrimaryCtaClickedAndReturningUsersNoOnboardingEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
-        emitShowDialogAndFireAndNeverHideTips()
-    }
-
-    @Test
-    fun whenOnPrimaryCtaClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
-        emitShowDialogAndFireAndNeverHideTips()
-    }
-
-    @Test
-    fun whenOnReturningUserClickedAndReturningUsersNoOnboardingEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
-        emitShowDialogAndFireAndHideTips()
-    }
-
-    @Test
-    fun whenOnReturningUserClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
-        emitShowDialogAndFireAndHideTips()
-    }
-
-    private fun emitShowDialogAndFireAndNeverHideTips() = coroutineRule.runBlocking {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
@@ -262,7 +240,49 @@ class WelcomePageViewModelTest {
         launch.cancel()
     }
 
-    private fun emitShowDialogAndFireAndHideTips() = coroutineRule.runBlocking {
+    @Test
+    fun whenOnPrimaryCtaClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        val intent = Intent()
+        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
+
+        val launch = launch {
+            viewEvents.collect { state ->
+                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            }
+        }
+        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+
+        verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
+        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenOnReturningUserClickedAndReturningUsersNoOnboardingEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        val intent = Intent()
+        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
+
+        val launch = launch {
+            viewEvents.collect { state ->
+                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            }
+        }
+        events.send(WelcomePageView.Event.OnReturningUserClicked)
+
+        verify(mockOnboardingStore).userMarkedAsReturningUser = true
+        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenOnReturningUserClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
