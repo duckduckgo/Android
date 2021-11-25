@@ -32,17 +32,12 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class ScorecardActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var repository: TabRepository
 
     private val binding: ActivityPrivacyScorecardBinding by viewBinding()
     private val trackersRenderer = TrackersRenderer()
@@ -64,16 +59,11 @@ class ScorecardActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { viewState ->
-            render(viewState)
-        }.launchIn(lifecycleScope)
-
-        repository.retrieveSiteData(intent.tabId!!).observe(
-            this,
-            {
-                viewModel.onSiteChanged(it)
-            }
-        )
+        lifecycleScope.launch {
+            viewModel.scoreCard(intent.tabId!!)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { render(it) }
+        }
     }
 
     private fun render(viewState: ScorecardViewModel.ViewState) {
