@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -140,6 +141,7 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -247,6 +249,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var themingDataStore: ThemingDataStore
+
+    @Inject
+    lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     @Inject
     @AppCoroutineScope
@@ -378,6 +383,8 @@ class BrowserTabFragment :
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
+        } else {
+            viewModel.onViewRecreated()
         }
 
         lifecycle.addObserver(object : LifecycleObserver {
@@ -508,6 +515,13 @@ class BrowserTabFragment :
             }
         )
 
+        viewModel.accessibilityViewState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let { renderer.applyAccessibilitySettings(it) }
+            }
+        )
+
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.command.observe(
@@ -586,6 +600,7 @@ class BrowserTabFragment :
 
     fun refresh() {
         webView?.reload()
+        viewModel.onWebViewRefreshed()
     }
 
     private fun processCommand(it: Command?) {
@@ -1219,6 +1234,9 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
+                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
+                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
+                }
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -2099,6 +2117,24 @@ class BrowserTabFragment :
                 } else {
                     if (it) exitFullScreen()
                 }
+            }
+        }
+
+        fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
+            Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
+            val webView = webView ?: return
+
+            val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
+            if (fontSizeChanged) {
+                Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+
+                webView.settings.textZoom = viewState.fontSize.toInt()
+            }
+
+            if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
+            if (viewState.refreshWebView) {
+                Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
+                refresh()
             }
         }
 

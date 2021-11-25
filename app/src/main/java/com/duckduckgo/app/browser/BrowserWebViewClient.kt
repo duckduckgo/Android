@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -59,7 +60,8 @@ class BrowserWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val emailInjector: EmailInjector
+    private val emailInjector: EmailInjector,
+    private val accessibilityManager: AccessibilityManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -181,6 +183,7 @@ class BrowserWebViewClient(
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         try {
+            accessibilityManager.onPageFinished(webView, url)
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
