@@ -18,20 +18,22 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
-import dagger.Binds
-import dagger.Module
-import dagger.SingleIn
-import dagger.Subcomponent
+import dagger.*
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(ActivityObjectGraph::class)
+@WrongScope(
+    comment = "To use the right scope we first need to enable dagger component nesting",
+    correctScope = ActivityObjectGraph::class,
+)
+@SingleIn(VpnObjectGraph::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = VpnObjectGraph::class
 )
 interface ReportBreakageTextFormActivityComponent : AndroidInjector<ReportBreakageTextFormActivity> {
     @Subcomponent.Factory
