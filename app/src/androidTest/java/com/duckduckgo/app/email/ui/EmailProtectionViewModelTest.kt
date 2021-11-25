@@ -52,7 +52,7 @@ class EmailProtectionViewModelTest {
     @Test
     fun whenViewModelCreatedThenEmitEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
-            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -62,7 +62,7 @@ class EmailProtectionViewModelTest {
     fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
             emailStateFlow.emit(false)
-            (expectItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
+            (awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -72,7 +72,7 @@ class EmailProtectionViewModelTest {
     fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
         testee.viewState.test {
             emailStateFlow.emit(true)
-            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -83,7 +83,7 @@ class EmailProtectionViewModelTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
         testee.viewState.test {
             emailStateFlow.emit(true)
-            assert(expectItem().emailState is EmailProtectionViewModel.EmailState.NotSupported)
+            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.NotSupported)
 
             cancelAndConsumeRemainingEvents()
         }

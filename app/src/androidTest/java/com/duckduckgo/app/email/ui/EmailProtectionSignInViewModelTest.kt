@@ -78,7 +78,7 @@ class EmailProtectionSignInViewModelTest {
     @Test
     fun whenViewModelCreatedThenEmitWaitlistState() = coroutineRule.runBlocking {
         testee.viewState.test {
-            assert(expectItem().waitlistState is NotJoinedQueue)
+            assert(awaitItem().waitlistState is NotJoinedQueue)
         }
     }
 
@@ -86,7 +86,7 @@ class EmailProtectionSignInViewModelTest {
     fun whenHaveADuckAddressThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
         testee.commands.test {
             testee.haveADuckAddress()
-            assertEquals(OpenUrl(url = LOGIN_URL), expectItem())
+            assertEquals(OpenUrl(url = LOGIN_URL), awaitItem())
         }
     }
 
@@ -98,7 +98,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.haveAnInviteCode()
-            assertEquals(OpenUrl(url = expectedURL), expectItem())
+            assertEquals(OpenUrl(url = expectedURL), awaitItem())
         }
     }
 
@@ -110,7 +110,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.getStarted()
-            assertEquals(OpenUrl(url = expectedURL), expectItem())
+            assertEquals(OpenUrl(url = expectedURL), awaitItem())
         }
     }
 
@@ -118,7 +118,7 @@ class EmailProtectionSignInViewModelTest {
     fun whenReadBlogPostThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
         testee.commands.test {
             testee.readBlogPost()
-            assertEquals(OpenUrl(url = ADDRESS_BLOG_POST), expectItem())
+            assertEquals(OpenUrl(url = ADDRESS_BLOG_POST), awaitItem())
         }
     }
 
@@ -126,7 +126,7 @@ class EmailProtectionSignInViewModelTest {
     fun whenReadPrivacyGuaranteeThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
         testee.commands.test {
             testee.readPrivacyGuarantees()
-            assertEquals(OpenUrl(url = PRIVACY_GUARANTEE), expectItem())
+            assertEquals(OpenUrl(url = PRIVACY_GUARANTEE), awaitItem())
         }
     }
 
@@ -137,7 +137,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
+            assertEquals(ShowErrorMessage, awaitItem())
         }
     }
 
@@ -148,7 +148,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
+            assertEquals(ShowErrorMessage, awaitItem())
         }
     }
 
@@ -159,7 +159,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
+            assertEquals(ShowErrorMessage, awaitItem())
         }
     }
 
@@ -179,7 +179,7 @@ class EmailProtectionSignInViewModelTest {
         testee.commands.test {
             testee.joinTheWaitlist()
 
-            assertEquals(ShowNotificationDialog, expectItem())
+            assertEquals(ShowNotificationDialog, awaitItem())
         }
     }
 
@@ -198,7 +198,7 @@ class EmailProtectionSignInViewModelTest {
 
         testee.commands.test {
             testee.joinTheWaitlist()
-            assertEquals(ShowErrorMessage, expectItem())
+            assertEquals(ShowErrorMessage, awaitItem())
         }
     }
 
@@ -214,11 +214,11 @@ class EmailProtectionSignInViewModelTest {
         givenJoinWaitlistSuccessful()
 
         testee.viewState.test {
-            assert(expectItem().waitlistState is NotJoinedQueue)
+            assert(awaitItem().waitlistState is NotJoinedQueue)
 
             testee.onDialogDismissed()
 
-            assert(expectItem().waitlistState is JoinedQueue)
+            assert(awaitItem().waitlistState is JoinedQueue)
         }
     }
 
