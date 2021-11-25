@@ -38,7 +38,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Provider
 
-class ScorecardViewModel(
+class ScorecardViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
@@ -93,18 +93,12 @@ class ScorecardViewModel(
 
 @ContributesMultibinding(AppObjectGraph::class)
 class ScorecardViewModelFactory @Inject constructor(
-    private val tabRepository: Provider<TabRepository>,
-    private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val contentBlocking: Provider<ContentBlocking>
+    private val viewModel: Provider<ScorecardViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(
-                    tabRepository.get(),
-                    userWhitelistDao.get(),
-                    contentBlocking.get()
-                ) as T
+                isAssignableFrom(ScorecardViewModel::class.java) -> viewModel.get() as T
                 else -> null
             }
         }
