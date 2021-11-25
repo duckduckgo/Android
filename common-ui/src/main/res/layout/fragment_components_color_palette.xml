@@ -15,10 +15,10 @@
 -->
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                       xmlns:app="http://schemas.android.com/apk/res-auto"
+                                       xmlns:tools="http://schemas.android.com/tools"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,134 +29,60 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
-            android:id="@+id/label"
-            android:layout_width="wrap_content"
+        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:text="Color scheme"
-            app:leadingIcon="@drawable/ic_colorize_24dp"
-            app:linkUrl="https://material.io/design/color/the-color-system.html" />
+            android:layout_width="match_parent"
+            android:text="Base Palette"/>
+
+        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_2"
+            android:text="Red 50"
+            app:colorFillColor="@color/red50"
+            app:colorStrokeColor="?attr/colorOnBackground"
+            tools:ignore="HardcodedText"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorPrimary"
-            app:colorFillColor="?attr/colorPrimary"
+            android:text="Blue 50"
+            app:colorFillColor="@color/blue50"
             app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorPrimaryVariant"
-            app:colorFillColor="?attr/colorPrimaryVariant"
+            android:text="Purple 50"
+            app:colorFillColor="@color/purple50"
             app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorSecondary"
-            app:colorFillColor="?attr/colorSecondary"
+            android:text="Yellow 50"
+            app:colorFillColor="@color/yellow50"
             app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"/>
 
         <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorSecondaryVariant"
-            app:colorFillColor="?attr/colorSecondaryVariant"
+            android:text="Green 50"
+            app:colorFillColor="@color/green50"
             app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorBackground"
-            app:colorFillColor="?android:attr/colorBackground"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorSurface"
-            app:colorFillColor="?attr/colorSurface"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorError"
-            app:colorFillColor="?attr/colorError"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorOnPrimary"
-            app:colorFillColor="?attr/colorOnPrimary"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorOnSecondary"
-            app:colorFillColor="?attr/colorOnSecondary"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorOnBackground"
-            app:colorFillColor="?attr/colorOnBackground"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorOnSurface"
-            app:colorFillColor="?attr/colorOnSurface"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
-
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_marginBottom="@dimen/keyline_2"
-            android:text="colorOnError"
-            app:colorFillColor="?attr/colorOnError"
-            app:colorStrokeColor="?attr/colorOnBackground"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

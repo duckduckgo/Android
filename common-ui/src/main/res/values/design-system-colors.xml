@@ -1,0 +1,46 @@
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!-- Day / Light theme colors -->
+    <color name="primaryTextColor">@color/gray90</color>
+    <color name="secondaryTextColor">@color/gray70</color>
+    <color name="disabledColor">#59000000</color>
+
+    <color name="primaryButtonDefaultTextColor">@color/white</color>
+    <color name="primaryButtonHoverTextColor">@color/white</color>
+    <color name="primaryButtonPressedTextColor">@color/white</color>
+    <color name="primaryButtonDisabledTextColor">@color/disabledColor</color>
+
+    <color name="red50">#DE5833</color>
+
+    <color name="purple50">#5132A9</color>
+
+    <color name="yellow50">#FFCC33</color>
+
+
+    <color name="green50">#4CBA3C</color>
+
+    <color name="gray90">#222222</color>
+    <color name="gray70">#666666</color>
+    <color name="gray20">#EEEEEE</color>
+
+    <color name="blue50">#3969EF</color>
+    <color name="blue60">#2B55CA</color>
+    <color name="blue70">#1E42A4</color>
+
+</resources>
