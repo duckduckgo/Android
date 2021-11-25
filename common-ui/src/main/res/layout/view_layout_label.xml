@@ -36,7 +36,7 @@
       android:layout_height="wrap_content"
       android:layout_gravity="center_vertical"
       android:text="Button"
-      android:textAppearance="?attr/textAppearanceOverline"
+      android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
       android:textColor="@color/material_on_background_emphasis_medium" />
 
     <ImageView

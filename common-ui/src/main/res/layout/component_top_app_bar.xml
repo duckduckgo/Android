@@ -24,14 +24,13 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
         android:id="@+id/label"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/top_app_bar_label_title"
+        android:layout_width="match_parent"
+        android:text="Top app bar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:linkUrl="https://material.io/design/components/app-bars-top.html" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
