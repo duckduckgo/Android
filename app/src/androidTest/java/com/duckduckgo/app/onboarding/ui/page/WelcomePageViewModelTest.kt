@@ -35,11 +35,8 @@ import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -97,97 +94,77 @@ class WelcomePageViewModelTest {
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
     }
 
+    @After
+    fun teardown() {
+        events.close()
+    }
+
     @Test
     fun whenOnPrimaryCtaClickedAndShouldNotShowDialogThenFireAndFinish() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog())
-            .thenReturn(false)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.Finish)
-            }
-        }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.Finish)
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
+        }
     }
 
     @Test
     fun whenOnPrimaryCtaClickedAndShouldShowDialogAndShowThenFireAndEmitShowDialog() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog())
-            .thenReturn(true)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any()))
-            .thenReturn(intent)
+        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            }
-        }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
+        }
     }
 
     @Test
     fun whenOnPrimaryCtaClickedAndShouldShowDialogNullIntentThenFireAndFinish() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialog.shouldShowDialog())
-            .thenReturn(true)
-        whenever(defaultRoleBrowserDialog.createIntent(any()))
-            .thenReturn(null)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(null)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.Finish)
-            }
-        }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
-        verify(pixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.Finish)
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
+            verify(pixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+        }
     }
 
     @Test
     fun whenOnDefaultBrowserSetThenCallDialogShownFireAndFinish() = coroutineRule.runBlocking {
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.Finish)
-            }
-        }
         events.send(WelcomePageView.Event.OnDefaultBrowserSet)
 
-        verify(defaultRoleBrowserDialog).dialogShown()
-        verify(pixel).fire(
-            AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
-        )
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.Finish)
+            verify(defaultRoleBrowserDialog).dialogShown()
+            verify(pixel).fire(
+                AppPixelName.DEFAULT_BROWSER_SET,
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+            )
+        }
     }
 
     @Test
     fun whenOnDefaultBrowserNotSetThenCallDialogShownFireAndFinish() = coroutineRule.runBlocking {
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.Finish)
-            }
-        }
         events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
 
-        verify(defaultRoleBrowserDialog).dialogShown()
-        verify(pixel).fire(
-            AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
-        )
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.Finish)
+            verify(defaultRoleBrowserDialog).dialogShown()
+            verify(pixel).fire(
+                AppPixelName.DEFAULT_BROWSER_NOT_SET,
+                mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+            )
+        }
     }
 
     @Test
@@ -227,17 +204,13 @@ class WelcomePageViewModelTest {
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            }
-        }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
+        }
     }
 
     @Test
@@ -247,17 +220,13 @@ class WelcomePageViewModelTest {
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            }
-        }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
+        }
     }
 
     @Test
@@ -267,17 +236,13 @@ class WelcomePageViewModelTest {
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            }
-        }
         events.send(WelcomePageView.Event.OnReturningUserClicked)
 
-        verify(mockOnboardingStore).userMarkedAsReturningUser = true
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            verify(mockOnboardingStore).userMarkedAsReturningUser = true
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
+        }
     }
 
     @Test
@@ -287,16 +252,12 @@ class WelcomePageViewModelTest {
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            }
-        }
         events.send(WelcomePageView.Event.OnReturningUserClicked)
 
-        verify(mockOnboardingStore).userMarkedAsReturningUser = true
-        verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
-
-        launch.cancel()
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
+            verify(mockOnboardingStore).userMarkedAsReturningUser = true
+            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
+        }
     }
 }
