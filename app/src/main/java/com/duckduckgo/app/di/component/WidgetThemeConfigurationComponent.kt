@@ -16,20 +16,20 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
+import com.duckduckgo.app.WidgetThemeConfiguration
 import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.app.WidgetThemeConfiguration
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleIn(ActivityObjectGraph::class)
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )
