@@ -36,7 +36,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
-class TrackerNetworksViewModel(
+class TrackerNetworksViewModel @Inject constructor(
     private val tabRepository: TabRepository
 ) : ViewModel() {
 
@@ -92,12 +92,12 @@ class TrackerNetworksViewModel(
 @Module
 @ContributesMultibinding(AppObjectGraph::class)
 class TrackerNetworksViewModelFactory @Inject constructor(
-    private val tabRepository: Provider<TabRepository>
+    private val viewModel: Provider<TrackerNetworksViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (TrackerNetworksViewModel(tabRepository.get()) as T)
+                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (viewModel.get() as T)
                 else -> null
             }
         }
