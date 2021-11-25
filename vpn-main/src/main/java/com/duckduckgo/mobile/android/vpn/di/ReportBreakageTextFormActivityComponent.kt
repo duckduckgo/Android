@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
+import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -29,9 +29,9 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(ActivityObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ActivityObjectGraph::class
 )
 interface ReportBreakageTextFormActivityComponent : AndroidInjector<ReportBreakageTextFormActivity> {
     @Subcomponent.Factory

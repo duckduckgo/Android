@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.ReceiverObjectGraph
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatDeviceBootMonitor
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -29,9 +29,9 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(ReceiverObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ReceiverObjectGraph::class
 )
 interface VpnHeartbeatDeviceBootMonitorComponent : AndroidInjector<VpnHeartbeatDeviceBootMonitor> {
     @Subcomponent.Factory

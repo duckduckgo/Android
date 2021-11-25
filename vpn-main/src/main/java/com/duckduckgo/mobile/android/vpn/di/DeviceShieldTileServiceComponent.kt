@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.QuickSettingsObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.DeviceShieldTileService
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -30,9 +30,9 @@ import dagger.binding.TileServiceBingingKey
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(QuickSettingsObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = QuickSettingsObjectGraph::class
 )
 interface DeviceShieldTileServiceComponent : AndroidInjector<DeviceShieldTileService> {
     @Subcomponent.Factory

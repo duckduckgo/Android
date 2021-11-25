@@ -16,7 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
+import com.duckduckgo.di.scopes.ActivityObjectGraph
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.FragmentObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment
@@ -98,27 +100,27 @@ import dummy.ui.VpnControllerActivity
 /* ======================================
  Step 1. Factory definition
  ====================================== */
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(ActivityObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ActivityObjectGraph::class
 )
 interface VpnControllerActivityComponent : AndroidInjector<VpnControllerActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnControllerActivity>
 }
 
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(FragmentObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = FragmentObjectGraph::class
 )
 interface DeviceShieldFragmentComponent : AndroidInjector<DeviceShieldFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldFragment>
 }
 
-@SingleIn(VpnObjectGraph::class)
+@SingleIn(ActivityObjectGraph::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ActivityObjectGraph::class
 )
 interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivity> {
     @Subcomponent.Factory

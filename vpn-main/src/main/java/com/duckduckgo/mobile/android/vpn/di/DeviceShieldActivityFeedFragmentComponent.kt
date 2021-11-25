@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.FragmentObjectGraph
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedFragment
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -29,9 +29,9 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(ActivityObjectGraph::class)
+@SingleIn(FragmentObjectGraph::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = FragmentObjectGraph::class
 )
 interface DeviceShieldActivityFeedFragmentComponent : AndroidInjector<DeviceShieldActivityFeedFragment> {
     @Subcomponent.Factory
