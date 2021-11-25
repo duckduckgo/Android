@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,29 +17,11 @@
 
 <resources>
 
-    <!--Common attributes-->
-    <attr name="listItemTitleColor" format="color"/>
-    <attr name="listItemSubtitleColor" format="color"/>
-
-    <!--Single Line Item view-->
-    <declare-styleable name="SingleLineListItem">
-        <attr name="singleLineItemTitle" format="string" />
-        <attr name="singleLineItemDrawable" format="reference" />
-        <attr name="singleLineItemImageVisible" format="boolean" />
-    </declare-styleable>
-
-    <!--Two Line Item view-->
-    <declare-styleable name="TwoLineListItem">
-        <attr name="twoLineItemTitle" format="string" />
-        <attr name="twoLineItemSubtitle" format="string" />
-        <attr name="twoLineItemDrawable" format="reference" />
-        <attr name="twoLineItemImageVisible" format="boolean" />
-    </declare-styleable>
-
     <!--Panel view-->
     <declare-styleable name="InfoPanel">
         <attr name="panelBackground" format="reference" />
         <attr name="panelDrawable" format="reference" />
         <attr name="panelText" format="string" />
     </declare-styleable>
+
 </resources>

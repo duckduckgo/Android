@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.system
+package com.duckduckgo.mobile.android.themepreview.ui.component.navigation
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentSystemFragment : ComponentFragment() {
+class ComponentMessagingFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.SNACKBAR)
+        return listOf(Component.INFO_PANEL, Component.SNACKBAR)
     }
 }
