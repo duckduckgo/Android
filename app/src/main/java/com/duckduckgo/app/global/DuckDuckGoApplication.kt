@@ -247,12 +247,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
      *
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
-    override fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key::class.simpleName}.
-                You probably forgot to create the ${key::class.simpleName}Component
+                Could not find the dagger component for ${key.simpleName}.
+                You probably forgot to create the ${key.simpleName}Component
                 """.trimIndent()
             )
     }
