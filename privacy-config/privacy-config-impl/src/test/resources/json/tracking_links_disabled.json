@@ -1,0 +1,20 @@
+{
+  "state": "disabled",
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "reason"
+    }
+  ],
+  "settings": {
+    "ampLinkFormats": [
+      "ampLinkFormat"
+    ],
+    "ampKeywords": [
+      "ampKeyword"
+    ],
+    "trackingParameters": [
+      "trackingParameter"
+    ]
+  }
+}

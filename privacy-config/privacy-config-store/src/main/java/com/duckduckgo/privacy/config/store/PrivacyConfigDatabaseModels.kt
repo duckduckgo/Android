@@ -22,6 +22,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.HttpsException
+import com.duckduckgo.privacy.config.api.TrackingLinksException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -93,9 +94,35 @@ data class PrivacyConfig(
     val readme: String
 )
 
+@Entity(tableName = "amp_link_formats")
+data class AmpLinkFormatEntity(
+    @PrimaryKey val format: String
+)
+
+@Entity(tableName = "amp_keywords")
+data class AmpKeywordEntity(
+    @PrimaryKey val keyword: String
+)
+
+@Entity(tableName = "tracking_parameters")
+data class TrackingParameterEntity(
+    @PrimaryKey val parameter: String
+)
+
+@Entity(tableName = "tracking_links_exceptions")
+data class TrackingLinksExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
+fun TrackingLinksExceptionEntity.toTrackingLinksException(): TrackingLinksException {
+    return TrackingLinksException(domain = this.domain, reason = this.reason)
+}
+
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
+
         private val ruleListType = Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
         val ruleListAdapter: JsonAdapter<List<AllowlistRuleEntity>> = moshi.adapter(ruleListType)
     }

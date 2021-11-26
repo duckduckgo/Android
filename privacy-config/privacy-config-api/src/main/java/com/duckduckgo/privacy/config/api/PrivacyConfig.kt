@@ -26,4 +26,5 @@ sealed class PrivacyFeatureName(override val value: String) : FeatureName {
     data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
     data class HttpsFeatureName(override val value: String = "https") : PrivacyFeatureName(value)
     data class TrackerAllowlistFeatureName(override val value: String = "trackerAllowlist") : PrivacyFeatureName(value)
+    data class TrackingLinksFeatureName(override val value: String = "trackingLinks") : PrivacyFeatureName(value)
 }
