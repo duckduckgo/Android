@@ -160,6 +160,7 @@ import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.google.android.material.snackbar.BaseTransientBottomBar
+import kotlinx.android.synthetic.main.include_cta.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -283,6 +284,8 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
+
+    private var hideDaxBackgroundLogo = false
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -2295,7 +2298,7 @@ class BrowserTabFragment :
 
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
-                homeBackgroundLogo.showLogo()
+                if (hideDaxBackgroundLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
@@ -2343,14 +2346,21 @@ class BrowserTabFragment :
 
             ctaContainer.removeAllViews()
 
-            inflate(context, R.layout.include_cta, ctaContainer)
+            if (configuration is HomePanelCta.AddReturningUsersWidgetAuto) {
+                hideDaxBackgroundLogo = true
+                inflate(context, R.layout.include_experiment_returning_users_cta, ctaContainer)
+            } else {
+                inflate(context, R.layout.include_cta, ctaContainer)
+            }
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
+                hideDaxBackgroundLogo = false
                 viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
+                hideDaxBackgroundLogo = false
                 viewModel.onUserDismissedCta()
             }
         }

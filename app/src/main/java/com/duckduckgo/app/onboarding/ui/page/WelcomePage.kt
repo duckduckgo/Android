@@ -23,11 +23,15 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
@@ -36,9 +40,7 @@ import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -62,10 +64,11 @@ class WelcomePage : OnboardingPageFragment() {
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
+        buildScreenContent()
         scheduleWelcomeAnimation()
         setSkipAnimationListener()
     }
@@ -83,6 +86,33 @@ class WelcomePage : OnboardingPageFragment() {
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
         }
+    }
+
+    private fun buildScreenContent() {
+        lifecycleScope.launch {
+            welcomePageViewModel.screenContent.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    when (it) {
+                        is WelcomePageViewModel.ViewState.NewOrReturningUsersState -> renderNewOrReturningUsers()
+                        is WelcomePageViewModel.ViewState.DefaultOnboardingState -> renterDefaultOnboarding()
+                    }
+                }
+        }
+    }
+
+    private fun renderNewOrReturningUsers() {
+        returningUserCta.visibility = VISIBLE
+        returningUserCta.setOnClickListener { event(WelcomePageView.Event.OnReturningUserClicked) }
+        ctaText = getString(R.string.returningUsersOnboardingDaxText)
+        hiddenTextCta.text = ctaText.html(requireContext())
+        primaryCta.text = getString(R.string.returningUsersNewUserButton)
+    }
+
+    private fun renterDefaultOnboarding() {
+        returningUserCta.visibility = GONE
+        ctaText = getString(R.string.onboardingDaxText)
+        hiddenTextCta.text = ctaText.html(requireContext())
+        primaryCta.text = getString(R.string.onboardingLetsDoItButton)
     }
 
     private fun render(state: WelcomePageView.State) {
@@ -112,8 +142,8 @@ class WelcomePage : OnboardingPageFragment() {
         applyFullScreenFlags()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         welcomeAnimation?.cancel()
         typingAnimation?.cancel()
     }

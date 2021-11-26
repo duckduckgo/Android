@@ -1918,7 +1918,7 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
-            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddReturningUsersWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
             else -> return
         }
