@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface SiteLocationPermissionDialogComponent : AndroidInjector<SiteLocationPe
     interface Factory : AndroidInjector.Factory<SiteLocationPermissionDialog>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface SiteLocationPermissionDialogComponentProvider {
     fun provideSiteLocationPermissionDialogComponentFactory(): SiteLocationPermissionDialogComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class SiteLocationPermissionDialogBindingModule {
     @Binds
     @IntoMap

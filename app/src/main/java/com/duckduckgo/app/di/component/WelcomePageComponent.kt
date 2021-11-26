@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface WelcomePageComponent : AndroidInjector<WelcomePage> {
     interface Factory : AndroidInjector.Factory<WelcomePage>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface WelcomePageComponentProvider {
     fun provideWelcomePageComponentFactory(): WelcomePageComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class WelcomePageBindingModule {
     @Binds
     @IntoMap

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface RateAppDialogFragmentComponent : AndroidInjector<RateAppDialogFragment
     interface Factory : AndroidInjector.Factory<RateAppDialogFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface RateAppDialogFragmentComponentProvider {
     fun provideRateAppDialogFragmentComponentFactory(): RateAppDialogFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class RateAppDialogFragmentBindingModule {
     @Binds
     @IntoMap

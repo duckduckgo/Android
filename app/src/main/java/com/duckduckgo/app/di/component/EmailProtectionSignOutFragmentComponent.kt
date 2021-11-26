@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.email.ui.EmailProtectionSignOutFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface EmailProtectionSignOutFragmentComponent : AndroidInjector<EmailProtect
     interface Factory : AndroidInjector.Factory<EmailProtectionSignOutFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface EmailProtectionSignOutFragmentComponentProvider {
     fun provideEmailProtectionSignOutFragmentComponentFactory(): EmailProtectionSignOutFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class EmailProtectionSignOutFragmentBindingModule {
     @Binds
     @IntoMap

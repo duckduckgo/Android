@@ -17,8 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.di.scopes.AppScope
-
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -39,13 +38,13 @@ interface BrowserTabFragmentComponent : AndroidInjector<BrowserTabFragment> {
     interface Factory : AndroidInjector.Factory<BrowserTabFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface BrowserTabFragmentComponentProvider {
     fun provideBrowserTabFragmentComponentFactory(): BrowserTabFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class BrowserTabFragmentBindingModule {
     @Binds
     @IntoMap
