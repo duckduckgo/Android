@@ -36,6 +36,7 @@ import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.IOException
 import java.net.InetSocketAddress
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -94,7 +95,9 @@ class UdpPacketProcessor @AssistedInject constructor(
                 try {
                     deviceToNetworkProcessing()
                 } catch (e: IOException) {
-                    Timber.w(e, "Failed to process device-to-network packet")
+                    Timber.w(e, "Failed to process UDP device-to-network packet")
+                } catch (e: CancelledKeyException) {
+                    Timber.w(e, "Failed to process UDP device-to-network packet")
                 }
             }
         } finally {
@@ -110,7 +113,9 @@ class UdpPacketProcessor @AssistedInject constructor(
             try {
                 networkToDeviceProcessing()
             } catch (e: IOException) {
-                Timber.w(e, "Failed to process network-to-device packet")
+                Timber.w(e, "Failed to process UDP network-to-device packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process UDP network-to-device packet")
             }
         }
     }
