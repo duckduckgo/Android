@@ -19,6 +19,7 @@ package com.duckduckgo.app.remotemessage.impl
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.store.ALL_MIGRATIONS
 import com.duckduckgo.app.remotemessage.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
@@ -29,11 +30,20 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.Multibinds
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+abstract class RemoteMessagingModuleBindingModule {
+
+    @Multibinds
+    abstract fun provideMatchingAttributesPlugins(): Set<@JvmSuppressWildcards MatchingAttributePlugin>
+}
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -64,6 +74,12 @@ class NetworkModule {
 
         return retrofit.create(RemoteMessagingService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun providesMatchingAttributePluginPoint(customConfigs: Set<@JvmSuppressWildcards MatchingAttributePlugin>): PluginPoint<MatchingAttributePlugin> {
+        return MatchingAttributePluginPoint(customConfigs)
+    }
 }
 
 @Module
@@ -72,9 +88,13 @@ class DataSourceModule {
     @Singleton
     @Provides
     fun providesRemoteMessagingConfigProcessor(
+        matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository
     ): RemoteMessagingConfigProcessor {
-        return RealRemoteMessagingConfigProcessor(remoteMessagingConfigRepository)
+        return RealRemoteMessagingConfigProcessor(
+            matchingAttributePluginPoint,
+            remoteMessagingConfigRepository
+        )
     }
 
     @Singleton

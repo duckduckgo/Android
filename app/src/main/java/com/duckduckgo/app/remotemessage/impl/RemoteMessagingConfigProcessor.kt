@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
 import timber.log.Timber
@@ -25,6 +27,7 @@ interface RemoteMessagingConfigProcessor {
 }
 
 class RealRemoteMessagingConfigProcessor(
+    private val matchingAttributesPluginPoint: PluginPoint<MatchingAttributePlugin>,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository
 ) : RemoteMessagingConfigProcessor {
 
@@ -35,6 +38,19 @@ class RealRemoteMessagingConfigProcessor(
 
         if (currentVersion != newVersion) {
             Timber.i("RMF: new version received")
+            jsonRemoteMessagingConfig.matchingRules.forEach {
+                Timber.i("RMF: MatchingRule ${it.id}")
+                it.attributes.map { (key, jsonObject) ->
+                    Timber.i("RMF: MatchingRule $key")
+                    matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
+                        val rule = plugin.parse(key, jsonObject.toString())
+                        if (rule != null) return@map rule
+                    }
+                    return@map MatchingAttribute.Unknown
+                }.forEach {
+                    Timber.i("RMF: Mapped $it")
+                }
+            }
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
         } else {
             Timber.i("RMF: skip, same version")

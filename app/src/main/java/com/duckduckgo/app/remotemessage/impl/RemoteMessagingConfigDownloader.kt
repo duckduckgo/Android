@@ -33,6 +33,7 @@ class RealRemoteMessagingConfigDownloader constructor(
         }.onSuccess {
             remoteMessagingConfigProcessor.process(it)
         }.onFailure {
+            Timber.e("RMF: error at RealRemoteMessagingConfigDownloader!!!!!")
             throw it
         }
 

@@ -16,6 +16,14 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
+import org.json.JSONObject
+
 data class JsonRemoteMessagingConfig(
-    val version: Long
+    val version: Long,
+    val matchingRules: List<MatchingRule>
+)
+
+data class MatchingRule(
+    val id: Int,
+    val attributes: Map<String, JSONObject?>
 )

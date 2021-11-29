@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
-import retrofit2.http.GET
+sealed class MatchingAttributeName(val key: String) {
+    object Api : MatchingAttributeName("os_api")
+}
 
-interface RemoteMessagingService {
-    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    suspend fun config(): JsonRemoteMessagingConfig
+sealed class MatchingAttribute(val fallback: Boolean? = null) {
+    data class Api(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    object Unknown : MatchingAttribute(fallback = false)
+}
+
+interface BooleanMatchingAttribute {
+    val value: Boolean
+}
+
+interface RangeIntMatchingAttribute {
+    val min: Int
+    val max: Int
 }

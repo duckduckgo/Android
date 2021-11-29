@@ -16,9 +16,17 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import retrofit2.http.GET
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
 
-interface RemoteMessagingService {
-    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    suspend fun config(): JsonRemoteMessagingConfig
+interface MatchingAttributePlugin {
+    fun parse(key: String, json: String): MatchingAttribute?
+}
+
+class MatchingAttributePluginPoint(
+    private val matchingAttributes: Set<@JvmSuppressWildcards MatchingAttributePlugin>
+) : PluginPoint<MatchingAttributePlugin> {
+    override fun getPlugins(): Collection<MatchingAttributePlugin> {
+        return matchingAttributes
+    }
 }
