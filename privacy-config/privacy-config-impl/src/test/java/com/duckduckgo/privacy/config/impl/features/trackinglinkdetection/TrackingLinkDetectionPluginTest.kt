@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinks
+package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.store.*
-import com.duckduckgo.privacy.config.store.features.trackinglinks.TrackingLinksRepository
+import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -26,31 +26,31 @@ import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Test
 
-class TrackingLinksPluginTest {
+class TrackingLinkDetectionPluginTest {
 
-    lateinit var testee: TrackingLinksPlugin
+    lateinit var testee: TrackingLinkDetectionPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    private val mockTrackingLinksRepository: TrackingLinksRepository = mock()
+    private val mockTrackingLinkDetectionRepository: TrackingLinkDetectionRepository = mock()
 
     @Before
     fun before() {
-        testee = TrackingLinksPlugin(mockTrackingLinksRepository, mockFeatureTogglesRepository)
+        testee = TrackingLinkDetectionPlugin(mockTrackingLinkDetectionRepository, mockFeatureTogglesRepository)
     }
 
     @Test
-    fun whenFeatureNameDoesNotMatchTrackingLinksThenReturnFalse() {
+    fun whenFeatureNameDoesNotMatchTrackingLinkDetectionThenReturnFalse() {
         assertFalse(testee.store("test", EMPTY_JSON_STRING))
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackingLinksThenReturnTrue() {
+    fun whenFeatureNameMatchesTrackingLinkDetectionThenReturnTrue() {
         assertTrue(testee.store(FEATURE_NAME, EMPTY_JSON_STRING))
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackingLinksAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/tracking_links.json")
+    fun whenFeatureNameMatchesTrackingLinkDetectionAndIsEnabledThenStoreFeatureEnabled() {
+        val jsonString = FileUtilities.loadText("json/tracking_link_detection.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -58,8 +58,8 @@ class TrackingLinksPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackerAllowlistAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/tracking_links_disabled.json")
+    fun whenFeatureNameMatchesTrackingLinkDetectionAndIsNotEnabledThenStoreFeatureDisabled() {
+        val jsonString = FileUtilities.loadText("json/tracking_link_detection_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -67,28 +67,28 @@ class TrackingLinksPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackerAllowlistThenUpdateAllExistingValues() {
-        val jsonString = FileUtilities.loadText("json/tracking_links.json")
+    fun whenFeatureNameMatchesTrackingLinkDetectionThenUpdateAllExistingValues() {
+        val jsonString = FileUtilities.loadText("json/tracking_link_detection.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        val exceptionArgumentCaptor = argumentCaptor<List<TrackingLinksExceptionEntity>>()
+        val exceptionArgumentCaptor = argumentCaptor<List<TrackingLinkExceptionEntity>>()
         val ampLinkFormatArgumentCaptor = argumentCaptor<List<AmpLinkFormatEntity>>()
         val ampKeywordArgumentCaptor = argumentCaptor<List<AmpKeywordEntity>>()
         val trackingParameterArgumentCaptor = argumentCaptor<List<TrackingParameterEntity>>()
 
-        verify(mockTrackingLinksRepository).updateAll(
+        verify(mockTrackingLinkDetectionRepository).updateAll(
             exceptionArgumentCaptor.capture(),
             ampLinkFormatArgumentCaptor.capture(),
             ampKeywordArgumentCaptor.capture(),
             trackingParameterArgumentCaptor.capture()
         )
 
-        val trackingLinksExceptionEntityList = exceptionArgumentCaptor.firstValue
+        val trackingLinkExceptionEntityList = exceptionArgumentCaptor.firstValue
 
-        assertEquals(1, trackingLinksExceptionEntityList.size)
-        assertEquals("example.com", trackingLinksExceptionEntityList.first().domain)
-        assertEquals("reason", trackingLinksExceptionEntityList.first().reason)
+        assertEquals(1, trackingLinkExceptionEntityList.size)
+        assertEquals("example.com", trackingLinkExceptionEntityList.first().domain)
+        assertEquals("reason", trackingLinkExceptionEntityList.first().reason)
 
         val ampLinkFormatEntityList = ampLinkFormatArgumentCaptor.firstValue
 

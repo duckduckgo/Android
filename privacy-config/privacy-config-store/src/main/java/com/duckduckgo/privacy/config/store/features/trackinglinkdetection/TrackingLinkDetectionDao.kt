@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.trackinglinks
+package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -23,14 +23,14 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.duckduckgo.privacy.config.store.AmpKeywordEntity
 import com.duckduckgo.privacy.config.store.AmpLinkFormatEntity
-import com.duckduckgo.privacy.config.store.TrackingLinksExceptionEntity
+import com.duckduckgo.privacy.config.store.TrackingLinkExceptionEntity
 import com.duckduckgo.privacy.config.store.TrackingParameterEntity
 
 @Dao
-abstract class TrackingLinksDao {
+abstract class TrackingLinkDetectionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAllExceptions(domains: List<TrackingLinksExceptionEntity>)
+    abstract fun insertAllExceptions(domains: List<TrackingLinkExceptionEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAllAmpLinkFormats(ampLinkFormats: List<AmpLinkFormatEntity>)
@@ -42,7 +42,7 @@ abstract class TrackingLinksDao {
     abstract fun insertAllTrackingParameters(trackingParameters: List<TrackingParameterEntity>)
 
     @Transaction
-    open fun updateAll(domains: List<TrackingLinksExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>, trackingParameters: List<TrackingParameterEntity>) {
+    open fun updateAll(domains: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>, trackingParameters: List<TrackingParameterEntity>) {
         deleteAllExceptions()
         insertAllExceptions(domains)
 
@@ -56,8 +56,8 @@ abstract class TrackingLinksDao {
         insertAllTrackingParameters(trackingParameters)
     }
 
-    @Query("select * from tracking_links_exceptions")
-    abstract fun getAllExceptions(): List<TrackingLinksExceptionEntity>
+    @Query("select * from tracking_link_exceptions")
+    abstract fun getAllExceptions(): List<TrackingLinkExceptionEntity>
 
     @Query("select * from amp_link_formats")
     abstract fun getAllAmpLinkFormats(): List<AmpLinkFormatEntity>
@@ -68,7 +68,7 @@ abstract class TrackingLinksDao {
     @Query("select * from tracking_parameters")
     abstract fun getAllTrackingParameters(): List<TrackingParameterEntity>
 
-    @Query("delete from tracking_links_exceptions")
+    @Query("delete from tracking_link_exceptions")
     abstract fun deleteAllExceptions()
 
     @Query("delete from amp_link_formats")

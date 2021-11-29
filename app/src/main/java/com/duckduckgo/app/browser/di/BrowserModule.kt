@@ -70,6 +70,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -175,7 +176,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
+    fun specialUrlDetector(packageManager: PackageManager, trackingLinkDetector: TrackingLinkDetector): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector)
 
     @Provides
     @Singleton

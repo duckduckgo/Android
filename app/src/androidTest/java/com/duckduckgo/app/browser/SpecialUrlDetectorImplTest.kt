@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -33,6 +34,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.net.URISyntaxException
@@ -44,10 +46,13 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var mockPackageManager: PackageManager
 
+    @Mock
+    lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = SpecialUrlDetectorImpl(mockPackageManager)
+        testee = SpecialUrlDetectorImpl(packageManager = mockPackageManager, trackingLinkDetector = mockTrackingLinkDetector)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
 
@@ -261,6 +266,14 @@ class SpecialUrlDetectorImplTest {
         val longTelephone = randomString(PHONE_MAX_LENGTH + 1)
         val type = testee.determineType("telprompt:$longTelephone") as Telephone
         assertEquals(longTelephone.substring(0, PHONE_MAX_LENGTH), type.telephoneNumber)
+    }
+
+    @Test
+    fun whenUrlIsTrackingLinkThenTrackingLinkTypeDetected() {
+        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn("www.example.com")
+        val expected = TrackingLink::class
+        val actual = testee.determineType("https://www.google.com/amp/s/www.example.com")
+        assertEquals(expected, actual::class)
     }
 
     private fun randomString(length: Int): String {

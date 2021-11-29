@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.trackinglinks
+package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
@@ -24,26 +24,27 @@ import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
-class RealTrackingLinksRepositoryTest {
+class RealTrackingLinkDetectionRepositoryTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    lateinit var testee: RealTrackingLinksRepository
+    lateinit var testee: RealTrackingLinkDetectionRepository
 
     private val mockDatabase: PrivacyConfigDatabase = mock()
-    private val mockTrackingLinksDao: TrackingLinksDao = mock()
+    private val mockTrackingLinkDetectionDao: TrackingLinkDetectionDao = mock()
 
     @Before
     fun before() {
-        whenever(mockDatabase.trackingLinksDao()).thenReturn(mockTrackingLinksDao)
-        testee = RealTrackingLinksRepository(
+        whenever(mockDatabase.trackingLinkDetectionDao()).thenReturn(mockTrackingLinkDetectionDao)
+        testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
             TestCoroutineScope(),
             coroutineRule.testDispatcherProvider
@@ -52,23 +53,23 @@ class RealTrackingLinksRepositoryTest {
 
     @Test
     fun whenRepositoryIsCreatedThenValuesLoadedIntoMemory() {
-        givenTrackingLinksDaoContainsEntities()
+        givenTrackingLinkDetectionDaoContainsEntities()
 
-        testee = RealTrackingLinksRepository(
+        testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
             TestCoroutineScope(),
             coroutineRule.testDispatcherProvider
         )
 
-        assertEquals(trackingLinksExceptionEntity.toTrackingLinksException(), testee.exceptions.first())
-        assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first())
+        assertEquals(trackingLinkExceptionEntity.toTrackingLinkException(), testee.exceptions.first())
+        assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first().toString())
         assertEquals(ampKeywordEntity.keyword, testee.ampKeywords.first())
         assertEquals(trackingParameterEntity.parameter, testee.trackingParameters.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealTrackingLinksRepository(
+        testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
             TestCoroutineScope(),
             coroutineRule.testDispatcherProvider
@@ -76,14 +77,14 @@ class RealTrackingLinksRepositoryTest {
 
         testee.updateAll(listOf(), listOf(), listOf(), listOf())
 
-        verify(mockTrackingLinksDao).updateAll(anyList(), anyList(), anyList(), anyList())
+        verify(mockTrackingLinkDetectionDao).updateAll(anyList(), anyList(), anyList(), anyList())
     }
 
     @Test
     fun whenUpdateAllThenPreviousValuesAreCleared() = coroutineRule.runBlocking {
-        givenTrackingLinksDaoContainsEntities()
+        givenTrackingLinkDetectionDaoContainsEntities()
 
-        testee = RealTrackingLinksRepository(
+        testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
             TestCoroutineScope(),
             coroutineRule.testDispatcherProvider
@@ -93,7 +94,7 @@ class RealTrackingLinksRepositoryTest {
         assertEquals(1, testee.ampKeywords.size)
         assertEquals(1, testee.trackingParameters.size)
 
-        reset(mockTrackingLinksDao)
+        reset(mockTrackingLinkDetectionDao)
 
         testee.updateAll(listOf(), listOf(), listOf(), listOf())
 
@@ -103,21 +104,35 @@ class RealTrackingLinksRepositoryTest {
         assertEquals(0, testee.trackingParameters.size)
     }
 
-    private fun givenTrackingLinksDaoContainsEntities() {
-        whenever(mockTrackingLinksDao.getAllExceptions()).thenReturn(listOf(trackingLinksExceptionEntity))
-        whenever(mockTrackingLinksDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
-        whenever(mockTrackingLinksDao.getAllAmpKeywords()).thenReturn(listOf(ampKeywordEntity))
-        whenever(mockTrackingLinksDao.getAllTrackingParameters()).thenReturn(listOf(trackingParameterEntity))
+    @Test
+    fun whenExtractCanonicalFromTrackingLinkAndUrlIsNotExtractableAmpLinkThenReturnNull() {
+        givenTrackingLinkDetectionDaoContainsEntities()
+        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
+
+        testee = RealTrackingLinkDetectionRepository(
+            mockDatabase,
+            TestCoroutineScope(),
+            coroutineRule.testDispatcherProvider
+        )
+
+        assertNull(testee.extractCanonicalFromTrackingLink("https://www.example.com"))
+    }
+
+    private fun givenTrackingLinkDetectionDaoContainsEntities() {
+        whenever(mockTrackingLinkDetectionDao.getAllExceptions()).thenReturn(listOf(trackingLinkExceptionEntity))
+        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
+        whenever(mockTrackingLinkDetectionDao.getAllAmpKeywords()).thenReturn(listOf(ampKeywordEntity))
+        whenever(mockTrackingLinkDetectionDao.getAllTrackingParameters()).thenReturn(listOf(trackingParameterEntity))
     }
 
     companion object {
-        val trackingLinksExceptionEntity = TrackingLinksExceptionEntity(
-            domain = "domain",
+        val trackingLinkExceptionEntity = TrackingLinkExceptionEntity(
+            domain = "https://www.example.com",
             reason = "reason"
         )
 
         val ampLinkFormatEntity = AmpLinkFormatEntity(
-            format = "format"
+            format = "https?:\\/\\/(?:w{3}\\.)?google\\.\\w{2,}\\/amp\\/s\\/(\\S+)"
         )
 
         val ampKeywordEntity = AmpKeywordEntity(

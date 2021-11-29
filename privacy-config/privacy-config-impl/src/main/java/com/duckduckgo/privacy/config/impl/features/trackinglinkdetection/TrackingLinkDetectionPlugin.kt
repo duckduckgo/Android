@@ -14,60 +14,60 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinks
+package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.*
-import com.duckduckgo.privacy.config.store.features.trackinglinks.TrackingLinksRepository
+import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
 @ContributesMultibinding(AppObjectGraph::class)
-class TrackingLinksPlugin @Inject constructor(
-    private val trackingLinksRepository: TrackingLinksRepository,
+class TrackingLinkDetectionPlugin @Inject constructor(
+    private val trackingLinkDetectionRepository: TrackingLinkDetectionRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(name: String, jsonString: String): Boolean {
         if (name == featureName.value) {
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<TrackingLinksFeature> =
-                moshi.adapter(TrackingLinksFeature::class.java)
+            val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> =
+                moshi.adapter(TrackingLinkDetectionFeature::class.java)
 
-            val exceptions = mutableListOf<TrackingLinksExceptionEntity>()
+            val exceptions = mutableListOf<TrackingLinkExceptionEntity>()
             val ampLinkFormats = mutableListOf<AmpLinkFormatEntity>()
             val ampKeywords = mutableListOf<AmpKeywordEntity>()
             val trackingParameters = mutableListOf<TrackingParameterEntity>()
 
-            val trackingLinksFeature: TrackingLinksFeature? = jsonAdapter.fromJson(jsonString)
+            val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonString)
 
-            trackingLinksFeature?.exceptions?.map {
-                exceptions.add(TrackingLinksExceptionEntity(it.domain, it.reason))
+            trackingLinkDetectionFeature?.exceptions?.map {
+                exceptions.add(TrackingLinkExceptionEntity(it.domain, it.reason))
             }
 
-            trackingLinksFeature?.settings?.ampLinkFormats?.map {
+            trackingLinkDetectionFeature?.settings?.ampLinkFormats?.map {
                 ampLinkFormats.add(AmpLinkFormatEntity(it))
             }
 
-            trackingLinksFeature?.settings?.ampKeywords?.map {
+            trackingLinkDetectionFeature?.settings?.ampKeywords?.map {
                 ampKeywords.add(AmpKeywordEntity(it))
             }
 
-            trackingLinksFeature?.settings?.trackingParameters?.map {
+            trackingLinkDetectionFeature?.settings?.trackingParameters?.map {
                 trackingParameters.add(TrackingParameterEntity(it))
             }
 
-            trackingLinksRepository.updateAll(exceptions, ampLinkFormats, ampKeywords, trackingParameters)
-            val isEnabled = trackingLinksFeature?.state == "enabled"
+            trackingLinkDetectionRepository.updateAll(exceptions, ampLinkFormats, ampKeywords, trackingParameters)
+            val isEnabled = trackingLinkDetectionFeature?.state == "enabled"
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true
         }
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackingLinksFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackingLinkDetectionFeatureName()
 }

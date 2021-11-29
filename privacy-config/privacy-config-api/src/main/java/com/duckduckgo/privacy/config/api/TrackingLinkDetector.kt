@@ -17,18 +17,24 @@
 package com.duckduckgo.privacy.config.api
 
 /**
- * Public interface for the Tracking Links feature
+ * Public interface for the Tracking Link Detection feature
  */
-interface TrackingLinks {
+interface TrackingLinkDetector {
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url]
      * is in the tracking links exceptions list
      * @return a `true` if the given [url] if the url is in the tracking links exceptions list and `false` otherwise.
      */
     fun isAnException(url: String): Boolean
+
+    /**
+     * This method takes a [url] and returns the extracted destination [url] from a tracking link.
+     * @return the extracted destination [url] or `null` if the [url] is not a tracking link.
+     */
+    fun extractCanonicalFromTrackingLink(url: String): String?
 }
 
 /**
  * Public data class for Tracking Links Exceptions
  */
-data class TrackingLinksException(val domain: String, val reason: String)
+data class TrackingLinkException(val domain: String, val reason: String)

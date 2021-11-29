@@ -26,7 +26,7 @@ import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlock
 import com.duckduckgo.privacy.config.store.features.gpc.GpcDao
 import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
-import com.duckduckgo.privacy.config.store.features.trackinglinks.TrackingLinksDao
+import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
 
 @TypeConverters(
@@ -44,7 +44,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         AmpLinkFormatEntity::class,
         AmpKeywordEntity::class,
         TrackingParameterEntity::class,
-        TrackingLinksExceptionEntity::class
+        TrackingLinkExceptionEntity::class
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -54,7 +54,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun gpcDao(): GpcDao
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyConfigDao(): PrivacyConfigDao
-    abstract fun trackingLinksDao(): TrackingLinksDao
+    abstract fun trackingLinkDetectionDao(): TrackingLinkDetectionDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

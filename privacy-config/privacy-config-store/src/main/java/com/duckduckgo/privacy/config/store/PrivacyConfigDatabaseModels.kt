@@ -22,7 +22,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.api.TrackingLinksException
+import com.duckduckgo.privacy.config.api.TrackingLinkException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -109,14 +109,14 @@ data class TrackingParameterEntity(
     @PrimaryKey val parameter: String
 )
 
-@Entity(tableName = "tracking_links_exceptions")
-data class TrackingLinksExceptionEntity(
+@Entity(tableName = "tracking_link_exceptions")
+data class TrackingLinkExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String
 )
 
-fun TrackingLinksExceptionEntity.toTrackingLinksException(): TrackingLinksException {
-    return TrackingLinksException(domain = this.domain, reason = this.reason)
+fun TrackingLinkExceptionEntity.toTrackingLinkException(): TrackingLinkException {
+    return TrackingLinkException(domain = this.domain, reason = this.reason)
 }
 
 class Adapters {

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinks
+package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
-import com.duckduckgo.privacy.config.api.TrackingLinksException
+import com.duckduckgo.privacy.config.api.TrackingLinkException
 
-data class TrackingLinksFeature(
+data class TrackingLinkDetectionFeature(
     val state: String,
-    val settings: TrackingLinksSettings,
-    val exceptions: List<TrackingLinksException>
+    val settings: TrackingLinkDetectionSettings,
+    val exceptions: List<TrackingLinkException>
 )
 
-data class TrackingLinksSettings(
+data class TrackingLinkDetectionSettings(
     val ampLinkFormats: List<String>,
     val ampKeywords: List<String>,
     val trackingParameters: List<String>

@@ -142,6 +142,13 @@ class BrowserWebViewClient(
                     }
                     false
                 }
+                is SpecialUrlDetector.UrlType.TrackingLink -> {
+                    if (isForMainFrame) {
+                        webView.loadUrl(urlType.destinationUrl)
+                        return true
+                    }
+                    false
+                }
             }
         } catch (e: Throwable) {
             appCoroutineScope.launch {
