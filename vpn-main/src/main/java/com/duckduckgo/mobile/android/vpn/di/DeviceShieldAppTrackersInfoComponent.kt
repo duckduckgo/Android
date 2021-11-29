@@ -49,5 +49,5 @@ abstract class DeviceShieldAppTrackersInfoBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldAppTrackersInfo::class)
-    abstract fun bindDeviceShieldAppTrackersInfoComponentFactory(factory: DeviceShieldAppTrackersInfoComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldAppTrackersInfoComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

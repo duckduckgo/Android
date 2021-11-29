@@ -50,5 +50,5 @@ abstract class FeedbackActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(FeedbackActivity::class)
-    abstract fun bindFeedbackActivityComponentFactory(factory: FeedbackActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun FeedbackActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

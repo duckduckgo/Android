@@ -49,5 +49,5 @@ abstract class BrokenSiteNegativeFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrokenSiteNegativeFeedbackFragment::class)
-    abstract fun bindBrokenSiteNegativeFeedbackFragmentComponentFactory(factory: BrokenSiteNegativeFeedbackFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrokenSiteNegativeFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

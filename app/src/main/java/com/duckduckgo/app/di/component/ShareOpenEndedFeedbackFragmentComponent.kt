@@ -49,5 +49,5 @@ abstract class ShareOpenEndedFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ShareOpenEndedFeedbackFragment::class)
-    abstract fun bindShareOpenEndedFeedbackFragmentComponentFactory(factory: ShareOpenEndedFeedbackFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ShareOpenEndedFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

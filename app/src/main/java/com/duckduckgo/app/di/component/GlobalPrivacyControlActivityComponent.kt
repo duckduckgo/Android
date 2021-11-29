@@ -49,5 +49,5 @@ abstract class GlobalPrivacyControlActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(GlobalPrivacyControlActivity::class)
-    abstract fun bindGlobalPrivacyControlActivityComponentFactory(factory: GlobalPrivacyControlActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun GlobalPrivacyControlActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

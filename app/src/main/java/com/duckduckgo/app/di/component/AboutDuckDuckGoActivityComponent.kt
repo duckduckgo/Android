@@ -49,5 +49,5 @@ abstract class AboutDuckDuckGoActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AboutDuckDuckGoActivity::class)
-    abstract fun bindAboutDuckDuckGoActivityComponentFactory(factory: AboutDuckDuckGoActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AboutDuckDuckGoActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -49,5 +49,5 @@ abstract class DownloadConfirmationFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DownloadConfirmationFragment::class)
-    abstract fun bindDownloadConfirmationFragmentComponentFactory(factory: DownloadConfirmationFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DownloadConfirmationFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

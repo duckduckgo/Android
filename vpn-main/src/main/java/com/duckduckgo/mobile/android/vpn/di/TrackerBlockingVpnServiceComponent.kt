@@ -49,5 +49,5 @@ abstract class TrackerBlockingVpnServiceComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TrackerBlockingVpnService::class)
-    abstract fun bindTrackerBlockingVpnServiceFactory(factory: TrackerBlockingVpnServiceComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun TrackerBlockingVpnServiceComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

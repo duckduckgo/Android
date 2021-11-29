@@ -49,5 +49,5 @@ abstract class TrackerNetworksActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TrackerNetworksActivity::class)
-    abstract fun bindTrackerNetworksActivityComponentFactory(factory: TrackerNetworksActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun TrackerNetworksActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

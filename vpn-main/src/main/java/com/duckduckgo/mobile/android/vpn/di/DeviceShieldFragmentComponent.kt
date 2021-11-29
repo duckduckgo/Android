@@ -49,5 +49,5 @@ abstract class DeviceShieldFragmentComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldFragment::class)
-    abstract fun bindDeviceShieldFragmentComponentFactory(factory: DeviceShieldFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

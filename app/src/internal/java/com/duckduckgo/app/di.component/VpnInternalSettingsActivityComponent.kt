@@ -51,5 +51,5 @@ abstract class VpnInternalSettingsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnInternalSettingsActivity::class)
-    abstract fun bindVpnInternalSettingsActivityComponentFactory(factory: VpnInternalSettingsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnInternalSettingsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

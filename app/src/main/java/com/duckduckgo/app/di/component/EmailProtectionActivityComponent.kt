@@ -49,5 +49,5 @@ abstract class EmailProtectionActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionActivity::class)
-    abstract fun bindEmailProtectionActivityComponentFactory(factory: EmailProtectionActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

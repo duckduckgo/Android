@@ -49,5 +49,5 @@ abstract class GiveFeedbackDialogFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(GiveFeedbackDialogFragment::class)
-    abstract fun bindGiveFeedbackDialogFragmentComponentFactory(factory: GiveFeedbackDialogFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun GiveFeedbackDialogFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

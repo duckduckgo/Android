@@ -49,5 +49,5 @@ abstract class SiteLocationPermissionDialogBindingModule {
     @Binds
     @IntoMap
     @ClassKey(SiteLocationPermissionDialog::class)
-    abstract fun bindSiteLocationPermissionDialogComponentFactory(factory: SiteLocationPermissionDialogComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun SiteLocationPermissionDialogComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

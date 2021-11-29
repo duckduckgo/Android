@@ -49,5 +49,5 @@ abstract class TrackingProtectionExclusionListActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TrackingProtectionExclusionListActivity::class)
-    abstract fun bindDeviceShieldExclusionListActivityComponentFactory(factory: TrackingProtectionExclusionListActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun TrackingProtectionExclusionListActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

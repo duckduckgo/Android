@@ -49,5 +49,5 @@ abstract class AccessibilityActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AccessibilityActivity::class)
-    abstract fun bindAccessibilityActivityComponentFactory(factory: AccessibilityActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AccessibilityActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -49,5 +49,5 @@ abstract class DeviceShieldMostRecentActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldMostRecentActivity::class)
-    abstract fun bindDeviceShieldMostRecentActivityComponentFactory(factory: DeviceShieldMostRecentActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldMostRecentActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

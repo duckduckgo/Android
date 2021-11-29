@@ -49,5 +49,5 @@ abstract class InitialFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(InitialFeedbackFragment::class)
-    abstract fun bindInitialFeedbackFragmentComponentFactory(factory: InitialFeedbackFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun InitialFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

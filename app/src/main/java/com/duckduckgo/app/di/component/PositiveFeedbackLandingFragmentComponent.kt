@@ -49,5 +49,5 @@ abstract class PositiveFeedbackLandingFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(PositiveFeedbackLandingFragment::class)
-    abstract fun bindPositiveFeedbackLandingFragmentComponentFactory(factory: PositiveFeedbackLandingFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun PositiveFeedbackLandingFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -49,5 +49,5 @@ abstract class AppTPCompanyTrackersActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AppTPCompanyTrackersActivity::class)
-    abstract fun bindAppTPCompanyTrackersActivityComponentFactory(factory: AppTPCompanyTrackersActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AppTPCompanyTrackersActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

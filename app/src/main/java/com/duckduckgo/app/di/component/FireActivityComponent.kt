@@ -49,5 +49,5 @@ abstract class FireActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(FireActivity::class)
-    abstract fun bindFireActivityComponentFactory(factory: FireActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun FireActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

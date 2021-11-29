@@ -49,5 +49,5 @@ abstract class SettingsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(SettingsActivity::class)
-    abstract fun bindSettingsActivityComponentFactory(factory: SettingsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun SettingsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

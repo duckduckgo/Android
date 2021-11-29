@@ -49,5 +49,5 @@ abstract class WhitelistActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WhitelistActivity::class)
-    abstract fun bindWhitelistActivityComponentFactory(factory: WhitelistActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WhitelistActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

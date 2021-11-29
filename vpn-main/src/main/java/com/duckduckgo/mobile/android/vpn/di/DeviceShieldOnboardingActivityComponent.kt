@@ -49,5 +49,5 @@ abstract class DeviceShieldOnboardingActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldOnboardingActivity::class)
-    abstract fun bindDeviceShieldOnboardingActivityComponentFactory(factory: DeviceShieldOnboardingActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldOnboardingActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

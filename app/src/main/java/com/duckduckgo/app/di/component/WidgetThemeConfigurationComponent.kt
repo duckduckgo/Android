@@ -49,5 +49,5 @@ abstract class WidgetThemeConfigurationBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WidgetThemeConfiguration::class)
-    abstract fun bindWidgetThemeConfigurationComponentFactory(factory: WidgetThemeConfigurationComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WidgetThemeConfigurationComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

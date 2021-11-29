@@ -50,5 +50,5 @@ abstract class LocationPermissionsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(LocationPermissionsActivity::class)
-    abstract fun bindLocationPermissionsActivityComponentFactory(factory: LocationPermissionsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun LocationPermissionsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

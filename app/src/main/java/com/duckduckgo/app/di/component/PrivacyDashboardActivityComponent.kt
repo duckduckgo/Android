@@ -49,5 +49,5 @@ abstract class PrivacyDashboardActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(PrivacyDashboardActivity::class)
-    abstract fun bindPrivacyDashboardActivityComponentFactory(factory: PrivacyDashboardActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun PrivacyDashboardActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

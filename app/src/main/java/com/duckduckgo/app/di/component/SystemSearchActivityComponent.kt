@@ -49,5 +49,5 @@ abstract class SystemSearchActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(SystemSearchActivity::class)
-    abstract fun bindSystemSearchActivityComponentFactory(factory: SystemSearchActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun SystemSearchActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

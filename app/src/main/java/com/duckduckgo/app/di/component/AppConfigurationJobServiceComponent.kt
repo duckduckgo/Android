@@ -49,5 +49,5 @@ abstract class AppConfigurationJobServiceBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AppConfigurationJobService::class)
-    abstract fun bindAppConfigurationJobServiceComponentFactory(factory: AppConfigurationJobServiceComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AppConfigurationJobServiceComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

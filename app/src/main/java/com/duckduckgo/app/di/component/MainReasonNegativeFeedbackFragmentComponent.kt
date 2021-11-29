@@ -49,5 +49,5 @@ abstract class MainReasonNegativeFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(MainReasonNegativeFeedbackFragment::class)
-    abstract fun bindMainReasonNegativeFeedbackFragmentComponentFactory(factory: MainReasonNegativeFeedbackFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun MainReasonNegativeFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

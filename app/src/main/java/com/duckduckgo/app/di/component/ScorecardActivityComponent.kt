@@ -50,5 +50,5 @@ abstract class ScorecardActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ScorecardActivity::class)
-    abstract fun bindScorecardActivityComponentFactory(factory: ScorecardActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ScorecardActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

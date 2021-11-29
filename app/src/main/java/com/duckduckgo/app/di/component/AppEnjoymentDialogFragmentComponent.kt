@@ -49,5 +49,5 @@ abstract class AppEnjoymentDialogFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AppEnjoymentDialogFragment::class)
-    abstract fun bindAppEnjoymentDialogFragmentComponentFactory(factory: AppEnjoymentDialogFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AppEnjoymentDialogFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

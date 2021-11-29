@@ -49,5 +49,5 @@ abstract class BookmarksActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BookmarksActivity::class)
-    abstract fun bindBookmarksActivityComponentFactory(factory: BookmarksActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BookmarksActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

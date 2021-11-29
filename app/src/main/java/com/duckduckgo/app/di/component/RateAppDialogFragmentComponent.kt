@@ -49,5 +49,5 @@ abstract class RateAppDialogFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(RateAppDialogFragment::class)
-    abstract fun bindRateAppDialogFragmentComponentFactory(factory: RateAppDialogFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun RateAppDialogFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

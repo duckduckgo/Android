@@ -49,5 +49,5 @@ abstract class LaunchBridgeActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(LaunchBridgeActivity::class)
-    abstract fun bindLaunchBridgeActivityComponentFactory(factory: LaunchBridgeActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun LaunchBridgeActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -50,5 +50,5 @@ abstract class BrowserTabFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrowserTabFragment::class)
-    abstract fun bindBrowserTabFragmentComponentFactory(factory: BrowserTabFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrowserTabFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

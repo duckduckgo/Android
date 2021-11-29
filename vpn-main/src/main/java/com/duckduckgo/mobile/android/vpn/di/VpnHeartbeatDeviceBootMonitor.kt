@@ -49,5 +49,5 @@ abstract class VpnHeartbeatDeviceBootMonitorBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnHeartbeatDeviceBootMonitor::class)
-    abstract fun bindVpnHeartbeatDeviceBootMonitorComponentFactory(factory: VpnHeartbeatDeviceBootMonitorComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnHeartbeatDeviceBootMonitorComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

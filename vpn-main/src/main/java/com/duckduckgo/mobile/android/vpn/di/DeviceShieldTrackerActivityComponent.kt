@@ -49,5 +49,5 @@ abstract class DeviceShieldTrackerActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldTrackerActivity::class)
-    abstract fun bindDeviceShieldTrackerActivityComponentFactory(factory: DeviceShieldTrackerActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldTrackerActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

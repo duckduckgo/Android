@@ -49,5 +49,5 @@ abstract class WelcomePageBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WelcomePage::class)
-    abstract fun bindWelcomePageComponentFactory(factory: WelcomePageComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WelcomePageComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

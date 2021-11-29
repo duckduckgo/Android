@@ -49,5 +49,5 @@ abstract class ReportBreakageSingleChoiceFormActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ReportBreakageSingleChoiceFormActivity::class)
-    abstract fun bindReportBreakageSingleChoiceFormActivityComponentFactory(factory: ReportBreakageSingleChoiceFormActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ReportBreakageSingleChoiceFormActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

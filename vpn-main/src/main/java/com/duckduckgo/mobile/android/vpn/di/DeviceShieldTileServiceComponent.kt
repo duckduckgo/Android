@@ -53,5 +53,5 @@ abstract class DeviceShieldTileServiceBindingModule {
     // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
     // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
     @ClassKey(TileServiceBingingKey::class)
-    abstract fun bindDeviceShieldTileServiceComponentFactory(factory: DeviceShieldTileServiceComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldTileServiceComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

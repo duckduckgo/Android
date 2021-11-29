@@ -49,5 +49,5 @@ abstract class EmailProtectionSignInFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionSignInFragment::class)
-    abstract fun bindEmailProtectionSignInFragmentComponentFactory(factory: EmailProtectionSignInFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionSignInFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

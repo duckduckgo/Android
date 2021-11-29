@@ -49,5 +49,5 @@ abstract class DeviceShieldFAQActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldFAQActivity::class)
-    abstract fun bindDeviceShieldFAQActivityComponentFactory(factory: DeviceShieldFAQActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldFAQActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

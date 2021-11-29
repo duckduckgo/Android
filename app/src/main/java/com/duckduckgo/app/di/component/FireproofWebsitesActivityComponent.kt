@@ -49,5 +49,5 @@ abstract class FireproofWebsitesActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(FireproofWebsitesActivity::class)
-    abstract fun bindFireproofWebsitesActivityComponentFactory(factory: FireproofWebsitesActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun FireproofWebsitesActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

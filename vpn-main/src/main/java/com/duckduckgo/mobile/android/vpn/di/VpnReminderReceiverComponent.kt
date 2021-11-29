@@ -49,5 +49,5 @@ abstract class VpnReminderReceiverBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnReminderReceiver::class)
-    abstract fun bindVpnReminderReceiverComponentFactory(factory: VpnReminderReceiverComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnReminderReceiverComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

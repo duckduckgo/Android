@@ -49,5 +49,5 @@ abstract class NotificationHandlerServiceBindingModule {
     @Binds
     @IntoMap
     @ClassKey(NotificationHandlerService::class)
-    abstract fun bindNotificationHandlerServiceComponentFactory(factory: NotificationHandlerServiceComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun NotificationHandlerServiceComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

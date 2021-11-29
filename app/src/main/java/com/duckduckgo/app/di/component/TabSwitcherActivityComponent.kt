@@ -49,5 +49,5 @@ abstract class TabSwitcherActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TabSwitcherActivity::class)
-    abstract fun bindTabSwitcherActivityComponentFactory(factory: TabSwitcherActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun TabSwitcherActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -49,5 +49,5 @@ abstract class BrokenSiteActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrokenSiteActivity::class)
-    abstract fun bindBrokenSiteActivityComponentFactory(factory: BrokenSiteActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrokenSiteActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

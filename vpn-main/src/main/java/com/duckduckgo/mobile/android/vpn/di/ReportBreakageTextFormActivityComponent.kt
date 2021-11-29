@@ -51,5 +51,5 @@ abstract class ReportBreakageTextFormActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ReportBreakageTextFormActivity::class)
-    abstract fun bindReportBreakageTextFormActivityComponentFactory(factory: ReportBreakageTextFormActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ReportBreakageTextFormActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

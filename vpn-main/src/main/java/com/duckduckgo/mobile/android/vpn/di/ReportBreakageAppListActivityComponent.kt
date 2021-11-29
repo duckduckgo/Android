@@ -49,5 +49,5 @@ abstract class ReportBreakageAppListActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ReportBreakageAppListActivity::class)
-    abstract fun bindDeviceShieldExclusionListActivityComponentFactory(factory: ReportBreakageAppListActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ReportBreakageAppListActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

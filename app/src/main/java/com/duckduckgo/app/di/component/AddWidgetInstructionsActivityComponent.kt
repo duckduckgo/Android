@@ -49,5 +49,5 @@ abstract class AddWidgetInstructionsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AddWidgetInstructionsActivity::class)
-    abstract fun bindAddWidgetInstructionsActivityComponentFactory(factory: AddWidgetInstructionsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AddWidgetInstructionsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

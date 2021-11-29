@@ -49,5 +49,5 @@ abstract class AppTPWaitlistActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AppTPWaitlistActivity::class)
-    abstract fun bindAppTPWaitlistActivityComponentFactory(factory: AppTPWaitlistActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AppTPWaitlistActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

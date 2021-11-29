@@ -49,5 +49,5 @@ abstract class DefaultBrowserPageBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DefaultBrowserPage::class)
-    abstract fun bindDefaultBrowserPageComponentFactory(factory: DefaultBrowserPageComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DefaultBrowserPageComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

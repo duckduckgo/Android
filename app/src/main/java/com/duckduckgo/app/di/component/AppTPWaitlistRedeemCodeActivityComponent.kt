@@ -49,5 +49,5 @@ abstract class AppTPWaitlistRedeemCodeActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AppTPWaitlistRedeemCodeActivity::class)
-    abstract fun bindAppTPWaitlistRedeemCodeActivityComponentFactory(factory: AppTPWaitlistRedeemCodeActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AppTPWaitlistRedeemCodeActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

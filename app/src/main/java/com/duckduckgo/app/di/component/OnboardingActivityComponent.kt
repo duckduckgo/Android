@@ -49,5 +49,5 @@ abstract class OnboardingActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(OnboardingActivity::class)
-    abstract fun bindOnboardingActivityComponentFactory(factory: OnboardingActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun OnboardingActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

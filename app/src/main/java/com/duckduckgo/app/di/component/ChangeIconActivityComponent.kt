@@ -50,5 +50,5 @@ abstract class ChangeIconActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ChangeIconActivity::class)
-    abstract fun bindChangeIconActivityComponentFactory(factory: ChangeIconActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ChangeIconActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

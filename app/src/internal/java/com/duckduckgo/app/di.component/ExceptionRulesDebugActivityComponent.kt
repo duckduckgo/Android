@@ -50,5 +50,5 @@ abstract class ExceptionRulesDebugActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ExceptionRulesDebugActivity::class)
-    abstract fun bindExceptionRulesDebugActivityComponentFactory(factory: ExceptionRulesDebugActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ExceptionRulesDebugActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

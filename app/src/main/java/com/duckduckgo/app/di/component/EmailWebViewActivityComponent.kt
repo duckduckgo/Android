@@ -49,5 +49,5 @@ abstract class EmailWebViewActivityComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailWebViewActivity::class)
-    abstract fun bindEmailWebViewActivityComponentFactory(factory: EmailWebViewActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailWebViewActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

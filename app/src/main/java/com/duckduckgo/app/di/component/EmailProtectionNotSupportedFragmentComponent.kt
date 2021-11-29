@@ -49,5 +49,5 @@ abstract class EmailProtectionNotSupportedFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionNotSupportedFragment::class)
-    abstract fun bindEmailProtectionNotSupportedFragmentComponentFactory(factory: EmailProtectionNotSupportedFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionNotSupportedFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

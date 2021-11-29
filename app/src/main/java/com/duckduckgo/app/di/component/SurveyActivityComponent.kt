@@ -49,5 +49,5 @@ abstract class SurveyActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(SurveyActivity::class)
-    abstract fun bindSurveyActivityComponentFactory(factory: SurveyActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun SurveyActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

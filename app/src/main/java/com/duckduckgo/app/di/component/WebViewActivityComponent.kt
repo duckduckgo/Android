@@ -49,5 +49,5 @@ abstract class WebViewActivityComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WebViewActivity::class)
-    abstract fun bindWebViewActivityComponentFactory(factory: WebViewActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WebViewActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

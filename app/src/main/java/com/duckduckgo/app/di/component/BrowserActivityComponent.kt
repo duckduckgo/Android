@@ -49,5 +49,5 @@ abstract class BrowserActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrowserActivity::class)
-    abstract fun bindBrowserActivityComponentFactory(factory: BrowserActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrowserActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

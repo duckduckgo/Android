@@ -49,5 +49,5 @@ abstract class VpnControllerActivityComponentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnControllerActivity::class)
-    abstract fun bindVpnControllerActivityComponentFactory(factory: VpnControllerActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnControllerActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }
