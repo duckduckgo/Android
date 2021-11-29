@@ -578,7 +578,7 @@
     <string name="newEmailAliasMenuTitle">Crea indirizzo Duck</string>
 
     <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Rimuovi protezioni e-mail?</string>
+    <string name="emailSignOutDialogTitle">Rimuovere protezioni e-mail?</string>
     <string name="emailSignOutDialogText">Nota: la rimozione delle protezioni e-mail da questo dispositivo non eliminerà il tuo indirizzo Duck.</string>
     <string name="emailSignOutDialogCancel">Annulla</string>
     <string name="emailSignOutDialogDisable">Rimuovi</string>
