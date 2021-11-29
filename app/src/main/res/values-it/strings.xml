@@ -286,7 +286,7 @@
     <string name="appEnjoymentDialogTitle">Ti piace DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Ci piacerebbe sapere cosa ne pensi.</string>
     <string name="appEnjoymentDialogPositiveButton">Mi piace</string>
-    <string name="appEnjoymentDialogNegativeButton">Deve essere migliorato</string>
+    <string name="appEnjoymentDialogNegativeButton">Deve essere migliorata</string>
 
     <string name="rateAppDialogTitle">Valuta l\'app</string>
     <string name="rateAppDialogMessage">Il tuo feedback ci interessa. Condividi il tuo apprezzamento con una recensione.</string>
