@@ -69,6 +69,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
+    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
@@ -94,6 +97,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         if (appIsRestarting()) return
 
         configureDependencyInjection()
+        setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler(currentProcess)
         initializeDateLibrary()
 
@@ -116,6 +120,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
         }
+    }
+
+    private fun setupActivityLifecycleCallbacks() {
+        activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
     }
 
     private fun configureUncaughtExceptionHandler(currentProcess: DuckDuckGoProcess) {

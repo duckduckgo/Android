@@ -2,6 +2,7 @@ plugins {
     id("de.fayard.refreshVersions") version "0.23.0"
 }
 
+include ':browser-api'
 include ':vpn'
 include ':vpn-store'
 include ':vpn-main'
