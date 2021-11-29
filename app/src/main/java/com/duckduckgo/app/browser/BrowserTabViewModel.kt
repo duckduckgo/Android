@@ -174,6 +174,11 @@ class BrowserTabViewModel(
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
+    data class SavedSiteChangedViewState(
+        val savedSite: SavedSite,
+        val bookmarkFolder: BookmarkFolder?
+    )
+
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
@@ -279,8 +284,8 @@ class BrowserTabViewModel(
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
-        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite, val bookmarkFolder: BookmarkFolder?) : Command()
-        class ShowEditSavedSiteDialog(val savedSite: SavedSite, val bookmarkFolder: BookmarkFolder?) : Command()
+        class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
+        class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
@@ -1459,7 +1464,7 @@ class BrowserTabViewModel(
         }
         val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
-            command.value = ShowSavedSiteAddedConfirmation(savedBookmark, bookmarkFolder)
+            command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
             browserViewState.value =
                 currentBrowserViewState().copy(bookmark = savedBookmark, bookmarkFolder = bookmarkFolder)
         }
@@ -1502,7 +1507,7 @@ class BrowserTabViewModel(
             }
             favorite?.let {
                 withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(it, null)
+                    command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
                 }
             }
         }
@@ -1567,35 +1572,44 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite) {
-        viewModelScope.launch(dispatchers.io()) {
-            editFavorite(favorite)
-        }
-    }
-
-    override fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
-        viewModelScope.launch(dispatchers.io()) {
-            editBookmark(bookmark, bookmarkFolder)
+    override fun onSavedSiteEdited(savedSite: SavedSite) {
+        when (savedSite) {
+            is SavedSite.Bookmark -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    editBookmark(savedSite)
+                }
+            }
+            is SavedSite.Favorite -> {
+                viewModelScope.launch(dispatchers.io()) {
+                    editFavorite(savedSite)
+                }
+            }
         }
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
-        command.value = ShowEditSavedSiteDialog(savedSite, bookmarkFolder)
+        command.value = ShowEditSavedSiteDialog(SavedSiteChangedViewState(savedSite, bookmarkFolder))
     }
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
         command.value = DeleteSavedSiteConfirmation(savedSite)
     }
 
-    private suspend fun editBookmark(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder) {
+    private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
         }
-        updateBookmarkAndFavoriteState(bookmark.url)
+        val bookmarkFolder = getBookmarkFolder(bookmark)
         withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(
+                bookmark = bookmark,
+                bookmarkFolder = bookmarkFolder
+            )
             command.value = ShowSavedSiteAddedConfirmation(
-                bookmark,
-                bookmarkFolder
+                SavedSiteChangedViewState(
+                    bookmark,
+                    bookmarkFolder
+                )
             )
         }
     }

@@ -88,15 +88,18 @@ class BookmarksViewModel(
         }
     }
 
-    override fun onSavedSiteBookmarkEdited(bookmark: Bookmark, bookmarkFolder: BookmarkFolder) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            editBookmark(bookmark)
-        }
-    }
-
-    override fun onSavedSiteFavoriteEdited(favorite: Favorite) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            editFavorite(favorite)
+    override fun onSavedSiteEdited(savedSite: SavedSite) {
+        when (savedSite) {
+            is Bookmark -> {
+                viewModelScope.launch(dispatcherProvider.io()) {
+                    editBookmark(savedSite)
+                }
+            }
+            is Favorite -> {
+                viewModelScope.launch(dispatcherProvider.io()) {
+                    editFavorite(savedSite)
+                }
+            }
         }
     }
 

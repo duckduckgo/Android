@@ -30,8 +30,7 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
-        fun onSavedSiteFavoriteEdited(favorite: SavedSite.Favorite)
-        fun onSavedSiteBookmarkEdited(bookmark: SavedSite.Bookmark, bookmarkFolder: BookmarkFolder)
+        fun onSavedSiteEdited(savedSite: SavedSite)
     }
 
     var listener: EditSavedSiteListener? = null
@@ -71,17 +70,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         when (savedSite) {
             is SavedSite.Bookmark -> {
                 val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
-                val parentFolderName = binding.savedSiteLocation.text.toString()
-                listener?.onSavedSiteBookmarkEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId),
-                    BookmarkFolder(
-                        name = parentFolderName,
-                        parentId = parentId
-                    )
+                listener?.onSavedSiteEdited(
+                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
                 )
             }
             is SavedSite.Favorite -> {
-                listener?.onSavedSiteFavoriteEdited(
+                listener?.onSavedSiteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
             }
