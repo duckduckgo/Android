@@ -32,9 +32,19 @@ interface TrackingLinkDetector {
      * @return the extracted destination [url] or `null` if the [url] is not a tracking link.
      */
     fun extractCanonicalFromTrackingLink(url: String): String?
+
+    /**
+     * The last tracking link and its destination URL.
+     */
+    var lastTrackingLinkInfo: TrackingLinkInfo?
 }
 
 /**
- * Public data class for Tracking Links Exceptions
+ * Public data class for Tracking Link Info.
+ */
+data class TrackingLinkInfo(val trackingLink: String, val destinationUrl: String)
+
+/**
+ * Public data class for Tracking Link Exceptions.
  */
 data class TrackingLinkException(val domain: String, val reason: String)

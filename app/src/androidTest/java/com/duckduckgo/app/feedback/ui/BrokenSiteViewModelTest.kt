@@ -9,8 +9,11 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkInfo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -35,6 +38,8 @@ class BrokenSiteViewModelTest {
 
     private val mockCommandObserver: Observer<Command> = mock()
 
+    private val mockTrackingLinkDetector: TrackingLinkDetector = mock()
+
     private lateinit var testee: BrokenSiteViewModel
 
     private val viewState: BrokenSiteViewModel.ViewState
@@ -43,7 +48,7 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
+        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockTrackingLinkDetector)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -142,6 +147,52 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
+    fun whenCanSubmitBrokenSiteAndLastTrackingLinkIsNullAndSubmitPressedThenReportUrlAndPixelSubmitted() {
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(null)
+
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = url,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenSiteAndUrlHasAssociatedTrackingLinkAndSubmitPressedThenTrackingLinkReportedAndPixelSubmitted() {
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(TrackingLinkInfo(trackingUrl, url))
+
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = trackingUrl,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
@@ -198,7 +249,7 @@ class BrokenSiteViewModelTest {
 
     companion object Constants {
         private const val url = "http://example.com"
-        private const val message = "Feedback message"
+        private const val trackingUrl = "https://foo.com"
     }
 
 }

@@ -31,11 +31,16 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
+class BrokenSiteViewModel(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender,
+    private val trackingLinkDetector: TrackingLinkDetector
+) : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -96,7 +101,13 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
-            val brokenSite = getBrokenSite(url, webViewVersion)
+
+            val brokenSite = if (trackingLinkDetector.lastTrackingLinkInfo?.destinationUrl == url) {
+                getBrokenSite(trackingLinkDetector.lastTrackingLinkInfo!!.trackingLink, webViewVersion)
+            } else {
+                getBrokenSite(url, webViewVersion)
+            }
+
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
@@ -133,12 +144,13 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 @ContributesMultibinding(AppObjectGraph::class)
 class BrokenSiteViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
-    private val brokenSiteSender: Provider<BrokenSiteSender>
+    private val brokenSiteSender: Provider<BrokenSiteSender>,
+    private val trackingLinkDetector: Provider<TrackingLinkDetector>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get(), trackingLinkDetector.get()) as T)
                 else -> null
             }
         }

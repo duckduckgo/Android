@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkInfo
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,6 +36,8 @@ class RealTrackingLinkDetector @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary
 ) : TrackingLinkDetector {
 
+    override var lastTrackingLinkInfo: TrackingLinkInfo? = null
+
     override fun isAnException(url: String): Boolean {
         return matches(url) || unprotectedTemporary.isAnException(url)
     }
@@ -46,6 +49,17 @@ class RealTrackingLinkDetector @Inject constructor(
     override fun extractCanonicalFromTrackingLink(url: String): String? {
         if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return null
         if (isAnException(url)) return null
-        return trackingLinkDetectionRepository.extractCanonicalFromTrackingLink(url)
+
+        if (lastTrackingLinkInfo?.destinationUrl != url) {
+            lastTrackingLinkInfo = null
+        }
+
+        val destinationUrl = trackingLinkDetectionRepository.extractCanonicalFromTrackingLink(url)
+
+        destinationUrl?.let {
+            lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url, destinationUrl = destinationUrl)
+        }
+
+        return destinationUrl
     }
 }

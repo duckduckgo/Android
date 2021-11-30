@@ -118,6 +118,21 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertNull(testee.extractCanonicalFromTrackingLink("https://www.example.com"))
     }
 
+    @Test
+    fun whenExtractCanonicalFromTrackingLinkAndUrlIsExtractableAmpLinkThenReturnExtractedUrl() {
+        givenTrackingLinkDetectionDaoContainsEntities()
+        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
+
+        testee = RealTrackingLinkDetectionRepository(
+            mockDatabase,
+            TestCoroutineScope(),
+            coroutineRule.testDispatcherProvider
+        )
+
+        val extractedLink = testee.extractCanonicalFromTrackingLink("https://www.google.com/amp/s/www.example.com")
+        assertEquals("https://www.example.com", extractedLink)
+    }
+
     private fun givenTrackingLinkDetectionDaoContainsEntities() {
         whenever(mockTrackingLinkDetectionDao.getAllExceptions()).thenReturn(listOf(trackingLinkExceptionEntity))
         whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))

@@ -16,9 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
 
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.privacy.config.api.TrackingLinkException
 import com.duckduckgo.privacy.config.store.*
 import kotlinx.coroutines.CoroutineScope
@@ -85,10 +83,9 @@ class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, c
         if (groups.size < 2) return null
 
         var destinationUrl = groups[1]?.value ?: return null
-        val destinationUri = destinationUrl.toUri()
 
-        if (destinationUri.scheme == null) {
-            destinationUrl = destinationUri.toHttps.toString()
+        if (!destinationUrl.startsWith("http")) {
+            destinationUrl = "https://$destinationUrl"
         }
         return destinationUrl
     }
