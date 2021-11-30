@@ -186,7 +186,7 @@
     <string name="atp_ProfilingInfoFirstParagraph">You\’ve probably heard about companies like Google and Facebook tracking you behind the scenes on third-party websites. But did you know they also track your personal information through apps on your device?\n\n<b>Over 96% of the 100 popular free Android apps</b> we tested contained hidden third-party trackers. Of those, 87% sent data to Google and 68% sent data to Facebook. This happens even when you\’re not using your device.\n\n<b>Trackers in apps may have access to a lot more information</b> than their website tracker cousins, such as your location down to which floor of a building you\'re on, how often you play games while at work, and when and how long you sleep each day. <b>Even if you don\'t have a Google or Facebook account, for example, they can still collect data about you from your apps.</b>\n\nTracking networks like Facebook and Google use these little pieces of information <b>to build a digital profile about you.</b> With it, tracking networks can manipulate what you see online and allow advertisers to bid on access to you based on your data.\n\nTrackers in apps is a BIG problem for privacy. <b>But DuckDuckGo has a solution that can help.</b>\n\nWhen enabled in the DuckDuckGo Privacy Browser app, App Tracking Protection blocks many trackers in other apps on your device, at the same time that the DuckDuckGo app blocks trackers we find on websites when you browse. <b>These dual layers of protection reduce what tracking companies know about you overall</b>, so you can use your apps with more peace of mind, knowing you\’re more protected.</string>
 
     <!--  App Tracking Protection Activity -->
-    <string name="atp_ActivityPastWeek">Past Week</string>
+    <string name="atp_ActivityPastWeek">Past 7 Days</string>
     <string name="atp_ActivityTitle">App Tracking Protection</string>
     <string name="atp_MostRecentActivityTitle">All Recent Activity</string>
     <string name="atp_ActivityRecentActivity">Recent Activity</string>
@@ -195,7 +195,7 @@
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Manage Protection for Your Apps</string>
-    <string name="atp_ActivityTrackersBlocked">%1d tracking attempts blocked in <![CDATA[<b>%2s</b>]]> app</string>
+    <string name="atp_ActivityTrackersBlocked">%1d tracking attempts blocked from <![CDATA[%2s]]> in <![CDATA[<b>%3s</b>]]> app</string>
     <string name="atp_ActivityTrackersCountOne">from %1$s</string>
     <string name="atp_ActivityTrackersCountTwo">from %1$s and 1 other</string>
     <string name="atp_ActivityTrackersCountMany">from %1$s and %2$d others</string>
@@ -206,9 +206,13 @@
     <string name="atp_ActivityEmptyListMessage">Keep using your device. Tracking attempts that App Tracking Protection blocks appear here.</string>
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>
+    <plurals name="atp_ActivityTrackersBlockedCompanyCount">
+        <item quantity="one">"%d company"</item>
+        <item quantity="other">%d companies"</item>
+    </plurals>
     <plurals name="atp_ActivityPastWeekTrackerCount">
-        <item quantity="one">Tracking attempt</item>
-        <item quantity="other">Tracking attempts</item>
+        <item quantity="one">Tracking Attempt</item>
+        <item quantity="other">Tracking Attempts</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">App</item>
@@ -257,13 +261,69 @@
 
     <!--  App Tracking Company Details -->
     <plurals name="atp_CompanyDetailsTrackingAttempts">
-        <item quantity="one">"%d attempt"</item>
-        <item quantity="other">%d attempts"</item>
+        <item quantity="one">"%d attempt. Known to collect:"</item>
+        <item quantity="other">%d attempts. Known to collect:"</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
-        <item quantity="one">"%d tracking attempt blocked"</item>
-        <item quantity="other">%d tracking attempts blocked"</item>
+        <item quantity="one">Blocked "%d tracking attempt"</item>
+        <item quantity="other">Blocked %d tracking attempts"</item>
     </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Report an Issue With This App</string>
+    <string name="atp_CompanyDetailsTrackingShowMore">Show %d more</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Apps may include trackers from other companies for things like analytics and marketing. If we didn\'t block them, these trackers could create even more detailed digital profiles on you. <annotation type="learn_more_link">Learn more.</annotation></string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">Android Advertising ID</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Unique Identifier</string>
+    <string name="atp_TrackingSignalCookies">Cookies</string>
+    <string name="atp_TrackingSignalOsVersion">OS Version</string>
+    <string name="atp_TrackingSignalOsBuildNumber">OS Build Number</string>
+    <string name="atp_TrackingSignalPlatform">Device Platform</string>
+    <string name="atp_TrackingSignalDeviceBrand">Device Brand</string>
+    <string name="atp_TrackingSignalDeviceModel">Device Model</string>
+    <string name="atp_TrackingSignalCPUData">CPU Data</string>
+    <string name="atp_TrackingSignalScreenResolution">Screen Resolution</string>
+    <string name="atp_TrackingSignalInternalStorage">Internal Storage</string>
+    <string name="atp_TrackingSignalExternalStorage">External Storage</string>
+    <string name="atp_TrackingSignalDeviceMemory">Device Memory</string>
+    <string name="atp_TrackingSignalDeviceName">Device Name</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Wifi Network Name</string>
+    <string name="atp_TrackingSignalAppName">App Name</string>
+    <string name="atp_TrackingSignalAppVersion">App Version</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Local IP Address</string>
+    <string name="atp_TrackingSignalISP">Internet Service Provider</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Device Boot Time</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Network Connection Type</string>
+    <string name="atp_TrackingSignalSystemVolume">System Volume</string>
+    <string name="atp_TrackingSignalBatteryLevel">Battery Level</string>
+    <string name="atp_TrackingSignalChargingStatus">Charging Status</string>
+    <string name="atp_TrackingSignalBrightness">Brightness</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Headphone Status</string>
+    <string name="atp_TrackingSignalAccelerometerData">Accelerometer Data</string>
+    <string name="atp_TrackingSignalRotationData">Rotation Data</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Device Orientation</string>
+    <string name="atp_TrackingSignalMagnetometerData">Magnetometer Data</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Available Internal Storage</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Available External Storage</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Available Device Memory</string>
+    <string name="atp_TrackingSignalScreenMargins">Screen Margins</string>
+    <string name="atp_TrackingSignalScreenDensity">Screen Density</string>
+    <string name="atp_TrackingSignalFontSize">Font Size</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Network Carrier</string>
+    <string name="atp_TrackingSignalAppInstallDate">App Install Date</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">First App Launch Date</string>
+    <string name="atp_TrackingSignalGPSCoordinates">GPS Coordinates</string>
+    <string name="atp_TrackingSignalPostalCode">Postal Code</string>
+    <string name="atp_TrackingSignalNeighbourhood">Neighbourhood</string>
+    <string name="atp_TrackingSignalCity">City</string>
+    <string name="atp_TrackingSignalState">State</string>
+    <string name="atp_TrackingSignalCountry">Country</string>
+    <string name="atp_TrackingSignalTimezone">Timezone</string>
+    <string name="atp_TrackingSignalEmailAddress">Email Address</string>
+    <string name="atp_TrackingSignalBirthday">Birthday</string>
+    <string name="atp_TrackingSignaGender">Gender</string>
+    <string name="atp_TrackingSignalFirstName">First Name</string>
+    <string name="atp_TrackingSignalLastName">Last Name</string>
 
     <!--  App Tracking Protection Disable VPN Dialog -->
     <string name="atp_DisableConfirmationDialogTitle">Disable App Tracking Protection?</string>

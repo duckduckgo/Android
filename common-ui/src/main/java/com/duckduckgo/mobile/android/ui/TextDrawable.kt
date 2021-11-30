@@ -252,6 +252,10 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         }
     }
 
+    fun asIconDrawable(text: String): TextDrawable {
+        return TextDrawable.builder().buildRound(text.take(1), Color.DKGRAY)
+    }
+
     init {
 
         // shape properties
