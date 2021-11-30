@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.TextView
 import com.duckduckgo.mobile.android.ui.view.leftDrawable
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 
 class TrackedSignalChip @JvmOverloads constructor(
     context: Context,
@@ -27,7 +28,7 @@ class TrackedSignalChip @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : TextView(context, attrs, defStyleAttr) {
 
-    fun bindTrackedSignal(trackingSignal: AppTPCompanyTrackersViewModel.TrackingSignal) {
+    fun bindTrackedSignal(trackingSignal: TrackingSignal) {
         text = resources.getString(trackingSignal.signalDisplayName)
         leftDrawable(trackingSignal.signalIcon)
     }

@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -159,11 +158,13 @@ class TrackerFeedAdapter @Inject constructor(
         fun bind(tracker: TrackerFeedItem.TrackerFeedData?, onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit) {
             tracker?.let { item ->
                 with(activityMessage) {
+                    val companies = resources.getQuantityString(R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackers.size, tracker.trackers.size)
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
                                 R.string.atp_ActivityTrackersBlocked,
                                 item.trackersTotalCount,
+                                companies,
                                 item.trackingApp.appDisplayName
                             ),
                             FROM_HTML_MODE_COMPACT
@@ -171,8 +172,7 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                val trackerInfoMessage = "${item.trackers.asInfoMessage()} · ${item.displayTimestamp}"
-                timeSinceTrackerBlocked.text = trackerInfoMessage
+                timeSinceTrackerBlocked.text = "${item.displayTimestamp}"
 
                 Glide.with(trackingAppIcon.context.applicationContext)
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
@@ -193,14 +193,6 @@ class TrackerFeedAdapter @Inject constructor(
 
         private fun String.asIconDrawable(): TextDrawable {
             return TextDrawable.builder().buildRound(this.take(1), Color.DKGRAY)
-        }
-
-        private fun List<TrackerInfo>.asInfoMessage(): String {
-            return when (size) {
-                1 -> context.getString(R.string.atp_ActivityTrackersCountOne, first().companyDisplayName)
-                2 -> context.getString(R.string.atp_ActivityTrackersCountTwo, first().companyDisplayName)
-                else -> context.getString(R.string.atp_ActivityTrackersCountMany, first().companyDisplayName, size - 1)
-            }
         }
     }
 
