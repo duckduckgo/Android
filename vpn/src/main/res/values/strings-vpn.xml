@@ -321,7 +321,7 @@
     <string name="atp_TrackingSignalTimezone">Timezone</string>
     <string name="atp_TrackingSignalEmailAddress">Email Address</string>
     <string name="atp_TrackingSignalBirthday">Birthday</string>
-    <string name="atp_TrackingSignaGender">Gender</string>
+    <string name="atp_TrackingSignalGender">Gender</string>
     <string name="atp_TrackingSignalFirstName">First Name</string>
     <string name="atp_TrackingSignalLastName">Last Name</string>
 
