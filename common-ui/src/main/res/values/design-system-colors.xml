@@ -21,6 +21,8 @@
     <color name="secondaryTextColor">@color/gray70</color>
     <color name="disabledColor">#59000000</color>
 
+    <color name="primaryIconColor">@color/gray95</color>
+
     <color name="primaryButtonDefaultTextColor">@color/white</color>
     <color name="primaryButtonHoverTextColor">@color/white</color>
     <color name="primaryButtonPressedTextColor">@color/white</color>
@@ -38,6 +40,7 @@
     <color name="gray90">#222222</color>
     <color name="gray70">#666666</color>
     <color name="gray20">#EEEEEE</color>
+    <color name="gray95">#494949</color>
 
     <color name="blue50">#3969EF</color>
     <color name="blue60">#2B55CA</color>

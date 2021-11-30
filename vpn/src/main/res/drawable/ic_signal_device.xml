@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
@@ -15,11 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <!-- Night / Dark theme colors -->
-    <color name="primaryTextColor">@color/white</color>
-    <color name="secondaryTextColor">@color/gray20</color>
-
-    <color name="primaryIconColor">@color/gray20</color>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M10.6667,1.34L5.3333,1.3333C4.6,1.3333 4,1.9333 4,2.6667V13.3333C4,14.0667 4.6,14.6667 5.3333,14.6667H10.6667C11.4,14.6667 12,14.0667 12,13.3333V2.6667C12,1.9333 11.4,1.34 10.6667,1.34ZM10.6667,11.3333H5.3333V4.6667H10.6667V11.3333Z"
+      android:fillColor="@color/primaryIconColor"/>
+</vector>
