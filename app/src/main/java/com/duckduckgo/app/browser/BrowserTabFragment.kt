@@ -2243,7 +2243,10 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeCta(configuration: HomePanelCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showHomeCta(
+            configuration: HomePanelCta,
+            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+        ) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
@@ -2263,11 +2266,13 @@ class BrowserTabFragment :
                 quickAccessAdapter.submitList(favorites)
                 quickAccessRecyclerView.show()
             }
+
+            newTabQuickAcessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            quickAccessRecyclerView.gone()
+            newTabQuickAcessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {

@@ -10,3 +10,5 @@ echo "Fetching ndk-bundle. Suppressing output to avoid travis 4MG size limit";
 sdkmanager "ndk-bundle" >/dev/null;
 echo "Fetching ndk-bundle complete";
 sdkmanager "system-images;android-22;default;armeabi-v7a";
+echo "Configuring pre-commit hooks"
+git config core.hooksPath .githooks

@@ -20,12 +20,12 @@ or alternatively using `brew install fastlane`
 ```
 fastlane android deploy_playstore
 ```
-Upload APK to Play Store
+Upload APK to Play Store, in pre-production staging track
 ### android deploy_dogfood
 ```
 fastlane android deploy_dogfood
 ```
-Upload APK to Play Store Dogfood track
+Upload APK to Play Store internal testing track
 ### android deploy_github
 ```
 fastlane android deploy_github

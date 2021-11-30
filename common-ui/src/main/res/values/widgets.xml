@@ -132,4 +132,36 @@
         <item name="android:paddingEnd">@dimen/keyline_2</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Switch">
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Switch.Blue">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Switch.Green">
+        <item name="colorControlActivated">@color/cornflowerGreen</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.InfoPanel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.InfoPanel.Text" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+    </style>
+
 </resources>

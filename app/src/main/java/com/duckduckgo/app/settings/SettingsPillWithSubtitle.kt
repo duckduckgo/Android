@@ -20,12 +20,10 @@ package com.duckduckgo.app.settings
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.view.children
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -60,13 +58,6 @@ class SettingsPillWithSubtitle : LinearLayout {
     override fun setEnabled(enabled: Boolean) {
         recursiveEnable(enabled)
         super.setEnabled(enabled)
-    }
-
-    fun View.recursiveEnable(enabled: Boolean) {
-        (this as? ViewGroup)?.children?.forEach {
-            it.isEnabled = enabled
-            it.recursiveEnable(enabled)
-        }
     }
 
 }
