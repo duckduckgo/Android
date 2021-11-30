@@ -34,7 +34,8 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
 class AppTPCompanyTrackersViewModel
-@Inject constructor(
+@Inject
+constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
@@ -66,22 +67,26 @@ class AppTPCompanyTrackersViewModel
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals()
-                )
-            )
+                    trackingSignals = mapTrackingSignals()))
         }
 
         val lastTrackerBlockedAgo =
-            timeDiffFormatter.formatTimePassed(
-                LocalDateTime.now(), LocalDateTime.parse(sourceData[0].timestamp)
-            )
+            if (sourceData.isNotEmpty()) {
+                timeDiffFormatter.formatTimePassed(
+                    LocalDateTime.now(), LocalDateTime.parse(sourceData[0].timestamp))
+            } else {
+                ""
+            }
 
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
     private fun mapTrackingSignals(): List<TrackingSignal> {
-        val trackingSignals = listOf(TrackingSignal.fromTag("aaid"), TrackingSignal.fromTag("device_id"), TrackingSignal.fromTag("fb_persistent_id"))
-        return trackingSignals.distinctBy { it.signalDisplayName }
+        val originalTrackingSignals = TrackingSignal.values()
+        val numberOfElements = (0 until 12).random()
+        val randomElements =
+            originalTrackingSignals.asSequence().shuffled().take(numberOfElements).toList()
+        return randomElements.distinctBy { it.signalDisplayName }
     }
 
     data class ViewState(
@@ -96,7 +101,6 @@ class AppTPCompanyTrackersViewModel
         val timestamp: String,
         val trackingSignals: List<TrackingSignal>
     )
-
 }
 
 @ContributesMultibinding(AppObjectGraph::class)

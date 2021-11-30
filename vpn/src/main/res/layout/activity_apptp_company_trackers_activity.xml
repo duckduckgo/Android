@@ -55,12 +55,15 @@
 
     <TextView
         android:id="@+id/tracking_learn_more"
+        style="@style/TextAppearance.DuckDuckGo.Body2"
         tools:text="@string/atp_CompanyDetailsTrackingLearnMore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_4"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"/>

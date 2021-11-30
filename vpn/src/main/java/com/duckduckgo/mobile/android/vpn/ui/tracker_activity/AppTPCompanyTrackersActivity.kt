@@ -75,8 +75,9 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             }
         }
 
-        binding.activityRecyclerView.adapter = itemsAdapter
         observeViewModel()
+        binding.activityRecyclerView.adapter = itemsAdapter
+
     }
 
     private fun observeViewModel() {
