@@ -23,8 +23,6 @@ import org.gradle.api.initialization.Settings
 import org.gradle.api.invocation.Gradle
 
 interface BuildAndTaskExecutionListener : BuildListener, TaskExecutionListener {
-    override fun buildStarted(gradle: Gradle) {}
-
     override fun beforeSettings(settings: Settings) {}
 
     override fun settingsEvaluated(settings: Settings) {}

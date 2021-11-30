@@ -71,6 +71,11 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 //tasks.register('checks') {

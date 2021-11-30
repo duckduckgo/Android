@@ -61,7 +61,7 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersCalledStartWithSkeleton() = runBlocking {
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), expectItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -69,8 +69,8 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersIsEmptyThenEmitEmpty() = runBlocking {
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), expectItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -82,7 +82,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[0])
 
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), expectItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
             assertEquals(
                 listOf(
                     TrackerFeedItem.TrackerFeedData(
@@ -109,7 +109,7 @@ class DeviceShieldActivityFeedViewModelTest {
                         trackersTotalCount = 1
                     ),
                 ),
-                expectItem()
+                awaitItem()
             )
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
@@ -122,8 +122,8 @@ class DeviceShieldActivityFeedViewModelTest {
 
         // we always start with skeleton, that's why we expect two items
         viewModel.getMostRecentTrackers(timeWindow, false).test {
-            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), expectItem())
-            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), expectItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
+            assertEquals(listOf(TrackerFeedItem.TrackerEmptyFeed), awaitItem())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }

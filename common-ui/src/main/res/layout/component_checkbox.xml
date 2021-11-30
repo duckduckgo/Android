@@ -25,14 +25,13 @@
   android:paddingStart="@dimen/keyline_4"
   android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
-      android:id="@+id/label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/checkbox_label_title"
-      app:linkUrl="https://material.io/design/components/selection-controls.html#checkboxes"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:id="@+id/label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Checkbox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <CheckBox
       android:id="@+id/checkbox_one"
