@@ -1518,8 +1518,8 @@ class BrowserTabViewModelTest {
         testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
-        assertEquals(url, command.savedSite.url)
-        assertEquals(title, command.savedSite.title)
+        assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
+        assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
     }
 
     @Test
@@ -3511,8 +3511,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
         val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
-        assertEquals("www.example.com", command.savedSite.url)
-        assertEquals("title", command.savedSite.title)
+        assertEquals("www.example.com", command.savedSiteChangedViewState.savedSite.url)
+        assertEquals("title", command.savedSiteChangedViewState.savedSite.title)
     }
 
     @Test
