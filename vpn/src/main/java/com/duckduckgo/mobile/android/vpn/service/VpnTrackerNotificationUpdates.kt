@@ -28,14 +28,14 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNoti
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(VpnObjectGraph::class)
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class VpnTrackerNotificationUpdates @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,

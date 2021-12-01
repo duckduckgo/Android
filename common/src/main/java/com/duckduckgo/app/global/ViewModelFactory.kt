@@ -21,9 +21,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class ViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {

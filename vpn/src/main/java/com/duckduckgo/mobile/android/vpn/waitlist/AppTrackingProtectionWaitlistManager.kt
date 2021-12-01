@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
@@ -37,7 +37,7 @@ interface TrackingProtectionWaitlistManager {
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 @ContributesBinding(AppObjectGraph::class)
 class AppTrackingProtectionWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,

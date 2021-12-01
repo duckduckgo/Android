@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
@@ -50,7 +50,7 @@ interface TrackingProtectionAppsRepository {
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,

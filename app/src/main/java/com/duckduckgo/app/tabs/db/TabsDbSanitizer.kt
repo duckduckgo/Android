@@ -26,9 +26,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TabsDbSanitizer @Inject constructor(
     private val tabRepository: TabRepository
 ) : LifecycleObserver {

@@ -20,13 +20,13 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface ViewModelFactoryPlugin {
     fun <T : ViewModel?> create(modelClass: Class<T>): T?
 }
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class ViewModelFactoryPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards ViewModelFactoryPlugin>
 ) : PluginPoint<ViewModelFactoryPlugin> {

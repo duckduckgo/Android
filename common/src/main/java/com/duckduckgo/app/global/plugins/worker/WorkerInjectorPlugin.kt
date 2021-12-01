@@ -20,7 +20,7 @@ import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface WorkerInjectorPlugin {
     /**
@@ -29,7 +29,7 @@ interface WorkerInjectorPlugin {
     fun inject(worker: ListenableWorker): Boolean
 }
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class WorkerInjectorPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards WorkerInjectorPlugin>
 ) : PluginPoint<WorkerInjectorPlugin> {

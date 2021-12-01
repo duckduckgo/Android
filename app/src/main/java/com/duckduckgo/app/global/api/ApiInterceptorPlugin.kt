@@ -23,7 +23,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface ApiInterceptorPlugin {
     fun getInterceptor(): Interceptor
@@ -47,7 +47,7 @@ abstract class ApiInterceptorPluginModule {
     @ContributesTo(AppObjectGraph::class)
     class ApiInterceptorPluginModuleExt {
         @Provides
-        @SingleIn(AppObjectGraph::class)
+        @SingleInstanceIn(AppObjectGraph::class)
         fun provideApiInterceptorPlugins(
             plugins: Set<@JvmSuppressWildcards ApiInterceptorPlugin>
         ): PluginPoint<ApiInterceptorPlugin> {

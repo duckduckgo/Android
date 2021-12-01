@@ -23,10 +23,10 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPluginPoint: PluginPoint<FeatureTogglesPlugin>) :
     FeatureToggle {
 

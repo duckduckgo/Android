@@ -32,7 +32,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import java.nio.channels.Selector
 import javax.inject.Named
@@ -42,7 +42,7 @@ import javax.inject.Named
 class VpnModule {
 
     @Provides
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @TargetApi(29)
     @Named("DetectOriginatingAppPackageModern")
     fun providesOriginatingAppResolverModern(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppPackageIdentifier {
@@ -50,7 +50,7 @@ class VpnModule {
     }
 
     @Provides
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Named("DetectOriginatingAppPackageLegacy")
     fun providesOriginatingAppResolverLegacy(
         packageManager: PackageManager,
@@ -60,13 +60,13 @@ class VpnModule {
         return DetectOriginatingAppPackageLegacy(packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     fun providesProcNetFileConnectionMatcher(): NetworkFileConnectionMatcher {
         return ProcNetFileConnectionMatcher()
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = AppNameResolver(packageManager)
 
@@ -92,7 +92,7 @@ class VpnModule {
         return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor)
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
         return if (BuildConfig.DEBUG) {
@@ -102,7 +102,7 @@ class VpnModule {
         }
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     fun providesVpnTrackerDetector(
         hostnameExtractor: HostnameExtractor,
@@ -116,13 +116,13 @@ class VpnModule {
         return DomainBasedTrackerDetector(hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase, requestInterceptors)
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     fun providesContentTypeExtractor(tlsMessageDetector: TlsMessageDetector): ContentTypeExtractor {
         return TlsContentTypeExtractor(tlsMessageDetector)
     }
 
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     @Provides
     @TcpNetworkSelector
     fun provideTcpNetworkSelector(): Selector {

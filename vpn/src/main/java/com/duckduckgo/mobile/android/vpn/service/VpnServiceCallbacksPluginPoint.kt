@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 
 private class VpnServiceCallbacksPluginPoint(
@@ -37,14 +37,14 @@ private class VpnServiceCallbacksPluginPoint(
 @ContributesTo(VpnObjectGraph::class)
 abstract class VpnServiceCallbacksProviderModule {
     @Multibinds
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     abstract fun provideVpnServiceCallbacksPlugins(): Set<@JvmSuppressWildcards VpnServiceCallbacks>
 
     @Module
     @ContributesTo(VpnObjectGraph::class)
     class VpnServiceCallbacksProviderModuleExt {
         @Provides
-        @SingleIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnObjectGraph::class)
         fun bindVpnServiceCallbacksPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnServiceCallbacks>
         ): PluginPoint<VpnServiceCallbacks> {

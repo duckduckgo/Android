@@ -21,12 +21,12 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 abstract class ApplicationModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Binds
     abstract fun bindContext(application: Application): Context
 

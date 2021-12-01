@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 private class PixelInterceptorPluginPoint(
     private val plugins: Set<@JvmSuppressWildcards PixelInterceptorPlugin>
@@ -43,7 +43,7 @@ abstract class PixelInterceptorPluginModule {
     @ContributesTo(AppObjectGraph::class)
     class PixelInterceptorPluginModuleExt {
         @Provides
-        @SingleIn(AppObjectGraph::class)
+        @SingleInstanceIn(AppObjectGraph::class)
         fun providePixelInterceptorPlugins(
             plugins: Set<@JvmSuppressWildcards PixelInterceptorPlugin>
         ): PluginPoint<PixelInterceptorPlugin> {

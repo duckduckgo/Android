@@ -33,10 +33,10 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @WorkerThread
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 @ContributesMultibinding(AppObjectGraph::class)
 class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,

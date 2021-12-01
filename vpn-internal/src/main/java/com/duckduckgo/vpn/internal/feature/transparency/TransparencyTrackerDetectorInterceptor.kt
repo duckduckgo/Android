@@ -23,10 +23,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @ContributesMultibinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
 
     private val enable = AtomicBoolean(false)

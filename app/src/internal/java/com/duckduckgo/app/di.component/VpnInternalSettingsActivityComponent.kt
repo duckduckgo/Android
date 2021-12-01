@@ -31,7 +31,7 @@ import dagger.multibindings.IntoMap
     comment = "To use the right scope we first need to enable dagger component nesting",
     correctScope = ActivityObjectGraph::class,
 )
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )

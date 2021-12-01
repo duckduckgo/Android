@@ -22,13 +22,13 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class JobsModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providesJobScheduler(context: Context): JobScheduler {
         return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler

@@ -23,13 +23,13 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class VariantModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager =
         ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
 

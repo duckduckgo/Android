@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -50,7 +50,7 @@ import javax.inject.Inject
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,

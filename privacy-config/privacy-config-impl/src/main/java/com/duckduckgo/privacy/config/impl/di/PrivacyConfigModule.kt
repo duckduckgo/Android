@@ -57,7 +57,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -73,7 +73,7 @@ abstract class PrivacyFeaturesBindingModule {
 class NetworkModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): PrivacyConfigService {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val retrofit = Retrofit.Builder()
@@ -86,7 +86,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun providePrivacyFeaturePluginPoint(customConfigs: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
         return PrivacyFeaturePluginPoint(customConfigs)
     }
@@ -96,7 +96,7 @@ class NetworkModule {
 @ContributesTo(AppObjectGraph::class)
 class DatabaseModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providePrivacyConfigDatabase(context: Context): PrivacyConfigDatabase {
         return Room.databaseBuilder(context, PrivacyConfigDatabase::class.java, "privacy_config.db")
@@ -106,55 +106,55 @@ class DatabaseModule {
             .build()
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providePrivacyConfigRepository(database: PrivacyConfigDatabase): PrivacyConfigRepository {
         return RealPrivacyConfigRepository(database)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providePTrackerAllowlistRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackerAllowlistRepository {
         return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun provideContentBlockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
         return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun provideGpcDataStore(context: Context): GpcDataStore {
         return GpcSharedPreferences(context)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providePrivacyFeatureTogglesDataStore(context: Context): PrivacyFeatureTogglesDataStore {
         return PrivacyFeatureTogglesSharedPreferences(context)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
         return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
         return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun provideUnprotectedTemporaryRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): UnprotectedTemporaryRepository {
         return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providePrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore): PrivacyFeatureTogglesRepository {
         return RealPrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore)

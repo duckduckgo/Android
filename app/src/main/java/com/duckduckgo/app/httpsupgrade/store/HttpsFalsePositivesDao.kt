@@ -19,10 +19,10 @@ package com.duckduckgo.app.httpsupgrade.store
 import androidx.room.*
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.duckduckgo.di.scopes.AppObjectGraph
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Dao
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 abstract class HttpsFalsePositivesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

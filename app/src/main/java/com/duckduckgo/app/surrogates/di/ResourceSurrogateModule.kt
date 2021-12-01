@@ -21,12 +21,12 @@ import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class ResourceSurrogateModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun analyticsSurrogates(): ResourceSurrogates = ResourceSurrogatesImpl()
 }

@@ -56,13 +56,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 import java.io.File
 import javax.inject.Named
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class NetworkModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Named("api")
     fun apiOkHttpClient(
         context: Context,
@@ -82,7 +82,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Named("nonCaching")
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
@@ -106,7 +106,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Named("api")
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
@@ -119,7 +119,7 @@ class NetworkModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Named("nonCaching")
     fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()

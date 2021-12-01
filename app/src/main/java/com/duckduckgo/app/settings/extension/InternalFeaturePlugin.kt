@@ -23,7 +23,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface InternalFeaturePlugin {
     /** @return the title of the internal feature */
@@ -58,7 +58,7 @@ abstract class SettingInternalFeaturePluginModule {
     @ContributesTo(AppObjectGraph::class)
     class SettingInternalFeaturePluginModuleExt {
         @Provides
-        @SingleIn(AppObjectGraph::class)
+        @SingleInstanceIn(AppObjectGraph::class)
         fun provideSettingInternalFeaturePlugins(
             plugins: Set<@JvmSuppressWildcards InternalFeaturePlugin>
         ): PluginPoint<InternalFeaturePlugin> {

@@ -23,13 +23,13 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.SearchAndFavoritesGridCalculator
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class WidgetModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun widgetCapabilities(context: Context): WidgetCapabilities = AppWidgetCapabilities(context)
 
     @Provides

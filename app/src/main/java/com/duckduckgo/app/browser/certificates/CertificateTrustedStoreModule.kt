@@ -21,18 +21,18 @@ import com.duckduckgo.app.browser.certificates.rootstore.*
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class CertificateTrustedStoreModule {
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun trustedCertificateStore(
         letsEncryptCertificateProvider: LetsEncryptCertificateProvider
     ): TrustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun letsEncryptCertificateProvider(
         context: Context
     ): LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(

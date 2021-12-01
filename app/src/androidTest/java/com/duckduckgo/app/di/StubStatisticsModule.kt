@@ -35,7 +35,7 @@ import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
@@ -90,7 +90,7 @@ class StubStatisticsModule {
 
     @Provides
     @IntoSet
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun atbInitializer(
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,

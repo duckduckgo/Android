@@ -30,7 +30,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -38,7 +38,7 @@ interface TrackerDetector {
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,

@@ -25,7 +25,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class OnboardingModule {
@@ -40,7 +40,7 @@ class OnboardingModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun onboardingPageBuilder(): OnboardingPageBuilder {
         return OnboardingFragmentPageBuilder()
     }

@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
@@ -32,7 +32,7 @@ import dagger.SingleIn
 class StubCoroutinesModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun providesDispatcherProvider(): DispatcherProvider {
         return CoroutineTestRule().testDispatcherProvider
     }

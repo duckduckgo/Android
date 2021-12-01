@@ -30,9 +30,9 @@ import okhttp3.Response
 import org.threeten.bp.LocalTime
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class PixelFlipperPlugin @Inject constructor() : FlipperPlugin, Interceptor, PixelInterceptorPlugin {
 
     private var connection: FlipperConnection? = null

@@ -37,9 +37,9 @@ import kotlinx.coroutines.flow.drop
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TabDataRepository @Inject constructor(
     private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,

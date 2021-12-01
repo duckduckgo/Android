@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.Multibinds
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -34,7 +34,7 @@ abstract class MigrationsPluginProviderModule {
     abstract fun provideMigrationsPlugins(): Set<@JvmSuppressWildcards MigrationPlugin>
 
     @Binds
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     abstract fun provideMigrationsPluginProvider(
         migrationPluginPoint: MigrationPluginPoint
     ): PluginPoint<MigrationPlugin>

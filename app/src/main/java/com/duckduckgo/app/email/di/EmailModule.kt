@@ -39,12 +39,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class EmailModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providesEmailManager(
         emailService: EmailService,
@@ -69,7 +69,7 @@ class EmailModule {
         return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providesWaitlistCodeFetcher(
         workManager: WorkManager,
@@ -83,7 +83,7 @@ class EmailModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
 }

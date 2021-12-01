@@ -23,10 +23,10 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class RealHttps @Inject constructor(private val httpsRepository: HttpsRepository, private val unprotectedTemporary: UnprotectedTemporary) : Https {
 
     override fun isAnException(url: String): Boolean {

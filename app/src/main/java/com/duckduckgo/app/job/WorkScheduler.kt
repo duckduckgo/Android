@@ -27,10 +27,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @ContributesMultibinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class AndroidWorkScheduler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val notificationScheduler: AndroidNotificationScheduler,

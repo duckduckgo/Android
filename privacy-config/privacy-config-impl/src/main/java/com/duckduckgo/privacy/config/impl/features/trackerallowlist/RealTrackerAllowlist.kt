@@ -28,10 +28,10 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.URI
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
 
     override fun isAnException(documentURL: String, url: String): Boolean {

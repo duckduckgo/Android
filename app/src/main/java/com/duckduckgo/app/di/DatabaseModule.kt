@@ -25,19 +25,19 @@ import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
 class DatabaseModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun provideWebviewDatabase(context: Context): WebViewDatabase {
         return WebViewDatabase.getInstance(context)
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun provideAppDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())

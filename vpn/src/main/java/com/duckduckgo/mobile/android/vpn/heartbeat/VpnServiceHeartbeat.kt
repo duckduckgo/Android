@@ -25,7 +25,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -35,7 +35,7 @@ import javax.inject.Inject
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class VpnServiceHeartbeatImpl @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,

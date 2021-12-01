@@ -33,7 +33,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -43,7 +43,7 @@ import javax.inject.Inject
     scope = AppObjectGraph::class,
     boundType = LifecycleObserver::class
 )
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class ShortcutReceiver @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,

@@ -40,7 +40,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
@@ -73,7 +73,7 @@ class StatisticsModule {
         RxBasedPixel(pixelSender)
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun pixelSender(
         pixelService: PixelService,
         statisticsDataStore: StatisticsDataStore,
@@ -86,7 +86,7 @@ class StatisticsModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun pixelSenderObserver(pixelSender: PixelSender): LifecycleObserver = pixelSender
 
@@ -102,7 +102,7 @@ class StatisticsModule {
 
     @Provides
     @IntoSet
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun atbInitializer(
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
@@ -112,7 +112,7 @@ class StatisticsModule {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun pixelDao(database: AppDatabase): PendingPixelDao {
         return database.pixelDao()

@@ -26,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Thread.UncaughtExceptionHandler
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 class VpnUncaughtExceptionHandler(
     private val context: Context,
@@ -57,7 +57,7 @@ class VpnUncaughtExceptionHandler(
 @ContributesTo(scope = AppObjectGraph::class)
 class VpnExceptionModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providesVpnUncaughtExceptionHandler(context: Context, @AppCoroutineScope vpnCoroutineScope: CoroutineScope): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()

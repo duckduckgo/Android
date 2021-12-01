@@ -22,12 +22,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
 
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
     override fun entryRemoved(evicted: Boolean, key: String?, oldValue: UdpPacketProcessor.ChannelDetails?, newValue: UdpPacketProcessor.ChannelDetails?) {
         Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")

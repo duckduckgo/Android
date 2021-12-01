@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 
 /**
@@ -48,14 +48,14 @@ private class VpnMemoryCollectorPluginPoint(
 abstract class VpnMemoryCollectorProviderModule {
 
     @Multibinds
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     abstract fun bindVpnMemoryCollectorPlugins(): Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
 
     @Module
     @ContributesTo(VpnObjectGraph::class)
     class VpnMemoryCollectorProviderModuleExt {
         @Provides
-        @SingleIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnObjectGraph::class)
         fun bindVpnMemoryCollectorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
         ): PluginPoint<VpnMemoryCollectorPlugin> {

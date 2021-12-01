@@ -23,13 +23,13 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class JsonModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun moshi(): Moshi = Moshi.Builder()
         .add(ActionJsonAdapter())
         .add(HttpsFalsePositivesJsonAdapter())

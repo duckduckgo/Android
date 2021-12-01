@@ -24,13 +24,13 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPluginPoint
 import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class WorkerModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun workManager(context: Context, workerFactory: WorkerFactory): WorkManager {
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)
@@ -40,7 +40,7 @@ class WorkerModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun workerFactory(
         workerInjectorPluginPoint: WorkerInjectorPluginPoint,
     ): WorkerFactory {

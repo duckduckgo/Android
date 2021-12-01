@@ -78,7 +78,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class BrowserModule {
@@ -143,7 +143,7 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
@@ -153,11 +153,11 @@ class BrowserModule {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun webDataManager(
         context: Context,
@@ -182,7 +182,7 @@ class BrowserModule {
     fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
         return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
     }
@@ -246,25 +246,25 @@ class BrowserModule {
         return CookieManagerRemover(cookieManager)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun webViewCookieManager(): CookieManager {
         return CookieManager.getInstance()
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
@@ -313,14 +313,14 @@ class BrowserModule {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
 }

@@ -26,7 +26,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
@@ -45,7 +45,7 @@ interface TcpSocketWriter {
     fun removeFromWriteQueue(tcb: TCB)
 }
 
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 @ContributesBinding(
     scope = VpnObjectGraph::class,
     boundType = TcpSocketWriter::class

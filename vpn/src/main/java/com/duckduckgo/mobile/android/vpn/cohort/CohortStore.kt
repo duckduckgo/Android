@@ -28,7 +28,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
@@ -93,6 +93,6 @@ class RealCohortStore @Inject constructor(
 abstract class CohortStoreModule {
     @Binds
     @IntoSet
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     abstract fun bindCohortStore(realCohortStore: RealCohortStore): VpnServiceCallbacks
 }

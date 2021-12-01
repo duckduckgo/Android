@@ -29,9 +29,9 @@ import com.duckduckgo.widget.SearchAndFavoritesWidget
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class FavoritesObserver @Inject constructor(
     private val context: Context,
     private val favoritesRepository: FavoritesRepository,

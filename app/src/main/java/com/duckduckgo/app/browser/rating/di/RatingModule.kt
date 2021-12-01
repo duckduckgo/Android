@@ -35,12 +35,12 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class RatingModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     @IntoSet
     fun appEnjoymentManagerObserver(
@@ -52,12 +52,12 @@ class RatingModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
@@ -83,13 +83,13 @@ class RatingModule {
         return PlayStoreAndroidUtils(context)
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
         return database.appEnjoymentDao()
     }
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
         return AppEnjoymentDatabaseRepository(appEnjoymentDao)

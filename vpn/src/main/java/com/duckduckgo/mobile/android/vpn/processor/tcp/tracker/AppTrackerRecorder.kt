@@ -27,7 +27,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.Executors
@@ -42,7 +42,7 @@ interface AppTrackerRecorder {
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class,
 )
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
@@ -100,6 +100,6 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
 abstract class AppTrackerRecorderModule {
 
     @Binds
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     abstract fun providesAppTrackerRecorder(batchedAppTrackerRecorder: BatchedAppTrackerRecorder): AppTrackerRecorder
 }

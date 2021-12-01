@@ -26,9 +26,9 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.di.scopes.AppObjectGraph
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class ServiceWorkerLifecycleObserver @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository

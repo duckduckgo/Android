@@ -20,11 +20,11 @@ import android.os.Debug
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import javax.inject.Inject
 
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 @ContributesMultibinding(VpnObjectGraph::class)
 class ProcessMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
     override fun collectMemoryMetrics(): Map<String, String> {

@@ -22,14 +22,14 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface MigrationStore {
     var version: Int
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class MigrationSharedPreferences @Inject constructor(private val context: Context) : MigrationStore {
 
     private val preferences: SharedPreferences

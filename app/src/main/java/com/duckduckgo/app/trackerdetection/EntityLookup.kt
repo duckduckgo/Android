@@ -26,7 +26,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.di.scopes.AppObjectGraph
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface EntityLookup {
     @WorkerThread
@@ -36,7 +36,7 @@ interface EntityLookup {
     fun entityForName(name: String): Entity?
 }
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TdsEntityLookup @Inject constructor(
     private val entityDao: TdsEntityDao,
     private val domainEntityDao: TdsDomainEntityDao

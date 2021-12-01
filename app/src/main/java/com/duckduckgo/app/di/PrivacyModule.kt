@@ -43,18 +43,18 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class PrivacyModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityLookup: EntityLookup): PrivacyPractices =
         PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun entityLookup(entityDao: TdsEntityDao, domainEntityDao: TdsDomainEntityDao): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
@@ -89,7 +89,7 @@ class PrivacyModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun automaticDataClearer(
         workManager: WorkManager,
         settingsDataStore: SettingsDataStore,
@@ -101,25 +101,25 @@ class PrivacyModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun dataClearerLifecycleObserver(dataClearer: DataClearer): LifecycleObserver = dataClearer
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
         dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
     ): LifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun geoLocationPermissions(
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,

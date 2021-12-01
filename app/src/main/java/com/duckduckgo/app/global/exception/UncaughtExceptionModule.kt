@@ -25,13 +25,13 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class UncaughtExceptionModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun uncaughtWebViewExceptionRepository(
         uncaughtExceptionDao: UncaughtExceptionDao,
         rootExceptionFinder: RootExceptionFinder,
@@ -41,7 +41,7 @@ class UncaughtExceptionModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun alertingUncaughtExceptionHandler(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,

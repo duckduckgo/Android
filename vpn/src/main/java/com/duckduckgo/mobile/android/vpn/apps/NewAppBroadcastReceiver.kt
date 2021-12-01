@@ -35,9 +35,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 @ContributesMultibinding(
     scope = VpnObjectGraph::class,
     boundType = VpnServiceCallbacks::class

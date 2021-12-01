@@ -22,12 +22,12 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class StatisticsLibraryConfigModule {
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun provideStatisticsLibraryConfig(): StatisticsLibraryConfig = DefaultStatisticsLibraryConfig()
 }

@@ -27,13 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 /**
  * This raw file store is temporary. Once we move to an api call to retrieve the json
  * we'll store the content in a db rather than a raw file.
  */
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, private val context: Context) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()

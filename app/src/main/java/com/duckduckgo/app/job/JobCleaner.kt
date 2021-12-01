@@ -22,7 +22,7 @@ import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedWorkerTags
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 interface JobCleaner {
     fun cleanDeprecatedJobs()
@@ -38,7 +38,7 @@ interface JobCleaner {
 }
 
 @ContributesBinding(AppObjectGraph::class)
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 class AndroidJobCleaner @Inject constructor(private val workManager: WorkManager) : JobCleaner {
 
     override fun cleanDeprecatedJobs() {

@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 
 private class VpnTrackerDetectorInterceptorPluginPoint(
@@ -42,7 +42,7 @@ abstract class VpnTrackerDetectorInterceptorModule {
     @ContributesTo(VpnObjectGraph::class)
     class VpnTrackerDetectorInterceptorModuleProvider {
         @Provides
-        @SingleIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnObjectGraph::class)
         fun provideVpnTrackerDetectorInterceptorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
         ): PluginPoint<VpnTrackerDetectorInterceptor> {

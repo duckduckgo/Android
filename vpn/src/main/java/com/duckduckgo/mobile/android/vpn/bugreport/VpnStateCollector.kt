@@ -25,7 +25,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -33,7 +33,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesBinding(VpnObjectGraph::class)
-@SingleIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnObjectGraph::class)
 class RealVpnStateCollector @Inject constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
     private val dispatcherProvider: DispatcherProvider,
@@ -66,14 +66,14 @@ private class VpnStateCollectorPluginPoint(
 abstract class VpnStateCollectorProviderModule {
 
     @Multibinds
-    @SingleIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnObjectGraph::class)
     abstract fun bindVpnStateCollectorEmptyPlugins(): Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
 
     @Module
     @ContributesTo(VpnObjectGraph::class)
     class VpnStateCollectorProviderModuleExt {
         @Provides
-        @SingleIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnObjectGraph::class)
         fun bindVpnMemoryCollectorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
         ): PluginPoint<VpnStateCollectorPlugin> {

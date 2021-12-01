@@ -26,13 +26,13 @@ import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class VpnAppModule {
 
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun providesConnectivityManager(context: Context): ConnectivityManager {
         return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -42,14 +42,14 @@ class VpnAppModule {
      * TODO this class should also not be needed in the AppScope.
      * It is needed because the DaggerWorkerFactory is not modular. Easy to fix tho
      */
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @Provides
     fun bindVpnDatabase(context: Context): VpnDatabase {
         return VpnDatabase.getInstance(context)
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun provideAppTrackerLoader(
         vpnDatabase: VpnDatabase
     ): AppTrackerRepository {
@@ -57,7 +57,7 @@ class VpnAppModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun providesResources(context: Context): Resources {
         return context.resources
     }

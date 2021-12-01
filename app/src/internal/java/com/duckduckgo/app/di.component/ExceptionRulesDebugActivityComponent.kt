@@ -24,13 +24,13 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleIn(ActivityObjectGraph::class)
+@SingleInstanceIn(ActivityObjectGraph::class)
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class
 )

@@ -23,14 +23,14 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppObjectGraph::class)
 class StoreReferralModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun appInstallationReferrerStateListener(
         referrerStateListener: EmptyReferrerStateListener
     ): AppInstallationReferrerStateListener = referrerStateListener

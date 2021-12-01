@@ -27,13 +27,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 class AppUsageModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     @IntoSet
     fun appDaysUsedRecorderObserver(
         appDaysUsedRepository: AppDaysUsedRepository,
@@ -43,7 +43,7 @@ class AppUsageModule {
     }
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun appDaysUsedRespository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
         return AppDaysUsedDatabaseRepository(appDaysUsedDao)
     }

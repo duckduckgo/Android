@@ -24,9 +24,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
-@SingleIn(AppObjectGraph::class)
+@SingleInstanceIn(AppObjectGraph::class)
 @ContributesMultibinding(AppObjectGraph::class)
 class VpnUptimeRecorder @Inject constructor() : VpnServiceCallbacks {
 
