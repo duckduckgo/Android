@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingTop="@dimen/keyline_5"
-        android:paddingBottom="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_2"
         tools:text="9 tracking attempts blocked"
         app:layout_constraintTop_toBottomOf="@+id/include_toolbar"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,9 @@
         tools:listItem="@layout/view_device_shield_activity_entry"
         app:layout_constraintTop_toBottomOf="@+id/tracking_attempts"
         app:layout_constraintBottom_toTopOf="@+id/tracking_learn_more"
-        android:layout_marginBottom="@dimen/keyline_5"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/keyline_5"
+        android:paddingTop="@dimen/keyline_4"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
@@ -64,6 +66,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_4"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"/>

@@ -19,6 +19,7 @@
     <attr name="daxLogoTextColor" format="color" />
     <attr name="normalTextColor" format="color" />
     <attr name="secondaryTextColor" format="color" />
+    <attr name="primaryIconColor" format="color" />
     <attr name="headerDescriptionColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />

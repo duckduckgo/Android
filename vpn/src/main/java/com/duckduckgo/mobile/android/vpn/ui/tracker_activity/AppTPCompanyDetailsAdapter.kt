@@ -28,10 +28,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.Chip
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.TrackedSignalChip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -83,6 +83,7 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
     class CompanyDetailsViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         companion object {
+            const val TOP_SIGNALS = 5
             fun create(parent: ViewGroup): CompanyDetailsViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val view = inflater.inflate(R.layout.item_apptp_company_details, parent, false)
@@ -115,19 +116,21 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             topSignalsLayout.removeAllViews()
             bottomSignalsLayout.removeAllViews()
 
-            val topSignals = trackerInfo.trackingSignals.take(2)
-            val bottomSignals = trackerInfo.trackingSignals.drop(2)
+            val topSignals = trackerInfo.trackingSignals.take(TOP_SIGNALS)
+            val bottomSignals = trackerInfo.trackingSignals.drop(TOP_SIGNALS)
 
             topSignals.forEach {
-                val topSignal = inflater.inflate(R.layout.view_company_tracked_signal, topSignalsLayout, false) as TrackedSignalChip
-                topSignal.bindTrackedSignal(it)
+                val topSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, topSignalsLayout, false) as Chip
+                topSignal.setChipText(it.signalDisplayName)
+                topSignal.setChipIcon(it.signalIcon)
                 topSignalsLayout.addView(topSignal)
             }
 
             if (bottomSignals.isNotEmpty()) {
                 bottomSignals.forEach {
-                    val bottomSignal = inflater.inflate(R.layout.view_company_tracked_signal, bottomSignalsLayout, false) as TrackedSignalChip
-                    bottomSignal.bindTrackedSignal(it)
+                    val bottomSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, bottomSignalsLayout, false) as Chip
+                    bottomSignal.setChipText(it.signalDisplayName)
+                    bottomSignal.setChipIcon(it.signalIcon)
                     bottomSignalsLayout.addView(bottomSignal)
                 }
                 showMore.show()
@@ -137,7 +140,7 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
             companyName.text = trackerInfo.companyDisplayName
             trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, trackerInfo.trackingAttempts, trackerInfo.trackingAttempts)
-            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, 5))
+            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
             showMore.setOnClickListener {
                 if (!bottomSignalsLayout.isVisible) {
                     bottomSignalsLayout.show()

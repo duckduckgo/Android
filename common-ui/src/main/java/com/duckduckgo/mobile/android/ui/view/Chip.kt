@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view
+package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.mobile.android.ui.view.leftDrawable
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 
-class TrackedSignalChip @JvmOverloads constructor(
+class Chip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : TextView(context, attrs, defStyleAttr) {
 
-    fun bindTrackedSignal(trackingSignal: TrackingSignal) {
-        text = resources.getString(trackingSignal.signalDisplayName)
-        leftDrawable(trackingSignal.signalIcon)
+    fun setChipText(@StringRes textResource: Int){
+        setText(textResource)
+    }
+
+    fun setChipIcon(@DrawableRes iconResource: Int){
+        leftDrawable(iconResource)
     }
 
 }
