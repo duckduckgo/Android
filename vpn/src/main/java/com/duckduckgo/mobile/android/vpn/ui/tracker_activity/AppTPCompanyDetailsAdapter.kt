@@ -22,11 +22,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.TrackedSignalChip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -88,6 +93,9 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
         var badgeImage: ImageView = view.findViewById(R.id.tracking_company_icon)
         var companyName: TextView = view.findViewById(R.id.tracking_company_name)
         var trackingAttempts: TextView = view.findViewById(R.id.tracking_company_attempts)
+        var showMore: TextView = view.findViewById(R.id.tracking_company_show_more)
+        var topSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_top_signals)
+        var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
 
         fun bind(trackerInfo: AppTPCompanyTrackersViewModel.CompanyTrackingDetails) {
             val badge = badgeIcon(view.context, trackerInfo.companyName)
@@ -103,9 +111,39 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
                 badgeImage.setImageResource(badge)
             }
 
+            val inflater = LayoutInflater.from(view.context)
+            topSignalsLayout.removeAllViews()
+            bottomSignalsLayout.removeAllViews()
+
+            val topSignals = trackerInfo.trackingSignals.take(2)
+            val bottomSignals = trackerInfo.trackingSignals.drop(2)
+
+            topSignals.forEach {
+                val topSignal = inflater.inflate(R.layout.view_company_tracked_signal, topSignalsLayout, false) as TrackedSignalChip
+                topSignal.bindTrackedSignal(it)
+                topSignalsLayout.addView(topSignal)
+            }
+
+            if (bottomSignals.isNotEmpty()) {
+                bottomSignals.forEach {
+                    val bottomSignal = inflater.inflate(R.layout.view_company_tracked_signal, bottomSignalsLayout, false) as TrackedSignalChip
+                    bottomSignal.bindTrackedSignal(it)
+                    bottomSignalsLayout.addView(bottomSignal)
+                }
+                showMore.show()
+            } else {
+                showMore.gone()
+            }
+
             companyName.text = trackerInfo.companyDisplayName
             trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, trackerInfo.trackingAttempts, trackerInfo.trackingAttempts)
-
+            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, 5))
+            showMore.setOnClickListener {
+                if (!bottomSignalsLayout.isVisible) {
+                    bottomSignalsLayout.show()
+                    showMore.gone()
+                }
+            }
         }
 
         private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
