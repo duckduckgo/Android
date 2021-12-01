@@ -22,7 +22,6 @@ import com.duckduckgo.app.global.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,15 +34,16 @@ class BrowserApplicationStateInfo @Inject constructor(
     private var started = 0
     private var resumed = 0
 
-    private val freshLaunchQueue: Queue<Boolean> = LinkedList()
+    private var isFreshLaunch: Boolean = false
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (created++ == 0) freshLaunchQueue.add(true)
+        if (created++ == 0) isFreshLaunch = true
     }
 
     override fun onActivityStarted(activity: Activity) {
         if (started++ == 0) {
-            observers.forEach { it.onOpen(true == freshLaunchQueue.poll()) }
+            observers.forEach { it.onOpen(isFreshLaunch) }
+            isFreshLaunch = false
         }
     }
 
