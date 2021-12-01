@@ -16,12 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +49,7 @@ class AppTPCompanyTrackersViewModelTest {
     fun setup() {
         viewModel = AppTPCompanyTrackersViewModel(
             repository,
+            TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
             CoroutineTestRule().testDispatcherProvider
         )
     }
