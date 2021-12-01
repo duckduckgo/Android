@@ -19,6 +19,7 @@ package com.duckduckgo.app.fire
 import android.os.Handler
 import android.os.SystemClock
 import androidx.annotation.UiThread
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
 import androidx.lifecycle.*
 import androidx.work.OneTimeWorkRequestBuilder
@@ -81,7 +82,8 @@ class AutomaticDataClearer @Inject constructor(
     }
 
     @UiThread
-    private suspend fun onAppForegroundedAsync() {
+    @VisibleForTesting
+    suspend fun onAppForegroundedAsync() {
         dataClearerState.value = INITIALIZING
 
         Timber.i("onAppForegrounded; is from fresh app launch? $isFreshAppLaunch")
@@ -202,7 +204,7 @@ class AutomaticDataClearer @Inject constructor(
 
         if (isFreshAppLaunch) {
             Timber.d("This is a fresh app launch, so will clear the data")
-            return !appIconChanged
+            return true
         }
 
         if (appIconChanged) {

@@ -16,13 +16,10 @@
 
 package com.duckduckgo.app.browser.state
 
-import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,10 +29,19 @@ class BrowserApplicationStateInfoTest {
 
     private lateinit var browserApplicationStateInfo: BrowserApplicationStateInfo
     private val observer: BrowserLifecycleObserver = mock()
-    private val activity: Activity = mock()
+    private val activity = FakeBrowserActivity()
+
+    class FakeBrowserActivity : BrowserActivity() {
+        var isConfigChange = false
+
+        override fun isChangingConfigurations(): Boolean {
+            return isConfigChange
+        }
+    }
 
     @Before
     fun setup() {
+        activity.destroyedByBackPress = false
         browserApplicationStateInfo = BrowserApplicationStateInfo(setOf(observer))
     }
 
@@ -97,5 +103,57 @@ class BrowserApplicationStateInfoTest {
         browserApplicationStateInfo.onActivityStarted(activity)
         browserApplicationStateInfo.onActivityStarted(activity)
         verify(observer).onOpen(true)
+    }
+
+    @Test
+    fun whenAllActivitiesAreDestroyedByBackPressAndRecreatedThenDoNotNotifyFreshAppLaunch() {
+        activity.destroyedByBackPress = true
+
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+
+        browserApplicationStateInfo.onActivityStarted(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+
+        verify(observer).onOpen(true)
+
+        browserApplicationStateInfo.onActivityStopped(activity)
+        browserApplicationStateInfo.onActivityStopped(activity)
+        verify(observer).onClose()
+
+        browserApplicationStateInfo.onActivityDestroyed(activity)
+        browserApplicationStateInfo.onActivityDestroyed(activity)
+        verify(observer).onClose()
+        verify(observer, never()).onExit()
+
+        browserApplicationStateInfo.onActivityStarted(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(false)
+    }
+
+    @Test
+    fun whenAllActivitiesAreDestroyedByConfigChangeAndRecreatedThenDoNotNotifyFreshAppLaunch() {
+        activity.isConfigChange = true
+
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+        browserApplicationStateInfo.onActivityCreated(activity, null)
+
+        browserApplicationStateInfo.onActivityStarted(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+
+        verify(observer).onOpen(true)
+
+        browserApplicationStateInfo.onActivityStopped(activity)
+        browserApplicationStateInfo.onActivityStopped(activity)
+        verify(observer).onClose()
+
+        browserApplicationStateInfo.onActivityDestroyed(activity)
+        browserApplicationStateInfo.onActivityDestroyed(activity)
+        verify(observer).onClose()
+        verify(observer, never()).onExit()
+
+        browserApplicationStateInfo.onActivityStarted(activity)
+        browserApplicationStateInfo.onActivityStarted(activity)
+        verify(observer).onOpen(false)
     }
 }

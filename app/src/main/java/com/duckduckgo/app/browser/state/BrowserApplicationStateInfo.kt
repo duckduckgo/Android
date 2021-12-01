@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.state
 
 import android.app.Activity
 import android.os.Bundle
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -35,9 +36,10 @@ class BrowserApplicationStateInfo @Inject constructor(
     private var resumed = 0
 
     private var isFreshLaunch: Boolean = false
+    private var overrideIsFreshLaunch: Boolean = false
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (created++ == 0) isFreshLaunch = true
+        if (created++ == 0 && !overrideIsFreshLaunch) isFreshLaunch = true
     }
 
     override fun onActivityStarted(activity: Activity) {
@@ -64,6 +66,12 @@ class BrowserApplicationStateInfo @Inject constructor(
 
     override fun onActivityDestroyed(activity: Activity) {
         if (created > 0) (--created)
-        if (created == 0) observers.forEach { it.onExit() }
+        if (created == 0 && (activity is BrowserActivity)) {
+            if (activity.destroyedByBackPress || activity.isChangingConfigurations) {
+                overrideIsFreshLaunch = true
+            } else {
+                observers.forEach { it.onExit() }
+            }
+        }
     }
 }
