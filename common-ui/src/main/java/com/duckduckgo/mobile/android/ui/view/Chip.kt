@@ -21,7 +21,6 @@ import android.util.AttributeSet
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.duckduckgo.mobile.android.ui.view.leftDrawable
 
 class Chip @JvmOverloads constructor(
     context: Context,
@@ -29,11 +28,11 @@ class Chip @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : TextView(context, attrs, defStyleAttr) {
 
-    fun setChipText(@StringRes textResource: Int){
+    fun setChipText(@StringRes textResource: Int) {
         setText(textResource)
     }
 
-    fun setChipIcon(@DrawableRes iconResource: Int){
+    fun setChipIcon(@DrawableRes iconResource: Int) {
         leftDrawable(iconResource)
     }
 

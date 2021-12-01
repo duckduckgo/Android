@@ -67,13 +67,16 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals()))
+                    trackingSignals = mapTrackingSignals()
+                )
+            )
         }
 
         val lastTrackerBlockedAgo =
             if (sourceData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(sourceData[0].timestamp))
+                    LocalDateTime.now(), LocalDateTime.parse(sourceData[0].timestamp)
+                )
             } else {
                 ""
             }
