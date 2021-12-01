@@ -56,16 +56,13 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME)!!
-        val appName = intent.getStringExtra(EXTRA_APP_NAME)!!
-
         setContentView(binding.root)
         with(binding.includeToolbar) {
             setupToolbar(defaultToolbar)
-            app_name.text = appName
+            app_name.text = getAppName()
             Glide.with(applicationContext)
-                .load(packageManager.safeGetApplicationIcon(packageName))
-                .error(TextDrawable.asIconDrawable(appName))
+                .load(packageManager.safeGetApplicationIcon(getPackage()))
+                .error(TextDrawable.asIconDrawable(getAppName()))
                 .into(appIcon)
         }
 
@@ -81,11 +78,10 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        val date = intent.getStringExtra(EXTRA_DATE)!!
         lifecycleScope.launch {
             viewModel.getTrackersForAppFromDate(
-                date,
-                packageName
+                getDate(),
+                getPackage()
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
@@ -111,9 +107,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME)!!
-        val appName = intent.getStringExtra(EXTRA_APP_NAME)!!
-        reportBreakage.launch(ReportBreakageScreen.LoginInformation(appName, packageName))
+        reportBreakage.launch(ReportBreakageScreen.LoginInformation(getAppName(), getPackage()))
     }
 
     override fun onBackPressed() {
@@ -123,6 +117,18 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun getDate(): String {
+        return intent.getStringExtra(EXTRA_DATE)!!
+    }
+
+    private fun getAppName(): String {
+        return intent.getStringExtra(EXTRA_APP_NAME)!!
+    }
+
+    private fun getPackage(): String {
+        return intent.getStringExtra(EXTRA_PACKAGE_NAME)!!
     }
 
     companion object {
