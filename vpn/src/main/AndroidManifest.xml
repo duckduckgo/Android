@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.mobile.android.vpn">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
-    <application android:largeHeap="true"
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <application
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
 
         <activity
@@ -19,11 +24,12 @@
         <activity
             android:name="dummy.ui.VpnDiagnosticsActivity"
             android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:process=":vpn" >
+            android:process=":vpn">
         </activity>
 
-        <activity android:name=".service.VpnPermissionRequesterActivity"
-                  android:screenOrientation="portrait"/>
+        <activity
+            android:name=".service.VpnPermissionRequesterActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
@@ -91,19 +97,33 @@
             android:screenOrientation="portrait"/>
 
         <activity
-                android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
-                android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-                android:screenOrientation="portrait"/>
+            android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.tv.TvActivity"
+            android:label="TV Activity"
+            android:theme="@style/Theme.Leanback"
+            android:screenOrientation="landscape">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+
+        </activity>
 
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="android.net.VpnService" />
+                <action android:name="android.net.VpnService"/>
             </intent-filter>
-            <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
-                       android:value="false"/>
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="false"/>
         </service>
 
         <service
@@ -122,7 +142,7 @@
             android:enabled="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="com.duckduckgo.vpn.internaltesters.reminder" />
+                <action android:name="com.duckduckgo.vpn.internaltesters.reminder"/>
             </intent-filter>
         </receiver>
 
@@ -131,13 +151,13 @@
             android:enabled="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
         <receiver android:name="com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 

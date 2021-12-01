@@ -129,4 +129,8 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':common-test')
+
+    // TV Dependencies
+    implementation 'androidx.leanback:leanback:_'
+    implementation 'androidx.leanback:leanback-preference:_'
 }

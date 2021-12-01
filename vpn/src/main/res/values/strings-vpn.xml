@@ -272,4 +272,6 @@
     <string name="atp_DisableConfirmationDisableAllApps">Disable for all apps</string>
     <string name="atp_DisableConfirmationCancel">Cancel</string>
 
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_TV_DialogTitle">Enable App Tracking Protection for Android TV?</string>
 </resources>

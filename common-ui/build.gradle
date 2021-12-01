@@ -36,6 +36,10 @@ dependencies {
     // just to get the dagger annotations
     implementation Google.dagger
 
+    // TV Dependencies
+    implementation 'androidx.leanback:leanback:_'
+    implementation 'androidx.leanback:leanback-preference:_'
+
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
 }
