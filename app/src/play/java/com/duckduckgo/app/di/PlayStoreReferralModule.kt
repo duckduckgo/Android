@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import dagger.SingleIn
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
@@ -34,7 +34,7 @@ import dagger.SingleIn
 class PlayStoreReferralModule {
 
     @Provides
-    @SingleIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppObjectGraph::class)
     fun appInstallationReferrerStateListener(
         playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
