@@ -78,6 +78,3 @@ android {
     }
 }
 
-//tasks.register('checks') {
-//    dependsOn 'spotlessCheck', 'testDebugUnitTest'
-//}
