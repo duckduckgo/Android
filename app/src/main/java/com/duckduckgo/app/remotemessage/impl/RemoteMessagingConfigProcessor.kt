@@ -21,6 +21,7 @@ import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribut
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.parse
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
+import okhttp3.internal.toImmutableList
 import timber.log.Timber
 
 interface RemoteMessagingConfigProcessor {
@@ -40,30 +41,29 @@ class RealRemoteMessagingConfigProcessor(
         // if (currentVersion != newVersion) {
         if (true) {
             Timber.i("RMF: new version received")
-            jsonRemoteMessagingConfig.matchingRules.forEach {
-
-                Timber.i("RMF: MatchingRule ${it.id}")
-                it.attributes.map { (key, jsonObject) ->
-
-                    Timber.i("RMF: MatchingRule $key")
-                    matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
-                        val rule = plugin.parse(key, jsonObject.toString())
-                        if (rule != null) return@map rule
-                    }
-
-                    return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
-                }.forEach {
-                    if (it is MatchingAttribute.Unknown) {
-                        Timber.i("RMF: Mapped Unknown: ${it.fallback}")
-                    } else {
-                        Timber.i("RMF: Mapped $it // ${it?.fallback}")
-                    }
-                }
-            }
+            val matchingRules = parseMatchingRules(jsonRemoteMessagingConfig.matchingRules)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
         } else {
             Timber.i("RMF: skip, same version")
         }
 
+    }
+
+    private fun parseMatchingRules(
+        jsonMatchingRules: List<MatchingRule>
+    ): Map<Int, List<MatchingAttribute?>> {
+        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
+        jsonMatchingRules.forEach {
+            Timber.i("RMF: MatchingRule ${it.id}")
+            matchingRules[it.id] = it.attributes.map { (key, jsonObject) ->
+                Timber.i("RMF: MatchingRule $key")
+                matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
+                    val rule = plugin.parse(key, jsonObject.toString())
+                    if (rule != null) return@map rule
+                }
+                return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
+            }.toImmutableList()
+        }
+        return matchingRules
     }
 }
