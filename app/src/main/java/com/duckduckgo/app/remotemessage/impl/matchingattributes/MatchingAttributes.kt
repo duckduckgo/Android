@@ -18,18 +18,53 @@ package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
 sealed class MatchingAttributeName(val key: String) {
     object Api : MatchingAttributeName("os_api")
+    object InstalledGPlay : MatchingAttributeName("installed_gplay")
 }
 
 sealed class MatchingAttribute(val fallback: Boolean? = null) {
+    data class Locale(override val value: List<String>) : MatchingAttribute(), StringArrayMatchingAttribute
     data class Api(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    object Unknown : MatchingAttribute(fallback = false)
+    data class WebView(override val min: String, override val max: String) : MatchingAttribute(), RangeStringMatchingAttribute
+    data class Flavor(override val value: List<String>) : MatchingAttribute(), StringArrayMatchingAttribute
+    data class AppId(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+
+    data class AppVersion(override val min: String, override val max: String) : MatchingAttribute(), RangeStringMatchingAttribute
+    data class Atb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+    data class AppAtb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+    data class SearchAtb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+    data class ExpVariant(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+    data class InstalledGPlay(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
+
+    data class DefaultBrowser(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
+    data class EmailEnabled(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
+    data class WidgetAdded(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
+    data class SearchCount(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class Bookmarks(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class Favorites(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class AppTheme(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+    data class DaysSinceInstalled(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class DaysUsedSince(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
+    class Unknown : MatchingAttribute()
+}
+
+interface RangeIntMatchingAttribute {
+    val min: Int
+    val max: Int
+}
+
+interface RangeStringMatchingAttribute {
+    val min: String
+    val max: String
 }
 
 interface BooleanMatchingAttribute {
     val value: Boolean
 }
 
-interface RangeIntMatchingAttribute {
-    val min: Int
-    val max: Int
+interface StringMatchingAttribute {
+    val value: String
+}
+
+interface StringArrayMatchingAttribute {
+    val value: List<String>
 }
