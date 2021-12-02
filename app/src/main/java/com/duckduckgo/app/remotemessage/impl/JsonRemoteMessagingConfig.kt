@@ -28,11 +28,16 @@ data class Message(
     val id: String,
     val messageType: String,
     val content: JSONObject?,
-    val matchingRules: List<Int>,
-    val exclusionRules: List<Int>
+    val exclusionRules: List<Int>?,
+    val matchingRules: List<Int>?
 )
 
 data class MatchingRule(
     val id: Int,
     val attributes: Map<String, JSONObject?>
+)
+
+data class ActionJson(
+    val type: String,
+    val value: String
 )

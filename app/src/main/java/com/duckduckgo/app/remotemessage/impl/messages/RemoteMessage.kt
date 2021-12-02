@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.remotemessage.impl.messages
 
+import com.duckduckgo.app.remotemessage.impl.ActionJson
+
 data class RemoteMessage(
     val id: String,
     val messageType: String,
@@ -26,9 +28,9 @@ data class RemoteMessage(
 
 sealed class Content {
     data class Small(val title: String, val description: String) : Content()
-    data class Medium(val title: String, val description: String, val category: String) : Content()
-    data class BigSingleAction(val title: String, val description: String, val category: String, val primaryAction: Action) : Content()
-    data class BigTwoActions(val title: String, val description: String, val category: String, val primaryAction: Action, val secondaryAction: Action) : Content()
+    data class Medium(val title: String, val description: String, val placeholder: String) : Content()
+    data class BigSingleAction(val title: String, val description: String, val placeholder: String, val button: String, val primaryAction: ActionJson) : Content()
+    data class BigTwoActions(val title: String, val description: String, val placeholder: String, val button: String, val primaryAction: ActionJson, val button2: String, val secondaryAction: ActionJson) : Content()
 }
 
 sealed class Action {

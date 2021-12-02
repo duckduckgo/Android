@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.remotemessage.impl.messages
 
+import com.duckduckgo.app.remotemessage.impl.ActionJson
 import com.duckduckgo.app.remotemessage.impl.MessagePlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
+import com.squareup.moshi.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(AppObjectGraph::class)
@@ -30,6 +31,27 @@ class SmallMessage @Inject constructor() : MessagePlugin {
     override fun parse(key: String, json: String) = parse<Content.Small>(key, json, featureName)
 }
 
+@ContributesMultibinding(AppObjectGraph::class)
+class MediumMessage @Inject constructor() : MessagePlugin {
+    private val featureName = "medium"
+
+    override fun parse(key: String, json: String) = parse<Content.Medium>(key, json, featureName)
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class BigSingleActionMessage @Inject constructor() : MessagePlugin {
+    private val featureName = "big_1"
+
+    override fun parse(key: String, json: String) = parse<Content.BigSingleAction>(key, json, featureName)
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class BigTwoActionsMessage @Inject constructor() : MessagePlugin {
+    private val featureName = "big_2"
+
+    override fun parse(key: String, json: String) = parse<Content.BigTwoActions>(key, json, featureName)
+}
+
 private inline fun <reified T : Content> parse(key: String, json: String, featureName: String): T? {
     if (key == featureName) {
         val moshi = Moshi.Builder().build()
@@ -37,4 +59,22 @@ private inline fun <reified T : Content> parse(key: String, json: String, featur
         return jsonAdapter.fromJson(json)
     }
     return null
+}
+
+class ActionAdapter {
+    @ToJson
+    fun toJson(action: Action): ActionJson {
+        Timber.i("RMF: toJson $action")
+        return ActionJson("", "")
+    }
+
+    @FromJson
+    fun fromJson(action: ActionJson): Action {
+        Timber.i("RMF: fromJson $action")
+        return when (action.type) {
+            "url" -> Action.Url(value = action.value)
+            "playstore" -> Action.PlayStore(value = action.value)
+            else -> throw JsonDataException("unknown suit: ${action.type}")
+        }
+    }
 }

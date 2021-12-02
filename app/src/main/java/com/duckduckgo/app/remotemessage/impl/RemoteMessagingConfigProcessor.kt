@@ -80,9 +80,11 @@ class RealRemoteMessagingConfigProcessor(
                 id = this.id,
                 messageType = this.messageType,
                 content = this.content?.mapToContent(this.messageType) ?: throw IllegalArgumentException(),
-                matchingRules = this.matchingRules,
-                exclusionRules = this.exclusionRules
+                matchingRules = this.matchingRules.orEmpty(),
+                exclusionRules = this.exclusionRules.orEmpty()
             )
+        }.onFailure {
+            Timber.i("RMF: error $it")
         }.getOrNull()
     }
 
