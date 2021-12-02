@@ -26,6 +26,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -56,6 +57,7 @@ class BrowserWebViewClientTest {
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: WebView
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val requestRewriter: RequestRewriter = mock()
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
@@ -65,6 +67,7 @@ class BrowserWebViewClientTest {
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
+    private val accessibilitySettings: AccessibilityManager = mock()
     private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
@@ -75,7 +78,7 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Before
     fun setup() {
-        webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
+        webView = TestWebView(context)
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -91,7 +94,8 @@ class BrowserWebViewClientTest {
             thirdPartyCookieManager,
             TestCoroutineScope(),
             coroutinesTestRule.testDispatcherProvider,
-            emailInjector
+            emailInjector,
+            accessibilitySettings
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -252,6 +256,14 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.url).thenThrow(exception)
         testee.onPageFinished(mockWebView, null)
         verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedThenNotifyAccessibilityManager() {
+        testee.onPageFinished(webView, "http://example.com")
+
+        verify(accessibilitySettings).onPageFinished(webView, "http://example.com")
     }
 
     @UiThreadTest

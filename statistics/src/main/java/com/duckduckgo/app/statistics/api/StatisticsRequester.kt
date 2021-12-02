@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -32,7 +33,8 @@ interface StatisticsUpdater {
 class StatisticsRequester(
     private val store: StatisticsDataStore,
     private val service: StatisticsService,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
 ) : StatisticsUpdater {
 
     /**
@@ -98,6 +100,7 @@ class StatisticsRequester(
                     Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
                     store.searchRetentionAtb = it.version
                     storeUpdateVersionIfPresent(it)
+                    plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
                 },
                 {
                     Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
@@ -124,6 +127,7 @@ class StatisticsRequester(
                     Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
                     store.appRetentionAtb = it.version
                     storeUpdateVersionIfPresent(it)
+                    plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
                 },
                 {
                     Timber.v("App atb refresh failed with error ${it.localizedMessage}")

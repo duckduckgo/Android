@@ -21,13 +21,12 @@
     <!--Main-->
     <string name="tab_title_color_palette">Color Palette</string>
     <string name="tab_title_typography">Typography</string>
-    <string name="tab_title_component_navigation">Navigation</string>
-    <string name="tab_title_component_buttons">Buttons</string>
-    <string name="tab_title_component_controls">Controls</string>
+    <string name="tab_title_component_interactive">Interactive</string>
+    <string name="tab_title_component_cards">Cards</string>
+    <string name="tab_title_component_messaging">Messaging</string>
     <string name="tab_title_component_system">System</string>
 
     <!--Components-->
-    <string name="text_button">Button</string>
     <string name="text_headline">Headline</string>
     <string name="button_left_button_label">Left</string>
     <string name="button_center_button_label">Center</string>

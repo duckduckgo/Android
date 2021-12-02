@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingBottom="16dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/onboarding_enabled_header"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:background="@color/light_blue"
+                android:contentDescription="@string/atp_OnboardingLogoDescription"
+                android:paddingTop="80dp"
+                android:paddingBottom="12dp"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                app:lottie_autoPlay="true"
+                app:lottie_rawRes="@raw/device_shield_tracking_apps"
+                app:lottie_imageAssetsFolder="images"
+                app:lottie_loop="true" />
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                android:src="@drawable/ic_device_shield_key" />
+
+            <TextView
+                android:id="@+id/onboarding_enabled_title"
+                style="@style/DeviceShieldOnboardingHeaderStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:text="@string/atp_EnabledTitle"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/onboarding_enabled_text"
+                style="@style/DeviceShieldOnboardingTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:text="@string/atp_EnabledMessage"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/onboarding_enabled_activity_cta"
+                style="@style/DeviceShieldTransparentRoundedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="60dp"
+                android:text="@string/atp_EnabledActivityCTA" />
+
+            <TextView
+                android:id="@+id/onboarding_enabled_settings_text"
+                style="@style/DeviceShieldOnboardingTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:text="@string/atp_EnabledSettings"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/onboarding_close"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/ic_baseline_close_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/deviceShieldKonfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

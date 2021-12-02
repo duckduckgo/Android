@@ -15,144 +15,137 @@
 ~ limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="@dimen/keyline_5"
-    android:paddingBottom="@dimen/keyline_5"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingEnd="@dimen/keyline_4">
+    android:layout_height="match_parent">
 
-    <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
-        android:id="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:text="Typography"
-        app:leadingIcon="@drawable/ic_format_size_24dp"
-        app:linkUrl="https://material.io/design/typography/the-type-system.html#type-scale" />
-
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceHeadline1"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance H1"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        android:paddingTop="@dimen/keyline_5"
+        android:paddingBottom="@dimen/keyline_5"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceHeadline2"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance H2"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Typography"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceHeadline3"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance H3"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
+            android:text="Text Appearance H1"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceHeadline4"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance H4"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+            android:text="Text Appearance H2"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance H5"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline3"
+            android:text="Text Appearance H3"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceBody1"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance Body1"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline4"
+            android:text="Text Appearance H4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceBody2"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance Body2"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline5"
+            android:text="Text Appearance H5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceButton1"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance Button1"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline6"
+            android:text="Text Appearance H6"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceButton2"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance Button2"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
+            android:text="Text Appearance Body1"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:gravity="start"
-        android:textAppearance="?attr/textAppearanceCaption"
-        android:textColor="@color/material_on_background_emphasis_high_type"
-        android:text="Text Appearance Caption"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
-        tools:ignore="HardcodedText"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+            android:text="Text Appearance Body2"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Button1"
+            android:text="Text Appearance Button1"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Button2"
+            android:text="Text Button2"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearance.DuckDuckGo.Caption"
+            android:text="Text Appearance Caption"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_2"
+            tools:ignore="HardcodedText"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
+
