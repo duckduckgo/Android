@@ -111,7 +111,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            appInfo.isSystemApp() ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 

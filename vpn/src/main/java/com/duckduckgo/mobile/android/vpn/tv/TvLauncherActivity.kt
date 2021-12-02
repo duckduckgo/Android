@@ -16,12 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.tv
 
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import androidx.leanback.app.GuidedStepSupportFragment
 import androidx.preference.PreferenceManager
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 
 class TvLauncherActivity : FragmentActivity() {
 
@@ -31,15 +32,15 @@ class TvLauncherActivity : FragmentActivity() {
         window.setBackgroundDrawable(
             ColorDrawable(resources.getColor(com.duckduckgo.mobile.android.R.color.marketing_red)))
 
-        PreferenceManager.getDefaultSharedPreferences(this).apply {
-            if (!getBoolean(COMPLETED_ONBOARDING_PREF_KEY, false)) {
-                val fragment: GuidedStepSupportFragment = AppTPDialogFragment()
-                GuidedStepSupportFragment.addAsRoot(
-                    this@TvLauncherActivity, fragment, android.R.id.content)
-                //                startActivity(Intent(this@TvLauncherActivity,
-                // TVOnboardingActivity::class.java))
-            } else {
-                startActivity(TvTrackerDetailsActivity.intent(this@TvLauncherActivity))
+        if (TrackerBlockingVpnService.isServiceRunning(this@TvLauncherActivity)) {
+            startActivity(TvTrackerDetailsActivity.intent(this@TvLauncherActivity))
+        } else {
+            PreferenceManager.getDefaultSharedPreferences(this).apply {
+                if (!getBoolean(COMPLETED_ONBOARDING_PREF_KEY, false)) {
+                    startActivity(Intent(this@TvLauncherActivity, TVOnboardingActivity::class.java))
+                } else {
+                    startActivity(TvTrackerDetailsActivity.intent(this@TvLauncherActivity))
+                }
             }
         }
     }

@@ -16,11 +16,15 @@
 
 package com.duckduckgo.mobile.android.vpn.tv
 
+import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.mobile.android.vpn.R
 
 class TVOnboardingActivity: FragmentActivity() {
 
-
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_tv_onboarding)
+    }
 
 }

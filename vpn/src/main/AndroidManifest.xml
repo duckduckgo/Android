@@ -118,6 +118,11 @@
             android:name=".tv.TvTrackerDetailsActivity"
             android:screenOrientation="landscape"/>
 
+        <activity
+            android:name=".tv.TVOnboardingActivity"
+            android:theme="@style/Theme.Leanback.Onboarding"
+            android:screenOrientation="landscape"/>
+
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
