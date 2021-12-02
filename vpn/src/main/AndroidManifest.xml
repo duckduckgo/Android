@@ -102,9 +102,9 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.tv.TvActivity"
-            android:label="TV Activity"
-            android:theme="@style/Theme.Leanback"
+            android:name="com.duckduckgo.mobile.android.vpn.tv.TvLauncherActivity"
+            android:label="TV Tracking Protection"
+            android:theme="@style/Theme.AndroidTV.LeanbackWizard"
             android:screenOrientation="landscape">
 
             <intent-filter>
@@ -113,6 +113,10 @@
             </intent-filter>
 
         </activity>
+
+        <activity
+            android:name=".tv.TvTrackerDetailsActivity"
+            android:screenOrientation="landscape"/>
 
         <service
             android:name=".service.TrackerBlockingVpnService"

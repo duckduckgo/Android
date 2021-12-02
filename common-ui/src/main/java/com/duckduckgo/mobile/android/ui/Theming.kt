@@ -40,7 +40,7 @@ enum class DuckDuckGoTheme {
 object Theming {
 
     fun getThemedDrawable(context: Context, drawableId: Int, theme: DuckDuckGoTheme): Drawable {
-        val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
+        val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Dark
         return context.resources.getDrawable(drawableId, ContextThemeWrapper(context, themeId).theme)
     }
 
@@ -69,7 +69,7 @@ fun AppCompatActivity.applyTheme(theme: DuckDuckGoTheme): BroadcastReceiver? {
         val themeId = when (uiManager.nightMode) {
             MODE_NIGHT_YES -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.DARK)]
             MODE_NIGHT_NO -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
-            else -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.LIGHT)]
+            else -> THEME_MAP[Pair(manifestThemeId(), DuckDuckGoTheme.DARK)]
         }
         if (themeId != null) setTheme(themeId)
     } else {

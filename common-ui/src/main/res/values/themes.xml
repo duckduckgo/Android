@@ -386,12 +386,12 @@
     </style>
 
     <!-- TV Themes -->
-    <style name="Theme.Example.Leanback" parent="Theme.Leanback">
+    <style name="Theme.AndroidTV" parent="Theme.AppCompat.NoActionBar">
         <item name="android:colorPrimary">@color/marketing_red</item>
         <item name="android:colorAccent">@color/white</item>
     </style>
 
-    <style name="Theme.Example.LeanbackWizard" parent="Theme.Leanback.GuidedStep">
+    <style name="Theme.AndroidTV.LeanbackWizard" parent="Theme.Leanback.GuidedStep">
         <item name="guidedActionsBackground">@color/app_guidedstep_actions_background</item>
         <item name="guidedActionsBackgroundDark">@color/app_guidedstep_subactions_background</item>
     </style>

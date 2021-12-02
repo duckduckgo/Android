@@ -67,6 +67,7 @@ class AppTPDialogFragment : GuidedStepSupportFragment() {
     override fun onGuidedActionClicked(action: GuidedAction) {
         if (ACTION_ID_POSITIVE.toLong() == action.id) {
             startVpnIfAllowed()
+            startActivity(TvTrackerDetailsActivity.intent(requireActivity()))
         } else {
             Toast.makeText(
                 activity, "No Clicked",
@@ -94,8 +95,7 @@ class AppTPDialogFragment : GuidedStepSupportFragment() {
 
     private fun startVpn() {
         TrackerBlockingVpnService.startService(requireContext())
-        startActivity(DeviceShieldEnabledActivity.intent(requireContext()))
-        Toast.makeText(activity, "VPN Started", Toast.LENGTH_SHORT).show()
+        startActivity(TvTrackerDetailsActivity.intent(requireContext()))
     }
 
     @Suppress("DEPRECATION")

@@ -37,7 +37,7 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
 
     private fun selectedThemeSavedValue(): DuckDuckGoTheme {
         val savedValue = preferences.getString(KEY_THEME, null)
-        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.LIGHT)
+        return themePrefMapper.themeFrom(savedValue, DuckDuckGoTheme.DARK)
     }
 
     private val preferences: SharedPreferences

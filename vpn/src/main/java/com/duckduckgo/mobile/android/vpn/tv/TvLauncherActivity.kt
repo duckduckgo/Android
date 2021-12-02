@@ -16,26 +16,35 @@
 
 package com.duckduckgo.mobile.android.vpn.tv
 
-import android.app.Activity
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.leanback.app.GuidedStepSupportFragment
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import androidx.preference.PreferenceManager
 import com.duckduckgo.mobile.android.vpn.R
 
-class TvActivity: DuckDuckGoActivity() {
+class TvLauncherActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.setBackgroundDrawable(ColorDrawable(resources.getColor(com.duckduckgo.mobile.android.R.color.marketing_red)))
+        window.setBackgroundDrawable(
+            ColorDrawable(resources.getColor(com.duckduckgo.mobile.android.R.color.marketing_red)))
 
-        window.setBackgroundDrawableResource(R.drawable.wizard_background_blackned)
-        val fragment: GuidedStepSupportFragment = AppTPDialogFragment()
-        GuidedStepSupportFragment.addAsRoot(this, fragment, android.R.id.content)
+        PreferenceManager.getDefaultSharedPreferences(this).apply {
+            if (!getBoolean(COMPLETED_ONBOARDING_PREF_KEY, false)) {
+                val fragment: GuidedStepSupportFragment = AppTPDialogFragment()
+                GuidedStepSupportFragment.addAsRoot(
+                    this@TvLauncherActivity, fragment, android.R.id.content)
+                //                startActivity(Intent(this@TvLauncherActivity,
+                // TVOnboardingActivity::class.java))
+            } else {
+                startActivity(TvTrackerDetailsActivity.intent(this@TvLauncherActivity))
+            }
+        }
     }
 
+    companion object {
+        const val COMPLETED_ONBOARDING_PREF_KEY = "COMPLETED_ONBOARDING_PREF_KEY"
+    }
 }
