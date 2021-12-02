@@ -30,9 +30,9 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.drm.DrmRequestManager
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.privacy.config.api.Drm
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,6 +51,7 @@ class BrowserChromeClientTest {
     private lateinit var mockUncaughtExceptionRepository: UncaughtExceptionRepository
     private lateinit var mockFilePathCallback: ValueCallback<Array<Uri>>
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
+    private lateinit var mockDrm: Drm
     private val fakeView = View(getInstrumentation().targetContext)
 
     @ExperimentalCoroutinesApi
@@ -58,7 +59,8 @@ class BrowserChromeClientTest {
     @Before
     fun setup() {
         mockUncaughtExceptionRepository = mock()
-        testee = BrowserChromeClient(mockUncaughtExceptionRepository, DrmRequestManager(), TestCoroutineScope())
+        mockDrm = mock()
+        testee = BrowserChromeClient(mockUncaughtExceptionRepository, mockDrm, TestCoroutineScope())
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
@@ -198,6 +200,7 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
+        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
 
         testee.onPermissionRequest(mockPermission)
 
@@ -210,6 +213,7 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
+        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 
