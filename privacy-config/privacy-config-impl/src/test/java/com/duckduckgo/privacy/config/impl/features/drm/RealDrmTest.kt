@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.drm
 
 import android.webkit.PermissionRequest
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -27,8 +28,10 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.util.concurrent.CopyOnWriteArrayList
 
+@RunWith(AndroidJUnit4::class)
 class RealDrmTest {
 
     private val mockFeatureToggle: FeatureToggle = mock()
@@ -66,6 +69,7 @@ class RealDrmTest {
     @Test
     fun whenGetDrmPermissionsForRequestIfFeatureIsEnabledAndDomainIsNotInExceptionsListThenNoPermissionsAreReturned() {
         giveFeatureIsEnabled()
+        givenUrlIsNotInExceptionList()
 
         val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val url = "https://test.com"
@@ -92,5 +96,9 @@ class RealDrmTest {
     private fun givenUrlIsInExceptionList() {
         val exceptions = CopyOnWriteArrayList<DrmException>().apply { add(DrmException("open.spotify.com", "my reason here")) }
         whenever(mockDrmRepository.exceptions).thenReturn(exceptions)
+    }
+
+    private fun givenUrlIsNotInExceptionList() {
+        whenever(mockDrmRepository.exceptions).thenReturn(CopyOnWriteArrayList<DrmException>())
     }
 }
