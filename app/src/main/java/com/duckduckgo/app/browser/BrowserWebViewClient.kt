@@ -68,6 +68,14 @@ class BrowserWebViewClient(
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
 
+    /**
+     * * This method is only used if the device is < 23 and it's using the old WebView APK
+     *   not the one from Play Store. It will be removed once we increase minSDK to 24
+     */
+    override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
+        return shouldOverride(view, Uri.parse(urlString), LollipopWebResourceRequest(urlString))
+    }
+
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
         return shouldOverride(view, url, request)
@@ -317,5 +325,19 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
+    }
+
+    private fun LollipopWebResourceRequest(urlString: String) = object : WebResourceRequest {
+        override fun getUrl(): Uri = Uri.parse(urlString)
+
+        override fun isRedirect(): Boolean = false
+
+        override fun getMethod(): String = "POST"
+
+        override fun getRequestHeaders(): MutableMap<String, String> = mutableMapOf()
+
+        override fun hasGesture(): Boolean = true
+
+        override fun isForMainFrame(): Boolean = true
     }
 }
