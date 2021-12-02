@@ -326,6 +326,11 @@ class CtaViewModel @Inject constructor(
         }
 
         nonNullSite.let {
+
+            if (isDuckDuckGoEmailUrl(it.url)) {
+                return null
+            }
+
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
@@ -369,6 +374,8 @@ class CtaViewModel @Inject constructor(
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
+
+    private fun isDuckDuckGoEmailUrl(url: String): Boolean = url.contains(DUCK_DUCK_GO_EMAIL_URL_PART)
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
@@ -424,5 +431,6 @@ class CtaViewModel @Inject constructor(
         private const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1L
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
+        private val DUCK_DUCK_GO_EMAIL_URL_PART = "duckduckgo.com/email"
     }
 }

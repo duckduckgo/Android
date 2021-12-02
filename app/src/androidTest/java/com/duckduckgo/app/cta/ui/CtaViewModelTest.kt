@@ -550,6 +550,14 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaWhileDaxOnboardingActiveAndBrowsingOnDuckDuckGoEmailUrlThenReturnNull() = runBlockingTest {
+        givenDaxOnboardingActive()
+        val site = site(url = "https://duckduckgo.com/email/")
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertNull(value)
+    }
+
+    @Test
     fun whenUserHidesAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenOnboardingActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
