@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.service.VpnQueuesTimeLogger
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
+@ContributesMultibinding(VpnScope::class)
 class VpnQueueCollector @Inject constructor(
     private val vpnQueues: VpnQueues,
     private val vpnQueuesTimeLogger: VpnQueuesTimeLogger

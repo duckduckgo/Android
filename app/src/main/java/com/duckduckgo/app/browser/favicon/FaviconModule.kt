@@ -22,7 +22,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -31,7 +31,7 @@ import dagger.SingleInstanceIn
 class FaviconModule {
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun faviconManager(
         faviconPersister: FaviconPersister,
         bookmarksDao: BookmarksDao,
@@ -53,7 +53,7 @@ class FaviconModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun faviconDownloader(context: Context, dispatcherProvider: DispatcherProvider): FaviconDownloader {
         return GlideFaviconDownloader(context, dispatcherProvider)
     }

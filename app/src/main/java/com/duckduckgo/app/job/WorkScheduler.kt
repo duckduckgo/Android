@@ -21,7 +21,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,8 +29,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesMultibinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class AndroidWorkScheduler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val notificationScheduler: AndroidNotificationScheduler,

@@ -30,7 +30,7 @@ import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
@@ -42,16 +42,16 @@ import dagger.SingleInstanceIn
 @Module
 class SystemComponentsModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun packageManager(context: Context): PackageManager = context.packageManager
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
 
     @Provides
@@ -70,7 +70,7 @@ class SystemComponentsModule {
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class SystemComponentsModuleBindings {
     @Binds
     @IntoSet

@@ -21,13 +21,13 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesMultibinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class MigrationLifecycleObserver @Inject constructor(
     private val migrationPluginPoint: PluginPoint<MigrationPlugin>,
     private val migrationStore: MigrationStore

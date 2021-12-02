@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
@@ -39,10 +39,10 @@ interface AppTrackerRecorder {
 }
 
 @ContributesMultibinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class,
 )
-@SingleInstanceIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
 class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
@@ -96,10 +96,10 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class AppTrackerRecorderModule {
 
     @Binds
-    @SingleInstanceIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnScope::class)
     abstract fun providesAppTrackerRecorder(batchedAppTrackerRecorder: BatchedAppTrackerRecorder): AppTrackerRecorder
 }

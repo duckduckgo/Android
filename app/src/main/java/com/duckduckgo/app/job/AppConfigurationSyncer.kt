@@ -26,7 +26,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -37,10 +37,10 @@ import timber.log.Timber
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class AppConfigurationSyncerModule {
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun provideAppConfigurationSyncer(
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,

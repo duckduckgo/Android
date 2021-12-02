@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
@@ -40,7 +40,7 @@ import dagger.SingleInstanceIn
  *
  * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
  */
-@SingleInstanceIn(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel

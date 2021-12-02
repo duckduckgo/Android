@@ -39,7 +39,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -49,12 +49,12 @@ import dagger.SingleInstanceIn
 class PrivacyModule {
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityLookup: EntityLookup): PrivacyPractices =
         PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun entityLookup(entityDao: TdsEntityDao, domainEntityDao: TdsDomainEntityDao): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
@@ -89,7 +89,7 @@ class PrivacyModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun automaticDataClearer(
         workManager: WorkManager,
         settingsDataStore: SettingsDataStore,
@@ -101,25 +101,25 @@ class PrivacyModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun dataClearerLifecycleObserver(dataClearer: DataClearer): LifecycleObserver = dataClearer
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
         dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
     ): LifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun geoLocationPermissions(
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,

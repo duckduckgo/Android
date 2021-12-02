@@ -19,7 +19,7 @@ package com.duckduckgo.app.dev.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ interface DevSettingsDataStore {
     var nextTdsEnabled: Boolean
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore {
     override var nextTdsEnabled: Boolean
         get() = preferences.getBoolean(KEY_NEXT_TDS_ENABLED, false)

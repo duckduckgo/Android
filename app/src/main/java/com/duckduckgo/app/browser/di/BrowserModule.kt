@@ -70,7 +70,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
@@ -143,7 +143,7 @@ class BrowserModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
@@ -153,11 +153,11 @@ class BrowserModule {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webDataManager(
         context: Context,
@@ -182,7 +182,7 @@ class BrowserModule {
     fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
         return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
     }
@@ -246,25 +246,25 @@ class BrowserModule {
         return CookieManagerRemover(cookieManager)
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewCookieManager(): CookieManager {
         return CookieManager.getInstance()
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
@@ -313,14 +313,14 @@ class BrowserModule {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
 }

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -29,22 +29,22 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import dummy.ui.VpnDiagnosticsActivity
 
-@SingleInstanceIn(ActivityObjectGraph::class)
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface VpnDiagnosticsActivityComponentProvider {
     fun vpnDiagnosticsActivityComponentFactory(): VpnDiagnosticsActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class VpnDiagnosticsActivityComponentBindingModule {
     @Binds
     @IntoMap

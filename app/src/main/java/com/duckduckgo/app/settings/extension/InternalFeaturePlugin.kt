@@ -18,7 +18,7 @@ package com.duckduckgo.app.settings.extension
 
 import android.content.Context
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -49,16 +49,16 @@ private class SettingsInternalFeaturePluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class SettingInternalFeaturePluginModule {
     @Multibinds
     abstract fun bindEmptySettingInternalFeaturePlugins(): Set<@JvmSuppressWildcards InternalFeaturePlugin>
 
     @Module
-    @ContributesTo(AppObjectGraph::class)
+    @ContributesTo(AppScope::class)
     class SettingInternalFeaturePluginModuleExt {
         @Provides
-        @SingleInstanceIn(AppObjectGraph::class)
+        @SingleInstanceIn(AppScope::class)
         fun provideSettingInternalFeaturePlugins(
             plugins: Set<@JvmSuppressWildcards InternalFeaturePlugin>
         ): PluginPoint<InternalFeaturePlugin> {

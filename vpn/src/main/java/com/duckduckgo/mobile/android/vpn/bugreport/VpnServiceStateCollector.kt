@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.content.Context
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -27,7 +27,7 @@ import org.json.JSONObject
 import xyz.hexene.localvpn.TCB
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
+@ContributesMultibinding(VpnScope::class)
 class VpnServiceStateCollector @Inject constructor(
     private val context: Context,
     private val memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>,

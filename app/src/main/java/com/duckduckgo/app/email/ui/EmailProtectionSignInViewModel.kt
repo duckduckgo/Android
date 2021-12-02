@@ -24,7 +24,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -134,7 +134,7 @@ class EmailProtectionSignInViewModel(
 
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class EmailProtectionSignViewModelFactory @Inject constructor(
     private val emailManager: Provider<EmailManager>,
     private val emailService: Provider<EmailService>,

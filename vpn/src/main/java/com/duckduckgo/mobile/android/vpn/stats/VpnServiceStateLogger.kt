@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.stats
 
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.di.VpnDispatcherProvider
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
@@ -30,10 +30,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleInstanceIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
 class VpnServiceStateLogger @Inject constructor(
     private val dispatcherProvider: VpnDispatcherProvider,
     private val vpnDatabase: VpnDatabase

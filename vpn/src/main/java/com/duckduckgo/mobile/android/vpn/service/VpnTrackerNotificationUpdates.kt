@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
-@SingleInstanceIn(VpnObjectGraph::class)
+@ContributesMultibinding(VpnScope::class)
+@SingleInstanceIn(VpnScope::class)
 class VpnTrackerNotificationUpdates @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,

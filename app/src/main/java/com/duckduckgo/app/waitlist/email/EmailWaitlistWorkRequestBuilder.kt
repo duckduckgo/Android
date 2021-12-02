@@ -23,7 +23,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -77,7 +77,7 @@ class EmailWaitlistWorker(private val context: Context, workerParams: WorkerPara
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppConfigurationWorkerInjectorPlugin @Inject constructor(
     private val emailManager: EmailManager,
     private val notificationSender: NotificationSender,

@@ -20,7 +20,7 @@ import android.os.SystemClock
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -32,8 +32,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
-@SingleInstanceIn(VpnObjectGraph::class)
+@ContributesMultibinding(VpnScope::class)
+@SingleInstanceIn(VpnScope::class)
 class VpnRunningTimeLogger @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val vpnDatabase: VpnDatabase

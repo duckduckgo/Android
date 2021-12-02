@@ -28,7 +28,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -108,7 +108,7 @@ class FireproofWebsitesViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FireproofWebsitesViewModelFactory @Inject constructor(
     private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>,

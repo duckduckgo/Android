@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
@@ -125,7 +125,7 @@ class AppTPWaitlistViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTPWaitlistViewModelFactory @Inject constructor(
     private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
     private val waitlistService: Provider<AppTrackingProtectionWaitlistService>,

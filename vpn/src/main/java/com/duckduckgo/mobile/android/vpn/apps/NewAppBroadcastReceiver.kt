@@ -23,8 +23,8 @@ import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
@@ -37,9 +37,9 @@ import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@SingleInstanceIn(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
 class NewAppBroadcastReceiver @Inject constructor(

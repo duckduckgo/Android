@@ -18,15 +18,15 @@ package com.duckduckgo.app.global.migrations
 
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesMultibinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class GpcMigrationPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val gpc: Gpc

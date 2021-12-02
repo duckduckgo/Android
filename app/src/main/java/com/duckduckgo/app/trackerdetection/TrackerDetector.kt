@@ -25,7 +25,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
@@ -37,8 +37,8 @@ interface TrackerDetector {
     fun evaluate(url: String, documentUrl: String): TrackingEvent?
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,

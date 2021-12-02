@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -27,8 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {

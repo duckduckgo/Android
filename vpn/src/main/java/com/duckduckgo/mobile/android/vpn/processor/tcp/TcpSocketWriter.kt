@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
@@ -45,9 +45,9 @@ interface TcpSocketWriter {
     fun removeFromWriteQueue(tcb: TCB)
 }
 
-@SingleInstanceIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
 @ContributesBinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = TcpSocketWriter::class
 )
 class RealTcpSocketWriter @Inject constructor(
@@ -176,7 +176,7 @@ class RealTcpSocketWriter @Inject constructor(
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class TcpSocketWriterModule {
     @Binds
     @IntoSet

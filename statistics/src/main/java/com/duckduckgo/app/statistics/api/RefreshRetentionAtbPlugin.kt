@@ -17,7 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.multibindings.Multibinds
@@ -42,7 +42,7 @@ class RefreshRetentionAtbPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class RefreshRetentionAtbPluginModule {
     @Multibinds
     abstract fun bindRefreshRetentionAtbPlugins(): Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>

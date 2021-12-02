@@ -17,8 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.FragmentObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -29,22 +29,22 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleInstanceIn(FragmentObjectGraph::class)
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = FragmentObjectGraph::class
+    scope = FragmentScope::class
 )
 interface SiteLocationPermissionDialogComponent : AndroidInjector<SiteLocationPermissionDialog> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<SiteLocationPermissionDialog>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface SiteLocationPermissionDialogComponentProvider {
     fun provideSiteLocationPermissionDialogComponentFactory(): SiteLocationPermissionDialogComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class SiteLocationPermissionDialogBindingModule {
     @Binds
     @IntoMap

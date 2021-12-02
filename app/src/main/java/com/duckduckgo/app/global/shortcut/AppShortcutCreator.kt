@@ -32,7 +32,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -42,7 +42,7 @@ import javax.inject.Inject
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
@@ -64,7 +64,7 @@ class AppShortcutCreatorLifecycleObserver(
     }
 }
 
-@SingleInstanceIn(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
 class AppShortcutCreator @Inject constructor(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

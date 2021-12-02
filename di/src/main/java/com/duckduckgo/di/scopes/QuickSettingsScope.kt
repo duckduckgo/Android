@@ -15,4 +15,4 @@
  */
 package com.duckduckgo.di.scopes
 
-abstract class AppObjectGraph private constructor()
+abstract class QuickSettingsScope private constructor()

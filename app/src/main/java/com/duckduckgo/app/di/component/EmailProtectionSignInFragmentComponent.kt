@@ -17,8 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.FragmentObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -29,22 +29,22 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleInstanceIn(FragmentObjectGraph::class)
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = FragmentObjectGraph::class
+    scope = FragmentScope::class
 )
 interface EmailProtectionSignInFragmentComponent : AndroidInjector<EmailProtectionSignInFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailProtectionSignInFragment>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface EmailProtectionSignInFragmentComponentProvider {
     fun provideEmailProtectionSignInFragmentComponentFactory(): EmailProtectionSignInFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class EmailProtectionSignInFragmentBindingModule {
     @Binds
     @IntoMap

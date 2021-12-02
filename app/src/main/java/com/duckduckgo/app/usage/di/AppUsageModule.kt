@@ -22,7 +22,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -33,7 +33,7 @@ import dagger.SingleInstanceIn
 class AppUsageModule {
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun appDaysUsedRecorderObserver(
         appDaysUsedRepository: AppDaysUsedRepository,
@@ -43,7 +43,7 @@ class AppUsageModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun appDaysUsedRespository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
         return AppDaysUsedDatabaseRepository(appDaysUsedDao)
     }

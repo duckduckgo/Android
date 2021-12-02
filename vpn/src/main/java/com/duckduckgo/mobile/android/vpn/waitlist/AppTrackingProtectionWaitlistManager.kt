@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.waitlist
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesBinding
@@ -37,8 +37,8 @@ interface TrackingProtectionWaitlistManager {
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
-@SingleInstanceIn(AppObjectGraph::class)
-@ContributesBinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class AppTrackingProtectionWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,

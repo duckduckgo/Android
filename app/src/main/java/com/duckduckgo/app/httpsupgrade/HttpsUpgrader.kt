@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -53,9 +53,9 @@ interface HttpsUpgrader {
     fun reloadData()
 }
 
-@SingleInstanceIn(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = HttpsUpgrader::class
 )
 class HttpsUpgraderImpl @Inject constructor(
@@ -134,10 +134,10 @@ class HttpsUpgraderImpl @Inject constructor(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class HttpsUpgraderModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Binds
     @IntoSet
     abstract fun bindHttpsUpgraderLifecycleObserver(

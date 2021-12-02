@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -29,24 +29,24 @@ import dagger.multibindings.IntoMap
 
 @WrongScope(
     comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityObjectGraph::class,
+    correctScope = ActivityScope::class,
 )
-@SingleInstanceIn(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = VpnScope::class
 )
 interface ReportBreakageTextFormActivityComponent : AndroidInjector<ReportBreakageTextFormActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ReportBreakageTextFormActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface ReportBreakageTextFormActivityComponentProvider {
     fun provideReportBreakageTextFormActivityComponentFactory(): ReportBreakageTextFormActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class ReportBreakageTextFormActivityBindingModule {
     @Binds
     @IntoMap

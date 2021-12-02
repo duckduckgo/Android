@@ -18,7 +18,7 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -26,13 +26,13 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [CoroutinesModule::class]
 )
 class StubCoroutinesModule {
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun providesDispatcherProvider(): DispatcherProvider {
         return CoroutineTestRule().testDispatcherProvider
     }

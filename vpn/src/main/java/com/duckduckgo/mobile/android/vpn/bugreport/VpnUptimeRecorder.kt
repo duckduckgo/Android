@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.os.SystemClock
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@SingleInstanceIn(AppObjectGraph::class)
-@ContributesMultibinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(AppScope::class)
 class VpnUptimeRecorder @Inject constructor() : VpnServiceCallbacks {
 
     private val vpnStartTime = AtomicLong(0)

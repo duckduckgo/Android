@@ -17,7 +17,7 @@
 package com.duckduckgo.app.global.plugins.migrations
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
@@ -26,7 +26,7 @@ interface MigrationPlugin {
     val version: Int
 }
 
-@SingleInstanceIn(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
 class MigrationPluginPoint @Inject constructor(
     private val injectorPlugins: Set<@JvmSuppressWildcards MigrationPlugin>
 ) : PluginPoint<MigrationPlugin> {

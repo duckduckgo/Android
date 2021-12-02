@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.di
 import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
@@ -29,10 +29,10 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class VpnAppModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesConnectivityManager(context: Context): ConnectivityManager {
         return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -42,14 +42,14 @@ class VpnAppModule {
      * TODO this class should also not be needed in the AppScope.
      * It is needed because the DaggerWorkerFactory is not modular. Easy to fix tho
      */
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun bindVpnDatabase(context: Context): VpnDatabase {
         return VpnDatabase.getInstance(context)
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun provideAppTrackerLoader(
         vpnDatabase: VpnDatabase
     ): AppTrackerRepository {
@@ -57,7 +57,7 @@ class VpnAppModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun providesResources(context: Context): Resources {
         return context.resources
     }

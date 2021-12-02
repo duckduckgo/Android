@@ -23,7 +23,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -36,8 +36,8 @@ import javax.inject.Inject
 import dagger.SingleInstanceIn
 
 @WorkerThread
-@SingleInstanceIn(AppObjectGraph::class)
-@ContributesMultibinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(AppScope::class)
 class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,
     private val privacyConfigPersister: PrivacyConfigPersister,

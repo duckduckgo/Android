@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.gpc
 
 import android.content.Context
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -29,8 +29,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository, private val unprotectedTemporary: UnprotectedTemporary) : Gpc {
 
     private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }

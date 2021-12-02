@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -152,7 +152,7 @@ internal sealed class Command {
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ExcludedAppsViewModelFactory @Inject constructor(
     private val deviceShieldExcludedApps: Provider<TrackingProtectionAppsRepository>,
     private val deviceShieldPixels: Provider<DeviceShieldPixels>

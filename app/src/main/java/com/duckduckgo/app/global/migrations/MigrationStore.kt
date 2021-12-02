@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.migrations
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
@@ -28,8 +28,8 @@ interface MigrationStore {
     var version: Int
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class MigrationSharedPreferences @Inject constructor(private val context: Context) : MigrationStore {
 
     private val preferences: SharedPreferences

@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -62,7 +62,7 @@ class DeviceShieldOnboardingViewModel(
 
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeviceShieldOnboardingViewModelFactory @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore

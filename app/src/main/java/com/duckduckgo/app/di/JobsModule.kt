@@ -18,17 +18,17 @@ package com.duckduckgo.app.di
 
 import android.app.job.JobScheduler
 import android.content.Context
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class JobsModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesJobScheduler(context: Context): JobScheduler {
         return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler

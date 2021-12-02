@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.os.SystemClock
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -48,8 +48,8 @@ interface VpnQueuesTimeLogger {
 
 // This is in the App object graph because we need to share it
 // in more than one dagger subcomponent
-@SingleInstanceIn(AppObjectGraph::class)
-@ContributesBinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LoggingLinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LoggingLinkedBlockingDeque()

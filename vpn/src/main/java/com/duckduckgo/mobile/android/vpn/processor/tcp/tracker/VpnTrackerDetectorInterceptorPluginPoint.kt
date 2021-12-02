@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -33,16 +33,16 @@ private class VpnTrackerDetectorInterceptorPluginPoint(
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class VpnTrackerDetectorInterceptorModule {
     @Multibinds
     abstract fun bindVpnTrackerDetectorInterceptorPlugins(): Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
 
     @Module
-    @ContributesTo(VpnObjectGraph::class)
+    @ContributesTo(VpnScope::class)
     class VpnTrackerDetectorInterceptorModuleProvider {
         @Provides
-        @SingleInstanceIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnScope::class)
         fun provideVpnTrackerDetectorInterceptorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
         ): PluginPoint<VpnTrackerDetectorInterceptor> {

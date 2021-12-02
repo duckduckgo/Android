@@ -25,7 +25,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
@@ -38,8 +38,8 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@SingleInstanceIn(VpnObjectGraph::class)
-@ContributesMultibinding(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(VpnScope::class)
 class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,

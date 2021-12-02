@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
@@ -35,8 +35,8 @@ interface PrivacyConfigPersister {
 }
 
 @WorkerThread
-@SingleInstanceIn(AppObjectGraph::class)
-@ContributesBinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,

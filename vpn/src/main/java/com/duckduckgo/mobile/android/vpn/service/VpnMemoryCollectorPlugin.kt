@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -44,18 +44,18 @@ private class VpnMemoryCollectorPluginPoint(
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class VpnMemoryCollectorProviderModule {
 
     @Multibinds
-    @SingleInstanceIn(VpnObjectGraph::class)
+    @SingleInstanceIn(VpnScope::class)
     abstract fun bindVpnMemoryCollectorPlugins(): Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
 
     @Module
-    @ContributesTo(VpnObjectGraph::class)
+    @ContributesTo(VpnScope::class)
     class VpnMemoryCollectorProviderModuleExt {
         @Provides
-        @SingleInstanceIn(VpnObjectGraph::class)
+        @SingleInstanceIn(VpnScope::class)
         fun bindVpnMemoryCollectorPluginPoint(
             plugins: Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
         ): PluginPoint<VpnMemoryCollectorPlugin> {

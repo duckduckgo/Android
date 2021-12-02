@@ -18,7 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import android.content.Context
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
@@ -26,7 +26,7 @@ import dagger.SingleInstanceIn
 @Module
 abstract class ApplicationModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Binds
     abstract fun bindContext(application: Application): Context
 

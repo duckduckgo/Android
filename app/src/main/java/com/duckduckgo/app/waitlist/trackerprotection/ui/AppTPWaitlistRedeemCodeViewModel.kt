@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -65,7 +65,7 @@ class AppTPWaitlistRedeemCodeViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTPWaitlistRedeemCodeViewModelFactory @Inject constructor(
     private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>,

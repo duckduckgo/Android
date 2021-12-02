@@ -19,7 +19,7 @@ package com.duckduckgo.app.di
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
 import com.duckduckgo.app.global.plugins.migrations.MigrationPluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
@@ -27,14 +27,14 @@ import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class MigrationsPluginProviderModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds
     abstract fun provideMigrationsPlugins(): Set<@JvmSuppressWildcards MigrationPlugin>
 
     @Binds
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     abstract fun provideMigrationsPluginProvider(
         migrationPluginPoint: MigrationPluginPoint
     ): PluginPoint<MigrationPlugin>

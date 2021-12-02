@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -25,8 +25,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealHttps @Inject constructor(private val httpsRepository: HttpsRepository, private val unprotectedTemporary: UnprotectedTemporary) : Https {
 
     override fun isAnException(url: String): Boolean {

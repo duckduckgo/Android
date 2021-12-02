@@ -36,7 +36,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
 import dagger.Module
@@ -44,11 +44,11 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class BookmarksModule {
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun savedSitesImporter(
         context: Context,
         bookmarksDao: BookmarksDao,
@@ -60,13 +60,13 @@ class BookmarksModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun savedSitesParser(): SavedSitesParser {
         return RealSavedSitesParser()
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun savedSitesExporter(
         context: Context,
         savedSitesParser: SavedSitesParser,
@@ -78,7 +78,7 @@ class BookmarksModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun bookmarkManager(
         savedSitesImporter: SavedSitesImporter,
         savedSitesExporter: SavedSitesExporter,
@@ -88,13 +88,13 @@ class BookmarksModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 
     @Provides
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }

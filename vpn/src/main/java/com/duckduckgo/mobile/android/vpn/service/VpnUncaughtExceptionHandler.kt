@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -54,10 +54,10 @@ class VpnUncaughtExceptionHandler(
 }
 
 @Module
-@ContributesTo(scope = AppObjectGraph::class)
+@ContributesTo(scope = AppScope::class)
 class VpnExceptionModule {
 
-    @SingleInstanceIn(AppObjectGraph::class)
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesVpnUncaughtExceptionHandler(context: Context, @AppCoroutineScope vpnCoroutineScope: CoroutineScope): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()

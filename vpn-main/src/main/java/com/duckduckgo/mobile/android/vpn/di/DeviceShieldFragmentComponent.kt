@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.FragmentObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -29,22 +29,22 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@SingleInstanceIn(FragmentObjectGraph::class)
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = FragmentObjectGraph::class
+    scope = FragmentScope::class
 )
 interface DeviceShieldFragmentComponent : AndroidInjector<DeviceShieldFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldFragment>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface DeviceShieldFragmentComponentProvider {
     fun deviceShieldFragmentComponentFactory(): DeviceShieldFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class DeviceShieldFragmentComponentBindingModule {
     @Binds
     @IntoMap

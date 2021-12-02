@@ -37,7 +37,7 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Observable
@@ -345,7 +345,7 @@ class SystemSearchViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SystemSearchViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val autoComplete: Provider<AutoCompleteApi>,

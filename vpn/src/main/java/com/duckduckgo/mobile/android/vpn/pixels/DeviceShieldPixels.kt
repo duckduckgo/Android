@@ -21,7 +21,7 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -264,8 +264,8 @@ interface DeviceShieldPixels {
     fun didChooseToCancelTrackingProtectionDialog()
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val context: Context,
     private val pixel: Pixel

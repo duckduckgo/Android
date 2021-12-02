@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
@@ -30,8 +30,8 @@ import java.net.URI
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@SingleInstanceIn(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
 
     override fun isAnException(documentURL: String, url: String): Boolean {
