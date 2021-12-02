@@ -16,23 +16,17 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import org.json.JSONObject
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.remotemessage.impl.messages.Content
 
-data class JsonRemoteMessagingConfig(
-    val version: Long,
-    val messages: List<Message>,
-    val matchingRules: List<MatchingRule>
-)
+interface MessagePlugin {
+    fun parse(key: String, json: String): Content?
+}
 
-data class Message(
-    val id: String,
-    val messageType: String,
-    val content: JSONObject?,
-    val matchingRules: List<Int>,
-    val exclusionRules: List<Int>
-)
-
-data class MatchingRule(
-    val id: Int,
-    val attributes: Map<String, JSONObject?>
-)
+class MessagePluginPoint(
+    private val messagesPlugins: Set<@JvmSuppressWildcards MessagePlugin>
+) : PluginPoint<MessagePlugin> {
+    override fun getPlugins(): Collection<MessagePlugin> {
+        return messagesPlugins
+    }
+}

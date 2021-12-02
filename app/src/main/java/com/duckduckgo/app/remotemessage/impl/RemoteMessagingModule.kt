@@ -43,6 +43,9 @@ abstract class RemoteMessagingModuleBindingModule {
 
     @Multibinds
     abstract fun provideMatchingAttributesPlugins(): Set<@JvmSuppressWildcards MatchingAttributePlugin>
+
+    @Multibinds
+    abstract fun provideMessagePlugins(): Set<@JvmSuppressWildcards MessagePlugin>
 }
 
 @Module
@@ -80,6 +83,12 @@ class NetworkModule {
     fun providesMatchingAttributePluginPoint(customConfigs: Set<@JvmSuppressWildcards MatchingAttributePlugin>): PluginPoint<MatchingAttributePlugin> {
         return MatchingAttributePluginPoint(customConfigs)
     }
+
+    @Provides
+    @Singleton
+    fun providesMessagePluginPoint(customConfigs: Set<@JvmSuppressWildcards MessagePlugin>): PluginPoint<MessagePlugin> {
+        return MessagePluginPoint(customConfigs)
+    }
 }
 
 @Module
@@ -88,10 +97,12 @@ class DataSourceModule {
     @Singleton
     @Provides
     fun providesRemoteMessagingConfigProcessor(
+        messagePluginPoint: PluginPoint<MessagePlugin>,
         matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
+            messagePluginPoint,
             matchingAttributePluginPoint,
             remoteMessagingConfigRepository
         )
