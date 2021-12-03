@@ -24,13 +24,20 @@ import dagger.Provides
 import dagger.multibindings.Multibinds
 import javax.inject.Singleton
 
+class UserAgentOverridePluginPoint(
+    private val userAgentOverride: Set<@JvmSuppressWildcards UserAgentOverride>
+) : PluginPoint<UserAgentOverride> {
+    override fun getPlugins(): Collection<UserAgentOverride> {
+        return userAgentOverride
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 abstract class UserAgentOverrideBindingModule {
 
     @Multibinds
     abstract fun provideUserAgentOverridePlugins(): Set<@JvmSuppressWildcards UserAgentOverride>
-
 }
 
 @Module

@@ -311,22 +311,12 @@ class BrowserModule {
         variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return BrowserTabFireproofDialogsEventHandler(
-            userEventsStore,
-            pixel,
-            fireproofWebsiteRepository,
-            appSettingsPreferencesStore,
-            variantManager,
-            dispatchers
-        )
+        return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 
     @Singleton
     @Provides
-    fun thirdPartyCookieManager(
-        cookieManager: CookieManager,
-        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
-    ): ThirdPartyCookieManager {
+    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 

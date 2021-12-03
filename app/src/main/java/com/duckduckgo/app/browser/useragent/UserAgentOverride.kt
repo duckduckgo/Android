@@ -16,18 +16,8 @@
 
 package com.duckduckgo.app.browser.useragent
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-
 interface UserAgentOverride {
     fun overrideUserAgent(): UAOverride
-}
-
-class UserAgentOverridePluginPoint(
-    private val userAgentOverride: Set<@JvmSuppressWildcards UserAgentOverride>
-) : PluginPoint<UserAgentOverride> {
-    override fun getPlugins(): Collection<UserAgentOverride> {
-        return userAgentOverride
-    }
 }
 
 enum class UAOverride {
