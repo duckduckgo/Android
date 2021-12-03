@@ -138,7 +138,9 @@ class AutomaticDataClearer @Inject constructor(
 
     override fun onExit() {
         // the app does not have any activity in CREATED state we kill the process
-        clearDataAction.killProcess()
+        if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
+            clearDataAction.killProcess()
+        }
     }
 
     private fun scheduleBackgroundTimerToTriggerClear(durationMillis: Long) {
