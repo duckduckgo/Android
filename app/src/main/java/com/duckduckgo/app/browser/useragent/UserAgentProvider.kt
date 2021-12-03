@@ -18,10 +18,9 @@ package com.duckduckgo.app.browser.useragent
 
 import android.os.Build
 import androidx.core.net.toUri
-import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
-import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.plugins.PluginPoint
 
 /**
  * Example Default User Agent (From Chrome):
@@ -30,7 +29,7 @@ import com.duckduckgo.app.global.device.DeviceInfo
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(private val defaultUserAgent: String, private val device: DeviceInfo, private val devSettingsDataStore: DevSettingsDataStore) {
+class UserAgentProvider constructor(private val defaultUserAgent: String, private val device: DeviceInfo, private val userAgentOverridePluginPoint: PluginPoint<UserAgentOverride>) {
 
     private val baseAgent: String
     private val baseDesktopAgent: String
@@ -54,18 +53,20 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
     fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
-        if (devSettingsDataStore.overrideUA) {
-            return when (devSettingsDataStore.selectedUA) {
-                UAOverride.NO_APP_ID -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "")
-                UAOverride.NO_VERSION -> defaultDDGUserAgent(url, isDesktop).replace(AgentRegex.version, "")
-                UAOverride.DDG -> defaultDDGUserAgent(url, isDesktop)
-                UAOverride.CHROME -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "").replace(AgentRegex.version, "")
-                UAOverride.FIREFOX -> "Mozilla/5.0 (Android 11; Mobile; rv:94.0) Gecko/94.0 Firefox/94.0"
-                UAOverride.WEBVIEW -> defaultUserAgent
-            }
+        var userAgent = UAOverride.DDG
+
+        userAgentOverridePluginPoint.getPlugins().forEach {
+            userAgent = it.overrideUserAgent()
         }
 
-        return defaultDDGUserAgent(url, isDesktop)
+        return when (userAgent) {
+            UAOverride.NO_APP_ID -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "")
+            UAOverride.NO_VERSION -> defaultDDGUserAgent(url, isDesktop).replace(AgentRegex.version, "")
+            UAOverride.DDG -> defaultDDGUserAgent(url, isDesktop)
+            UAOverride.CHROME -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "").replace(AgentRegex.version, "")
+            UAOverride.FIREFOX -> "Mozilla/5.0 (Android 11; Mobile; rv:94.0) Gecko/94.0 Firefox/94.0"
+            UAOverride.WEBVIEW -> defaultUserAgent
+        }
     }
 
     private fun defaultDDGUserAgent(url: String?, isDesktop: Boolean): String {

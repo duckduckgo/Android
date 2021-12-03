@@ -19,8 +19,11 @@ package com.duckduckgo.app.dev.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.useragent.UAOverride
+import com.duckduckgo.app.browser.useragent.UserAgentOverride
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface DevSettingsDataStore {
@@ -29,8 +32,9 @@ interface DevSettingsDataStore {
     var selectedUA: UAOverride
 }
 
-@ContributesBinding(AppObjectGraph::class)
-class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore {
+@ContributesBinding(AppObjectGraph::class, DevSettingsDataStore::class)
+@ContributesMultibinding(AppObjectGraph::class, UserAgentOverride::class)
+class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore, UserAgentOverride {
     override var nextTdsEnabled: Boolean
         get() = preferences.getBoolean(KEY_NEXT_TDS_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_NEXT_TDS_ENABLED, enabled) }
@@ -51,19 +55,14 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
         return UAOverride.valueOf(savedValue)
     }
 
+    override fun overrideUserAgent(): UAOverride {
+        return if (overrideUA) return selectedUA else UAOverride.DDG
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.dev_settings_activity.dev_settings"
         const val KEY_NEXT_TDS_ENABLED = "KEY_NEXT_TDS_ENABLED"
         const val KEY_OVERRIDE_UA = "KEY_OVERRIDE_UA"
         const val KEY_SELECTED_UA = "KEY_SELECTED_UA"
     }
-}
-
-enum class UAOverride {
-    NO_APP_ID,
-    NO_VERSION,
-    CHROME,
-    FIREFOX,
-    DDG,
-    WEBVIEW
 }

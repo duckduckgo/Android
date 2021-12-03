@@ -45,8 +45,8 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.useragent.UserAgentOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.*
@@ -59,6 +59,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -183,8 +184,8 @@ class BrowserModule {
 
     @Provides
     @Singleton
-    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo, devSettingsDataStore: DevSettingsDataStore): UserAgentProvider {
-        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo, devSettingsDataStore)
+    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo, userAgentOverridePluginPoint: PluginPoint<UserAgentOverride>): UserAgentProvider {
+        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo, userAgentOverridePluginPoint)
     }
 
     @Provides
@@ -310,12 +311,22 @@ class BrowserModule {
         variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+        return BrowserTabFireproofDialogsEventHandler(
+            userEventsStore,
+            pixel,
+            fireproofWebsiteRepository,
+            appSettingsPreferencesStore,
+            variantManager,
+            dispatchers
+        )
     }
 
     @Singleton
     @Provides
-    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
+    fun thirdPartyCookieManager(
+        cookieManager: CookieManager,
+        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+    ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
