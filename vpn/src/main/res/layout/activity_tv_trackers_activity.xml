@@ -22,6 +22,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="horizontal"
+                                                   android:background="@drawable/bg_duckduckgo"
               android:layout_marginTop="27dp"
               android:layout_marginBottom="27dp"
               android:layout_marginLeft="48dp"
@@ -34,7 +35,6 @@
         android:layout_marginStart="24dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent">
-
 
         <TextView
             android:id="@+id/past_week_activity"

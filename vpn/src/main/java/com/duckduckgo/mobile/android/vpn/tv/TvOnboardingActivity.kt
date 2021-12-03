@@ -24,6 +24,8 @@ class TVOnboardingActivity: FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.setBackgroundDrawableResource(R.drawable.bg_duckduckgo)
         setContentView(R.layout.activity_tv_onboarding)
     }
 
