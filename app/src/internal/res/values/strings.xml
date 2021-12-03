@@ -27,4 +27,13 @@
     <string name="devSettingsScreenMajorFetch" translatable="false">Major via fetch</string>
     <string name="devSettingsScreenMajorFetchSubtitle" translatable="false">Check Facebook is blocked</string>
     <string name="devSettingsScreenTdsWait" translatable="false">Please wait while we download the tds version</string>
+    <string name="devSettingsScreenUserAgentSection" translatable="false">USER AGENT</string>
+    <string name="devSettingsScreenUserAgentOverride" translatable="false">Override UserAgent</string>
+    <string name="devSettingsScreenUserAgentSelectorTitle" translatable="false">UserAgent</string>
+    <string name="devSettingsScreenUserAgentNoAppId" translatable="false">No App Id</string>
+    <string name="devSettingsScreenUserAgentNoVersion" translatable="false">No WebView Version</string>
+    <string name="devSettingsScreenUserAgentChrome" translatable="false">Chrome</string>
+    <string name="devSettingsScreenUserAgentFirefox" translatable="false">Firefox</string>
+    <string name="devSettingsScreenUserAgentDuckDuckGo" translatable="false">DuckDuckGo</string>
+    <string name="devSettingsScreenUserAgentWebView" translatable="false">WebView</string>
 </resources>

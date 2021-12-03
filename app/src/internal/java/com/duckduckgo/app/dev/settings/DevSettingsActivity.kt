@@ -19,8 +19,11 @@ package com.duckduckgo.app.dev.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
+import androidx.annotation.MenuRes
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,10 +32,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.lang.IllegalStateException
 
 class DevSettingsActivity : DuckDuckGoActivity() {
 
@@ -42,6 +48,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
 
     private val nextTdsToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onNextTdsToggled(isChecked)
+    }
+
+    private val overrideUAListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onOverrideUAToggled(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +71,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
         binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
+        binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
     }
 
     private fun observeViewModel() {
@@ -69,6 +80,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
+                    binding.overrideUserAgentSelector.isEnabled = it.overrideUA
+                    binding.overrideUserAgentSelector.setSubtitle(it.userAgent)
                 }
             }.launchIn(lifecycleScope)
 
@@ -82,6 +96,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
             is Command.GoToUrl -> goToUrl(it.url)
+            is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
             else -> TODO()
         }
     }
@@ -96,6 +111,26 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         val intent = Intent()
         intent.action = DOWNLOAD_TDS_INTENT_ACTION
         sendBroadcast(intent)
+    }
+
+    private fun showUASelector(@MenuRes popupMenu: Int) {
+        val popup = PopupMenu(this, binding.overrideUserAgentSelector)
+        popup.menuInflater.inflate(popupMenu, popup.menu)
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            val userAgent = when (menuItem.itemId) {
+                R.id.noAppId -> UAOverride.NO_APP_ID
+                R.id.noVersion -> UAOverride.NO_VERSION
+                R.id.chrome -> UAOverride.CHROME
+                R.id.firefox -> UAOverride.FIREFOX
+                R.id.duckDuckGo -> UAOverride.DDG
+                R.id.webView -> UAOverride.WEBVIEW
+                else -> throw IllegalStateException()
+            }
+            viewModel.onUserAgentSelected(userAgent)
+            true
+        }
+        popup.setOnDismissListener { }
+        popup.show()
     }
 
     companion object {

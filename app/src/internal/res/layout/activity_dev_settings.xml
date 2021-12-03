@@ -83,4 +83,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/privacyTest1"/>
 
+    <View
+        style="@style/SettingsGroupDivider"/>
+
+    <TextView
+        android:id="@+id/userAgentTitle"
+        style="@style/SettingsSectionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/devSettingsScreenUserAgentSection" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/overrideUserAgentToggle"
+        style="@style/SettingsSwitch"
+        android:text="@string/devSettingsScreenUserAgentOverride"
+        android:theme="@style/SettingsSwitchTheme" />
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/overrideUserAgentSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/devSettingsScreenUserAgentSelectorTitle" />
+
 </LinearLayout>

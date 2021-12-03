@@ -19,7 +19,9 @@ package com.duckduckgo.app.dev.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
+import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -29,7 +31,10 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,15 +42,19 @@ import javax.inject.Provider
 
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
+    private val userAgentProvider: UserAgentProvider
 ) : ViewModel() {
 
     data class ViewState(
-        val nextTdsEnabled: Boolean = false
+        val nextTdsEnabled: Boolean = false,
+        val overrideUA: Boolean = false,
+        val userAgent: String = ""
     )
 
     sealed class Command {
         object SendTdsIntent : Command()
         data class GoToUrl(val url: String) : Command()
+        object OpenUASelector : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -55,7 +64,9 @@ class DevSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    nextTdsEnabled = devSettingsDataStore.nextTdsEnabled
+                    nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
+                    overrideUA = devSettingsDataStore.overrideUA,
+                    userAgent = userAgentProvider.userAgent("", false)
                 )
             )
         }
@@ -78,6 +89,13 @@ class DevSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onOverrideUAToggled(enabled: Boolean) {
+        devSettingsDataStore.overrideUA = enabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(overrideUA = enabled))
+        }
+    }
+
     fun goToPrivacyTest1() {
         viewModelScope.launch { command.send(Command.GoToUrl(PRIVACY_TEST_URL_1)) }
     }
@@ -90,6 +108,17 @@ class DevSettingsViewModel @Inject constructor(
         return viewState.value
     }
 
+    fun onUserAgentSelectorClicked() {
+        viewModelScope.launch { command.send(Command.OpenUASelector) }
+    }
+
+    fun onUserAgentSelected(userAgent: UAOverride) {
+        devSettingsDataStore.selectedUA = userAgent
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
+        }
+    }
+
     companion object {
         private const val PRIVACY_TEST_URL_1 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html"
         private const val PRIVACY_TEST_URL_2 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-fetch.html"
@@ -99,6 +128,7 @@ class DevSettingsViewModel @Inject constructor(
 @ContributesMultibinding(AppObjectGraph::class)
 class SettingsViewModelFactory @Inject constructor(
     private val devSettingsDataStore: Provider<DevSettingsDataStore>,
+    private val userAgentProvider: Provider<UserAgentProvider>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
     private val variantManager: Provider<VariantManager>,
     private val emailManager: Provider<EmailManager>,
@@ -108,7 +138,7 @@ class SettingsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DevSettingsViewModel::class.java) -> (DevSettingsViewModel(devSettingsDataStore.get()) as T)
+                isAssignableFrom(DevSettingsViewModel::class.java) -> (DevSettingsViewModel(devSettingsDataStore.get(), userAgentProvider.get()) as T)
                 else -> null
             }
         }

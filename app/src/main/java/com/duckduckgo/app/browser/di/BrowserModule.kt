@@ -46,6 +46,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.*
@@ -182,8 +183,8 @@ class BrowserModule {
 
     @Provides
     @Singleton
-    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
-        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo, devSettingsDataStore: DevSettingsDataStore): UserAgentProvider {
+        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo, devSettingsDataStore)
     }
 
     @Provides
