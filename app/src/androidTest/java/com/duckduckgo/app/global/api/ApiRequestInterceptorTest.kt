@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.api
 import android.webkit.WebSettings
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -34,7 +35,8 @@ class ApiRequestInterceptorTest {
     fun before() {
         userAgentProvider = UserAgentProvider(
             WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context),
-            ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context)
+            ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context),
+            provideUserAgentOverridePluginPoint()
         )
 
         testee = ApiRequestInterceptor(
