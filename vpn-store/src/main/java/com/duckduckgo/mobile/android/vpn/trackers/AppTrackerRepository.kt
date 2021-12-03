@@ -76,18 +76,54 @@ class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrack
             "trvdp.com",
             "tv-static.scdn.co",
             "#tv.deezer.com # Breaks Deezer's smart-TV apps",
-            "xml.opera.com")
+            "xml.opera.com",
+            "0077777700140002.myhomescreen.tv",
+            "cert-test.sandbox.google.com",
+            "collect.myhomescreen.tv",
+            "usage.myhomescreen.tv",
+            "collect-us-fy2014.myhomescreen.tv",
+            "collect-us-fy2015.myhomescreen.tv",
+            "collect-us-fy2016.myhomescreen.tv",
+            "collect-us-fy2017.myhomescreen.tv",
+            "collect-us-fy2018.myhomescreen.tv",
+            "collect-us-fy2019.myhomescreen.tv",
+            "collect-us-fy2020.myhomescreen.tv",
+            "collect-eu-fy2014.myhomescreen.tv",
+            "collect-eu-fy2015.myhomescreen.tv",
+            "collect-eu-fy2017.myhomescreen.tv",
+            "collect-eu-fy2016.myhomescreen.tv",
+            "collect-eu-fy2018.myhomescreen.tv",
+            "collect-eu-fy2019.myhomescreen.tv",
+            "collect-eu-fy2020.myhomescreen.tv",
+            "usage-eu-fy2014.myhomescreen.tv",
+            "usage-eu-fy2015.myhomescreen.tv",
+            "usage-eu-fy2016.myhomescreen.tv",
+            "usage-eu-fy2017.myhomescreen.tv",
+            "usage-eu-fy2018.myhomescreen.tv",
+            "usage-eu-fy2019.myhomescreen.tv",
+            "usage-eu-fy2020.myhomescreen.tv",
+            "usage-us-fy2014.myhomescreen.tv",
+            "usage-us-fy2015.myhomescreen.tv",
+            "usage-us-fy2016.myhomescreen.tv",
+            "usage-us-fy2017.myhomescreen.tv",
+            "usage-us-fy2018.myhomescreen.tv",
+            "usage-us-fy2019.myhomescreen.tv",
+            "usage-us-fy2020.myhomescreen.tv",
+            "mhc-sec-eu.myhomescreen.tv",
+            "x2.vindicosuite.com")
 
     override fun findTracker(hostname: String, packageName: String): AppTrackerType {
-        val tracker =
-            vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname)
-                ?: return AppTrackerType.NotTracker
-        val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
-        if (firstPartyTracker(tracker, entityName)) {
-            return AppTrackerType.FirstParty(tracker)
-        }
+        val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname)
+        if (tracker == null) {
+            return findSmartTVTracker(hostname)
+        } else {
+            val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
+            if (firstPartyTracker(tracker, entityName)) {
+                return AppTrackerType.FirstParty(tracker)
+            }
 
-        return AppTrackerType.ThirdParty(tracker)
+            return AppTrackerType.ThirdParty(tracker)
+        }
     }
 
     private fun findSmartTVTracker(hostname: String): AppTrackerType {
@@ -95,7 +131,11 @@ class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrack
             Timber.d("Found specific Smart TV Tracker")
             AppTrackerType.ThirdParty(
                 AppTracker(
-                    hostname, 1279484251, TrackerOwner("Smart TV", "Smart TV"), TrackerApp(0, 100.0), false))
+                    hostname,
+                    1279484251,
+                    TrackerOwner("Smart TV", "Smart TV"),
+                    TrackerApp(0, 100.0),
+                    false))
         } else {
             AppTrackerType.NotTracker
         }
