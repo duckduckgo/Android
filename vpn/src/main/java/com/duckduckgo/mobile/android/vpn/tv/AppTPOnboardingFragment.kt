@@ -24,6 +24,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.leanback.app.OnboardingSupportFragment
 import androidx.preference.PreferenceManager
 import com.duckduckgo.mobile.android.vpn.R
@@ -42,6 +44,22 @@ class AppTPOnboardingFragment : OnboardingSupportFragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
         logoResourceId = R.drawable.logo_full
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
+            when (resultCode) {
+                AppCompatActivity.RESULT_OK -> {
+                    startVpn()
+                    return
+                }
+                else -> {
+                    Toast.makeText(activity, "Permission not granted", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
 
     override fun onFinishFragment() {
         super.onFinishFragment()
@@ -99,10 +117,7 @@ class AppTPOnboardingFragment : OnboardingSupportFragment() {
     }
 
     override fun onCreateBackgroundView(inflater: LayoutInflater?, container: ViewGroup?): View? {
-        val bgView = View(requireActivity())
-        bgView.setBackgroundColor(
-            resources.getColor(com.duckduckgo.mobile.android.R.color.marketing_red))
-        return bgView
+        return null
     }
 
     override fun onCreateContentView(inflater: LayoutInflater?, container: ViewGroup?): View? {
