@@ -34,10 +34,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -53,6 +50,10 @@ interface DataClearer {
 @ContributesBinding(
     scope = AppObjectGraph::class,
     boundType = DataClearer::class
+)
+@ContributesMultibinding(
+    scope = AppObjectGraph::class,
+    boundType = BrowserLifecycleObserver::class
 )
 @Singleton
 class AutomaticDataClearer @Inject constructor(
@@ -230,13 +231,4 @@ class AutomaticDataClearer @Inject constructor(
         return enoughTimePassed
     }
 
-}
-
-@Module
-@ContributesTo(AppObjectGraph::class)
-abstract class DataClearerModule {
-    @Binds
-    @IntoSet
-    @Singleton
-    abstract fun AutomaticDataClearer.bind(): BrowserLifecycleObserver
 }
