@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -43,7 +44,7 @@ interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
 }
 
 private class ActivityLifecycleCallbacksPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards ActivityLifecycleCallbacks>
+    private val plugins: DaggerSet<ActivityLifecycleCallbacks>
 ) : PluginPoint<ActivityLifecycleCallbacks> {
     override fun getPlugins(): Collection<ActivityLifecycleCallbacks> {
         return plugins.sortedBy { it.javaClass.simpleName }
@@ -56,6 +57,6 @@ class ActivityLifecycleCallbacksModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideActivityLifecycleCallbacksPluginPoint(
-        plugins: Set<@JvmSuppressWildcards ActivityLifecycleCallbacks>
+        plugins: DaggerSet<ActivityLifecycleCallbacks>
     ): PluginPoint<ActivityLifecycleCallbacks> = ActivityLifecycleCallbacksPluginPoint(plugins)
 }

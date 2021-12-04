@@ -27,6 +27,7 @@ import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -95,7 +96,7 @@ class StubStatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }

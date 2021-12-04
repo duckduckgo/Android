@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.VpnScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -25,7 +26,7 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 
 private class VpnTrackerDetectorInterceptorPluginPoint(
-    private val requestInterceptors: Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
+    private val requestInterceptors: DaggerSet<VpnTrackerDetectorInterceptor>
 ) : PluginPoint<VpnTrackerDetectorInterceptor> {
     override fun getPlugins(): Collection<VpnTrackerDetectorInterceptor> {
         return requestInterceptors
@@ -36,7 +37,7 @@ private class VpnTrackerDetectorInterceptorPluginPoint(
 @ContributesTo(VpnScope::class)
 abstract class VpnTrackerDetectorInterceptorModule {
     @Multibinds
-    abstract fun bindVpnTrackerDetectorInterceptorPlugins(): Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
+    abstract fun bindVpnTrackerDetectorInterceptorPlugins(): DaggerSet<VpnTrackerDetectorInterceptor>
 
     @Module
     @ContributesTo(VpnScope::class)
@@ -44,7 +45,7 @@ abstract class VpnTrackerDetectorInterceptorModule {
         @Provides
         @SingleInstanceIn(VpnScope::class)
         fun provideVpnTrackerDetectorInterceptorPluginPoint(
-            plugins: Set<@JvmSuppressWildcards VpnTrackerDetectorInterceptor>
+            plugins: DaggerSet<VpnTrackerDetectorInterceptor>
         ): PluginPoint<VpnTrackerDetectorInterceptor> {
             return VpnTrackerDetectorInterceptorPluginPoint(plugins)
         }

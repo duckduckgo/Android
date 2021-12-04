@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -54,7 +55,7 @@ class RealVpnStateCollector @Inject constructor(
 }
 
 private class VpnStateCollectorPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+    private val plugins: DaggerSet<VpnStateCollectorPlugin>
 ) : PluginPoint<VpnStateCollectorPlugin> {
     override fun getPlugins(): Collection<VpnStateCollectorPlugin> {
         return plugins.sortedBy { it.collectorName }
@@ -67,7 +68,7 @@ abstract class VpnStateCollectorProviderModule {
 
     @Multibinds
     @SingleInstanceIn(VpnScope::class)
-    abstract fun bindVpnStateCollectorEmptyPlugins(): Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+    abstract fun bindVpnStateCollectorEmptyPlugins(): DaggerSet<VpnStateCollectorPlugin>
 
     @Module
     @ContributesTo(VpnScope::class)
@@ -75,7 +76,7 @@ abstract class VpnStateCollectorProviderModule {
         @Provides
         @SingleInstanceIn(VpnScope::class)
         fun bindVpnMemoryCollectorPluginPoint(
-            plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+            plugins: DaggerSet<VpnStateCollectorPlugin>
         ): PluginPoint<VpnStateCollectorPlugin> {
             return VpnStateCollectorPluginPoint(plugins)
         }

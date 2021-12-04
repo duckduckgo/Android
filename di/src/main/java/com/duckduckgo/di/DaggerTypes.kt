@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.plugins
+package com.duckduckgo.di
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-
-interface PrivacyFeaturePlugin {
-    fun store(name: String, jsonString: String): Boolean
-    val featureName: PrivacyFeatureName
-}
-
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures
-    }
-}
+/** Sugar over multibindings that helps with Kotlin wildcards. */
+typealias DaggerSet<T> = Set<@JvmSuppressWildcards T>
+typealias DaggerMap<K, V> = Map<@JvmSuppressWildcards K, @JvmSuppressWildcards V>

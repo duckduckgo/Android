@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -30,7 +31,7 @@ interface ApiInterceptorPlugin {
 }
 
 private class ApiInterceptorPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards ApiInterceptorPlugin>
+    private val plugins: DaggerSet<ApiInterceptorPlugin>
 ) : PluginPoint<ApiInterceptorPlugin> {
     override fun getPlugins(): Collection<ApiInterceptorPlugin> {
         return plugins
@@ -41,7 +42,7 @@ private class ApiInterceptorPluginPoint(
 @ContributesTo(AppScope::class)
 abstract class ApiInterceptorPluginModule {
     @Multibinds
-    abstract fun bindEmptyApiInterceptorPlugins(): Set<@JvmSuppressWildcards ApiInterceptorPlugin>
+    abstract fun bindEmptyApiInterceptorPlugins(): DaggerSet<ApiInterceptorPlugin>
 
     @Module
     @ContributesTo(AppScope::class)
@@ -49,7 +50,7 @@ abstract class ApiInterceptorPluginModule {
         @Provides
         @SingleInstanceIn(AppScope::class)
         fun provideApiInterceptorPlugins(
-            plugins: Set<@JvmSuppressWildcards ApiInterceptorPlugin>
+            plugins: DaggerSet<ApiInterceptorPlugin>
         ): PluginPoint<ApiInterceptorPlugin> {
             return ApiInterceptorPluginPoint(plugins)
         }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -34,7 +35,7 @@ interface RefreshRetentionAtbPlugin {
 }
 
 class RefreshRetentionAtbPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>
+    private val plugins: DaggerSet<RefreshRetentionAtbPlugin>
 ) : PluginPoint<RefreshRetentionAtbPlugin> {
     override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
         return plugins.sortedBy { it.javaClass.simpleName }
@@ -45,5 +46,5 @@ class RefreshRetentionAtbPluginPoint(
 @ContributesTo(AppScope::class)
 abstract class RefreshRetentionAtbPluginModule {
     @Multibinds
-    abstract fun bindRefreshRetentionAtbPlugins(): Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>
+    abstract fun bindRefreshRetentionAtbPlugins(): DaggerSet<RefreshRetentionAtbPlugin>
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.feature.toggles.impl.di
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.impl.FeatureCustomConfigPluginPoint
@@ -31,7 +32,7 @@ import dagger.SingleInstanceIn
 abstract class FeatureTogglesBindingModule {
 
     @Multibinds
-    abstract fun provideFeatureTogglesPlugins(): Set<@JvmSuppressWildcards FeatureTogglesPlugin>
+    abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
 
 }
 
@@ -41,7 +42,7 @@ class FeatureTogglesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideFeatureTogglesPluginPoint(toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
+    fun provideFeatureTogglesPluginPoint(toggles: DaggerSet<FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
         return FeatureCustomConfigPluginPoint(toggles)
     }
 }

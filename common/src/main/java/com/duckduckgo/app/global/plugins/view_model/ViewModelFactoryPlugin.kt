@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.plugins.view_model
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 import dagger.SingleInstanceIn
@@ -28,7 +29,7 @@ interface ViewModelFactoryPlugin {
 
 @SingleInstanceIn(AppScope::class)
 class ViewModelFactoryPluginPoint @Inject constructor(
-    private val injectorPlugins: Set<@JvmSuppressWildcards ViewModelFactoryPlugin>
+    private val injectorPlugins: DaggerSet<ViewModelFactoryPlugin>
 ) : PluginPoint<ViewModelFactoryPlugin> {
     override fun getPlugins(): List<ViewModelFactoryPlugin> {
         return injectorPlugins.toList()

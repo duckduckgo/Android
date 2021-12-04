@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.VpnScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -36,7 +37,7 @@ interface VpnMemoryCollectorPlugin {
 }
 
 private class VpnMemoryCollectorPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
+    private val plugins: DaggerSet<VpnMemoryCollectorPlugin>
 ) : PluginPoint<VpnMemoryCollectorPlugin> {
     override fun getPlugins(): Collection<VpnMemoryCollectorPlugin> {
         return plugins
@@ -49,7 +50,7 @@ abstract class VpnMemoryCollectorProviderModule {
 
     @Multibinds
     @SingleInstanceIn(VpnScope::class)
-    abstract fun bindVpnMemoryCollectorPlugins(): Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
+    abstract fun bindVpnMemoryCollectorPlugins(): DaggerSet<VpnMemoryCollectorPlugin>
 
     @Module
     @ContributesTo(VpnScope::class)
@@ -57,7 +58,7 @@ abstract class VpnMemoryCollectorProviderModule {
         @Provides
         @SingleInstanceIn(VpnScope::class)
         fun bindVpnMemoryCollectorPluginPoint(
-            plugins: Set<@JvmSuppressWildcards VpnMemoryCollectorPlugin>
+            plugins: DaggerSet<VpnMemoryCollectorPlugin>
         ): PluginPoint<VpnMemoryCollectorPlugin> {
             return VpnMemoryCollectorPluginPoint(plugins)
         }

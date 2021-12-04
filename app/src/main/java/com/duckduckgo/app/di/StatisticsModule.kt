@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -54,7 +55,7 @@ class StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
         variantManager: VariantManager,
-        plugins: Set<@JvmSuppressWildcards RefreshRetentionAtbPlugin>,
+        plugins: DaggerSet<RefreshRetentionAtbPlugin>,
     ): StatisticsUpdater {
         return StatisticsRequester(
             statisticsDataStore, statisticsService, variantManager, RefreshRetentionAtbPluginPoint(plugins)
@@ -107,7 +108,7 @@ class StatisticsModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }

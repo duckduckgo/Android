@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
@@ -66,7 +67,7 @@ import dagger.SingleInstanceIn
 abstract class PrivacyFeaturesBindingModule {
 
     @Multibinds
-    abstract fun providePrivacyFeatureStorePlugins(): Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
+    abstract fun providePrivacyFeatureStorePlugins(): DaggerSet<PrivacyFeaturePlugin>
 
 }
 
@@ -89,7 +90,7 @@ class NetworkModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providePrivacyFeaturePluginPoint(customConfigs: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
+    fun providePrivacyFeaturePluginPoint(customConfigs: DaggerSet<PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
         return PrivacyFeaturePluginPoint(customConfigs)
     }
 }
