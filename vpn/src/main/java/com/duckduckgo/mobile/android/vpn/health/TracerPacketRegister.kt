@@ -18,14 +18,12 @@ package com.duckduckgo.mobile.android.vpn.health
 
 import androidx.collection.LruCache
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Completed
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Invalid
 import dagger.SingleInstanceIn
 import timber.log.Timber
 import java.text.NumberFormat
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @SingleInstanceIn(AppScope::class)
 class TracerPacketRegister @Inject constructor() {

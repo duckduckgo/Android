@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
-
-import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.statistics.VariantManager
-import dagger.Module
-import dagger.Provides
-
-@Module
-class BrowserAutoCompleteModule {
-
-    @Provides
-    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
-
+plugins {
+    id 'java-library'
+    id 'kotlin'
 }
+
+apply from: "$rootProject.projectDir/spotless.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
+}
+

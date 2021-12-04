@@ -21,7 +21,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
@@ -34,6 +33,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -43,10 +43,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import org.mockito.kotlin.*
-import kotlinx.android.synthetic.main.content_settings_general.view.*
-import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -98,10 +95,11 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboardingStore
 
+    @Mock
+    private lateinit var mockAppBuildConfig: AppBuildConfig
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
-
-    private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
     fun before() {
@@ -119,6 +117,7 @@ class SettingsViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
+            mockAppBuildConfig
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -128,6 +127,8 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockAppBuildConfig.versionName).thenReturn("name")
+        whenever(mockAppBuildConfig.versionCode).thenReturn(1)
     }
 
     @Test
@@ -203,7 +204,7 @@ class SettingsViewModelTest {
         testee.start()
         testee.viewState().test {
             val value = expectMostRecentItem()
-            val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name (1)"
             assertTrue(value.version.startsWith(expectedStartString))
 
             cancelAndConsumeRemainingEvents()
@@ -433,7 +434,7 @@ class SettingsViewModelTest {
     fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() = runTest {
         testee.start()
         testee.viewState().test {
-            val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name (1)"
             assertEquals(expectedStartString, awaitItem().version)
 
             cancelAndConsumeRemainingEvents()
@@ -446,7 +447,7 @@ class SettingsViewModelTest {
         testee.start()
 
         testee.viewState().test {
-            val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name ab (1)"
             assertEquals(expectedStartString, awaitItem().version)
 
             cancelAndConsumeRemainingEvents()

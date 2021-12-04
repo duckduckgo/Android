@@ -125,6 +125,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
     implementation project(path: ':common')

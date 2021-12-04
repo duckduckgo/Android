@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app
+package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class AppVersionCollector @Inject constructor() : VpnStateCollectorPlugin {
+@ContributesMultibinding(VpnScope::class)
+class AppVersionCollector @Inject constructor(
+    private val appBuildConfig: AppBuildConfig
+) : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "appInfo"
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put("appVersion", BuildConfig.VERSION_NAME)
+            put("appVersion", appBuildConfig.versionName)
         }
     }
 }

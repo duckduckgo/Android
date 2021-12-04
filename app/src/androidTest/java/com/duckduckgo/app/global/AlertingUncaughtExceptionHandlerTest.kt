@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -38,18 +39,22 @@ class AlertingUncaughtExceptionHandlerTest {
     private val mockDefaultExceptionHandler: Thread.UncaughtExceptionHandler = mock()
     private val mockPixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
+        whenever(mockAppBuildConfig.isDebug).thenReturn(true)
+
         testee = AlertingUncaughtExceptionHandler(
             mockDefaultExceptionHandler,
             mockPixelCountDataStore,
             mockUncaughtExceptionRepository,
             coroutineTestRule.testDispatcherProvider,
-            TestScope()
+            TestScope(),
+            mockAppBuildConfig
         )
     }
 

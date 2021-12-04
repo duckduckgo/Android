@@ -26,6 +26,7 @@ import com.duckduckgo.app.feedback.ui.common.FragmentState.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -60,6 +61,7 @@ class FeedbackViewModelTest {
 
     private val playStoreUtils: PlayStoreUtils = mock()
     private val feedbackSubmitter: FeedbackSubmitter = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -71,7 +73,9 @@ class FeedbackViewModelTest {
     @Before
     @UiThreadTest
     fun setup() {
-        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, TestScope(), coroutineRule.testDispatcherProvider)
+        whenever(appBuildConfig.isDebug).thenReturn(true)
+
+        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, TestScope(), appBuildConfig, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
