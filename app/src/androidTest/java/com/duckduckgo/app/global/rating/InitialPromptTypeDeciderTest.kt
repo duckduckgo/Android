@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.rating
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.nhaarman.mockitokotlin2.mock
@@ -36,21 +37,24 @@ class InitialPromptTypeDeciderTest {
     private val mockSearchCountDao: SearchCountDao = mock()
     private val mockInitialPromptDecider: ShowPromptDecider = mock()
     private val mockSecondaryPromptDecider: ShowPromptDecider = mock()
+    private val mockOnboardingStore: OnboardingStore = mock()
 
     @Before
     fun setup() = runBlocking<Unit> {
 
         testee = InitialPromptTypeDecider(
-            mockPlayStoreUtils,
-            mockSearchCountDao,
-            mockInitialPromptDecider,
-            mockSecondaryPromptDecider,
-            InstrumentationRegistry.getInstrumentation().targetContext
+            playStoreUtils = mockPlayStoreUtils,
+            searchCountDao = mockSearchCountDao,
+            initialPromptDecider = mockInitialPromptDecider,
+            secondaryPromptDecider = mockSecondaryPromptDecider,
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            onboardingStore = mockOnboardingStore
         )
 
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
         whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
+        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(false)
     }
 
     @Test
@@ -80,6 +84,12 @@ class InitialPromptTypeDeciderTest {
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
         val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
         assertSecondPrompt(type.promptCount)
+    }
+
+    @Test
+    fun whenUsersMarkedAsReturningUserThenNoPromptShown() = runBlocking {
+        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+        assertPromptNotShown(testee.determineInitialPromptType())
     }
 
     private fun assertPromptNotShown(prompt: AppEnjoymentPromptOptions) {

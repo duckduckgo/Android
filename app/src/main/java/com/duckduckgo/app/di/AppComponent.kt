@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
-import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.EmptyFavoritesWidgetService
@@ -39,7 +38,6 @@ import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
@@ -51,7 +49,6 @@ import javax.inject.Singleton
     modules = [
         ApplicationModule::class,
         WorkerModule::class,
-        AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,
         StoreModule::class,
@@ -62,7 +59,6 @@ import javax.inject.Singleton
         BrowserModule::class,
         BrowserAutoCompleteModule::class,
         ResourceSurrogateModule::class,
-        TrackerDetectionModule::class,
         NotificationModule::class,
         OnboardingModule::class,
         VariantModule::class,
@@ -76,7 +72,8 @@ import javax.inject.Singleton
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
-        EmailModule::class
+        FormatterModule::class,
+        EmailModule::class,
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

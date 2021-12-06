@@ -31,6 +31,9 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.events.db.AppUserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -58,7 +61,8 @@ class BrowserViewModel(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val userEventsStore: UserEventsStore
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -229,6 +233,12 @@ class BrowserViewModel(
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
+
+    fun promotedFireButtonCancelled() {
+        launch(dispatchers.io()) {
+            userEventsStore.registerUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED)
+        }
+    }
 }
 
 @ContributesMultibinding(AppObjectGraph::class)
@@ -239,12 +249,13 @@ class BrowserViewModelFactory @Inject constructor(
     val appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
     val appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
     val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    val pixel: Provider<Pixel>
+    val pixel: Provider<Pixel>,
+    val userEventsStore: Provider<AppUserEventsStore>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get()) as T
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), userEventsStore.get()) as T
                 else -> null
             }
         }

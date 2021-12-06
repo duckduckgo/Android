@@ -285,7 +285,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
         quickAccessAdapter.submitList(it.favorites)
-        quickAccessItemsBinding.quickAccessRecyclerView.visibility = View.VISIBLE
     }
 
     private fun processCommand(command: SystemSearchViewModel.Command) {

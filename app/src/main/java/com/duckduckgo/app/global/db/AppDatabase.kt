@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 39,
+    exportSchema = true, version = 41,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -93,6 +93,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UserEventEntity::class,
         LocationPermissionEntity::class,
         PixelEntity::class,
+        WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class
     ]
 )
@@ -139,6 +140,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userEventsDao(): UserEventsDao
     abstract fun pixelDao(): PendingPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
+    abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 }
 
 @Suppress("PropertyName")
@@ -452,12 +454,23 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
-    /**
-     * WARNING ⚠️
-     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
-     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
-     * constraint.
-     */
+    val MIGRATION_39_TO_40: Migration = object : Migration(39, 40) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM survey")
+        }
+    }
+
+    // todo: This is VPN project migration, KEEP IT ALWAYS LAST
+    val MIGRATION_40_TO_41: Migration = object : Migration(40, 41) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)")
+            // place here new migrations from the main app
+            // this avoids crashes and forcing to uninstall the appTP app every time a new migration
+            // is added to the main app
+            MIGRATION_39_TO_40.migrate(database)
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, parentId INTEGER NOT NULL DEFAULT 0, UNIQUE (url, parentId) ON CONFLICT REPLACE)")
@@ -467,6 +480,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
         override fun onOpen(db: SupportSQLiteDatabase) {
             db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
@@ -512,7 +531,9 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_35_TO_36,
             MIGRATION_36_TO_37,
             MIGRATION_37_TO_38,
-            MIGRATION_38_TO_39
+            MIGRATION_38_TO_39,
+            MIGRATION_39_TO_40,
+            MIGRATION_40_TO_41,
         )
 
     @Deprecated(

@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -140,6 +141,7 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -156,6 +158,9 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import kotlinx.android.synthetic.main.include_cta.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -247,6 +252,9 @@ class BrowserTabFragment :
     lateinit var themingDataStore: ThemingDataStore
 
     @Inject
+    lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
@@ -276,6 +284,8 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
+
+    private var hideDaxBackgroundLogo = false
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -376,6 +386,8 @@ class BrowserTabFragment :
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
+        } else {
+            viewModel.onViewRecreated()
         }
 
         lifecycle.addObserver(object : LifecycleObserver {
@@ -506,6 +518,13 @@ class BrowserTabFragment :
             }
         )
 
+        viewModel.accessibilityViewState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let { renderer.applyAccessibilitySettings(it) }
+            }
+        )
+
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.command.observe(
@@ -584,6 +603,7 @@ class BrowserTabFragment :
 
     fun refresh() {
         webView?.reload()
+        viewModel.onWebViewRefreshed()
     }
 
     private fun processCommand(it: Command?) {
@@ -862,8 +882,18 @@ class BrowserTabFragment :
                 message,
                 Snackbar.LENGTH_LONG
             ).setAction(action) {
+                pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                 openAppLink(appLink)
-            }
+            }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
 
             appLinksSnackBar?.setDuration(6000)?.show()
         }
@@ -1207,6 +1237,9 @@ class BrowserTabFragment :
                 disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
+                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
+                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
+                }
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -1368,12 +1401,28 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        rootView.makeSnackbarWithNoBottomInset(
+        val snackbar = rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+        )
+
+        snackbar.setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-        }.show()
+        }
+
+        if (variantManager.isFireproofExperimentEnabled()) {
+            snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onShown(transientBottomBar: Snackbar?) {
+                    super.onShown(transientBottomBar)
+                    pixel.fire(AppPixelName.FIREPROOF_SNACKBAR_SHOWN)
+                }
+
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                }
+            })
+        }
+        snackbar.show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -1843,6 +1892,7 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
             }
@@ -2077,6 +2127,24 @@ class BrowserTabFragment :
             }
         }
 
+        fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
+            Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
+            val webView = webView ?: return
+
+            val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
+            if (fontSizeChanged) {
+                Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+
+                webView.settings.textZoom = viewState.fontSize.toInt()
+            }
+
+            if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
+            if (viewState.refreshWebView) {
+                Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
+                refresh()
+            }
+        }
+
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
             popupMenu.contentView.apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
@@ -2198,6 +2266,11 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+
+            if (configuration is DaxBubbleCta.DaxFireproofCta) {
+                configureFireproofButtons()
+            }
+
             viewModel.onCtaShown()
         }
 
@@ -2213,7 +2286,10 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeCta(configuration: HomePanelCta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showHomeCta(
+            configuration: HomePanelCta,
+            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+        ) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
@@ -2226,18 +2302,20 @@ class BrowserTabFragment :
 
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
-                homeBackgroundLogo.showLogo()
+                if (hideDaxBackgroundLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
                 quickAccessRecyclerView.show()
             }
+
+            newTabQuickAcessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            quickAccessRecyclerView.gone()
+            newTabQuickAcessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {
@@ -2249,6 +2327,22 @@ class BrowserTabFragment :
             ctaContainer.gone()
         }
 
+        private fun configureFireproofButtons() {
+            daxCtaContainer.fireproofButtons.show()
+
+            daxCtaContainer.fireproofButtons.fireproofKeepMeSignedIn.setOnClickListener {
+                daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
+                viewModel.userSelectedFireproofSetting(true)
+            }
+
+            daxCtaContainer.fireproofButtons.fireproofBurnEverything.setOnClickListener {
+                daxCtaContainer.fireproofButtons.gone()
+                daxCtaContainer.dialogTextCta.cancelAnimation()
+                viewModel.userSelectedFireproofSetting(false)
+            }
+        }
+
         fun renderHomeCta() {
             val context = context ?: return
             val cta = lastSeenCtaViewState?.cta ?: return
@@ -2256,14 +2350,21 @@ class BrowserTabFragment :
 
             ctaContainer.removeAllViews()
 
-            inflate(context, R.layout.include_cta, ctaContainer)
+            if (configuration is HomePanelCta.AddReturningUsersWidgetAuto) {
+                hideDaxBackgroundLogo = true
+                inflate(context, R.layout.include_experiment_returning_users_cta, ctaContainer)
+            } else {
+                inflate(context, R.layout.include_cta, ctaContainer)
+            }
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
+                hideDaxBackgroundLogo = false
                 viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
+                hideDaxBackgroundLogo = false
                 viewModel.onUserDismissedCta()
             }
         }
@@ -2354,7 +2455,7 @@ class BrowserTabFragment :
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
-        Timber.i("Continuing to download $pendingFileDownload")
+        Timber.i("Continuing to download %s", pendingFileDownload)
         viewModel.download(pendingFileDownload)
     }
 

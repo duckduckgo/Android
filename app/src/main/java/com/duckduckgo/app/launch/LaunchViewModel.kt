@@ -44,6 +44,7 @@ class LaunchViewModel(
     }
 
     suspend fun determineViewToShow() {
+
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {

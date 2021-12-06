@@ -50,9 +50,10 @@ class FilenameExtractor @Inject constructor(
 
     private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
         val latestGuess = guesses.latestGuess
+        val bestGuess = guesses.bestGuess
 
         // if it contains a '.' then it's a good chance of a filetype and we can update our best guess
-        if (latestGuess.contains(".")) {
+        if (latestGuess.contains(".") && bestGuess.isNullOrEmpty()) {
             guesses.bestGuess = latestGuess
         }
 

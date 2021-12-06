@@ -44,6 +44,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -160,13 +161,24 @@ class CtaViewModelTest {
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager,
+            userEventsStore = mockUserEventsStore
         )
+
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @After
     fun after() {
         db.close()
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", -1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        assertTrue(value is HomePanelCta.Survey)
     }
 
     @Test
@@ -177,9 +189,23 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUkThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.UK)
+        assertTrue(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsCanadaThenCtaIsSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
+        assertTrue(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsCanadaOrUkThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.FRANCE)
         assertFalse(value is HomePanelCta.Survey)
     }
 
@@ -472,7 +498,34 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenFireproofCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxFireproofCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndFireproofCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIREPROOF)).thenReturn(true)
+        givenAtLeastOneDaxDialogCtaShown()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxEndCta)
+    }
+
+    @Test
     fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
+
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
@@ -640,6 +693,32 @@ class CtaViewModelTest {
         val fireDialogCta = testee.getFireDialogCta()
 
         assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndReturningUsersNoOnboardingEnabledTrueAndWidgetCompatibleThenReturnNull() = coroutineRule.runBlocking {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zv" })
+        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+        whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndReturningUsersNoOnboardingEnabledTrueAndAboveThresholdAndWidgetCompatibleThenReturnWidget() = coroutineRule.runBlocking {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zv" })
+        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+        whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomePanelCta)
     }
 
     private suspend fun givenDaxOnboardingActive() {

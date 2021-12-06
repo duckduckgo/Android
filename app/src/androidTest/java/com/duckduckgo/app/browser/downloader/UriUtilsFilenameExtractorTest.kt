@@ -70,6 +70,46 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    fun whenUrlContainsFilenameButContainsPathSegmentsWhichLookLikeAFilenameThenFilenameShouldBeExtracted() {
+        val url = "https://foo.example.com/path/dotted.path/b/b1/realFilename.jpg"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 22)
+    fun whenUrlContainsAmbiguousFilenameButContainsPathSegmentsWhichLookLikeAFilenameAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
+        val url = "https://foo.example.com/path/dotted.path/b/b1/realFilename"
+        val mimeType = "image/jpeg"
+        val contentDisposition: String? = null
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
+    }
+
+    @Test
+    fun whenUrlContainsFilenameAndContainsMultiplePathSegmentsAndMimeTypeProvidedThenFilenameShouldBeExtracted() {
+        val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg"
+        val mimeType = "image/jpeg"
+        val contentDisposition: String? = null
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+        assertEquals("realFilename.jpg", extractionResult.filename)
+    }
+
+    @Test
     fun whenUrlContainsFilenameButContainsAdditionalPathSegmentsAndQueryParamsWhichLookLikeAFilenameThenFilenameShouldBeExtracted() {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff?cb=123.com"
         val mimeType: String? = null

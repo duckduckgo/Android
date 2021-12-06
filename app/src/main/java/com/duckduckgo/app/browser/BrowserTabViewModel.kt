@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -98,7 +99,9 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -117,8 +120,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -157,8 +159,10 @@ class BrowserTabViewModel(
     private val gpc: Gpc,
     private val fireproofDialogsEventHandler: FireproofDialogsEventHandler,
     private val emailManager: EmailManager,
+    private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val appLinksHandler: AppLinksHandler
+    private val appLinksHandler: AppLinksHandler,
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -239,6 +243,12 @@ class BrowserTabViewModel(
         val isLoading: Boolean = false,
         val privacyOn: Boolean = true,
         val progress: Int = 0
+    )
+
+    data class AccessibilityViewState(
+        val fontSize: Float,
+        val forceZoom: Boolean,
+        val refreshWebView: Boolean
     )
 
     data class FindInPageViewState(
@@ -342,6 +352,7 @@ class BrowserTabViewModel(
     val loadingViewState: MutableLiveData<LoadingViewState> = MutableLiveData()
     val omnibarViewState: MutableLiveData<OmnibarViewState> = MutableLiveData()
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
+    val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
@@ -350,6 +361,7 @@ class BrowserTabViewModel(
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    private var refreshOnViewVisible = MutableStateFlow(true)
 
     val url: String?
         get() = site?.url
@@ -389,6 +401,7 @@ class BrowserTabViewModel(
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
+    private var accessibilityObserver: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -439,7 +452,13 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    if (variantManager.isFireproofExperimentEnabled()) {
+                        if (appSettingsPreferencesStore.appLoginDetection) {
+                            onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                        }
+                    } else {
+                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    }
                 }
             }
         }
@@ -462,6 +481,8 @@ class BrowserTabViewModel(
         emailManager.signedInFlow().onEach { isSignedIn ->
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
         }.launchIn(viewModelScope)
+
+        observeAccessibilitySettings()
 
         favoritesRepository.favorites().onEach { favoriteSites ->
             val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
@@ -492,6 +513,22 @@ class BrowserTabViewModel(
         url?.let {
             onUserSubmittedQuery(it)
         }
+    }
+
+    fun onViewRecreated() {
+        observeAccessibilitySettings()
+    }
+
+    fun observeAccessibilitySettings() {
+        accessibilityObserver?.cancel()
+        accessibilityObserver = accessibilitySettingsDataStore.settingsFlow()
+            .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
+            .onEach { (settings, viewVisible) ->
+                Timber.v("Accessibility: newSettings $settings, $viewVisible")
+                val shouldRefreshWebview = (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
+                accessibilityViewState.value =
+                    currentAccessibilityViewState().copy(fontSize = settings.fontSize, forceZoom = settings.forceZoom, refreshWebView = shouldRefreshWebview)
+            }.launchIn(viewModelScope)
     }
 
     fun onMessageProcessed() {
@@ -571,10 +608,16 @@ class BrowserTabViewModel(
         } else {
             command.value = HideKeyboard
         }
+        viewModelScope.launch {
+            refreshOnViewVisible.emit(true)
+        }
     }
 
     fun onViewHidden() {
         skipHome = false
+        viewModelScope.launch {
+            refreshOnViewVisible.emit(false)
+        }
     }
 
     suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
@@ -1375,6 +1418,7 @@ class BrowserTabViewModel(
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
     private fun currentBrowserViewState(): BrowserViewState = browserViewState.value!!
     private fun currentFindInPageViewState(): FindInPageViewState = findInPageViewState.value!!
+    private fun currentAccessibilityViewState(): AccessibilityViewState = accessibilityViewState.value!!
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
@@ -1767,6 +1811,11 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
         privacyGradeViewState.value = PrivacyGradeViewState()
+        accessibilityViewState.value = AccessibilityViewState(
+            fontSize = accessibilitySettingsDataStore.fontSize,
+            forceZoom = accessibilitySettingsDataStore.forceZoom,
+            refreshWebView = false
+        )
     }
 
     fun onShareSelected() {
@@ -1892,7 +1941,7 @@ class BrowserTabViewModel(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxFireproofCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -1907,7 +1956,7 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
-            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddReturningUsersWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
             else -> return
         }
@@ -1941,6 +1990,17 @@ class BrowserTabViewModel(
                 is HomePanelCta -> refreshCta()
                 else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
+        }
+    }
+
+    fun userSelectedFireproofSetting(isAutoFireproofingEnabled: Boolean) {
+        appSettingsPreferencesStore.appLoginDetection = isAutoFireproofingEnabled
+
+        val cta = currentCtaViewState().cta ?: return
+
+        viewModelScope.launch {
+            ctaViewModel.onUserClickFireproofExperimentButton(isAutoFireproofingEnabled, cta)
+            refreshCta()
         }
     }
 
@@ -2205,6 +2265,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onWebViewRefreshed() {
+        accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
@@ -2248,13 +2312,15 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val gpc: Provider<Gpc>,
     private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
     private val emailManager: Provider<EmailManager>,
+    private val accessibilitySettingsDataStore: Provider<AccessibilitySettingsDataStore>,
     private val appCoroutineScope: Provider<CoroutineScope>,
-    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>
+    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
+    private val variantManager: Provider<VariantManager>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), appCoroutineScope.get(), appLinksHandler.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), accessibilitySettingsDataStore.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
                 else -> null
             }
         }

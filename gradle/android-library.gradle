@@ -44,3 +44,11 @@ android {
         viewBinding = true
     }
 }
+
+tasks.register('android_checks') {
+    dependsOn 'connectedDebugAndroidTest'
+}
+
+tasks.register('jvm_checks') {
+    dependsOn 'spotlessCheck', 'testDebugUnitTest'
+}

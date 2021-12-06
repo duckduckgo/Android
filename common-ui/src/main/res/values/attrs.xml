@@ -19,6 +19,7 @@
     <attr name="daxLogoTextColor" format="color" />
     <attr name="normalTextColor" format="color" />
     <attr name="secondaryTextColor" format="color" />
+    <attr name="headerDescriptionColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
@@ -73,9 +74,14 @@
     <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
     <attr name="quickAccessItemTitleTextColor" format="color" />
     <attr name="listItemImageBackground" format="color" />
+    <attr name="lightContainerBackground" format="color" />
 
     <attr name="textAppearanceButton1" format="reference" />
     <attr name="textAppearanceButton2" format="reference" />
     <attr name="savedSiteEditTextUnderlineColor" format="color" />
+    <attr name="listItemBackgroundColor" format="color" />
+    <attr name="listItemSeparatorColor" format="color" />
+    <attr name="textInputOutlinedBoxColor" format="color" />
+    <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
 </resources>
