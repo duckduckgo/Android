@@ -62,4 +62,18 @@ class RealTrackingLinkDetector @Inject constructor(
 
         return destinationUrl
     }
+
+    override fun urlContainsTrackingKeyword(url: String): Boolean {
+        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return false
+        if (isAnException(url)) return false
+
+        val ampKeywords = trackingLinkDetectionRepository.ampKeywords
+
+        ampKeywords.forEach { keyword ->
+            if (url.contains(keyword)) {
+                return true
+            }
+        }
+        return false
+    }
 }

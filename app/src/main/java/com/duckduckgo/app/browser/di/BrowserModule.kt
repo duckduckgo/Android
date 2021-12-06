@@ -44,6 +44,9 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailInjector
@@ -126,6 +129,45 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             emailInjector
+        )
+    }
+
+    @Provides
+    fun urlExtractingWebViewClient(
+        webViewHttpAuthStore: WebViewHttpAuthStore,
+        trustedCertificateStore: TrustedCertificateStore,
+        requestRewriter: RequestRewriter,
+        specialUrlDetector: SpecialUrlDetector,
+        requestInterceptor: RequestInterceptor,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        cookieManager: CookieManager,
+        loginDetector: DOMLoginDetector,
+        dosDetector: DosDetector,
+        gpc: Gpc,
+        thirdPartyCookieManager: ThirdPartyCookieManager,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        emailInjector: EmailInjector,
+        urlExtractor: DOMUrlExtractor
+    ): UrlExtractingWebViewClient {
+        return UrlExtractingWebViewClient(
+            webViewHttpAuthStore,
+            trustedCertificateStore,
+            requestRewriter,
+            specialUrlDetector,
+            requestInterceptor,
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository,
+            cookieManager,
+            loginDetector,
+            dosDetector,
+            gpc,
+            thirdPartyCookieManager,
+            appCoroutineScope,
+            dispatcherProvider,
+            emailInjector,
+            urlExtractor
         )
     }
 
@@ -275,6 +317,11 @@ class BrowserModule {
     @Provides
     fun domLoginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
         return JsLoginDetector(settingsDataStore)
+    }
+
+    @Provides
+    fun domUrlExtractor(): DOMUrlExtractor {
+        return JsUrlExtractor()
     }
 
     @Provides

@@ -3625,6 +3625,12 @@ class BrowserTabViewModelTest {
         assertCommandNotIssued<Command.OpenAppLink>()
     }
 
+    @Test
+    fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
+        testee.handleCloakedTrackingLink(initialUrl = "example.com")
+        assertCommandIssued<Command.ExtractUrlFromTrackingLink>()
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)

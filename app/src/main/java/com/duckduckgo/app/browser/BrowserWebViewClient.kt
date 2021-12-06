@@ -44,7 +44,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
-class BrowserWebViewClient(
+open class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
@@ -146,6 +146,15 @@ class BrowserWebViewClient(
                     if (isForMainFrame) {
                         webView.loadUrl(urlType.destinationUrl)
                         return true
+                    }
+                    false
+                }
+                is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            listener.handleCloakedTrackingLink(urlType.initialUrl)
+                            return true
+                        }
                     }
                     false
                 }

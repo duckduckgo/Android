@@ -398,6 +398,22 @@ class BrowserWebViewClientTest {
         verify(mockWebView, never()).loadUrl(EXAMPLE_URL)
     }
 
+    @Test
+    fun whenCloakedTrackingLinkDetectedAndIsForMainFrameThenHandleCloakedTrackingLink() = coroutinesTestRule.runBlocking {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleCloakedTrackingLink(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenCloakedTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = coroutinesTestRule.runBlocking {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener, never()).handleCloakedTrackingLink(any())
+    }
+
     private class TestWebView(context: Context) : WebView(context)
 
     companion object {

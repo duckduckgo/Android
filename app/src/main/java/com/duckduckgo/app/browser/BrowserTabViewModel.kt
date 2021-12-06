@@ -295,6 +295,7 @@ class BrowserTabViewModel(
         class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
+        class ExtractUrlFromTrackingLink(val initialUrl: String) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -2185,6 +2186,10 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             favoritesRepository.updateWithPosition(newList.map { it.favorite })
         }
+    }
+
+    override fun handleCloakedTrackingLink(initialUrl: String) {
+        command.value = ExtractUrlFromTrackingLink(initialUrl)
     }
 
     companion object {

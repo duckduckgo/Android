@@ -276,6 +276,14 @@ class SpecialUrlDetectorImplTest {
         assertEquals(expected, actual::class)
     }
 
+    @Test
+    fun whenUrlIsCloakedTrackingLinkThenCloakedTrackingLinkTypeDetected() {
+        whenever(mockTrackingLinkDetector.urlContainsTrackingKeyword(anyString())).thenReturn(true)
+        val expected = CloakedTrackingLink::class
+        val actual = testee.determineType("https://www.example.com/amp")
+        assertEquals(expected, actual::class)
+    }
+
     private fun randomString(length: Int): String {
         val charList: List<Char> = ('a'..'z') + ('0'..'9')
         return List(length) { charList.random() }.joinToString("")

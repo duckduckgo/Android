@@ -23,7 +23,7 @@ interface TrackingLinkDetector {
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url]
      * is in the tracking links exceptions list
-     * @return a `true` if the given [url] if the url is in the tracking links exceptions list and `false` otherwise.
+     * @return `true` if the given [url] is in the tracking links exceptions list and `false` otherwise.
      */
     fun isAnException(url: String): Boolean
 
@@ -32,6 +32,13 @@ interface TrackingLinkDetector {
      * @return the extracted destination [url] or `null` if the [url] is not a tracking link.
      */
     fun extractCanonicalFromTrackingLink(url: String): String?
+
+    /**
+     * This method takes a [url] and returns `true` or `false` depending if the [url]
+     * contains a tracking keyword.
+     * @return `true` if the given [url] contains a tracking keyword and `false` otherwise.
+     */
+    fun urlContainsTrackingKeyword(url: String): Boolean
 
     /**
      * The last tracking link and its destination URL.

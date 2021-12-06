@@ -156,8 +156,12 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.google.android.material.snackbar.BaseTransientBottomBar
+import javax.inject.Provider
 
 class BrowserTabFragment :
     Fragment(),
@@ -251,6 +255,17 @@ class BrowserTabFragment :
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+
+    @Inject
+    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+
+    @Inject
+    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+
+    private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
 
@@ -677,6 +692,9 @@ class BrowserTabFragment :
             is Command.HandleNonHttpAppLink -> {
                 openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
             }
+            is Command.ExtractUrlFromTrackingLink -> {
+                extractUrlFromTrackingLink(it.initialUrl)
+            }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
@@ -707,6 +725,32 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+        }
+    }
+
+    private fun extractUrlFromTrackingLink(initialUrl: String) {
+        context?.let {
+
+            Timber.d("Tracking link detection: Creating WebView for URL extraction")
+            urlExtractingWebView = UrlExtractingWebView(requireContext(), urlExtractingWebViewClient.get(), urlExtractorUserAgent.get(), urlExtractor.get())
+
+            urlExtractingWebView?.extractedUrlListener = { extractedUrl ->
+                val destinationUrl: String
+
+                if (extractedUrl != null) {
+                    destinationUrl = extractedUrl
+                    Timber.d("Tracking link detection: Success! Loading extracted URL: $destinationUrl")
+                } else {
+                    destinationUrl = initialUrl
+                    Timber.d("Tracking link detection: Failed! Loading initial URL: $destinationUrl")
+                }
+
+                requireActivity().runOnUiThread {
+                    webView?.loadUrl(destinationUrl)
+                }
+                urlExtractingWebView = null
+            }
+            urlExtractingWebView?.loadUrl(initialUrl)
         }
     }
 

@@ -42,6 +42,7 @@ interface SpecialUrlDetector {
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
         class TrackingLink(val destinationUrl: String) : UrlType()
+        class CloakedTrackingLink(val initialUrl: String) : UrlType()
     }
 }
 
@@ -100,6 +101,11 @@ class SpecialUrlDetectorImpl(
         trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { extractedUrl ->
             return UrlType.TrackingLink(destinationUrl = extractedUrl)
         }
+
+        if (trackingLinkDetector.urlContainsTrackingKeyword(uriString)) {
+            return UrlType.CloakedTrackingLink(initialUrl = uriString)
+        }
+
         return UrlType.Web(uriString)
     }
 
