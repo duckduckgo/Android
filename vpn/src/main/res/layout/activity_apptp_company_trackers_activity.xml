@@ -16,59 +16,62 @@
   ~ limitations under the License.
   -->
 
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:tools="http://schemas.android.com/tools"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context=".ui.tracker_activity.AppTPCompanyTrackersActivity">
 
     <include
         android:id="@+id/include_toolbar"
         layout="@layout/include_company_trackers_toolbar"/>
 
-    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-        android:id="@+id/tracking_attempts"
-        android:paddingStart="@dimen/keyline_4"
-        android:layout_height="wrap_content"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:paddingTop="@dimen/keyline_5"
-        android:paddingBottom="@dimen/keyline_2"
-        tools:text="9 tracking attempts blocked"
-        app:layout_constraintTop_toBottomOf="@+id/include_toolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/activity_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/keyline_empty"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listItem="@layout/view_device_shield_activity_entry"
-        app:layout_constraintTop_toBottomOf="@+id/tracking_attempts"
-        app:layout_constraintBottom_toTopOf="@+id/tracking_learn_more"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/keyline_5"
-        android:paddingTop="@dimen/keyline_4"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tracking_learn_more"
-        style="@style/TextAppearance.DuckDuckGo.Body2"
-        tools:text="@string/atp_CompanyDetailsTrackingLearnMore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingEnd="@dimen/keyline_4"
-        android:paddingTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:id="@+id/tracking_attempts"
+                android:paddingStart="@dimen/keyline_4"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingTop="@dimen/keyline_5"
+                android:paddingBottom="@dimen/keyline_2"
+                tools:text="9 tracking attempts blocked"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/activity_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listItem="@layout/item_apptp_company_details"
+                android:paddingBottom="@dimen/keyline_5"
+                android:paddingTop="@dimen/keyline_4"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tracking_learn_more"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                tools:text="@string/atp_CompanyDetailsTrackingLearnMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_4"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>
