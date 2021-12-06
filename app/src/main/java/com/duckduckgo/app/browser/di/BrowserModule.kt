@@ -76,6 +76,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -181,8 +182,8 @@ class BrowserModule {
 
     @Provides
     @Singleton
-    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
-        return UserAgentProvider(context, deviceInfo)
+    fun userAgentProvider(@Named("defaultUserAgent") defaultUserAgent: Provider<String>, deviceInfo: DeviceInfo): UserAgentProvider {
+        return UserAgentProvider(defaultUserAgent, deviceInfo)
     }
 
     @Provides

@@ -22,6 +22,13 @@ import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import javax.inject.Named
+import javax.inject.Provider
+import javax.inject.Singleton
 
 /**
  * Example Default User Agent (From Chrome):
@@ -30,13 +37,12 @@ import com.duckduckgo.app.global.device.DeviceInfo
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(private val context: Context, private val device: DeviceInfo) {
+class UserAgentProvider constructor(@Named("defaultUserAgent") private val defaultUserAgent: Provider<String>, private val device: DeviceInfo) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
     private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
     private val safariComponent: String? by lazy { getSafariComponentFromUserAgent() }
     private val applicationComponent = "DuckDuckGo/${device.majorAppVersion}"
-    fun defaultUserAgent(): String { return WebSettings.getDefaultUserAgent(context) }
 
     /**
      * Returns, our custom UA, including our application component before Safari
@@ -77,7 +83,7 @@ class UserAgentProvider constructor(private val context: Context, private val de
     }
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
-        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent()) ?: return null
+        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
         var result = matches.groupValues.last()
         if (forDesktop) {
             result = result.replace(" Mobile", "")
@@ -90,7 +96,7 @@ class UserAgentProvider constructor(private val context: Context, private val de
     }
 
     private fun getSafariComponentFromUserAgent(): String? {
-        val matches = AgentRegex.safari.find(defaultUserAgent()) ?: return null
+        val matches = AgentRegex.safari.find(defaultUserAgent.get()) ?: return null
         return matches.groupValues.last()
     }
 
@@ -130,4 +136,15 @@ class UserAgentProvider constructor(private val context: Context, private val de
     }
 
     data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
+}
+
+@ContributesTo(AppObjectGraph::class)
+@Module
+class DefaultUserAgentModule {
+    @Singleton
+    @Provides
+    @Named("defaultUserAgent")
+    fun provideDefaultUserAgent(context: Context): String {
+        return WebSettings.getDefaultUserAgent(context)
+    }
 }
