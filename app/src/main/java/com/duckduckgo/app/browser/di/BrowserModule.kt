@@ -20,7 +20,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.webkit.CookieManager
-import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
@@ -183,7 +182,7 @@ class BrowserModule {
     @Provides
     @Singleton
     fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
-        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+        return UserAgentProvider(context, deviceInfo)
     }
 
     @Provides
