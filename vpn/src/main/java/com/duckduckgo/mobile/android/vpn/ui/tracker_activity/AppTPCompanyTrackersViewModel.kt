@@ -21,7 +21,8 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerSignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
@@ -52,14 +53,15 @@ constructor(
                 .flowOn(Dispatchers.Default)
         }
 
-    private fun aggregateDataPerApp(trackerData: List<VpnTracker>): ViewState {
+    private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
-        val trackerCompany = trackerData.groupBy { it.trackerCompanyId }
+        val trackerCompany = trackerData.groupBy { it.tracker.trackerCompanyId }
 
         trackerCompany.forEach { data ->
-            val trackerCompanyName = data.value[0].company
-            val trackerCompanyDisplayName = data.value[0].companyDisplayName
-            val timestamp = data.value[0].timestamp
+            val trackerCompanyName = data.value[0].tracker.company
+            val trackerCompanyDisplayName = data.value[0].tracker.companyDisplayName
+            val trackingSignals = data.value[0].trackerSignals
+            val timestamp = data.value[0].tracker.timestamp
 
             sourceData.add(
                 CompanyTrackingDetails(
@@ -67,7 +69,7 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals()
+                    trackingSignals = mapTrackingSignals(trackingSignals)
                 )
             )
         }
@@ -84,7 +86,11 @@ constructor(
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(): List<TrackingSignal> {
+    private fun mapTrackingSignals(trackingSignals: List<VpnTrackerSignal>): List<TrackingSignal> {
+        return trackingSignals.map {
+            TrackingSignal.fromTag(it.trackerSignalTag)
+        }
+
         val originalTrackingSignals = TrackingSignal.values()
         val numberOfElements = (0 until 12).random()
         val randomElements =

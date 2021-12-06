@@ -16,12 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -57,8 +55,9 @@ interface VpnTrackerDao {
     @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 
+    @Transaction
     @Query("SELECT * FROM vpn_tracker WHERE timestamp LIKE :date || '%' AND packageId = :appPackage order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
-    fun getTrackersForAppFromDate(date: String, appPackage: String): Flow<List<VpnTracker>>
+    fun getTrackersForAppFromDate(date: String, appPackage: String): Flow<List<VpnTrackerCompanySignal>>
 
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
     fun getTrackersForApp(appPackage: String): List<VpnTracker>

@@ -18,10 +18,7 @@ package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
-import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
-import com.duckduckgo.mobile.android.vpn.model.VpnState
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +61,7 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     }
 
     @WorkerThread
-    fun getTrackersForAppFromDate(date: String, packageName: String): Flow<List<VpnTracker>> {
+    fun getTrackersForAppFromDate(date: String, packageName: String): Flow<List<VpnTrackerCompanySignal>> {
         return trackerDao.getTrackersForAppFromDate(date, packageName)
             .conflate()
             .distinctUntilChanged()
