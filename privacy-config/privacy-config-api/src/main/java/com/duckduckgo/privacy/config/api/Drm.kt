@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+package com.duckduckgo.privacy.config.api
+
+/**
+ * Public interface for the DRM feature
+ */
+interface Drm {
+    /**
+     * This method takes a [url] and an [Array<String>] returns an `Array<String>` depending on the [url]
+     * @return an `Array<String>` if the given [url] is in the eme list and an empty array otherwise.
+     */
+    fun getDrmPermissionsForRequest(url: String, resources: Array<String>): Array<String>
 }
 
-apply from: "$rootProject.projectDir/spotless.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-dependencies {
-    implementation Google.dagger
-    implementation Kotlin.stdlib.jdk7
-}
-
+/**
+ * Public data class for Drm Exceptions
+ */
+data class DrmException(val domain: String, val reason: String)

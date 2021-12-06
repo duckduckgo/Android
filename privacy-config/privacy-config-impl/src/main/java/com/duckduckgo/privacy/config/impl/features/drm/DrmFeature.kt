@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
+package com.duckduckgo.privacy.config.impl.features.drm
 
-apply from: "$rootProject.projectDir/spotless.gradle"
+import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-dependencies {
-    implementation Google.dagger
-    implementation Kotlin.stdlib.jdk7
-}
-
+data class DrmFeature(
+    val state: String,
+    val exceptions: List<DrmExceptionEntity>
+)

@@ -18,7 +18,6 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import androidx.lifecycle.LifecycleObserver
-import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.*
@@ -86,23 +85,6 @@ class PrivacyModule {
     fun backgroundTimeKeeper(): BackgroundTimeKeeper {
         return DataClearerTimeKeeper()
     }
-
-    @Provides
-    @Singleton
-    fun automaticDataClearer(
-        workManager: WorkManager,
-        settingsDataStore: SettingsDataStore,
-        clearDataAction: ClearDataAction,
-        dataClearerTimeKeeper: BackgroundTimeKeeper,
-        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
-    ): DataClearer {
-        return AutomaticDataClearer(workManager, settingsDataStore, clearDataAction, dataClearerTimeKeeper, dataClearerForegroundAppRestartPixel)
-    }
-
-    @Provides
-    @Singleton
-    @IntoSet
-    fun dataClearerLifecycleObserver(dataClearer: DataClearer): LifecycleObserver = dataClearer
 
     @Provides
     @Singleton

@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'java-library'
-    id 'kotlin'
+package com.duckduckgo.app.notification
+
+import android.app.TaskStackBuilder
+import android.content.Context
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
+
+interface TaskStackBuilderFactory {
+    fun createTaskBuilder(): TaskStackBuilder
 }
 
-apply from: "$rootProject.projectDir/spotless.gradle"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+@ContributesBinding(AppObjectGraph::class)
+class RealTaskStackBuilderFactory @Inject constructor(
+    private val context: Context
+) : TaskStackBuilderFactory {
+    override fun createTaskBuilder(): TaskStackBuilder {
+        return TaskStackBuilder.create(context)
+    }
 }
-
-dependencies {
-    implementation Google.dagger
-    implementation Kotlin.stdlib.jdk7
-}
-

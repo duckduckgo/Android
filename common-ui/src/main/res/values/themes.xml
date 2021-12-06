@@ -360,6 +360,7 @@
         <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
