@@ -141,14 +141,14 @@ open class BrowserWebViewClient(
                     false
                 }
                 is SpecialUrlDetector.UrlType.TrackingLink -> {
-                    if (isForMainFrame) {
+                    if (request.isForMainFrame) {
                         webView.loadUrl(urlType.destinationUrl)
                         return true
                     }
                     false
                 }
                 is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                    if (isForMainFrame) {
+                    if (request.isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.handleCloakedTrackingLink(urlType.initialUrl)
                             return true

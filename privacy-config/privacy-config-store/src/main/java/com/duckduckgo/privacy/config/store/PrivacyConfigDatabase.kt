@@ -34,7 +34,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 4,
+    exportSchema = true, version = 5,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,

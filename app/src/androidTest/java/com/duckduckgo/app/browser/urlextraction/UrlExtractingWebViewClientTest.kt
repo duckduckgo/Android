@@ -20,6 +20,7 @@ import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -58,6 +59,7 @@ class UrlExtractingWebViewClientTest {
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
+    private val accessibilityManager: AccessibilityManager = mock()
     private val urlExtractor: DOMUrlExtractor = mock()
     private val mockWebView: WebView = mock()
 
@@ -80,6 +82,7 @@ class UrlExtractingWebViewClientTest {
             TestCoroutineScope(),
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
+            accessibilityManager,
             urlExtractor
         )
     }

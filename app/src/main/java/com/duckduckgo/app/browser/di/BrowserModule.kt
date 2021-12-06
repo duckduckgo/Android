@@ -152,6 +152,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
+        accessibilityManager: AccessibilityManager,
         urlExtractor: DOMUrlExtractor
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
@@ -170,6 +171,7 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             emailInjector,
+            accessibilityManager,
             urlExtractor
         )
     }

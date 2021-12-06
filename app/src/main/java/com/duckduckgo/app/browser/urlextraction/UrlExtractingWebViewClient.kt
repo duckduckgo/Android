@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.urlextraction
 
 import android.graphics.Bitmap
 import android.webkit.*
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -47,6 +48,7 @@ class UrlExtractingWebViewClient(
     appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     emailInjector: EmailInjector,
+    accessibilityManager: AccessibilityManager,
     private val urlExtractor: DOMUrlExtractor
 ) : BrowserWebViewClient(
     webViewHttpAuthStore,
@@ -63,7 +65,8 @@ class UrlExtractingWebViewClient(
     thirdPartyCookieManager,
     appCoroutineScope,
     dispatcherProvider,
-    emailInjector
+    emailInjector,
+    accessibilityManager
 ) {
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         super.onPageStarted(webView, url, favicon)
