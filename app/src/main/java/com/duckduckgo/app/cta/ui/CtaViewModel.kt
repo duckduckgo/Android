@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -70,7 +71,8 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val variantManager: VariantManager,
-    private val userEventsStore: UserEventsStore
+    private val userEventsStore: UserEventsStore,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -327,7 +329,7 @@ class CtaViewModel @Inject constructor(
 
         nonNullSite.let {
 
-            if (isDuckDuckGoEmailUrl(it.url)) {
+            if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
             }
 
@@ -374,8 +376,6 @@ class CtaViewModel @Inject constructor(
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
-
-    private fun isDuckDuckGoEmailUrl(url: String): Boolean = url.contains(DUCK_DUCK_GO_EMAIL_URL_PART)
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
@@ -431,6 +431,5 @@ class CtaViewModel @Inject constructor(
         private const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1L
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
-        private val DUCK_DUCK_GO_EMAIL_URL_PART = "duckduckgo.com/email"
     }
 }
