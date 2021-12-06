@@ -262,6 +262,21 @@ interface DeviceShieldPixels {
     fun didChooseToDisableOneAppFromDialog()
 
     fun didChooseToCancelTrackingProtectionDialog()
+
+    /**
+     * Will fire when the waitlist dialog is showed to the user
+     */
+    fun didShowWaitlistDialog()
+
+    /**
+     * Will fire when the user presses "notify me" CTA in the waitlist dialog
+     */
+    fun didPressWaitlistDialogNotifyMe()
+
+    /**
+     * Will fire when the user presses dismisses the waitlist dialog
+     */
+    fun didPressWaitlistDialogDismiss()
 }
 
 @ContributesBinding(AppObjectGraph::class)
@@ -533,6 +548,18 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didChooseToCancelTrackingProtectionDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didShowWaitlistDialog() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
+    }
+
+    override fun didPressWaitlistDialogNotifyMe() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
+    }
+
+    override fun didPressWaitlistDialogDismiss() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
     private fun suddenKill() {

@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
-import com.duckduckgo.app.email.waitlist.WaitlistNotificationDialog
+import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -107,6 +107,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
             val dialog = WaitlistNotificationDialog.create()
             dialog.show(it, NOTIFICATION_DIALOG_TAG)
             dialog.onNotifyClicked = { viewModel.onNotifyMeClicked() }
+            dialog.onNoThanksClicked = { viewModel.onNoThanksClicked() }
             dialog.onDialogDismissed = { viewModel.onDialogDismissed() }
         }
     }

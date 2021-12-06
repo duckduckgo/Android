@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.email.waitlist
+package com.duckduckgo.app.waitlist.email
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -26,12 +26,14 @@ import com.duckduckgo.app.browser.R
 class WaitlistNotificationDialog : DialogFragment() {
 
     var onNotifyClicked: (() -> Unit) = {}
+    var onNoThanksClicked: (() -> Unit) = {}
     var onDialogDismissed: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setMessage(R.string.waitlistNotificationDialogDescription)
             .setNegativeButton(R.string.waitlistNotificationDialogNoThanks) { _, _ ->
+                onNoThanksClicked()
                 dismiss()
             }
             .setPositiveButton(R.string.waitlistNotificationDialogNotifyMe) { _, _ ->
