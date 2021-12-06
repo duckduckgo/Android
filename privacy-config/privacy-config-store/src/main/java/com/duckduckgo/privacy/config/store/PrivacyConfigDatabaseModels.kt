@@ -20,6 +20,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
+import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.TrackingLinkException
@@ -50,6 +51,16 @@ class RuleTypeConverter {
     fun fromRules(value: List<AllowlistRuleEntity>): String {
         return Adapters.ruleListAdapter.toJson(value)
     }
+}
+
+@Entity(tableName = "drm_exceptions")
+data class DrmExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
+fun DrmExceptionEntity.toDrmException(): DrmException {
+    return DrmException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "unprotected_temporary")

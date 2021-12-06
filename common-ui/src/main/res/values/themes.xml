@@ -44,6 +44,7 @@
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="radioButtonStyle">@style/RadioButtonStyle</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
+        <item name="sliderStyle">@style/Widget.App.Slider</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -118,6 +119,7 @@
         <item name="android:textColorPrimary">?attr/normalTextColor</item>
         <item name="android:textColorSecondary">?attr/secondaryTextColor</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="lightContainerBackground">@color/almostBlack</item>
 
         <item name="listItemBackgroundColor">@color/almostBlack</item>
         <item name="listItemSeparatorColor">@color/charcoalGrey</item>
@@ -218,6 +220,7 @@
         <item name="quickAccessItemTitleTextColor">@color/brownishGrayTwo</item>
 
         <item name="savedSiteEditTextUnderlineColor">@color/dimmed</item>
+        <item name="lightContainerBackground">@color/whiteThree</item>
 
         <item name="listItemTitleColor">@color/almostBlackDark</item>
         <item name="listItemSubtitleColor">@color/warmerGray</item>
@@ -357,6 +360,7 @@
         <item name="android:background">?attr/dialogBgColor</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorAlertDialogListItem">?attr/normalTextColor</item>
+        <item name="textColorAlertDialogListItem">?attr/normalTextColor</item>
         <item name="android:buttonBarButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
@@ -365,5 +369,19 @@
 
     <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Slider</item>
+        <item name="trackHeight">6dp</item>
+        <item name="trackColorInactive">@color/slider_inactive_track</item>
+        <item name="trackColorActive">@color/accentBlue</item>
+        <item name="thumbColor">@color/accentBlue</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Slider" parent="">
+        <item name="colorPrimary">@color/accentBlue</item>
+        <item name="colorOnPrimary">@color/accentBlue</item>
+        <item name="colorOnSurface">?attr/settingsSwitchBackgroundColor</item>
     </style>
 </resources>

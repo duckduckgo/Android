@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.controls
+package com.duckduckgo.app.notification
 
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
+import android.app.TaskStackBuilder
+import android.content.Context
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-class ComponentControlsFragment : ComponentFragment() {
-    override fun getComponents(): List<Component> {
-        return listOf(Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX)
+interface TaskStackBuilderFactory {
+    fun createTaskBuilder(): TaskStackBuilder
+}
+
+@ContributesBinding(AppObjectGraph::class)
+class RealTaskStackBuilderFactory @Inject constructor(
+    private val context: Context
+) : TaskStackBuilderFactory {
+    override fun createTaskBuilder(): TaskStackBuilder {
+        return TaskStackBuilder.create(context)
     }
 }

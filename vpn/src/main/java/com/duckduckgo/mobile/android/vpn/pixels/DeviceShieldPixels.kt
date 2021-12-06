@@ -454,32 +454,26 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_LOW_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_LOW, payload)
     }
 
     override fun vpnProcessExpendableModerate(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_MODERATE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_MODERATE, payload)
     }
 
     override fun vpnProcessExpendableComplete(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_COMPLETE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_EXPENDABLE_COMPLETE, payload)
     }
 
     override fun vpnMemoryRunningLow(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_LOW_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_LOW, payload)
     }
 
     override fun vpnMemoryRunningModerate(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_MODERATE_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_MODERATE, payload)
     }
 
     override fun vpnMemoryRunningCritical(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL, payload)
     }
 
     override fun disableAppProtection(payload: Map<String, String>) {

@@ -1,0 +1,13 @@
+{
+  "state": "enabled",
+  "exceptions": [
+    {
+      "domain": "open.spotify.com",
+      "reason": "Site breakage"
+    },
+    {
+      "domain": "netflix.com",
+      "reason": "Site breakage"
+    }
+  ]
+}

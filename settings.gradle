@@ -1,7 +1,8 @@
 plugins {
-    id("de.fayard.refreshVersions") version "0.21.0"
+    id("de.fayard.refreshVersions") version "0.23.0"
 }
 
+include ':browser-api'
 include ':vpn'
 include ':vpn-store'
 include ':vpn-main'
@@ -38,9 +39,31 @@ rootProject.children.each { subproject ->
 
 
 buildCache {
+
+    def getFile = { dir, filename ->
+        File file = new File("$dir$File.separator$filename")
+        file?.exists() ? file : null
+    }
+
+    def getLocalProperties = { dir ->
+        def file = getFile(dir, "local.properties")
+        if (!file) {
+            return null
+        }
+
+        Properties properties = new Properties()
+        properties.load(file.newInputStream())
+        return properties
+    }
+
     local {
+        def properties = getLocalProperties(rootDir)
+        if (properties != null) {
+            enabled = "true" == properties.getProperty("local.build.cache", "true")
+        } else {
+            enabled = true
+        }
         // configure local build cache directory so that it is local to the project dir
-        enabled = true
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7
     }

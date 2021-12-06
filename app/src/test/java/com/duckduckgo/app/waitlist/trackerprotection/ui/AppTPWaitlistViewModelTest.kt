@@ -75,7 +75,7 @@ class AppTPWaitlistViewModelTest {
             verify(manager).joinWaitlist(any(), any())
             verify(workManager).enqueue(expectedWorkRequest)
 
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
         }
     }
 
@@ -86,7 +86,7 @@ class AppTPWaitlistViewModelTest {
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
@@ -97,7 +97,7 @@ class AppTPWaitlistViewModelTest {
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
@@ -107,14 +107,14 @@ class AppTPWaitlistViewModelTest {
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
     @Test
     fun whenViewModelCreatedThenWaitlistStateIsNotJoined() = coroutineRule.runBlocking {
         viewModel.viewState.test {
-            assert(expectItem().waitlist is WaitlistState.NotJoinedQueue)
+            assert(awaitItem().waitlist is WaitlistState.NotJoinedQueue)
         }
     }
 
@@ -122,7 +122,7 @@ class AppTPWaitlistViewModelTest {
     fun whenUserHasAnInviteCodeThenEnterInviteCodeCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.haveAnInviteCode()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.EnterInviteCode)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.EnterInviteCode)
         }
     }
 
@@ -130,7 +130,7 @@ class AppTPWaitlistViewModelTest {
     fun whenUserWantsToLearnMoreThenOpenUrlCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.learnMore()
-            assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, expectItem())
+            assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, awaitItem())
         }
     }
 
@@ -144,7 +144,7 @@ class AppTPWaitlistViewModelTest {
     fun whenUserWantsToGetStartedThenShowOnboardingCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.getStarted()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
         }
     }
 

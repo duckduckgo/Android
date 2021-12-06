@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component.navigation
+package com.duckduckgo.privacy.config.impl.features.drm
 
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component
-import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
+import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 
-class ComponentNavigationFragment : ComponentFragment() {
-    override fun getComponents(): List<Component> {
-        return listOf(Component.TOP_APP_BAR)
-    }
-}
+data class DrmFeature(
+    val state: String,
+    val exceptions: List<DrmExceptionEntity>
+)

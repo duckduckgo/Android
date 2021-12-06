@@ -44,6 +44,7 @@ import xyz.hexene.localvpn.Packet.TCPHeader.FIN
 import xyz.hexene.localvpn.TCB
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors.newSingleThreadExecutor
@@ -146,6 +147,8 @@ class TcpPacketProcessor @AssistedInject constructor(
                 tcpDeviceToNetwork.deviceToNetworkProcessing()
             } catch (e: IOException) {
                 Timber.w(e, "Failed to process TCP device-to-network packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
             }
         }
     }
@@ -157,6 +160,8 @@ class TcpPacketProcessor @AssistedInject constructor(
             try {
                 tcpNetworkToDevice.networkToDeviceProcessing()
             } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
+            } catch (e: CancelledKeyException) {
                 Timber.w(e, "Failed to process TCP network-to-device packet")
             }
         }

@@ -31,6 +31,7 @@ enum class Component {
     BOTTOM_APP_BAR,
     TABS,
     SNACKBAR,
+    INFO_PANEL,
     DIALOG,
     BOTTOM_SHEET,
     IMAGE
