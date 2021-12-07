@@ -52,7 +52,8 @@ import java.util.concurrent.Executors
         AppTrackerExceptionRule::class,
         AppTrackerExceptionRuleMetadata::class,
         AppTrackerPackage::class,
-        AppTrackerManualExcludedApp::class
+        AppTrackerManualExcludedApp::class,
+        AppTrackingSignal::class
     ]
 )
 

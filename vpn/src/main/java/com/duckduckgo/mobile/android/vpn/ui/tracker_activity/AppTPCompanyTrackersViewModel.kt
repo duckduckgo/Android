@@ -22,7 +22,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerSignal
+import com.duckduckgo.mobile.android.vpn.model.AppTrackingSignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
@@ -86,10 +86,10 @@ constructor(
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(trackingSignals: List<VpnTrackerSignal>): List<TrackingSignal> {
-        return trackingSignals.map {
-            TrackingSignal.fromTag(it.trackerSignalTag)
-        }
+    private fun mapTrackingSignals(trackingSignals: List<AppTrackingSignal>): List<TrackingSignal> {
+//        return trackingSignals.map {
+//            TrackingSignal.fromTag(it.trackerSignalTag)
+//        }
 
         val originalTrackingSignals = TrackingSignal.values()
         val numberOfElements = (0 until 12).random()

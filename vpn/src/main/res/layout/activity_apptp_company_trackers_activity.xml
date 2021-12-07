@@ -56,7 +56,6 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/item_apptp_company_details"
                 android:paddingBottom="@dimen/keyline_5"
-                android:paddingTop="@dimen/keyline_4"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView

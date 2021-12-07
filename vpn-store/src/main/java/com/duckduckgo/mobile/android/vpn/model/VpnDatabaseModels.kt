@@ -83,8 +83,8 @@ data class VpnPreferences(
     val value: Boolean
 )
 
-@Entity(tableName = "vpn_tracker_signals")
-data class VpnTrackerSignal(
+@Entity(tableName = "vpn_app_tracking_signals")
+data class AppTrackingSignal(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val trackerCompanyId: Int,
     val trackerSignalTag: String
@@ -100,5 +100,5 @@ data class VpnTrackerCompanySignal(
         parentColumn = "trackerCompanyId",
         entityColumn = "trackerCompanyId"
     )
-    val trackerSignals: List<VpnTrackerSignal>
+    val trackerSignals: List<AppTrackingSignal>
 )
