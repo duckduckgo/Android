@@ -3701,6 +3701,26 @@ class BrowserTabViewModelTest {
         verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo("https://foo.com")
     }
 
+    @Test
+    fun whenUserSubmittedQueryIsCloakedTrackingLinkThenHandleCloakedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromTrackingLink }
+        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromTrackingLink).initialUrl)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsExtractedTrackingLinkThenNavigateToExtractedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)

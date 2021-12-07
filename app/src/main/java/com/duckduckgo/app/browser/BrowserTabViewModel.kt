@@ -655,25 +655,36 @@ class BrowserTabViewModel(
         }
 
         val verticalParameter = extractVerticalParameter(url)
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+        var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
-        val type = specialUrlDetector.determineType(trimmedInput)
-        if (type is NonHttpAppLink) {
-            nonHttpAppLinkClicked(type)
-        } else {
-            if (shouldClearHistoryOnNewQuery()) {
-                command.value = ResetHistory
+        when (val type = specialUrlDetector.determineType(trimmedInput)) {
+            is NonHttpAppLink -> {
+                nonHttpAppLinkClicked(type)
             }
-
-            fireQueryChangedPixel(trimmedInput)
-
-            if (!appSettingsPreferencesStore.showAppLinksPrompt) {
-                appLinksHandler.updatePreviousUrl(urlToNavigate)
-                appLinksHandler.setUserQueryState(true)
-            } else {
-                clearPreviousUrl()
+            is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
+                handleCloakedTrackingLink(type.trackingUrl)
             }
-            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+            else -> {
+
+                if (type is SpecialUrlDetector.UrlType.ExtractedTrackingLink) {
+                    urlToNavigate = type.extractedUrl
+                }
+
+                if (shouldClearHistoryOnNewQuery()) {
+                    command.value = ResetHistory
+                }
+
+                fireQueryChangedPixel(trimmedInput)
+
+                if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                    appLinksHandler.updatePreviousUrl(urlToNavigate)
+                    appLinksHandler.setUserQueryState(true)
+                } else {
+                    clearPreviousUrl()
+                }
+
+                command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+            }
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
