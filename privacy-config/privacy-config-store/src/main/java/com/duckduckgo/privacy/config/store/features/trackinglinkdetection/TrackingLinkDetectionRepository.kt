@@ -24,12 +24,11 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackingLinkDetectionRepository {
-    fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>, trackingParameters: List<TrackingParameterEntity>)
+    fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)
     fun extractCanonicalFromTrackingLink(url: String): String?
     val exceptions: CopyOnWriteArrayList<TrackingLinkException>
     val ampLinkFormats: CopyOnWriteArrayList<Regex>
     val ampKeywords: CopyOnWriteArrayList<String>
-    val trackingParameters: CopyOnWriteArrayList<String>
 }
 
 class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
@@ -40,7 +39,6 @@ class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, c
     override val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
     override val ampLinkFormats = CopyOnWriteArrayList<Regex>()
     override val ampKeywords = CopyOnWriteArrayList<String>()
-    override val trackingParameters = CopyOnWriteArrayList<String>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -48,8 +46,8 @@ class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, c
         }
     }
 
-    override fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>, trackingParameters: List<TrackingParameterEntity>) {
-        trackingLinkDetectionDao.updateAll(exceptions, ampLinkFormats, ampKeywords, trackingParameters)
+    override fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>) {
+        trackingLinkDetectionDao.updateAll(exceptions, ampLinkFormats, ampKeywords)
         loadToMemory()
     }
 
@@ -67,11 +65,6 @@ class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, c
         ampKeywords.clear()
         trackingLinkDetectionDao.getAllAmpKeywords().map {
             ampKeywords.add(it.keyword)
-        }
-
-        trackingParameters.clear()
-        trackingLinkDetectionDao.getAllTrackingParameters().map {
-            trackingParameters.add(it.parameter)
         }
     }
 

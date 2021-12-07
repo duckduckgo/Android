@@ -24,7 +24,6 @@ import androidx.room.Transaction
 import com.duckduckgo.privacy.config.store.AmpKeywordEntity
 import com.duckduckgo.privacy.config.store.AmpLinkFormatEntity
 import com.duckduckgo.privacy.config.store.TrackingLinkExceptionEntity
-import com.duckduckgo.privacy.config.store.TrackingParameterEntity
 
 @Dao
 abstract class TrackingLinkDetectionDao {
@@ -38,11 +37,8 @@ abstract class TrackingLinkDetectionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAllAmpKeywords(ampKeywords: List<AmpKeywordEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAllTrackingParameters(trackingParameters: List<TrackingParameterEntity>)
-
     @Transaction
-    open fun updateAll(domains: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>, trackingParameters: List<TrackingParameterEntity>) {
+    open fun updateAll(domains: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>) {
         deleteAllExceptions()
         insertAllExceptions(domains)
 
@@ -51,9 +47,6 @@ abstract class TrackingLinkDetectionDao {
 
         deleteAllAmpKeywords()
         insertAllAmpKeywords(ampKeywords)
-
-        deleteAllTrackingParameters()
-        insertAllTrackingParameters(trackingParameters)
     }
 
     @Query("select * from tracking_link_exceptions")
@@ -65,9 +58,6 @@ abstract class TrackingLinkDetectionDao {
     @Query("select * from amp_keywords")
     abstract fun getAllAmpKeywords(): List<AmpKeywordEntity>
 
-    @Query("select * from tracking_parameters")
-    abstract fun getAllTrackingParameters(): List<TrackingParameterEntity>
-
     @Query("delete from tracking_link_exceptions")
     abstract fun deleteAllExceptions()
 
@@ -76,7 +66,4 @@ abstract class TrackingLinkDetectionDao {
 
     @Query("delete from amp_keywords")
     abstract fun deleteAllAmpKeywords()
-
-    @Query("delete from tracking_parameters")
-    abstract fun deleteAllTrackingParameters()
 }

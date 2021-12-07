@@ -303,15 +303,15 @@
         }
       ]
     },
-    "trackingLinks": {
+    "ampLinks": {
       "state": "enabled",
       "exceptions": [],
       "settings": {
-        "ampLinkFormats": [
-          "https?:\\/\\/(?:w{3}\\.)?google\\.\\w{2,}\\/amp\\/s\\/(\\S+)",
-          "https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)"
+        "linkFormats": [
+          "^https?:\\/\\/(?:w{3}\\.)?google\\.\\S{2,}\\/amp\\/s\\/(\\S+)$",
+          "^https?:\\/\\/\\S+ampproject\\.org\\/v\\/s\\/(\\S+)$"
         ],
-        "ampKeywords": [
+        "keywords": [
           "=amp",
           "amp=",
           "&amp",
@@ -325,8 +325,14 @@
           "_amp",
           "amp_",
           "?amp"
-        ],
-        "trackingParameters": [
+        ]
+      }
+    },
+    "trackingParameters": {
+      "state": "enabled",
+      "exceptions": [],
+      "settings": {
+        "parameters": [
           "utm_[a-zA-Z]*",
           "gclid",
           "fbclid",

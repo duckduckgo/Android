@@ -41,7 +41,6 @@ class TrackingLinkDetectionPlugin @Inject constructor(
             val exceptions = mutableListOf<TrackingLinkExceptionEntity>()
             val ampLinkFormats = mutableListOf<AmpLinkFormatEntity>()
             val ampKeywords = mutableListOf<AmpKeywordEntity>()
-            val trackingParameters = mutableListOf<TrackingParameterEntity>()
 
             val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonString)
 
@@ -49,19 +48,15 @@ class TrackingLinkDetectionPlugin @Inject constructor(
                 exceptions.add(TrackingLinkExceptionEntity(it.domain, it.reason))
             }
 
-            trackingLinkDetectionFeature?.settings?.ampLinkFormats?.map {
+            trackingLinkDetectionFeature?.settings?.linkFormats?.map {
                 ampLinkFormats.add(AmpLinkFormatEntity(it))
             }
 
-            trackingLinkDetectionFeature?.settings?.ampKeywords?.map {
+            trackingLinkDetectionFeature?.settings?.keywords?.map {
                 ampKeywords.add(AmpKeywordEntity(it))
             }
 
-            trackingLinkDetectionFeature?.settings?.trackingParameters?.map {
-                trackingParameters.add(TrackingParameterEntity(it))
-            }
-
-            trackingLinkDetectionRepository.updateAll(exceptions, ampLinkFormats, ampKeywords, trackingParameters)
+            trackingLinkDetectionRepository.updateAll(exceptions, ampLinkFormats, ampKeywords)
             val isEnabled = trackingLinkDetectionFeature?.state == "enabled"
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true

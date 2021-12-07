@@ -25,7 +25,6 @@ data class TrackingLinkDetectionFeature(
 )
 
 data class TrackingLinkDetectionSettings(
-    val ampLinkFormats: List<String>,
-    val ampKeywords: List<String>,
-    val trackingParameters: List<String>
+    val linkFormats: List<String>,
+    val keywords: List<String>
 )

@@ -75,13 +75,11 @@ class TrackingLinkDetectionPluginTest {
         val exceptionArgumentCaptor = argumentCaptor<List<TrackingLinkExceptionEntity>>()
         val ampLinkFormatArgumentCaptor = argumentCaptor<List<AmpLinkFormatEntity>>()
         val ampKeywordArgumentCaptor = argumentCaptor<List<AmpKeywordEntity>>()
-        val trackingParameterArgumentCaptor = argumentCaptor<List<TrackingParameterEntity>>()
 
         verify(mockTrackingLinkDetectionRepository).updateAll(
             exceptionArgumentCaptor.capture(),
             ampLinkFormatArgumentCaptor.capture(),
             ampKeywordArgumentCaptor.capture(),
-            trackingParameterArgumentCaptor.capture()
         )
 
         val trackingLinkExceptionEntityList = exceptionArgumentCaptor.firstValue
@@ -93,21 +91,16 @@ class TrackingLinkDetectionPluginTest {
         val ampLinkFormatEntityList = ampLinkFormatArgumentCaptor.firstValue
 
         assertEquals(1, ampLinkFormatEntityList.size)
-        assertEquals("ampLinkFormat", ampLinkFormatEntityList.first().format)
+        assertEquals("linkFormat", ampLinkFormatEntityList.first().format)
 
         val ampKeywordEntityList = ampKeywordArgumentCaptor.firstValue
 
         assertEquals(1, ampKeywordEntityList.size)
-        assertEquals("ampKeyword", ampKeywordEntityList.first().keyword)
-
-        val trackingParameterEntityList = trackingParameterArgumentCaptor.firstValue
-
-        assertEquals(1, trackingParameterEntityList.size)
-        assertEquals("trackingParameter", trackingParameterEntityList.first().parameter)
+        assertEquals("keyword", ampKeywordEntityList.first().keyword)
     }
 
     companion object {
-        private const val FEATURE_NAME = "trackingLinks"
+        private const val FEATURE_NAME = "ampLinks"
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

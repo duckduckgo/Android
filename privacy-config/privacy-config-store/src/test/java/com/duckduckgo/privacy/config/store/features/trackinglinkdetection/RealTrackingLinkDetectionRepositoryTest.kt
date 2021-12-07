@@ -64,7 +64,6 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertEquals(trackingLinkExceptionEntity.toTrackingLinkException(), testee.exceptions.first())
         assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first().toString())
         assertEquals(ampKeywordEntity.keyword, testee.ampKeywords.first())
-        assertEquals(trackingParameterEntity.parameter, testee.trackingParameters.first())
     }
 
     @Test
@@ -92,16 +91,14 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertEquals(1, testee.exceptions.size)
         assertEquals(1, testee.ampLinkFormats.size)
         assertEquals(1, testee.ampKeywords.size)
-        assertEquals(1, testee.trackingParameters.size)
 
         reset(mockTrackingLinkDetectionDao)
 
-        testee.updateAll(listOf(), listOf(), listOf(), listOf())
+        testee.updateAll(listOf(), listOf(), listOf())
 
         assertEquals(0, testee.exceptions.size)
         assertEquals(0, testee.ampLinkFormats.size)
         assertEquals(0, testee.ampKeywords.size)
-        assertEquals(0, testee.trackingParameters.size)
     }
 
     @Test
@@ -137,7 +134,6 @@ class RealTrackingLinkDetectionRepositoryTest {
         whenever(mockTrackingLinkDetectionDao.getAllExceptions()).thenReturn(listOf(trackingLinkExceptionEntity))
         whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
         whenever(mockTrackingLinkDetectionDao.getAllAmpKeywords()).thenReturn(listOf(ampKeywordEntity))
-        whenever(mockTrackingLinkDetectionDao.getAllTrackingParameters()).thenReturn(listOf(trackingParameterEntity))
     }
 
     companion object {
@@ -152,10 +148,6 @@ class RealTrackingLinkDetectionRepositoryTest {
 
         val ampKeywordEntity = AmpKeywordEntity(
             keyword = "keyword"
-        )
-
-        val trackingParameterEntity = TrackingParameterEntity(
-            parameter = "parameter"
         )
     }
 }

@@ -45,7 +45,6 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         PrivacyConfig::class,
         AmpLinkFormatEntity::class,
         AmpKeywordEntity::class,
-        TrackingParameterEntity::class,
         TrackingLinkExceptionEntity::class
     ]
 )

@@ -7,14 +7,11 @@
     }
   ],
   "settings": {
-    "ampLinkFormats": [
+    "linkFormats": [
       "ampLinkFormat"
     ],
-    "ampKeywords": [
+    "keywords": [
       "ampKeyword"
-    ],
-    "trackingParameters": [
-      "trackingParameter"
     ]
   }
 }
