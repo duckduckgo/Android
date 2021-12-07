@@ -140,9 +140,9 @@ open class BrowserWebViewClient(
                     }
                     false
                 }
-                is SpecialUrlDetector.UrlType.TrackingLink -> {
+                is SpecialUrlDetector.UrlType.ExtractedTrackingLink -> {
                     if (request.isForMainFrame) {
-                        webView.loadUrl(urlType.destinationUrl)
+                        webView.loadUrl(urlType.extractedUrl)
                         return true
                     }
                     false
@@ -150,7 +150,7 @@ open class BrowserWebViewClient(
                 is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
                     if (request.isForMainFrame) {
                         webViewClientListener?.let { listener ->
-                            listener.handleCloakedTrackingLink(urlType.initialUrl)
+                            listener.handleCloakedTrackingLink(urlType.trackingUrl)
                             return true
                         }
                     }

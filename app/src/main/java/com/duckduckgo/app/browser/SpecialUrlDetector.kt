@@ -25,6 +25,7 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkType
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -41,8 +42,8 @@ interface SpecialUrlDetector {
         class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
-        class TrackingLink(val destinationUrl: String) : UrlType()
-        class CloakedTrackingLink(val initialUrl: String) : UrlType()
+        class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
+        class CloakedTrackingLink(val trackingUrl: String) : UrlType()
     }
 }
 
@@ -98,14 +99,13 @@ class SpecialUrlDetectorImpl(
             }
         }
 
-        trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { extractedUrl ->
-            return UrlType.TrackingLink(destinationUrl = extractedUrl)
+        trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { trackingLinkType ->
+            if (trackingLinkType is TrackingLinkType.ExtractedTrackingLink) {
+                return UrlType.ExtractedTrackingLink(extractedUrl = trackingLinkType.extractedUrl)
+            } else if (trackingLinkType is TrackingLinkType.CloakedTrackingLink) {
+                return UrlType.CloakedTrackingLink(trackingUrl = trackingLinkType.trackingUrl)
+            }
         }
-
-        if (trackingLinkDetector.urlContainsTrackingKeyword(uriString)) {
-            return UrlType.CloakedTrackingLink(initialUrl = uriString)
-        }
-
         return UrlType.Web(uriString)
     }
 

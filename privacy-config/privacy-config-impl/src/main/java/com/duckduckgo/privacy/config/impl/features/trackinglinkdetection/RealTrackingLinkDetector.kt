@@ -22,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkInfo
+import com.duckduckgo.privacy.config.api.TrackingLinkType
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,6 +37,8 @@ class RealTrackingLinkDetector @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary
 ) : TrackingLinkDetector {
 
+    private var lastExtractedUrl: String? = null
+
     override var lastTrackingLinkInfo: TrackingLinkInfo? = null
 
     override fun isAnException(url: String): Boolean {
@@ -46,27 +49,27 @@ class RealTrackingLinkDetector @Inject constructor(
         return trackingLinkDetectionRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
-    override fun extractCanonicalFromTrackingLink(url: String): String? {
+    override fun extractCanonicalFromTrackingLink(url: String): TrackingLinkType? {
         if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return null
         if (isAnException(url)) return null
+        if (url == lastExtractedUrl) return null
 
-        if (lastTrackingLinkInfo?.destinationUrl != url) {
-            lastTrackingLinkInfo = null
+        val extractedUrl = trackingLinkDetectionRepository.extractCanonicalFromTrackingLink(url)
+
+        lastExtractedUrl = extractedUrl
+
+        extractedUrl?.let {
+            lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url)
+            return TrackingLinkType.ExtractedTrackingLink(extractedUrl = extractedUrl)
         }
 
-        val destinationUrl = trackingLinkDetectionRepository.extractCanonicalFromTrackingLink(url)
-
-        destinationUrl?.let {
-            lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url, destinationUrl = destinationUrl)
+        if (urlContainsTrackingKeyword(url)) {
+            return TrackingLinkType.CloakedTrackingLink(trackingUrl = url)
         }
-
-        return destinationUrl
+        return null
     }
 
-    override fun urlContainsTrackingKeyword(url: String): Boolean {
-        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return false
-        if (isAnException(url)) return false
-
+    private fun urlContainsTrackingKeyword(url: String): Boolean {
         val ampKeywords = trackingLinkDetectionRepository.ampKeywords
 
         ampKeywords.forEach { keyword ->

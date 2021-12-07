@@ -757,6 +757,7 @@ class BrowserTabFragment :
 
                 if (extractedUrl != null) {
                     destinationUrl = extractedUrl
+                    viewModel.updateLastTrackingLink(initialUrl)
                     Timber.d("Tracking link detection: Success! Loading extracted URL: $destinationUrl")
                 } else {
                     destinationUrl = initialUrl
@@ -768,6 +769,7 @@ class BrowserTabFragment :
                 }
                 urlExtractingWebView = null
             }
+            Timber.d("Tracking link detection: Loading tracking URL for extraction")
             urlExtractingWebView?.loadUrl(initialUrl)
         }
     }

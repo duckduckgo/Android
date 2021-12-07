@@ -40,7 +40,7 @@ class UrlExtractingWebView(
             domStorageEnabled = true
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             disableWebSql(this)
-            blockNetworkImage = true
+            loadsImagesAutomatically = false
         }
         setWebViewClient(webViewClient)
 

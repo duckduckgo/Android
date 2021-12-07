@@ -28,17 +28,10 @@ interface TrackingLinkDetector {
     fun isAnException(url: String): Boolean
 
     /**
-     * This method takes a [url] and returns the extracted destination [url] from a tracking link.
-     * @return the extracted destination [url] or `null` if the [url] is not a tracking link.
+     * This method takes a [url] and returns a [TrackingLinkType] depending on the detected tracking link.
+     * @return the [TrackingLinkType] or `null` if the [url] is not a tracking link.
      */
-    fun extractCanonicalFromTrackingLink(url: String): String?
-
-    /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url]
-     * contains a tracking keyword.
-     * @return `true` if the given [url] contains a tracking keyword and `false` otherwise.
-     */
-    fun urlContainsTrackingKeyword(url: String): Boolean
+    fun extractCanonicalFromTrackingLink(url: String): TrackingLinkType?
 
     /**
      * The last tracking link and its destination URL.
@@ -49,9 +42,17 @@ interface TrackingLinkDetector {
 /**
  * Public data class for Tracking Link Info.
  */
-data class TrackingLinkInfo(val trackingLink: String, val destinationUrl: String)
+data class TrackingLinkInfo(val trackingLink: String, var destinationUrl: String? = null)
 
 /**
  * Public data class for Tracking Link Exceptions.
  */
 data class TrackingLinkException(val domain: String, val reason: String)
+
+/**
+ * Public sealed class for Tracking Link Type.
+ */
+sealed class TrackingLinkType {
+    class ExtractedTrackingLink(val extractedUrl: String) : TrackingLinkType()
+    class CloakedTrackingLink(val trackingUrl: String) : TrackingLinkType()
+}

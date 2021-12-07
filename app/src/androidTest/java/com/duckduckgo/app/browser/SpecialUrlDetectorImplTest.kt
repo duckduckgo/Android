@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkType
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -269,19 +270,21 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsTrackingLinkThenTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn("www.example.com")
-        val expected = TrackingLink::class
+    fun whenUrlIsTrackingLinkThenExtractedTrackingLinkTypeDetected() {
+        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn(TrackingLinkType.ExtractedTrackingLink(extractedUrl = "https://www.example.com"))
+        val expected = ExtractedTrackingLink::class
         val actual = testee.determineType("https://www.google.com/amp/s/www.example.com")
         assertEquals(expected, actual::class)
+        assertEquals("https://www.example.com", (actual as ExtractedTrackingLink).extractedUrl)
     }
 
     @Test
     fun whenUrlIsCloakedTrackingLinkThenCloakedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.urlContainsTrackingKeyword(anyString())).thenReturn(true)
+        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn(TrackingLinkType.CloakedTrackingLink(trackingUrl = "https://www.example.com/amp"))
         val expected = CloakedTrackingLink::class
         val actual = testee.determineType("https://www.example.com/amp")
         assertEquals(expected, actual::class)
+        assertEquals("https://www.example.com/amp", (actual as CloakedTrackingLink).trackingUrl)
     }
 
     private fun randomString(length: Int): String {

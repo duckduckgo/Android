@@ -114,9 +114,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -290,6 +288,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
 
+    @Mock
+    private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -419,7 +420,8 @@ class BrowserTabViewModelTest {
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            trackingLinkDetector = mockTrackingLinkDetector
         )
 
         testee.loadData("abc", null, false, false)
@@ -3665,6 +3667,38 @@ class BrowserTabViewModelTest {
     fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
         testee.handleCloakedTrackingLink(initialUrl = "example.com")
         assertCommandIssued<Command.ExtractUrlFromTrackingLink>()
+    }
+
+    @Test
+    fun whenPageChangedThenUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("http://twitter.com/explore", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoHasDestinationUrlThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com", "https://bar.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("https://bar.com", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoIsNullThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = null
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertNull(trackingLinkInfo)
+    }
+
+    @Test
+    fun whenUpdateLastTrackingLinkThenUpdateTrackingLinkInfo() {
+        testee.updateLastTrackingLink("https://foo.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo("https://foo.com")
     }
 
     private fun givenUrlCanUseGpc() {

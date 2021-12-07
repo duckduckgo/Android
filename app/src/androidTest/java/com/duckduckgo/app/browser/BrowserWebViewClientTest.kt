@@ -337,8 +337,8 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadUrl() = coroutinesTestRule.runBlocking {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingLink(EXAMPLE_URL))
+    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = coroutinesTestRule.runBlocking {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
@@ -347,7 +347,7 @@ class BrowserWebViewClientTest {
 
     @Test
     fun whenTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = coroutinesTestRule.runBlocking {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingLink(EXAMPLE_URL))
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         val mockWebView = mock<WebView>()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
