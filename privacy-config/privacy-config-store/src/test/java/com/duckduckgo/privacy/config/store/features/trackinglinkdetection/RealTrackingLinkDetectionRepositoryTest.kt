@@ -74,9 +74,9 @@ class RealTrackingLinkDetectionRepositoryTest {
             coroutineRule.testDispatcherProvider
         )
 
-        testee.updateAll(listOf(), listOf(), listOf(), listOf())
+        testee.updateAll(listOf(), listOf(), listOf())
 
-        verify(mockTrackingLinkDetectionDao).updateAll(anyList(), anyList(), anyList(), anyList())
+        verify(mockTrackingLinkDetectionDao).updateAll(anyList(), anyList(), anyList())
     }
 
     @Test
