@@ -8,10 +8,10 @@
   ],
   "settings": {
     "linkFormats": [
-      "ampLinkFormat"
+      "linkFormat"
     ],
     "keywords": [
-      "ampKeyword"
+      "keyword"
     ]
   }
 }
