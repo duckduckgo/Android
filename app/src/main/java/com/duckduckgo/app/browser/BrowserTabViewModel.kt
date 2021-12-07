@@ -667,6 +667,7 @@ class BrowserTabViewModel(
             else -> {
 
                 if (type is SpecialUrlDetector.UrlType.ExtractedTrackingLink) {
+                    Timber.d("Tracking link detection: Using extracted URL: ${type.extractedUrl}")
                     urlToNavigate = type.extractedUrl
                 }
 
