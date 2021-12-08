@@ -3,7 +3,7 @@ buildscript {
 
     ext {
         kotlin_version = '1.5.10'
-        spotless = "6.0.4"
+        spotless = "5.14.0"
         anvil_version = "2.3.3"
         gradle_plugin = "7.0.3"
         min_sdk = 21
