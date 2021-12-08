@@ -45,14 +45,6 @@ class ExcludedAppsViewModel(
     internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
 
     fun onAppProtectionDisabled(answer: Int = 0, appName: String, packageName: String, skippedReport: Boolean) {
-        if (skippedReport) {
-            pixel.disableAppProtectionReportingSkipped()
-        } else {
-            if (answer > ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED) {
-                pixel.disableAppProtection(mapOf(PACKAGE_NAME to packageName, EXCLUDING_REASON to answer.toString()))
-            }
-        }
-
         recordManualChange(packageName)
 
         viewModelScope.launch {
@@ -65,9 +57,6 @@ class ExcludedAppsViewModel(
 
     fun onAppProtectionEnabled(packageName: String, excludingReason: Int, needsPixel: Boolean = false) {
         recordManualChange(packageName)
-        if (needsPixel && excludingReason > 0) {
-            pixel.enableAppProtection(mapOf(PACKAGE_NAME to packageName, EXCLUDING_REASON to excludingReason.toString()))
-        }
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }
