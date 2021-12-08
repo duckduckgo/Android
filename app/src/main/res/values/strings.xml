@@ -153,6 +153,7 @@
     <string name="settingsHeadingOther">Other</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsAboutDuckduckgo">About DuckDuckGo</string>
+    <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
