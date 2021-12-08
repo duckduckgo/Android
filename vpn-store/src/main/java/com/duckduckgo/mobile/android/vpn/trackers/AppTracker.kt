@@ -75,10 +75,18 @@ data class AppTrackerManualExcludedApp(
 
 data class JsonAppBlockingList(
     val trackers: Map<String, JsonAppTracker>,
-    val packageNames: Map<String, String>
+    val packageNames: Map<String, String>,
+    val signals: Map<String, JsonAppTracker>,
 )
 
 class JsonAppTracker(
+    val owner: TrackerOwner,
+    val app: TrackerApp,
+    @field:Json(name = "CDN")
+    val isCdn: Boolean
+)
+
+class JsonTrackingSignal(
     val owner: TrackerOwner,
     val app: TrackerApp,
     @field:Json(name = "CDN")
