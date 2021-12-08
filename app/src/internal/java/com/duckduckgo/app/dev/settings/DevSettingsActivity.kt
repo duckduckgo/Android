@@ -19,6 +19,8 @@ package com.duckduckgo.app.dev.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
@@ -65,6 +67,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
         binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
+        binding.triggerAnr.setOnClickListener {
+            Handler(Looper.getMainLooper()).post {
+                Thread.sleep(10000)
+            }
+        }
     }
 
     private fun observeViewModel() {

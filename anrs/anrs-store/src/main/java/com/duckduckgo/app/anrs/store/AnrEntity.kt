@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-}
+package com.duckduckgo.app.anrs.store
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-dependencies {
-
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.room.runtime
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-
-    kapt AndroidX.room.compiler
-}
+@Entity(tableName = "anr_entity")
+data class AnrEntity(
+    @PrimaryKey val hash: String,
+    val message: String,
+    val name: String,
+    val file: String?,
+    val lineNumber: Int,
+    val stackTrace: List<String>,
+    val timestamp: String,
+)

@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
+package com.duckduckgo.anrs.api
+
+interface AnrRepository {
+    fun getAllAnrs(): List<Anr>
+
+    fun peekMostRecentAnr(): Anr?
+
+    fun removeMostRecentAnr(): Anr?
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.room.runtime
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-
-    kapt AndroidX.room.compiler
-}
+data class Anr(
+    val message: String?,
+    val name: String?,
+    val file: String?,
+    val lineNumber: Int,
+    val stackTrace: List<String>,
+    val timestamp: String,
+)

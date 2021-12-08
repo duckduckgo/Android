@@ -26,6 +26,10 @@ include ':privacy-config-store'
 include ':traces-api'
 include ':traces-impl'
 
+include ':anrs-api'
+include ':anrs-impl'
+include ':anrs-store'
+
 include ':common-test'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
@@ -36,6 +40,10 @@ project(':privacy-config-store').projectDir = new File('privacy-config/privacy-c
 
 project(':traces-api').projectDir = new File('traces/traces-api')
 project(':traces-impl').projectDir = new File('traces/traces-impl')
+
+project(':anrs-api').projectDir = new File('anrs/anrs-api')
+project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
+project(':anrs-store').projectDir = new File('anrs/anrs-store')
 
 rootProject.children.each { subproject ->
 
