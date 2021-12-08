@@ -18,9 +18,7 @@ package com.duckduckgo.app.privacy.cleanup
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -82,10 +80,9 @@ class TrackersDbCleanerWorkerInjectorPlugin(
     }
 }
 
-class TrackersDbCleanerScheduler(private val workManager: WorkManager) : LifecycleObserver {
+class TrackersDbCleanerScheduler(private val workManager: WorkManager) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleDbCleaner() {
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Scheduling Trackers Blocked DB cleaner")
         val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
             .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
