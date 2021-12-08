@@ -48,6 +48,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CheckboxComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
+    class InfoPanelComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+
     @SuppressLint("ShowToast")
     class SnackbarComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
@@ -73,6 +77,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
                 CHECKBOX -> CheckboxComponentViewHolder(parent)
                 SNACKBAR -> SnackbarComponentViewHolder(parent)
+                INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 else -> TODO()
             }
         }

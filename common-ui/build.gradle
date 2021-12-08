@@ -27,15 +27,14 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':di')
 
-    implementation Google.dagger.android
-    implementation Google.dagger.android.support
-
     implementation Kotlin.stdlib.jdk7
 
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
+    // just to get the dagger annotations
+    implementation Google.dagger
 
     implementation "androidx.core:core-ktx:_"
     implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"

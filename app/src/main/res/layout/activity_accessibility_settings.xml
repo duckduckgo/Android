@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.app.accessibility.AccessibilityActivity">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_4"
+            android:orientation="vertical">
+
+            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+                android:id="@+id/appFontSizeToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:toggleSubTitle="@string/accessibilityTextSizeOverrideSubtitle"
+                app:toggleTitle="@string/accessibilityTextSizeOverrideTitle" />
+
+            <LinearLayout
+                android:id="@+id/fontSizeSettingsGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="Overdraw">
+
+                <TextView
+                    style="@style/SettingsSectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/keyline_4"
+                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
+                    android:paddingEnd="@dimen/settingsItemHorizontalPadding"
+                    android:text="@string/accessibilityFontSizeTitle"
+                    tools:text="Text goes here" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/settingsItemHorizontalPadding"
+                    android:paddingEnd="@dimen/settingsItemHorizontalPadding">
+
+                    <TextView
+                        android:id="@+id/accessibilitySliderValue"
+                        style="@style/TextAppearance.DuckDuckGo.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical|start"
+                        android:minWidth="50dp"
+                        android:textColor="?attr/normalTextColor" />
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/accessibilitySlider"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingTop="@dimen/keyline_4"
+                        android:paddingBottom="@dimen/keyline_4"
+                        android:stepSize="10"
+                        android:valueFrom="70"
+                        android:valueTo="170"
+                        app:labelBehavior="gone"
+                        app:tickVisible="false" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/accessibilityHint"
+                    style="@style/TextAppearance.DuckDuckGo.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
+                    android:background="?lightContainerBackground"
+                    android:ellipsize="end"
+                    android:padding="@dimen/keyline_2"
+                    android:text="@string/accessibilityFontSizeHint"
+                    android:textColor="?attr/normalTextColor" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/accessitilityDivider"
+                style="@style/SettingsGroupDivider"
+                android:layout_marginBottom="@dimen/keyline_5" />
+
+            <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+                android:id="@+id/forceZoomToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:toggleSubTitle="@string/accessibilityForceZoomSubtitle"
+                app:toggleTitle="@string/accessibilityForceZoomTitle" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

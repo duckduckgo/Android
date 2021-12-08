@@ -28,12 +28,12 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
-import com.duckduckgo.app.email.waitlist.AppWaitlistCodeFetcher
-import com.duckduckgo.app.email.waitlist.WaitlistCodeFetcher
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
-import com.duckduckgo.app.notification.model.WaitlistCodeNotification
+import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
+import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -45,7 +45,12 @@ class EmailModule {
 
     @Singleton
     @Provides
-    fun providesEmailManager(emailService: EmailService, emailDataStore: EmailDataStore, dispatcherProvider: DispatcherProvider, @AppCoroutineScope appCoroutineScope: CoroutineScope): EmailManager {
+    fun providesEmailManager(
+        emailService: EmailService,
+        emailDataStore: EmailDataStore,
+        dispatcherProvider: DispatcherProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): EmailManager {
         return AppEmailManager(emailService, emailDataStore, dispatcherProvider, appCoroutineScope)
     }
 
@@ -68,16 +73,16 @@ class EmailModule {
     fun providesWaitlistCodeFetcher(
         workManager: WorkManager,
         emailManager: EmailManager,
-        notification: WaitlistCodeNotification,
+        notification: EmailWaitlistCodeNotification,
         notificationSender: NotificationSender,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
-    ): WaitlistCodeFetcher {
-        return AppWaitlistCodeFetcher(workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
+    ): EmailWaitlistCodeFetcher {
+        return AppEmailWaitlistCodeFetcher(workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
     }
 
     @Provides
     @Singleton
     @IntoSet
-    fun providesWaitlistCodeFetcherObserver(waitlistCodeFetcher: WaitlistCodeFetcher): LifecycleObserver = waitlistCodeFetcher
+    fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
 }

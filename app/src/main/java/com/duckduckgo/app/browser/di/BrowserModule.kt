@@ -20,8 +20,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.webkit.CookieManager
-import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -76,6 +76,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -107,7 +108,8 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector
+        emailInjector: EmailInjector,
+        accessibilityManager: AccessibilityManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -124,7 +126,8 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector
+            emailInjector,
+            accessibilityManager
         )
     }
 
@@ -179,8 +182,8 @@ class BrowserModule {
 
     @Provides
     @Singleton
-    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
-        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+    fun userAgentProvider(@Named("defaultUserAgent") defaultUserAgent: Provider<String>, deviceInfo: DeviceInfo): UserAgentProvider {
+        return UserAgentProvider(defaultUserAgent, deviceInfo)
     }
 
     @Provides

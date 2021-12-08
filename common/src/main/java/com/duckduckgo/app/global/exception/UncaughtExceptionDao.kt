@@ -16,22 +16,28 @@
 
 package com.duckduckgo.app.global.exception
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.TypeConverter
+import androidx.room.*
 
 @Dao
 abstract class UncaughtExceptionDao {
 
-    @Insert abstract fun add(uncaughtException: UncaughtExceptionEntity)
+    @Insert
+    abstract fun add(uncaughtException: UncaughtExceptionEntity)
 
-    @Query("SELECT COUNT(1) FROM UncaughtExceptionEntity") abstract fun count(): Long
+    @Query("SELECT COUNT(1) FROM UncaughtExceptionEntity")
+    abstract fun count(): Long
 
     @Query("SELECT * FROM UncaughtExceptionEntity")
     abstract fun all(): List<UncaughtExceptionEntity>
 
-    @Query("DELETE FROM UncaughtExceptionEntity WHERE id=:id") abstract fun delete(id: Long)
+    @Query("SELECT * FROM UncaughtExceptionEntity ORDER BY id DESC LIMIT 1")
+    abstract fun getLatestException(): UncaughtExceptionEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun update(uncaughtException: UncaughtExceptionEntity)
+
+    @Query("DELETE FROM UncaughtExceptionEntity WHERE id=:id")
+    abstract fun delete(id: Long)
 }
 
 enum class UncaughtExceptionSource {
@@ -51,9 +57,9 @@ enum class UncaughtExceptionSource {
 
 class UncaughtExceptionSourceConverter {
 
-    @TypeConverter fun convertForDb(event: UncaughtExceptionSource): String = event.name
+    @TypeConverter
+    fun convertForDb(event: UncaughtExceptionSource): String = event.name
 
     @TypeConverter
-    fun convertFromDb(value: String): UncaughtExceptionSource? =
-        UncaughtExceptionSource.valueOf(value)
+    fun convertFromDb(value: String): UncaughtExceptionSource? = UncaughtExceptionSource.valueOf(value)
 }

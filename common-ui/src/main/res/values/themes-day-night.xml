@@ -50,7 +50,7 @@
         <item name="actionOverflowMenuStyle">@style/PopUpOverflowMenu</item>
         <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.Snackbar</item>
         <item name="autoCompleteTextViewStyle">@style/Widget.DuckDuckGo.AutoCompleteTextView</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>s
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialComponents.Dialog.Alert</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Surface</item>
     </style>
 

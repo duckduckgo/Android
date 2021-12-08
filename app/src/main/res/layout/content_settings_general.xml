@@ -24,6 +24,8 @@
     <TextView
         android:id="@+id/settingsGeneralTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingGeneral"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,5 +91,13 @@
         app:layout_constraintTop_toBottomOf="@id/changeAppIcon"
         app:subtitle="@string/settingsHeroFireAnimation"
         app:title="@string/settingsFireAnimation" />
+
+    <TextView
+        android:id="@+id/accessibilitySetting"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsAccessibility"
+        app:layout_constraintTop_toBottomOf="@id/selectedFireAnimationSetting" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

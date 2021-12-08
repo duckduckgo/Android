@@ -15,94 +15,39 @@
 ~ limitations under the License.
 -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:clipToPadding="false"
-  android:paddingTop="@dimen/keyline_5"
-  android:paddingBottom="@dimen/keyline_5"
-  android:paddingStart="@dimen/keyline_4"
-  android:paddingEnd="@dimen/keyline_4">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:clipToPadding="false"
+              android:orientation="vertical"
+              android:paddingTop="@dimen/keyline_5"
+              android:paddingBottom="@dimen/keyline_5"
+              android:paddingStart="@dimen/keyline_4"
+              android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.themepreview.ui.widget.LabelLinkView
-      android:id="@+id/label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Button"
-      app:linkUrl="https://material.io/design/components/buttons.html"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-      android:id="@+id/button_filled"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/text_button"
-      android:layout_marginTop="@dimen/component_label_horizontal_margin"
-      android:layout_marginEnd="@dimen/keyline_2"
-      app:layout_constraintEnd_toStartOf="@+id/button_text"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintHorizontal_chainStyle="spread_inside"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/label" />
+    <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+        android:id="@+id/label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Buttons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
-      style="@style/Widget.MaterialComponents.Button.TextButton"
-      android:id="@+id/button_text"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/text_button"
-      android:layout_marginStart="@dimen/keyline_2"
-      android:layout_marginEnd="@dimen/keyline_2"
-      app:layout_constraintBottom_toBottomOf="@+id/button_filled"
-      app:layout_constraintEnd_toStartOf="@+id/button_outlined"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toEndOf="@+id/button_filled"
-      app:layout_constraintTop_toTopOf="@+id/button_filled" />
+        android:id="@+id/primary_button"
+        android:text="Primary Button"
+        style="@style/DeviceShield.Button.Blue"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
 
     <Button
-      style="?materialButtonOutlinedStyle"
-      android:id="@+id/button_outlined"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/text_button"
-      android:layout_marginStart="@dimen/keyline_2"
-      app:layout_constraintBottom_toBottomOf="@+id/button_text"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.5"
-      app:layout_constraintStart_toEndOf="@+id/button_text"
-      app:layout_constraintTop_toTopOf="@+id/button_text" />
+        android:id="@+id/secondary_button"
+        style="@style/DeviceShield.Button.Border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Secondary Button"/>
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-      android:id="@+id/button_group"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/keyline_5"
-      app:layout_constraintTop_toBottomOf="@+id/button_filled"
-      app:layout_constraintStart_toStartOf="parent">
-
-        <Button
-          style="?attr/materialButtonOutlinedStyle"
-          android:id="@+id/button_one"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/button_left_button_label" />
-
-        <Button
-          style="?attr/materialButtonOutlinedStyle"
-          android:id="@+id/button_center"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/button_center_button_label" />
-
-        <Button
-          style="?attr/materialButtonOutlinedStyle"
-          android:id="@+id/button_three"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="@string/button_right_button_label" />
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

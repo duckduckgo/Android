@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.notification
 
+import android.app.TaskStackBuilder
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,10 +25,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
@@ -39,21 +37,32 @@ class NotificationHandlerServiceTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private var mockPixel: Pixel = mock()
-    private var testee = NotificationHandlerService()
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private lateinit var testee: NotificationHandlerService
+    private lateinit var mockPixel: Pixel
+
+    private val appContext = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     @Before
     fun before() {
-        testee.pixel = mockPixel
-        testee.context = context
-        testee.notificationManager = NotificationManagerCompat.from(context)
-        testee.dispatcher = coroutinesTestRule.testDispatcherProvider
+        mockPixel = mock()
+        val mockTaskStackBuilderFactory: TaskStackBuilderFactory = mock()
+        val taskStackBuilder: TaskStackBuilder = mock()
+
+        whenever(taskStackBuilder.addNextIntentWithParentStack(any())).thenReturn(taskStackBuilder)
+        whenever(mockTaskStackBuilderFactory.createTaskBuilder()).thenReturn(taskStackBuilder)
+
+        testee = NotificationHandlerService().apply {
+            pixel = mockPixel
+            this.context = appContext
+            notificationManager = NotificationManagerCompat.from(context)
+            dispatcher = coroutinesTestRule.testDispatcherProvider
+            taskStackBuilderFactory = mockTaskStackBuilderFactory
+        }
     }
 
     @Test
     fun whenIntentIsClearDataLaunchedThenCorrespondingPixelIsFired() {
-        val intent = Intent(context, NotificationHandlerService::class.java)
+        val intent = Intent(appContext, NotificationHandlerService::class.java)
         intent.type = CLEAR_DATA_LAUNCH
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
@@ -62,7 +71,7 @@ class NotificationHandlerServiceTest {
 
     @Test
     fun whenIntentIsClearDataCancelledThenCorrespondingPixelIsFired() {
-        val intent = Intent(context, NotificationHandlerService::class.java)
+        val intent = Intent(appContext, NotificationHandlerService::class.java)
         intent.type = CANCEL
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)

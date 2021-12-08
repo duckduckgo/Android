@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -37,30 +39,42 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
+    private val appContext: Context,
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
+    private val appTPWaitlistManager: TrackingProtectionWaitlistManager,
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel
-) : ViewModel() {
+) : ViewModel(), LifecycleObserver {
+
+    private var deviceShieldStatePollingJob: Job? = null
 
     data class ViewState(
         val loading: Boolean = true,
@@ -73,7 +87,9 @@ class SettingsViewModel @Inject constructor(
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
-        val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME
+        val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
+        val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
+        val appTrackingProtectionEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -87,6 +103,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAccessibilitySettigns : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
@@ -94,6 +111,9 @@ class SettingsViewModel @Inject constructor(
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
         object LaunchGlobalPrivacyControl : Command()
+        object LaunchAppTPTrackersScreen : Command()
+        object LaunchAppTPWaitlist : Command()
+        object LaunchAppTPOnboarding : Command()
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
@@ -128,10 +148,35 @@ class SettingsViewModel @Inject constructor(
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt)
+                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
+                    appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
                 )
             )
         }
+    }
+
+    // FIXME
+    // We need to fix this. This logic as inside the start method but it messes with the unit tests
+    // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
+    // becomes a while(true) without any delay
+    fun startPollingAppTpEnableState() {
+        viewModelScope.launch {
+            while (isActive) {
+                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
+                    viewState.value = currentViewState().copy(
+                        appTrackingProtectionEnabled = isDeviceShieldEnabled
+                    )
+                }
+                delay(1_000)
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun stopPollingDeviceShieldState() {
+        deviceShieldStatePollingJob?.cancel()
     }
 
     fun viewState(): StateFlow<ViewState> {
@@ -153,6 +198,10 @@ class SettingsViewModel @Inject constructor(
     fun userRequestedToChangeFireAnimation() {
         viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
+    }
+
+    fun onAccessibilitySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettigns) }
     }
 
     fun userRequestedToChangeTheme() {
@@ -196,6 +245,18 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(isAppDefaultBrowser = enabled))
             command.send(Command.LaunchDefaultBrowser)
+        }
+    }
+
+    fun onAppTPSettingClicked() {
+        if (appTPWaitlistManager.didJoinBeta()) {
+            if (deviceShieldOnboardingStore.didShowOnboarding()) {
+                viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
+            } else {
+                viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+            }
+        } else {
+            viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
         }
     }
 
@@ -369,6 +430,7 @@ enum class AppLinkSettingType {
 
 @ContributesMultibinding(AppObjectGraph::class)
 class SettingsViewModelFactory @Inject constructor(
+    private val context: Provider<Context>,
     private val themingDataStore: Provider<ThemingDataStore>,
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
@@ -376,12 +438,28 @@ class SettingsViewModelFactory @Inject constructor(
     private val fireAnimationLoader: Provider<FireAnimationLoader>,
     private val gpc: Provider<Gpc>,
     private val featureToggle: Provider<FeatureToggle>,
-    private val pixel: Provider<Pixel>
+    private val pixel: Provider<Pixel>,
+    private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>,
+    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(themingDataStore.get(), settingsDataStore.get(), defaultWebBrowserCapability.get(), variantManager.get(), fireAnimationLoader.get(), gpc.get(), featureToggle.get(), pixel.get()) as T)
+                isAssignableFrom(SettingsViewModel::class.java) -> (
+                    SettingsViewModel(
+                        context.get(),
+                        themingDataStore.get(),
+                        settingsDataStore.get(),
+                        defaultWebBrowserCapability.get(),
+                        variantManager.get(),
+                        fireAnimationLoader.get(),
+                        appTPWaitlistManager.get(),
+                        deviceShieldOnboardingStore.get(),
+                        gpc.get(),
+                        featureToggle.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

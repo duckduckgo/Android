@@ -63,7 +63,8 @@ class KeyboardAwareEditText : AppCompatEditText {
                 // we need to post for the selectAll to take effect. The wonders of Android layout !
                 post { Selection.selectAll(text) }
             }
-            showKeyboard()
+            // This is triggering multiple keyboard shows, which is unnecessary
+            // showKeyboard()
         }
     }
 

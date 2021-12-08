@@ -28,9 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 interface EmailManager : LifecycleObserver {
     fun signedInFlow(): StateFlow<Boolean>

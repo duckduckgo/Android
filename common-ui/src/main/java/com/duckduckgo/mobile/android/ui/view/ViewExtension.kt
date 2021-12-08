@@ -24,6 +24,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import androidx.annotation.StringRes
 import androidx.core.view.children
+import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
 import com.google.android.material.snackbar.Snackbar
 
@@ -130,4 +131,10 @@ fun View.makeSnackbarWithNoBottomInset(@StringRes resId: Int, @Duration duration
     val snackbar = Snackbar.make(this, resId, duration)
     snackbar.isGestureInsetBottomIgnored = true
     return snackbar
+}
+
+fun Slider.quietlySetValue(newValue: Float, listener: Slider.OnChangeListener) {
+    removeOnChangeListener(listener)
+    value = newValue
+    addOnChangeListener(listener)
 }

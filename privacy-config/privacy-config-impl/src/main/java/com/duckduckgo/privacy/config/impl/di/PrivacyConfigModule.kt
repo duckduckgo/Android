@@ -37,6 +37,8 @@ import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
+import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
+import com.duckduckgo.privacy.config.store.features.drm.RealDrmRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcDataStore
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcSharedPreferences
@@ -184,5 +186,11 @@ class DatabaseModule {
         privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
     ): PrivacyFeatureTogglesRepository {
         return RealPrivacyFeatureTogglesRepository(privacyFeatureTogglesDataStore)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDrmRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): DrmRepository {
+        return RealDrmRepository(database, coroutineScope, dispatcherProvider)
     }
 }

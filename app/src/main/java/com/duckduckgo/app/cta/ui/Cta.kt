@@ -39,6 +39,9 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -368,9 +371,9 @@ sealed class HomePanelCta(
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {
-        view.ctaIcon.setImageResource(image)
-        view.ctaTitle.text = view.context.getString(title)
-        view.ctaSubtitle.text = view.context.getString(description)
+        view.ctaIcon?.setImageResource(image)
+        view.ctaTitle?.text = view.context.getString(title)
+        view.ctaSubtitle?.text = view.context.getString(description)
         view.ctaOkButton.text = view.context.getString(okButton)
         view.ctaDismissButton.text = view.context.getString(dismissButton)
         view.show()
@@ -394,6 +397,18 @@ sealed class HomePanelCta(
         AppPixelName.SURVEY_CTA_DISMISSED
     )
 
+    object DeviceShieldCta : HomePanelCta(
+        CtaId.DEVICE_SHIELD_CTA,
+        R.drawable.add_widget_cta_icon,
+        R.string.addWidgetCtaTitle,
+        R.string.addWidgetCtaDescription,
+        R.string.addWidgetCtaAutoLaunchButton,
+        R.string.addWidgetCtaDismissButton,
+        null,
+        null,
+        null
+    )
+
     object AddWidgetAuto : HomePanelCta(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,
@@ -401,6 +416,18 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
+        AppPixelName.WIDGET_CTA_SHOWN,
+        AppPixelName.WIDGET_CTA_LAUNCHED,
+        AppPixelName.WIDGET_CTA_DISMISSED
+    )
+
+    object AddReturningUsersWidgetAuto : HomePanelCta(
+        CtaId.ADD_WIDGET,
+        R.drawable.add_widget_cta_icon,
+        R.string.addWidgetCtaTitle,
+        R.string.addWidgetCtaDescription,
+        R.string.addWidgetCtaAutoLaunchButton,
+        R.string.returningUsersWidgetDismissButtonLabel,
         AppPixelName.WIDGET_CTA_SHOWN,
         AppPixelName.WIDGET_CTA_LAUNCHED,
         AppPixelName.WIDGET_CTA_DISMISSED
