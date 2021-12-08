@@ -59,7 +59,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
         viewModel.getChoices().test {
             val expectedChoices = ReportBreakageSingleChoiceFormView.State(
                 CHOICES.map { if (it.questionStringRes == selectedChoice.questionStringRes) selectedChoice else it },
-                true
+                false
             )
 
             assertEquals(expectedChoices, awaitItem())
@@ -80,7 +80,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
 
             expectedChoices = ReportBreakageSingleChoiceFormView.State(
                 CHOICES.map { if (it.questionStringRes == selectedChoice.questionStringRes) selectedChoice else it },
-                true
+                false
             )
 
             assertEquals(expectedChoices, awaitItem())

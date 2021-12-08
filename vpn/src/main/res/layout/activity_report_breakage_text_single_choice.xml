@@ -72,6 +72,17 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/appBreakageFormConfirmationCheckbox"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingBottom="@dimen/keyline_2"
+        style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/PopUpMenuSwitchTheme"
+        android:text="@string/atp_ReportBreakageFormCheckboxText" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -84,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:layout_gravity="bottom"
-        android:enabled="true"
+        android:enabled="false"
         android:text="@string/atp_ReportBreakageAppSubmitCta"/>
 
 </LinearLayout>

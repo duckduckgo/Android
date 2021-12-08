@@ -32,6 +32,7 @@ import javax.inject.Inject
 class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
 
     private var selectedChoice: Choice? = null
+    private var isCheckboxChecked = false
 
     private val choices = MutableStateFlow(CHOICES)
     private var refreshTickerChannel = MutableStateFlow(System.currentTimeMillis())
@@ -43,11 +44,16 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
         return choices.asStateFlow()
             .combine(refreshTickerChannel) { choices, _ -> choices }
             .map { it.update(selectedChoice) }
-            .map { ReportBreakageSingleChoiceFormView.State(it, canSubmit = it.any { choice -> choice.isSelected }) }
+            .map { ReportBreakageSingleChoiceFormView.State(it, canSubmit = it.any { choice -> choice.isSelected && isCheckboxChecked }) }
     }
 
     internal fun onChoiceSelected(choice: Choice) {
         selectedChoice = choice.copy(isSelected = true)
+        viewModelScope.launch { refreshTickerChannel.emit(System.currentTimeMillis()) }
+    }
+
+    internal fun onCheckboxChange(isChecked: Boolean) {
+        isCheckboxChecked = isChecked
         viewModelScope.launch { refreshTickerChannel.emit(System.currentTimeMillis()) }
     }
 
