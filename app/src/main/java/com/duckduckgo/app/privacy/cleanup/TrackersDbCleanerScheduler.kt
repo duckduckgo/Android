@@ -26,7 +26,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.db.AppDatabase
@@ -87,22 +86,12 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Lifecyc
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleDbCleaner() {
-        if (isAlreadyScheduled()) {
-            Timber.v("Trackers Blocked DB cleaner worker is already scheduled, no need to schedule again")
-        } else {
-            Timber.v("Scheduling Trackers Blocked DB cleaner")
-            val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
-                .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-                .build()
-            workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
-        }
-    }
-
-    private fun isAlreadyScheduled(): Boolean {
-        return workManager
-            .getWorkInfosByTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
-            .get().any { it.state == WorkInfo.State.ENQUEUED }
+        Timber.v("Scheduling Trackers Blocked DB cleaner")
+        val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
+            .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
     }
 
     companion object {
