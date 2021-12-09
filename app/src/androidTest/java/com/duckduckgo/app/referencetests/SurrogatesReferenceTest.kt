@@ -21,12 +21,14 @@ package com.duckduckgo.app.referencetests
 import android.util.Base64
 import android.webkit.*
 import androidx.core.net.toUri
+import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -36,10 +38,13 @@ import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.app.trackerdetection.Client
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsClient
+import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -57,7 +62,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.MockitoAnnotations
 
 @RunWith(Parameterized::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
@@ -66,35 +70,29 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
+    private lateinit var entityLookup: EntityLookup
+    private lateinit var db: AppDatabase
+    private lateinit var trackerDetector: TrackerDetector
+    private lateinit var tdsEntityDao: TdsEntityDao
+    private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
     private lateinit var testee: WebViewRequestInterceptor
 
-    private var mockTrackerDetector: TrackerDetector = mock()
-    private var mockHttpsUpgrader: HttpsUpgrader = mock()
-    private var mockRequest: WebResourceRequest = mock()
-    private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
-    private val mockGpc: Gpc = mock()
-    private val mockWebBackForwardList: WebBackForwardList = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
-
     private val resourceSurrogates = ResourceSurrogatesImpl()
+
     private var webView: WebView = mock()
-
-    private val actionConverter = ActionJsonAdapter()
-    private val moshi = Moshi.Builder().add(actionConverter).build()
-    private val jsonAdapter: JsonAdapter<TdsJson> = moshi.adapter(TdsJson::class.java)
-
-    private val mockEntityLookup: EntityLookup = mock()
     private val mockUserWhitelistDao: UserWhitelistDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
-    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+    private var mockHttpsUpgrader: HttpsUpgrader = mock()
+    private var mockRequest: WebResourceRequest = mock()
+    private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider("", mock())
+    private val mockGpc: Gpc = mock()
 
     companion object {
-        const val DEFAULT =
-            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
-        private val moshi = Moshi.Builder().build()
-        val adapter: JsonAdapter<SurrogateTest> = moshi.adapter(SurrogateTest::class.java)
+        private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
+        private val adapter: JsonAdapter<SurrogateTest> = moshi.adapter(SurrogateTest::class.java)
 
         @JvmStatic
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
@@ -129,10 +127,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     @UiThreadTest
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
-        initialiseResourceSurrogates()
         initialiseTds()
-        configureUserAgent()
+        initialiseResourceSurrogates()
         whenever(mockRequest.isForMainFrame).thenReturn(false)
 
         testee = WebViewRequestInterceptor(
@@ -146,8 +142,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun test() = runBlocking<Unit> {
-        configureShouldNotUpgrade()
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
 
         val response = testee.shouldIntercept(
@@ -171,11 +166,26 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseTds() {
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
+        tdsEntityDao = db.tdsEntityDao()
+        tdsDomainEntityDao = db.tdsDomainEntityDao()
+
+        entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
+        trackerDetector = TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+
         val json = FileUtilities.loadText("reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
         val tdsJson = adapter.fromJson(json)!!
         val trackers = tdsJson.jsonToTrackers().values.toList()
+        val entities = tdsJson.jsonToEntities()
+        val domainEntities = tdsJson.jsonToDomainEntities()
         val client = TdsClient(Client.ClientName.TDS, trackers)
+
+        tdsEntityDao.insertAll(entities)
+        tdsDomainEntityDao.insertAll(domainEntities)
         trackerDetector.addClient(client)
     }
 
@@ -206,16 +216,5 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         assertNull(response!!.data)
         assertNull(response.mimeType)
         assertNull(response.encoding)
-    }
-
-    private fun configureShouldNotUpgrade() = runBlocking<Unit> {
-        whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
-        whenever(mockRequest.isForMainFrame).thenReturn(false)
-    }
-
-    private fun configureUserAgent() {
-        val settings: WebSettings = mock()
-        whenever(webView.settings).thenReturn(settings)
-        whenever(settings.userAgentString).thenReturn(userAgentProvider.userAgent())
     }
 }

@@ -69,8 +69,8 @@
     "ignore.test": {
       "domain": "ignore.test",
       "owner": {
-        "name": "Test Site for Tracker Blocking",
-        "displayName": "ignore Site",
+        "name": "Ignore Site for Tracker Blocking",
+        "displayName": "Ignore Site",
         "privacyPolicy": "",
         "url": "http://ignore.test"
       },
@@ -88,8 +88,8 @@
     "surrogates.test": {
       "domain": "surrogates.test",
       "owner": {
-        "name": "Test Site for surrogates",
-        "displayName": "Bad Third Party Site",
+        "name": "Test Site for Surrogates",
+        "displayName": "Surrogates Site",
         "privacyPolicy": "",
         "url": "http://surrogates.test"
       },
@@ -122,13 +122,21 @@
       "prevalence": 0.1,
       "displayName": "Test Site for Tracker Blocking"
     },
-    "ignore Site for Tracker Blocking": {
+    "Ignore Site for Tracker Blocking": {
       "domains": [
         "ignore.test",
         "sub.ignore.test"
       ],
       "prevalence": 0.1,
-      "displayName": "ignore Site for Tracker Blocking"
+      "displayName": "Ignore Site for Tracker Blocking"
+    },
+    "Test Site for Surrogates": {
+      "domains": [
+        "other-surrogates.test",
+        "surrogates.test"
+      ],
+      "prevalence": 0.1,
+      "displayName": "Test Site for Surrogates"
     }
   },
   "cnames": {
@@ -141,8 +149,9 @@
     "broken.third-party.site": "Test Site for Tracker Blocking",
     "third-party.site": "Test Site for Tracker Blocking",
     "tracker.test": "Test Site for Tracker Blocking",
-    "ignore.test": "ignore Site for Tracker Blocking",
-    "sub.ignore.test": "ignore Site for Tracker Blocking",
-    "surrogates.test": "Test Site for surrogates"
+    "ignore.test": "Ignore Site for Tracker Blocking",
+    "sub.ignore.test": "Ignore Site for Tracker Blocking",
+    "surrogates.test": "Test Site for Surrogates",
+    "other-surrogates.test": "Test Site for Surrogates"
   }
 }

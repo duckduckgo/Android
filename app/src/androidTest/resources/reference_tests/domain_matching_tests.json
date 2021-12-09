@@ -214,7 +214,7 @@
       },
       {
         "name": "skip surrogates for same entity",
-        "siteURL": "https://tracker.test/",
+        "siteURL": "https://other-surrogates.test/",
         "requestURL": "https://surrogates.test/tracker?abc=2",
         "requestType": "script",
         "expectAction": "ignore"
