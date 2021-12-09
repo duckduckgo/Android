@@ -18,8 +18,12 @@ package com.duckduckgo.app.widget.ui
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class AddWidgetInstructionsViewModel : ViewModel() {
 
@@ -37,5 +41,16 @@ class AddWidgetInstructionsViewModel : ViewModel() {
     fun onClosePressed() {
         command.value = Close
     }
+}
 
+@ContributesMultibinding(AppObjectGraph::class)
+class AddWidgetInstructionsViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> (AddWidgetInstructionsViewModel() as T)
+                else -> null
+            }
+        }
+    }
 }

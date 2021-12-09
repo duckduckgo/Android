@@ -24,7 +24,7 @@ import dagger.Provides
 class DaoModule {
 
     @Provides
-    fun providesHttpsWhitelistDao(database: AppDatabase) = database.httpsWhitelistedDao()
+    fun providesHttpsFalsePositivesDao(database: AppDatabase) = database.httpsFalsePositivesDao()
 
     @Provides
     fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
@@ -39,13 +39,19 @@ class DaoModule {
     fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
 
     @Provides
-    fun providesTemporaryTrackingWhitelist(database: AppDatabase) = database.temporaryTrackingWhitelistDao()
+    fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
 
     @Provides
     fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
+
+    @Provides
+    fun providesFavoritesDao(database: AppDatabase) = database.favoritesDao()
+
+    @Provides
+    fun providesBookmarkFoldersDao(database: AppDatabase) = database.bookmarkFoldersDao()
 
     @Provides
     fun providesTabsDao(database: AppDatabase) = database.tabsDao()
@@ -76,4 +82,19 @@ class DaoModule {
 
     @Provides
     fun userStageDao(database: AppDatabase) = database.userStageDao()
+
+    @Provides
+    fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
+
+    @Provides
+    fun userEventsDao(database: AppDatabase) = database.userEventsDao()
+
+    @Provides
+    fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
+
+    @Provides
+    fun webTrackersBlockedDao(database: AppDatabase) = database.webTrackersBlockedDao()
+
+    @Provides
+    fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
 }

@@ -57,7 +57,7 @@ class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvide
         }
 
         val escapedQuery = Regex.escape(query)
-        val wordPrefixMatchingRegex = ".*\\b${escapedQuery}.*".toRegex(IGNORE_CASE)
+        val wordPrefixMatchingRegex = ".*\\b$escapedQuery.*".toRegex(IGNORE_CASE)
         return apps!!.filter {
             it.shortName.matches(wordPrefixMatchingRegex)
         }.sortedWith(comparator(query))

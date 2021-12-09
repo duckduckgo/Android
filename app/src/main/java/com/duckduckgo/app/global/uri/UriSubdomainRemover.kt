@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.uri
 
 import android.net.Uri
 
-
 fun Uri.removeSubdomain(): String? {
     val host = host ?: return null
 

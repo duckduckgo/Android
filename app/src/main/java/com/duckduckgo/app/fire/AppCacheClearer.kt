@@ -17,9 +17,9 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.file.FileDeleter
-
 
 interface AppCacheClearer {
 
@@ -53,7 +53,8 @@ class AndroidAppCacheClearer(private val context: Context, private val fileDelet
         private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
             WEBVIEW_CACHE_DIR,
             WEBVIEW_CACHE_DIR_LEGACY,
-            NETWORK_CACHE_DIR
+            NETWORK_CACHE_DIR,
+            FAVICON_PERSISTED_DIR
         )
     }
 

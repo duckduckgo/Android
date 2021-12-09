@@ -18,17 +18,27 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.api.isCached
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.sha1
 import com.duckduckgo.app.global.toHttps
-import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Https
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.concurrent.thread
 
 interface HttpsUpgrader {
 
@@ -43,92 +53,94 @@ interface HttpsUpgrader {
     fun reloadData()
 }
 
-class HttpsUpgraderImpl(
-    private val whitelistedDao: HttpsWhitelistDao,
+@Singleton
+@ContributesBinding(
+    scope = AppObjectGraph::class,
+    boundType = HttpsUpgrader::class
+)
+class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
-    private val httpsUpgradeService: HttpsUpgradeService,
-    private val pixel: Pixel
-) : HttpsUpgrader {
+    private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
+    private val userAllowListDao: UserWhitelistDao,
+    private val toggle: FeatureToggle,
+    private val https: Https
+) : HttpsUpgrader, LifecycleObserver {
 
-    private var localBloomFilter: BloomFilter? = null
-    private val localDataReloadLock = ReentrantLock()
-    private val isLocalListReloading get() = localDataReloadLock.isLocked
+    private var bloomFilter: BloomFilter? = null
+    private val bloomReloadLock = ReentrantLock()
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onApplicationCreated() {
+        thread { reloadData() }
+    }
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
+        val host = uri.host ?: return false
+
+        if (toggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()) != true) {
+            Timber.d("https is disabled in the remote config and so $host is not upgradable")
+            return false
+        }
 
         if (uri.isHttps) {
-            pixel.fire(HTTPS_NO_LOOKUP)
             return false
         }
 
-        val host = uri.host
-        if (host == null) {
-            pixel.fire(HTTPS_NO_LOOKUP)
+        if (https.isAnException(uri.toString())) {
+            Timber.d("$host is in the remote exception list and so not upgradable")
             return false
         }
 
-        if (whitelistedDao.contains(host)) {
-            pixel.fire(HTTPS_NO_LOOKUP)
-            Timber.d("$host is in whitelist and so not upgradable")
+        if (userAllowListDao.contains(host)) {
+            Timber.d("$host is in user allowlist and so not upgradable")
             return false
         }
 
-        val isLocallyUpgradable = !isLocalListReloading && isInLocalUpgradeList(host)
-        Timber.d("$host ${if (isLocallyUpgradable) "is" else "is not"} locally upgradable")
-        if (isLocallyUpgradable) {
-            pixel.fire(HTTPS_LOCAL_UPGRADE)
-            return true
+        if (bloomFalsePositiveDao.contains(host)) {
+            Timber.d("$host is in https whitelist and so not upgradable")
+            return false
         }
 
-        val serviceUpgradeResult = isInServiceUpgradeList(host)
-        if (serviceUpgradeResult.isUpgradable) {
-            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_UPGRADE else HTTPS_SERVICE_REQUEST_UPGRADE)
-        } else {
-            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
-        }
-        Timber.d("$host ${if (serviceUpgradeResult.isUpgradable) "is" else "is not"} service upgradable")
-        return serviceUpgradeResult.isUpgradable
+        val isUpgradable = isInUpgradeList(host)
+        Timber.d("$host ${if (isUpgradable) "is" else "is not"} upgradable")
+        return isUpgradable
     }
 
     @WorkerThread
-    private fun isInLocalUpgradeList(host: String): Boolean {
-        return localBloomFilter?.contains(host) == true
-    }
-
-    @WorkerThread
-    private fun isInServiceUpgradeList(host: String): HttpsServiceResult {
-
-        val sha1Host = host.sha1
-        val partialSha1Host = sha1Host.substring(0, 4)
-
-        try {
-            val response = httpsUpgradeService.upgradeListForPartialHost(partialSha1Host).execute()
-            if (response.isSuccessful) {
-                val shouldUpgrade = response.body()?.contains(sha1Host) == true
-                return HttpsServiceResult(shouldUpgrade, response.isCached)
-            } else {
-                Timber.w("Service https lookup failed with ${response.code()}")
-            }
-        } catch (error: Exception) {
-            Timber.w("Service https lookup failed with $error")
-        }
-
-        return HttpsServiceResult(isUpgradable = false, isCached = false)
+    private fun isInUpgradeList(host: String): Boolean {
+        waitForAnyReloadsToComplete()
+        return bloomFilter?.contains(host) == true
     }
 
     @WorkerThread
     override fun reloadData() {
-        localDataReloadLock.lock()
+        Timber.v("Reload Https upgrader data")
+        bloomReloadLock.lock()
         try {
-            localBloomFilter = bloomFactory.create()
+            bloomFilter = bloomFactory.create()
         } finally {
-            localDataReloadLock.unlock()
+            bloomReloadLock.unlock()
         }
     }
 
-    data class HttpsServiceResult(
-        val isUpgradable: Boolean,
-        val isCached: Boolean
-    )
+    private fun waitForAnyReloadsToComplete() {
+        // wait for lock (by locking and unlocking) before continuing
+        if (bloomReloadLock.isLocked) {
+            bloomReloadLock.lock()
+            bloomReloadLock.unlock()
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+abstract class HttpsUpgraderModule {
+
+    @Singleton
+    @Binds
+    @IntoSet
+    abstract fun bindHttpsUpgraderLifecycleObserver(
+        httpsUpgraderImpl: HttpsUpgraderImpl
+    ): LifecycleObserver
 }

@@ -21,7 +21,6 @@ import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.model.HttpsStatus
 
-
 @DrawableRes
 fun HttpsStatus.icon(): Int {
     return when (this) {

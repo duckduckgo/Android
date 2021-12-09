@@ -19,16 +19,20 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.CoroutineWorker
+import androidx.work.ListenableWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
+import javax.inject.Inject
 
 class DataClearingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
 
@@ -89,3 +93,18 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
     }
 }
 
+@ContributesMultibinding(AppObjectGraph::class)
+class DataClearingWorkerInjectorPlugin @Inject constructor(
+    private val settingsDataStore: SettingsDataStore,
+    private val clearDataAction: ClearDataAction
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is DataClearingWorker) {
+            worker.settingsDataStore = settingsDataStore
+            worker.clearDataAction = clearDataAction
+            return true
+        }
+        return false
+    }
+}

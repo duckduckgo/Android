@@ -19,20 +19,26 @@ package com.duckduckgo.app.di
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [JobsModule::class]
+)
 class StubJobSchedulerModule {
 
     @Singleton
     @Provides
     fun providesJobScheduler(): JobScheduler {
         return object : JobScheduler() {
-            override fun enqueue(job: JobInfo?, work: JobWorkItem?): Int = JobScheduler.RESULT_SUCCESS
+            override fun enqueue(job: JobInfo, work: JobWorkItem): Int = JobScheduler.RESULT_SUCCESS
 
-            override fun schedule(job: JobInfo?): Int = JobScheduler.RESULT_SUCCESS
+            override fun schedule(job: JobInfo): Int = JobScheduler.RESULT_SUCCESS
 
             override fun cancel(jobId: Int) {}
 

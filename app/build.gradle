@@ -3,22 +3,26 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
+apply from: "$rootDir/spotless.gradle"
+apply plugin: 'com.duckduckgo.buildtime'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
+    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion compile_sdk
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdk min_sdk
+        targetSdk target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
-        testInstrumentationRunner "com.duckduckgo.app.TestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
 
@@ -30,14 +34,21 @@ android {
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
             androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
+            main {
+                java {
+                    resources {
+                        srcDirs += files("$projectDir/../submodules/autofill/dist/".toString())
+                    }
+                }
+            }
         }
+    }
+    buildFeatures {
+        viewBinding = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
     signingConfigs {
         release
@@ -47,7 +58,7 @@ android {
             applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_blue",
+                    appIcon     : "@mipmap/ic_launcher_blue",
                     appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
         }
@@ -56,9 +67,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_red",
+                    appIcon     : "@mipmap/ic_launcher_red",
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
+        }
+    }
+    flavorDimensions "store"
+    productFlavors {
+        internal {
+            dimension "store"
+        }
+        fdroid {
+            dimension "store"
+        }
+        play {
+            dimension "store"
+        }
+    }
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (names.contains("fdroid") && variant.buildType.name == "debug") {
+            // We don't need fdroidDebug build type
+            setIgnore(true)
         }
     }
     externalNativeBuild {
@@ -68,24 +98,23 @@ android {
         }
     }
     lintOptions {
-        abortOnError false
+        abortOnError true
+        baseline file("lint-baseline.xml")
     }
     testOptions {
         unitTests.returnDefaultValues = true
-
+        animationsDisabled = true
         if (USE_ORCHESTRATOR) {
             execution 'ANDROID_TEST_ORCHESTRATOR'
         }
     }
 
-    def staticConfigPath = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
-    def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"
+    def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
     def propertiesFile = new File(propertiesPath)
     if (propertiesFile.exists()) {
-        println "Signing properties found"
         def props = new Properties()
         props.load(new FileInputStream(propertiesFile))
-        android.signingConfigs.release.storeFile = file("${staticConfigPath}/${props['key.store']}")
+        android.signingConfigs.release.storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
         android.signingConfigs.release.storePassword = props['key.store.password']
         android.signingConfigs.release.keyAlias = props['key.alias']
         android.signingConfigs.release.keyPassword = props['key.alias.password']
@@ -95,131 +124,159 @@ android {
     }
 }
 
-ext {
-    androidX = "1.2.0-beta01"
-    materialDesign = "1.2.0-alpha05"
-    architectureComponents = "1.1.1"
-    architectureComponentsExtensions = "1.1.1"
-    androidKtxCore = "1.2.0"
-    fragmentKtx = "1.2.3"
-    constraintLayout = "2.0.0-beta4"
-    lifecycle = "2.2.0"
-    room = "2.2.5"
-    workManager = "2.3.4"
-    legacySupport = "1.0.0"
-    coreTesting = "2.1.0"
-    testRunner = "1.2.0"
-    coroutines = "1.3.5"
-    retrofitCoroutinesAdapter = "0.9.2"
-    webkit = "1.2.0"
-    referrerLibrary = "1.1.2"
-
-    junit = "4.12"
-    dagger = "2.27"
-    retrofit = "2.8.1"
-    ankoVersion = "0.10.4"
-    glide = "4.11.0"
-    lottieVersion = "2.6.0-beta19"
-    okHttp = "3.14.7"
-    rxJava = "2.1.10"
-    rxAndroid = "2.0.2"
-    timber = "4.7.1"
-    rxRelay = "2.0.0"
-    leakCanary = "2.0"
-    mockito = "2.18.3"
-    mockitoKotlin = "2.0.0"
-    commonsMath = "3.6.1"
-}
-
-
 dependencies {
-    implementation "androidx.legacy:legacy-support-v4:$legacySupport"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
+    implementation project(path: ':browser-api')
+    implementation project(path: ':statistics')
+    implementation project(path: ':common')
+    implementation project(path: ':app-store')
+    implementation project(path: ':common-ui')
+    implementation project(path: ':di')
+    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn-store')
+    internalImplementation project(path: ':vpn-internal')
+
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':feature-toggles-impl')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':privacy-config-impl')
+
+    implementation AndroidX.legacy.supportV4
+    debugImplementation Square.leakCanary.android
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+    implementation KotlinX.coroutines.core
+    implementation KotlinX.coroutines.android
+    androidTestImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
-    implementation "androidx.appcompat:appcompat:$androidX"
-    implementation "com.google.android.material:material:$materialDesign"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
-    implementation "androidx.webkit:webkit:$webkit"
-    implementation "com.squareup.okhttp3:okhttp:$okHttp"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
-    implementation "com.squareup.retrofit2:converter-scalars:$retrofit"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$retrofitCoroutinesAdapter"
-    implementation "io.reactivex.rxjava2:rxjava:$rxJava"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
-    implementation "com.jakewharton.timber:timber:$timber"
-    implementation "com.google.dagger:dagger-android:$dagger"
-    implementation "com.google.dagger:dagger-android-support:$dagger"
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.recyclerView
+    implementation AndroidX.swipeRefreshLayout
+    implementation AndroidX.webkit
+    implementation Square.okHttp3.okHttp
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.retrofit2.adapter.rxJava2
+    implementation Square.retrofit2.converter.scalars
+    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation JakeWharton.timber
+
+    // ThreeTenABP
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     // RxRelay
-    implementation "com.jakewharton.rxrelay2:rxrelay:$rxRelay"
-
-    // Anko
-    implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
-    implementation "org.jetbrains.anko:anko-design:$ankoVersion"
+    implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
     // Android KTX
-    implementation "androidx.core:core-ktx:$androidKtxCore"
-    implementation "androidx.fragment:fragment-ktx:$fragmentKtx"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.fragmentKtx
 
     // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.liveDataKtx
+    implementation AndroidX.lifecycle.process
 
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
-    testImplementation "androidx.arch.core:core-testing:$coreTesting"
-    androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
+    implementation AndroidX.lifecycle.commonJava8
+    testImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.archCore.testing
 
     // Room
-    implementation "androidx.room:room-runtime:$room"
-    implementation "androidx.room:room-rxjava2:$room"
-    implementation "androidx.room:room-ktx:$room"
-    kapt "androidx.room:room-compiler:$room"
-    testImplementation "androidx.room:room-testing:$room"
-    androidTestImplementation "androidx.room:room-testing:$room"
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    kapt AndroidX.room.compiler
+    testImplementation AndroidX.room.testing
+    androidTestImplementation AndroidX.room.testing
 
     // WorkManager
-    implementation "androidx.work:work-runtime-ktx:$workManager"
+    implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
+    androidTestImplementation AndroidX.work.testing
+    implementation AndroidX.work.rxJava2
 
     // Dagger
-    kapt "com.google.dagger:dagger-android-processor:$dagger"
-    kapt "com.google.dagger:dagger-compiler:$dagger"
-    kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
+    kapt Google.dagger.compiler
+    implementation Google.dagger
 
     // Glide
-    implementation "com.github.bumptech.glide:glide:$glide"
-    kapt "com.github.bumptech.glide:compiler:$glide"
+    implementation "com.github.bumptech.glide:glide:_"
+    implementation "com.github.bumptech.glide:okhttp3-integration:_"
+    kapt "com.github.bumptech.glide:compiler:_"
 
     // Lottie
-    implementation "com.airbnb.android:lottie:$lottieVersion"
+    implementation "com.airbnb.android:lottie:_"
 
-    // Apache commons
-    implementation "org.apache.commons:commons-math3:$commonsMath"
+    // Security crypto
+    implementation AndroidX.security.crypto
 
     // Play Store referrer library
-    implementation("com.android.installreferrer:installreferrer:$referrerLibrary")
+    playImplementation("com.android.installreferrer:installreferrer:_")
+
+    // HTML
+    implementation 'org.jsoup:jsoup:_'
+
+
+    // Flipper
+    internalImplementation "com.facebook.flipper:flipper:_"
+    internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
-    testImplementation "org.mockito:mockito-core:$mockito"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-    testImplementation "junit:junit:$junit"
+    androidTestUtil AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation Testing.mockito.android
+    androidTestImplementation Testing.mockito.kotlin
+    androidTestImplementation Square.okHttp3.mockWebServer
+    androidTestImplementation CashApp.turbine
+    androidTestImplementation AndroidX.test.orchestrator
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation "androidx.test.ext:junit-ktx:_"
+    androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
-    androidTestImplementation "androidx.test:runner:$testRunner"
-    androidTestImplementation "androidx.test:rules:$testRunner"
-    androidTestUtil "androidx.test:orchestrator:$testRunner"
-    androidTestImplementation "org.mockito:mockito-android:$mockito"
-    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
-    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
+    testImplementation "androidx.test:runner:_"
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
-    kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
-    annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
+}
+
+tasks.register('fastlaneVersionCode') {
+    doLast {
+        print buildVersionCode()
+    }
+}
+
+tasks.register('checks') {
+    dependsOn 'jvm_checks', 'android_checks'
+}
+
+tasks.register('android_checks') {
+    dependsOn 'connectedPlayDebugAndroidTest'
+}
+
+tasks.register('jvm_checks') {
+    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
 }

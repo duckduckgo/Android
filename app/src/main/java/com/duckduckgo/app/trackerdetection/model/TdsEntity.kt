@@ -25,4 +25,3 @@ data class TdsEntity(
     override val displayName: String,
     override val prevalence: Double
 ) : com.duckduckgo.app.trackerdetection.model.Entity
-

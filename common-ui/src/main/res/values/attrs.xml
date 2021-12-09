@@ -1,0 +1,87 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <attr name="daxLogoTextColor" format="color" />
+    <attr name="normalTextColor" format="color" />
+    <attr name="secondaryTextColor" format="color" />
+    <attr name="headerDescriptionColor" format="color" />
+    <attr name="dialogBgColor" format="color" />
+    <attr name="toolbarIconColor" format="color" />
+    <attr name="toolbarTextColor" format="color" />
+    <attr name="toolbarBgColor" format="color" />
+    <attr name="toolbarBgBorderColor" format="color" />
+    <attr name="browserIconColorSelector" format="color" />
+    <attr name="browserMenuTextColor" format="color" />
+    <attr name="browserMenuTextColorDisabled" format="color" />
+    <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
+    <attr name="omnibarTextColor" format="color" />
+    <attr name="omnibarHintColor" format="color" />
+    <attr name="omnibarLogoLetterTextColor" format="color" />
+    <attr name="autoCompleteTextColor" format="color" />
+    <attr name="autoCompleteSubtitleTextColor" format="color" />
+    <attr name="tabTitleTextColor" format="color" />
+    <attr name="tabTitleTextColorLegacy" format="color" />
+    <attr name="tabSubtitleTextColor" format="color" />
+    <attr name="tabSelectedBorderColor" format="color" />
+    <attr name="tabsFireTextColor" format="color" />
+    <attr name="tabCardBackgroundColor" format="color" />
+    <attr name="whitelistTextColor" format="color" />
+    <attr name="bookmarkIconColor" format="color" />
+    <attr name="websiteListFaviconBackground" format="color" />
+    <attr name="savedSiteEmptyTextColor" format="color" />
+    <attr name="settingsItemTextColor" format="color" />
+    <attr name="settingsItemTextColorDisabled" format="color" />
+    <attr name="settingsMinorTextColor" format="color" />
+    <attr name="settingsSwitchBackgroundColor" format="color" />
+    <attr name="settingsDividerColor" format="color" />
+    <attr name="buttonOutlinedBorderColor" format="color" />
+    <attr name="buttonOutlinedTextColor" format="color" />
+    <attr name="callToActionTitleColor" format="color" />
+    <attr name="callToActionSubtitleColor" format="color" />
+    <attr name="feedbackAnonymousFeedbackLabelColor" format="color" />
+    <attr name="feedbackListItemBackgroundColor" format="color" />
+    <attr name="feedbackListItemSeparatorColor" format="color" />
+    <attr name="feedbackEditTextBackgroundColor" format="color" />
+    <attr name="feedbackEditTextHintColor" format="color" />
+    <attr name="daxDialogBackgroundColor" format="color" />
+    <attr name="daxDialogSecondaryButtonTextColor" format="color" />
+    <attr name="daxDialogSecondaryButtonRippleColor" format="color" />
+    <attr name="brokenSiteSelectionTextColor" format="color" />
+    <attr name="brokenSiteOutlinedColor" format="color" />
+    <attr name="brokenSitesButtonDisabledBackgroundColor" format="color" />
+    <attr name="brokenSitesButtonDisabledTextColor" format="color" />
+    <attr name="brokenSitesButtonRippleColor" format="color" />
+    <attr name="topCallToActionDescriptionColor" format="color" />
+    <attr name="topCallToActionBackgroundColor" format="color" />
+    <attr name="privacyDashboardLogoLetterTextColor" format="color" />
+    <attr name="fireproofWebsiteTitleTextColor" format="color" />
+    <attr name="emailButtonRippleColor" format="color" />
+    <attr name="deviceShieldExcludedAppNameTextColor" format="color" />
+    <attr name="quickAccessItemTitleTextColor" format="color" />
+    <attr name="listItemImageBackground" format="color" />
+    <attr name="lightContainerBackground" format="color" />
+
+    <attr name="textAppearanceButton1" format="reference" />
+    <attr name="textAppearanceButton2" format="reference" />
+    <attr name="savedSiteEditTextUnderlineColor" format="color" />
+    <attr name="listItemBackgroundColor" format="color" />
+    <attr name="listItemSeparatorColor" format="color" />
+    <attr name="textInputOutlinedBoxColor" format="color" />
+    <attr name="textInputOutlinedBoxColorHighlight" format="color" />
+
+</resources>

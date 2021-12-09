@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-
 interface FileDeleter {
 
     /**
@@ -35,6 +34,11 @@ interface FileDeleter {
      * Delete the contents of the given directory, and deletes the directory itself.
      */
     suspend fun deleteDirectory(directoryToDelete: File)
+
+    /**
+     * Delete a file(s) of the given directory, but don't delete the directory itself
+     */
+    suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>)
 }
 
 class AndroidFileDeleter : FileDeleter {
@@ -49,6 +53,14 @@ class AndroidFileDeleter : FileDeleter {
     override suspend fun deleteDirectory(directoryToDelete: File) {
         withContext(Dispatchers.IO) {
             directoryToDelete.deleteRecursively()
+        }
+    }
+
+    override suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>) {
+        withContext(Dispatchers.IO) {
+            val allFiles = parentDirectory.listFiles() ?: return@withContext
+            val filesToDelete = allFiles.filter { files.contains(it.name) }
+            filesToDelete.forEach { it.deleteRecursively() }
         }
     }
 }

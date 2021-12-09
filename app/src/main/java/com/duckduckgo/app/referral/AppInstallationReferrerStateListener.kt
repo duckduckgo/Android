@@ -16,21 +16,10 @@
 
 package com.duckduckgo.app.referral
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import com.android.installreferrer.api.InstallReferrerClient
-import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse.*
-import com.android.installreferrer.api.InstallReferrerStateListener
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
-import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
-import com.duckduckgo.app.referral.ParseFailureReason.*
-import com.duckduckgo.app.referral.ParsedReferrerResult.*
-import com.duckduckgo.app.statistics.VariantManager
-import kotlinx.coroutines.delay
+import com.duckduckgo.app.statistics.AtbInitializerListener
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface AppInstallationReferrerStateListener {
 
@@ -43,85 +32,17 @@ interface AppInstallationReferrerStateListener {
 
 }
 
-class PlayStoreAppReferrerStateListener @Inject constructor(
-    val context: Context,
-    private val packageManager: PackageManager,
-    private val appInstallationReferrerParser: AppInstallationReferrerParser,
-    private val appReferrerDataStore: AppReferrerDataStore,
-    private val variantManager: VariantManager
-) : InstallReferrerStateListener, AppInstallationReferrerStateListener {
+@Singleton
+class EmptyReferrerStateListener @Inject constructor() : AppInstallationReferrerStateListener, AtbInitializerListener {
 
-    private val referralClient = InstallReferrerClient.newBuilder(context).build()
-    private var initialisationStartTime: Long = 0
-
-    private var referralResult: ParsedReferrerResult = ReferrerInitialising
+    private var referralResult: ParsedReferrerResult = ParsedReferrerResult.ReferrerInitialising
 
     /**
      * Initialises the referrer service. This should only be called once.
      */
     override fun initialiseReferralRetrieval() {
-        try {
-            initialisationStartTime = System.currentTimeMillis()
-
-            if (appReferrerDataStore.referrerCheckedPreviously) {
-
-                referralResult = if (appReferrerDataStore.installedFromEuAuction) {
-                    EuAuctionReferrerFound(fromCache = true)
-                } else {
-                    loadPreviousReferrerData()
-                }
-
-                Timber.i("Already inspected this referrer data")
-                return
-            }
-
-            if (playStoreReferralServiceInstalled()) {
-                referralClient.startConnection(this)
-            } else {
-                referralResult = ParseFailure(ReferralServiceUnavailable)
-            }
-        } catch (e: RuntimeException) {
-            Timber.w(e, "Failed to obtain referrer information")
-            referralResult = ParseFailure(UnknownError)
-        }
-    }
-
-    private fun loadPreviousReferrerData(): ParsedReferrerResult {
-        val suffix = loadFromDataStore()
-        return if (suffix == null) {
-            Timber.i("Already saw referrer data, but no campaign suffix saved")
-            ReferrerNotFound(fromCache = true)
-        } else {
-            Timber.i("Already have referrer data from previous run - $suffix")
-            CampaignReferrerFound(suffix, fromCache = true)
-        }
-    }
-
-    override fun onInstallReferrerSetupFinished(responseCode: Int) {
-        val referrerRetrievalDurationMs = System.currentTimeMillis() - initialisationStartTime
-        Timber.i("Took ${referrerRetrievalDurationMs}ms to get initial referral data callback")
-        try {
-            when (responseCode) {
-                OK -> {
-                    Timber.d("Successfully connected to Referrer service")
-                    val response = referralClient.installReferrer
-                    val referrer = response.installReferrer
-                    val parsedResult = appInstallationReferrerParser.parse(referrer)
-                    referralResultReceived(parsedResult)
-                }
-                FEATURE_NOT_SUPPORTED -> referralResultFailed(FeatureNotSupported)
-                SERVICE_UNAVAILABLE -> referralResultFailed(ServiceUnavailable)
-                DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
-                SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
-                else -> referralResultFailed(UnknownError)
-
-            }
-
-            referralClient.endConnection()
-        } catch (e: RuntimeException) {
-            Timber.w(e, "Failed to retrieve referrer data")
-            referralResultFailed(UnknownError)
-        }
+        Timber.d("Empty referrer, nothing to do here")
+        referralResult = ParsedReferrerResult.ReferrerNotFound()
     }
 
     /**
@@ -131,55 +52,17 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
      * It is the caller's responsibility to guard against this function not returning a result in a timely manner, or not returning a result ever.
      */
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
-        if (referralResult != ReferrerInitialising) {
+        if (referralResult != ParsedReferrerResult.ReferrerInitialising) {
             Timber.d("Referrer already determined; immediately answering")
             return referralResult
-        }
-
-        Timber.i("Referrer: Retrieving referral code from Play Store referrer service")
-
-        // poll, awaiting referral result to become available
-        while (referralResult == ReferrerInitialising) {
-            Timber.v("Still initialising - waiting")
-            delay(10)
         }
 
         return referralResult
     }
 
-    private fun loadFromDataStore(): String? {
-        return appReferrerDataStore.campaignSuffix
+    override suspend fun beforeAtbInit() {
+        waitForReferrerCode()
     }
 
-    private fun playStoreReferralServiceInstalled(): Boolean {
-        val playStoreConnectionServiceIntent = Intent()
-        playStoreConnectionServiceIntent.component = ComponentName(PLAY_STORE_PACKAGE, PLAY_STORE_REFERRAL_SERVICE)
-        val matchingServices = packageManager.queryIntentServices(playStoreConnectionServiceIntent, 0)
-        return matchingServices.size > 0
-    }
-
-    private fun referralResultReceived(result: ParsedReferrerResult) {
-        referralResult = result
-
-        when (result) {
-            is CampaignReferrerFound -> {
-                variantManager.updateAppReferrerVariant(result.campaignSuffix)
-                appReferrerDataStore.campaignSuffix = result.campaignSuffix
-            }
-            is EuAuctionReferrerFound -> {
-                variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
-                appReferrerDataStore.installedFromEuAuction = true
-            }
-        }
-
-        appReferrerDataStore.referrerCheckedPreviously = true
-    }
-
-    private fun referralResultFailed(reason: ParseFailureReason) {
-        referralResult = ParseFailure(reason)
-    }
-
-    override fun onInstallReferrerServiceDisconnected() {
-        Timber.i("Referrer: ServiceDisconnected")
-    }
+    override fun beforeAtbInitTimeoutMillis(): Long = AppInstallationReferrerStateListener.MAX_REFERRER_WAIT_TIME_MS
 }

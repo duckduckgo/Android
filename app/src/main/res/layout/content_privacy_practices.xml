@@ -140,7 +140,6 @@
         android:fontFamily="sans-serif"
         android:gravity="center_horizontal"
         android:lineSpacingExtra="4sp"
-        android:onClick="onTosdrLinkClicked"
         android:paddingTop="22dp"
         android:paddingBottom="22dp"
         android:text="@string/practicesTosdrLink"

@@ -22,7 +22,6 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 
-
 class DefaultBrowserSystemSettings {
 
     companion object {

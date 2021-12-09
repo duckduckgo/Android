@@ -21,14 +21,17 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
-import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -73,6 +76,15 @@ class NotificationModule {
     }
 
     @Provides
+    fun provideWaitlistCodeNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        emailDataStore: EmailDataStore
+    ): EmailWaitlistCodeNotification {
+        return EmailWaitlistCodeNotification(context, notificationDao, emailDataStore)
+    }
+
+    @Provides
     @Singleton
     fun providesNotificationScheduler(
         workManager: WorkManager,
@@ -91,4 +103,26 @@ class NotificationModule {
     fun providesNotificationFactory(context: Context, manager: NotificationManagerCompat): NotificationFactory {
         return NotificationFactory(context, manager)
     }
+
+    @Provides
+    @Singleton
+    fun providesNotificationSender(
+        context: Context,
+        pixel: Pixel,
+        manager: NotificationManagerCompat,
+        factory: NotificationFactory,
+        notificationDao: NotificationDao
+    ): NotificationSender {
+        return AppNotificationSender(context, pixel, manager, factory, notificationDao)
+    }
+
+    @Provides
+    fun provideAppTpWaitlistCodeNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+        dataStore: AppTrackingProtectionWaitlistDataStore
+    ): AppTPWaitlistCodeNotification {
+        return AppTPWaitlistCodeNotification(context, notificationDao, dataStore)
+    }
+
 }

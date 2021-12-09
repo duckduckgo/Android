@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.UrlScheme.Companion.https
@@ -27,8 +28,13 @@ import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
-    override fun convertQueryToUrl(searchQuery: String): String {
-        if (UriString.isWebUrl(searchQuery)) {
+    override fun convertQueryToUrl(searchQuery: String, vertical: String?, queryOrigin: QueryOrigin): String {
+        val isUrl = when (queryOrigin) {
+            is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
+            is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
+        }
+
+        if (isUrl == true) {
             return convertUri(searchQuery)
         }
 
@@ -38,8 +44,12 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
 
         val uriBuilder = Uri.Builder()
             .scheme(https)
-            .appendQueryParameter("q", searchQuery)
+            .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
             .authority(Url.HOST)
+
+        if (vertical != null && majorVerticals.contains(vertical)) {
+            uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)
+        }
 
         requestRewriter.addCustomQueryParams(uriBuilder)
         return uriBuilder.build().toString()
@@ -53,6 +63,10 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         }
 
         return uri.toString()
+    }
+
+    companion object {
+        val majorVerticals = listOf("images", "videos", "news", "shopping")
     }
 
 }

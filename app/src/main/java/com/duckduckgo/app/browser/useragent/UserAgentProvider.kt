@@ -16,9 +16,19 @@
 
 package com.duckduckgo.app.browser.useragent
 
+import android.content.Context
 import android.os.Build
+import android.webkit.WebSettings
+import androidx.core.net.toUri
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
-
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import javax.inject.Named
+import javax.inject.Provider
+import javax.inject.Singleton
 
 /**
  * Example Default User Agent (From Chrome):
@@ -27,44 +37,114 @@ import com.duckduckgo.app.global.device.DeviceInfo
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(private val defaultUserAgent: String, private val device: DeviceInfo) {
+class UserAgentProvider constructor(@Named("defaultUserAgent") private val defaultUserAgent: Provider<String>, private val device: DeviceInfo) {
+
+    private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
+    private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
+    private val safariComponent: String? by lazy { getSafariComponentFromUserAgent() }
+    private val applicationComponent = "DuckDuckGo/${device.majorAppVersion}"
 
     /**
-     * Returns a modified UA string which omits the user's device make and model
+     * Returns, our custom UA, including our application component before Safari
+     *
+     * Modifies UA string to omits the user's device make and model and drops components that may casue breakages
      * If the user is requesting a desktop site, we add generic X11 Linux indicator, but include the real architecture
      * If the user is requesting a mobile site, we add Linux Android indicator, and include the real Android OS version
+     * If the site breaks when our application component is included, we exclude it
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun getUserAgent(desktopSiteRequested: Boolean = false): String {
-
-        val platform = if (desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
-        val userAgentStringSuffix = "${getWebKitVersionOnwards(desktopSiteRequested)} ${getApplicationSuffix()}"
-
-        return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
-    }
-
-    private fun mobileUaPrefix() = "Linux; Android ${Build.VERSION.RELEASE}"
-
-    private fun desktopUaPrefix() = "X11; Linux ${System.getProperty("os.arch")}"
-
-    private fun getWebKitVersionOnwards(desktopSiteRequested: Boolean): String {
-        val matches = WEB_KIT_REGEX.find(defaultUserAgent) ?: return ""
-        var result = matches.groupValues[0]
-        if (desktopSiteRequested) {
-            result = result.replace(" Mobile ", " ")
+    fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
+        val host = url?.toUri()?.host
+        val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
+        val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
+        val shouldUseDesktopAgent =
+            if (url != null && host != null) {
+                sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
+            } else {
+                false
+            }
+        var prefix = if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
+        if (omitVersionComponent) {
+            prefix = prefix.replace(AgentRegex.version, "")
         }
-        return " $result"
+
+        val application = if (!omitApplicationComponent) applicationComponent else null
+        return concatWithSpaces(prefix, application, safariComponent)
     }
 
-    private fun getApplicationSuffix(): String {
-        return "DuckDuckGo/${device.majorAppVersion}"
+    private fun containsExcludedPath(url: String?, site: DesktopAgentSiteOnly): Boolean {
+        return if (url != null) {
+            val segments = url.toUri().pathSegments
+            site.excludedPaths.any { segments.contains(it) }
+        } else {
+            false
+        }
+    }
+
+    private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
+        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
+        var result = matches.groupValues.last()
+        if (forDesktop) {
+            result = result.replace(" Mobile", "")
+        }
+        return result
+    }
+
+    private fun concatWithSpaces(vararg elements: String?): String {
+        return elements.filterNotNull().joinToString(SPACE)
+    }
+
+    private fun getSafariComponentFromUserAgent(): String? {
+        val matches = AgentRegex.safari.find(defaultUserAgent.get()) ?: return null
+        return matches.groupValues.last()
+    }
+
+    private object AgentRegex {
+        val webkitUntilSafari = Regex("(AppleWebKit/.*) Safari")
+        val webkitUntilEnd = Regex("(AppleWebKit/.*)")
+        val safari = Regex("(Safari/[^ ]+) *")
+        val version = Regex("(Version/[^ ]+) *")
     }
 
     companion object {
-        private val WEB_KIT_REGEX = Regex("AppleWebKit/.*")
+        const val SPACE = " "
+        val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
+        val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
 
-        private const val MOZILLA_PREFIX = "Mozilla/5.0"
+        val sitesThatOmitApplication = listOf(
+            "cvs.com",
+            "chase.com",
+            "tirerack.com",
+            "sovietgames.su",
+            "thesun.co.uk",
+            "accounts.google.com",
+            "mail.google.com"
+        )
+
+        val sitesThatOmitVersion = listOf(
+            "ing.nl",
+            "chase.com",
+            "digid.nl",
+            "accounts.google.com",
+            "xfinity.com"
+        )
+
+        val sitesThatShouldUseDesktopAgent = listOf(
+            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))
+        )
     }
 
+    data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
+}
+
+@ContributesTo(AppObjectGraph::class)
+@Module
+class DefaultUserAgentModule {
+    @Singleton
+    @Provides
+    @Named("defaultUserAgent")
+    fun provideDefaultUserAgent(context: Context): String {
+        return WebSettings.getDefaultUserAgent(context)
+    }
 }

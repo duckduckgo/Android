@@ -18,7 +18,10 @@ package com.duckduckgo.app.feedback.ui.positive.initial
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class PositiveFeedbackLandingViewModel : ViewModel() {
 
@@ -43,4 +46,16 @@ sealed class Command {
     object LaunchPlayStore : Command()
     object Exit : Command()
     object LaunchShareFeedbackPage : Command()
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class PositiveFeedbackLandingViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> (PositiveFeedbackLandingViewModel() as T)
+                else -> null
+            }
+        }
+    }
 }

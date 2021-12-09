@@ -18,4 +18,5 @@
 <resources>
     <integer name="tab_switcher_animation_duration_ms">300</integer>
     <integer name="slide_animation_duration_ms">300</integer>
+    <integer name="crossing_animation_delay_ms">500</integer>
 </resources>

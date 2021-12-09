@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.notification.model
 
+import android.os.Bundle
 import com.duckduckgo.app.notification.NotificationRegistrar
 
 interface SchedulableNotification {
@@ -37,5 +38,6 @@ interface NotificationSpec {
     val closeButton: String?
     val pixelSuffix: String
     val autoCancel: Boolean
+    val bundle: Bundle
+    val color: Int
 }
-

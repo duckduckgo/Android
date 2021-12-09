@@ -38,6 +38,6 @@ class TdsTest {
     }
 
     companion object {
-        private const val DEFAULT_TDS_HASH_VALUE = -1752095080
+        private const val DEFAULT_TDS_HASH_VALUE = -160289387
     }
 }

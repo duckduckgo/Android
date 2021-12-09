@@ -50,7 +50,7 @@
                     android:duration="20"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="strokeWidth"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="0"
                     android:valueTo="2"
                     android:valueType="floatType" />
@@ -58,7 +58,7 @@
                     android:duration="200"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="pathData"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="M 10 10 L 10 10"
                     android:valueTo="M 2 2 L 20 20"
                     android:valueType="pathType" />
@@ -66,7 +66,7 @@
                     android:duration="200"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="strokeAlpha"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="0"
                     android:valueTo="1"
                     android:valueType="floatType" />
@@ -80,7 +80,7 @@
                     android:duration="20"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="strokeWidth"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="0"
                     android:valueTo="6"
                     android:valueType="floatType" />
@@ -88,7 +88,7 @@
                     android:duration="200"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="pathData"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="M 10 10 L 10 10"
                     android:valueTo="M 2 2 L 20 20"
                     android:valueType="pathType" />
@@ -96,7 +96,7 @@
                     android:duration="200"
                     android:interpolator="@android:interpolator/linear"
                     android:propertyName="strokeAlpha"
-                    android:startOffset="800"
+                    android:startOffset="@integer/crossing_animation_delay_ms"
                     android:valueFrom="0"
                     android:valueTo="1"
                     android:valueType="floatType" />

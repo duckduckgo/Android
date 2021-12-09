@@ -28,14 +28,13 @@ class BloomFilter {
         nativePointer = createBloomFilter(maxItems, targetProbability)
     }
 
-    constructor(path: String, maxItems: Int) {
-        nativePointer = createBloomFilterFromFile(path, maxItems)
+    constructor(path: String, bits: Int, maxItems: Int) {
+        nativePointer = createBloomFilterFromFile(path, bits, maxItems)
     }
 
     private external fun createBloomFilter(maxItems: Int, targetProbability: Double): Long
 
-    private external fun createBloomFilterFromFile(path: String, maxItems: Int): Long
-
+    private external fun createBloomFilterFromFile(path: String, bits: Int, maxItems: Int): Long
 
     fun add(element: String) {
         add(nativePointer, element)

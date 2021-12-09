@@ -77,9 +77,9 @@ class UncaughtExceptionDaoTest {
 
     @Test
     fun whenSeveralExceptionExistAndOneDeletedThenCorrectEntryIsRemoved() {
-        val exception1 = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo1")
-        val exception2 = UncaughtExceptionEntity(id = 2, exceptionSource = ON_PROGRESS_CHANGED, message = "foo2")
-        val exception3 = UncaughtExceptionEntity(id = 3, exceptionSource = ON_PAGE_STARTED, message = "foo3")
+        val exception1 = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo1", "version")
+        val exception2 = UncaughtExceptionEntity(id = 2, exceptionSource = ON_PROGRESS_CHANGED, message = "foo2", "version")
+        val exception3 = UncaughtExceptionEntity(id = 3, exceptionSource = ON_PAGE_STARTED, message = "foo3", "version")
         dao.add(exception1)
         dao.add(exception2)
         dao.add(exception3)
@@ -102,7 +102,7 @@ class UncaughtExceptionDaoTest {
 
     @Test
     fun whenExceptionRetrievedFromDatabaseThenAllDetailsRestored() {
-        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo")
+        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo", "version")
         dao.add(exception)
         val list = dao.all()
         assertEquals(1, list.size)
@@ -115,6 +115,26 @@ class UncaughtExceptionDaoTest {
         }
     }
 
+    @Test
+    fun whenGetLatestExceptionThenReturnLatestExceptionFromDatabase() {
+        val exception1 = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo", "version")
+        val exception2 = UncaughtExceptionEntity(id = 2, exceptionSource = GLOBAL, message = "bar", "version")
+        dao.add(exception1)
+        dao.add(exception2)
+        val latestException = dao.getLatestException()
+        assertEquals(exception2, latestException)
+    }
+
+    @Test
+    fun whenUpdateExceptionThenUpdateExceptionInDatabase() {
+        val exception = UncaughtExceptionEntity(id = 1, exceptionSource = GLOBAL, message = "foo", "version", timestamp = 1000)
+        dao.add(exception)
+        val updatedException = exception.copy(timestamp = 2000)
+        dao.update(updatedException)
+        val latestException = dao.getLatestException()
+        assertEquals(updatedException, latestException)
+    }
+
     private fun anUncaughtExceptionEntity(id: Long? = null) =
-        UncaughtExceptionEntity(id = id ?: 0, exceptionSource = GLOBAL, message = "foo")
+        UncaughtExceptionEntity(id = id ?: 0, exceptionSource = GLOBAL, message = "foo", "version")
 }

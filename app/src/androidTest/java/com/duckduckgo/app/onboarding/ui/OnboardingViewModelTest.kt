@@ -26,7 +26,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Rule
 import org.junit.Test
 
-
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 

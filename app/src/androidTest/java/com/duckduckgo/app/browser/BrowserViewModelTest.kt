@@ -19,18 +19,23 @@ package com.duckduckgo.app.browser
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -42,13 +47,16 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.Arrays.asList
 
+@ExperimentalCoroutinesApi
 class BrowserViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
@@ -71,6 +79,12 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
+    @Mock
+    private lateinit var mockUserEventsStore: UserEventsStore
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -84,43 +98,68 @@ class BrowserViewModelTest {
             queryUrlConverter = mockOmnibarEntryConverter,
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            userEventsStore = mockUserEventsStore
         )
+
         testee.command.observeForever(mockCommandObserver)
 
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
         }
     }
 
     @After
     fun after() {
-        testee.command.removeObserver(mockCommandObserver)
+        if (this::testee.isInitialized) {
+            testee.command.removeObserver(mockCommandObserver)
+        }
     }
 
     @Test
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
     }
 
     @Test
-    fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
-        val url = "http://example.com"
-        testee.onOpenInNewTabRequested(url)
-        verify(mockTabRepository).add(url)
+    fun whenNewTabRequestedFromSourceTabThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onNewTabRequested("sourceTabId")
+        verify(mockTabRepository).addFromSourceTab(sourceTabId = "sourceTabId")
     }
 
     @Test
-    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() = runBlocking<Unit> {
+    fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+        val url = "http://example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onOpenInNewTabRequested(url)
+        verify(mockTabRepository).add(url = url, skipHome = false)
+    }
+
+    @Test
+    fun whenOpenInNewTabRequestedWithSourceTabIdThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        val url = "http://example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId")
+        verify(mockTabRepository).addFromSourceTab(url = url, skipHome = false, sourceTabId = "tabId")
+    }
+
+    @Test
+    fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runBlocking<Unit> {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add(null, false, true)
+        verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
-        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", false, true, 0)))
+        testee.onTabsUpdated(listOf(TabEntity(TAB_ID, "", "", skipHome = false, viewed = true, position = 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -135,13 +174,6 @@ class BrowserViewModelTest {
     fun whenUnknownDashboardResultReceivedThenNoCommandTriggered() {
         testee.receivedDashboardResult(1111)
         verify(mockCommandObserver, never()).onChanged(any())
-    }
-
-    @Test
-    fun whenClearCompleteThenMessageDisplayed() {
-        testee.onClearComplete()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(DisplayMessage(R.string.fireDataCleared), commandCaptor.lastValue)
     }
 
     @Test
@@ -161,6 +193,38 @@ class BrowserViewModelTest {
     @Test
     fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
         assertTrue(testee.viewState.value!!.hideWebContent)
+    }
+
+    @Test
+    fun whenOpenShortcutThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url)
+    }
+
+    @Test
+    fun whenOpenShortcutThenFirePixel() {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel).fire(AppPixelName.SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenFavoriteThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenFavoriteFromWidget(url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url)
+    }
+
+    @Test
+    fun whenOpenFavoriteFromWidgetThenFirePixel() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenFavoriteFromWidget(url)
+        verify(mockPixel).fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
     }
 
     companion object {

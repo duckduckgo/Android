@@ -24,19 +24,22 @@
     <TextView
         android:id="@+id/settingsGeneralTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/settingsHeadingGeneral"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/lightThemeToggle"
-        style="@style/SettingsSwitch"
-        android:text="@string/settingsLightTheme"
-        android:theme="@style/SettingsSwitchTheme"
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/selectedThemeSetting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
+        app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle"
+        app:subtitle="@string/settingsSystemTheme"
+        app:title="@string/settingsTheme" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
@@ -45,7 +48,7 @@
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
+        app:layout_constraintTop_toBottomOf="@id/selectedThemeSetting" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/setAsDefaultBrowserSetting"
@@ -78,5 +81,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
         tools:srcCompat="@drawable/ic_app_icon_red_round" />
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/selectedFireAnimationSetting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/changeAppIcon"
+        app:subtitle="@string/settingsHeroFireAnimation"
+        app:title="@string/settingsFireAnimation" />
+
+    <TextView
+        android:id="@+id/accessibilitySetting"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsAccessibility"
+        app:layout_constraintTop_toBottomOf="@id/selectedFireAnimationSetting" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,12 +19,9 @@ package com.duckduckgo.app.fire
 import android.os.Handler
 import android.os.SystemClock
 import androidx.annotation.UiThread
+import androidx.annotation.VisibleForTesting
 import androidx.core.os.postDelayed
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -34,26 +31,38 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
-interface DataClearer : LifecycleObserver {
+interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
     var isFreshAppLaunch: Boolean
 }
 
-class AutomaticDataClearer(
+@ContributesBinding(
+    scope = AppObjectGraph::class,
+    boundType = DataClearer::class
+)
+@ContributesMultibinding(
+    scope = AppObjectGraph::class,
+    boundType = BrowserLifecycleObserver::class
+)
+@Singleton
+class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
-    private val dataClearerTimeKeeper: BackgroundTimeKeeper
-) : DataClearer, LifecycleObserver, CoroutineScope {
+    private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+    private val dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+) : DataClearer, BrowserLifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
 
@@ -66,15 +75,15 @@ class AutomaticDataClearer(
 
     override var isFreshAppLaunch = true
 
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
+    override fun onOpen(isFreshLaunch: Boolean) {
+        isFreshAppLaunch = isFreshLaunch
         launch {
             onAppForegroundedAsync()
         }
     }
 
     @UiThread
+    @VisibleForTesting
     suspend fun onAppForegroundedAsync() {
         dataClearerState.value = INITIALIZING
 
@@ -109,9 +118,7 @@ class AutomaticDataClearer(
         settingsDataStore.clearAppBackgroundTimestamp()
     }
 
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
+    override fun onClose() {
         val timeNow = SystemClock.elapsedRealtime()
         Timber.i("Recording when app backgrounded ($timeNow)")
 
@@ -126,6 +133,13 @@ class AutomaticDataClearer(
             Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
         } else {
             scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+        }
+    }
+
+    override fun onExit() {
+        // the app does not have any activity in CREATED state we kill the process
+        if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
+            clearDataAction.killProcess()
         }
     }
 
@@ -167,11 +181,11 @@ class AutomaticDataClearer(
                 Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
                 if (processNeedsRestarted) {
                     clearDataAction.setAppUsedSinceLastClearFlag(false)
-
+                    dataClearerForegroundAppRestartPixel.incrementCount()
                     // need a moment to draw background color (reduces flickering UX)
                     Handler().postDelayed(100) {
                         Timber.i("Will now restart process")
-                        clearDataAction.killAndRestartProcess()
+                        clearDataAction.killAndRestartProcess(notifyDataCleared = true)
                     }
                 } else {
                     Timber.i("Will not restart process")

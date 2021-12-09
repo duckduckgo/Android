@@ -21,15 +21,15 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FEEDBACK_NEGATIVE_SUBMISSION
+import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
-
 
 interface FeedbackSubmitter {
 
@@ -40,11 +40,12 @@ interface FeedbackSubmitter {
 }
 
 class FireAndForgetFeedbackSubmitter(
-        private val feedbackService: FeedbackService,
-        private val variantManager: VariantManager,
-        private val apiKeyMapper: SubReasonApiMapper,
-        private val statisticsDataStore: StatisticsDataStore,
-        private val pixel: Pixel
+    private val feedbackService: FeedbackService,
+    private val variantManager: VariantManager,
+    private val apiKeyMapper: SubReasonApiMapper,
+    private val statisticsDataStore: StatisticsDataStore,
+    private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
         Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
@@ -54,7 +55,7 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             runCatching {
                 submitFeedback(
                     openEnded = openEnded,
@@ -74,7 +75,7 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForPositiveFeedback())
 
         if (openEnded != null) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 runCatching { submitFeedback(openEnded = openEnded, rating = POSITIVE_FEEDBACK) }
                     .onSuccess { Timber.i("Successfully submitted feedback") }
                     .onFailure { Timber.w(it, "Failed to send feedback") }
@@ -89,13 +90,14 @@ class FireAndForgetFeedbackSubmitter(
         val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        GlobalScope.launch {
+        appCoroutineScope.launch {
             runCatching {
                 submitFeedback(
                     rating = NEGATIVE_FEEDBACK,
                     url = brokenSite,
                     openEnded = openEnded,
-                    category = category)
+                    category = category
+                )
             }
                 .onSuccess { Timber.i("Successfully submitted broken site feedback") }
                 .onFailure { Timber.w(it, "Failed to send broken site feedback") }
@@ -112,7 +114,7 @@ class FireAndForgetFeedbackSubmitter(
         pixel.fire(pixelName)
     }
 
-    private fun submitFeedback(
+    private suspend fun submitFeedback(
         openEnded: String,
         rating: String,
         category: String? = null,
@@ -132,7 +134,7 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = Build.VERSION.SDK_INT,
             atb = atbWithVariant()
-        ).execute()
+        )
     }
 
     private fun categoryFromMainReason(mainReason: MainReason): String {
@@ -151,7 +153,7 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun pixelForPositiveFeedback(): String {
-        return String.format(Locale.US, Pixel.PixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
+        return String.format(Locale.US, AppPixelName.FEEDBACK_POSITIVE_SUBMISSION.pixelName, POSITIVE_FEEDBACK)
     }
 
     private fun version(): String {

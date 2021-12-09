@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomeBlueprint
@@ -31,6 +32,7 @@ interface OnboardingPageManager {
 }
 
 class OnboardingPageManagerWithTrackerBlocking(
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val onboardingPageBuilder: OnboardingPageBuilder,
     private val defaultWebBrowserCapability: DefaultBrowserDetector
 ) : OnboardingPageManager {
@@ -58,8 +60,9 @@ class OnboardingPageManagerWithTrackerBlocking(
     }
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
-        return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
-                && !defaultWebBrowserCapability.isDefaultBrowser()
+        return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() &&
+            !defaultWebBrowserCapability.isDefaultBrowser() &&
+            !defaultRoleBrowserDialog.shouldShowDialog()
     }
 
     private fun buildDefaultBrowserPage(): DefaultBrowserPage {

@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.view
 
 import timber.log.Timber
 
-
 /**
  * This method will execute the given lambda only if the given view states differ
  */

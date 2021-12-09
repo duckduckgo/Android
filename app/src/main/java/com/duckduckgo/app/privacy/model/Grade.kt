@@ -31,13 +31,16 @@ class Grade(
     enum class Grading {
 
         A,
+
         @Json(name = "B+")
         B_PLUS,
         B,
+
         @Json(name = "C+")
         C_PLUS,
         C,
         D,
+
         @Json(name = "D-")
         D_MINUS,
         UNKNOWN

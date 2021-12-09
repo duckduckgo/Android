@@ -22,7 +22,6 @@ import android.util.LruCache
 import android.webkit.WebView
 import timber.log.Timber
 
-
 interface WebViewSessionStorage {
     fun saveSession(webView: WebView?, tabId: String)
     fun restoreSession(webView: WebView?, tabId: String): Boolean
@@ -87,7 +86,9 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         }
 
         val webViewBundle = bundle.getBundle(CACHE_KEY_WEBVIEW)
-        webView.restoreState(webViewBundle)
+        webViewBundle?.let {
+            webView.restoreState(it)
+        }
         webView.scrollY = bundle.getInt(CACHE_KEY_SCROLL_POSITION)
         cache.remove(tabId)
 

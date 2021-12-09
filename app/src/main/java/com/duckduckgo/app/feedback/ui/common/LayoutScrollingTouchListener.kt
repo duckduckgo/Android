@@ -20,7 +20,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ScrollView
 
-
 class LayoutScrollingTouchListener(private val scrollView: ScrollView, private val desiredScrollPosition: Int) : View.OnTouchListener {
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+>
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_default_toolbar"/>
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/appBreakageReportFeature"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                android:paddingTop="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/atp_ReportBreakageAppFeature"
+                android:textColor="?attr/settingsMinorTextColor"/>
+
+            <View
+                android:id="@+id/appBreakageReportSplitter"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:background="@color/splitterGray"/>
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/deviceShieldReportBreakageAppListSkeleton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:paddingTop="@dimen/keyline_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_report_breakage_app_list_skeleton"/>
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reportBreakageAppsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingBottom="@dimen/keyline_2"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listItem="@layout/view_device_shield_report_app_breakage_entry"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/splitterGray"/>
+
+    <Button
+        android:id="@+id/ctaSubmitAppBreakage"
+        style="@style/DeviceShield.Button.Blue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/keyline_4"
+        android:enabled="false"
+        android:text="@string/atp_ReportBreakageAppSubmitCta"/>
+
+</LinearLayout>

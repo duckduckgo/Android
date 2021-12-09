@@ -16,22 +16,29 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.R
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        data class DisplayMessage(@StringRes val messageId: Int) : Command()
         object Close : Command()
     }
 
@@ -50,8 +57,30 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
         webViewSessionStorage.deleteSession(tab.tabId)
     }
 
-    fun onClearComplete() {
-        command.value = Command.DisplayMessage(R.string.fireDataCleared)
-        command.value = Command.Close
+    suspend fun onMarkTabAsDeletable(tab: TabEntity) {
+        tabRepository.markDeletable(tab)
+    }
+
+    suspend fun undoDeletableTab(tab: TabEntity) {
+        tabRepository.undoDeletable(tab)
+    }
+
+    suspend fun purgeDeletableTabs() {
+        tabRepository.purgeDeletableTabs()
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class TabSwitcherViewModelFactory @Inject constructor(
+    private val tabRepository: Provider<TabRepository>,
+    private val webViewSessionStorage: Provider<WebViewSessionStorage>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
+                else -> null
+            }
+        }
     }
 }

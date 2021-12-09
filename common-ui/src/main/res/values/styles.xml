@@ -1,0 +1,783 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="DashboardHeader">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textColor">@color/grayishTwo</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DashboardEntryText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingEnd">22dp</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:clickable">false</item>
+    </style>
+
+    <style name="DashboardEntryIcon">
+        <item name="android:layout_width">66dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:clickable">false</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+
+    <style name="ScorecardText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:selectable">true</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingStart">20dp</item>
+    </style>
+
+    <style name="ScorecardSpecialText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/midGreen</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingStart">20dp</item>
+    </style>
+
+    <style name="SettingsSectionTitle">
+        <item name="android:paddingTop">32dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="SettingsItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/settings_title_color_selector</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="SettingsItemClickable" parent="SettingsItem">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="SettingsMinorText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">-7dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/settings_subtitle_color_selector</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="SettingsSwitch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingStart">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingEnd">@dimen/settingsItemHorizontalPadding</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/settingsItemTextColor</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="SettingsGroupDivider">
+        <item name="android:background">?attr/settingsDividerColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">25dp</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="BrowserIconMenuItem">
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:tint">?attr/browserIconColorSelector</item>
+    </style>
+
+    <style name="BrowserTextMenuItem">
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="BrowserCheckBoxMenuItem">
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="OnboardingButtonCircleCta" parent="Widget.AppCompat.Button.Borderless">
+        <item name="layout_constraintWidth_max">400dp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="android:background">@drawable/onboarding_cta_button_circle_bg</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="OnboardingButtonPrimaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="layout_constraintWidth_max">400dp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="android:background">@drawable/onboarding_primary_cta_button_rounded_bg</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="DeviceShieldTransparentRoundedButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/background_blue_button_rounded_corners</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="DeviceShieldOnboardingSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorSwitchThumbNormal">@color/cornflowerDisabled</item>
+    </style>
+
+    <style name="DeviceShieldTrackersSwitch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">@color/cornflowerGreen</item>
+    </style>
+
+    <style name="DeviceShieldOnboardingHeaderStyle">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="DeviceShieldOnboardingTextStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?secondaryTextColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="DeviceShieldOnboardingFAQHeaderStyle">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="DeviceShieldOnboardingFAQTextStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="OnboardingButtonSecondaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/cornflowerDark</item>
+        <item name="layout_constraintBottom_toBottomOf">parent</item>
+        <item name="layout_constraintWidth_max">400dp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="android:background">@drawable/onboarding_secondary_cta_button_rounded_bg</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="FeedbackFragmentStyle">
+        <item name="android:background">?attr/colorPrimaryDark</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="TextInputEditTextTheme" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:colorControlActivated">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="FeedbackInputBoxStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/cornflowerBlue</item>
+        <item name="hintTextColor">@color/cornflowerBlue</item>
+        <item name="android:textColorHint">?attr/feedbackEditTextHintColor</item>
+        <item name="boxBackgroundColor">?attr/feedbackEditTextBackgroundColor</item>
+        <item name="android:theme">@style/TextInputEditTextTheme</item>
+    </style>
+
+    <style name="FeedbackEditTextInputStyle" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
+        <item name="android:textSize">14sp</item>
+        <item name="android:imeOptions">flagNoExtractUi</item>
+        <item name="android:inputType">textLongMessage|textMultiLine</item>
+        <item name="android:importantForAutofill" tools:ignore="NewApi">no</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">top</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+    </style>
+
+    <style name="FeedbackTitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="FeedbackTitle.FeedbackSubtitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+    </style>
+
+    <style name="FeedbackTitle.FeedbackHappySadDisambiguationTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/feedbackTitleMarginTop</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+    </style>
+
+    <style name="FeedbackTitle.FeedbackSubtitle.FeedbackHappySadDisambiguationSubtitle">
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginTop">9dp</item>
+    </style>
+
+    <style name="BrokenSitesButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="backgroundTint">@color/broken_sites_button_background</item>
+        <item name="android:textColor">@color/broken_sites_button_text</item>
+        <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+    </style>
+
+    <style name="DaxDialogButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+
+    <style name="DaxDialogButton.Primary">
+        <item name="backgroundTint">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+    </style>
+
+    <style name="DaxDialogButton.Secondary">
+        <item name="backgroundTint">?attr/daxDialogBackgroundColor</item>
+        <item name="android:textColor">?attr/daxDialogSecondaryButtonTextColor</item>
+        <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+    </style>
+
+    <style name="EmailSignOutButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="android:textSize">15sp</item>
+        <item name="rippleColor">?attr/emailButtonRippleColor</item>
+        <item name="android:textColor">@color/red50</item>
+    </style>
+
+    <style name="EmailButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="rippleColor">?attr/emailButtonRippleColor</item>
+    </style>
+
+    <style name="EmailButton.Primary">
+        <item name="backgroundTint">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="EmailButton.Secondary" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0.0</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="strokeColor">@color/cornflowerBlue</item>
+        <item name="rippleColor">?attr/emailButtonRippleColor</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="UnknownTrackerText">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/omnibarLogoLetterTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="FireproofWebsiteSectionTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="FireproofWebsiteSwitch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/settingsItemTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="ListDivider">
+        <item name="android:background">?attr/settingsDividerColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="FireDialog" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/FireDialogStyle</item>
+    </style>
+
+    <style name="FireDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="EmailTooltip" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/EmailTooltipStyle</item>
+    </style>
+
+    <style name="EmailTooltipStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="LocationPermissionDialogTitle">
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginEnd">24dp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="LocationPermissionDialogSubtitle">
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginEnd">24dp</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+    </style>
+
+    <style name="LocationPermissionDialogButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?android:colorAccent</item>
+        <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
+
+    <style name="LocationPermissionDialogSplitter">
+        <item name="android:background">?toolbarBgBorderColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="LocationPermissionsSwitch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/settingsItemTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <style name="LocationPermissionsGroupDivider">
+        <item name="android:background">?attr/settingsDividerColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="LocationPermissionsSectionTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="SavedSiteSectionTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="DeviceShield" />
+
+    <style name="DeviceShield.Button" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="DeviceShield.Button.Blue">
+        <item name="android:background">@drawable/background_blue_button_rounded_corners</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="DeviceShield.Button.Blue.Lowercase">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="DeviceShield.Button.Border">
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:background">@drawable/background_transparent_button_rounded_corners</item>
+    </style>
+
+    <style name="DeviceShield.Button.Borderless">
+        <item name="android:textColor">@color/cornflowerBlue</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport" />
+
+    <style name="DeviceShield.PrivacyReport.Title">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.Label">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:drawablePadding">18dp</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.Label.Yellow">
+        <item name="android:background">@drawable/background_yellow_tooltip</item>
+        <item name="android:drawableStart">@drawable/ic_alert_color_24</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.Label.Blue">
+        <item name="android:background">@drawable/background_blue_tooltip</item>
+        <item name="android:drawableStart">@drawable/ic_check_color_24</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.Toggle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.TrackerEntry.Company">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.TrackerEntry.Time">
+        <item name="android:textColor">?secondaryTextColor</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.PastWeekCounters">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.PastWeekCounters.Title">
+        <item name="android:textColor">@color/warmerGray</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.TrackerEntry">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="DeviceShield.PrivacyReport.Time">
+        <item name="android:textColor">?secondaryTextColor</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:selectable">false</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DeviceShield.NewTab" />
+
+    <style name="DeviceShield.NewTab.TextStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+    <style name="SearchWidgetFavoriteContainer">
+        <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
+        <item name="android:clipToPadding">false</item>
+    </style>
+
+    <style name="SearchWidgetFavoriteFavicon">
+        <item name="android:layout_width">@dimen/savedSiteGridItemFavicon</item>
+        <item name="android:layout_height">@dimen/savedSiteGridItemFavicon</item>
+        <item name="android:layout_gravity">center_horizontal|top</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="SearchWidgetFavoriteTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center_horizontal|bottom</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="SearchWidgetContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingTop">@dimen/searchWidgetPadding</item>
+        <item name="android:paddingBottom">@dimen/searchWidgetPadding</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:layout_marginStart">1dp</item>
+        <item name="android:layout_marginEnd">1dp</item>
+    </style>
+
+    <style name="SearchWidgetSearchBarContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <style name="SearchWithFavoritesWidgetSearchBarContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_gravity">top</item>
+        <item name="android:layout_marginStart">@dimen/searchWidgetSearchBarSideMargin</item>
+        <item name="android:layout_marginEnd">@dimen/searchWidgetSearchBarSideMargin</item>
+    </style>
+
+    <style name="SearchWidgetDDGLogo">
+        <item name="android:layout_width">26dp</item>
+        <item name="android:layout_height">26dp</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="SearchWidgetInputBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SearchWidgetSearchIcon">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+    </style>
+
+    <style name="SearchWidgetFavoritesGrid">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginTop">@dimen/searchWidgetFavoritesTopMargin</item>
+        <item name="android:verticalSpacing">@dimen/searchWidgetFavoritesVerticalSpacing</item>
+        <item name="android:horizontalSpacing">@dimen/searchWidgetFavoritesHorizontalSpacing</item>
+        <item name="android:scrollbars">none</item>
+        <item name="android:listSelector">#00000000</item>
+    </style>
+
+    <style name="SearchWidgetEmtpyFavoritesHintContainer">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/savedSiteGridItemFavicon</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+
+    <style name="SearchWidgetEmtpyFavoritesHint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/warGreyTwo</item>
+    </style>
+
+    <style name="SearchWidgetEmtpyFavoritesAction">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
+
+    <style name="SearchWidgetCtaTitle">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">20sp</item>
+        <item name="lineHeight">23dp</item>
+    </style>
+
+    <style name="SavedSiteFullScreenDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="SavedSiteTextInputEditTextTheme">
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:backgroundTint">?attr/savedSiteEditTextUnderlineColor</item>
+    </style>
+
+    <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

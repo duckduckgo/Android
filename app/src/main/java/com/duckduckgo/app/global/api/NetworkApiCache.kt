@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.api
 
-
 class NetworkApiCache {
 
     companion object {

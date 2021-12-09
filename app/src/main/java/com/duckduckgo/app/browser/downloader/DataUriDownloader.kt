@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import androidx.annotation.WorkerThread
 import android.util.Base64
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.downloader.DataUriParser.GeneratedFilename
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult
 import timber.log.Timber
@@ -33,24 +33,33 @@ class DataUriDownloader @Inject constructor(
     fun download(pending: FileDownloader.PendingFileDownload, callback: FileDownloader.FileDownloadListener?) {
 
         try {
-            callback?.downloadStarted()
+            callback?.downloadStartedDataUri()
 
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
                     Timber.w("Failed to extract data from data URI")
-                    callback?.downloadFailed("Failed to extract data from data URI")
+                    callback?.downloadFailed("Failed to extract data from data URI", DownloadFailReason.DataUriParseException)
                     return
                 }
                 is ParseResult.ParsedDataUri -> {
                     val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
 
-                    writeBytesToFiles(parsedDataUri.data, file)
-                    callback?.downloadFinished(file, parsedDataUri.mimeType)
+                    runCatching {
+                        writeBytesToFiles(parsedDataUri.data, file)
+                    }
+                        .onSuccess {
+                            Timber.v("Succeeded to decode Base64")
+                            callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
+                        }
+                        .onFailure {
+                            Timber.e(it, "Failed to decode Base64")
+                            callback?.downloadFailed("Failed to download data uri", DownloadFailReason.DataUriParseException)
+                        }
                 }
             }
         } catch (e: IOException) {
             Timber.e(e, "Failed to save data uri")
-            callback?.downloadFailed("Failed to download data uri")
+            callback?.downloadFailed("Failed to download data uri", DownloadFailReason.DataUriParseException)
         }
     }
 

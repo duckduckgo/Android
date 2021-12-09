@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.*
 
-
 class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
     interface Listener {
@@ -43,7 +42,7 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhat)
+            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
                     val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup

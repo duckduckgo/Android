@@ -25,10 +25,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
-
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
@@ -50,7 +49,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhat)
+            .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
                     val radioGroup = it.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
@@ -82,7 +81,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     @IdRes
-    private fun ClearWhenOption.radioButtonId() : Int {
+    private fun ClearWhenOption.radioButtonId(): Int {
         return when (this) {
             ClearWhenOption.APP_EXIT_ONLY -> R.id.settingAppExitOnly
             ClearWhenOption.APP_EXIT_OR_5_MINS -> R.id.settingInactive5Mins

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
   <path
-      android:pathData="M16.446,11.358h-1.834v1.834h1.834v1.833h1.833v-1.833h1.834v-1.834h-1.834L18.279,9.525h-1.833v1.833zM12,23C5.925,23 1,18.075 1,12S5.925,1 12,1s11,4.925 11,11 -4.925,11 -11,11zM9.8,16.565c2.007,0 3.176,-1.114 3.822,-2.255l-1.677,-0.811c-0.385,0.742 -1.21,1.333 -2.145,1.333 -1.678,0 -2.888,-1.278 -2.888,-3.01 0,-1.733 1.21,-3.012 2.888,-3.012 0.935,0 1.76,0.591 2.145,1.334l1.678,-0.825c-0.647,-1.155 -1.816,-2.242 -3.823,-2.242 -2.764,0 -4.895,1.912 -4.895,4.744 0,2.819 2.131,4.744 4.895,4.744z"
-      android:fillColor="?attr/toolbarIconColor" />
+      android:pathData="M15.446,10.358L13.613,10.358L13.613,12.192L15.446,12.192L15.446,14.025L17.279,14.025L17.279,12.192L19.113,12.192L19.113,10.358L17.279,10.358L17.279,8.525L15.446,8.525L15.446,10.358ZM11,22C4.925,22 0,17.075 0,11C0,4.925 4.925,0 11,0C17.075,0 22,4.925 22,11C22,17.075 17.075,22 11,22ZM8.8,15.565C10.807,15.565 11.976,14.451 12.622,13.31L10.945,12.499C10.56,13.241 9.735,13.832 8.8,13.832C7.122,13.832 5.912,12.554 5.912,10.822C5.912,9.089 7.122,7.81 8.8,7.81C9.735,7.81 10.56,8.401 10.945,9.144L12.623,8.319C11.976,7.164 10.807,6.077 8.8,6.077C6.036,6.077 3.905,7.989 3.905,10.821C3.905,13.64 6.036,15.565 8.8,15.565Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
 </vector>

@@ -18,18 +18,24 @@ package com.duckduckgo.app.global.install
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
-interface AppInstallStore {
+interface AppInstallStore : LifecycleObserver {
     var installTimestamp: Long
 
     var widgetInstalled: Boolean
 
     var defaultBrowser: Boolean
+
+    var newDefaultBrowserDialogCount: Int
 
     fun hasInstallTimestampRecorded(): Boolean
 }
@@ -51,10 +57,23 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
         set(defaultBrowser) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser) }
 
+    override var newDefaultBrowserDialogCount: Int
+        get() = preferences.getInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, 0)
+        set(defaultBrowser) = preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
+
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun recordInstallationTimestamp() {
+        Timber.i("recording installation timestamp")
+        if (!hasInstallTimestampRecorded()) {
+            installTimestamp = System.currentTimeMillis()
+        }
+    }
 
     companion object {
         @VisibleForTesting
@@ -62,6 +81,6 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
         const val KEY_WIDGET_INSTALLED = "KEY_WIDGET_INSTALLED"
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"
+        private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
     }
 }
-

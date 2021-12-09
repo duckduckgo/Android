@@ -38,7 +38,11 @@ class StageTypeConverter {
 
     @TypeConverter
     fun toStage(stage: String): AppStage {
-        return AppStage.valueOf(stage)
+        return try {
+            AppStage.valueOf(stage)
+        } catch (ex: IllegalArgumentException) {
+            AppStage.ESTABLISHED
+        }
     }
 
     @TypeConverter

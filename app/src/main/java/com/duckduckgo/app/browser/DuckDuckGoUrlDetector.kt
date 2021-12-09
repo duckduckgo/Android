@@ -21,8 +21,13 @@ import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import javax.inject.Inject
 
-
 class DuckDuckGoUrlDetector @Inject constructor() {
+
+    fun isDuckDuckGoEmailUrl(url: String): Boolean {
+        val uri = url.toUri()
+        val firstSegment = uri.pathSegments.firstOrNull()
+        return isDuckDuckGoUrl(url) && firstSegment == AppUrl.Url.EMAIL_SEGMENT
+    }
 
     fun isDuckDuckGoUrl(uri: String): Boolean {
         return AppUrl.Url.HOST == uri.toUri().host
@@ -32,6 +37,18 @@ class DuckDuckGoUrlDetector @Inject constructor() {
         return isDuckDuckGoUrl(uri) && hasQuery(uri)
     }
 
+    fun isDuckDuckGoStaticUrl(uri: String): Boolean {
+        return isDuckDuckGoUrl(uri) && matchesStaticPage(uri)
+    }
+
+    private fun matchesStaticPage(uri: String): Boolean {
+        return when (uri.toUri().path) {
+            AppUrl.StaticUrl.SETTINGS -> true
+            AppUrl.StaticUrl.PARAMS -> true
+            else -> false
+        }
+    }
+
     private fun hasQuery(uri: String): Boolean {
         return uri.toUri().queryParameterNames.contains(ParamKey.QUERY)
     }
@@ -39,6 +56,19 @@ class DuckDuckGoUrlDetector @Inject constructor() {
     fun extractQuery(uriString: String): String? {
         val uri = uriString.toUri()
         return uri.getQueryParameter(ParamKey.QUERY)
+    }
+
+    fun isDuckDuckGoVerticalUrl(uri: String): Boolean {
+        return isDuckDuckGoUrl(uri) && hasVertical(uri)
+    }
+
+    private fun hasVertical(uri: String): Boolean {
+        return uri.toUri().queryParameterNames.contains(ParamKey.VERTICAL)
+    }
+
+    fun extractVertical(uriString: String): String? {
+        val uri = uriString.toUri()
+        return uri.getQueryParameter(ParamKey.VERTICAL)
     }
 
     private fun String.toUri(): Uri {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.surrogates
 
-import android.net.Uri
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -50,27 +49,18 @@ class ResourceSurrogatesTest {
     }
 
     @Test
-    fun whenSearchingForExactMatchingExistingSurrogateThenCanFindByName() {
-        val surrogate = SurrogateResponse(name = "foo")
+    fun whenSearchingForExactMatchingExistingSurrogateThenCanFindByScriptId() {
+        val surrogate = SurrogateResponse(scriptId = "fooId", name = "foo")
         testee.loadSurrogates(listOf(surrogate))
-        val retrieved = testee.get(Uri.parse("foo"))
-        assertTrue(retrieved.responseAvailable)
-    }
-
-
-    @Test
-    fun whenSearchingForSubstringMatchingExistingSurrogateThenCanFindByName() {
-        val surrogate = SurrogateResponse(name = "foo.com")
-        testee.loadSurrogates(listOf(surrogate))
-        val retrieved = testee.get(Uri.parse("foo.com/a/b/c"))
+        val retrieved = testee.get("fooId")
         assertTrue(retrieved.responseAvailable)
     }
 
     @Test
-    fun whenSearchingByNonExistentNameThenResponseUnavailableSurrogateResultReturned() {
-        val surrogate = SurrogateResponse(name = "foo")
+    fun whenSearchingByNonExistentScriptIdThenResponseUnavailableSurrogateResultReturned() {
+        val surrogate = SurrogateResponse(scriptId = "fooId", name = "foo")
         testee.loadSurrogates(listOf(surrogate))
-        val retrieved = testee.get(Uri.parse("bar"))
+        val retrieved = testee.get("bar")
         assertFalse(retrieved.responseAvailable)
     }
 }

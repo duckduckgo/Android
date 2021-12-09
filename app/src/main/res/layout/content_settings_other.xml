@@ -24,10 +24,20 @@
     <TextView
         android:id="@+id/settingsOtherTitle"
         style="@style/SettingsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsHeadingOther" />
+
+    <TextView
+        android:id="@+id/privacyPolicy"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPrivacyPolicyDuckduckgo"
+        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
 
     <TextView
         android:id="@+id/about"
@@ -35,7 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsAboutDuckduckgo"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
+        app:layout_constraintTop_toBottomOf="@id/privacyPolicy" />
 
     <TextView
         android:id="@+id/provideFeedback"

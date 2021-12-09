@@ -19,20 +19,30 @@ package com.duckduckgo.app.survey.ui
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
-import io.reactivex.schedulers.Schedulers
-
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Provider
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
-    private val appInstallStore: AppInstallStore
+    private val appInstallStore: AppInstallStore,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     sealed class Command {
@@ -79,10 +89,14 @@ class SurveyViewModel(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        Schedulers.io().scheduleDirect {
-            surveyDao.update(survey)
+        viewModelScope.launch() {
+            withContext(dispatchers.io() + NonCancellable) {
+                surveyDao.update(survey)
+            }
+            withContext(dispatchers.main()) {
+                command.value = Command.Close
+            }
         }
-        command.value = Command.Close
     }
 
     fun onSurveyDismissed() {
@@ -97,5 +111,21 @@ class SurveyViewModel(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class SurveyViewModelFactory @Inject constructor(
+    private val surveyDao: Provider<SurveyDao>,
+    private val statisticsStore: Provider<StatisticsDataStore>,
+    private val appInstallStore: Provider<AppInstallStore>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao.get(), statisticsStore.get(), appInstallStore.get()) as T)
+                else -> null
+            }
+        }
     }
 }

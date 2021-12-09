@@ -27,7 +27,13 @@ import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
@@ -89,9 +95,14 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     fun onSubmitPressed(webViewVersion: String) {
-        val brokenSite = getBrokenSite(url, webViewVersion)
-        brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
+        if (url.isNotEmpty()) {
+            val brokenSite = getBrokenSite(url, webViewVersion)
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+            pixel.fire(
+                AppPixelName.BROKEN_SITE_REPORTED,
+                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl)
+            )
+        }
         command.value = Command.ConfirmAndFinish
     }
 
@@ -116,5 +127,20 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         const val WEBVIEW_UNKNOWN_VERSION = "unknown"
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class BrokenSiteViewModelFactory @Inject constructor(
+    private val pixel: Provider<Pixel>,
+    private val brokenSiteSender: Provider<BrokenSiteSender>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
+                else -> null
+            }
+        }
     }
 }

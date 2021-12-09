@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -30,6 +32,10 @@ interface WebViewClientListener {
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
+    fun willOverrideUrl(newUrl: String)
+    fun redirectTriggeredByGpc()
+
+    fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
 
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
@@ -41,12 +47,20 @@ interface WebViewClientListener {
     fun goFullScreen(view: View)
     fun exitFullScreen()
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
-    fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
-    fun openInNewTab(url: String?)
+    fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isForMainFrame: Boolean): Boolean
+    fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
     fun closeCurrentTab()
+    fun closeAndSelectSourceTab()
     fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
+    fun isDesktopSiteEnabled(): Boolean
+
+    fun loginDetected()
+    fun dosAttackDetected()
+    fun iconReceived(url: String, icon: Bitmap)
+    fun iconReceived(visitedUrl: String, iconUrl: String)
+    fun prefetchFavicon(url: String)
 }

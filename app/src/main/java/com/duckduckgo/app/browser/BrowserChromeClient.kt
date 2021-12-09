@@ -16,21 +16,30 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import kotlinx.coroutines.GlobalScope
+import com.duckduckgo.privacy.config.api.Drm
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepository: UncaughtExceptionRepository) : WebChromeClient() {
+class BrowserChromeClient @Inject constructor(
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val drm: Drm,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 
@@ -48,7 +57,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.goFullScreen(view)
 
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
                 throw e
             }
@@ -61,7 +70,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.exitFullScreen()
             customView = null
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
                 throw e
             }
@@ -72,21 +81,36 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
                 throw e
             }
         }
     }
 
+    override fun onReceivedIcon(webView: WebView, icon: Bitmap) {
+        webView.url?.let {
+            Timber.i("Favicon bitmap received: ${webView.url}")
+            webViewClientListener?.iconReceived(it, icon)
+        }
+    }
+
+    override fun onReceivedTouchIconUrl(view: WebView?, url: String?, precomposed: Boolean) {
+        Timber.i("Favicon touch received: ${view?.url}, $url")
+        val visitedUrl = view?.url ?: return
+        val iconUrl = url ?: return
+        webViewClientListener?.iconReceived(visitedUrl, iconUrl)
+        super.onReceivedTouchIconUrl(view, url, precomposed)
+    }
+
     override fun onReceivedTitle(view: WebView, title: String) {
         try {
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
                 throw e
             }
@@ -98,7 +122,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
             true
         } catch (e: Throwable) {
-            GlobalScope.launch {
+            appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
                 throw e
             }
@@ -117,7 +141,19 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
         return false
     }
 
+    override fun onPermissionRequest(request: PermissionRequest) {
+        val permissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
+        if (permissions.isNotEmpty()) {
+            request.grant(permissions)
+        }
+    }
+
     override fun onCloseWindow(window: WebView?) {
         webViewClientListener?.closeCurrentTab()
     }
+
+    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+        webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
+    }
+
 }

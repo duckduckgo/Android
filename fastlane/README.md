@@ -12,10 +12,20 @@ Install _fastlane_ using
 ```
 [sudo] gem install fastlane -NV
 ```
-or alternatively using `brew cask install fastlane`
+or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
+### android deploy_playstore
+```
+fastlane android deploy_playstore
+```
+Upload APK to Play Store, in pre-production staging track
+### android deploy_dogfood
+```
+fastlane android deploy_dogfood
+```
+Upload APK to Play Store internal testing track
 ### android deploy_github
 ```
 fastlane android deploy_github

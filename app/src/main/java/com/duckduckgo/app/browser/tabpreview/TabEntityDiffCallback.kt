@@ -20,7 +20,6 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-
 class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
     override fun areItemsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
@@ -29,8 +28,8 @@ class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
     override fun areContentsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
-                oldItem.viewed == newItem.viewed &&
-                oldItem.title == newItem.title
+            oldItem.viewed == newItem.viewed &&
+            oldItem.title == newItem.title
     }
 
     override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {

@@ -16,8 +16,13 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -28,19 +33,34 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.bookmarks.model.BookmarksRepository
+import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.FaviconSource
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.LoginDetected
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -49,21 +69,39 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.data.LocationPermissionsDao
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -75,23 +113,56 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
+import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
+import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
+import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.whenever
+import dagger.Lazy
 import io.reactivex.Observable
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.*
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
+import org.mockito.internal.util.DefaultMockingDetails
+import java.io.File
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class BrowserTabViewModelTest {
 
@@ -127,19 +198,22 @@ class BrowserTabViewModelTest {
     private lateinit var mockBookmarksDao: BookmarksDao
 
     @Mock
+    private lateinit var mockBookmarksRepository: BookmarksRepository
+
+    @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
 
     @Mock
     private lateinit var mockOmnibarConverter: OmnibarEntryConverter
 
     @Mock
-    private lateinit var mockTabsRepository: TabRepository
+    private lateinit var mockTabRepository: TabRepository
 
     @Mock
     private lateinit var webViewSessionStorage: WebViewSessionStorage
 
     @Mock
-    private lateinit var mockFaviconDownloader: FaviconDownloader
+    private lateinit var mockFaviconManager: FaviconManager
 
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
@@ -157,9 +231,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -172,10 +243,54 @@ class BrowserTabViewModelTest {
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private lateinit var mockUserWhitelistDao: UserWhitelistDao
+
+    @Mock
+    private lateinit var mockContentBlocking: ContentBlocking
+
+    @Mock
+    private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
+
+    @Mock
+    private lateinit var mockUserEventsStore: UserEventsStore
+
+    @Mock
+    private lateinit var mockFileDownloader: FileDownloader
+
+    @Mock
+    private lateinit var geoLocationPermissions: GeoLocationPermissions
+
+    @Mock
+    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
+
+    @Mock
+    private lateinit var mockFavoritesRepository: FavoritesRepository
+
+    @Mock
+    private lateinit var mockSpecialUrlDetector: SpecialUrlDetector
+
+    @Mock
+    private lateinit var mockAppLinksHandler: AppLinksHandler
+
+    @Mock
+    private lateinit var mockVariantManager: VariantManager
+
+    @Mock
+    private lateinit var mockFeatureToggle: FeatureToggle
+
+    @Mock
+    private lateinit var mockGpcRepository: GpcRepository
+
+    @Mock
+    private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
+
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -184,77 +299,146 @@ class BrowserTabViewModelTest {
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
+    @Captor
+    private lateinit var appLinkCaptor: ArgumentCaptor<() -> Unit>
+
     private lateinit var db: AppDatabase
 
     private lateinit var testee: BrowserTabViewModel
 
+    private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
+
+    private lateinit var locationPermissionsDao: LocationPermissionsDao
+
+    private lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+
+    private val context = getInstrumentation().targetContext
+
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
+
+    private val loginEventLiveData = MutableLiveData<LoginDetected>()
+
+    private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
+
+    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
+    private val childClosedTabsSharedFlow = MutableSharedFlow<String>()
+
+    private val childClosedTabsFlow = childClosedTabsSharedFlow.asSharedFlow()
+
+    private val emailStateFlow = MutableStateFlow(false)
+
+    private val bookmarksListFlow = Channel<List<Bookmark>>()
+
+    private val favoriteListFlow = Channel<List<Favorite>>()
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
-
-        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
+        MockitoAnnotations.openMocks(this)
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        fireproofWebsiteDao = db.fireproofWebsiteDao()
+        locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao, mockFavoritesRepository)
+        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
+
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+        whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
+        whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
+        whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
 
         ctaViewModel = CtaViewModel(
-            mockAppInstallStore,
-            mockPixel,
-            mockSurveyDao,
-            mockWidgetCapabilities,
-            mockDismissedCtaDao,
-            mockVariantManager,
-            mockSettingsStore,
-            mockOnboardingStore,
-            mockPrivacySettingsStore,
-            mockUserStageStore,
-            coroutineRule.testDispatcherProvider
+            appInstallStore = mockAppInstallStore,
+            pixel = mockPixel,
+            surveyDao = mockSurveyDao,
+            widgetCapabilities = mockWidgetCapabilities,
+            dismissedCtaDao = mockDismissedCtaDao,
+            userWhitelistDao = mockUserWhitelistDao,
+            settingsDataStore = mockSettingsStore,
+            onboardingStore = mockOnboardingStore,
+            userStageStore = mockUserStageStore,
+            tabRepository = mockTabRepository,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            variantManager = mockVariantManager,
+            userEventsStore = mockUserEventsStore
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
-        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
-        whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
-        whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
+        whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
+        whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+        whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
+        whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
             queryUrlConverter = mockOmnibarConverter,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
-            tabRepository = mockTabsRepository,
+            tabRepository = mockTabRepository,
+            userWhitelistDao = mockUserWhitelistDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
-            bookmarksDao = mockBookmarksDao,
+            bookmarksRepository = mockBookmarksRepository,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
-            specialUrlDetector = SpecialUrlDetectorImpl(),
-            faviconDownloader = mockFaviconDownloader,
+            specialUrlDetector = mockSpecialUrlDetector,
+            faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            fireproofWebsiteRepository = fireproofWebsiteRepository,
+            locationPermissionsRepository = LocationPermissionsRepository(
+                locationPermissionsDao,
+                lazyFaviconManager,
+                coroutineRule.testDispatcherProvider
+            ),
+            geoLocationPermissions = geoLocationPermissions,
+            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
+            userEventsStore = mockUserEventsStore,
+            fileDownloader = mockFileDownloader,
+            gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary),
+            fireproofDialogsEventHandler = fireproofDialogsEventHandler,
+            emailManager = mockEmailManager,
+            favoritesRepository = mockFavoritesRepository,
+            appCoroutineScope = TestCoroutineScope(),
+            appLinksHandler = mockAppLinksHandler,
+            contentBlocking = mockContentBlocking,
+            accessibilitySettingsDataStore = accessibilitySettingsDataStore,
+            variantManager = mockVariantManager
         )
 
-        testee.loadData("abc", null, false)
+        testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
+
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @ExperimentalCoroutinesApi
     @After
     fun after() {
+        ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
+        dismissedCtaDaoChannel.close()
+        bookmarksListFlow.close()
+        favoriteListFlow.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
+        clearAccessibilitySettings()
     }
 
     @Test
@@ -288,23 +472,34 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.OpenInNewBackgroundTab)
 
-        verify(mockTabsRepository).addNewTabAfterExistingTab(url, "abc")
+        verify(mockTabRepository).addNewTabAfterExistingTab(url, "abc")
     }
 
     @Test
-    fun whenViewIsResumedAndBrowserShowingThenKeyboardHidden() {
-        setBrowserShowing(true)
-        testee.onViewResumed()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
-    }
-
-    @Test
-    fun whenViewIsResumedAndHomeShowingThenKeyboardShown() {
+    fun whenViewBecomesVisibleAndHomeShowingThenKeyboardShown() = coroutineRule.runBlocking {
         setBrowserShowing(false)
-        testee.onViewResumed()
+
+        testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndHomeCtaPresentThenKeyboardHidden() = coroutineRule.runBlocking {
+        givenExpectedCtaAddWidgetInstructions()
+
+        testee.onViewVisible()
+
+        assertCommandIssued<Command.HideKeyboard>()
+        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
+        setBrowserShowing(true)
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
@@ -345,48 +540,112 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }
 
     @Test
-    fun whenBrowsingAndUrlPresentThenAddBookmarkButtonEnabled() {
+    fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
         loadUrl("www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canAddBookmarks)
+        assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
-    fun whenBrowsingAndNoUrlThenAddBookmarkButtonDisabled() {
+    fun whenBrowsingAndNoUrlThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl(null, isBrowserShowing = true)
         assertFalse(browserViewState().canAddBookmarks)
+        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
-    fun whenNotBrowsingAndUrlPresentThenAddBookmarkButtonDisabled() {
+    fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl("www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canAddBookmarks)
+        assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
-        testee.editBookmark(0, "A title", "www.example.com")
-        verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
+    fun whenBookmarkEditedThenRepositoryIsUpdated() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
+        testee.onSavedSiteEdited(bookmark)
+        verify(mockBookmarksRepository).update(bookmark)
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
-        loadUrl("www.example.com", "A title")
+    fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
+        val favorite = Favorite(0, "A title", "www.example.com", 1)
+        testee.onSavedSiteEdited(favorite)
+        verify(mockFavoritesRepository).update(favorite)
+    }
 
-        testee.onBookmarkAddRequested()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "A title", url = "www.example.com"))
+    @Test
+    fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
+        val url = "http://www.example.com"
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
+
+        testee.onBookmarkMenuClicked()
+        verify(mockBookmarksRepository).insert(title = title, url = url)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowBookmarkAddedConfirmation)
+        assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
+    }
+
+    @Test
+    fun whenFavoriteAddedThenRepositoryUpdatedAndUserNotified() = coroutineRule.runBlocking {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        loadUrl("www.example.com", "A title")
+        whenever(mockFavoritesRepository.insert(any(), any())).thenReturn(savedSite)
+
+        testee.onFavoriteMenuClicked()
+
+        verify(mockFavoritesRepository).insert(title = "A title", url = "www.example.com")
+        assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
+    }
+
+    @Test
+    fun whenNoSiteAndUserSelectsToAddFavoriteThenSiteIsNotAdded() = coroutineRule.runBlocking {
+
+        testee.onFavoriteMenuClicked()
+
+        verify(mockFavoritesRepository, times(0)).insert(any(), any())
+    }
+
+    @Test
+    fun whenQuickAccessDeletedThenRepositoryUpdated() = coroutineRule.runBlocking {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+
+        testee.deleteQuickAccessItem(savedSite)
+
+        verify(mockFavoritesRepository).delete(savedSite)
+    }
+
+    @Test
+    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+
+        testee.insertQuickAccessItem(savedSite)
+
+        verify(mockFavoritesRepository).insert(savedSite)
+    }
+
+    @Test
+    fun whenQuickAccessListChangedThenRepositoryUpdated() {
+        val savedSite = Favorite(1, "title", "http://example.com", 0)
+        val savedSites = listOf(QuickAccessFavorite(savedSite))
+
+        testee.onQuickAccessListChanged(savedSites)
+
+        verify(mockFavoritesRepository).updateWithPosition(listOf(savedSite))
     }
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
         val networkEntity = TestEntity("Network1", "Network1", 10.0)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), networkEntity, false, null)
         testee.trackerDetected(event)
         verify(mockNetworkLeaderboardDao).incrementNetworkCount("Network1")
     }
@@ -405,6 +664,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonEmptyInputThenNavigateCommandSubmittedToActivity() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Navigate)
@@ -415,7 +675,9 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         givenInvalidatedGlobalLayout()
         testee.onUserSubmittedQuery("foo")
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertNull(sourceTabId)
+        }
     }
 
     @Test
@@ -426,7 +688,7 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -500,6 +762,50 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenUserRedirectedThenNotifyLoginDetector() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect("http://example.com"))
+    }
+
+    @Test
+    fun whenLoadingProgressReaches50ThenShowWebContent() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        onProgressChanged(url = "http://example.com", newProgress = 50)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = coroutineRule.runBlocking {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(omnibarViewState().isEditing)
@@ -557,10 +863,6 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(0)
-        assertEquals(50, loadingViewState().progress)
-        assertEquals(true, loadingViewState().isLoading)
-
         testee.progressChanged(15)
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
@@ -577,26 +879,98 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlClearedThenPrivacyGradeIsCleared() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
         loadUrl(null)
-        assertNull(testee.privacyGrade.value)
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenUrlLoadedThenPrivacyGradeIsReset() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = testee.privacyGrade.value
+        val grade = privacyGradeState().privacyGrade
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
-            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
         }
-        assertNotEquals(grade, testee.privacyGrade.value)
+        assertNotEquals(grade, privacyGradeState().privacyGrade)
+    }
+
+    @Test
+    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
+        testee.stopShowingEmptyGrade()
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        testee.stopShowingEmptyGrade()
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
+        assertTrue(testee.isEnabled)
+    }
+
+    @Test
+    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
+        assertFalse(testee.isEnabled)
+    }
+
+    @Test
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsTrue() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
+        assertTrue(testee.isEnabled)
     }
 
     @Test
@@ -611,6 +985,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
     fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
@@ -619,6 +999,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
@@ -633,6 +1014,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
@@ -641,31 +1023,31 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenFireButtonIsShown() {
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is HighlightableButton.Gone)
     }
 
     @Test
@@ -699,36 +1081,35 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenMenuButtonIsShown() {
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenMenuButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showMenuButton)
+        assertTrue(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenMenuButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showMenuButton)
+        assertFalse(browserViewState().showMenuButton.isEnabled())
     }
 
     @Test
     fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
-        whenever(mockBookmarksDao.bookmarksByQuery("%foo%")).thenReturn(Single.just(emptyList()))
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
@@ -740,6 +1121,15 @@ class BrowserTabViewModelTest {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
+    }
+
+    @Test
+    fun whenOmnibarFocusedWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(favorites = listOf(QuickAccessFavorite(Favorite(1, "title", "http://example.com", 1))))
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.onOmnibarInputStateChanged("https://example.com", true, hasQueryChanged = false)
+        assertFalse(autoCompleteViewState().showSuggestions)
+        assertTrue(autoCompleteViewState().showFavorites)
     }
 
     @Test
@@ -771,21 +1161,43 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
     }
 
     @Test
+    fun whenEnteringAppLinkQueryAndShouldShowAppLinksPromptThenNavigateInBrowserAndSetPreviousUrlToNull() {
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+        verify(mockAppLinksHandler).updatePreviousUrl(null)
+    }
+
+    @Test
+    fun whenEnteringAppLinkQueryAndShouldNotShowAppLinksPromptThenNavigateInBrowserAndSetUserQueryState() {
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
+        verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
+        verify(mockAppLinksHandler).setUserQueryState(true)
+    }
+
+    @Test
     fun whenNotifiedEnteringFullScreenThenViewStateUpdatedWithFullScreenFlag() {
-        val stubView = View(getInstrumentation().targetContext)
+        val stubView = View(context)
         testee.goFullScreen(stubView)
         assertTrue(browserViewState().isFullScreen)
     }
 
     @Test
     fun whenNotifiedEnteringFullScreenThenEnterFullScreenCommandIssued() {
-        val stubView = View(getInstrumentation().targetContext)
+        val stubView = View(context)
         testee.goFullScreen(stubView)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowFullScreen)
@@ -848,6 +1260,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -855,6 +1268,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(false)
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -870,6 +1284,19 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         assertFalse(browserViewState().browserShowing)
         assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenFindInPageShowingByPressingBackOnBrowserThenViewStateUpdatedInvisibleAndDoesNotGoToPreviousPage() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        testee.onFindInPageSelected()
+        testee.onUserPressedBack()
+
+        assertFalse(findInPageViewState().visible)
+        assertCommandIssued<Command.DismissFindInPage>()
+
+        val issuedCommand = commandCaptor.allValues.find { it is Command.NavigateBack }
+        assertNull(issuedCommand)
     }
 
     @Test
@@ -942,7 +1369,9 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab>() {
+            assertNull(sourceTabId)
+        }
     }
 
     @Test
@@ -953,7 +1382,7 @@ class BrowserTabViewModelTest {
         testee.onRefreshRequested()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -961,6 +1390,57 @@ class BrowserTabViewModelTest {
     fun whenRefreshRequestedWithBrowserGlobalLayoutThenRefresh() {
         testee.onRefreshRequested()
         assertCommandIssued<Command.Refresh>()
+    }
+
+    @Test
+    fun whenRefreshRequestedWithQuerySearchThenFireQueryChangePixelZero() {
+        loadUrl("query")
+
+        testee.onRefreshRequested()
+
+        verify(mockPixel).fire("rq_0")
+    }
+
+    @Test
+    fun whenRefreshRequestedWithUrlThenDoNotFireQueryChangePixel() {
+        loadUrl("https://example.com")
+
+        testee.onRefreshRequested()
+
+        verify(mockPixel, never()).fire("rq_0")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryWithPreviousBlankQueryThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryWithDifferentPreviousQueryThenSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("query")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel).fire("rq_1")
+    }
+
+    @Test
+    fun whenUserSubmittedDifferentQueryAndOldQueryIsUrlThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("www.foo.com")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
     }
 
     @Test
@@ -1037,27 +1517,69 @@ class BrowserTabViewModelTest {
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
         val command = captureCommands().value as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertNotNull(sourceTabId)
+        }
     }
 
     @Test
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = coroutineRule.runBlocking {
-        loadUrl("foo.com")
-        testee.titleReceived("Foo Title")
-        testee.onBookmarkAddRequested()
-        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-        assertEquals("foo.com", command.url)
-        assertEquals("Foo Title", command.title)
+        val url = "http://foo.com"
+        val title = "Foo Title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url)
+        testee.titleReceived(newTitle = title)
+        testee.onBookmarkMenuClicked()
+        val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
+        assertEquals(url, command.savedSite.url)
+        assertEquals(title, command.savedSite.title)
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = coroutineRule.runBlocking {
-        whenever(mockBookmarksDao.insert(any())).thenReturn(1)
-        testee.onBookmarkAddRequested()
-        verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
-        val command = captureCommands().value as Command.ShowBookmarkAddedConfirmation
-        assertEquals(1, command.bookmarkId)
-        assertEquals("", command.title)
-        assertEquals("", command.url)
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkIsNotAdded() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 0, title = "A title", url = "www.example.com", parentId = 0)
+        whenever(mockBookmarksRepository.insert(anyString(), anyString(), anyLong())).thenReturn(bookmark)
+
+        testee.onBookmarkMenuClicked()
+
+        verify(mockBookmarksRepository, times(0)).insert(bookmark)
+    }
+
+    @Test
+    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = coroutineRule.runBlocking {
+        loadUrl("foo.com", isBrowserShowing = true)
+        testee.onBrokenSiteSelected()
+        val command = captureCommands().value as Command.BrokenSiteFeedback
+        assertEquals("foo.com", command.data.url)
+    }
+
+    @Test
+    fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
+        testee.onBrokenSiteSelected()
+        val command = captureCommands().value as Command.BrokenSiteFeedback
+        assertEquals("", command.data.url)
     }
 
     @Test
@@ -1066,21 +1588,6 @@ class BrowserTabViewModelTest {
         testee.onShareSelected()
         val command = captureCommands().value as Command.ShareLink
         assertEquals("foo.com", command.url)
-    }
-
-    @Test
-    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = coroutineRule.runBlocking {
-        loadUrl("foo.com", isBrowserShowing = true)
-        testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("foo.com", command.url)
-    }
-
-    @Test
-    fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
-        testee.onBrokenSiteSelected()
-        val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("", command.url)
     }
 
     @Test
@@ -1129,35 +1636,62 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUrlNullThenSetBrowserNotShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", null, false)
+        testee.loadData("id", null, false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlBlankThenSetBrowserNotShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", "  ", false)
+        testee.loadData("id", "  ", false, false)
         testee.determineShowBrowser()
         assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
     fun whenUrlPresentThenSetBrowserShowing() = coroutineRule.runBlocking {
-        testee.loadData("id", "https://example.com", false)
+        testee.loadData("id", "https://example.com", false, false)
         testee.determineShowBrowser()
         assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
-    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
-        val url = "https://example.com"
-        testee.openInNewTab(url)
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+    fun whenFavoritesOnboardingAndSiteLoadedThenHighglightMenuButton() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.showMenuButton?.isHighlighted())
+    }
 
-        val command = commandCaptor.lastValue
-        assertTrue(command is Command.OpenInNewTab)
-        command as Command.OpenInNewTab
-        assertEquals(url, command.query)
+    @Test
+    fun whenFavoritesOnboardingAndUserOpensOptionsMenuThenHighglightAddFavoriteOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClicked()
+
+        assertEquals(true, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenMenuButtonNotHighlighted() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+
+        testee.onBrowserMenuClosed()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
+    }
+
+    @Test
+    fun whenFavoritesOnboardingAndUserClosesOptionsMenuThenLoadingNewSiteDoesNotHighlightMenuOption() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false, true)
+        testee.determineShowBrowser()
+        testee.onBrowserMenuClicked()
+        testee.onBrowserMenuClosed()
+
+        testee.determineShowBrowser()
+
+        assertEquals(false, testee.browserViewState.value?.addFavorite?.isHighlighted())
     }
 
     @Test
@@ -1177,6 +1711,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
         }
     }
 
@@ -1190,7 +1725,7 @@ class BrowserTabViewModelTest {
         showErrorWithAction.action()
 
         coroutineRule.runBlocking {
-            verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+            verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
         }
     }
 
@@ -1225,6 +1760,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canGoForward)
         assertFalse(browserViewState().canReportSite)
         assertFalse(browserViewState().canChangeBrowsingMode)
+        assertFalse(browserViewState().canFireproofSite)
         assertFalse(findInPageViewState().canFindInPage)
     }
 
@@ -1244,6 +1780,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationIsRequiredForSameHostThenNoChangesOnBrowser() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://example.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+        assertEquals("http://example.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenAuthenticationIsRequiredForDifferentHostThenUpdateUrlAndHideWebContent() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://another.website.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertCommandIssued<Command.HideWebContent>()
+        assertEquals(siteURL, omnibarViewState().omnibarText)
+    }
+
+    @Test
     fun whenHandleAuthenticationThenHandlerCalledWithParameters() {
         val mockHandler = mock<HttpAuthHandler>()
         val username = "user"
@@ -1256,41 +1818,62 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationDialogAcceptedThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
+    fun whenAuthenticationDialogCanceledThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+
+        testee.cancelAuthentication(request = authenticationRequest)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(true)
         val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
-        whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
+        whenever(mockBookmarksRepository.hasBookmarks()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
+        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
     }
 
     @Test
     fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = coroutineRule.runBlocking {
         testee.onUserSelectedToEditQuery("foo")
-        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
+
+        assertCommandIssued<Command.EditWithSelectedQuery>()
     }
 
     @Test
     fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
     }
@@ -1315,7 +1898,7 @@ class BrowserTabViewModelTest {
     fun whenCloseCurrentTabSelectedThenTabDeletedFromRepository() = runBlocking {
         givenOneActiveTabSelected()
         testee.closeCurrentTab()
-        verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
+        verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
     }
 
     @Test
@@ -1329,18 +1912,36 @@ class BrowserTabViewModelTest {
     fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.contains(Command.GenerateWebViewPreviewImage))
+    }
+
+    @Test
+    fun whenUserPressesBackAndGoesToHomeThenKeyboardShown() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenUserPressesBackOnATabWithASourceTabThenDeleteCurrentAndSelectSource() = coroutineRule.runBlocking {
+        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
+        setupNavigation(isBrowsing = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockTabRepository).deleteTabAndSelectSource("TAB_ID")
     }
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED), Locale.US)
         assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED), Locale.US)
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -1418,14 +2019,6 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.onCtaShown()
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenManualCtaShownThenFirePixel() {
-        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-
-        testee.onManualCtaShown(cta)
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
     }
 
@@ -1577,108 +2170,1540 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoHttpsUpgradedThenReturnHttpsUpgradedFalse() {
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertFalse(brokenSiteFeedback.httpsUpgraded)
+    fun whenHomeShowingByPressingBackThenFireproofWebsiteOptionMenuDisabled() {
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoTrackersThenReturnBlockedTrackersEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndTrackersBlockedThenReturnBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com,www.anothertracker.com", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSameHostTrackersBlockedThenDoNotReturnDuplicatedBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoSurrogatesThenReturnSurrogatesEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.surrogates)
+    fun whenUrlClearedThenFireproofWebsiteOptionMenuDisabled() {
+        loadUrl("http://www.example.com/path")
+        assertTrue(browserViewState().canFireproofSite)
+        loadUrl(null)
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSurrogatesThenReturnSurrogates() {
-        givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
-
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com,anothersurrogate.com", brokenSiteFeedback.surrogates)
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/", isBrowserShowing = true)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSameHostSurrogatesThenDoNotReturnDuplicatedSurrogates() {
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("twitter.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        updateUrl("http://example.com/", "http://twitter.com/explore", true)
+        assertTrue(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertTrue(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenFireproofWebsiteAddedThenPixelSent() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertFalse(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenPixelSent() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
+    }
+
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(anyString())).doAnswer {
+            val domain = it.arguments.first() as String
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess(FireproofWebsiteEntity(domain)))
+        }
+
+        testee.onUserConfirmedFireproofDialog("login.example.com")
+
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenAskToDisableLoginDetectionEventReceivedThenAskUserToDisableLoginDetection() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserDismissedFireproofLoginDialog()).doAnswer {
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.AskToDisableLoginDetection)
+        }
+
+        testee.onUserDismissedFireproofLoginDialog()
+
+        assertCommandIssued<Command.AskToDisableLoginDetection>()
+    }
+
+    @Test
+    fun whenLoginAttempDetectedThenNotifyNavigationAwareLoginDetector() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+
+        testee.loginDetected()
+
+        verify(mockNavigationAwareLoginDetector).onEvent(LoginAttempt("http://example.com/"))
+    }
+
+    @Test
+    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebsite() {
+        givenFireproofWebsiteDomain("example.com")
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedThenAskToFireproofWebsite() {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
+
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandIssued<Command.AskToFireproofWebsite> {
+            assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
+        }
+    }
+
+    @Test
+    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionEnabledThenFireproofWebsite() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+        whenever(mockSettingsStore.appLoginDetection).thenReturn(true)
+
+        loginEventLiveData.value = givenLoginDetected("example.com")
+
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        verify(fireproofDialogsEventHandler).onUserConfirmedFireproofDialog("example.com")
+    }
+
+    @Test
+    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionDisabledThenDoNothing() = coroutineRule.runBlocking {
+        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
+        whenever(mockSettingsStore.appLoginDetection).thenReturn(false)
+
+        loginEventLiveData.value = givenLoginDetected("example.com")
+
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+        verify(fireproofDialogsEventHandler, never()).onUserConfirmedFireproofDialog("example.com")
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotAddBookmarkOrFavorite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canAddBookmarks)
+        assertFalse(browserViewState().addFavorite.isEnabled())
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotSharePage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotNavigateBack() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(findInPageViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCanGoForward() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmarkOrFavorite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canAddBookmarks)
+        assertTrue(browserViewState().addFavorite.isEnabled())
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanShare() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(findInPageViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenBrowsingDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsVisible() {
+        val url = "https://duckduckgo.com?q=test%20search"
+        loadUrl(url, isBrowserShowing = true)
+        assertTrue(browserViewState().showDaxIcon)
+        assertFalse(browserViewState().showSearchIcon)
+    }
+
+    @Test
+    fun whenBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsNotVisible() {
+        val url = "https://example.com"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+        assertTrue(browserViewState().showPrivacyGrade)
+    }
+
+    @Test
+    fun whenNotBrowsingAndDDGUrlPresentThenDaxIconIsNotVisible() {
+        loadUrl("https://duckduckgo.com?q=test%20search", isBrowserShowing = false)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenQueryIsNotHierarchicalThenUnsupportedOperationExceptionIsHandled() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("about:blank", null)).thenReturn("about:blank")
+        testee.onUserSubmittedQuery("about:blank")
+    }
+
+    @Test
+    fun whenDosAttackDetectedThenErrorIsShown() {
+        testee.dosAttackDetected()
+        assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
+    @Test
+    fun whenDeviceLocationSharingIsDisabledThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(false)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        givenDeviceLocationSharingIsEnabled(true)
+        givenCurrentSite("https://wwww.example.com/")
+        givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
+
+        verify(geoLocationPermissions).clear("https://wwww.anotherexample.com/")
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionThenPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssuedTimes<Command.CheckSystemLocationPermission>(times = 1)
+    }
+
+    @Test
+    fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedOneTime()
+
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockSettingsStore).appLocationPermission = true
+    }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions, atLeastOnce()).allow(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions, atLeastOnce()).clear(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNotAllowed()
+
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+        verify(geoLocationPermissions).clear(domain)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionAllowed()
+
+        assertCommandIssued<Command.RequestSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSiteLocationPermissionAlwaysDenied()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserRefreshesASiteLocationMessageIsNotShownAgain() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+        assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
+    }
+
+    @Test
+    fun whenUserSelectsPermissionAndRefreshesPageThenLocationMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "http://example.com"
+
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        loadUrl(domain, isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedOneTime()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedForeverThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedForever()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedForeverThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedForever()
+
+        verify(mockSettingsStore).appLocationPermissionDeniedForever = true
+    }
+
+    @Test
+    fun whenSystemLocationIsGrantedThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockSettingsStore).appLocationPermissionDeniedForever = false
+    }
+
+    @Test
+    fun whenPrefetchFaviconThenFetchFaviconForCurrentTab() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        givenCurrentSite(url)
+        testee.prefetchFavicon(url)
+
+        verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconExistsThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        val file = File("test")
+        givenCurrentSite(url)
+        whenever(mockFaviconManager.tryFetchFaviconForUrl(any(), any())).thenReturn(file)
+
+        testee.prefetchFavicon(url)
+
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconDoesNotExistThenDoNotCallUpdateTabFavicon() = coroutineRule.runBlocking {
+        whenever(mockFaviconManager.tryFetchFaviconForUrl(any(), any())).thenReturn(null)
+
+        testee.prefetchFavicon("url")
+
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedThenStoreFavicon() = coroutineRule.runBlocking {
         givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
+        testee.iconReceived("https://example.com", bitmap)
 
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
+        verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(bitmap, "https://example.com"))
+    }
 
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
+    @Test
+    fun whenIconReceivedIfCorrectlySavedThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://example.com", bitmap)
+
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(null)
+
+        testee.iconReceived("https://example.com", bitmap)
+
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedFromPreviousUrlThenDontUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://notexample.com", bitmap)
+
+        verify(mockTabRepository, never()).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenUrlIconReceivedThenStoreFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        testee.iconReceived("https://example.com", "https://example.com/favicon.png")
+
+        verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.UrlFavicon("https://example.com/favicon.png", "https://example.com"))
+    }
+
+    @Test
+    fun whenUrlIconReceivedIfCorrectlySavedThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val file = File("test")
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://example.com", "https://example.com/favicon.png")
+
+        verify(mockTabRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenUrlIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(null)
+
+        testee.iconReceived("https://example.com", "https://example.com/favicon.png")
+
+        verify(mockTabRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenUrlIconReceivedFromPreviousUrlThenDontUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val file = File("test")
+        whenever(mockFaviconManager.storeFavicon(any(), any())).thenReturn(file)
+
+        testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
+
+        verify(mockFaviconManager, never()).storeFavicon(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsAllowAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.ALLOW_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsDenyAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.DENY_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSystemLocationPermissionNeverAllowedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val title = "A title"
+        val bookmark = Bookmark(id = 0, title = title, url = url, parentId = 0)
+        whenever(mockBookmarksRepository.insert(title = anyString(), url = anyString(), parentId = anyLong())).thenReturn(bookmark)
+        loadUrl(url = url, title = title)
+
+        testee.onBookmarkMenuClicked()
+
+        verify(mockFaviconManager).persistCachedFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedButUrlIsNullThenDoNotPersistFavicon() = coroutineRule.runBlocking {
+        loadUrl(null, "A title")
+
+        testee.onBookmarkMenuClicked()
+
+        verify(mockFaviconManager, never()).persistCachedFavicon(any(), any())
+    }
+
+    @Test
+    fun whenFireproofWebsiteAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        loadUrl(url, isBrowserShowing = true)
+
+        testee.onFireproofWebsiteMenuClicked()
+
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            verify(mockFaviconManager).persistCachedFavicon(any(), eq(this.fireproofWebsiteEntity.domain))
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(bitmap)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertEquals(bitmap, this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertNull(this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        val url = "foo.com"
+        givenUrlCannotUseGpc(url)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn(url)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        givenUrlCannotUseGpc("example.com")
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
+        givenUrlCanUseGpc()
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndFallbackUrlIsNullThenDoNotAddHeaderToUrl() {
+        givenUrlCanUseGpc()
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), null)
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
+        val url = "fallback"
+        givenUrlCannotUseGpc(url)
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), url)
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        givenGpcIsDisabled()
+        val intentType = SpecialUrlDetector.UrlType.NonHttpAppLink("query", mock(), "fallback")
+
+        testee.nonHttpAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleNonHttpAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenFirePulsingAnimationStartsThenItStopsAfterOneHour() = coroutineRule.runBlocking {
+        givenFireButtonPulsing()
+        val observer = ValueCaptorObserver<BrowserTabViewModel.BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+
+        testee.onViewVisible()
+
+        advanceTimeBy(3_600_001)
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
+    }
+
+    @Test
+    fun whenRedirectTriggeredByGpcThenGpcRedirectEventSent() {
+        testee.redirectTriggeredByGpc()
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.GpcRedirect)
+    }
+
+    @Test
+    fun whenProgressIs100ThenRefreshUserAgentCommandSent() {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        assertCommandIssued<Command.RefreshUserAgent>()
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
+        val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+
+        testee.requestFileDownload(blobUrl, null, mime, true)
+
+        assertCommandIssued<Command.ConvertBlobToDataUri> {
+            assertEquals(blobUrl, url)
+            assertEquals(mime, mimeType)
+        }
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsNotBlobThenRquestFileDownloadCommandSent() {
+        val normalUrl = "https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+
+        testee.requestFileDownload(normalUrl, null, mime, true)
+
+        assertCommandIssued<Command.RequestFileDownload> {
+            assertEquals(normalUrl, url)
+            assertEquals(mime, mimeType)
+            assertNull(contentDisposition)
+            assertTrue(requestUserConfirmation)
+        }
+    }
+
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsParentThenChildTabClosedCommandSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("TAB_ID")
+
+        assertCommandIssued<Command.ChildTabClosed>()
+    }
+
+    @Test
+    fun whenChildrenTabClosedIfViewModelIsNotParentThenChildTabClosedCommandNotSent() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+
+        childClosedTabsSharedFlow.emit("other_tab")
+
+        assertCommandNotIssued<Command.ChildTabClosed>()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenCopyAliasToClipboardCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAliasAndCopyToClipboard()
+
+        assertCommandIssued<Command.CopyAliasToClipboard>()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAliasAndCopyToClipboard()
+
+        verify(mockEmailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenConsumeAliasAndCopyToClipboardThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
+
+        testee.consumeAlias()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenEmailIsSignedOutThenIsEmailSignedInReturnsFalse() = coroutineRule.runBlocking {
+        emailStateFlow.emit(false)
+
+        assertFalse(browserViewState().isEmailSignedIn)
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenIsEmailSignedInReturnsTrue() = coroutineRule.runBlocking {
+        emailStateFlow.emit(true)
+
+        assertTrue(browserViewState().isEmailSignedIn)
+    }
+
+    @Test
+    fun whenConsumeAliasThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("alias", this.address)
+        }
+    }
+
+    @Test
+    fun whenConsumeAliasThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
+
+        testee.consumeAlias()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.consumeAlias()
+
+        verify(mockEmailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenCancelAutofillTooltipThenPixelSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+
+        testee.cancelAutofillTooltip()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
+    }
+
+    @Test
+    fun whenUseAddressThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("address", this.address)
+        }
+    }
+
+    @Test
+    fun whenUseAddressThenPixelSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
+        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
+
+        testee.useAddress()
+
+        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+    }
+
+    @Test
+    fun whenUseAddressThenSetNewLastUsedDateCalled() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.useAddress()
+
+        verify(mockEmailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.showEmailTooltip()
+
+        assertCommandIssued<Command.ShowEmailTooltip> {
+            assertEquals("address", this.address)
+        }
+    }
+
+    @Test
+    fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
+
+        testee.showEmailTooltip()
+
+        assertCommandNotIssued<Command.ShowEmailTooltip>()
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledAndShowAppLinksPromptIsTrueThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledAndIsUserQueryThenShowAppLinkPromptAndUserQueryStateSetToFalse() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.ShowAppLinkPrompt>()
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenHandleAppLinkCalledAndIsNotUserQueryAndShowAppLinksPromptIsFalseThenOpenAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
+        testee.handleAppLink(urlType, isForMainFrame = true)
+        whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), capture(appLinkCaptor))
+        appLinkCaptor.value.invoke()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledThenHandleNonHttpAppLink() {
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), "http://example.com")
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsAppLinkAndShouldShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrlToNull() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        testee.onUserSubmittedQuery("foo")
+        verify(mockAppLinksHandler).updatePreviousUrl(null)
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsAppLinkAndShouldNotShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
+        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        testee.onUserSubmittedQuery("foo")
+        verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNullThenResetHistoryCommandSent() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNotNullThenResetHistoryCommandNotSent() {
+        setupNavigation(isBrowsing = true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandNotIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() {
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertTrue(browserViewState().isWhitelisted)
+    }
+
+    @Test
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenPrivacyOnIsFalse() {
+        whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
+        loadUrl("https://example.com")
+        assertFalse(loadingViewState().privacyOn)
+    }
+
+    @Test
+    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() {
+        whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
+        loadUrl("https://example.com")
+        assertNull(privacyGradeState().privacyGrade)
+    }
+
+    @Test
+    fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = coroutineRule.runBlocking {
+        val url = "http://www.example.com"
+        val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark(url = url)).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl(url = url, isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockBookmarksRepository, never()).insert(title = anyString(), url = anyString(), parentId = anyLong())
+    }
+
+    @Test
+    fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
+    }
+
+    @Test
+    fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        val bookmark = Bookmark(id = 1L, title = "title", url = "www.example.com", parentId = 0L)
+        whenever(mockBookmarksRepository.getBookmark("www.example.com")).thenReturn(bookmark)
+        bookmarksListFlow.send(listOf(bookmark))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onBookmarkMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
+        val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenDaoInsertIsNotCalled() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, never()).insert(any())
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenRemoveFavoritePressedPixelIsFired() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName
+        )
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockFavoritesRepository, atLeastOnce()).delete(favoriteSite)
+    }
+
+    @Test
+    fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = coroutineRule.runBlocking {
+        val favoriteSite = Favorite(id = 1L, title = "title", url = "www.example.com", position = 0)
+        whenever(mockFavoritesRepository.favorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.DeleteSavedSiteConfirmation)
+        val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
+        assertEquals("www.example.com", command.savedSite.url)
+        assertEquals("title", command.savedSite.title)
+    }
+
+    @Test
+    fun whenPageChangedThenUpdatePreviousUrlAndUserQueryStateSetToFalse() {
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        verify(mockAppLinksHandler).updatePreviousUrl("www.example.com")
+        verify(mockAppLinksHandler).setUserQueryState(false)
+    }
+
+    @Test
+    fun whenPageChangedAndIsAppLinkThenUpdatePreviousAppLink() {
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = "www.example.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(appLink)
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertEquals(appLink, browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenPageChangedAndIsNotAppLinkThenSetPreviousAppLinkToNull() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.Web("www.example.com"))
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertNull(browserViewState().previousAppLink)
+    }
+
+    @Test
+    fun whenOpenAppLinkThenOpenPreviousAppLink() {
+        testee.browserViewState.value = browserViewState().copy(previousAppLink = SpecialUrlDetector.UrlType.AppLink(uriString = "example.com"))
+        testee.openAppLink()
+        assertCommandIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenOpenAppLinkAndPreviousAppLinkIsNullThenDoNotOpenAppLink() {
+        testee.openAppLink()
+        assertCommandNotIssued<Command.OpenAppLink>()
+    }
+
+    @Test
+    fun whenForceZoomEnabledThenEmitNewState() {
+        accessibilitySettingsDataStore.forceZoom = true
+        assertTrue(accessibilityViewState().forceZoom)
+        assertTrue(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
+    fun whenForceZoomEnabledAndWebViewRefreshedThenEmitNewState() {
+        accessibilitySettingsDataStore.forceZoom = true
+        assertTrue(accessibilityViewState().forceZoom)
+        assertTrue(accessibilityViewState().refreshWebView)
+
+        testee.onWebViewRefreshed()
+
+        assertFalse(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
+    fun whenFontSizeChangedThenEmitNewState() {
+        accessibilitySettingsDataStore.appFontSize = 150f
+        accessibilitySettingsDataStore.overrideSystemFontSize = false
+
+        assertFalse(accessibilityViewState().refreshWebView)
+        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
+    }
+
+    private fun givenUrlCanUseGpc() {
+        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
+        whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList())
+    }
+
+    private fun givenUrlCannotUseGpc(url: String) {
+        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
+        whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
+    }
+
+    private fun givenGpcIsDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
+        whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
+    }
+
+    private suspend fun givenFireButtonPulsing() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
+    }
+
+    private fun givenNewPermissionRequestFromDomain(domain: String) {
+        testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
+    }
+
+    private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
+        whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
+    }
+
+    private fun givenLocationPermissionIsEnabled(state: Boolean) {
+        whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
+    }
+
+    private fun givenUserAlreadySelectedPermissionForDomain(domain: String, permission: LocationPermissionType) {
+        locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
+    }
+
+    class StubPermissionCallback : GeolocationPermissions.Callback {
+        override fun invoke(p0: String?, p1: Boolean, p2: Boolean) {
+            // nothing to see
+        }
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -1686,6 +3711,25 @@ class BrowserTabViewModelTest {
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNotNull(issuedCommand)
         (issuedCommand as T).apply { instanceAssertions() }
+    }
+
+    private inline fun <reified T : Command> assertCommandNotIssued() {
+        val defaultMockingDetails = DefaultMockingDetails(mockCommandObserver)
+        if (defaultMockingDetails.invocations.isNotEmpty()) {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val issuedCommand = commandCaptor.allValues.find { it is T }
+            assertNull(issuedCommand)
+        }
+    }
+
+    private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
+        if (times == 0) {
+            assertCommandNotIssued<T>()
+        } else {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val timesIssued = commandCaptor.allValues.count { it is T }
+            assertEquals(times, timesIssued)
+        }
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
@@ -1712,7 +3756,25 @@ class BrowserTabViewModelTest {
 
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
-        testee.loadData("TAB_ID", "https://example.com", false)
+        testee.loadData("TAB_ID", "https://example.com", false, false)
+    }
+
+    private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
+        fireproofWebsitesDomain.forEach {
+            fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
+        }
+    }
+
+    private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
+
+    private fun givenCurrentSite(domain: String) {
+        val site: Site = mock()
+        whenever(site.url).thenReturn(domain)
+        whenever(site.uri).thenReturn(Uri.parse(domain))
+        val siteLiveData = MutableLiveData<Site>()
+        siteLiveData.value = site
+        whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        testee.loadData("TAB_ID", domain, false, false)
     }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
@@ -1734,6 +3796,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
     }
 
+    @Suppress("SameParameterValue")
+    private fun onProgressChanged(url: String?, newProgress: Int) {
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
+    }
+
+    private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.willOverrideUrl(newUrl = url)
+    }
+
     private fun setupNavigation(
         skipHome: Boolean = false,
         isBrowsing: Boolean,
@@ -1752,13 +3824,18 @@ class BrowserTabViewModelTest {
         return commandCaptor
     }
 
+    private fun clearAccessibilitySettings() {
+        context.getSharedPreferences(AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit().clear().commit()
+    }
+
     private fun buildWebNavigation(
         currentUrl: String? = null,
         originalUrl: String? = null,
         title: String? = null,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
-        stepsToPreviousPage: Int = 0
+        stepsToPreviousPage: Int = 0,
+        progress: Int? = null
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -1767,9 +3844,11 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoForward).thenReturn(canGoForward)
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        whenever(nav.progress).thenReturn(progress)
         return nav
     }
 
+    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!
@@ -1778,4 +3857,5 @@ class BrowserTabViewModelTest {
     private fun findInPageViewState() = testee.findInPageViewState.value!!
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
+    private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 }

@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.dialog
 import android.content.DialogInterface
 import android.view.KeyEvent
 
-
 class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.OnKeyListener {
 
     override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {

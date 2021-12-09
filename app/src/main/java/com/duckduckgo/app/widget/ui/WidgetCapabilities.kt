@@ -20,10 +20,10 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
 import javax.inject.Inject
-
 
 interface WidgetCapabilities {
     val supportsStandardWidgetAdd: Boolean
@@ -50,5 +50,6 @@ val Context.hasInstalledWidgets: Boolean
         val manager = AppWidgetManager.getInstance(this)
         val hasDarkWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidget::class.java)).any()
         val hasLightWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidgetLight::class.java)).any()
-        return hasDarkWidget || hasLightWidget
+        val hasSearchAndFavoritesWidget = manager.getAppWidgetIds(ComponentName(this, SearchAndFavoritesWidget::class.java)).any()
+        return hasDarkWidget || hasLightWidget || hasSearchAndFavoritesWidget
     }

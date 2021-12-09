@@ -20,11 +20,13 @@ import android.app.NotificationManager
 import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Test
 
@@ -44,6 +46,7 @@ class NotificationRegistrarTest {
     fun before() {
         whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationRegistrar(
+            TestCoroutineScope(),
             context,
             notificationManager,
             notifcationManagerCompat,
@@ -56,7 +59,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOffAndNowOnThenPixelIsFiredAndSettingsUpdated() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(false)
         testee.updateStatus(true)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_ENABLED), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.NOTIFICATIONS_ENABLED), any(), any())
         verify(mockSettingsDataStore).appNotificationsEnabled = true
     }
 
@@ -80,7 +83,7 @@ class NotificationRegistrarTest {
     fun whenNotificationsPreviouslyOnAndNowOffPixelIsFiredAndSettingsUpdated() {
         whenever(mockSettingsDataStore.appNotificationsEnabled).thenReturn(true)
         testee.updateStatus(false)
-        verify(mockPixel).fire(eq(Pixel.PixelName.NOTIFICATIONS_DISABLED), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.NOTIFICATIONS_DISABLED), any(), any())
         verify(mockSettingsDataStore).appNotificationsEnabled = false
     }
 }

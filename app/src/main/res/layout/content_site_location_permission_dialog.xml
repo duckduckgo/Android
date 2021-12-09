@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?toolbarBgColor"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/sitePermissionDialogFaviconContainer"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/list_item_image_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/sitePermissionDialogFavicon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_globe_gray_16dp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/sitePermissionDialogTitle"
+        style="@style/LocationPermissionDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/preciseLocationSiteDialogTitle" />
+
+    <TextView
+        android:id="@+id/sitePermissionDialogSubtitle"
+        style="@style/LocationPermissionDialogSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/preciseLocationSiteDialogSubtitle" />
+
+    <View style="@style/LocationPermissionDialogSplitter" />
+
+    <Button
+        android:id="@+id/siteAllowAlwaysLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogAllowAlways" />
+
+    <View
+        android:id="@+id/siteAllowOnceLocationPermissionDivider"
+        style="@style/LocationPermissionDialogSplitter" />
+
+    <Button
+        android:id="@+id/siteAllowOnceLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogAllowOnce" />
+
+    <View style="@style/LocationPermissionDialogSplitter"
+        android:id="@+id/siteDenyLocationPermissionDivider"/>
+
+    <Button
+        android:id="@+id/siteDenyOnceLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogDenyOnce" />
+
+    <View style="@style/LocationPermissionDialogSplitter" />
+
+    <Button
+        android:id="@+id/siteDenyAlwaysLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogDenyAlways" />
+
+</LinearLayout>

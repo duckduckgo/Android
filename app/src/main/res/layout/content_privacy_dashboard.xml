@@ -47,7 +47,7 @@
                 android:id="@+id/httpsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onEncryptionClicked">
+                app:layout_constraintBottom_toTopOf="@id/networksContainer">
 
                 <ImageView
                     android:id="@+id/httpsIcon"
@@ -68,7 +68,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:onClick="onNetworksClicked"
                 app:layout_constraintTop_toBottomOf="@id/httpsContainer">
 
                 <ImageView
@@ -89,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:onClick="onPracticesClicked"
                 app:layout_constraintTop_toBottomOf="@id/networksContainer">
 
                 <ImageView
@@ -126,6 +124,7 @@
                 android:textSize="14sp"
                 android:textStyle="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -139,14 +138,65 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer">
+
+            <TextView
+                android:id="@+id/whitelistButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/manageWhitelist"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/grayish" />
+
+            <TextView
+                android:id="@+id/brokenSiteButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/reportBrokenSite"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/trackerNetworkLeaderboard"
             android:layout_width="match_parent"
             android:layout_height="108dp"
-            android:onClick="onLeaderboardClick"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer">
+            app:layout_constraintTop_toBottomOf="@id/buttonContainer">
 
             <TextView
                 android:id="@+id/trackerNetworkLeaderboardHeader"

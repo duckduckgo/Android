@@ -17,13 +17,16 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bookmarkRootView"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.bookmarks.ui.BookmarksActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_toolbar" />
 
     <include layout="@layout/content_bookmarks" />
 

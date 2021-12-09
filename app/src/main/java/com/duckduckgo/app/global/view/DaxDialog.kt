@@ -22,13 +22,13 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.content_dax_dialog.*
+import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
     fun setDaxText(daxText: String)
@@ -41,26 +41,27 @@ interface DaxDialog {
 interface DaxDialogListener {
     fun onDaxDialogDismiss()
     fun onDaxDialogPrimaryCtaClick()
+    fun onDaxDialogSecondaryCtaClick()
     fun onDaxDialogHideClick()
 }
 
-class TypewriterDaxDialog : DialogFragment(), DaxDialog {
+class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDialog {
+
+    private val binding: ContentDaxDialogBinding by viewBinding()
 
     private var daxText: String = ""
     private var primaryButtonText: String = ""
     private var secondaryButtonText: String = ""
     private var toolbarDimmed: Boolean = true
-    private var dismissible: Boolean = true
+    private var dismissible: Boolean = false
     private var typingDelayInMs: Long = DEFAULT_TYPING_DELAY
+    private var showHideButton: Boolean = true
 
     private var daxDialogListener: DaxDialogListener? = null
 
     override fun setDaxDialogListener(listener: DaxDialogListener) {
         daxDialogListener = listener
     }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.content_dax_dialog, container, false)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -94,6 +95,9 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             if (containsKey(ARG_TYPING_DELAY)) {
                 typingDelayInMs = getLong(ARG_TYPING_DELAY)
             }
+            if (containsKey(ARG_SHOW_HIDE_BUTTON)) {
+                showHideButton = getBoolean(ARG_SHOW_HIDE_BUTTON)
+            }
         }
     }
 
@@ -114,7 +118,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
     override fun onDismiss(dialog: DialogInterface) {
         if (activity != null) {
-            dialogText?.cancelAnimation()
+            binding.dialogText.cancelAnimation()
             daxDialogListener?.onDaxDialogDismiss()
         }
         daxDialogListener = null
@@ -134,26 +138,38 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     override fun setDialogAndStartAnimation() {
         setDialog()
         setListeners()
-        dialogText.startTypingAnimation(daxText, true)
+        binding.dialogText.startTypingAnimation(daxText, true)
     }
 
     private fun setListeners() {
-        hideText.setOnClickListener {
-            dialogText.cancelAnimation()
-            daxDialogListener?.onDaxDialogHideClick()
-            dismiss()
-        }
-
-        primaryCta.setOnClickListener {
-            dialogText.cancelAnimation()
-            daxDialogListener?.onDaxDialogPrimaryCtaClick()
-            dismiss()
-        }
-
-        if (dismissible) {
-            dialogContainer.setOnClickListener {
+        with(binding) {
+            hideText.setOnClickListener {
                 dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogHideClick()
                 dismiss()
+            }
+
+            primaryCta.setOnClickListener {
+                dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogPrimaryCtaClick()
+                dismiss()
+            }
+
+            secondaryCta.setOnClickListener {
+                dialogText.cancelAnimation()
+                daxDialogListener?.onDaxDialogSecondaryCtaClick()
+                dismiss()
+            }
+
+            dialogContainer.setOnClickListener {
+                if (dismissible) {
+                    dialogText.cancelAnimation()
+                    dismiss()
+                } else {
+                    if (!dialogText.hasAnimationFinished()) {
+                        dialogText.finishAnimation()
+                    }
+                }
             }
         }
     }
@@ -166,12 +182,15 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
         context?.let {
             val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
-            toolbarDialogLayout.setBackgroundColor(toolbarColor)
-            hiddenText.text = daxText.html(it)
-            primaryCta.text = primaryButtonText
-            secondaryCta.text = secondaryButtonText
-            secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
-            dialogText.typingDelayInMs = typingDelayInMs
+            with(binding) {
+                toolbarDialogLayout.setBackgroundColor(toolbarColor)
+                hiddenText.text = daxText.html(it)
+                primaryCta.text = primaryButtonText
+                secondaryCta.text = secondaryButtonText
+                secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
+                dialogText.typingDelayInMs = typingDelayInMs
+                hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
+            }
         }
     }
 
@@ -182,8 +201,9 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             primaryButtonText: String,
             secondaryButtonText: String? = "",
             toolbarDimmed: Boolean = true,
-            dismissible: Boolean = true,
-            typingDelayInMs: Long = DEFAULT_TYPING_DELAY
+            dismissible: Boolean = false,
+            typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
+            showHideButton: Boolean = true
         ): TypewriterDaxDialog {
             return TypewriterDaxDialog().apply {
                 arguments = Bundle().apply {
@@ -193,6 +213,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
                     putBoolean(ARG_TOOLBAR_DIMMED, toolbarDimmed)
                     putBoolean(ARG_DISMISSIBLE, dismissible)
                     putLong(ARG_TYPING_DELAY, typingDelayInMs)
+                    putBoolean(ARG_SHOW_HIDE_BUTTON, showHideButton)
                 }
             }
         }
@@ -204,5 +225,6 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         private const val ARG_TOOLBAR_DIMMED = "toolbarDimmed"
         private const val ARG_DISMISSIBLE = "isDismissible"
         private const val ARG_TYPING_DELAY = "typingDelay"
+        private const val ARG_SHOW_HIDE_BUTTON = "showHideButton"
     }
 }

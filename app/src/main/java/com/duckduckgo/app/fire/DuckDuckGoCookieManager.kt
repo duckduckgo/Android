@@ -17,12 +17,11 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
 
 interface DuckDuckGoCookieManager {
     suspend fun removeExternalCookies()
@@ -31,22 +30,25 @@ interface DuckDuckGoCookieManager {
 
 class WebViewCookieManager(
     private val cookieManager: CookieManager,
-    private val host: String
+    private val host: String,
+    private val removeCookies: RemoveCookiesStrategy,
+    private val dispatcher: DispatcherProvider
 ) : DuckDuckGoCookieManager {
+
     override suspend fun removeExternalCookies() {
-
-        val ddgCookies = getDuckDuckGoCookies()
-
-        suspendCoroutine<Unit> { continuation ->
-            cookieManager.removeAllCookies {
-                Timber.v("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
-                continuation.resume(Unit)
-            }
+        withContext(dispatcher.io()) {
+            flush()
         }
-
-        storeDuckDuckGoCookies(ddgCookies)
-
-        withContext(Dispatchers.IO) {
+        // The Fire Button does not delete the user's DuckDuckGo search settings, which are saved as cookies.
+        // Removing these cookies would reset them and have undesired consequences, i.e. changing the theme, default language, etc.
+        // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
+        // More info in https://duckduckgo.com/privacy
+        val ddgCookies = getDuckDuckGoCookies()
+        if (cookieManager.hasCookies()) {
+            removeCookies.removeCookies()
+            storeDuckDuckGoCookies(ddgCookies)
+        }
+        withContext(dispatcher.io()) {
             flush()
         }
     }

@@ -17,31 +17,37 @@
 package com.duckduckgo.app.browser.rating.di
 
 import android.content.Context
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDatabaseRepository
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
-
 
 @Module
 class RatingModule {
 
     @Singleton
     @Provides
-    fun appEnjoymentManager(
+    @IntoSet
+    fun appEnjoymentManagerObserver(
         appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
-        promptTypeDecider: PromptTypeDecider
-    ): AppEnjoymentLifecycleObserver {
-        return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider)
+        promptTypeDecider: PromptTypeDecider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): LifecycleObserver {
+        return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope)
     }
 
     @Provides
@@ -65,9 +71,10 @@ class RatingModule {
         searchCountDao: SearchCountDao,
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
-        context: Context
+        context: Context,
+        onboardingStore: OnboardingStore
     ): PromptTypeDecider {
-        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context)
+        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore)
     }
 
     @Provides

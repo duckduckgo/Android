@@ -16,27 +16,20 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import android.net.Uri
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
-import timber.log.Timber
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
 
-class FileDownloader @Inject constructor(
-    private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloader: NetworkFileDownloader
-) {
+interface FileDownloader {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
-        when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending)
-            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.downloadFailed("Not supported")
-        }
-    }
+    fun download(pending: PendingFileDownload, callback: FileDownloadListener)
 
     data class PendingFileDownload(
         val url: String,
@@ -45,21 +38,47 @@ class FileDownloader @Inject constructor(
         val subfolder: String,
         val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
-    ): Serializable
+    ) : Serializable
 
     interface FileDownloadListener {
-        fun downloadStarted()
-        fun downloadFinished(file: File, mimeType: String?)
-        fun downloadFailed(message: String)
+        fun downloadStartedDataUri()
+        fun downloadStartedNetworkFile()
+        fun downloadFinishedDataUri(file: File, mimeType: String?)
+        fun downloadFinishedNetworkFile(file: File, mimeType: String?)
+        fun downloadFailed(message: String, downloadFailReason: DownloadFailReason)
+        fun downloadCancelled()
+        fun downloadOpened()
     }
 }
 
-fun FileDownloader.PendingFileDownload.guessFileName(): String {
-    val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
-    Timber.i("Guessed filename of $guessedFileName for url $url")
-    return guessedFileName
+class AndroidFileDownloader @Inject constructor(
+    private val dataUriDownloader: DataUriDownloader,
+    private val networkFileDownloader: NetworkFileDownloader
+) : FileDownloader {
+
+    @WorkerThread
+    override fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
+        when {
+            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
+            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
+            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
+        }
+    }
 }
 
-val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+val PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
 
-val FileDownloader.PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
+val PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
+
+sealed class DownloadFailReason {
+
+    object DownloadManagerDisabled : DownloadFailReason()
+    object UnsupportedUrlType : DownloadFailReason()
+    object Other : DownloadFailReason()
+    object DataUriParseException : DownloadFailReason()
+    object ConnectionRefused : DownloadFailReason()
+
+    companion object {
+        val DOWNLOAD_MANAGER_SETTINGS_URI: Uri = Uri.parse("package:com.android.providers.downloads")
+    }
+}

@@ -19,11 +19,16 @@ package com.duckduckgo.app.icon.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import javax.inject.Provider
 
 class ChangeIconViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
@@ -56,7 +61,7 @@ class ChangeIconViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun start() {
-        pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
+        pixel.fire(AppPixelName.CHANGE_APP_ICON_OPENED)
         val selectedIcon = settingsDataStore.appIcon
         viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, selectedIcon) })
     }
@@ -72,5 +77,20 @@ class ChangeIconViewModel @Inject constructor(
         appIconModifier.changeIcon(previousIcon, viewData.appIcon)
         command.value = Command.IconChanged
     }
+}
 
+@ContributesMultibinding(AppObjectGraph::class)
+class ChangeIconViewModelFactory @Inject constructor(
+    private val settingsDataStore: Provider<SettingsDataStore>,
+    private val appIconModifier: Provider<IconModifier>,
+    private val pixel: Provider<Pixel>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
+                else -> null
+            }
+        }
+    }
 }

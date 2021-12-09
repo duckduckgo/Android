@@ -16,21 +16,33 @@
 
 package com.duckduckgo.app.global.initialization
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-
+@ContributesMultibinding(AppObjectGraph::class)
 class AppDataLoader @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val termsOfServiceStore: TermsOfServiceStore,
     private val privacyPractices: PrivacyPractices
-) {
+) : LifecycleObserver {
 
-    suspend fun loadData() {
-        Timber.i("Started to load app data")
-        termsOfServiceStore.loadData()
-        privacyPractices.loadData()
-        Timber.i("Finished loading app data")
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun loadData() {
+        appCoroutineScope.launch {
+            Timber.i("Started to load app data")
+            termsOfServiceStore.loadData()
+            privacyPractices.loadData()
+            Timber.i("Finished loading app data")
+        }
     }
 }

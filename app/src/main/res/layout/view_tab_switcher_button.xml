@@ -15,7 +15,6 @@
   -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.RelativeLayout">
 
@@ -23,7 +22,6 @@
         android:id="@+id/tabCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:textAlignment="center"
         android:textColor="?toolbarIconColor"
         android:textSize="12sp"

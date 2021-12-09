@@ -1,9 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
   <path
-      android:pathData="M12,23C5.925,23 1,18.075 1,12S5.925,1 12,1s11,4.925 11,11 -4.925,11 -11,11zM12.495,16.538c2.008,0 3.176,-1.114 3.822,-2.255l-1.677,-0.812c-0.385,0.743 -1.21,1.334 -2.145,1.334 -1.677,0 -2.887,-1.279 -2.887,-3.011 0,-1.733 1.21,-3.011 2.887,-3.011 0.935,0 1.76,0.59 2.145,1.333l1.677,-0.825c-0.646,-1.155 -1.815,-2.241 -3.822,-2.241 -2.764,0 -4.895,1.911 -4.895,4.744 0,2.819 2.131,4.744 4.895,4.744z"
-      android:fillColor="?attr/toolbarIconColor" />
+      android:pathData="M11,22C4.925,22 0,17.075 0,11C0,4.925 4.925,0 11,0C17.075,0 22,4.925 22,11C22,17.075 17.075,22 11,22ZM11.495,15.538C13.503,15.538 14.671,14.424 15.317,13.283L13.64,12.471C13.255,13.214 12.43,13.805 11.495,13.805C9.818,13.805 8.608,12.526 8.608,10.794C8.608,9.061 9.818,7.783 11.495,7.783C12.43,7.783 13.255,8.373 13.64,9.116L15.317,8.291C14.671,7.136 13.502,6.05 11.495,6.05C8.731,6.05 6.6,7.961 6.6,10.794C6.6,13.613 8.731,15.538 11.495,15.538L11.495,15.538Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
 </vector>

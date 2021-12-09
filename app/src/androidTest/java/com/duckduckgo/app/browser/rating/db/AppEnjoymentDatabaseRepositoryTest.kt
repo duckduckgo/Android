@@ -42,7 +42,6 @@ class AppEnjoymentDatabaseRepositoryTest {
     private lateinit var database: AppDatabase
     private lateinit var dao: AppEnjoymentDao
 
-
     @Before
     fun setup() {
         database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)

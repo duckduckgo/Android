@@ -19,52 +19,60 @@ package com.duckduckgo.app.privacy.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityTrackerNetworksBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.tabId
-import kotlinx.android.synthetic.main.content_tracker_networks.*
-import kotlinx.android.synthetic.main.include_toolbar.*
-import javax.inject.Inject
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class TrackerNetworksActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var repository: TabRepository
+    private val binding: ActivityTrackerNetworksBinding by viewBinding()
+
     private val trackersRenderer = TrackersRenderer()
     private val networksAdapter = TrackerNetworksAdapter()
 
     private val viewModel: TrackerNetworksViewModel by bindViewModel()
 
+    private val toolbar
+        get() = binding.includeToolbar.toolbar
+
+    private val trackerNetworks
+        get() = binding.contentTrackerNetworks
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_tracker_networks)
+        setContentView(binding.root)
         setupToolbar(toolbar)
         configureRecycler()
 
-        viewModel.viewState.observe(this, Observer<TrackerNetworksViewModel.ViewState> {
-            it?.let { render(it) }
-        })
-
-        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
-            viewModel.onSiteChanged(it)
-        })
+        lifecycleScope.launch {
+            viewModel.trackers(intent.tabId!!)
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { render(it) }
+        }
     }
 
     private fun configureRecycler() {
-        networksList.layoutManager = LinearLayoutManager(this)
-        networksList.adapter = networksAdapter
+        with(trackerNetworks) {
+            networksList.layoutManager = LinearLayoutManager(this@TrackerNetworksActivity)
+            networksList.adapter = networksAdapter
+        }
     }
 
     private fun render(viewState: TrackerNetworksViewModel.ViewState) {
-        networksBanner.setImageResource(trackersRenderer.networksBanner(viewState.allTrackersBlocked))
-        domain.text = viewState.domain
-        heading.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
-        networksAdapter.updateData(viewState.trackingEventsByNetwork)
+        with(trackerNetworks) {
+            networksBanner.setImageResource(trackersRenderer.networksBanner(viewState.allTrackersBlocked))
+            domain.text = viewState.domain
+            heading.text = trackersRenderer.trackersText(this@TrackerNetworksActivity, viewState.trackerCount, viewState.allTrackersBlocked)
+            networksAdapter.updateData(viewState.trackingEventsByNetwork)
+        }
     }
 
     companion object {

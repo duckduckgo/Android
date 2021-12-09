@@ -17,20 +17,17 @@
 package com.duckduckgo.app.job
 
 import android.app.job.JobParameters
+import android.app.job.JobScheduler
 import android.app.job.JobService
 import dagger.android.AndroidInjection
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-
+@Deprecated("This is the old sync service which uses JobScheduler. A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards.")
 class AppConfigurationJobService : JobService() {
 
     @Inject
-    lateinit var appConfigurationDownloader: ConfigurationDownloader
-
-    private var downloadTask: Disposable? = null
+    lateinit var jobScheduler: JobScheduler
 
     override fun onCreate() {
         AndroidInjection.inject(this)
@@ -38,37 +35,14 @@ class AppConfigurationJobService : JobService() {
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
-        Timber.i("onStartJob")
-
-        downloadTask = appConfigurationDownloader.downloadTask()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.i("Successfully downloaded all data")
-                jobFinishedSuccessfully(params)
-            }, {
-                Timber.w("Failed to download app configuration ${it.localizedMessage}")
-                jobFinishedFailed(params)
-            })
-
-        return true
+        Timber.i("Deprecated AppConfigurationJobService running. Unscheduling future syncs using this job")
+        jobScheduler.cancel(LEGACY_APP_CONFIGURATION_JOB_ID)
+        return false
     }
 
-    private fun jobFinishedSuccessfully(params: JobParameters?) {
-        Timber.i("Finished job successfully")
-        jobFinished(params, false)
-    }
+    override fun onStopJob(params: JobParameters?): Boolean = false
 
-    private fun jobFinishedFailed(params: JobParameters?) {
-        Timber.w("Error executing job")
-        jobFinished(params, true)
-    }
-
-    override fun onStopJob(p0: JobParameters?): Boolean {
-        Timber.i("onStopJob")
-
-        // job needs to be force stopped
-        downloadTask?.dispose()
-
-        return true
+    companion object {
+        const val LEGACY_APP_CONFIGURATION_JOB_ID = 1
     }
 }

@@ -18,6 +18,8 @@ package com.duckduckgo.app.surrogates
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -29,11 +31,12 @@ class ResourceSurrogateLoaderTest {
     private lateinit var dataStore: ResourceSurrogateDataStore
     private lateinit var resourceSurrogates: ResourceSurrogates
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
         dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        testee = ResourceSurrogateLoader(resourceSurrogates, dataStore)
+        testee = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
     }
 
     @Test
@@ -103,6 +106,17 @@ class ResourceSurrogateLoaderTest {
     fun whenSurrogateFileIsHasSpaceInFinalFunctionBlock() {
         val surrogates = initialiseFile("surrogates_valid_but_unexpected_extra_space_in_function_close")
         assertEquals(6, surrogates.size)
+    }
+
+    @Test
+    fun whenLoadingSurrogatesThenCorrectScriptIdStored() {
+        val surrogates = initialiseFile("surrogates_6")
+        assertEquals("ga.js", surrogates[0].scriptId)
+        assertEquals("analytics.js", surrogates[1].scriptId)
+        assertEquals("inpage_linkid.js", surrogates[2].scriptId)
+        assertEquals("api.js", surrogates[3].scriptId)
+        assertEquals("gpt.js", surrogates[4].scriptId)
+        assertEquals("gtm.js", surrogates[5].scriptId)
     }
 
     private fun initialiseFile(filename: String): List<SurrogateResponse> {

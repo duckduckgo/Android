@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.rating.db
 
 import androidx.room.*
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.location.data.LocationPermissionType
 
 private const val TYPE_PROVIDED_RATING = 1
 private const val TYPE_DECLINED_RATING = 2
@@ -55,7 +56,8 @@ interface AppEnjoymentDao {
 data class AppEnjoymentEntity(
     val eventType: AppEnjoymentEventType,
     val promptCount: PromptCount,
-    val timestamp: Long = System.currentTimeMillis(), @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
+    val timestamp: Long = System.currentTimeMillis(),
+    @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
 )
 
 enum class AppEnjoymentEventType(val value: Int) {
@@ -90,5 +92,15 @@ class PromptCountConverter {
 
     @TypeConverter
     fun convertFromDb(promptCount: Int): PromptCount = PromptCount(promptCount)
+
+}
+
+class LocationPermissionTypeConverter {
+
+    @TypeConverter
+    fun convertForDb(event: LocationPermissionType): Int = event.value
+
+    @TypeConverter
+    fun convertFromDb(value: Int): LocationPermissionType? = LocationPermissionType.fromValue(value)
 
 }

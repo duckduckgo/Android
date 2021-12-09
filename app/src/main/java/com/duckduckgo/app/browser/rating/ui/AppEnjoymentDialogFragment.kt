@@ -22,8 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
-
+import com.duckduckgo.app.pixels.AppPixelName.*
 
 class AppEnjoymentDialogFragment : EnjoymentDialog() {
 
@@ -38,7 +37,7 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity())
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
             .setPositiveButton(R.string.appEnjoymentDialogPositiveButton) { _, _ ->
@@ -49,10 +48,12 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
                 firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING)
                 listener.onUserSelectedAppIsNotEnjoyed(promptCount)
             }
-            .setOnKeyListener(BackKeyListener {
-                firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED)
-                listener.onUserCancelledAppEnjoymentDialog(promptCount)
-            })
+            .setOnKeyListener(
+                BackKeyListener {
+                    firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED)
+                    listener.onUserCancelledAppEnjoymentDialog(promptCount)
+                }
+            )
             .create()
     }
 

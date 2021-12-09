@@ -16,31 +16,42 @@
 
 package com.duckduckgo.app.browser
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.events.db.AppUserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
@@ -48,7 +59,10 @@ class BrowserViewModel(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
-    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val pixel: Pixel,
+    private val userEventsStore: UserEventsStore
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -65,7 +79,6 @@ class BrowserViewModel(
     sealed class Command {
         object Refresh : Command()
         data class Query(val query: String) : Command()
-        data class DisplayMessage(@StringRes val messageId: Int) : Command()
         object LaunchPlayStore : Command()
         object LaunchFeedbackView : Command()
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
@@ -119,28 +132,44 @@ class BrowserViewModel(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onNewTabRequested(isDefaultTab: Boolean = false): String {
-        return tabRepository.add(isDefaultTab = isDefaultTab)
+    suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
+        } else {
+            tabRepository.add()
+        }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false): String {
-        return tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
+    suspend fun onOpenInNewTabRequested(query: String, sourceTabId: String? = null, skipHome: Boolean = false): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(
+                url = queryUrlConverter.convertQueryToUrl(query),
+                skipHome = skipHome,
+                sourceTabId = sourceTabId
+            )
+        } else {
+            tabRepository.add(
+                url = queryUrlConverter.convertQueryToUrl(query),
+                skipHome = skipHome
+            )
+        }
+    }
+
+    suspend fun onOpenFavoriteFromWidget(query: String) {
+        pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
+        tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
-        if (tabs == null || tabs.isEmpty()) {
+        if (tabs.isNullOrEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
-            tabRepository.add(isDefaultTab = true)
+            tabRepository.addDefaultTab()
             return
         }
     }
 
     fun receivedDashboardResult(resultCode: Int) {
         if (resultCode == RELOAD_RESULT_CODE) command.value = Refresh
-    }
-
-    fun onClearComplete() {
-        command.value = DisplayMessage(R.string.fireDataCleared)
     }
 
     /**
@@ -196,5 +225,39 @@ class BrowserViewModel(
 
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
+    }
+
+    fun onOpenShortcut(url: String) {
+        launch(dispatchers.io()) {
+            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
+            pixel.fire(AppPixelName.SHORTCUT_OPENED)
+        }
+    }
+
+    fun promotedFireButtonCancelled() {
+        launch(dispatchers.io()) {
+            userEventsStore.registerUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED)
+        }
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class BrowserViewModelFactory @Inject constructor(
+    val tabRepository: Provider<TabRepository>,
+    val queryUrlConverter: Provider<QueryUrlConverter>,
+    val dataClearer: Provider<DataClearer>,
+    val appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
+    val appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
+    val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    val pixel: Provider<Pixel>,
+    val userEventsStore: Provider<AppUserEventsStore>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), userEventsStore.get()) as T
+                else -> null
+            }
+        }
     }
 }

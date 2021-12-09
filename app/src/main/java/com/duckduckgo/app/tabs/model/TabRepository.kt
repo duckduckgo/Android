@@ -19,19 +19,35 @@ package com.duckduckgo.app.tabs.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface TabRepository {
 
+    /**
+     * @return the tabs that are NOT marked as deletable in the DB
+     */
     val liveTabs: LiveData<List<TabEntity>>
+
+    val flowTabs: Flow<List<TabEntity>>
+
+    val childClosedTabs: SharedFlow<String>
+
+    /**
+     * @return the tabs that are marked as "deletable" in the DB
+     */
+    val flowDeletableTabs: Flow<List<TabEntity>>
 
     val liveSelectedTab: LiveData<TabEntity>
 
     /**
      * @return tabId of new record
      */
-    suspend fun add(url: String? = null, skipHome: Boolean = false, isDefaultTab: Boolean = false): String
+    suspend fun add(url: String? = null, skipHome: Boolean = false): String
 
-    suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean = false, isDefaultTab: Boolean = false)
+    suspend fun addDefaultTab(): String
+
+    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, sourceTabId: String): String
 
     suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
@@ -44,9 +60,24 @@ interface TabRepository {
 
     suspend fun delete(tab: TabEntity)
 
-    fun deleteAll()
+    suspend fun markDeletable(tab: TabEntity)
+
+    suspend fun undoDeletable(tab: TabEntity)
+
+    /**
+     * Deletes from the DB all tabs that are marked as "deletable"
+     */
+    suspend fun purgeDeletableTabs()
+
+    suspend fun deleteTabAndSelectSource(tabId: String)
+
+    suspend fun deleteAll()
 
     suspend fun select(tabId: String)
 
     fun updateTabPreviewImage(tabId: String, fileName: String?)
+
+    fun updateTabFavicon(tabId: String, fileName: String?)
+
+    suspend fun selectByUrlOrNewTab(url: String)
 }

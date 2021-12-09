@@ -16,21 +16,39 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.nhaarman.mockitokotlin2.*
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import java.net.URISyntaxException
 
 class SpecialUrlDetectorImplTest {
 
     lateinit var testee: SpecialUrlDetector
 
+    @Mock
+    lateinit var mockPackageManager: PackageManager
+
     @Before
     fun setup() {
-        testee = SpecialUrlDetectorImpl()
+        MockitoAnnotations.openMocks(this)
+        testee = SpecialUrlDetectorImpl(mockPackageManager)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
 
     @Test
@@ -57,6 +75,60 @@ class SpecialUrlDetectorImplTest {
     fun whenUrlIsHttpsThenSchemePreserved() {
         val type = testee.determineType("https://example.com") as Web
         assertEquals("https://example.com", type.webAddress)
+    }
+
+    @Test
+    fun whenNoNonBrowserActivitiesFoundThenReturnWebType() {
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildBrowserResolveInfo()))
+        val type = testee.determineType("https://example.com")
+        assertTrue(type is Web)
+    }
+
+    @Test
+    fun whenAppLinkThrowsURISyntaxExceptionThenReturnWebType() {
+        given(mockPackageManager.queryIntentActivities(any(), anyInt())).willAnswer { throw URISyntaxException("", "") }
+        val type = testee.determineType("https://example.com")
+        assertTrue(type is Web)
+    }
+
+    @Test
+    fun whenOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            val type = testee.determineType("https://example.com")
+            verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
+            assertTrue(type is AppLink)
+            val appLinkType = type as AppLink
+            assertEquals("https://example.com", appLinkType.uriString)
+            assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
+            assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
+            assertNull(appLinkType.excludedComponents)
+        }
+    }
+
+    @Test
+    fun whenMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            val type = testee.determineType("https://example.com")
+            verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
+            assertTrue(type is AppLink)
+            val appLinkType = type as AppLink
+            assertEquals("https://example.com", appLinkType.uriString)
+            assertEquals(1, appLinkType.excludedComponents!!.size)
+            assertEquals(EXAMPLE_BROWSER_PACKAGE, appLinkType.excludedComponents!![0].packageName)
+            assertEquals(EXAMPLE_BROWSER_ACTIVITY_NAME, appLinkType.excludedComponents!![0].className)
+            assertNull(appLinkType.appIntent)
+        }
+    }
+
+    @Test
+    fun whenAppLinkCheckedOnApiLessThan24ThenReturnWebType() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            val type = testee.determineType("https://example.com")
+            verifyZeroInteractions(mockPackageManager)
+            assertTrue(type is Web)
+        }
     }
 
     @Test
@@ -132,9 +204,9 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsCustomUriSchemeThenIntentTypeDetected() {
-        val type = testee.determineType("myapp:foo bar") as IntentType
-        assertEquals("myapp:foo bar", type.url)
+    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetected() {
+        val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
+        assertEquals("myapp:foo bar", type.uriString)
     }
 
     @Test
@@ -194,5 +266,32 @@ class SpecialUrlDetectorImplTest {
     private fun randomString(length: Int): String {
         val charList: List<Char> = ('a'..'z') + ('0'..'9')
         return List(length) { charList.random() }.joinToString("")
+    }
+
+    private fun buildAppResolveInfo(): ResolveInfo {
+        val activity = ResolveInfo()
+        activity.filter = IntentFilter()
+        activity.filter.addDataAuthority("host.com", "123")
+        activity.filter.addDataPath("/path", 0)
+        activity.activityInfo = ActivityInfo()
+        activity.activityInfo.packageName = EXAMPLE_APP_PACKAGE
+        activity.activityInfo.name = EXAMPLE_APP_ACTIVITY_NAME
+        return activity
+    }
+
+    private fun buildBrowserResolveInfo(): ResolveInfo {
+        val activity = ResolveInfo()
+        activity.filter = IntentFilter()
+        activity.activityInfo = ActivityInfo()
+        activity.activityInfo.packageName = EXAMPLE_BROWSER_PACKAGE
+        activity.activityInfo.name = EXAMPLE_BROWSER_ACTIVITY_NAME
+        return activity
+    }
+
+    companion object {
+        const val EXAMPLE_APP_PACKAGE = "com.test.apppackage"
+        const val EXAMPLE_APP_ACTIVITY_NAME = "com.test.AppActivity"
+        const val EXAMPLE_BROWSER_PACKAGE = "com.test.browserpackage"
+        const val EXAMPLE_BROWSER_ACTIVITY_NAME = "com.test.BrowserActivity"
     }
 }

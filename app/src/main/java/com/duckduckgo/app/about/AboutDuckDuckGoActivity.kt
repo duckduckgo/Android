@@ -20,20 +20,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.content_about_duck_duck_go.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
+    private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_about_duck_duck_go)
-        setupToolbar(toolbar)
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
 
-        learnMoreLink.setOnClickListener {
+        binding.includeContent.learnMoreLink.setOnClickListener {
             startActivity(BrowserActivity.intent(this, Url.ABOUT))
             finish()
         }

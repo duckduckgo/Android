@@ -46,8 +46,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cardContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/bottom_sheet_behavior">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/hiddenTextCta"
@@ -81,6 +80,48 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/fireproofButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/hiddenTextCta"
+                app:layout_constraintTop_toBottomOf="@id/dialogTextCta"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fireproofKeepMeSignedIn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:backgroundTint="@color/cornflowerBlue"
+                    android:text="@string/daxFireproofKeepMeSignedInButton"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:letterSpacing="0.0"
+                    app:cornerRadius="22dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fireproofBurnEverything"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="24dp"
+                    app:backgroundTint="@color/cornflowerBlue"
+                    android:text="@string/daxFireproofBurnEverythingButton"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:letterSpacing="0.0"
+                    app:cornerRadius="22dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -96,18 +137,36 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/primaryCta"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/cornflowerBlue"
+        app:backgroundTint="@color/cornflowerBlue"
         android:text="@string/onboardingLetsDoItButton"
         android:textAllCaps="false"
         android:textColor="@color/white"
+        android:letterSpacing="0.0"
+        app:cornerRadius="22dp"
+        app:layout_constraintBottom_toTopOf="@id/returningUserCta"
+        app:layout_constraintEnd_toEndOf="@id/cardView"
+        app:layout_constraintStart_toStartOf="@id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/cardView" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/returningUserCta"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:letterSpacing="0.0"
+        android:text="@string/returningUsersReturningUserButton"
+        android:textAllCaps="false"
+        android:textColor="@color/cornflowerBlue"
+        android:visibility="gone"
+        app:backgroundTint="@color/white"
         app:cornerRadius="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
-        app:layout_constraintTop_toBottomOf="@id/cardView" />
+        app:layout_constraintTop_toBottomOf="@id/primaryCta" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,17 +13,101 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
+ # CONSTANTS
+    releaseNotesBodyHeader = "What's new in this release?"
+    releaseNotesSuffixHeader = "Have feedback?"
+    releaseNotesFileBody = "../app/version/release-notes"
+    releaseNotesFileHiring = "../app/version/release-notes-hiring"
+    releaseNotesFileSuffix = "../app/version/release-notes-suffix"
+    releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
+    errorMessageCancelled = "Release cancelled 😢"
+
 default_platform(:android)
 
 platform :android do
+
+  desc "Generate release notes for the Play Store"
+  private_lane :release_notes_playstore do
+
+    releaseNotesBody = File.read(releaseNotesFileBody)
+    releaseNotesSuffix = File.read(releaseNotesFileSuffix)
+    releaseNotesHiring = File.read(releaseNotesFileHiring)
+
+    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+    UI.message("\n#{formatted}")
+    formatted
+
+  end
+
+  desc "Generate release notes for GitHub"
+    private_lane :release_notes_github do
+
+      releaseNotesBody = File.read(releaseNotesFileBody)
+      releaseNotesSuffix = File.read(releaseNotesFileSuffix)
+      releaseNotesHiring = File.read(releaseNotesFileHiring)
+
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      UI.message("\n#{formatted}")
+      formatted
+
+    end
+
+
+  desc "Upload APK to Play Store, in pre-production staging track"
+  lane :deploy_playstore do
+
+    update_fastlane_release_notes()
+
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+    apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+    upload_to_play_store(
+      apk: apkPath,
+      track: 'Staging',
+      skip_upload_screenshots: true,
+      skip_upload_images: true,
+      validate_only: false
+    )
+
+    cleanup_fastlane_release_notes()
+
+  end
+
+  desc "Upload APK to ad-hoc internal app sharing"
+  private_lane :deploy_adhoc do
+
+      props = property_file_read(file: "app/version/version.properties")
+      version = props["VERSION"]
+      apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
+
+      upload_to_play_store_internal_app_sharing(
+        apk: apkPath
+      )
+
+ end
+
+ desc "Upload APK to Play Store internal testing track"
+ lane :deploy_dogfood do |options|
+
+   UI.message("Apk path: #{options[:apk_path]}")
+   upload_to_play_store(
+     apk: options[:apk_path],
+     track: 'internal',
+     skip_upload_screenshots: true,
+     skip_upload_images: true,
+     validate_only: false
+   )
+
+ end
 
   desc "Deploy APK to GitHub"
   lane :deploy_github do
 
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
-    releaseNotes = File.read("../app/version/release-notes")
-    apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
+    releaseNotes = release_notes_github()
+    apkPath = "app/build/outputs/apk/play/release/duckduckgo-#{version}-play-release.apk"
     token = ENV["GITHUB_UPLOAD_TOKEN"]
 
     UI.message ("Upload new app version to GitHub\nVersion: #{version}\nRelease Notes:\n=====\n#{releaseNotes}\n=====\n")
@@ -40,34 +124,45 @@ platform :android do
 
     end
 
+    desc "Update local changelist metadata"
+    private_lane :update_fastlane_release_notes do
+
+      releaseNotes = release_notes_playstore()
+
+      flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
+      UI.message("App version for fastlane is #{flversion}.\nRelease notes for Play Store:\n\n#{releaseNotes}")
+
+      releaseNotesLocales.each do |locale|
+        File.open("../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt", 'w') do |file| file.write("#{releaseNotes}") end
+      end
+
+    end
+
+    desc "Clean up local changelist metadata"
+        private_lane :cleanup_fastlane_release_notes do
+
+          flversion=gradle(task: '-q fastlaneVersionCode').lines.map(&:chomp)[0]
+
+          releaseNotesLocales.each do |locale|
+            sh("rm '../fastlane/metadata/android/#{locale}/changelogs/#{flversion}.txt'")
+          end
+
+        end
+
     # Note, this currently relies on having `git flow` tools installed.
     # This dependency could be removed with a little more time to tidy up this script to do the branching/merging manually.
 
     desc "Create new release"
       lane :release do
 
-        UI.header "Creating a new release"
-        UI.message ("Checking current branch: #{git_branch}")
-
         ensure_git_status_clean
+        ensure_git_branch( branch: 'develop' )
 
-        ensure_git_branch(
-          branch: 'develop'
-        )
+        releaseNotes = determine_release_notes()
 
         newVersion = prompt(text: "\nLast release was: #{last_git_tag}\nEnter New Version Number:")
-        releaseNotes = prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
-        commits = changelog_from_git_commits(
-            between: [last_git_tag, "HEAD"],
-            pretty: "- %s",
-            date_format: "short",
-            match_lightweight_tag: false,
-            merge_commit_filtering: "exclude_merges"
-        )
-        UI.message ("Performing a new release for #{newVersion}")
 
-
-        if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nCommits Since Last Release:\n#{commits}\nRelease Notes:\n#{releaseNotes}\n")
+        if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nRelease Notes:\n#{releaseNotes}\n")
           UI.success "Creating release branch for release/#{newVersion}"
 
           sh "git flow release start #{newVersion}"
@@ -77,32 +172,61 @@ platform :android do
           end
 
           File.open('../app/version/release-notes', 'w') do |file|
-            file.write("""## What's new in this release?
-#{releaseNotes}
-
-## Have feedback?
-You can always reach us at https://duckduckgo.com/feedback.""")
+            file.write("""#{releaseNotes}""")
           end
 
           if UI.confirm(text:"If you have any other changes to make to the release branch, do them now. Enter `y` when ready to create and push tags")
 
-            git_commit(path: "*", message: "Updated release notes and version number for new release - #{newVersion}")
+            git_commit(
+                message: "Updated release notes and version number for new release - #{newVersion}",
+                path: "*",
+                allow_nothing_to_commit: true,
+                skip_git_hooks: true
+            )
             
             sh "git flow release finish -mnFS '#{newVersion}' '#{newVersion}'"
             push_git_tags
-            sh "git push origin master"
+            sh "git push origin main"
             sh "git push origin develop"
 
-            UI.header("#{newVersion} has been successfully released 🎉")
+            UI.header("#{newVersion} tag has been successfully created. 🎉")
 
           else
-            UI.error "Release cancelled 😢"
+            UI.error errorMessageCancelled
           end
 
         else
-          UI.error "Release cancelled 😢"
+          UI.error errorMessageCancelled
         end
 
         end
+
+        private_lane :determine_release_notes do
+
+        commits = changelog_from_git_commits(
+            between: [last_git_tag, "HEAD"],
+            pretty: "- %s",
+            date_format: "short",
+            match_lightweight_tag: false,
+            merge_commit_filtering: "exclude_merges"
+        )
+
+            existingReleaseNotes = File.read(releaseNotesFileBody)
+            UI.important("Existing release notes:\n")
+            UI.message("#{existingReleaseNotes}\n")
+            choice = UI.select "What do you want to do for release notes?", ["KEEP EXISTING", "CUSTOM",
+              "Bug fixes and other improvements",
+            ]
+
+            rl = case choice
+                when "KEEP EXISTING"
+                    existingReleaseNotes
+                when "CUSTOM"
+                    prompt(text: "Release Notes: ", multi_line_end_keyword: "END")
+                else
+                    choice
+            end
+        end
+
 
 end

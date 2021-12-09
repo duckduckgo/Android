@@ -21,13 +21,13 @@
 
     <item
         android:id="@+id/fire"
-        android:icon="@drawable/ic_fire_24dp"
+        android:icon="@drawable/ic_fire"
         android:title="@string/fireMenu"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/newTab"
-        android:icon="@drawable/ic_add_24dp"
+        android:icon="@drawable/ic_add"
         android:title="@string/newTabMenuItem"
         app:showAsAction="always" />
 

@@ -25,10 +25,9 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.pixels.AppPixelName.*
 import timber.log.Timber
 import javax.inject.Inject
-
 
 interface LongPressHandler {
     fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu)
@@ -47,7 +46,7 @@ interface LongPressHandler {
 class WebViewLongPressHandler @Inject constructor(private val context: Context, private val pixel: Pixel) : LongPressHandler {
 
     override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
-        menu.setHeaderTitle(longPressTargetUrl ?: context.getString(R.string.options))
+        menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
 
         var menuShown = true
         when (longPressTargetType) {
@@ -129,7 +128,6 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         }
     }
 
-
     companion object {
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB = 2
@@ -137,5 +135,7 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         const val CONTEXT_MENU_ID_SHARE_LINK = 4
         const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 5
         const val CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB = 6
+
+        private const val MAX_TITLE_LENGTH = 100
     }
 }

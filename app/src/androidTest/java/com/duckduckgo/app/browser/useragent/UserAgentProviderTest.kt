@@ -23,21 +23,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-private const val CHROME_MOBILE_UA =
-    "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
-
-// Some values will be dynamic based on OS/Architecture/Software versions, so use Regex to match around dynamic values
-private val DESKTOP_UA_REGEX = Regex(
-    "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+ DuckDuckGo/5"
-)
-private val MOBILE_UA_REGEX = Regex(
-    "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+ DuckDuckGo/5"
-)
-
-private val MOBILE_UA_REGEX_MISSING_APPLE_WEBKIT_DETAILS = Regex(
-    "Mozilla/5.0 \\(Linux; Android .*?\\) DuckDuckGo/5"
-)
-
 class UserAgentProviderTest {
 
     private lateinit var testee: UserAgentProvider
@@ -50,24 +35,143 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenMobileUaRetrievedThenDeviceStrippedAndDuckDuckGoSuffixAddedToUA() {
-        testee = UserAgentProvider(CHROME_MOBILE_UA, deviceInfo)
-        val actual = testee.getUserAgent(desktopSiteRequested = false)
-        assertTrue(MOBILE_UA_REGEX.matches(actual))
+    fun whenUaRetrievedWithNoParamsThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent()
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
-    fun whenDesktopUaRetrievedThenDeviceStrippedAndDuckDuckGoSuffixAddedToUA() {
-        testee = UserAgentProvider(CHROME_MOBILE_UA, deviceInfo)
-        val actual = testee.getUserAgent(desktopSiteRequested = true)
-        assertTrue(DESKTOP_UA_REGEX.matches(actual))
+    fun whenMobileUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(isDesktop = false)
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
-    fun whenMissingAppleWebKitStringThenUAContainsOnlyMozillaAndDuckDuckGoProducts() {
-        val missingAppleWebKitPart = "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) Chrome/64.0.3282.137 Mobile Safari/537.36"
-        testee = UserAgentProvider(missingAppleWebKitPart, deviceInfo)
-        val actual = testee.getUserAgent(desktopSiteRequested = false)
-        assertTrue(MOBILE_UA_REGEX_MISSING_APPLE_WEBKIT_DETAILS.matches(actual))
+    fun whenDesktopUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(isDesktop = true)
+        assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
+    }
+
+    @Test
+    fun whenMissingAppleWebKitComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
+        testee = UserAgentProvider({ Agent.NO_WEBKIT }, deviceInfo)
+        val actual = testee.userAgent(isDesktop = false)
+        assertTrue("$actual does not match expected regex", ValidationRegex.missingWebKit.matches(actual))
+    }
+
+    @Test
+    fun whenMissingSafariComponentThenUaContainsMozillaAndVersionAndApplicationComponents() {
+        testee = UserAgentProvider({ Agent.NO_SAFARI }, deviceInfo)
+        val actual = testee.userAgent(isDesktop = false)
+        assertTrue("$actual does not match expected result", ValidationRegex.missingSafari.matches(actual))
+    }
+
+    @Test
+    fun whenMissingVersionComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
+        testee = UserAgentProvider({ Agent.NO_VERSION }, deviceInfo)
+        val actual = testee.userAgent(isDesktop = false)
+        assertTrue("$actual does not match expected result", ValidationRegex.noVersion.matches(actual))
+    }
+
+    @Test
+    fun whenDomainDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(NO_APPLICATION_DOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
+    }
+
+    @Test
+    fun whenSubdomsinDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(NO_APPLICATION_SUBDOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
+    }
+
+    @Test
+    fun whenDomainSupportsApplicationThenUaAddsApplicationComponentBeforeSafari() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(DOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
+    }
+
+    @Test
+    fun whenDomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(NO_VERSION_DOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
+    }
+
+    @Test
+    fun whenSubdomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(NO_VERSION_SUBDOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
+    }
+
+    @Test
+    fun whenDomainSupportsVersionThenUaIncludesVersionComponentInUsualLocation() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(DOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
+    }
+
+    @Test
+    fun whenUserAgentIsForASiteThatShouldUseDesktopAgentThenReturnDesktopUserAgent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(DESKTOP_ONLY_SITE)
+        assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
+    }
+
+    @Test
+    fun whenUserAgentIsForASiteThatShouldUseDesktopAgentButContainsAnExclusionThenDoNotReturnConvertedUserAgent() {
+        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        val actual = testee.userAgent(DESKTOP_ONLY_SITE_EXCEPTION)
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
+    }
+
+    companion object {
+        const val DOMAIN = "http://example.com"
+        const val NO_APPLICATION_DOMAIN = "http://cvs.com"
+        const val NO_APPLICATION_SUBDOMAIN = "http://subdomain.cvs.com"
+        const val NO_VERSION_DOMAIN = "http://ing.nl"
+        const val NO_VERSION_SUBDOMAIN = "http://subdomain.ing.nl"
+        const val DESKTOP_ONLY_SITE = "http://m.facebook.com"
+        const val DESKTOP_ONLY_SITE_EXCEPTION = "http://m.facebook.com/dialog/"
+    }
+
+    private object Agent {
+        const val DEFAULT =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+        const val NO_WEBKIT =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+        const val NO_SAFARI =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile"
+        const val NO_VERSION =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36"
+    }
+
+    // Some values will be dynamic based on OS/Architecture/Software versions, so we use Regex to validate values
+    private object ValidationRegex {
+        val converted = Regex(
+            "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+"
+        )
+        val desktop = Regex(
+            "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ DuckDuckGo/5 Safari/[.0-9]+"
+        )
+        val noApplication = Regex(
+            "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile Safari/[.0-9]+"
+        )
+        val noVersion = Regex(
+            "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+"
+        )
+        val missingWebKit = Regex(
+            "Mozilla/5.0 \\(Linux; Android .*?\\) DuckDuckGo/5 Safari/[.0-9]+"
+        )
+        val missingSafari = Regex(
+            "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5"
+        )
     }
 }

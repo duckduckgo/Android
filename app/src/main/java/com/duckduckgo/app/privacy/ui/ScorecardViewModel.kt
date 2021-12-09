@@ -16,70 +16,66 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Provider
 
-class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
+class ScorecardViewModel @Inject constructor(
+    private val tabRepository: TabRepository,
+    private val userWhitelistDao: UserWhitelistDao,
+    private val contentBlocking: ContentBlocking,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+) : ViewModel() {
 
     data class ViewState(
-        val domain: String,
-        val beforeGrade: PrivacyGrade,
-        val afterGrade: PrivacyGrade,
-        val httpsStatus: HttpsStatus,
-        val trackerCount: Int,
-        val majorNetworkCount: Int,
-        val allTrackersBlocked: Boolean,
-        val practices: PrivacyPractices.Summary,
-        val privacyOn: Boolean,
-        val showIsMemberOfMajorNetwork: Boolean,
-        val showEnhancedGrade: Boolean
+        val domain: String = "",
+        val beforeGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val afterGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val httpsStatus: HttpsStatus = HttpsStatus.SECURE,
+        val trackerCount: Int = 0,
+        val majorNetworkCount: Int = 0,
+        val allTrackersBlocked: Boolean = true,
+        val practices: PrivacyPractices.Summary = UNKNOWN,
+        val privacyOn: Boolean = true,
+        val showIsMemberOfMajorNetwork: Boolean = false,
+        val showEnhancedGrade: Boolean = false,
+        val isSiteInTempAllowedList: Boolean = false
     )
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    private var site: Site? = null
-
-    init {
-        resetViewState()
-    }
-
-    fun onSiteChanged(site: Site?) {
-        this.site = site
-        if (site == null) {
-            resetViewState()
-        } else {
-            updateSite(site)
+    fun scoreCard(tabId: String): StateFlow<ViewState> = flow {
+        tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
+            val domain = site.domain ?: ""
+            val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+            val isSiteAContentBlockingException = withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
+            emit(updatedState(site, domain, isWhitelisted, isSiteAContentBlockingException))
         }
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
-    private fun resetViewState() {
-        viewState.value = ViewState(
-            domain = "",
-            beforeGrade = PrivacyGrade.UNKNOWN,
-            afterGrade = PrivacyGrade.UNKNOWN,
-            httpsStatus = HttpsStatus.SECURE,
-            trackerCount = 0,
-            majorNetworkCount = 0,
-            allTrackersBlocked = true,
-            practices = UNKNOWN,
-            privacyOn = settingsStore.privacyOn,
-            showIsMemberOfMajorNetwork = false,
-            showEnhancedGrade = false
-        )
-    }
-
-    private fun updateSite(site: Site) {
+    private fun updatedState(site: Site, domain: String, isWhitelisted: Boolean, isSiteAContentBlockingException: Boolean): ViewState {
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade
 
-        viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
+        return ViewState(
+            domain = domain,
             beforeGrade = grade,
             afterGrade = improvedGrade,
             trackerCount = site.trackerCount,
@@ -87,8 +83,24 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
             httpsStatus = site.https,
             allTrackersBlocked = site.allTrackersBlocked,
             practices = site.privacyPractices.summary,
+            privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
             showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-            showEnhancedGrade = grade != improvedGrade
+            showEnhancedGrade = grade != improvedGrade,
+            isSiteInTempAllowedList = isSiteAContentBlockingException
         )
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class ScorecardViewModelFactory @Inject constructor(
+    private val viewModel: Provider<ScorecardViewModel>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ScorecardViewModel::class.java) -> viewModel.get() as T
+                else -> null
+            }
+        }
     }
 }

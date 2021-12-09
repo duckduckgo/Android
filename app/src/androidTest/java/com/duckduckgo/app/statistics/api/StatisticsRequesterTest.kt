@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
@@ -28,7 +29,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
 class StatisticsRequesterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
@@ -36,7 +36,12 @@ class StatisticsRequesterTest {
     private var mockResponseBody: ResponseBody = mock()
     private var mockVariantManager: VariantManager = mock()
 
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager)
+    private val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
+        override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+            return listOf()
+        }
+    }
+    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins)
 
     @get:Rule
     @Suppress("unused")

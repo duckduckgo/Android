@@ -19,6 +19,10 @@ package com.duckduckgo.app.feedback.ui.initial
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.common.ViewState
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class InitialFeedbackFragmentViewModel : ViewModel() {
 
@@ -37,5 +41,17 @@ class InitialFeedbackFragmentViewModel : ViewModel() {
         object PositiveFeedbackSelected : Command()
         object NegativeFeedbackSelected : Command()
         object UserCancelled : Command()
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class InitialFeedbackFragmentViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> (InitialFeedbackFragmentViewModel() as T)
+                else -> null
+            }
+        }
     }
 }

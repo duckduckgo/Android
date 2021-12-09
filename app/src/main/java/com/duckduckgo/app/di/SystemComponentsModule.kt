@@ -18,19 +18,29 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.fire.LottieFireAnimationLoader
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
-open class SystemComponentsModule {
+class SystemComponentsModule {
 
     @Singleton
     @Provides
@@ -47,4 +57,22 @@ open class SystemComponentsModule {
     @Provides
     fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
         AppIconModifier(context, appShortcutCreator)
+
+    @Provides
+    fun animatorLoader(
+        context: Context,
+        settingsDataStore: SettingsDataStore,
+        dispatcherProvider: DispatcherProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope
+    ): FireAnimationLoader {
+        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider, appCoroutineScope)
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+abstract class SystemComponentsModuleBindings {
+    @Binds
+    @IntoSet
+    abstract fun animatorLoaderObserver(fireAnimationLoader: FireAnimationLoader): LifecycleObserver
 }

@@ -58,7 +58,6 @@ class DataUriParser @Inject constructor() {
         private const val REGEX_GROUP_DATA = 5
     }
 
-
     sealed class ParseResult {
 
         object Invalid : ParseResult()

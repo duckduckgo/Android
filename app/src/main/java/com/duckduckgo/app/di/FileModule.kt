@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.file.FileDeleter
 import dagger.Module
 import dagger.Provides
 
-
 @Module
 class FileModule {
 

@@ -1,9 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
   <path
-      android:pathData="M12,23C5.925,23 1,18.075 1,12S5.925,1 12,1s11,4.925 11,11 -4.925,11 -11,11zM13.815,16.771c1.76,0 2.668,-1.1 2.668,-2.489 0,-1.14 -0.77,-2.09 -1.76,-2.24 0.866,-0.18 1.58,-0.963 1.58,-2.104 0,-1.224 -0.893,-2.338 -2.64,-2.338L8.839,7.6v9.171h4.977zM13.238,11.244L10.79,11.244L10.79,9.319h2.448c0.66,0 1.072,0.398 1.072,0.962 0,0.591 -0.412,0.963 -1.072,0.963zM13.32,15.053h-2.53v-2.09h2.53c0.756,0 1.169,0.467 1.169,1.045 0,0.66 -0.44,1.045 -1.169,1.045z"
-      android:fillColor="?attr/toolbarIconColor" />
+      android:pathData="M11,22C4.925,22 0,17.075 0,11C0,4.925 4.925,0 11,0C17.075,0 22,4.925 22,11C22,17.075 17.075,22 11,22ZM12.815,15.771C14.575,15.771 15.483,14.671 15.483,13.282C15.483,12.142 14.713,11.192 13.723,11.042C14.589,10.862 15.303,10.079 15.303,8.938C15.303,7.714 14.41,6.6 12.663,6.6L7.839,6.6L7.839,15.771L12.816,15.771L12.815,15.771ZM12.238,10.244L9.79,10.244L9.79,8.319L12.238,8.319C12.898,8.319 13.31,8.717 13.31,9.281C13.31,9.872 12.898,10.244 12.238,10.244ZM12.32,14.053L9.79,14.053L9.79,11.963L12.32,11.963C13.076,11.963 13.489,12.43 13.489,13.008C13.489,13.668 13.049,14.053 12.32,14.053Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
 </vector>

@@ -18,17 +18,17 @@
 
 package com.duckduckgo.app.notification
 
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Configuration
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,22 +45,33 @@ class AndroidNotificationSchedulerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private var workManager = WorkManager.getInstance(context)
+    private lateinit var workManager: WorkManager
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
-        whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
+        initializeWorkManager()
+
         testee = NotificationScheduler(
             workManager,
             clearNotification,
             privacyNotification
         )
+    }
+
+    // https://developer.android.com/topic/libraries/architecture/workmanager/how-to/integration-testing
+    private fun initializeWorkManager() {
+        val config = Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setExecutor(SynchronousExecutor())
+            .build()
+
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+        workManager = WorkManager.getInstance(context)
     }
 
     @Test
@@ -69,7 +80,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -78,7 +89,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -87,7 +98,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -96,39 +107,15 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
-    @Test
-    fun whenNotificationIsScheduledOldJobsAreCancelled() = runBlocking<Unit> {
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(false)
-
-        enqueueDeprecatedJobs()
-
-        testee.scheduleNextNotification()
-
-        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
-            assertTrue(getScheduledWorkers(it).isEmpty())
-        }
+    private fun assertNotificationScheduled(workerName: String, tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {
+        assertTrue(getScheduledWorkers(tag).any { it.tags.contains(workerName) })
     }
 
-    private fun enqueueDeprecatedJobs() {
-        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
-            val request = OneTimeWorkRequestBuilder<PrivacyNotificationWorker>()
-                .addTag(it)
-                .build()
-
-            workManager.enqueue(request)
-        }
-    }
-
-    private fun assertUnusedAppNotificationScheduled(workerName: String) {
-        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
-    }
-
-    private fun assertNoUnusedAppNotificationScheduled() {
-        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).isEmpty())
+    private fun assertNoNotificationScheduled(tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {
+        assertTrue(getScheduledWorkers(tag).isEmpty())
     }
 
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {

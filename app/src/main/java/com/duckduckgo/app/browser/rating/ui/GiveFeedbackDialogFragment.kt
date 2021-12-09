@@ -22,8 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
-
+import com.duckduckgo.app.pixels.AppPixelName.*
 
 class GiveFeedbackDialogFragment : EnjoymentDialog() {
 
@@ -38,7 +37,7 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity())
             .setTitle(R.string.giveFeedbackDialogTitle)
             .setMessage(R.string.giveFeedbackDialogMessage)
             .setPositiveButton(R.string.giveFeedbackDialogPositiveButton) { _, _ ->
@@ -49,10 +48,12 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK)
                 listener.onUserDeclinedToGiveFeedback(promptCount)
             }
-            .setOnKeyListener(BackKeyListener {
-                firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
-                listener.onUserCancelledGiveFeedbackDialog(promptCount)
-            })
+            .setOnKeyListener(
+                BackKeyListener {
+                    firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
+                    listener.onUserCancelledGiveFeedbackDialog(promptCount)
+                }
+            )
             .create()
     }
 

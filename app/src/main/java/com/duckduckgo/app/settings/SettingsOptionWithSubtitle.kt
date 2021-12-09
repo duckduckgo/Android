@@ -20,27 +20,21 @@ package com.duckduckgo.app.settings
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
 import com.duckduckgo.app.browser.R
-import org.jetbrains.anko.childrenRecursiveSequence
-
+import com.duckduckgo.app.browser.databinding.SettingsOptionWithSubtitleBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsOptionWithSubtitle : ConstraintLayout {
 
-    private var root: View
-    private var titleView: TextView
-    private var subtitleView: TextView
+    private val binding: SettingsOptionWithSubtitleBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
-
-        root = LayoutInflater.from(context).inflate(R.layout.settings_option_with_subtitle, this, true)
-        titleView = root.findViewById(R.id.title)
-        subtitleView = root.findViewById(R.id.subtitle)
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsOptionWithSubtitle)
         setTitle(attributes.getString(R.styleable.SettingsOptionWithSubtitle_title) ?: "")
@@ -49,17 +43,23 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
     }
 
     fun setTitle(title: String) {
-        titleView.text = title
+        binding.title.text = title
     }
 
     fun setSubtitle(subtitle: String) {
-        subtitleView.text = subtitle
+        binding.subtitle.text = subtitle
     }
 
     override fun setEnabled(enabled: Boolean) {
-        root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
+        recursiveEnable(enabled)
         super.setEnabled(enabled)
     }
 
+    fun View.recursiveEnable(enabled: Boolean) {
+        (this as? ViewGroup)?.children?.forEach {
+            it.isEnabled = enabled
+            it.recursiveEnable(enabled)
+        }
+    }
 
 }

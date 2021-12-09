@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
-import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import javax.inject.Inject
 
 interface IconModifier {
@@ -87,7 +86,7 @@ class AppIconModifier @Inject constructor(
         enable(context, newIcon)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            appShortcutCreator.configureAppShortcuts(context)
+            appShortcutCreator.configureAppShortcuts()
         }
     }
 

@@ -17,9 +17,9 @@
 package com.duckduckgo.app.global
 
 import android.net.Uri
+import androidx.core.net.toUri
 import org.junit.Assert.*
 import org.junit.Test
-
 
 class UriExtensionTest {
 
@@ -194,5 +194,62 @@ class UriExtensionTest {
     fun whenGettingAbsoluteStringThenDoNotReturnQueryParameters() {
         val absoluteString = Uri.parse("https://example.com/test?q=example/#1/anotherrandomcode").absoluteString
         assertEquals("https://example.com/test", absoluteString)
+    }
+
+    @Test
+    fun whenNullUrlThenNullFaviconUrl() {
+        assertNull("".toUri().faviconLocation())
+    }
+
+    @Test
+    fun whenHttpRequestThenFaviconLocationAlsoHttp() {
+        val favicon = "http://example.com".toUri().faviconLocation()
+        assertTrue(favicon!!.isHttp)
+    }
+
+    @Test
+    fun whenHttpsRequestThenFaviconLocationAlsoHttps() {
+        val favicon = "https://example.com".toUri().faviconLocation()
+        assertTrue(favicon!!.isHttps)
+    }
+
+    @Test
+    fun whenUrlContainsASubdomainThenSubdomainReturnedInFavicon() {
+        val favicon = "https://sub.example.com".toUri().faviconLocation()
+        assertEquals("https://sub.example.com/favicon.ico", favicon.toString())
+    }
+
+    @Test
+    fun whenUrlIsIpAddressThenIpReturnedInFaviconUrl() {
+        val favicon = "https://192.168.1.0".toUri().faviconLocation()
+        assertEquals("https://192.168.1.0/favicon.ico", favicon.toString())
+    }
+
+    @Test
+    fun whenUrlDoesNotHaveSchemeReturnNull() {
+        assertNull("www.example.com".toUri().domain())
+    }
+
+    @Test
+    fun whenUrlHasSchemeReturnDomain() {
+        assertEquals("www.example.com", "http://www.example.com".toUri().domain())
+    }
+
+    @Test
+    fun whenUriHasResourceNameThenDropSchemeReturnResourceName() {
+        assertEquals("www.foo.com", "https://www.foo.com".toUri().toStringDropScheme())
+        assertEquals("www.foo.com", "http://www.foo.com".toUri().toStringDropScheme())
+    }
+
+    @Test
+    fun whenUriHasResourceNameAndPathThenDropSchemeReturnResourceNameAndPath() {
+        assertEquals("www.foo.com/path/to/foo", "https://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo", "http://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+    }
+
+    @Test
+    fun whenUriHasResourceNamePathAndParamsThenDropSchemeReturnResourceNamePathAndParams() {
+        assertEquals("www.foo.com/path/to/foo?key=value", "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo?key=value", "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
     }
 }

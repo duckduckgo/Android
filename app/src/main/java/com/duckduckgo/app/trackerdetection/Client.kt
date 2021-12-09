@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 DuckDuckGo
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@ interface Client {
     enum class ClientName(val type: ClientType) {
         // current clients
         TDS(ClientType.BLOCKING),
-        TEMPORARY_WHITELIST(ClientType.WHITELIST),
 
         // legacy clients
         EASYLIST(ClientType.BLOCKING),
@@ -37,7 +36,8 @@ interface Client {
     data class Result(
         val matches: Boolean,
         val entityName: String? = null,
-        val categories: List<String>? = null
+        val categories: List<String>? = null,
+        val surrogate: String? = null
     )
 
     val name: ClientName

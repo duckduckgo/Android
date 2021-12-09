@@ -23,13 +23,44 @@
     <TextView
         android:id="@+id/settingsPrivacyTitle"
         style="@style/SettingsSectionTitle"
-        android:text="@string/settingsHeadingPrivacy" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settingsHeadingPrivacy"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/globalPrivacyControlSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:subtitle="test test test"
+        app:title="@string/globalPrivacyControlSetting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
+
+    <TextView
+        android:id="@+id/fireproofWebsites"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsFireproofWebsites"
+        app:layout_constraintTop_toBottomOf="@id/globalPrivacyControlSetting" />
+
+    <TextView
+        android:id="@+id/locationPermissions"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPreciseLocation"
+        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/automaticallyClearWhatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle"
+        app:layout_constraintTop_toBottomOf="@id/locationPermissions"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhat" />
 
@@ -42,4 +73,42 @@
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhatSetting"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhen" />
+
+    <TextView
+        android:id="@+id/whitelist"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPrivacyProtectionWhitelist"
+        app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/appLinksSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/whitelist"
+        app:title="@string/settingsTitleAppLinks" />
+
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+        android:id="@+id/emailSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appLinksSetting"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/settingsEmailProtectionSubtitle"
+        app:pillTitle="@string/settingsEmailProtectionTitle" />
+
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+            android:id="@+id/deviceShieldSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emailSetting"
+            app:pillDrawable="@drawable/ic_beta_pill"
+            app:pillSubtitle="@string/atp_SettingsDeviceShieldDisabled"
+            app:pillTitle="@string/atp_SettingsTitle" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,19 +7,16 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 
 class BrokenSiteViewModelTest {
@@ -117,8 +114,30 @@ class BrokenSiteViewModelTest {
             siteType = BrokenSiteViewModel.DESKTOP_SITE
         )
 
-        verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenSiteAndUrlIsEmptyAndSubmitPressedThenDoNotSubmit() {
+        val nullUrl = ""
+        testee.setInitialBrokenSite(nullUrl, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = nullUrl,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 

@@ -19,12 +19,16 @@ package com.duckduckgo.app.brokensite.api
 import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -36,15 +40,20 @@ class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val tdsMetadataDao: TdsMetadataDao,
-    private val pixel: Pixel
+    private val gpc: Gpc,
+    private val featureToggle: FeatureToggle,
+    private val pixel: Pixel,
+    private val appCoroutineScope: CoroutineScope
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        GlobalScope.launch(Dispatchers.IO) {
+        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+
+        appCoroutineScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,
-                UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
+                UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
                 ATB_KEY to atbWithVariant(),
@@ -52,14 +61,15 @@ class BrokenSiteSubmitter(
                 MANUFACTURER_KEY to Build.MANUFACTURER,
                 MODEL_KEY to Build.MODEL,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
-                SITE_TYPE_KEY to brokenSite.siteType
+                SITE_TYPE_KEY to brokenSite.siteType,
+                GPC to isGpcEnabled
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates
             )
             runCatching {
-                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
+                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
@@ -73,7 +83,7 @@ class BrokenSiteSubmitter(
     companion object {
         private const val CATEGORY_KEY = "category"
         private const val SITE_URL_KEY = "siteUrl"
-        private const val UPDGRADED_HTTPS_KEY = "upgradedHttps"
+        private const val UPGRADED_HTTPS_KEY = "upgradedHttps"
         private const val TDS_ETAG_KEY = "tds"
         private const val BLOCKED_TRACKERS_KEY = "blockedTrackers"
         private const val SURROGATES_KEY = "surrogates"
@@ -84,5 +94,6 @@ class BrokenSiteSubmitter(
         private const val MODEL_KEY = "model"
         private const val WEBVIEW_VERSION_KEY = "wvVersion"
         private const val SITE_TYPE_KEY = "siteType"
+        private const val GPC = "gpc"
     }
 }

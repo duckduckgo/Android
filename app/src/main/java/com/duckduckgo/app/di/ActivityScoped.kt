@@ -18,7 +18,6 @@ package com.duckduckgo.app.di
 
 import javax.inject.Scope
 
-
 /**
  * In Dagger, an unscoped component cannot depend on a scoped component. As
  * [AppComponent] is a scoped component (`@Singleton`, we create a custom

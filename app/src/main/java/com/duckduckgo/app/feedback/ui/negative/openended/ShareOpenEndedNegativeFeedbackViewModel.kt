@@ -20,14 +20,17 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
-
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun userSubmittingPositiveFeedback(feedback: String) {
-            command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
+        command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
     }
 
     fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
@@ -41,3 +44,14 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
     }
 }
 
+@ContributesMultibinding(AppObjectGraph::class)
+class ShareOpenEndedNegativeFeedbackViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> (ShareOpenEndedNegativeFeedbackViewModel() as T)
+                else -> null
+            }
+        }
+    }
+}

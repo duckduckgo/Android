@@ -33,13 +33,13 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/OmnibarToolbarTheme">
+            android:background="?toolbarBgColor">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/toolbarBgColor"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -48,21 +48,25 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/omniBarContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/omnibar_field_background"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/omniBarContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/omnibar_field_background"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/networksContainer"
+                            android:id="@+id/animationContainer"
+                            android:paddingStart="10dp"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
+                            app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                            app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
+                            tools:ignore="RtlSymmetry" >
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <FrameLayout
                             android:id="@+id/omnibarIconContainer"
@@ -72,28 +76,34 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
 
+                            <ImageView
+                                android:id="@+id/daxIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:contentDescription="@string/privacyGradeContentDescription"
+                                android:padding="4dp"
+                                android:visibility="gone"
+                                android:src="@drawable/ic_ddg_logo" />
+
                             <ImageButton
                                 android:id="@+id/privacyGradeButton"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:padding="4dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:contentDescription="@string/privacyGradeContentDescription"
-                                android:padding="4dp"
-                                android:src="@drawable/privacygrade_icon_a"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:src="@drawable/privacygrade_icon_loading" />
 
                             <ImageView
                                 android:id="@+id/searchIcon"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
                                 android:contentDescription="@string/privacyGradeContentDescription"
                                 android:padding="4dp"
-                                android:src="@drawable/ic_loupe_24dp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:src="@drawable/ic_loupe_24dp" />
 
                         </FrameLayout>
 
@@ -140,6 +150,19 @@
 
             </androidx.appcompat.widget.Toolbar>
 
+            <ProgressBar
+                android:id="@+id/pageLoadingIndicator"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:progressDrawable="@drawable/loading_progress"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:progress="50"
+                tools:visibility="visible" />
+
             <FrameLayout
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
@@ -154,14 +177,14 @@
                 tools:visibility="visible">
 
                 <ImageView
+                    android:id="@+id/fireIconImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
                     android:padding="3dp"
-                    android:src="@drawable/ic_fire_24dp" />
-
+                    android:src="@drawable/ic_fire" />
             </FrameLayout>
 
             <com.duckduckgo.app.browser.TabSwitcherButton
@@ -190,6 +213,7 @@
                 tools:visibility="visible">
 
                 <ImageView
+                    android:id="@+id/browserMenuImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -199,18 +223,6 @@
                     android:src="@drawable/ic_overflow_12dp" />
 
             </FrameLayout>
-
-            <ProgressBar
-                android:id="@+id/pageLoadingIndicator"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:progress="50"
-                tools:visibility="visible" />
 
             <include
                 layout="@layout/include_find_in_page"

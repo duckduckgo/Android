@@ -33,7 +33,7 @@ class TdsEntityJsonTest {
     fun whenFormatIsValidThenEntitiesAreCreated() {
         val json = loadText("json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
-        assertEquals(3, entities.count())
+        assertEquals(4, entities.count())
     }
 
     @Test
@@ -58,5 +58,13 @@ class TdsEntityJsonTest {
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities[2]
         assertEquals("4Cite Marketing", entity.displayName)
+    }
+
+    @Test
+    fun whenEntityHasBlankDisplayNameThenDisplayNameIsSameAsName() {
+        val json = loadText("json/tds_entities.json")
+        val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
+        val entity = entities.last()
+        assertEquals("AT Internet", entity.displayName)
     }
 }

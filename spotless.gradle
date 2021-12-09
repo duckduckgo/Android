@@ -1,0 +1,22 @@
+apply plugin: 'com.diffplug.spotless'
+
+spotless {
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        indentWithSpaces()
+    }
+    kotlin {
+        target '**/*.kt'
+        ktlint('0.39.0').userData(['disabled_rules': 'no-wildcard-imports, import-ordering, no-blank-line-before-rbrace'])
+        trimTrailingWhitespace()
+        indentWithSpaces()
+    }
+    format 'xml', {
+        target '**/*.xml'
+        indentWithSpaces()
+        trimTrailingWhitespace()
+    }
+}

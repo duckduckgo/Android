@@ -18,14 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.core.view.NestedScrollingChild
-import androidx.core.view.NestedScrollingChildHelper
-import androidx.core.view.ViewCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
+import androidx.core.view.NestedScrollingChild
+import androidx.core.view.NestedScrollingChildHelper
+import androidx.core.view.ViewCompat
 
 /**
  * WebView subclass which allows the WebView to
@@ -35,7 +35,14 @@ import android.webkit.WebView
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
+    private var lastClampedTopY: Boolean = true // when created we are always at the top
+    private var contentAllowsSwipeToRefresh: Boolean = true
+    private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
+    private var hasGestureFinished = true
+    private var canSwipeToRefresh = true
+
     private var lastY: Int = 0
+    private var lastDeltaY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
     private var nestedOffsetY: Int = 0
@@ -54,7 +61,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         return inputConnection
     }
 
-
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
         outAttrs.imeOptions = outAttrs.imeOptions or IME_FLAG_NO_PERSONALIZED_LEARNING
     }
@@ -72,8 +78,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         event.offsetLocation(0f, nestedOffsetY.toFloat())
 
         when (action) {
+            MotionEvent.ACTION_UP -> {
+                hasGestureFinished = true
+                returnValue = super.onTouchEvent(event)
+                stopNestedScroll()
+            }
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
+
+                lastClampedTopY = deltaY <= 0
 
                 if (dispatchNestedPreScroll(0, deltaY, scrollConsumed, scrollOffset)) {
                     deltaY -= scrollConsumed[1]
@@ -89,9 +102,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
                     nestedOffsetY += scrollOffset[1]
                     lastY -= scrollOffset[1]
                 }
+
+                lastDeltaY = deltaY
             }
 
             MotionEvent.ACTION_DOWN -> {
+                hasGestureFinished = false
+                // disable swipeRefresh until we can be sure it should be enabled
+                enableSwipeRefresh(false)
+
                 returnValue = super.onTouchEvent(event)
                 lastY = eventY
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
@@ -131,6 +150,37 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
+
+    override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
+        // taking into account lastDeltaY since we are only interested whether we clamped at the top
+        lastClampedTopY = clampedY && lastDeltaY <= 0
+
+        if (!lastClampedTopY) {
+            canSwipeToRefresh = false // disable because user scrolled down so we need a new gesture
+        }
+
+        if (lastClampedTopY && hasGestureFinished) {
+            canSwipeToRefresh = true // only enable if at the top and gestured finished
+        }
+
+        enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
+    }
+
+    fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
+        enableSwipeRefreshCallback = callback
+    }
+
+    private fun enableSwipeRefresh(enable: Boolean) {
+        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
+    }
+
+    private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+        contentAllowsSwipeToRefresh = allowed
+        if (!allowed) {
+            enableSwipeRefresh(false)
+        }
+    }
 
     companion object {
 

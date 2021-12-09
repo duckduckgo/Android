@@ -53,7 +53,6 @@ abstract class NetworkLeaderboardDao {
     @Query("UPDATE network_leaderboard SET count = count + 1 WHERE networkName = :networkName")
     protected abstract fun incrementNetworkCountIfExists(networkName: String): Int
 
-
     @Query("select * from network_leaderboard order by count desc")
     abstract fun trackerNetworkLeaderboard(): LiveData<List<NetworkLeaderboardEntry>>
 }

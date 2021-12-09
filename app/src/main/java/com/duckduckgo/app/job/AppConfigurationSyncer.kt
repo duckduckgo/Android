@@ -16,19 +16,58 @@
 
 package com.duckduckgo.app.job
 
-import android.app.job.JobScheduler
-import android.content.Context
 import androidx.annotation.CheckResult
-import com.duckduckgo.app.global.job.APP_CONFIGURATION_JOB_ID
-import com.duckduckgo.app.global.job.JobBuilder
+import androidx.annotation.UiThread
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
+import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
+import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Singleton
 
+@Module
+@ContributesTo(AppObjectGraph::class)
+class AppConfigurationSyncerModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideAppConfigurationSyncer(
+        appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
+        workManager: WorkManager,
+        appConfigurationDownloader: ConfigurationDownloader
+    ): LifecycleObserver {
+        return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
+    }
+}
+
+@VisibleForTesting
 class AppConfigurationSyncer(
-    private val jobBuilder: JobBuilder,
-    private val jobScheduler: JobScheduler,
+    private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
+    private val workManager: WorkManager,
     private val appConfigurationDownloader: ConfigurationDownloader
-) {
+) : LifecycleObserver {
+
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun configureDataDownloader() {
+        scheduleImmediateSync()
+            .subscribeOn(Schedulers.io())
+            .doAfterTerminate {
+                scheduleRegularSync()
+            }
+            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+    }
 
     @CheckResult
     fun scheduleImmediateSync(): Completable {
@@ -36,24 +75,9 @@ class AppConfigurationSyncer(
         return appConfigurationDownloader.downloadTask()
     }
 
-    /**
-     * Scheduling the same job again would kill the existing job if it was running.
-     *
-     * So this method can be used to first query if the job is already scheduled.
-     */
-    fun jobScheduled(): Boolean {
-        return jobScheduler.allPendingJobs
-            .filter { APP_CONFIGURATION_JOB_ID == it.id }
-            .count() > 0
-    }
-
-    fun scheduleRegularSync(context: Context) {
-        val jobInfo = jobBuilder.appConfigurationJob(context)
-
-        if (jobScheduler.schedule(jobInfo) == JobScheduler.RESULT_SUCCESS) {
-            Timber.i("Job scheduled successfully")
-        } else {
-            Timber.e("Failed to schedule job")
-        }
+    fun scheduleRegularSync() {
+        Timber.i("Scheduling regular sync")
+        val workRequest = appConfigurationSyncWorkRequestBuilder.appConfigurationWork()
+        workManager.enqueueUniquePeriodicWork(APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }
 }

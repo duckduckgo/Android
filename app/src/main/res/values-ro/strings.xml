@@ -1,21 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt.</string>
+    <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
+    <string name="open">Deschideți</string>
+    <string name="cancel">Renunță</string>
     <string name="search">Căutare</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
+    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>
-    <string name="defaultBrowserMaybeLater">Poate Mai Târziu</string>
-    <string name="defaultBrowserLetsDoIt">Hai să o facem!</string>
-    <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile cu liniște sufletească, de fiecare dată.</string>
+    <string name="defaultBrowserMaybeLater">Poate mai târziu</string>
+    <string name="defaultBrowserLetsDoIt">Setare ca browser implicit</string>
+    <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile liniștit, de fiecare dată.</string>
     <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
@@ -28,12 +49,17 @@
     <string name="clearButtonContentDescription">Ștergeți datele introduse pentru căutare</string>
     <string name="no_compatible_third_party_app_installed">Nicio aplicație compatibilă instalată</string>
     <string name="addBookmarkMenuTitle">Adăugare semn de carte</string>
+    <string name="editBookmarkMenuTitle">Editare semn de carte</string>
+    <string name="addFavoriteMenuTitle">Adaugă preferință</string>
+    <string name="removeFavoriteMenuTitle">Elimină Favoritul</string>
+    <string name="favoriteAddedMessage">Preferință adăugată</string>
+    <string name="bookmarkAddedMessage">Semn de carte adăugat</string>
     <string name="requestDesktopSiteMenuTitle">Versiune desktop</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Descărcare imagine</string>
     <string name="permissionRequiredToDownload">Descărcarea necesită permisiune de stocare</string>
-    <string name="downloadComplete">Descărcare completă.</string>
+    <string name="downloadComplete">Descărcare completă</string>
     <string name="downloadFailed">Descărcarea a eșuat</string>
     <string name="downloadInProgress">Se descarcă</string>
 
@@ -49,6 +75,7 @@
     <string name="previousSearchTermDescription">Găsirea rezultatului anterior</string>
     <string name="closeFindInPageButtonDescription">Închideți vizualizarea „găsire în pagină”</string>
     <string name="findInPageHint">Găsire în pagină</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
@@ -61,6 +88,7 @@
     <string name="unableToOpenLink">Imposibil de deschis acest tip de link</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">File</string>
     <string name="tabsMenuItem">File</string>
     <string name="newTabMenuItem">Filă nouă</string>
@@ -70,14 +98,18 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
     <string name="closeAllTabsMenuItem">Închidere toate filele</string>
-    <string name="closeTab">Închidere nouă</string>
+    <string name="closeTab">Închidere filă</string>
+    <string name="tabClosed">Filă închisă</string>
+    <string name="tabClosedUndo">Anulați</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
+    <string name="privacyProtectionEnabled">PROTECȚIE SITE ACTIVATĂ</string>
+    <string name="privacyProtectionDisabled">PROTECȚIE SITE DEZACTIVATĂ</string>
     <string name="privacyDashboardActivityTitle">Tabloul de bord privind confidențialitatea</string>
-    <string name="privacyProtectionEnabled">PROTECȚIA CONFIDENȚIALITĂȚII A FOST ACTIVATĂ</string>
-    <string name="privacyProtectionDisabled">PROTECȚIA CONFIDENȚIALITĂȚII A FOST DEZACTIVATĂ</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src="%d" /&gt; LA &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MĂRIT DE LA &lt;img src=\"%1$d\" /&gt; LA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad de confidențialitate</string>
+    <string name="privacyProtectionTemporarilyDisabled">Am dezactivat temporar protecția confidențialității, deoarece pare să spargă acest site.</string>
 
     <string name="httpsGood">Conexiune criptată</string>
     <string name="httpsMixed">Conexiune cu criptare mixtă</string>
@@ -88,44 +120,43 @@
     <string name="networksOverview">Rețelele de cookie-uri de urmărire vă adună istoricul web într-un profil de date despre dvs. Rețelele mari de cookie-uri de urmărire sunt mai dăunătoare, deoarece vă pot urmări și vă pot viza pe mai multe site-uri de pe internet.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s Urmăritor Găsit</item>
-        <item quantity="few">%s Urmăritori Găsiți</item>
-        <item quantity="other">%s Urmăritori Găsiți</item>
+        <item quantity="one">%1$s urmăritor găsit</item>
+        <item quantity="few">%1$s urmăritori găsiți</item>
+        <item quantity="other">%1$s de urmăritori găsiți</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s Urmăritor Blocat</item>
-        <item quantity="few">%s Urmăritori Blocați</item>
-        <item quantity="other">%s Urmăritori Blocați</item>
+        <item quantity="one">%1$s urmăritor blocat</item>
+        <item quantity="few">%1$s urmăritori blocați</item>
+        <item quantity="other">%1$s de urmăritori blocați</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s Rețea Principală Urmăritoare Găsită</item>
-        <item quantity="few">%s Rețele Principale Urmăritoare Găsite</item>
-        <item quantity="other">%s Rețele Principale Urmăritoare Găsite</item>
+        <item quantity="one">%1$s rețea principală urmăritoare găsită</item>
+        <item quantity="few">%1$s rețele principale urmăritoare găsite</item>
+        <item quantity="other">%1$s de rețele principale urmăritoare găsite</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s Rețea Principală Urmăritoare Blocată</item>
-        <item quantity="few">%s Rețele Principale Urmpritoare Blocate</item>
-        <item quantity="other">%s Rețele Principale Urmpritoare Blocate</item>
+        <item quantity="one">%1$s rețea principală urmăritoare blocată</item>
+        <item quantity="few">%1$s rețele principale urmăritoare blocate</item>
+        <item quantity="other">%1$s de rețele principale urmăritoare blocate</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Grad de confidențialitate</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site-ul este o rețea mare de cookie-uri de urmărire</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Site-ul este o rețea mare de instrumente de urmărire</string>
     <string name="scorecardPrivacyGrade">Grad de confidențialitate</string>
     <string name="scorecardEnhancedGrade">Grad mărit</string>
 
     <string name="privacyTermsActivityTitle">Practici privind confidențialitatea</string>
     <string name="practicesGood">Bune practici privind confidențialitatea</string>
-    <string name="practicesMixed">Practici mixte privind confidențialitatea”</string>
-    <string name="practicesBad">„Practici inadecvate privind confidențialitatea”</string>
+    <string name="practicesMixed">Practici mixte privind confidențialitatea</string>
+    <string name="practicesBad">Practici inadecvate privind confidențialitatea</string>
     <string name="practicesUnknown">Practici necunoscute privind confidențialitatea</string>
     <string name="practicesOverview">Practicile privind confidențialitatea indică în ce măsură datele cu caracter personal pe care le partajați cu un site web sunt protejate.</string>
-    <string name="practicesTosdrLink">Practicile privind confidențialitatea rezultă din <b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Practici de confidențialitate de la <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Pictogramă „Bune practici”</string>
     <string name="practicesIconContentBad">Pictogramă „Practici inadecvate”</string>
-    <string name="privacyProtectionToggle">Protecția confidențialității</string>
 
     <string name="networkTrackerSummaryHeader">CEI MAI MARI INFRACTORI PRIVIND REȚELELE DE COOKIE-URI DE URMĂRIRE</string>
     <string name="networkTrackerSummaryNotReady">Continuă să colectăm date pentru a arăta câte cookie-uri de urmărire am blocat.</string>
@@ -142,42 +173,45 @@
     <string name="settingsHeadingGeneral">Generalități</string>
     <string name="settingsHeadingOther">Altele</string>
     <string name="settingsHeadingPrivacy">Confidențialitate</string>
-    <string name="settingsLightTheme">Temă luminoasă</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
-    <string name="leaveFeedback">Trimiteți feedback</string>
+    <string name="leaveFeedback">Partajează feedback</string>
+    <string name="settingsEmailProtectionTitle">Protecția comunicațiilor prin e-mail</string>
+    <string name="settingsEmailProtectionSubtitle">Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa.</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvare</string>
 
     <string name="settingsAutomaticallyClearWhat">Ștergere automată…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Ștergere automată…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Niciuna</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">File</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
 
     <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar ieșire din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ieșire din aplicație, inactiv timp de 5 minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ieșire din aplicație, inactiv timp de 15 minute</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ieșire din aplicație, inactiv timp de 30 de minute</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 60 de minute</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ieșire din aplicație, inactiv timp de 1 oră</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Despre noi</string>
+    <string name="aboutActivityTitle">Despre DuckDuckGo</string>
     <string name="aboutDescription">
-        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\ DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\ La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
+        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\nDuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\nLa urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
     <string name="aboutMoreLink">Aflați mai multe la duckduckgo.com/about</string>
     <string name="no_suggestions">Fără sugestii</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Raportare site defect</string>
-    <string name="brokenSiteHeading">Raportare site defect</string>
-    <string name="brokenSiteSubmitted">Vă mulțumim! Feedback trimis</string>
-    <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat:</string>
+    <string name="brokenSiteHeading">Raportați site-ul distrus</string>
+    <string name="brokenSiteSubmitted">Mulțumesc! Feedback trimis.</string>
+    <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat</string>
     <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
-    <string name="brokenSiteSubmitButton">Trimite Raportul</string>
-    <string name="brokenSiteDescription">Trimiterea unui raport anonim al unui site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
+    <string name="brokenSiteSubmitButton">Trimite raportul</string>
+    <string name="brokenSiteDescription">Trimiterea unui raport anonim despre un site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
 
     <string name="brokenSiteCategoryImages">Imaginile nu s-au încărcat</string>
     <string name="brokenSiteCategoryPaywall">Site-ul mi-a cerut să dezactivez</string>
@@ -185,31 +219,45 @@
     <string name="brokenSiteCategoryVideos">Videoclipul nu s-a redat</string>
     <string name="brokenSiteCategoryLinks">Linkurile sau butoanele nu funcționează</string>
     <string name="brokenSiteCategoryContent">Conținutul lipsește</string>
-    <string name="brokenSiteCategoryLogin">Nu mă pot autentifica</string>
+    <string name="brokenSiteCategoryLogin">Nu mă pot conecta</string>
     <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
     <string name="brokenSiteCategoryOther">Altceva</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Semne de carte</string>
     <string name="bookmarksActivityTitle">Semne de carte</string>
-    <string name="bookmarkDeleteConfirmMessage">Sunteți sigur că doriți să ștergeți semnul de carte &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Confirmare</string>
-    <string name="bookmarkAddedFeedback">Semn de carte adăugat</string>
-    <string name="bookmarkTitleHint">Titlu semn de carte</string>
-    <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
-    <string name="bookmarkSave">Salvare</string>
-    <string name="bookmarkTitleEdit">Editare semn de carte</string>
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
-    <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %s</string>
+    <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
+    <string name="exportBookmarksMenu">Export</string>
+    <string name="exportBookmarksEmpty">Nu ai marcaje, nimic nu va fi exportat</string>
+    <string name="exportBookmarksError">Nu s-au putut exporta marcaje, a apărut o eroare</string>
+    <string name="exportBookmarksSuccess">Toate marcajele au fost exportate cu succes</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
+    <string name="importBookmarksError">Nu s-au putut importa marcaje, a apărut o eroare</string>
+    <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
+    <string name="importBookmarksSuccess">%1$d marcaje importate cu succes</string>
+    <string name="savedSiteDialogTitleHint">Titlu</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Editare</string>
+    <string name="bookmarksSectionTitle">Semne de carte</string>
+    <string name="favoritesSectionTitle">Preferințe</string>
+    <string name="bookmarksEmptyHint">Nu s-a adăugat niciun semn de carte</string>
+    <string name="favoritesEmptyHint">Nicio preferință adăugată încă</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Confirmare</string>
+    <string name="dialogSave">Salvare</string>
     <string name="delete">Ștergere</string>
     <string name="edit">Editare</string>
-    <string name="bookmarkEdited">Semn de carte adăugat</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Adăugare la pagina principală</string>
+    <string name="shortcutAddedText">Succes! %1$s a fost adăugat pe ecranul de pornire.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ajutați-ne să îmbunătățim aplicația!</string>
@@ -223,34 +271,36 @@
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nVă rugăm să încercați din nou, mai târziu.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Încercați-ne widget-ul de căutare!</string>
+    <string name="addWidgetCtaTitle">Încearcă widget-ul nostru de căutare!</string>
     <string name="addWidgetCtaDescription">Adăugați widget-ul de căutare la ecranul dvs. de pornire, pentru acces rapid și ușor.</string>
     <string name="addWidgetCtaAutoLaunchButton">Adăugare widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Afișare</string>
     <string name="addWidgetCtaDismissButton">Renunțare</string>
     <string name="addWidgetInstructionsActivityTitle">Adăugare widget</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Apăsați lung pe ecranul de pornire, apoi deschideți meniul widget-uri</string>
+    <string name="addWidgetInstruction1">Apasă lung pe ecranul de pornire, apoi deschide meniul widget-urilor.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Găsiți widget-ul DuckDuckGo</string>
+    <string name="addWidgetInstruction2">Găsește widget-ul DuckDuckGo.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Trageți widget-ul pe ecranul de pornire</string>
+    <string name="addWidgetInstruction3">Trage widget-ul pe ecranul de pornire.</string>
     <string name="addWidgetInstructionsButtonGoHome">Accesați ecranul de pornire</string>
     <string name="addWidgetInstructionsButtonClose">Închidere</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Vă place DuckDuckGo?</string>
-    <string name="appEnjoymentDialogMessage">Ne-ar plăcea să știm ce credeți</string>
+    <string name="appEnjoymentDialogMessage">Ne-ar plăcea să știm ce crezi.</string>
     <string name="appEnjoymentDialogPositiveButton">Îmi place</string>
-    <string name="appEnjoymentDialogNegativeButton">Mai trebuie lucrată</string>
+    <string name="appEnjoymentDialogNegativeButton">Mai trebuie lucrat</string>
 
     <string name="rateAppDialogTitle">Evaluați aplicația</string>
     <string name="rateAppDialogMessage">Feedback-ul dvs. contează. Vă rugăm să vă partajați preferința printr-o recenzie.</string>
     <string name="rateAppDialogPositiveButton">Evaluați aplicația</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Ne pare rău să auzim aceasta</string>
-    <string name="giveFeedbackDialogMessage">Spuneți-ne cum putem îmbunătăți aplicația pentru dvs.</string>
-    <string name="giveFeedbackDialogPositiveButton">Trimiteți feedback</string>
+    <string name="giveFeedbackDialogMessage">Spune-ne cum putem îmbunătăți aplicația pentru tine.</string>
+    <string name="giveFeedbackDialogPositiveButton">Partajează feedback</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nu, mulțumesc</string>
 
@@ -267,14 +317,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Vă protejăm confidențialitatea</string>
     <string name="privacyProtectionNotificationReportTitle">Raportul dvs. privind confidențialitatea</string>
     <string name="privacyProtectionNotificationDefaultDescription">Utilizând aplicația DuckDuckGo, datele dvs. sunt protejate prin blocarea cookie-urilor de urmărire și criptarea conexiunilor.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">V-ați protejat datele, securizând %d conexiuni necriptate, în timpul utilizării DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">V-ați protejat datele, blocând %d cookie-uri de urmărire, în timpul utilizării DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">V-ați protejat datele blocând %d cookie-uri de urmărire și securizând %d conexiuni necriptate în timpul utilizării DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">V-ați protejat datele, securizând %1$d conexiuni necriptate, în timpul utilizării DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">V-ați protejat datele, blocând %1$d cookie-uri de urmărire, în timpul utilizării DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">V-ați protejat datele blocând %1$d cookie-uri de urmărire și securizând %2$d conexiuni necriptate în timpul utilizării DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reluare navigare</string>
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Autentificare</string>
-    <string name="authenticationDialogMessage">%s necesită un nume de utilizator și o parolă.</string>
+    <string name="authenticationDialogMessage">%1$s necesită un nume de utilizator și o parolă.</string>
     <string name="authenticationDialogPositiveButton">Autentificare</string>
     <string name="authenticationDialogNegativeButton">Anulare</string>
     <string name="authenticationDialogUsernameHint">Nume utilizator</string>
@@ -284,11 +334,11 @@
     <string name="systemTextSearchMessage">Căutare DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Partajați-vă feedbackul</string>
+    <string name="feedbackActivityTitle">Partajează feedback</string>
     <string name="missingBrowserFeaturesTitleLong">Funcțiile browserului lipsesc sau sunt frustrante pentru utilizator</string>
     <string name="missingBrowserFeaturesTitleShort">Probleme privind funcțiile browserului</string>
     <string name="missingBrowserFeaturesSubtitle">Ce funcție de navigare putem adăuga sau îmbunătăți?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigare înainte, înapoi, reîmprospătare</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigare înainte, înapoi și/sau reîmprospătare</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Crearea și gestionarea filelor</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Blocarea anunțurilor și ferestrelor pop-up</string>
     <string name="missingBrowserFeatureSubReasonVideos">Vizionarea videoclipurilor</string>
@@ -296,9 +346,9 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Crearea și gestionarea marcajelor</string>
     <string name="missingBrowserFeatureSubReasonOther">Niciuna dintre acestea</string>
 
-    <string name="websiteNotLoadingTitleLong">Anumite site-uri web nu se încarcă corect</string>
+    <string name="websiteNotLoadingTitleLong">Probleme privind încărcarea site-ului web</string>
     <string name="websiteNotLoadingTitleShort">Probleme privind încărcarea site-ului web</string>
-    <string name="websiteNotLoadingSubtitle">Ce site este defect?”</string>
+    <string name="websiteNotLoadingSubtitle">Ce site este defect?</string>
 
     <string name="searchNotGoodEnoughTitleLong">Căutarea DuckDuckGo nu este suficient de bună</string>
     <string name="searchNotGoodEnoughTitleShort">Probleme privind funcția de căutare a DuckDuckGo</string>
@@ -332,19 +382,19 @@
     <string name="otherMainReasonTitleLong">Niciuna dintre acestea</string>
     <string name="otherMainReasonTitleShort">Alte probleme</string>
 
-    <string name="openEndedInputHint">Cum putem îmbunătăți aplicația? (opțional)</string>
-    <string name="submitFeedback">TRIMITERE FEEDBACK</string>
+    <string name="openEndedInputHint">Vă rugăm să furnizați detalii cât mai concrete</string>
+    <string name="submitFeedback">Trimite</string>
 
     <string name="tellUsHowToImprove">Vă rugăm să ne spuneți ce putem îmbunătăți.</string>
     <string name="thanksForTheFeedback">Vă mulțumim pentru feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Ce aspect vă deranjează cel mai tare?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău să auzim aceasta.</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Ne pare rău să auzim aceasta</string>
     <string name="feedbackShareDetails">Partajare detalii</string>
     <string name="sharePositiveFeedbackWithTheTeam">Există detalii pe care doriți să le împărtășiți echipei?</string>
     <string name="whatHaveYouBeenEnjoying">Ce v-a plăcut?</string>
     <string name="awesomeToHear">Ne bucurăm să auzim aceasta!</string>
     <string name="shareTheLoveWithARating">Vă rugăm să vă partajați preferința, evaluând aplicația în Play Store.</string>
-    <string name="rateTheApp">EVALUAȚI APLICAȚIA</string>
+    <string name="rateTheApp">Evaluați aplicația</string>
     <string name="declineFurtherFeedback">NU, MULȚUMESC, AM TERMINAT</string>
     <string name="whichBrokenSites">Unde vedeți aceste probleme?</string>
     <string name="whichBrokenSitesHint">Ce site web are probleme?</string>
@@ -356,18 +406,18 @@
     <string name="feedbackIsImportantToUs">Feedbackul dvs. anonim este important pentru noi.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Pagina web nu a putut fi afișată.</string>
-    <string name="crashedWebViewErrorAction">Reîncarcă</string>
+    <string name="crashedWebViewErrorMessage">"Pagina web nu a putut fi afișată."</string>
+    <string name="crashedWebViewErrorAction">"Reîncarcă"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
-    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, atunci când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea aplicația DuckDuckGo:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blochează urmăritoriinesiguri</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere</string>
+    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blochează instrumentele de urmărire nesigure.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere.</string>
     <string name="systemSearchOnboardingButtonMore">Arată mai multe</string>
     <string name="systemSearchOnboardingButtonLess">Ascunde</string>
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
@@ -376,30 +426,205 @@
     <string name="daxDialogHideButton">ASCUNDE</string>
     <string name="daxDialogPhew">Pfiu!</string>
     <string name="daxDialogNext">Următorul</string>
-    <string name="daxDialogHighFive">Bate Palma!</string>
+    <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
     <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
     <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
     <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Bine ai venit la DuckDuckGo!</string>
-    <string name="onboardingDaxText">Internetul poate fi cam terifiant.&lt;br/&gt;&lt;br/&gt;Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.</string>
-    <string name="onboardingLetsDoItButton">Hai Să O Facem!</string>
-    <string name="daxIntroCtaText">Apoi, încearcă să vizitezi unul din site-urile tale preferate! &lt;br/&gt;&lt;br/&gt;Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. &#128274;</string>
-    <string name="daxEndCtaText">Ai ghicit! &lt;br/&gt;&lt;br/&gt;Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. &#128077;</string>
-    <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. &#128588;</string>
+    <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
+    <string name="onboardingLetsDoItButton">Să începem!</string>
+    <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
+    <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;și &lt;b&gt;%d altul&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
-        <item quantity="few">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
-        <item quantity="other">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
+        <item quantity="one"><![CDATA[ și <b>%1$d altul</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
+        <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
+        <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
-        <item quantity="few">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
-        <item quantity="other">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. &lt;br/&gt;&lt;br/&gt;Dă-i bătaie- continuă să navighezi!</string>
-    <string name="daxMainNetworkOwnedCtaText">Atenție! %s este deținut de %s.&lt;br/&gt;&lt;br/&gt; Urmăritorii %s spionează %s site-urile web de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
-    <string name="daxMainNetworkCtaText">Atenție! %s este o rețea semnificativă de urmărire.&lt;br/&gt;&lt;br/&gt; Urmăritorii lor spionează %s site-uri de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie — continuă să navighezi!]]></string>
+    <string name="daxMainNetworkCtaText">Atenție! Nu pot împiedica utilizatorul %1$s să îți vadă activitatea pe %2$s.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot limita ceea ce știe %3$s despre tine în general, blocându-i instrumentul de urmărire pe o mulțime de alte site-uri.</string>
+    <string name="daxMainNetworkOwnedCtaText">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Continuați</string>
+    <string name="downloadConfirmationSaveFileTitle">Salvați %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Păstrați ambele</string>
+    <string name="downloadConfirmationReplaceOldFileText">Înlocuiți</string>
+    <string name="downloadConfirmationOpenFileText">Deschideți</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Fișierul nu poate fi deschis</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Nu s-a putut șterge fișierul vechi</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Pictograma aplicației</string>
+    <string name="changeIconCtaLabel">Pictograma Aplicației</string>
+    <string name="changeIconCtaAccept">Aplicați</string>
+    <string name="changeIconCtaCancel">Anulare</string>
+    <string name="changeIconDialogTitle">Aplicați noua pictogramă?</string>
+    <string name="changeIconDialogMessage">Aplicația se poate închide pentru aplicarea modificărilor. Reveniți după ce ați admirat noua dvs. splendidă pictogramă.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Site-uri neprotejate</string>
+    <string name="reportBrokenSite">Raportare site defect</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Adăugați</string>
+    <string name="dialogEditTitle">Editare</string>
+    <string name="dialogSaveAction">Salvează</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Site-uri neprotejate</string>
+    <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
+    <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
+    <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
+    <string name="whitelistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
+    <string name="whitelistNoEntries">Protecția confidențialității este activată pentru toate site-urile</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Introdu un domeniu precum <b>example.com</b> și încearcă din nou</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Site-uri neprotejate</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="settingsFireproofWebsites">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Site cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; nu mai păstrează acum activitatea și istoricul! Accesează setările pentru a gestiona.</string>
+    <string name="fireproofWebsiteSnackbarAction">Anulați</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Nu există site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteFeatureDescription">Site-urile web se bazează pe cookie-uri pentru a te menține conectat. Atunci când ștergi activitatea și istoricul unui site, cookie-urile nu vor fi șterse și vei rămâne conectat, chiar și după utilizarea butonului Ștergere activitate și istoric. Blocăm totuși instrumentele de urmărire terțe găsite pe site-urile web cu ștergerea activității și istoricului din browser la ieșire.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Mai multe opțiuni pentru site-ul cu ștergerea activității și istoricului din browser la ieșire %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Dorești să ștergi activitatea și istoricul pentru %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Ștergerea activității și istoricului din browser pentru acest site te va menține conectat după utilizarea butonului Ștergere activitate și istoric.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Ștergerea activității și istoricului din browser</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
+    <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
+    <string name="disableLoginDetectionDialogTitle">Dezactivezi memento pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
+    <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
+    <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>
+    <string name="disableLoginDetectionDialogNegative">ANULARE</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animație buton Foc</string>
+    <string name="settingsHeroFireAnimation">Infern</string>
+    <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
+    <string name="settingsHeroAbstractAnimation">Curent de aer</string>
+    <string name="settingsNoneAnimation">Niciuna</string>
+    <string name="settingsSelectFireAnimationDialog">Animație buton Foc</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvare</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Managerul descărcărilor este dezactivat</string>
+    <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
+    <string name="enable">Activare</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
+    <string name="preciseLocationSystemDialogAllow">Activare</string>
+    <string name="preciseLocationSystemDialogDeny">Poate mai târziu</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Nu întreba din nou pentru acest site</string>
+    <string name="preciseLocationSiteDialogTitle">Acorzi %1$s permisiunea de a accesa locația?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Folosim locația ta anonimă doar pentru a oferi rezultate mai bune, mai aproape de tine. Poți oricând să te răzgândești mai târziu.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Poți gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale în Setări.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Întotdeauna</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Respinge pentru această sesiune</string>
+    <string name="settingsPreciseLocation">Locație</string>
+    <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. DuckDuckGo utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
+    <string name="preciseLocationToggleText">Site-urile îmi pot cere locația</string>
+    <string name="preciseLocationEmptyListHint">Niciun site web nu a acordat permisiunea de a accesa locația</string>
+    <string name="preciseLocationNoSystemPermission">Pentru a gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale, activează locația pentru această aplicație în Setări Android.</string>
+    <string name="preciseLocationActivityTitle">Locație</string>
+    <string name="preciseLocationDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Mai multe opțiuni pentru permisiunile de locație din domeniul %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Acordat</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Respins</string>
+    <string name="preciseLocationSnackbarMessage">Anterior ai acordat %1$s permisiunea de a accesa locația dispozitivului.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">În browserul tău se pot acumula date personale. Bleah. Utilizează butonul Ștergere activitate și istoric pentru a șterge totul. Încearcă acum! 👇</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="disabled">Dezactivat</string>
+    <string name="enabled">Activat</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Deschide linkuri în aplicațiile asociate</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Dezactivează pentru a preveni deschiderea automată a linkurilor în alte aplicații instalate.</string>
+    <string name="appLinkDialogTitle">Deschizi în altă aplicație?</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Adresă nouă copiată în clipboard</string>
+    <string name="autofillTooltipUseYourAlias">Utilizează %1$s</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blochează modulele cookie de urmărire pentru e-mail</string>
+    <string name="autofillTooltipGenerateAddress">Generează o adresă privată</string>
+    <string name="autofillTooltipGenerateAddressDescription">Blochează modulele cookie de urmărire pentru e-mail și îți ascunde adresa</string>
+    <string name="newEmailAliasMenuTitle">Creează adresa Duck</string>
+
+    <!-- Email Sign Out Dialog -->
+    <string name="emailSignOutDialogTitle">Elimini protecțiile comunicațiilor prin e-mail?</string>
+    <string name="emailSignOutDialogText">Notă: eliminarea protecțiilor comunicațiilor prin e-mail de pe acest dispozitiv nu va șterge adresa Duck.</string>
+    <string name="emailSignOutDialogCancel">Anulare</string>
+    <string name="emailSignOutDialogDisable">Elimină</string>
+
+    <!-- Waitlist Notification -->
+    <string name="notificationChannelEmailWaitlist">Trimite prin e-mail lista de așteptare</string>
+    <string name="waitlistNotificationTitle">Invitația ta de protecție a comunicațiilor prin e-mail este aici!</string>
+    <string name="waitlistNotificationDescription">Te-ai alăturat listei de așteptare și ne-ai solicitat să te anunțăm când este rândul tău să încerci funcția noastră de protecție a comunicațiilor prin e-mail. Atinge pentru a vizualiza invitația ta.</string>
+
+    <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
+    <string name="waitlistNotificationDialogNoThanks">Nu, mulțumesc</string>
+    <string name="waitlistNotificationDialogNotifyMe">DORESC SĂ PRIMESC NOTIFICĂRI</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionWebViewActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
+    <string name="emailProtectionActivityTitle">Protecția comunicațiilor prin e-mail (beta)</string>
+    <string name="emailProtectionFooterDescription"><![CDATA[Nu îți salvăm e-mailurile. <b><a href=\"\">Află mai multe</a></b>.]]></string>
+    <string name="emailProtectionErrorJoiningWaitlist">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>
+    <string name="emailProtectionDuckAddressCta">Am deja o adresă Duck</string>
+    <string name="emailProtectionInviteCodeCta">Am un cod de invitație</string>
+    <string name="emailProtectionWaitlistCta">Alătură-te listei de așteptare private</string>
+    <string name="emailProtectionGetStartedCta">Să începem</string>
+
+    <!-- Screen 1-->
+    <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, <br/> fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+
+    <!-- Screen 2 -->
+    <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=\"\"><b>primești o notificare</b></a> când ajunge?<br/><a href=\"\"><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
+
+    <!-- Screen 3 -->
+    <string name="emailProtectionStatusTitleInBeta">Ești invitat!</string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, <br/> fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+
+    <!-- Email Protection Sign Out -->
+    <string name="emailProtectionSignOutTitle">Adresa Duck personală</string>
+    <string name="emailProtectionSignOutFooter">
+        <![CDATA[Eliminarea protecției comunicațiilor prin e-mail de pe acest dispozitiv elimină opțiunea de a completa adresa personală Duck sau o adresă Duck privată, recent generată în câmpurile de e-mail în timp ce navighezi pe web.<br/><br/>Pentru a șterge complet adresele Duck sau pentru orice alte întrebări sau feedback, contactează-ne la <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
+    </string>
+    <string name="emailProtectionSignOutRemoveCta">Elimină de pe dispozitiv</string>
 </resources>

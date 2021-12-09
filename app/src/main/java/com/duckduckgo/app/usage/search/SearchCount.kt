@@ -19,7 +19,6 @@ package com.duckduckgo.app.usage.search
 import androidx.room.*
 import javax.inject.Singleton
 
-
 @Dao
 @Singleton
 abstract class SearchCountDao {
@@ -56,4 +55,3 @@ data class SearchCountEntity(
         const val SINGLETON_KEY = "SINGLETON_KEY"
     }
 }
-

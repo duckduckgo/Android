@@ -18,13 +18,17 @@ package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Provider
 
 class LaunchViewModel(
     private val userStageStore: UserStageStore,
@@ -40,6 +44,7 @@ class LaunchViewModel(
     }
 
     suspend fun determineViewToShow() {
+
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
@@ -58,5 +63,20 @@ class LaunchViewModel(
         }
 
         Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
+    }
+}
+
+@ContributesMultibinding(AppObjectGraph::class)
+class LaunchViewModelFactory @Inject constructor(
+    private val userStageStore: Provider<UserStageStore>,
+    private val appInstallationReferrerStateListener: Provider<AppInstallationReferrerStateListener>
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore.get(), appInstallationReferrerStateListener.get()) as T)
+                else -> null
+            }
+        }
     }
 }

@@ -17,7 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.webkit.WebViewDatabase
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import dagger.Module
@@ -29,9 +31,18 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
+    fun provideWebviewDatabase(context: Context): WebViewDatabase {
+        return WebViewDatabase.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
+            .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
+            .addCallback(migrationsProvider.CHANGE_JOURNAL_ON_OPEN)
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .build()
     }
 

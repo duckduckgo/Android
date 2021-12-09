@@ -28,7 +28,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 /**
  * This raw file store is temporary. Once we move to an api call to retrieve the json
  * we'll store the content in a db rather than a raw file.

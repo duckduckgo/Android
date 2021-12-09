@@ -23,7 +23,7 @@
     android:layout_marginEnd="7dp"
     android:layout_marginBottom="10dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="?attr/colorPrimary"
+    app:cardBackgroundColor="?toolbarBgColor"
     app:cardCornerRadius="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +68,7 @@
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
             android:src="@drawable/ic_close_tab"
-            android:tint="@color/grayish"
+            android:tint="?normalTextColor"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />

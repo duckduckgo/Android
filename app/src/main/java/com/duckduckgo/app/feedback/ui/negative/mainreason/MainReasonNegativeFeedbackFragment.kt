@@ -17,32 +17,32 @@
 package com.duckduckgo.app.feedback.ui.negative.mainreason
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeDisambiguationMainReasonBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackItemDecoration
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
-import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_main_reason.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-
-class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
+class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_main_reason) {
     private lateinit var recyclerAdapter: MainReasonAdapter
 
     interface MainReasonNegativeFeedbackListener {
 
         fun userSelectedNegativeFeedbackMainReason(type: MainReason)
     }
+
+    private val binding: ContentFeedbackNegativeDisambiguationMainReasonBinding by viewBinding()
+
     private val listener: MainReasonNegativeFeedbackListener?
         get() = activity as MainReasonNegativeFeedbackListener
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.content_feedback_negative_disambiguation_main_reason, container, false)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
             override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
@@ -50,22 +50,15 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
             }
         })
 
-        return rootView
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
         activity?.let {
-            recyclerView.layoutManager = LinearLayoutManager(it)
-            recyclerView.adapter = recyclerAdapter
-            recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
+            binding.recyclerView.layoutManager = LinearLayoutManager(it)
+            binding.recyclerView.adapter = recyclerAdapter
+            binding.recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             val listValues = getMainReasonsDisplayText()
             recyclerAdapter.submitList(listValues)
         }
     }
-
 
     private fun getMainReasonsDisplayText(): List<FeedbackTypeMainReasonDisplay> {
         return MainReason.values().mapNotNull {

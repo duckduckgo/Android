@@ -24,7 +24,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-
 abstract class EnjoymentDialog : DialogFragment() {
 
     @Inject

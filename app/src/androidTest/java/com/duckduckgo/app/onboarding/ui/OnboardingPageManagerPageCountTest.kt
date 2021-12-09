@@ -17,6 +17,8 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.statistics.Variant
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -31,10 +33,11 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -55,12 +58,14 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     companion object {
 
+        private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
+
         @JvmStatic
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
             return arrayOf(
-                TestCase(false, 1),
-                TestCase(true, 2)
+                TestCase(false, 1, otherVariant),
+                TestCase(true, 2, otherVariant)
             )
         }
     }
@@ -73,5 +78,5 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
-    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int)
+    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int, val variant: Variant)
 }

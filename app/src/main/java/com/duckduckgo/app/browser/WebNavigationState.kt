@@ -21,7 +21,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
-
 interface WebNavigationState {
     val originalUrl: String?
     val currentUrl: String?
@@ -30,6 +29,7 @@ interface WebNavigationState {
     val canGoBack: Boolean
     val canGoForward: Boolean
     val hasNavigationHistory: Boolean
+    val progress: Int?
 }
 
 sealed class WebNavigationStateChange {
@@ -74,7 +74,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
     return Other
 }
 
-data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNavigationState {
+data class WebViewNavigationState(private val stack: WebBackForwardList, override val progress: Int? = null) : WebNavigationState {
 
     override val originalUrl: String? = stack.originalUrl
 
@@ -106,6 +106,7 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
         if (canGoBack != other.canGoBack) return false
         if (canGoForward != other.canGoForward) return false
         if (hasNavigationHistory != other.hasNavigationHistory) return false
+        if (progress != other.progress) return false
 
         return true
     }
@@ -121,14 +122,17 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
         result = 31 * result + canGoBack.hashCode()
         result = 31 * result + canGoForward.hashCode()
         result = 31 * result + hasNavigationHistory.hashCode()
+        result = 31 * result + (progress?.hashCode() ?: 0)
         return result
     }
 }
 
 @Suppress("DataClassPrivateConstructor")
-data class EmptyNavigationState private constructor(override val originalUrl: String?,
-                                                    override val currentUrl: String?,
-                                                    override val title: String?) : WebNavigationState {
+data class EmptyNavigationState private constructor(
+    override val originalUrl: String?,
+    override val currentUrl: String?,
+    override val title: String?
+) : WebNavigationState {
     companion object {
         operator fun invoke(webNavigationState: WebNavigationState): EmptyNavigationState {
             return EmptyNavigationState(
@@ -143,6 +147,7 @@ data class EmptyNavigationState private constructor(override val originalUrl: St
     override val canGoBack: Boolean = false
     override val canGoForward: Boolean = false
     override val hasNavigationHistory: Boolean = false
+    override val progress: Int? = null
 }
 
 private val WebBackForwardList.originalUrl: String?

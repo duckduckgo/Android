@@ -21,14 +21,16 @@ package com.duckduckgo.app.tabs.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -59,14 +61,24 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
+    private val repoDeletableTabs = Channel<List<TabEntity>>()
+
+    @ExperimentalCoroutinesApi
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
         runBlocking {
+            whenever(mockTabRepository.flowDeletableTabs)
+                .thenReturn(repoDeletableTabs.consumeAsFlow())
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
             testee.command.observeForever(mockCommandObserver)
         }
+    }
+
+    @After
+    fun after() {
+        repoDeletableTabs.close()
     }
 
     @Test
@@ -93,11 +105,51 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenClearCompleteThenMessageDisplayedAndSwitcherClosed() {
-        testee.onClearComplete()
-        verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
-        assertEquals(Command.DisplayMessage(R.string.fireDataCleared), commandCaptor.allValues[0])
-        assertEquals(Command.Close, commandCaptor.allValues[1])
+    fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runBlocking {
+        val entity = TabEntity("abc", "", "", position = 0)
+        testee.onMarkTabAsDeletable(entity)
+
+        verify(mockTabRepository).markDeletable(entity)
     }
 
+    @Test
+    fun whenUndoDeletableTabThenUndoDeletable() = runBlocking {
+        val entity = TabEntity("abc", "", "", position = 0)
+        testee.undoDeletableTab(entity)
+
+        verify(mockTabRepository).undoDeletable(entity)
+    }
+
+    @Test
+    fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runBlocking {
+        testee.purgeDeletableTabs()
+
+        verify(mockTabRepository).purgeDeletableTabs()
+    }
+
+    @Test
+    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runBlocking {
+        val tab = TabEntity("ID", position = 0)
+
+        val expectedTabs = listOf(listOf(), listOf(tab))
+        var index = 0
+        testee.deletableTabs.observeForever {
+            assertEquals(expectedTabs[index++], it)
+        }
+
+        repoDeletableTabs.send(listOf())
+        repoDeletableTabs.send(listOf(tab))
+    }
+
+    @Test
+    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runBlocking {
+        val tab = TabEntity("ID", position = 0)
+
+        testee.deletableTabs.observeForever {
+            assertEquals(listOf(tab), it)
+        }
+
+        repoDeletableTabs.send(listOf(tab))
+        repoDeletableTabs.send(listOf(tab))
+    }
 }

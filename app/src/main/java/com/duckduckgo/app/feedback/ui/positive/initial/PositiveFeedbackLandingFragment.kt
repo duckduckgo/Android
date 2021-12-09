@@ -16,25 +16,23 @@
 
 package com.duckduckgo.app.feedback.ui.positive.initial
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentFeedbackPositiveLandingBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import kotlinx.android.synthetic.main.content_feedback_positive_landing.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
-
-class PositiveFeedbackLandingFragment : FeedbackFragment() {
+class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedback_positive_landing) {
 
     interface PositiveFeedbackLandingListener {
         fun userSelectedToRateApp()
         fun userSelectedToGiveFeedback()
         fun userGavePositiveFeedbackNoDetails()
     }
+
+    private val binding: ContentFeedbackPositiveLandingBinding by viewBinding()
 
     private val viewModel by bindViewModel<PositiveFeedbackLandingViewModel>()
 
@@ -44,31 +42,30 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.content_feedback_positive_landing, container, false)
-    }
-
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                Command.LaunchPlayStore -> {
-                    launchPlayStore()
-                    listener?.userSelectedToRateApp()
-                }
-                Command.Exit -> {
-                    listener?.userGavePositiveFeedbackNoDetails()
-                }
-                Command.LaunchShareFeedbackPage -> {
-                    listener?.userSelectedToGiveFeedback()
+        viewModel.command.observe(
+            this,
+            Observer { command ->
+                when (command) {
+                    Command.LaunchPlayStore -> {
+                        launchPlayStore()
+                        listener?.userSelectedToRateApp()
+                    }
+                    Command.Exit -> {
+                        listener?.userGavePositiveFeedbackNoDetails()
+                    }
+                    Command.LaunchShareFeedbackPage -> {
+                        listener?.userSelectedToGiveFeedback()
+                    }
                 }
             }
-        })
+        )
     }
 
     override fun configureListeners() {
-        rateAppButton.setOnClickListener { viewModel.userSelectedToRateApp() }
-        shareFeedbackButton.setOnClickListener { viewModel.userSelectedToProvideFeedbackDetails() }
-        cancelButton.setOnClickListener { viewModel.userFinishedGivingPositiveFeedback() }
+        binding.rateAppButton.setOnClickListener { viewModel.userSelectedToRateApp() }
+        binding.shareFeedbackButton.setOnClickListener { viewModel.userSelectedToProvideFeedbackDetails() }
+        binding.cancelButton.setOnClickListener { viewModel.userFinishedGivingPositiveFeedback() }
     }
 
     private fun launchPlayStore() {

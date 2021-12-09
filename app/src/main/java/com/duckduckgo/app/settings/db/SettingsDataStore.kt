@@ -20,20 +20,28 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
-import javax.inject.Inject
+import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 
 interface SettingsDataStore {
 
     var lastExecutedJobId: String?
-    var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
+    var selectedFireAnimation: FireAnimation
+    val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
+    var appLoginDetection: Boolean
+    var appLocationPermission: Boolean
+    var appLocationPermissionDeniedForever: Boolean
+    var globalPrivacyControlEnabled: Boolean
+    var appLinksEnabled: Boolean
+    var showAppLinksPrompt: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -49,11 +57,14 @@ interface SettingsDataStore {
     var appNotificationsEnabled: Boolean
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
+    fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 }
 
-class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
+class SettingsSharedPreferences constructor(private val context: Context, private val variantManager: VariantManager) : SettingsDataStore {
+
+    private val fireAnimationMapper = FireAnimationPrefsMapper()
 
     override var lastExecutedJobId: String?
         get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
@@ -64,13 +75,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             }
         }
 
-    override var theme: DuckDuckGoTheme?
-        get() {
-            val themeName = preferences.getString(KEY_THEME, null) ?: return null
-            return DuckDuckGoTheme.valueOf(themeName)
-        }
-        set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
-
     override var hideTips: Boolean
         get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
         set(enabled) = preferences.edit { putBoolean(KEY_HIDE_TIPS, enabled) }
@@ -79,12 +83,35 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
+    override var appLoginDetection: Boolean
+        get() = if (variantManager.isFireproofExperimentEnabled()) {
+            preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, false)
+        } else {
+            preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
+        }
+        set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
+
+    override var appLocationPermission: Boolean
+        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, enabled) }
+
+    override var appLocationPermissionDeniedForever: Boolean
+        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, enabled) }
+
     override var appIcon: AppIcon
         get() {
             val componentName = preferences.getString(KEY_APP_ICON, DEFAULT_ICON.componentName) ?: return DEFAULT_ICON
             return AppIcon.from(componentName)
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
+
+    override var selectedFireAnimation: FireAnimation
+        get() = selectedFireAnimationSavedValue()
+        set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, fireAnimationMapper.prefValue(value)) }
+
+    override val fireAnimationEnabled: Boolean
+        get() = selectedFireAnimation.resId != -1
 
     // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
     // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon
@@ -113,6 +140,18 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
 
+    override var globalPrivacyControlEnabled: Boolean
+        get() = preferences.getBoolean(KEY_DO_NOT_SELL_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_DO_NOT_SELL_ENABLED, enabled) }
+
+    override var appLinksEnabled: Boolean
+        get() = preferences.getBoolean(APP_LINKS_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(APP_LINKS_ENABLED, enabled) }
+
+    override var showAppLinksPrompt: Boolean
+        get() = preferences.getBoolean(SHOW_APP_LINKS_PROMPT, true)
+        set(enabled) = preferences.edit { putBoolean(SHOW_APP_LINKS_PROMPT, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -126,6 +165,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         return currentlySelected == clearWhenOption
     }
 
+    override fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean {
+        return selectedFireAnimationSavedValue() == fireAnimation
+    }
+
     private fun automaticallyClearWhatSavedValue(): ClearWhatOption? {
         val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: return null
         return ClearWhatOption.valueOf(savedValue)
@@ -136,6 +179,11 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         return ClearWhenOption.valueOf(savedValue)
     }
 
+    private fun selectedFireAnimationSavedValue(): FireAnimation {
+        val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
+    }
+
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
@@ -144,6 +192,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
+        const val KEY_LOGIN_DETECTION_ENABLED = "KEY_LOGIN_DETECTION_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
@@ -151,7 +200,13 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
+        const val KEY_SELECTED_FIRE_ANIMATION = "SELECTED_FIRE_ANIMATION"
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
+        const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
+        const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
+        const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
+        const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
+        const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
 
         private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
             AppIcon.BLUE
@@ -159,5 +214,29 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             AppIcon.DEFAULT
         }
         const val KEY_SEARCH_NOTIFICATION = "SEARCH_NOTIFICATION"
+    }
+
+    private class FireAnimationPrefsMapper {
+        companion object {
+            private const val HERO_FIRE_PREFS_VALUE = "HERO_FIRE"
+            private const val HERO_WATER_PREFS_VALUE = "HERO_WATER"
+            private const val HERO_ABSTRACT_PREFS_VALUE = "HERO_ABSTRACT"
+            private const val NONE_PREFS_VALUE = "NONE"
+        }
+
+        fun prefValue(fireAnimation: FireAnimation) = when (fireAnimation) {
+            FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
+            FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
+            FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
+            FireAnimation.None -> NONE_PREFS_VALUE
+        }
+
+        fun fireAnimationFrom(value: String?, defValue: FireAnimation) = when (value) {
+            HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
+            HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
+            HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract
+            NONE_PREFS_VALUE -> FireAnimation.None
+            else -> defValue
+        }
     }
 }

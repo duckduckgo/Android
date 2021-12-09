@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.di
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
@@ -30,10 +31,11 @@ class OnboardingModule {
 
     @Provides
     fun onboardingPageManger(
+        defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector)
+        return OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, defaultBrowserDetector)
     }
 
     @Provides

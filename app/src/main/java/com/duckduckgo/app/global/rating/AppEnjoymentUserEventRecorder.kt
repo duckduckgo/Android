@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.rating
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import timber.log.Timber
 
-
 interface AppEnjoymentUserEventRecorder {
 
     fun onUserEnjoyingApp(promptCount: PromptCount)

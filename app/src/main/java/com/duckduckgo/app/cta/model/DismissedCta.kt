@@ -24,11 +24,17 @@ enum class CtaId {
     SURVEY,
     ADD_WIDGET,
     DAX_INTRO,
+    DAX_FIRE_BUTTON,
     DAX_DIALOG_SERP,
     DAX_DIALOG_TRACKERS_FOUND,
     DAX_DIALOG_NETWORK,
     DAX_DIALOG_OTHER,
-    DAX_END
+    DAX_END,
+    DAX_FAVORITES_ONBOARDING,
+    DAX_FIREPROOF,
+    DAX_FIRE_BUTTON_PULSE,
+    DEVICE_SHIELD_CTA,
+    UNKNOWN
 }
 
 @Entity(
@@ -43,7 +49,11 @@ data class DismissedCta(
 
         @TypeConverter
         fun toId(value: String): CtaId {
-            return CtaId.valueOf(value)
+            return try {
+                CtaId.valueOf(value)
+            } catch (ex: IllegalArgumentException) {
+                CtaId.UNKNOWN
+            }
         }
 
         @TypeConverter
@@ -52,4 +62,3 @@ data class DismissedCta(
         }
     }
 }
-

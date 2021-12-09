@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import timber.log.Timber
 
-
 interface ShowPromptDecider {
     suspend fun shouldShowPrompt(): Boolean
 }

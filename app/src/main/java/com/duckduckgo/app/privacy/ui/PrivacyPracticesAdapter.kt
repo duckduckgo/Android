@@ -17,13 +17,10 @@
 package com.duckduckgo.app.privacy.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import kotlinx.android.synthetic.main.item_privacy_practice.view.*
+import com.duckduckgo.app.browser.databinding.ItemPrivacyPracticeBinding
 
 class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.PracticeViewHolder>() {
 
@@ -35,16 +32,16 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     private var terms: List<Pair<Int, String>> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PracticeViewHolder {
-        val root = LayoutInflater.from(parent.context).inflate(R.layout.item_privacy_practice, parent, false)
-        return PracticeViewHolder(root, root.icon, root.description)
+        val binding = ItemPrivacyPracticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PracticeViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PracticeViewHolder, position: Int) {
         val term = terms[position]
         val descriptionResource = if (term.first == GOOD) R.string.practicesIconContentGood else R.string.practicesIconContentBad
-        holder.icon.contentDescription = holder.icon.context.getText(descriptionResource)
-        holder.icon.setImageResource(if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
-        holder.description.text = term.second.capitalize()
+        holder.binding.icon.contentDescription = holder.binding.icon.context.getText(descriptionResource)
+        holder.binding.icon.setImageResource(if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
+        holder.binding.description.text = term.second.capitalize()
     }
 
     override fun getItemCount(): Int {
@@ -57,10 +54,7 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     }
 
     class PracticeViewHolder(
-        val root: View,
-        val icon: ImageView,
-        val description: TextView
-    ) : RecyclerView.ViewHolder(root)
+        val binding: ItemPrivacyPracticeBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 
 }
-

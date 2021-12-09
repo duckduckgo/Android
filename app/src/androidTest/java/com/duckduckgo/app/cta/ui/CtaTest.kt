@@ -100,7 +100,6 @@ class CtaTest {
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
-
     @Test
     fun whenCtaIsAddWidgetInstructionsReturnEmptyOkParameters() {
         val testee = HomePanelCta.AddWidgetInstructions
@@ -298,8 +297,8 @@ class CtaTest {
     @Test
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
 
@@ -308,6 +307,21 @@ class CtaTest {
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Other, Facebook</b>withZero", value)
+    }
+
+    @Test
+    fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
+        val trackers = listOf(
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null, surrogateId = null)
+        )
+        val site = site(events = trackers)
+
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+        val value = testee.getDaxText(mockActivity)
+
+        assertEquals("<b>Facebook</b>withZero", value)
     }
 
     @Test
@@ -322,6 +336,19 @@ class CtaTest {
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook</b>withZero", value)
+    }
+
+    @Test
+    fun whenTryClearDataCtaShownThenConcatenateJourneyStoredValueInPixel() {
+        val existingJourney = "s:0-t:1"
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        val testee = DaxFireDialogCta.TryClearDataCta(mockOnboardingStore, mockAppInstallStore)
+        val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
+
+        val value = testee.pixelShownParameters()
+
+        assertEquals(expectedValue, value[CTA_SHOWN])
     }
 
     private fun site(

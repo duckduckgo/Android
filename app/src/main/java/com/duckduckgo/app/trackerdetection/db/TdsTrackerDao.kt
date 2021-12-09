@@ -37,7 +37,6 @@ abstract class TdsTrackerDao {
     @Query("select * from tds_tracker where domain = :domain")
     abstract fun get(domain: String): TdsTracker?
 
-
     @Query("select count(*) from tds_tracker")
     abstract fun count(): Int
 

@@ -23,10 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemTabBinding
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
@@ -34,46 +37,45 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
-import com.google.android.material.card.MaterialCardView
-import kotlinx.android.synthetic.main.item_tab.view.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
-class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, private val webViewPreviewPersister: WebViewPreviewPersister) :
+class TabSwitcherAdapter(
+    private val itemClickListener: TabSwitcherListener,
+    private val webViewPreviewPersister: WebViewPreviewPersister,
+    private val lifecycleOwner: LifecycleOwner,
+    private val faviconManager: FaviconManager
+) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val root = inflater.inflate(R.layout.item_tab, parent, false) as MaterialCardView
+        val binding = ItemTabBinding.inflate(inflater, parent, false)
 
         return TabViewHolder(
-            root = root,
-            favicon = root.favicon,
-            tabPreview = root.tabPreview,
-            title = root.title,
-            close = root.close,
-            cardContentsContainer = root.cardContentsContainer,
-            tabUnread = root.tabUnread
+            binding = binding,
+            favicon = binding.favicon,
+            tabPreview = binding.tabPreview,
+            title = binding.title,
+            close = binding.close,
+            cardContentsContainer = binding.cardContentsContainer,
+            tabUnread = binding.tabUnread
         )
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
-        val context = holder.root.context
+        val context = holder.binding.root.context
         val tab = getItem(position)
         val glide = GlideApp.with(context)
 
         holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
 
-        glide.load(tab.favicon())
-            .placeholder(R.drawable.ic_globe_gray_16dp)
-            .error(R.drawable.ic_globe_gray_16dp)
-            .into(holder.favicon)
-
-
+        loadFavicon(tab, holder.favicon)
         loadTabPreviewImage(tab, glide, holder)
 
         attachClickListeners(holder, tab)
@@ -105,7 +107,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             }
 
             bundle[DIFF_KEY_PREVIEW]?.let {
-                loadTabPreviewImage(tab, GlideApp.with(holder.root), holder)
+                loadTabPreviewImage(tab, GlideApp.with(holder.binding.root), holder)
             }
 
             bundle[DIFF_KEY_TITLE]?.let {
@@ -115,6 +117,13 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             bundle[DIFF_KEY_VIEWED]?.let {
                 updateUnreadIndicator(holder, tab)
             }
+        }
+    }
+
+    private fun loadFavicon(tab: TabEntity, view: ImageView) {
+        val url = tab.url ?: return
+        lifecycleOwner.lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalOrFallback(tab.tabId, url, view)
         }
     }
 
@@ -138,7 +147,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
-        holder.root.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             itemClickListener.onTabSelected(tab)
         }
         holder.close.setOnClickListener {
@@ -163,13 +172,12 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
     }
 
     data class TabViewHolder(
-        val root: MaterialCardView,
+        val binding: ItemTabBinding,
         val favicon: ImageView,
         val tabPreview: ImageView,
         val title: TextView,
         val close: ImageView,
         val tabUnread: ImageView,
         val cardContentsContainer: ViewGroup
-    ) : ViewHolder(root)
-
+    ) : ViewHolder(binding.root)
 }

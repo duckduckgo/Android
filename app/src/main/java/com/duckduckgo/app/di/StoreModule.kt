@@ -16,20 +16,33 @@
 
 package com.duckduckgo.app.di
 
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
+import com.duckduckgo.app.global.events.db.*
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.privacy.store.*
+import com.duckduckgo.app.onboarding.store.AppUserStageStore
+import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.privacy.store.TermsOfServiceRawStore
+import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.OfflinePixelCountSharedPreferences
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
+import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
+import com.duckduckgo.app.widget.FavoritesObserver
+import com.duckduckgo.widget.AppWidgetThemePreferences
+import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds
 import dagger.Module
+import dagger.multibindings.IntoSet
 
 @Module
 abstract class StoreModule {
@@ -38,10 +51,10 @@ abstract class StoreModule {
     abstract fun bindStatisticsStore(statisticsStore: StatisticsSharedPreferences): StatisticsDataStore
 
     @Binds
-    abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
+    abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
 
     @Binds
-    abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore
+    abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
 
     @Binds
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
@@ -53,11 +66,33 @@ abstract class StoreModule {
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
 
     @Binds
+    @IntoSet
+    abstract fun bindAppInstallStoreObserver(appInstallStore: AppInstallStore): LifecycleObserver
+
+    @Binds
     abstract fun bindDataClearingStore(store: UnsentForgetAllPixelStoreSharedPreferences): UnsentForgetAllPixelStore
 
     @Binds
     abstract fun bindOfflinePixelDataStore(store: OfflinePixelCountSharedPreferences): OfflinePixelCountDataStore
 
     @Binds
-    abstract fun bindUserStageStore(userStageDao: AppUserStageStore): UserStageStore
+    abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
+
+    @Binds
+    @IntoSet
+    abstract fun bindUserStageStoreObserver(userStageStore: UserStageStore): LifecycleObserver
+
+    @Binds
+    abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
+
+    @Binds
+    @IntoSet
+    abstract fun bindTabsDbSanitizerObserver(tabsDbSanitizer: TabsDbSanitizer): LifecycleObserver
+
+    @Binds
+    @IntoSet
+    abstract fun bindFavoritesObserver(favoritesObserver: FavoritesObserver): LifecycleObserver
+
+    @Binds
+    abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
 }

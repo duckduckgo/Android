@@ -19,20 +19,20 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 interface ClearDataAction {
 
@@ -42,22 +42,24 @@ interface ClearDataAction {
     suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess()
+    fun killAndRestartProcess(notifyDataCleared: Boolean)
 }
 
-class ClearPersonalDataAction @Inject constructor(
+class ClearPersonalDataAction(
     private val context: Context,
     private val dataManager: WebDataManager,
     private val clearingStore: UnsentForgetAllPixelStore,
     private val tabRepository: TabRepository,
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
-    private val appCacheClearer: AppCacheClearer
+    private val appCacheClearer: AppCacheClearer,
+    private val geoLocationPermissions: GeoLocationPermissions,
+    private val thirdPartyCookieManager: ThirdPartyCookieManager
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess() {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context)
+        FireActivity.triggerRestart(context, notifyDataCleared)
     }
 
     override fun killProcess() {
@@ -68,12 +70,15 @@ class ClearPersonalDataAction @Inject constructor(
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
         withContext(Dispatchers.IO) {
             cookieManager.flush()
+            geoLocationPermissions.clearAllButFireproofed()
+            thirdPartyCookieManager.clearAllData()
             clearTabsAsync(appInForeground)
         }
 
         withContext(Dispatchers.Main) {
             clearDataAsync(shouldFireDataClearPixel)
         }
+
         Timber.i("Finished clearing everything")
     }
 
@@ -94,7 +99,7 @@ class ClearPersonalDataAction @Inject constructor(
             clearingStore.incrementCount()
         }
 
-        dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
+        dataManager.clearData(createWebView(), createWebStorage())
         appCacheClearer.clearCache()
 
         Timber.i("Finished clearing data")

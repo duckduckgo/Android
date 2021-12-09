@@ -16,25 +16,43 @@
 
 package com.duckduckgo.app.surrogates
 
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @WorkerThread
+@ContributesMultibinding(AppObjectGraph::class)
 class ResourceSurrogateLoader @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,
     private val surrogatesDataStore: ResourceSurrogateDataStore
-) {
+) : LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun onApplicationCreated() {
+        appCoroutineScope.launch { loadData() }
+    }
 
     fun loadData() {
+        Timber.v("Loading surrogate data")
         if (surrogatesDataStore.hasData()) {
             val bytes = surrogatesDataStore.loadData()
             resourceSurrogates.loadSurrogates(convertBytes(bytes))
         }
     }
 
+    @VisibleForTesting
     fun convertBytes(bytes: ByteArray): List<SurrogateResponse> {
         return try {
             parse(bytes)
@@ -50,6 +68,7 @@ class ResourceSurrogateLoader @Inject constructor(
 
         var nextLineIsNewRule = true
 
+        var scriptId = ""
         var ruleName = ""
         var mimeType = ""
         val functionBuilder = StringBuilder()
@@ -66,7 +85,10 @@ class ResourceSurrogateLoader @Inject constructor(
                     ruleName = this[0]
                     mimeType = this[1]
                 }
-                Timber.d("Found new surrogate rule: $ruleName - $mimeType")
+                with(ruleName.split("/")) {
+                    scriptId = this.last()
+                }
+                Timber.d("Found new surrogate rule: $scriptId - $ruleName - $mimeType")
                 nextLineIsNewRule = false
                 return@forEach
             }
@@ -74,6 +96,7 @@ class ResourceSurrogateLoader @Inject constructor(
             if (it.isBlank()) {
                 surrogates.add(
                     SurrogateResponse(
+                        scriptId = scriptId,
                         name = ruleName,
                         mimeType = mimeType,
                         jsFunction = functionBuilder.toString()

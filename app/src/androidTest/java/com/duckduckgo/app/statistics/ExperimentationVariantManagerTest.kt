@@ -18,7 +18,6 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.statistics.VariantManager.Companion.RESERVED_EU_AUCTION_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*

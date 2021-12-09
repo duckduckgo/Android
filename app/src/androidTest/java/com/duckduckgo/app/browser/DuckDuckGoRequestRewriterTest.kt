@@ -35,6 +35,7 @@ class DuckDuckGoRequestRewriterTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private lateinit var builder: Uri.Builder
+    private val currentUrl = "http://www.duckduckgo.com"
 
     @Before
     fun before() {
@@ -77,6 +78,14 @@ class DuckDuckGoRequestRewriterTest {
         testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
+    }
+
+    @Test
+    fun whenSerpRemovalFeatureIsActiveThenHideParamIsAddedToSerpUrl() {
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
 
 }

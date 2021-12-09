@@ -23,18 +23,52 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Module
+@ContributesTo(AppObjectGraph::class)
+class AppShortcutCreatorModule {
+    @Provides
+    @IntoSet
+    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator): LifecycleObserver {
+        return AppShortcutCreatorLifecycleObserver(appShortcutCreator)
+    }
+}
 
-class AppShortcutCreator @Inject constructor() {
+class AppShortcutCreatorLifecycleObserver(
+    private val appShortcutCreator: AppShortcutCreator
+) : LifecycleObserver {
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun configureAppShortcuts() {
+        Timber.i("Configure app shortcuts")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            appShortcutCreator.configureAppShortcuts()
+        }
+    }
+}
+
+@Singleton
+class AppShortcutCreator @Inject constructor(private val context: Context) {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
-    fun configureAppShortcuts(context: Context) {
+    fun configureAppShortcuts() {
         val shortcutList = mutableListOf<ShortcutInfo>()
 
         shortcutList.add(buildNewTabShortcut(context))
@@ -50,10 +84,12 @@ class AppShortcutCreator @Inject constructor() {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_NEW_TAB)
             .setShortLabel(context.getString(R.string.newTabMenuItem))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab))
-            .setIntent(Intent(context, BrowserActivity::class.java).also {
-                it.action = Intent.ACTION_VIEW
-                it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-            })
+            .setIntent(
+                Intent(context, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
+                }
+            )
             .build().toShortcutInfo()
     }
 
@@ -62,10 +98,12 @@ class AppShortcutCreator @Inject constructor() {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire))
-            .setIntent(Intent(context, BrowserActivity::class.java).also {
-                it.action = Intent.ACTION_VIEW
-                it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-            })
+            .setIntent(
+                Intent(context, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+                }
+            )
             .build().toShortcutInfo()
     }
 

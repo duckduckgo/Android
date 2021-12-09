@@ -19,11 +19,13 @@
 package com.duckduckgo.app.fire
 
 import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -39,12 +41,14 @@ class AutomaticDataClearerTest {
     private val mockClearAction: ClearDataAction = mock()
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
+    private val pixel: Pixel = mock()
+    private val dataClearerForegroundAppRestartPixel = DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
 
     @UiThreadTest
     @Before
     fun setup() {
         whenever(mockSettingsDataStore.hasBackgroundTimestampRecorded()).thenReturn(true)
-        testee = AutomaticDataClearer(mockWorkManager, mockSettingsDataStore, mockClearAction, mockTimeKeeper)
+        testee = AutomaticDataClearer(mockWorkManager, mockSettingsDataStore, mockClearAction, mockTimeKeeper, dataClearerForegroundAppRestartPixel)
     }
 
     private suspend fun simulateLifecycle(isFreshAppLaunch: Boolean) {
@@ -517,11 +521,10 @@ class AutomaticDataClearerTest {
         }
     }
 
-
     @Test
     fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
         val isFreshAppLaunch = false
-        
+
         configureAppIconNotChanged()
         configureAppNotUsedSinceLastClear()
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)

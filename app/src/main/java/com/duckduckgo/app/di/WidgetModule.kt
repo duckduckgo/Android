@@ -19,10 +19,10 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.widget.SearchAndFavoritesGridCalculator
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
-
 
 @Module
 class WidgetModule {
@@ -30,4 +30,7 @@ class WidgetModule {
     @Provides
     @Singleton
     fun widgetCapabilities(context: Context): WidgetCapabilities = AppWidgetCapabilities(context)
+
+    @Provides
+    fun gridCalculator(): SearchAndFavoritesGridCalculator = SearchAndFavoritesGridCalculator()
 }

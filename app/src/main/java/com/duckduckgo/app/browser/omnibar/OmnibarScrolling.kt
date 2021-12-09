@@ -21,7 +21,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import javax.inject.Inject
 
-
 class OmnibarScrolling @Inject constructor() {
 
     fun enableOmnibarScrolling(toolbarContainer: View) {
