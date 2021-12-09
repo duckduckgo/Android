@@ -24,6 +24,8 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
@@ -40,6 +42,7 @@ class EmailProtectionSignInViewModel(
     private val emailService: EmailService,
     private val workManager: WorkManager,
     private val emailWaitlistWorkRequestBuilder: EmailWaitlistWorkRequestBuilder,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> = MutableStateFlow(ViewState(waitlistState = emailManager.waitlistState()))
@@ -105,9 +108,14 @@ class EmailProtectionSignInViewModel(
     }
 
     fun onNotifyMeClicked() {
+        pixel.fire(AppPixelName.EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
         viewModelScope.launch {
             emailManager.notifyOnJoinedWaitlist()
         }
+    }
+
+    fun onNoThanksClicked() {
+        pixel.fire(AppPixelName.EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS)
     }
 
     fun onDialogDismissed() {
@@ -117,6 +125,7 @@ class EmailProtectionSignInViewModel(
     }
 
     private fun joinedWaitlist(timestamp: Int, token: String) {
+        pixel.fire(AppPixelName.EMAIL_DID_SHOW_WAITLIST_DIALOG)
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
             commandChannel.send(Command.ShowNotificationDialog)
@@ -140,11 +149,20 @@ class EmailProtectionSignViewModelFactory @Inject constructor(
     private val emailService: Provider<EmailService>,
     private val workManager: Provider<WorkManager>,
     private val emailWaitlistWorkRequestBuilder: Provider<EmailWaitlistWorkRequestBuilder>,
+    private val pixel: Provider<Pixel>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(EmailProtectionSignInViewModel::class.java) -> (EmailProtectionSignInViewModel(emailManager.get(), emailService.get(), workManager.get(), emailWaitlistWorkRequestBuilder.get()) as T)
+                isAssignableFrom(EmailProtectionSignInViewModel::class.java) -> {
+                    EmailProtectionSignInViewModel(
+                        emailManager.get(),
+                        emailService.get(),
+                        workManager.get(),
+                        emailWaitlistWorkRequestBuilder.get(),
+                        pixel.get()
+                    ) as T
+                }
                 else -> null
             }
         }
