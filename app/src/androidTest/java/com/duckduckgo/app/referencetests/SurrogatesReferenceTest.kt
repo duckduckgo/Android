@@ -87,7 +87,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider("", mock())
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ "" }, mock())
     private val mockGpc: Gpc = mock()
 
     companion object {
