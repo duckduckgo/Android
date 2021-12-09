@@ -57,7 +57,7 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ DEFAULT }, mock())
 
     private var webView: WebView = mock()
 
