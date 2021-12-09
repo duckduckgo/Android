@@ -75,9 +75,6 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
         binding.ctaNextFormSubmit.setOnClickListener {
             viewModel.onSubmitChoices()
         }
-        binding.appBreakageFormConfirmationCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onCheckboxChange(isChecked)
-        }
     }
 
     private fun observeViewModel() {

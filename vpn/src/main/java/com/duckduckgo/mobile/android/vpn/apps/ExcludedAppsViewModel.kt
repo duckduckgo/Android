@@ -84,6 +84,7 @@ class ExcludedAppsViewModel(
     fun onLeavingScreen() {
         viewModelScope.launch {
             if (userMadeChanges()) {
+                manualChanges.clear()
                 command.send(Command.RestartVpn)
             }
         }
