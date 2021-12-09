@@ -1,0 +1,9 @@
+# This file contains "surrogates". Surrogates are small scripts that our apps and extensions serve in place of trackers that cause site breakage when blocked.
+# Learn more: https://github.com/duckduckgo/tracker-surrogates
+surrogates.test/tracker application/javascript
+(function() {var tracker=true})();
+
+something.else.com/script.js application/javascript
+(() => {
+    'use strict';
+})();

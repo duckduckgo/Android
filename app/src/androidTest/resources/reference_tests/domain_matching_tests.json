@@ -1,0 +1,246 @@
+{
+  "domainTests": {
+    "name": "URL-matching",
+    "desc": "interactions between root domain and resource URLs from tracker lists",
+    "tests": [
+      {
+        "name": "same party tracker",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "script",
+        "expectAction": "ignore",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "bad loads same root domain resources",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://third-party.site/",
+        "requestType": "script",
+        "expectAction": null,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "root domain matches itself, not a subdomain",
+        "siteURL": "https://third-party.site/",
+        "requestURL": "https://third-party.site/stuff",
+        "requestType": "script",
+        "expectAction": null,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "same party ignore",
+        "siteURL": "https://ignore.test/",
+        "requestURL": "https://ignore.test/",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "tracker loads ignore",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://ignore.test/",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "ignore image exception loads tracker image",
+        "siteURL": "https://ignore.test/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "image",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "ignore image exception doesn't load tracker script",
+        "siteURL": "https://ignore.test/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "notignore doesn't load tracker",
+        "siteURL": "https://notignore.test/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "random blocks tracker",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "random blocks cname tracker",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://bad.cnames.test/something",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "uncloacked tracker should contain original path and be checked against the ignore rules",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://bad.cnames.test/breakage",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "random allows sub.cname tracker",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://also.bad.cnames.test/something",
+        "requestType": "script",
+        "expectAction": null,
+        "exceptPlatforms": [
+          "ios-browser"
+        ]
+      },
+      {
+        "name": "random allows notbad cname tracker",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://notbad.cnames.test/something",
+        "requestType": "script",
+        "expectAction": null
+      },
+      {
+        "name": "tracker.test CNAME'd to ignore.test should still be blocked",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://fake-ignore.tracker.test/spy/script.js",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "no blocklist entry for an uncloacked domain - request should not be blocked",
+        "siteURL": "https://randomsite123.com/",
+        "requestURL": "https://domain.cloaked.test/some/script.js",
+        "requestType": "script",
+        "expectAction": null
+      },
+      {
+        "name": "sub.ignore loads tracker",
+        "siteURL": "https://sub.ignore.test/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "image",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "tracker loads ignore resource type",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://ignore.test/",
+        "requestType": "image",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "tracker blocks non-ignore resource type",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://ignore.test/",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "tracker loads random",
+        "siteURL": "https://bad.third-party.site/",
+        "requestURL": "https://random.test/",
+        "requestType": "script",
+        "expectAction": null
+      },
+      {
+        "name": "random does not load tracker",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://bad.third-party.site/",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "random loads itself",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://random.test/",
+        "requestType": "script",
+        "expectAction": null
+      },
+      {
+        "name": "random loads ignore path on tracker",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://bad.third-party.site/ignore",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "random loads broken.site",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://broken.third-party.site/",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "random loads randomsub.third-party.site",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://randomsub.third-party.site/",
+        "requestType": "script",
+        "expectAction": null
+      },
+      {
+        "name": "random doesn't load randomsub.tracker",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://randomsub.tracker.test/",
+        "requestType": "script",
+        "expectAction": "block"
+      },
+      {
+        "name": "tracker loads permitted for same entity",
+        "siteURL": "https://third-party.site/",
+        "requestURL": "https://tracker.test/",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "block tracker path in ignore domain",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://ignore.test/tracker?abc=2",
+        "requestType": "script",
+        "expectAction": "block"
+      }
+    ]
+  },
+  "surrogateTests": {
+    "name": "surrogate-tests",
+    "desc": "interactions between root domain and resource URLs for surrogates",
+    "tests": [
+      {
+        "name": "handle surrogates",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://surrogates.test/tracker?abc=2",
+        "requestType": "script",
+        "expectAction": "redirect",
+        "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3ZhciB0cmFja2VyPXRydWV9KSgpOw=="
+      },
+      {
+        "name": "skip surrogates for same entity",
+        "siteURL": "https://tracker.test/",
+        "requestURL": "https://surrogates.test/tracker?abc=2",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "surrogates match on substrings",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://surrogates.test/trackerNOT?abc=2",
+        "requestType": "script",
+        "expectAction": "redirect",
+        "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3ZhciB0cmFja2VyPXRydWV9KSgpOw=="
+      },
+      {
+        "name": "require exact match for surrogates",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://surrogates.test/NOTtracker?abc=2",
+        "requestType": "script",
+        "expectAction": "ignore"
+      },
+      {
+        "name": "block on undefined surrogates",
+        "siteURL": "https://random.test/",
+        "requestURL": "https://surrogates.test/anothertracker?abc=2",
+        "requestType": "script",
+        "expectAction": "block"
+      }
+    ]
+  }
+}

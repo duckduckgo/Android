@@ -1,0 +1,221 @@
+/*
+ * Copyright (c) 2021 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@file:Suppress("RemoveExplicitTypeArguments")
+
+package com.duckduckgo.app.referencetests
+
+import android.util.Base64
+import android.webkit.*
+import androidx.core.net.toUri
+import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.browser.WebViewRequestInterceptor
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
+import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
+import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import com.duckduckgo.app.trackerdetection.Client
+import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.TdsClient
+import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
+import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
+import com.duckduckgo.app.trackerdetection.api.TdsJson
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.nhaarman.mockitokotlin2.*
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
+import org.json.JSONObject
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.mockito.MockitoAnnotations
+
+@RunWith(Parameterized::class)
+class SurrogatesReferenceTest(private val testCase: TestCase) {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
+    private lateinit var testee: WebViewRequestInterceptor
+
+    private var mockTrackerDetector: TrackerDetector = mock()
+    private var mockHttpsUpgrader: HttpsUpgrader = mock()
+    private var mockRequest: WebResourceRequest = mock()
+    private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
+    private val mockGpc: Gpc = mock()
+    private val mockWebBackForwardList: WebBackForwardList = mock()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
+
+    private val resourceSurrogates = ResourceSurrogatesImpl()
+    private var webView: WebView = mock()
+
+    private val actionConverter = ActionJsonAdapter()
+    private val moshi = Moshi.Builder().add(actionConverter).build()
+    private val jsonAdapter: JsonAdapter<TdsJson> = moshi.adapter(TdsJson::class.java)
+
+    private val mockEntityLookup: EntityLookup = mock()
+    private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockContentBlocking: ContentBlocking = mock()
+    private val mockTrackerAllowlist: TrackerAllowlist = mock()
+    private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
+    private val trackerDetector = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+
+    companion object {
+        const val DEFAULT =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+        private val moshi = Moshi.Builder().build()
+        val adapter: JsonAdapter<SurrogateTest> = moshi.adapter(SurrogateTest::class.java)
+
+        @JvmStatic
+        @Parameterized.Parameters(name = "Test case: {index} - {0}")
+        fun testData(): List<TestCase> {
+            var surrogateTests: SurrogateTest? = null
+            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("reference_tests/domain_matching_tests.json")
+
+            jsonObject.keys().forEach {
+                if (it == "surrogateTests") {
+                    surrogateTests = adapter.fromJson(jsonObject.get(it).toString())
+                }
+            }
+            return surrogateTests?.tests ?: emptyList()
+        }
+    }
+
+    data class SurrogateTest(
+        val name: String,
+        val desc: String,
+        val tests: List<TestCase>
+    )
+
+    data class TestCase(
+        val name: String,
+        val siteURL: String,
+        val requestURL: String,
+        val requestType: String,
+        val expectAction: String,
+        val expectRedirect: String
+    )
+
+    @UiThreadTest
+    @Before
+    fun setup() {
+        MockitoAnnotations.openMocks(this)
+        initialiseResourceSurrogates()
+        initialiseTds()
+        configureUserAgent()
+        whenever(mockRequest.isForMainFrame).thenReturn(false)
+
+        testee = WebViewRequestInterceptor(
+            trackerDetector = trackerDetector,
+            httpsUpgrader = mockHttpsUpgrader,
+            resourceSurrogates = resourceSurrogates,
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
+            gpc = mockGpc,
+            userAgentProvider = userAgentProvider
+        )
+    }
+
+    @Test
+    fun test() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
+
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = testCase.siteURL,
+            webView = webView,
+            webViewClientListener = null
+        )
+
+        when (testCase.expectAction) {
+            "redirect" -> {
+                assertRedirectCorrectlyDone(response, testCase.expectRedirect)
+            }
+            "ignore" -> {
+                assertRequestCanContinueToLoad(response)
+            }
+            "block" -> {
+                assertCancelledResponse(response)
+            }
+        }
+    }
+
+    private fun initialiseTds() {
+        val json = FileUtilities.loadText("reference_tests/tracker_radar_reference.json")
+        val adapter = moshi.adapter(TdsJson::class.java)
+        val tdsJson = adapter.fromJson(json)!!
+        val trackers = tdsJson.jsonToTrackers().values.toList()
+        val client = TdsClient(Client.ClientName.TDS, trackers)
+        trackerDetector.addClient(client)
+    }
+
+    private fun initialiseResourceSurrogates() {
+        val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
+        val resourceSurrogateLoader = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
+        val surrogatesFile = FileUtilities.loadText("reference_tests/surrogates.txt").toByteArray()
+        val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
+        resourceSurrogates.loadSurrogates(surrogates)
+    }
+
+    private fun assertRedirectCorrectlyDone(response: WebResourceResponse?, expectedRedirect: String) {
+        val result = response?.let {
+            val test = String(it.data.readBytes()).trim()
+            val base64String = Base64.encodeToString(test.toByteArray(), Base64.NO_WRAP)
+            val mimeType = it.mimeType
+            "data:$mimeType;base64,$base64String"
+        }
+        assertEquals(expectedRedirect, result)
+    }
+
+    private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
+        assertNull(response)
+    }
+
+    private fun assertCancelledResponse(response: WebResourceResponse?) {
+        assertNotNull(response)
+        assertNull(response!!.data)
+        assertNull(response.mimeType)
+        assertNull(response.encoding)
+    }
+
+    private fun configureShouldNotUpgrade() = runBlocking<Unit> {
+        whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
+        whenever(mockRequest.isForMainFrame).thenReturn(false)
+    }
+
+    private fun configureUserAgent() {
+        val settings: WebSettings = mock()
+        whenever(webView.settings).thenReturn(settings)
+        whenever(settings.userAgentString).thenReturn(userAgentProvider.userAgent())
+    }
+}

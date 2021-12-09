@@ -1,0 +1,148 @@
+{
+  "trackers": {
+    "bad.third-party.site": {
+      "domain": "bad.third-party.site",
+      "owner": {
+        "name": "Test Site for Tracker Blocking",
+        "displayName": "Bad Third Party Site",
+        "privacyPolicy": "",
+        "url": "http://bad.third-party.site"
+      },
+      "prevalence": 0.1,
+      "fingerprinting": 3,
+      "cookies": 0.1,
+      "categories": [],
+      "default": "block",
+      "rules": [
+        {
+          "rule": "bad\\.third-party\\.site\\/ignore",
+          "action": "ignore"
+        },
+        {
+          "rule": "bad\\.third-party\\.site",
+          "exceptions": {
+            "domains": [
+              "ignore.test"
+            ],
+            "types": [
+              "image"
+            ]
+          }
+        }
+      ]
+    },
+    "broken.third-party.site": {
+      "domain": "broken.third-party.site",
+      "owner": {
+        "name": "Test Site for Tracker Blocking",
+        "displayName": "Broken Third Party Site",
+        "privacyPolicy": "",
+        "url": "http://broken.third-party.site"
+      },
+      "prevalence": 0.1,
+      "fingerprinting": 3,
+      "cookies": 0.1,
+      "categories": [],
+      "rules": [],
+      "default": "ignore"
+    },
+    "tracker.test": {
+      "domain": "tracker.test",
+      "owner": {
+        "name": "Test Site for Tracker Blocking",
+        "displayName": "Bad Third Party Site",
+        "privacyPolicy": "",
+        "url": "http://tracker.test"
+      },
+      "prevalence": 0.1,
+      "fingerprinting": 3,
+      "cookies": 0.1,
+      "categories": [],
+      "default": "block",
+      "rules": [
+        {
+          "action": "ignore",
+          "rule": "tracker\\.test\\/breakage"
+        }
+      ]
+    },
+    "ignore.test": {
+      "domain": "ignore.test",
+      "owner": {
+        "name": "Test Site for Tracker Blocking",
+        "displayName": "ignore Site",
+        "privacyPolicy": "",
+        "url": "http://ignore.test"
+      },
+      "prevalence": 0.1,
+      "fingerprinting": 3,
+      "cookies": 0.1,
+      "categories": [],
+      "default": "ignore",
+      "rules": [
+        {
+          "rule": "ignore\\.test\\/tracker"
+        }
+      ]
+    },
+    "surrogates.test": {
+      "domain": "surrogates.test",
+      "owner": {
+        "name": "Test Site for surrogates",
+        "displayName": "Bad Third Party Site",
+        "privacyPolicy": "",
+        "url": "http://surrogates.test"
+      },
+      "prevalence": 0.1,
+      "fingerprinting": 3,
+      "cookies": 0.1,
+      "categories": [],
+      "rules": [
+        {
+          "rule": "surrogates\\.test\\/tracker",
+          "surrogate": "tracker"
+        },
+        {
+          "rule": "surrogates\\.test\\/anothertracker",
+          "surrogate": "missingsurrogate"
+        }
+      ],
+      "default": "ignore"
+    }
+  },
+  "entities": {
+    "Test Site for Tracker Blocking": {
+      "domains": [
+        "bad.third-party.site",
+        "broken.third-party.site",
+        "third-party.site",
+        "tracker.test",
+        "surrogates.test"
+      ],
+      "prevalence": 0.1,
+      "displayName": "Test Site for Tracker Blocking"
+    },
+    "ignore Site for Tracker Blocking": {
+      "domains": [
+        "ignore.test",
+        "sub.ignore.test"
+      ],
+      "prevalence": 0.1,
+      "displayName": "ignore Site for Tracker Blocking"
+    }
+  },
+  "cnames": {
+    "bad.cnames.test": "cname.tracker.test",
+    "fake-ignore.tracker.test": "tracker.ignore.test",
+    "domain.cloaked.test": "some.other.unknown.test"
+  },
+  "domains": {
+    "bad.third-party.site": "Test Site for Tracker Blocking",
+    "broken.third-party.site": "Test Site for Tracker Blocking",
+    "third-party.site": "Test Site for Tracker Blocking",
+    "tracker.test": "Test Site for Tracker Blocking",
+    "ignore.test": "ignore Site for Tracker Blocking",
+    "sub.ignore.test": "ignore Site for Tracker Blocking",
+    "surrogates.test": "Test Site for surrogates"
+  }
+}
