@@ -226,15 +226,6 @@ interface DeviceShieldPixels {
     /** Will fire when the system is running extremely low on memory */
     fun vpnMemoryRunningCritical(payload: Map<String, String>)
 
-    /** Will fire when the user disables protection for a specific app */
-    fun disableAppProtection(payload: Map<String, String>)
-
-    /** Will fire when the user skips submitting the reason that made them disable app protection for a specific app */
-    fun disableAppProtectionReportingSkipped()
-
-    /** Will fire when the user enables protection for a specific app */
-    fun enableAppProtection(payload: Map<String, String>)
-
     /** Will fire when the user restores to the default protection list */
     fun restoreDefaultProtectionList()
 
@@ -474,20 +465,6 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun vpnMemoryRunningCritical(payload: Map<String, String>) {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL_DAILY, payload)
-    }
-
-    override fun disableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION, payload)
-    }
-
-    override fun disableAppProtectionReportingSkipped() {
-        firePixel(DeviceShieldPixelNames.ATP_APP_PROTECTION_DIALOG_REPORTING_SKIPPED)
-    }
-
-    override fun enableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP, payload)
     }
 
     override fun restoreDefaultProtectionList() {
