@@ -20,6 +20,7 @@ package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 
 @Entity(
     tableName = "vpn_tracker",
@@ -83,13 +84,6 @@ data class VpnPreferences(
     val value: Boolean
 )
 
-@Entity(tableName = "vpn_app_tracking_signals")
-data class AppTrackingSignal(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val trackerCompanyId: Int,
-    val trackerSignalTag: String
-)
-
 data class TrackingApp(val packageId: String, val appDisplayName: String) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
@@ -100,5 +94,5 @@ data class VpnTrackerCompanySignal(
         parentColumn = "trackerCompanyId",
         entityColumn = "trackerCompanyId"
     )
-    val trackerSignals: List<AppTrackingSignal>
+    val trackerSignals: List<AppTrackerEntity>
 )

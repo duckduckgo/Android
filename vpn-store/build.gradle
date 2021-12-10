@@ -45,9 +45,12 @@ dependencies {
     androidTestImplementation AndroidX.room.testing
 
     testImplementation "junit:junit:_"
+    testImplementation project(path: ':common-test')
+
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation Testing.mockito.android
     androidTestImplementation Testing.mockito.kotlin
+
 }

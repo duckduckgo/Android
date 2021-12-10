@@ -22,9 +22,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
-import com.duckduckgo.mobile.android.vpn.model.AppTrackingSignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -69,7 +69,7 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals(trackingSignals)
+                    trackingSignals = mapTrackingSignals(trackingSignals.get(0))
                 )
             )
         }
@@ -86,16 +86,8 @@ constructor(
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(trackingSignals: List<AppTrackingSignal>): List<TrackingSignal> {
-//        return trackingSignals.map {
-//            TrackingSignal.fromTag(it.trackerSignalTag)
-//        }
-
-        val originalTrackingSignals = TrackingSignal.values()
-        val numberOfElements = (0 until 12).random()
-        val randomElements =
-            originalTrackingSignals.asSequence().shuffled().take(numberOfElements).toList()
-        return randomElements.distinctBy { it.signalDisplayName }
+    private fun mapTrackingSignals(entity: AppTrackerEntity): List<TrackingSignal> {
+        return entity.signals.map { TrackingSignal.fromTag(it) }
     }
 
     data class ViewState(

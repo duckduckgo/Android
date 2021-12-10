@@ -53,7 +53,7 @@ import java.util.concurrent.Executors
         AppTrackerExceptionRuleMetadata::class,
         AppTrackerPackage::class,
         AppTrackerManualExcludedApp::class,
-        AppTrackingSignal::class
+        AppTrackerEntity::class
     ]
 )
 
@@ -116,13 +116,14 @@ abstract class VpnDatabase : RoomDatabase() {
 
         @VisibleForTesting
         internal fun prepopulateAppTrackerBlockingList(context: Context, vpnDatabase: VpnDatabase) {
-            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist_v2).bufferedReader()
                 .use { it.readText() }
                 .also {
-                    val trackers = getFullAppTrackerBlockingList(it)
+                    val blocklist = getFullAppTrackerBlockingList(it)
                     with(vpnDatabase.vpnAppTrackerBlockingDao()) {
-                        insertTrackerBlocklist(trackers.first)
-                        insertAppPackages(trackers.second)
+                        insertTrackerBlocklist(blocklist.trackers)
+                        insertAppPackages(blocklist.packages)
+                        insertTrackerEntities(blocklist.entities)
                     }
                 }
         }
@@ -146,7 +147,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+        private fun getFullAppTrackerBlockingList(json: String): AppTrackerBlocklist {
             return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
 

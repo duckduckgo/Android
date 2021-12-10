@@ -44,11 +44,22 @@ interface VpnAppTrackerBlockingDao {
     @Query("DELETE FROM vpn_app_tracker_blocking_app_packages")
     fun deleteAppPackages()
 
+    @Query("DELETE FROM vpn_app_tracker_entities")
+    fun deleTrackerEntities()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAppPackages(appPackages: List<AppTrackerPackage>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTrackerEntities(signals: List<AppTrackerEntity>)
+
     @Transaction
-    fun updateTrackerBlocklist(blocklist: List<AppTracker>, appPackages: List<AppTrackerPackage>, metadata: AppTrackerMetadata) {
+    fun updateTrackerBlocklist(
+        blocklist: List<AppTracker>,
+        appPackages: List<AppTrackerPackage>,
+        metadata: AppTrackerMetadata,
+        entities: List<AppTrackerEntity>
+    ) {
         setTrackerBlocklistMetadata(metadata)
 
         deleteTrackerBlockList()
@@ -56,6 +67,9 @@ interface VpnAppTrackerBlockingDao {
 
         deleteAppPackages()
         insertAppPackages(appPackages)
+
+//        deleTrackerEntities()
+//        insertTrackerEntities(entities)
     }
 
     @Query("SELECT * from vpn_app_tracker_blocking_app_packages where packageName=:packageName")

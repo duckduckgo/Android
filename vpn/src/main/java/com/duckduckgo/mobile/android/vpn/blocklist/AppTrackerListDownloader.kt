@@ -19,12 +19,7 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -34,7 +29,8 @@ import javax.inject.Inject
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
     val blocklist: List<AppTracker> = listOf(),
-    val appPackages: List<AppTrackerPackage> = listOf()
+    val appPackages: List<AppTrackerPackage> = listOf(),
+    val entities: List<AppTrackerEntity> = listOf()
 )
 
 data class AppTrackerExclusionList(
@@ -86,10 +82,11 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         val blocklist = extractBlocklist(responseBody)
         val packages = extractAppPackages(responseBody)
+        val trackerEntities = extractTrackerEntities(responseBody)
 
-        Timber.d("Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}")
+        Timber.d("Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}, entities size: ${trackerEntities.size}")
 
-        return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages)
+        return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages, entities = trackerEntities)
     }
 
     private fun extractBlocklist(response: JsonAppBlockingList?): List<AppTracker> {
@@ -98,6 +95,10 @@ class RealAppTrackerListDownloader @Inject constructor(
 
     private fun extractAppPackages(response: JsonAppBlockingList?): List<AppTrackerPackage> {
         return AppTrackerJsonParser.parseAppPackages(response)
+    }
+
+    private fun extractTrackerEntities(response: JsonAppBlockingList?): List<AppTrackerEntity> {
+        return AppTrackerJsonParser.parseTrackerEntities(response)
     }
 
     override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {

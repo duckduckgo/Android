@@ -73,10 +73,19 @@ data class AppTrackerManualExcludedApp(
     val isProtected: Boolean
 )
 
+@Entity(tableName = "vpn_app_tracker_entities")
+data class AppTrackerEntity(
+    @PrimaryKey val trackerCompanyId: Int,
+    val entityName: String,
+    val score: Int,
+    val signals: List<String>
+)
+
 data class JsonAppBlockingList(
+    val version: String,
     val trackers: Map<String, JsonAppTracker>,
     val packageNames: Map<String, String>,
-    val signals: Map<String, JsonAppTracker>,
+    val entities: Map<String, JsonTrackingSignal>,
 )
 
 class JsonAppTracker(
@@ -87,10 +96,8 @@ class JsonAppTracker(
 )
 
 class JsonTrackingSignal(
-    val owner: TrackerOwner,
-    val app: TrackerApp,
-    @field:Json(name = "CDN")
-    val isCdn: Boolean
+    val score: Int,
+    val signals: List<String>
 )
 
 data class TrackerOwner(
@@ -109,6 +116,13 @@ sealed class AppTrackerType {
     object NotTracker : AppTrackerType()
 }
 
+data class AppTrackerBlocklist(
+    val version: String,
+    val trackers: List<AppTracker>,
+    val packages: List<AppTrackerPackage>,
+    val entities: List<AppTrackerEntity>
+)
+
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
     val rules: List<String>
@@ -118,3 +132,5 @@ data class JsonAppTrackerExclusionList(
 data class JsonAppTrackerExceptionRules(
     val rules: List<AppTrackerExceptionRule>
 )
+
+
