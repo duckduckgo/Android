@@ -55,26 +55,19 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
 
     companion object {
         private val moshi = Moshi.Builder().build()
-        private val adapter: JsonAdapter<AmpFormatTest> = moshi.adapter(AmpFormatTest::class.java)
+        val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            var ampFormatTest: AmpFormatTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("reference_tests/tracking_link_detection_matching_tests.json")
-
-            jsonObject.keys().forEach {
-                if (it == "ampFormats") {
-                    ampFormatTest = adapter.fromJson(jsonObject.get(it).toString())
-                }
-            }
-            return ampFormatTest?.tests ?: emptyList()
+            val test = adapter.fromJson(FileUtilities.loadText("reference_tests/tracking_link_detection_matching_tests.json"))
+            return test?.ampFormats?.tests ?: emptyList()
         }
     }
 
     @Test
     fun whenSomething() {
-        val extractedUrl = testee.extractCanonicalFromTrackingLink(testCase.ampUrl)
+        val extractedUrl = testee.extractCanonicalFromTrackingLink(testCase.ampURL)
         assertEquals(testCase.expectURL, extractedUrl)
     }
 
@@ -95,7 +88,7 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
 
     data class TestCase(
         val name: String,
-        val ampUrl: String,
+        val ampURL: String,
         val expectURL: String,
         val exceptPlatforms: List<String>
     )
@@ -105,5 +98,9 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         val desc: String,
         val referenceConfig: String,
         val tests: List<TestCase>
+    )
+
+    data class ReferenceTest(
+        val ampFormats: AmpFormatTest
     )
 }
