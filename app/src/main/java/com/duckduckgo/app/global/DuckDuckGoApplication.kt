@@ -36,6 +36,7 @@ import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess
 import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
@@ -76,7 +77,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
 
     private val processDetector = ProcessDetector()
 
@@ -255,12 +256,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
      *
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
-    override fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key::class.simpleName}.
-                You probably forgot to create the ${key::class.simpleName}Component
+                Could not find the dagger component for ${key.simpleName}.
+                You probably forgot to create the ${key.simpleName}Component
                 """.trimIndent()
             )
     }

@@ -21,14 +21,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class VpnServiceHeartbeatMonitorModule {
 
     @Provides

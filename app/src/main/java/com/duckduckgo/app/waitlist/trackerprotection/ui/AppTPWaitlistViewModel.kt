@@ -22,7 +22,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
@@ -41,6 +42,7 @@ class AppTPWaitlistViewModel(
     private val waitlistService: AppTrackingProtectionWaitlistService,
     private val workManager: WorkManager,
     private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
+    private val deviceShieldPixels: DeviceShieldPixels
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> =
@@ -91,6 +93,7 @@ class AppTPWaitlistViewModel(
     }
 
     private fun joinedWaitlist(timestamp: Int, token: String) {
+        deviceShieldPixels.didShowWaitlistDialog()
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)
             commandChannel.send(Command.ShowNotificationDialog)
@@ -105,9 +108,14 @@ class AppTPWaitlistViewModel(
     }
 
     fun onNotifyMeClicked() {
+        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
         viewModelScope.launch {
             waitlistManager.notifyOnJoinedWaitlist()
         }
+    }
+
+    fun onNoThanksClicked() {
+        deviceShieldPixels.didPressWaitlistDialogDismiss()
     }
 
     fun onDialogDismissed() {
@@ -125,12 +133,13 @@ class AppTPWaitlistViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTPWaitlistViewModelFactory @Inject constructor(
     private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
     private val waitlistService: Provider<AppTrackingProtectionWaitlistService>,
     private val workManager: Provider<WorkManager>,
     private val workRequestBuilder: Provider<AppTPWaitlistWorkRequestBuilder>,
+    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -140,7 +149,8 @@ class AppTPWaitlistViewModelFactory @Inject constructor(
                         waitlistManager.get(),
                         waitlistService.get(),
                         workManager.get(),
-                        workRequestBuilder.get()
+                        workRequestBuilder.get(),
+                        deviceShieldPixels.get(),
                     ) as T
                     )
                 else -> null

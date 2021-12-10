@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,7 +94,7 @@ class AccessibilitySettingsViewModel constructor(
     private fun currentViewState() = viewState.value
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AccessibilitySettingsViewModelFactory @Inject constructor(
     private val accessibilitySettings: Provider<AccessibilitySettingsDataStore>,
 ) : ViewModelFactoryPlugin {

@@ -19,20 +19,20 @@ package com.duckduckgo.app.di
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [JobsModule::class]
 )
 class StubJobSchedulerModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesJobScheduler(): JobScheduler {
         return object : JobScheduler() {

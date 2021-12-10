@@ -19,7 +19,7 @@ package com.duckduckgo.app.flipper.plugins
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
@@ -33,7 +33,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TrackerProtectionFlipperPlugin @Inject constructor(
     vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,

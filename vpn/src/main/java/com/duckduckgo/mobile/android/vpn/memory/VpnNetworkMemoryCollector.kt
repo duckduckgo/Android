@@ -16,17 +16,17 @@
 
 package com.duckduckgo.mobile.android.vpn.memory
 
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import xyz.hexene.localvpn.TCB
 import java.io.RandomAccessFile
 import javax.inject.Inject
 
-@VpnScope
-@ContributesMultibinding(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(VpnScope::class)
 class VpnNetworkMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
     override fun collectMemoryMetrics(): Map<String, String> {
         Timber.v("Collecting vpn network memory resources")

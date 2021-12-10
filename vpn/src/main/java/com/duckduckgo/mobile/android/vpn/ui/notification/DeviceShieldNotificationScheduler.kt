@@ -23,7 +23,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotification
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotificationsDao
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
@@ -39,7 +39,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet

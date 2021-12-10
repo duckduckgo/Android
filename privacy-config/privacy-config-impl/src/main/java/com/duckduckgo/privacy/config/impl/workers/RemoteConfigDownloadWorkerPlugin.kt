@@ -19,16 +19,14 @@ package com.duckduckgo.privacy.config.impl.workers
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
-class RemoteConfigDownloadWorkerPlugin
-@Inject
-constructor(
+@ContributesMultibinding(AppScope::class)
+class RemoteConfigDownloadWorkerPlugin @Inject constructor(
     private val privacyConfigDownloader: PrivacyConfigDownloader,
     private val dispatcherProvider: DispatcherProvider
 ) : WorkerInjectorPlugin {

@@ -19,17 +19,18 @@ package com.duckduckgo.app.global
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPluginPoint
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@Singleton
-class ViewModelFactory
-@Inject
-constructor(private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint) :
-    ViewModelProvider.NewInstanceFactory() {
+@SingleInstanceIn(AppScope::class)
+class ViewModelFactory @Inject constructor(
+    private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
+) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
-        return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }.first()
+        return viewModelFactoryPluginPoint.getPlugins().mapNotNull { it.create(modelClass) }
+            .first()
     }
 }

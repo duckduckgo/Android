@@ -17,32 +17,32 @@
 package com.duckduckgo.feature.toggles.impl.di
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.impl.FeatureCustomConfigPluginPoint
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class FeatureTogglesBindingModule {
 
     @Multibinds
-    abstract fun provideFeatureTogglesPlugins(): Set<@JvmSuppressWildcards FeatureTogglesPlugin>
+    abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
+
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class FeatureTogglesModule {
 
     @Provides
-    @Singleton
-    fun provideFeatureTogglesPluginPoint(
-        toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>
-    ): PluginPoint<FeatureTogglesPlugin> {
+    @SingleInstanceIn(AppScope::class)
+    fun provideFeatureTogglesPluginPoint(toggles: DaggerSet<FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
         return FeatureCustomConfigPluginPoint(toggles)
     }
 }

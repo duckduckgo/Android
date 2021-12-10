@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -25,21 +25,14 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
-class RealContentBlocking
-@Inject
-constructor(
-    private val contentBlockingRepository: ContentBlockingRepository,
-    private val featureToggle: FeatureToggle,
-    private val unprotectedTemporary: UnprotectedTemporary
-) : ContentBlocking {
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {
-        return if (featureToggle.isFeatureEnabled(
-            PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
+        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
             unprotectedTemporary.isAnException(url) || matches(url)
         } else {
             false
@@ -49,4 +42,5 @@ constructor(
     private fun matches(url: String): Boolean {
         return contentBlockingRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
     }
+
 }

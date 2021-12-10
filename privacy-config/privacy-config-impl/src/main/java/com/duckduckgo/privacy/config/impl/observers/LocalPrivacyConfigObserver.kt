@@ -23,24 +23,22 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import dagger.SingleInstanceIn
 
 @WorkerThread
-@Singleton
-@ContributesMultibinding(AppObjectGraph::class)
-class LocalPrivacyConfigObserver
-@Inject
-constructor(
+@SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(AppScope::class)
+class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,
     private val privacyConfigPersister: PrivacyConfigPersister,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
@@ -49,21 +47,23 @@ constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun storeLocalPrivacyConfig() {
-        coroutineScope.launch(dispatcherProvider.io()) { loadPrivacyConfig() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            loadPrivacyConfig()
+        }
     }
 
     private suspend fun loadPrivacyConfig() {
         val privacyConfigJson = getPrivacyConfigFromFile()
-        privacyConfigJson?.let { privacyConfigPersister.persistPrivacyConfig(it) }
+        privacyConfigJson?.let {
+            privacyConfigPersister.persistPrivacyConfig(it)
+        }
     }
 
     private fun getPrivacyConfigFromFile(): JsonPrivacyConfig? {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-        val json =
-            context.resources.openRawResource(R.raw.privacy_config).bufferedReader().use {
-                it.readText()
-            }
+        val json = context.resources.openRawResource(R.raw.privacy_config).bufferedReader().use { it.readText() }
         val adapter = moshi.adapter(JsonPrivacyConfig::class.java)
         return adapter.fromJson(json)
     }
+
 }

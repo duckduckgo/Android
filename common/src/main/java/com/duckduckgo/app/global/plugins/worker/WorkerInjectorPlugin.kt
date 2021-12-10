@@ -18,19 +18,22 @@ package com.duckduckgo.app.global.plugins.worker
 
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface WorkerInjectorPlugin {
-    /** @return whether the worker has been injected */
+    /**
+     * @return whether the worker has been injected
+     */
     fun inject(worker: ListenableWorker): Boolean
 }
 
-@Singleton
-class WorkerInjectorPluginPoint
-@Inject
-constructor(private val injectorPlugins: Set<@JvmSuppressWildcards WorkerInjectorPlugin>) :
-    PluginPoint<WorkerInjectorPlugin> {
+@SingleInstanceIn(AppScope::class)
+class WorkerInjectorPluginPoint @Inject constructor(
+    private val injectorPlugins: DaggerSet<WorkerInjectorPlugin>
+) : PluginPoint<WorkerInjectorPlugin> {
     override fun getPlugins(): List<WorkerInjectorPlugin> {
         return injectorPlugins.toList()
     }

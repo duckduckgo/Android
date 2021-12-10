@@ -17,30 +17,25 @@
 package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface UnprotectedTemporary {
     fun isAnException(url: String): Boolean
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
-class RealUnprotectedTemporary
-@Inject
-constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) :
-    UnprotectedTemporary {
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return unprotectedTemporaryRepository.exceptions.any {
-            UriString.sameOrSubdomain(url, it.domain)
-        }
+        return unprotectedTemporaryRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 }

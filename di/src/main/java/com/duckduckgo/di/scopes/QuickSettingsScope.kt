@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (C) 2020. Aitor Viana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.di.scopes
 
-package com.duckduckgo.app.di
-
-import javax.inject.Scope
-
-/**
- * In Dagger, an unscoped component cannot depend on a scoped component. As
- * [AppComponent] is a scoped component (`@Singleton`, we create a custom
- * scope to be used by all fragment components. Additionally, a component with a specific scope
- * cannot have a sub component with the same scope.
- */
-@MustBeDocumented
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ActivityScoped
+abstract class QuickSettingsScope private constructor()

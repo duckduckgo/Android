@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface TabSwitcherActivityComponent : AndroidInjector<TabSwitcherActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<TabSwitcherActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface TabSwitcherActivityComponentProvider {
     fun provideTabSwitcherActivityComponentFactory(): TabSwitcherActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class TabSwitcherActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TabSwitcherActivity::class)
-    abstract fun bindTabSwitcherActivityComponentFactory(factory: TabSwitcherActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun TabSwitcherActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

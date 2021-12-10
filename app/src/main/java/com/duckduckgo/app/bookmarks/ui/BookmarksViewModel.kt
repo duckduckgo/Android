@@ -35,7 +35,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
@@ -242,7 +242,7 @@ class BookmarksViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val bookmarksRepository: Provider<BookmarksRepository>,

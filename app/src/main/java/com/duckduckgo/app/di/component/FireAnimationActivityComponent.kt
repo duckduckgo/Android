@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.settings.FireAnimationActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface FireAnimationActivityComponent : AndroidInjector<FireAnimationActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<FireAnimationActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface FireAnimationActivityComponentProvider {
     fun provideFireAnimationActivityComponentFactory(): FireAnimationActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class FireAnimationActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(FireAnimationActivity::class)
-    abstract fun bindFireAnimationActivityComponentFactory(factory: FireAnimationActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun FireAnimationActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }
