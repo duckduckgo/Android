@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -55,12 +54,12 @@ constructor(
 
     private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
-        val trackerCompany = trackerData.groupBy { it.tracker.trackerCompanyId }
+        val trackerCompany = trackerData.sortedBy { it.trackerEntity.score }.groupBy { it.tracker.trackerCompanyId }
 
         trackerCompany.forEach { data ->
             val trackerCompanyName = data.value[0].tracker.company
             val trackerCompanyDisplayName = data.value[0].tracker.companyDisplayName
-            val trackingSignals = data.value[0].trackerSignals
+            val trackingSignals = data.value[0].trackerEntity.signals
             val timestamp = data.value[0].tracker.timestamp
 
             sourceData.add(
@@ -69,7 +68,7 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals(trackingSignals.get(0))
+                    trackingSignals = mapTrackingSignals(trackingSignals)
                 )
             )
         }
@@ -86,8 +85,8 @@ constructor(
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(entity: AppTrackerEntity): List<TrackingSignal> {
-        return entity.signals.map { TrackingSignal.fromTag(it) }
+    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
+        return signals.map { TrackingSignal.fromTag(it) }
     }
 
     data class ViewState(

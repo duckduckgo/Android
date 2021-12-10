@@ -94,5 +94,5 @@ data class VpnTrackerCompanySignal(
         parentColumn = "trackerCompanyId",
         entityColumn = "trackerCompanyId"
     )
-    val trackerSignals: List<AppTrackerEntity>
+    val trackerEntity: AppTrackerEntity
 )
