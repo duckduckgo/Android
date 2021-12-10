@@ -27,7 +27,8 @@ import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -35,11 +36,11 @@ import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [StatisticsModule::class]
 )
 class StubStatisticsModule {
@@ -90,12 +91,12 @@ class StubStatisticsModule {
 
     @Provides
     @IntoSet
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun atbInitializer(
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
+        listeners: DaggerSet<AtbInitializerListener>
     ): LifecycleObserver {
         return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }

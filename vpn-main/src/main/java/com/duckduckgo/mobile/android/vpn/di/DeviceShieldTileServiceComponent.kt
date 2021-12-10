@@ -16,35 +16,36 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.service.DeviceShieldTileService
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.binding.TileServiceBingingKey
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(QuickSettingsScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = QuickSettingsScope::class
 )
 interface DeviceShieldTileServiceComponent : AndroidInjector<DeviceShieldTileService> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldTileService>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface DeviceShieldTileServiceComponentProvider {
     fun provideDeviceShieldTileServiceComponentFactory(): DeviceShieldTileServiceComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class DeviceShieldTileServiceBindingModule {
     @Binds
     @IntoMap
@@ -52,5 +53,5 @@ abstract class DeviceShieldTileServiceBindingModule {
     // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
     // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
     @ClassKey(TileServiceBingingKey::class)
-    abstract fun bindDeviceShieldTileServiceComponentFactory(factory: DeviceShieldTileServiceComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldTileServiceComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -27,7 +27,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class
 )
 class CohortPixelInterceptor @Inject constructor(

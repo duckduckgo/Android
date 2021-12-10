@@ -16,39 +16,39 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface LocationPermissionsActivityComponent : AndroidInjector<LocationPermissionsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<LocationPermissionsActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface LocationPermissionsActivityComponentProvider {
     fun provideLocationPermissionsActivityComponentFactory(): LocationPermissionsActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class LocationPermissionsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(LocationPermissionsActivity::class)
-    abstract fun bindLocationPermissionsActivityComponentFactory(factory: LocationPermissionsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun LocationPermissionsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

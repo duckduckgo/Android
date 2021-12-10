@@ -27,7 +27,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -52,7 +52,7 @@ class TrackerDataDevReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TrackerDataDevReceiverRegister @Inject constructor(
     private val context: Context,
     private val trackderDataDownloader: TrackerDataDownloader

@@ -20,11 +20,12 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Dao
-@Singleton
+@SingleInstanceIn(AppScope::class)
 abstract class TabsDao {
 
     @Query("select * from tabs where deletable is 0 order by position limit 1")

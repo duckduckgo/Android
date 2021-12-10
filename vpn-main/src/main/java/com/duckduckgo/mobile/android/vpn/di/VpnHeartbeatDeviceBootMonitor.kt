@@ -16,37 +16,38 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnHeartbeatDeviceBootMonitor
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(ReceiverScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ReceiverScope::class
 )
 interface VpnHeartbeatDeviceBootMonitorComponent : AndroidInjector<VpnHeartbeatDeviceBootMonitor> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnHeartbeatDeviceBootMonitor>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface VpnHeartbeatDeviceBootMonitorComponentProvider {
     fun provideVpnHeartbeatDeviceBootMonitorComponentFactory(): VpnHeartbeatDeviceBootMonitorComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class VpnHeartbeatDeviceBootMonitorBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnHeartbeatDeviceBootMonitor::class)
-    abstract fun bindVpnHeartbeatDeviceBootMonitorComponentFactory(factory: VpnHeartbeatDeviceBootMonitorComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnHeartbeatDeviceBootMonitorComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

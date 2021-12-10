@@ -27,7 +27,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
@@ -54,10 +54,10 @@ interface WebViewHttpAuthStore {
 }
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = LifecycleObserver::class
 )
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
@@ -106,10 +106,10 @@ class RealWebViewHttpAuthStore @Inject constructor(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class WebViewHttpAuthStoreModule {
     @Binds
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     abstract fun bindWebViewHttpAuthStore(
         realWebViewHttpAuthStore: RealWebViewHttpAuthStore
     ): WebViewHttpAuthStore

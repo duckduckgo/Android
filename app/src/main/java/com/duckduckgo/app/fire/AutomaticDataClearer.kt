@@ -32,14 +32,14 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 interface DataClearer {
@@ -48,14 +48,14 @@ interface DataClearer {
 }
 
 @ContributesBinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = DataClearer::class
 )
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = BrowserLifecycleObserver::class
 )
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class AutomaticDataClearer @Inject constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,

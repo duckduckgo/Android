@@ -23,7 +23,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,7 +32,7 @@ import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @WorkerThread
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ResourceSurrogateLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,

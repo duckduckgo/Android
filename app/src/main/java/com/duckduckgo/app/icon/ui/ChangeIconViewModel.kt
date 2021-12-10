@@ -25,7 +25,7 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -79,7 +79,7 @@ class ChangeIconViewModel @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ChangeIconViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val appIconModifier: Provider<IconModifier>,

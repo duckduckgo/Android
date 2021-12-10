@@ -22,13 +22,13 @@ import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import javax.inject.Named
 import javax.inject.Provider
-import javax.inject.Singleton
 
 /**
  * Example Default User Agent (From Chrome):
@@ -138,10 +138,10 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
     data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 @Module
 class DefaultUserAgentModule {
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     @Named("defaultUserAgent")
     fun provideDefaultUserAgent(context: Context): String {

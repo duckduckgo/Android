@@ -17,16 +17,17 @@
 package com.duckduckgo.feature.toggles.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPluginPoint: PluginPoint<FeatureTogglesPlugin>) :
     FeatureToggle {
 
@@ -39,7 +40,7 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
 }
 
 class FeatureCustomConfigPluginPoint(
-    private val toggles: Set<@JvmSuppressWildcards FeatureTogglesPlugin>
+    private val toggles: DaggerSet<FeatureTogglesPlugin>
 ) : PluginPoint<FeatureTogglesPlugin> {
     override fun getPlugins(): Collection<FeatureTogglesPlugin> {
         return toggles

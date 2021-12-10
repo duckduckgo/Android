@@ -22,7 +22,7 @@ import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTP
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,7 +31,7 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class HttpsBloomFilterFactoryImpl @Inject constructor(
     private val dao: HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,

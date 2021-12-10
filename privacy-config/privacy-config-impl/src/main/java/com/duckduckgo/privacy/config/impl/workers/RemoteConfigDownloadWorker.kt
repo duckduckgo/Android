@@ -27,7 +27,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withContext
@@ -52,7 +52,7 @@ class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerPara
 
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleObserver {

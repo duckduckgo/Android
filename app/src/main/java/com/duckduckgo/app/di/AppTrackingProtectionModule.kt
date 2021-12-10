@@ -23,20 +23,20 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTrackingProtectionWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.trackerprotection.TrackingProtectionWaitlistCodeFetcher
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class AppTrackingProtectionModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesAppTrackingProtectionWaitlistCodeFetcher(
         workManager: WorkManager,
@@ -50,7 +50,7 @@ class AppTrackingProtectionModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun providesAppTrackingProtectionCodeFetcherObserver(codeFetcher: TrackingProtectionWaitlistCodeFetcher): LifecycleObserver = codeFetcher
 }

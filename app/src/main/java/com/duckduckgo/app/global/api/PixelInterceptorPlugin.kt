@@ -18,15 +18,16 @@ package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 private class PixelInterceptorPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards PixelInterceptorPlugin>
+    private val plugins: DaggerSet<PixelInterceptorPlugin>
 ) : PluginPoint<PixelInterceptorPlugin> {
     override fun getPlugins(): Collection<PixelInterceptorPlugin> {
         return plugins.sortedBy { it.javaClass.simpleName }
@@ -34,18 +35,18 @@ private class PixelInterceptorPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class PixelInterceptorPluginModule {
     @Multibinds
-    abstract fun bindEmptyPixelInterceptorPlugins(): Set<@JvmSuppressWildcards PixelInterceptorPlugin>
+    abstract fun bindEmptyPixelInterceptorPlugins(): DaggerSet<PixelInterceptorPlugin>
 
     @Module
-    @ContributesTo(AppObjectGraph::class)
+    @ContributesTo(AppScope::class)
     class PixelInterceptorPluginModuleExt {
         @Provides
-        @Singleton
+        @SingleInstanceIn(AppScope::class)
         fun providePixelInterceptorPlugins(
-            plugins: Set<@JvmSuppressWildcards PixelInterceptorPlugin>
+            plugins: DaggerSet<PixelInterceptorPlugin>
         ): PluginPoint<PixelInterceptorPlugin> {
             return PixelInterceptorPluginPoint(plugins)
         }
