@@ -16,42 +16,34 @@
 
 package com.duckduckgo.privacy.config.api
 
-/**
- * Public interface for the Tracking Link Detection feature
- */
+/** Public interface for the Tracking Link Detection feature */
 interface TrackingLinkDetector {
     /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url]
-     * is in the tracking links exceptions list
-     * @return `true` if the given [url] is in the tracking links exceptions list and `false` otherwise.
+     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
+     * tracking links exceptions list
+     * @return `true` if the given [url] is in the tracking links exceptions list and `false`
+     * otherwise.
      */
     fun isAnException(url: String): Boolean
 
     /**
-     * This method takes a [url] and returns a [TrackingLinkType] depending on the detected tracking link.
+     * This method takes a [url] and returns a [TrackingLinkType] depending on the detected tracking
+     * link.
      * @return the [TrackingLinkType] or `null` if the [url] is not a tracking link.
      */
     fun extractCanonicalFromTrackingLink(url: String): TrackingLinkType?
 
-    /**
-     * The last tracking link and its destination URL.
-     */
+    /** The last tracking link and its destination URL. */
     var lastTrackingLinkInfo: TrackingLinkInfo?
 }
 
-/**
- * Public data class for Tracking Link Info.
- */
+/** Public data class for Tracking Link Info. */
 data class TrackingLinkInfo(val trackingLink: String, var destinationUrl: String? = null)
 
-/**
- * Public data class for Tracking Link Exceptions.
- */
+/** Public data class for Tracking Link Exceptions. */
 data class TrackingLinkException(val domain: String, val reason: String)
 
-/**
- * Public sealed class for Tracking Link Type.
- */
+/** Public sealed class for Tracking Link Type. */
 sealed class TrackingLinkType {
     class ExtractedTrackingLink(val extractedUrl: String) : TrackingLinkType()
     class CloakedTrackingLink(val trackingUrl: String) : TrackingLinkType()
