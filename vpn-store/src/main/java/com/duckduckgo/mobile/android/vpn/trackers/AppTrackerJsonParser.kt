@@ -47,7 +47,8 @@ class AppTrackerJsonParser {
                         trackerCompanyId = it.value.owner.name.hashCode(),
                         owner = it.value.owner,
                         app = it.value.app,
-                        isCdn = it.value.isCdn)
+                        isCdn = it.value.isCdn
+                    )
                 }
                 .map { it.value }
 
@@ -68,7 +69,8 @@ class AppTrackerJsonParser {
                         trackerCompanyId = it.key.hashCode(),
                         entityName = it.key,
                         score = it.value.score,
-                        signals = it.value.signals)
+                        signals = it.value.signals
+                    )
                 }
                 .map { it.value }
                 .sortedBy { it.score }

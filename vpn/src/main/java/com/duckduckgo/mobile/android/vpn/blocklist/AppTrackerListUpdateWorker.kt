@@ -75,7 +75,8 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                         blocklist.blocklist,
                         blocklist.appPackages,
                         AppTrackerMetadata(eTag = blocklist.etag.value),
-                        blocklist.entities)
+                        blocklist.entities
+                    )
 
                 return Result.success()
             }
@@ -105,7 +106,8 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                     .vpnAppTrackerBlockingDao()
                     .updateTrackerExceptionRules(
                         exceptionRules.trackerExceptionRules,
-                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value))
+                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value)
+                    )
 
                 return Result.success()
             }
@@ -131,7 +133,8 @@ constructor(private val workManager: WorkManager) : LifecycleObserver {
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                 .build()
         workManager.enqueueUniquePeriodicWork(
-            APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+            APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest
+        )
     }
 
     companion object {

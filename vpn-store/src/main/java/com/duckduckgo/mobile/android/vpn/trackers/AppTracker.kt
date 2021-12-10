@@ -132,5 +132,3 @@ data class JsonAppTrackerExclusionList(
 data class JsonAppTrackerExceptionRules(
     val rules: List<AppTrackerExceptionRule>
 )
-
-

@@ -54,6 +54,16 @@ constructor(
 
     private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
+
+        val lastTrackerBlockedAgo =
+            if (sourceData.isNotEmpty()) {
+                timeDiffFormatter.formatTimePassed(
+                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                )
+            } else {
+                ""
+            }
+
         val trackerCompany = trackerData.sortedBy { it.trackerEntity.score }.groupBy { it.tracker.trackerCompanyId }
 
         trackerCompany.forEach { data ->
@@ -72,15 +82,6 @@ constructor(
                 )
             )
         }
-
-        val lastTrackerBlockedAgo =
-            if (sourceData.isNotEmpty()) {
-                timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(sourceData[0].timestamp)
-                )
-            } else {
-                ""
-            }
 
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }

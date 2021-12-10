@@ -22,7 +22,7 @@ import com.squareup.moshi.Moshi
 import org.junit.Assert
 import org.junit.Test
 
-class AppTrackerJsonParserTest{
+class AppTrackerJsonParserTest {
 
     private val moshi = Moshi.Builder().build()
     private val jsonAdapter: JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
