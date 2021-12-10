@@ -171,7 +171,7 @@ class DatabaseModule {
         return RealDrmRepository(database, coroutineScope, dispatcherProvider)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideTrackingLinkDetectionRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackingLinkDetectionRepository {
         return RealTrackingLinkDetectionRepository(database, coroutineScope, dispatcherProvider)

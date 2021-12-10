@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
@@ -26,11 +26,11 @@ import com.duckduckgo.privacy.config.api.TrackingLinkType
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealTrackingLinkDetector @Inject constructor(
     private val trackingLinkDetectionRepository: TrackingLinkDetectionRepository,
     private val featureToggle: FeatureToggle,
