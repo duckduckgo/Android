@@ -54,7 +54,7 @@ class RealTrackingLinkDetector @Inject constructor(
         if (isAnException(url)) return null
         if (url == lastExtractedUrl) return null
 
-        val extractedUrl = trackingLinkDetectionRepository.extractCanonicalFromTrackingLink(url)
+        val extractedUrl = extractCanonical(url)
 
         lastExtractedUrl = extractedUrl
 
@@ -78,5 +78,31 @@ class RealTrackingLinkDetector @Inject constructor(
             }
         }
         return false
+    }
+
+    fun extractCanonical(url: String): String? {
+        val ampFormat = urlIsExtractableAmpLink(url) ?: return null
+        val matchResult = ampFormat.find(url) ?: return null
+
+        val groups = matchResult.groups
+        if (groups.size < 2) return null
+
+        var destinationUrl = groups[1]?.value ?: return null
+
+        if (!destinationUrl.startsWith("http")) {
+            destinationUrl = "https://$destinationUrl"
+        }
+        return destinationUrl
+    }
+
+    private fun urlIsExtractableAmpLink(url: String): Regex? {
+        val ampLinkFormats = trackingLinkDetectionRepository.ampLinkFormats
+
+        ampLinkFormats.forEach { format ->
+            if (url.matches(format)) {
+                return format
+            }
+        }
+        return null
     }
 }

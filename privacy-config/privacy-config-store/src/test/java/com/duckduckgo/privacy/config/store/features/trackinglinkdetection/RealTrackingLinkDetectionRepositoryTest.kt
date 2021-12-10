@@ -24,7 +24,6 @@ import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -99,35 +98,6 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertEquals(0, testee.exceptions.size)
         assertEquals(0, testee.ampLinkFormats.size)
         assertEquals(0, testee.ampKeywords.size)
-    }
-
-    @Test
-    fun whenExtractCanonicalFromTrackingLinkAndUrlIsNotExtractableAmpLinkThenReturnNull() {
-        givenTrackingLinkDetectionDaoContainsEntities()
-        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
-
-        testee = RealTrackingLinkDetectionRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-
-        assertNull(testee.extractCanonicalFromTrackingLink("https://www.example.com"))
-    }
-
-    @Test
-    fun whenExtractCanonicalFromTrackingLinkAndUrlIsExtractableAmpLinkThenReturnExtractedUrl() {
-        givenTrackingLinkDetectionDaoContainsEntities()
-        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
-
-        testee = RealTrackingLinkDetectionRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-
-        val extractedLink = testee.extractCanonicalFromTrackingLink("https://www.google.com/amp/s/www.example.com")
-        assertEquals("https://www.example.com", extractedLink)
     }
 
     private fun givenTrackingLinkDetectionDaoContainsEntities() {
