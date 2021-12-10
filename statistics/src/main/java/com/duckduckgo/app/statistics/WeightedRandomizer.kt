@@ -44,5 +44,4 @@ class WeightedRandomizer : IndexRandomizer {
     private fun arrayPopulatedWithProbabilities(items: List<Probabilistic>): DoubleArray {
         return items.map { it.weight }.toDoubleArray()
     }
-
 }

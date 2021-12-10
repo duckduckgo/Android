@@ -41,6 +41,5 @@ abstract class UnprotectedTemporaryDao {
     @Query("select * from unprotected_temporary")
     abstract fun getAll(): List<UnprotectedTemporaryEntity>
 
-    @Query("delete from unprotected_temporary")
-    abstract fun deleteAll()
+    @Query("delete from unprotected_temporary") abstract fun deleteAll()
 }

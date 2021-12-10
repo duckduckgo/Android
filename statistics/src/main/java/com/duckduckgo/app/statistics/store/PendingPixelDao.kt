@@ -23,12 +23,9 @@ import io.reactivex.Observable
 @Dao
 interface PendingPixelDao {
 
-    @Query("select * from pixel_store")
-    fun pixels(): Observable<List<PixelEntity>>
+    @Query("select * from pixel_store") fun pixels(): Observable<List<PixelEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(pixel: PixelEntity): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(pixel: PixelEntity): Long
 
-    @Delete
-    fun delete(pixel: PixelEntity)
+    @Delete fun delete(pixel: PixelEntity)
 }

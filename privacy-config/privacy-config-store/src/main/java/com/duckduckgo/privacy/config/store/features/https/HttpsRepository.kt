@@ -21,25 +21,26 @@ import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toHttpsException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface HttpsRepository {
     fun updateAll(exceptions: List<HttpsExceptionEntity>)
     val exceptions: CopyOnWriteArrayList<HttpsException>
 }
 
-class RealHttpsRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    HttpsRepository {
+class RealHttpsRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : HttpsRepository {
 
     private val httpsDao: HttpsDao = database.httpsDao()
     override val exceptions = CopyOnWriteArrayList<HttpsException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
     override fun updateAll(exceptions: List<HttpsExceptionEntity>) {
@@ -49,8 +50,6 @@ class RealHttpsRepository(val database: PrivacyConfigDatabase, coroutineScope: C
 
     private fun loadToMemory() {
         exceptions.clear()
-        httpsDao.getAll().map {
-            exceptions.add(it.toHttpsException())
-        }
+        httpsDao.getAll().map { exceptions.add(it.toHttpsException()) }
     }
 }

@@ -33,8 +33,7 @@ import org.mockito.ArgumentMatchers
 
 class RealUnprotectedTemporaryRepositoryTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealUnprotectedTemporaryRepository
 
@@ -44,57 +43,52 @@ class RealUnprotectedTemporaryRepositoryTest {
     @Before
     fun before() {
         whenever(mockDatabase.unprotectedTemporaryDao()).thenReturn(mockUnprotectedTemporaryDao)
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealUnprotectedTemporaryRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenUnprotectedTemporaryDaoContainsExceptions()
 
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealUnprotectedTemporaryRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(unprotectedTemporaryException, testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+    fun whenUpdateAllThenUpdateAllCalled() =
+        coroutineRule.runBlocking {
+            testee =
+                RealUnprotectedTemporaryRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        verify(mockUnprotectedTemporaryDao).updateAll(ArgumentMatchers.anyList())
-    }
+            verify(mockUnprotectedTemporaryDao).updateAll(ArgumentMatchers.anyList())
+        }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
-        givenUnprotectedTemporaryDaoContainsExceptions()
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-        assertEquals(1, testee.exceptions.size)
-        reset(mockUnprotectedTemporaryDao)
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+        coroutineRule.runBlocking {
+            givenUnprotectedTemporaryDaoContainsExceptions()
+            testee =
+                RealUnprotectedTemporaryRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+            assertEquals(1, testee.exceptions.size)
+            reset(mockUnprotectedTemporaryDao)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        assertEquals(0, testee.exceptions.size)
-    }
+            assertEquals(0, testee.exceptions.size)
+        }
 
     private fun givenUnprotectedTemporaryDaoContainsExceptions() {
-        whenever(mockUnprotectedTemporaryDao.getAll()).thenReturn(listOf(unprotectedTemporaryException))
+        whenever(mockUnprotectedTemporaryDao.getAll())
+            .thenReturn(listOf(unprotectedTemporaryException))
     }
 
     companion object {

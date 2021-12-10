@@ -22,11 +22,11 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealHttpsTest {
@@ -70,7 +70,10 @@ class RealHttpsTest {
     }
 
     private fun givenThereAreExceptions() {
-        val exceptions = CopyOnWriteArrayList<HttpsException>().apply { add(HttpsException("example.com", "my reason here")) }
+        val exceptions =
+            CopyOnWriteArrayList<HttpsException>().apply {
+                add(HttpsException("example.com", "my reason here"))
+            }
         whenever(mockHttpsRepository.exceptions).thenReturn(exceptions)
     }
 }
