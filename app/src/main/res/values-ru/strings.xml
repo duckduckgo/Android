@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Надежная защита почты и ничего лишнего.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Оказывается, чтобы избавиться от трекеров и скрыть свой адрес,<br/>вовсе не нужно менять почтовый сервис. <a href=\"\"><b>Подробнее</b></a>...]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Оказывается, чтобы избавиться от трекеров и скрыть свой адрес, вовсе не нужно менять почтовый сервис. <a href=\"\"><b>Подробнее</b></a>...]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Теперь вы в списке!</string>

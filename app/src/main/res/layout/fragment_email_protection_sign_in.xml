@@ -19,8 +19,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,6 +39,8 @@
             android:id="@+id/statusTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="4sp"
             android:paddingTop="24dp"
@@ -50,12 +52,14 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/emailPrivacyDescription"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="4sp"
+            android:maxWidth="500dp"
             android:paddingTop="8dp"
             android:text="@string/emailProtectionDescriptionJoin"
             android:textAlignment="center"
@@ -69,34 +73,39 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="24dp"
+            android:gravity="center"
             android:orientation="vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/waitListButton"
                 style="@style/EmailButton.Primary"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="55dp"
+                android:minWidth="500dp"
                 android:text="@string/emailProtectionWaitlistCta" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/getStartedButton"
                 style="@style/EmailButton.Primary"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="55dp"
+                android:minWidth="500dp"
                 android:text="@string/emailProtectionGetStartedCta" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/inviteCodeButton"
                 style="@style/EmailButton.Secondary"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="55dp"
+                android:minWidth="500dp"
                 android:text="@string/emailProtectionInviteCodeCta" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/duckAddressButton"
                 style="@style/EmailButton.Secondary"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="55dp"
+                android:minWidth="500dp"
                 android:text="@string/emailProtectionDuckAddressCta" />
         </LinearLayout>
 
@@ -105,6 +114,9 @@
             android:id="@+id/footerDescription"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:layout_marginBottom="35dp"
             android:fontFamily="sans-serif"
             android:gravity="bottom|center_horizontal"

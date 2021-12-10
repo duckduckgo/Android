@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Fortrolighed af e-mail, forenklet.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokér e-mailtrackere og skjul din adresse,<br/> uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokér e-mailtrackere og skjul din adresse, uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du er på listen!</string>

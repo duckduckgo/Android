@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilce e-pošte in skrijte svoj naslov,<br/>brez zamenjave ponudnika e-pošte. <a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilce e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte. <a href=\"\"><b>Več</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
