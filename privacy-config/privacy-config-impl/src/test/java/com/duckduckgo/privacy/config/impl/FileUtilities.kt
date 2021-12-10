@@ -16,9 +16,9 @@
 
 package com.duckduckgo.privacy.config.impl
 
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
+import org.json.JSONObject
 
 object FileUtilities {
 

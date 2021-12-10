@@ -18,7 +18,4 @@ package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 
-data class HttpsFeature(
-    val state: String,
-    val exceptions: List<HttpsExceptionEntity>
-)
+data class HttpsFeature(val state: String, val exceptions: List<HttpsExceptionEntity>)

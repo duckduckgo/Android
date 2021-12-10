@@ -18,20 +18,20 @@ package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.di.StatisticsLibraryConfigModule
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [StatisticsLibraryConfigModule::class]
 )
 class InternalStatisticsLibraryConfigModule {
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun provideStatisticsLibraryConfig(): StatisticsLibraryConfig {
         return object : StatisticsLibraryConfig {
             override fun shouldFirePixelsAsDev(): Boolean {

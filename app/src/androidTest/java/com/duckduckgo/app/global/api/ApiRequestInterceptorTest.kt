@@ -33,7 +33,7 @@ class ApiRequestInterceptorTest {
     @Before
     fun before() {
         userAgentProvider = UserAgentProvider(
-            WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context),
+            { WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context) },
             ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context)
         )
 

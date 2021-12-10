@@ -32,12 +32,20 @@
         android:text="@string/settingsHeadingOther" />
 
     <TextView
+        android:id="@+id/privacyPolicy"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPrivacyPolicyDuckduckgo"
+        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
+
+    <TextView
         android:id="@+id/about"
         style="@style/SettingsItemClickable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsAboutDuckduckgo"
-        app:layout_constraintTop_toBottomOf="@id/settingsOtherTitle" />
+        app:layout_constraintTop_toBottomOf="@id/privacyPolicy" />
 
     <TextView
         android:id="@+id/provideFeedback"

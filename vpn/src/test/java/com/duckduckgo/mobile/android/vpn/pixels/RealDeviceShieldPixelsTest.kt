@@ -298,6 +298,27 @@ class RealDeviceShieldPixelsTest {
         verifyNoMoreInteractions(pixel)
     }
 
+    @Test
+    fun whenDidShowWaitlistDialogThenFirePixels() {
+        deviceShieldPixels.didShowWaitlistDialog()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
+    }
+
+    @Test
+    fun whenWaitlistDialogDismissThenFirePixels() {
+        deviceShieldPixels.didPressWaitlistDialogDismiss()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
+    }
+
+    @Test
+    fun whenWaitlistDialogNotifyMeThenFirePixels() {
+        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
+    }
+
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {
         return String.format(Locale.US, pixelName, variant)
     }

@@ -25,7 +25,7 @@ import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -96,7 +96,7 @@ class DevSettingsViewModel @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SettingsViewModelFactory @Inject constructor(
     private val devSettingsDataStore: Provider<DevSettingsDataStore>,
     private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,

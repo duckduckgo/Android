@@ -17,15 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.memory
 
 import android.os.Debug
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import javax.inject.Inject
 
-@VpnScope
-@ContributesMultibinding(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(VpnScope::class)
 class ProcessMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin {
     override fun collectMemoryMetrics(): Map<String, String> {
         Timber.v("Collecting process memory data")

@@ -110,7 +110,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
@@ -2272,7 +2272,7 @@ class BrowserTabViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BrowserTabViewModelFactory @Inject constructor(
     private val statisticsUpdater: Provider<StatisticsUpdater>,
     private val queryUrlConverter: Provider<QueryUrlConverter>,

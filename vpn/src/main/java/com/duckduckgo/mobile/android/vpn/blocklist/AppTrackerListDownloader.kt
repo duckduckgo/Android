@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
@@ -63,7 +63,7 @@ interface AppTrackerListDownloader {
     fun downloadAppTrackerExceptionRules(): AppTrackerRuleList
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class RealAppTrackerListDownloader @Inject constructor(
     private val appTrackerListService: AppTrackerListService
 ) : AppTrackerListDownloader {

@@ -38,6 +38,7 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.privacy.config.api.Gpc
@@ -55,13 +56,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 import java.io.File
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class NetworkModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("api")
     fun apiOkHttpClient(
         context: Context,
@@ -81,7 +82,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
@@ -105,7 +106,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("api")
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
@@ -118,7 +119,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
     fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()

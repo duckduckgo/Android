@@ -102,4 +102,7 @@
     <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
     <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
 
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
+
 </resources>

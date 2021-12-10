@@ -26,7 +26,8 @@ interface PrivacyFeatureTogglesDataStore {
     fun deleteAll()
 }
 
-class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Context) : PrivacyFeatureTogglesDataStore {
+class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Context) :
+    PrivacyFeatureTogglesDataStore {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -52,7 +53,4 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
     }
 }
 
-data class PrivacyFeatureToggles(
-    val featureName: String,
-    val enabled: Boolean
-)
+data class PrivacyFeatureToggles(val featureName: String, val enabled: Boolean)

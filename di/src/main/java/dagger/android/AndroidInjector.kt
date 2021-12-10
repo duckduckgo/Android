@@ -33,7 +33,7 @@ interface HasDaggerInjector {
      *  1. creating the dagger component
      *  2. inject the dependencies in the Android type (eg. Activity)
      */
-    fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*>
+    fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*>
 }
 
 interface AndroidInjector<T> {

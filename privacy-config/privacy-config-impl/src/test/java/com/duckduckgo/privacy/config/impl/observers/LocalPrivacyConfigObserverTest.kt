@@ -18,9 +18,9 @@ package com.duckduckgo.privacy.config.impl.observers
 
 import android.content.Context
 import android.content.res.Resources
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import com.nhaarman.mockitokotlin2.any
@@ -36,8 +36,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LocalPrivacyConfigObserverTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
     private val mockContext: Context = mock()
@@ -45,21 +44,28 @@ class LocalPrivacyConfigObserverTest {
 
     @Before
     fun before() {
-        testee = LocalPrivacyConfigObserver(mockContext, mockPrivacyConfigPersister, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        testee =
+            LocalPrivacyConfigObserver(
+                mockContext,
+                mockPrivacyConfigPersister,
+                TestCoroutineScope(),
+                coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenOnCreateApplicationThenCallPersistPrivacyConfig() = coroutineRule.runBlocking {
-        givenLocalPrivacyConfigFileExists()
+    fun whenOnCreateApplicationThenCallPersistPrivacyConfig() =
+        coroutineRule.runBlocking {
+            givenLocalPrivacyConfigFileExists()
 
-        testee.storeLocalPrivacyConfig()
+            testee.storeLocalPrivacyConfig()
 
-        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
-    }
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+        }
 
     private fun givenLocalPrivacyConfigFileExists() {
         val resources: Resources = mock()
         whenever(mockContext.resources).thenReturn(resources)
-        whenever(resources.openRawResource(any())).thenReturn(loadResource("json/privacy_config.json"))
+        whenever(resources.openRawResource(any()))
+            .thenReturn(loadResource("json/privacy_config.json"))
     }
 }

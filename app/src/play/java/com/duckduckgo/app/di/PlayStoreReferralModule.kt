@@ -18,23 +18,23 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.PlayStoreAppReferrerStateListener
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [StoreReferralModule::class]
 )
 class PlayStoreReferralModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun appInstallationReferrerStateListener(
         playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener

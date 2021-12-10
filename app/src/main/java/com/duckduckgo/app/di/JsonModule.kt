@@ -19,16 +19,17 @@ package com.duckduckgo.app.di
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.privacy.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class JsonModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun moshi(): Moshi = Moshi.Builder()
         .add(ActionJsonAdapter())
         .add(HttpsFalsePositivesJsonAdapter())

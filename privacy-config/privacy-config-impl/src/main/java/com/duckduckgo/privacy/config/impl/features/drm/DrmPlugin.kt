@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.drm
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
@@ -28,7 +28,7 @@ import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DrmPlugin @Inject constructor(
     private val drmRepository: DrmRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository

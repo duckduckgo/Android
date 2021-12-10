@@ -23,7 +23,8 @@ import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-inline fun <reified T : ViewBinding> AppCompatActivity.viewBinding() = ActivityViewBindingDelegate(T::class.java, this)
+inline fun <reified T : ViewBinding> AppCompatActivity.viewBinding() =
+    ActivityViewBindingDelegate(T::class.java, this)
 
 class ActivityViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
@@ -34,7 +35,9 @@ class ActivityViewBindingDelegate<T : ViewBinding>(
     private val bindMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java)
 
     override fun getValue(thisRef: AppCompatActivity, property: KProperty<*>): T {
-        binding?.let { return it }
+        binding?.let {
+            return it
+        }
 
         val lifecycle = thisRef.lifecycle
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
@@ -47,5 +50,4 @@ class ActivityViewBindingDelegate<T : ViewBinding>(
     }
 }
 
-@Suppress("UNCHECKED_CAST")
-private fun <T> Any.cast(): T = this as T
+@Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
