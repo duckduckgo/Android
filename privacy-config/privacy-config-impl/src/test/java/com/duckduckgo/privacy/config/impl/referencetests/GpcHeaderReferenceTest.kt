@@ -77,8 +77,12 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() {
-        val hasGpcHeader = gpc.getHeaders(testCase.requestURL).containsKey(RealGpc.GPC_HEADER)
-        assertEquals(testCase.expectGPCHeader, hasGpcHeader)
+        val gpcHeader = gpc.getHeaders(testCase.requestURL)[RealGpc.GPC_HEADER]
+        val gpcHeaderExists = gpcHeader != null
+        assertEquals(testCase.expectGPCHeader, gpcHeaderExists)
+        if (gpcHeaderExists) {
+            assertEquals(testCase.expectGPCHeaderValue, gpcHeader)
+        }
     }
 
     private fun mockGpcPrivacyConfig() {
