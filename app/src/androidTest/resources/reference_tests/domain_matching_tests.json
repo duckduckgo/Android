@@ -53,7 +53,10 @@
         "siteURL": "https://ignore.test/",
         "requestURL": "https://bad.third-party.site/",
         "requestType": "script",
-        "expectAction": "block"
+        "expectAction": "block",
+        "exceptPlatforms": [
+          "android-browser"
+        ]
       },
       {
         "name": "notignore doesn't load tracker",
@@ -74,7 +77,10 @@
         "siteURL": "https://randomsite123.com/",
         "requestURL": "https://bad.cnames.test/something",
         "requestType": "script",
-        "expectAction": "block"
+        "expectAction": "block",
+        "exceptPlatforms": [
+          "android-browser"
+        ]
       },
       {
         "name": "uncloacked tracker should contain original path and be checked against the ignore rules",
