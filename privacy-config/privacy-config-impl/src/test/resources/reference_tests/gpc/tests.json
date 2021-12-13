@@ -1,0 +1,129 @@
+{
+  "gpcHeader": {
+    "name": "Tests related to the GPC request header",
+    "desc": "Check if `Sec-GPC: 1` is correctly sent with all requests",
+    "tests": [
+      {
+        "name": "Header injected - navigational requests",
+        "siteURL": "http://global-privacy-control.glitch.me",
+        "requestURL": "http://global-privacy-control.glitch.me",
+        "requestType": "main_frame",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": true,
+        "expectGPCHeaderValue": "1",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Header not injected - user opted out of GPC",
+        "siteURL": "http://global-privacy-control.glitch.me",
+        "requestURL": "http://global-privacy-control.glitch.me",
+        "requestType": "main_frame",
+        "gpcUserSettingOn": false,
+        "expectGPCHeader": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Header not injected - privacy config local exception (gpc/exceptions)",
+        "siteURL": "https://www.washingtonpost.com/",
+        "requestURL": "https://www.washingtonpost.com/",
+        "requestType": "main_frame",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Header not injected - privacy config global exception (unprotectedTemporary)",
+        "siteURL": "https://globalprivacycontrol.org/",
+        "requestURL": "https://globalprivacycontrol.org/",
+        "requestType": "main_frame",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Header injected - subrequest",
+        "siteURL": "https://example.com/",
+        "requestURL": "https://example.com/image.png",
+        "requestType": "image",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": true,
+        "exceptPlatforms": [
+          "ios-browser",
+          "macos-browser",
+          "android-browser"
+        ]
+      },
+      {
+        "name": "Header not injected - subrequest on a excluded site (gpc/exceptions)",
+        "siteURL": "https://www.washingtonpost.com/",
+        "requestURL": "https://example.com/image.png",
+        "requestType": "image",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": false,
+        "exceptPlatforms": [
+          "ios-browser",
+          "macos-browser",
+          "android-browser"
+        ]
+      },
+      {
+        "name": "Header not injected - subrequest on a excluded site (unprotectedTemporary)",
+        "siteURL": "https://globalprivacycontrol.org/",
+        "requestURL": "https://example.com/image.png",
+        "requestType": "image",
+        "gpcUserSettingOn": true,
+        "expectGPCHeader": false,
+        "exceptPlatforms": [
+          "ios-browser",
+          "macos-browser",
+          "android-browser"
+        ]
+      }
+    ]
+  },
+  "gpcJavaScriptAPI": {
+    "name": "Tests related to GPC JavaScript API",
+    "desc": "Check if Navigator.prototype.globalPrivacyControl is set to true in all frames",
+    "tests": [
+      {
+        "name": "API injected - main frame",
+        "siteURL": "http://global-privacy-control.glitch.me",
+        "gpcUserSettingOn": true,
+        "expectGPCAPI": true,
+        "expectGPCAPIValue": "true",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "API injected - sub frame",
+        "siteURL": "http://global-privacy-control.glitch.me",
+        "frameURL": "https://subframe.com",
+        "gpcUserSettingOn": true,
+        "expectGPCAPI": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "API NOT injected - excluded site (gpc/exceptions)",
+        "siteURL": "https://www.washingtonpost.com/",
+        "gpcUserSettingOn": true,
+        "expectGPCAPI": false,
+        "expectGPCAPIValue": "undefined",
+        "exceptPlatforms": []
+      },
+      {
+        "name": "API NOT injected - subframe on a excluded site (unprotectedTemporary)",
+        "siteURL": "https://globalprivacycontrol.org/",
+        "gpcUserSettingOn": true,
+        "expectGPCAPI": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "API NOT injected - user opted out of GPC",
+        "siteURL": "http://global-privacy-control.glitch.me",
+        "gpcUserSettingOn": false,
+        "expectGPCAPI": true,
+        "expectGPCAPIValue": "false",
+        "exceptPlatforms": []
+      }
+    ]
+  }
+}
