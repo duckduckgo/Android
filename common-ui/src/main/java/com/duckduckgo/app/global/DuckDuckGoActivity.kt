@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -29,9 +28,10 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import dagger.android.AndroidInjection
+import dagger.android.DaggerActivity
 import javax.inject.Inject
 
-abstract class DuckDuckGoActivity : AppCompatActivity() {
+abstract class DuckDuckGoActivity : DaggerActivity() {
 
     @Inject lateinit var viewModelFactory: ViewModelFactory
 
