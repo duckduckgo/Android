@@ -72,7 +72,6 @@ class ExcludedAppsViewModelTest {
             viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName, skippedReport = false)
 
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-            verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to "com.package.name", "reason" to STOPPED_WORKING.toString()))
 
             assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), awaitItem())
             cancelAndConsumeRemainingEvents()
@@ -84,7 +83,6 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName, skippedReport = false)
 
-        verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to packageName, "reason" to ManuallyDisableAppProtectionDialog.DONT_USE.toString()))
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
@@ -102,7 +100,6 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 1, true)
 
-        verify(deviceShieldPixels).enableAppProtection(mapOf("packageName" to packageName, "reason" to 1.toString()))
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 

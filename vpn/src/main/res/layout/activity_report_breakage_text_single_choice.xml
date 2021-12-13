@@ -72,6 +72,15 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+
+    <TextView
+        android:id="@+id/appBreakageFormConfirmationCheckbox"
+        android:padding="@dimen/keyline_4"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/atp_ReportBreakageFormCheckboxText" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -84,7 +93,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:layout_gravity="bottom"
-        android:enabled="true"
         android:text="@string/atp_ReportBreakageAppSubmitCta"/>
 
 </LinearLayout>
