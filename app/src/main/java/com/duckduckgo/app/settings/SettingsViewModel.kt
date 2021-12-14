@@ -35,7 +35,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -103,6 +103,7 @@ class SettingsViewModel(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAccessibilitySettigns : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
@@ -197,6 +198,10 @@ class SettingsViewModel(
     fun userRequestedToChangeFireAnimation() {
         viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
+    }
+
+    fun onAccessibilitySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettigns) }
     }
 
     fun userRequestedToChangeTheme() {
@@ -423,7 +428,7 @@ enum class AppLinkSettingType {
     NEVER
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SettingsViewModelFactory @Inject constructor(
     private val context: Provider<Context>,
     private val themingDataStore: Provider<ThemingDataStore>,

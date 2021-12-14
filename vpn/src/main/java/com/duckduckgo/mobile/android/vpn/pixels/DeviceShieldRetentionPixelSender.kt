@@ -18,12 +18,12 @@ package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeviceShieldRetentionPixelSender @Inject constructor(
     private val context: Context,
     private val deviceShieldPixels: DeviceShieldPixels,

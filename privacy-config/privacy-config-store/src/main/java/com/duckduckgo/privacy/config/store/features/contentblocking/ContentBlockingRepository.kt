@@ -21,25 +21,26 @@ import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toContentBlockingException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface ContentBlockingRepository {
     fun updateAll(exceptions: List<ContentBlockingExceptionEntity>)
     val exceptions: CopyOnWriteArrayList<ContentBlockingException>
 }
 
-class RealContentBlockingRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    ContentBlockingRepository {
+class RealContentBlockingRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : ContentBlockingRepository {
 
     private val contentBlockingDao: ContentBlockingDao = database.contentBlockingDao()
     override val exceptions = CopyOnWriteArrayList<ContentBlockingException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
     override fun updateAll(exceptions: List<ContentBlockingExceptionEntity>) {
@@ -49,8 +50,6 @@ class RealContentBlockingRepository(val database: PrivacyConfigDatabase, corouti
 
     private fun loadToMemory() {
         exceptions.clear()
-        contentBlockingDao.getAll().map {
-            exceptions.add(it.toContentBlockingException())
-        }
+        contentBlockingDao.getAll().map { exceptions.add(it.toContentBlockingException()) }
     }
 }

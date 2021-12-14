@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
@@ -77,7 +77,7 @@ class ReportBreakageAppListViewModel constructor(
     private fun List<InstalledApp>.hasSelected() = find { it.isSelected } != null
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ReportBreakageAppListViewModelFactory @Inject constructor(
     private val repository: Provider<TrackingProtectionAppsRepository>
 ) : ViewModelFactoryPlugin {

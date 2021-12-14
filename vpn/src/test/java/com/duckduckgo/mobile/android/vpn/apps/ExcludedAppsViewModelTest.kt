@@ -72,9 +72,8 @@ class ExcludedAppsViewModelTest {
             viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName, skippedReport = false)
 
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-            verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to "com.package.name", "reason" to STOPPED_WORKING.toString()))
 
-            assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), expectItem())
+            assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -84,7 +83,6 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName, skippedReport = false)
 
-        verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to packageName, "reason" to ManuallyDisableAppProtectionDialog.DONT_USE.toString()))
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
@@ -102,7 +100,6 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 1, true)
 
-        verify(deviceShieldPixels).enableAppProtection(mapOf("packageName" to packageName, "reason" to 1.toString()))
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
@@ -110,7 +107,7 @@ class ExcludedAppsViewModelTest {
     fun whenUserWantsToRestoreDefaultThenDefaultListIsRestoredAndVpnRestarted() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.restoreProtectedApps()
-            assertEquals(Command.RestartVpn, expectItem())
+            assertEquals(Command.RestartVpn, awaitItem())
             verify(trackingProtectionAppsRepository).restoreDefaultProtectedList()
             verify(deviceShieldPixels).restoreDefaultProtectionList()
             cancelAndConsumeRemainingEvents()
@@ -124,7 +121,7 @@ class ExcludedAppsViewModelTest {
 
         viewModel.commands().test {
             viewModel.onLeavingScreen()
-            assertEquals(Command.RestartVpn, expectItem())
+            assertEquals(Command.RestartVpn, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -142,7 +139,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithKnownIssuesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithKnownIssues, 0, true)
-            assertEquals(Command.ShowEnableProtectionDialog(appWithKnownIssues, 0), expectItem())
+            assertEquals(Command.ShowEnableProtectionDialog(appWithKnownIssues, 0), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -160,7 +157,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppLoadsWebsitesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appLoadsWebsites, 0, true)
-            assertEquals(Command.ShowEnableProtectionDialog(appLoadsWebsites, 0), expectItem())
+            assertEquals(Command.ShowEnableProtectionDialog(appLoadsWebsites, 0), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -187,7 +184,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, false)
-            assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -205,7 +202,7 @@ class ExcludedAppsViewModelTest {
     fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = coroutineRule.runBlocking {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, false)
-            assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded), expectItem())
+            assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }

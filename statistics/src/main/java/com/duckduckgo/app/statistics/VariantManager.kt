@@ -29,6 +29,9 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object FireproofExperiment : VariantFeature()
+
+        object ReturningUsersNoOnboarding : VariantFeature()
+        object ReturningUsersWidgetPromotion : VariantFeature()
     }
 
     companion object {
@@ -45,8 +48,13 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Fireproof experiment
-            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
+            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
+
+            // Returning users
+            Variant(key = "zk", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zv", weight = 1.0, features = listOf(VariantFeature.ReturningUsersNoOnboarding), filterBy = { isEnglishLocale() }),
+            Variant(key = "zz", weight = 1.0, features = listOf(VariantFeature.ReturningUsersWidgetPromotion), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -174,6 +182,9 @@ class ExperimentationVariantManager(
 }
 
 fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
+
+fun VariantManager.returningUsersNoOnboardingEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.ReturningUsersNoOnboarding)
+fun VariantManager.returningUsersWidgetPromotionEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.ReturningUsersWidgetPromotion)
 
 /**
  * A variant which can be used for experimentation.

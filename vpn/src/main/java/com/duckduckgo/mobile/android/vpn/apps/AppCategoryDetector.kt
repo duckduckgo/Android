@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.Context
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ interface AppCategoryDetector {
     fun getAppCategory(packageName: String): AppCategory
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class RealAppCategoryDetector @Inject constructor(context: Context) : AppCategoryDetector {
     private val packageManager = context.packageManager
 

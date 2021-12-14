@@ -16,9 +16,9 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
@@ -35,8 +35,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigDownloaderTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigDownloader
 
@@ -48,22 +47,25 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
-    fun whenDownloadIsNotSuccessfulThenReturnFalse() = coroutineRule.runBlocking {
-        testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
-        assertFalse(testee.download())
-    }
+    fun whenDownloadIsNotSuccessfulThenReturnFalse() =
+        coroutineRule.runBlocking {
+            testee =
+                RealPrivacyConfigDownloader(
+                    TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
+            assertFalse(testee.download())
+        }
 
     @Test
-    fun whenDownloadIsSuccessfulThenReturnTrue() = coroutineRule.runBlocking {
-        assertTrue(testee.download())
-    }
+    fun whenDownloadIsSuccessfulThenReturnTrue() =
+        coroutineRule.runBlocking { assertTrue(testee.download()) }
 
     @Test
-    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() = coroutineRule.runBlocking {
-        testee.download()
+    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() =
+        coroutineRule.runBlocking {
+            testee.download()
 
-        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
-    }
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+        }
 
     class TestFailingPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
@@ -73,7 +75,11 @@ class RealPrivacyConfigDownloaderTest {
 
     class TestPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
-            return JsonPrivacyConfig(version = 1, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)), unprotectedTemporaryList)
+            return JsonPrivacyConfig(
+                version = 1,
+                readme = "readme",
+                features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
+                unprotectedTemporaryList)
         }
     }
 

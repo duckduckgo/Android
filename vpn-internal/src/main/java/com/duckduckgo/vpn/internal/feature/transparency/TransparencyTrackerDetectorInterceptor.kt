@@ -16,17 +16,17 @@
 
 package com.duckduckgo.vpn.internal.feature.transparency
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@ContributesMultibinding(AppObjectGraph::class)
-@Singleton
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
 
     private val enable = AtomicBoolean(false)

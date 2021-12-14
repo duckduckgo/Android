@@ -39,6 +39,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
+    ONBOARDING_DAX_PRIMARY_CTA_PRESSED("m_onboarding_dax_primary_cta_pressed"),
+    ONBOARDING_DAX_NEW_USER_CTA_PRESSED("m_onboarding_dax_new_user_cta_pressed"),
+    ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED("m_onboarding_dax_returning_user_cta_pressed"),
+
     ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
     ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
     ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
@@ -236,6 +240,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
+    EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),
+    EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
+    EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),

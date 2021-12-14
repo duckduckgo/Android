@@ -33,8 +33,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
+import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
@@ -127,6 +129,7 @@ class SettingsActivity :
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
             changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
         }
 
         with(viewsPrivacy) {
@@ -144,6 +147,9 @@ class SettingsActivity :
         with(viewsOther) {
             provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
             about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            privacyPolicy.setOnClickListener {
+                startActivity(WebViewActivity.intent(this@SettingsActivity, PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo)))
+            }
         }
 
     }
@@ -255,6 +261,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
+            is Command.LaunchAccessibilitySettigns -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
@@ -314,6 +321,11 @@ class SettingsActivity :
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
+    }
+
+    private fun launchAccessibilitySettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AccessibilityActivity.intent(this), options)
     }
 
     private fun launchLocation() {
@@ -438,6 +450,7 @@ class SettingsActivity :
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
+        private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

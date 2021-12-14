@@ -41,6 +41,5 @@ abstract class ContentBlockingDao {
     @Query("select * from content_blocking_exceptions")
     abstract fun getAll(): List<ContentBlockingExceptionEntity>
 
-    @Query("delete from content_blocking_exceptions")
-    abstract fun deleteAll()
+    @Query("delete from content_blocking_exceptions") abstract fun deleteAll()
 }

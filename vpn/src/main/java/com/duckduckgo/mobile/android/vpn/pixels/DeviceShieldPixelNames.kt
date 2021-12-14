@@ -103,24 +103,14 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_TUN_INTERFACE_DOWN_DAILY("m_atp_ev_tun_down_d"),
     ATP_TUN_INTERFACE_DOWN("m_atp_ev_tun_down_c"),
 
-    ATP_PROCESS_EXPENDABLE_LOW("m_atp_ev_expen_memory_low_c"),
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
-    ATP_PROCESS_EXPENDABLE_MODERATE("m_atp_ev_expen_memory_moderate_c"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
-    ATP_PROCESS_EXPENDABLE_COMPLETE("m_atp_ev_expen_memory_complete_c"),
     ATP_PROCESS_EXPENDABLE_COMPLETE_DAILY("m_atp_ev_expen_memory_complete_d"),
 
-    ATP_PROCESS_MEMORY_LOW("m_atp_ev_memory_low_c"),
     ATP_PROCESS_MEMORY_LOW_DAILY("m_atp_ev_memory_low_d"),
-    ATP_PROCESS_MEMORY_MODERATE("m_atp_ev_memory_moderate_c"),
     ATP_PROCESS_MEMORY_MODERATE_DAILY("m_atp_ev_memory_moderate_d"),
-    ATP_PROCESS_MEMORY_CRITICAL("m_atp_ev_memory_critical_c"),
     ATP_PROCESS_MEMORY_CRITICAL_DAILY("m_atp_ev_memory_critical_d"),
 
-    ATP_DISABLE_APP_PROTECTION("m_atp_ev_disabled_protection_c"),
-    ATP_DISABLE_APP_PROTECTION_DAILY("m_atp_ev_disabled_protection_d"),
-    ATP_ENABLE_APP_PROTECTION_APP("m_atp_ev_enabled_protection_c"),
-    ATP_ENABLE_APP_PROTECTION_APP_DAILY("m_atp_ev_enabled_protection_d"),
     ATP_RESTORE_APP_PROTECTION_LIST("m_atp_ev_restore_protection_c"),
     ATP_RESTORE_APP_PROTECTION_LIST_DAILY("m_atp_ev_restore_protection_d"),
     ATP_LAUNCH_FEEDBACK("m_atp_ev_launch_feedback_c"),
@@ -130,8 +120,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_ENCRYPTED_IO_EXCEPTION("m_atp_ev_encrypted_io_error_c"),
     ATP_ENCRYPTED_GENERAL_EXCEPTION("m_atp_ev_encrypted_error_c"),
-
-    ATP_APP_PROTECTION_DIALOG_REPORTING_SKIPPED("m_atp_ev_protection_dialog_skip_c"),
 
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST("m_atp_imp_report_breakage_c"),
     ATP_DID_SHOW_REPORT_BREAKAGE_APP_LIST_DAILY("m_atp_imp_report_breakage_d"),
@@ -144,5 +132,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_disable_protection_c"),
     ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG("m_atp_ev_selected_disable_app_protection_c"),
     ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG("m_atp_ev_selected_cancel_app_protection_c"),
+
+    ATP_DID_SHOW_WAITLIST_DIALOG("m_atp_imp_waitlist_dialog_c"),
+    ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("m_atp_ev_waitlist_dialog_notify_me_c"),
+    ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
     ;
 }

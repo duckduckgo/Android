@@ -20,8 +20,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.webkit.CookieManager
-import android.webkit.WebSettings
 import androidx.lifecycle.LifecycleObserver
+import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -69,6 +69,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
@@ -76,7 +77,8 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
+import javax.inject.Provider
 
 @Module
 class BrowserModule {
@@ -107,7 +109,8 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector
+        emailInjector: EmailInjector,
+        accessibilityManager: AccessibilityManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -124,7 +127,8 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector
+            emailInjector,
+            accessibilityManager
         )
     }
 
@@ -139,7 +143,7 @@ class BrowserModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
@@ -149,11 +153,11 @@ class BrowserModule {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewSessionStorage(): WebViewSessionStorage = WebViewSessionInMemoryStorage()
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webDataManager(
         context: Context,
@@ -178,9 +182,9 @@ class BrowserModule {
     fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
 
     @Provides
-    @Singleton
-    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
-        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+    @SingleInstanceIn(AppScope::class)
+    fun userAgentProvider(@Named("defaultUserAgent") defaultUserAgent: Provider<String>, deviceInfo: DeviceInfo): UserAgentProvider {
+        return UserAgentProvider(defaultUserAgent, deviceInfo)
     }
 
     @Provides
@@ -242,25 +246,25 @@ class BrowserModule {
         return CookieManagerRemover(cookieManager)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewCookieManager(): CookieManager {
         return CookieManager.getInstance()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun gridViewColumnCalculator(context: Context): GridViewColumnCalculator {
         return GridViewColumnCalculator(context)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
@@ -309,14 +313,14 @@ class BrowserModule {
         return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
 }

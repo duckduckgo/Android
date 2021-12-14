@@ -23,6 +23,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
+import com.duckduckgo.privacy.config.store.features.drm.DrmDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcDao
 import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
@@ -32,13 +33,14 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 3,
+    exportSchema = true, version = 4,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
         HttpsExceptionEntity::class,
         GpcExceptionEntity::class,
         ContentBlockingExceptionEntity::class,
+        DrmExceptionEntity::class,
         PrivacyConfig::class
     ]
 )
@@ -49,6 +51,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun gpcDao(): GpcDao
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyConfigDao(): PrivacyConfigDao
+    abstract fun drmDao(): DrmDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

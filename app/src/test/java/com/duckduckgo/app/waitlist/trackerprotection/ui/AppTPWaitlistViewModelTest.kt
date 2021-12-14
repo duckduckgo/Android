@@ -25,13 +25,11 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorker
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.*
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals
@@ -49,6 +47,7 @@ class AppTPWaitlistViewModelTest {
     private var service: AppTrackingProtectionWaitlistService = mock()
     private var workManager: WorkManager = mock()
     private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = mock()
+    private val deviceShieldPixels: DeviceShieldPixels = mock()
 
     private lateinit var viewModel: AppTPWaitlistViewModel
 
@@ -58,7 +57,7 @@ class AppTPWaitlistViewModelTest {
     @Before
     fun before() {
         whenever(manager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
-        viewModel = AppTPWaitlistViewModel(manager, service, workManager, waitlistBuilder)
+        viewModel = AppTPWaitlistViewModel(manager, service, workManager, waitlistBuilder, deviceShieldPixels)
     }
 
     @Test
@@ -74,8 +73,9 @@ class AppTPWaitlistViewModelTest {
 
             verify(manager).joinWaitlist(any(), any())
             verify(workManager).enqueue(expectedWorkRequest)
+            verify(deviceShieldPixels).didShowWaitlistDialog()
 
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
         }
     }
 
@@ -86,7 +86,7 @@ class AppTPWaitlistViewModelTest {
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
@@ -97,24 +97,24 @@ class AppTPWaitlistViewModelTest {
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
     @Test
     fun whenUserCantJoinsWaitlistThenErrorMessageIsShown() = coroutineRule.runBlocking {
-        viewModel = AppTPWaitlistViewModel(manager, FailWaitlistService(), workManager, waitlistBuilder)
+        viewModel = AppTPWaitlistViewModel(manager, FailWaitlistService(), workManager, waitlistBuilder, deviceShieldPixels)
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowErrorMessage)
         }
     }
 
     @Test
     fun whenViewModelCreatedThenWaitlistStateIsNotJoined() = coroutineRule.runBlocking {
         viewModel.viewState.test {
-            assert(expectItem().waitlist is WaitlistState.NotJoinedQueue)
+            assert(awaitItem().waitlist is WaitlistState.NotJoinedQueue)
         }
     }
 
@@ -122,7 +122,7 @@ class AppTPWaitlistViewModelTest {
     fun whenUserHasAnInviteCodeThenEnterInviteCodeCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.haveAnInviteCode()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.EnterInviteCode)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.EnterInviteCode)
         }
     }
 
@@ -130,33 +130,43 @@ class AppTPWaitlistViewModelTest {
     fun whenUserWantsToLearnMoreThenOpenUrlCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.learnMore()
-            assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, expectItem())
+            assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, awaitItem())
         }
     }
 
     @Test
     fun whenUserWantsToBeNotifiedThenWaitlistManagerStoresIt() = coroutineRule.runBlocking {
         viewModel.onNotifyMeClicked()
+
         verify(manager).notifyOnJoinedWaitlist()
+        verify(deviceShieldPixels).didPressWaitlistDialogNotifyMe()
     }
 
     @Test
     fun whenUserWantsToGetStartedThenShowOnboardingCommandSent() = coroutineRule.runBlocking {
         viewModel.commands.test {
             viewModel.getStarted()
-            assert(expectItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
+            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
         }
     }
 
     @Test
-    fun whenUserDismissedDialogThenWaitlistStateIsJoinedQueue() = coroutineRule.runBlocking {
+    fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = coroutineRule.runBlocking {
         val waitlistState = WaitlistState.JoinedQueue(false)
         whenever(manager.waitlistState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onDialogDismissed()
+
+            verify(deviceShieldPixels, never()).didPressWaitlistDialogDismiss()
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(waitlistState)), awaitEvent())
         }
+    }
+
+    @Test
+    fun whenUserDismissedDialogThenWaitlistStateIsJoinedQueue() = coroutineRule.runBlocking {
+        viewModel.onNoThanksClicked()
+        verify(deviceShieldPixels).didPressWaitlistDialogDismiss()
     }
 
     @Test

@@ -124,7 +124,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -135,7 +135,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -146,7 +146,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -157,7 +157,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -168,7 +168,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -180,7 +180,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTPToggleSwitched(true)
 
             verify(deviceShieldPixels).enableFromSummaryTrackerActivity()
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -192,7 +192,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTPToggleSwitched(false)
 
             verifyZeroInteractions(deviceShieldPixels)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -204,7 +204,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTpManuallyDisabled()
 
             verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield, expectItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

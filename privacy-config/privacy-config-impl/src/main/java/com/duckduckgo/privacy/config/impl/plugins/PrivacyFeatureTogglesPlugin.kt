@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.plugins
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -24,7 +24,7 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyFeatureTogglesPlugin @Inject constructor(private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository) :
     FeatureTogglesPlugin {
 

@@ -27,7 +27,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -135,7 +135,7 @@ class LocationPermissionsViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class LocationPermissionsViewModelFactory @Inject constructor(
     private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
     private val geoLocationPermissions: Provider<GeoLocationPermissions>,

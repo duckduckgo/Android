@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -32,6 +33,8 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -307,6 +310,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
 
+    private lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+
     private val context = getInstrumentation().targetContext
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
@@ -363,6 +368,8 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
+        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
@@ -411,6 +418,7 @@ class BrowserTabViewModelTest {
             appCoroutineScope = TestCoroutineScope(),
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
+            accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager
         )
 
@@ -430,6 +438,7 @@ class BrowserTabViewModelTest {
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
+        clearAccessibilitySettings()
     }
 
     @Test
@@ -3625,6 +3634,33 @@ class BrowserTabViewModelTest {
         assertCommandNotIssued<Command.OpenAppLink>()
     }
 
+    @Test
+    fun whenForceZoomEnabledThenEmitNewState() {
+        accessibilitySettingsDataStore.forceZoom = true
+        assertTrue(accessibilityViewState().forceZoom)
+        assertTrue(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
+    fun whenForceZoomEnabledAndWebViewRefreshedThenEmitNewState() {
+        accessibilitySettingsDataStore.forceZoom = true
+        assertTrue(accessibilityViewState().forceZoom)
+        assertTrue(accessibilityViewState().refreshWebView)
+
+        testee.onWebViewRefreshed()
+
+        assertFalse(accessibilityViewState().refreshWebView)
+    }
+
+    @Test
+    fun whenFontSizeChangedThenEmitNewState() {
+        accessibilitySettingsDataStore.appFontSize = 150f
+        accessibilitySettingsDataStore.overrideSystemFontSize = false
+
+        assertFalse(accessibilityViewState().refreshWebView)
+        assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -3788,6 +3824,10 @@ class BrowserTabViewModelTest {
         return commandCaptor
     }
 
+    private fun clearAccessibilitySettings() {
+        context.getSharedPreferences(AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit().clear().commit()
+    }
+
     private fun buildWebNavigation(
         currentUrl: String? = null,
         originalUrl: String? = null,
@@ -3817,4 +3857,5 @@ class BrowserTabViewModelTest {
     private fun findInPageViewState() = testee.findInPageViewState.value!!
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
+    private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 }

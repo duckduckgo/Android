@@ -24,21 +24,23 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class RatingModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     @IntoSet
     fun appEnjoymentManagerObserver(
@@ -50,12 +52,12 @@ class RatingModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
@@ -70,9 +72,10 @@ class RatingModule {
         searchCountDao: SearchCountDao,
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
-        context: Context
+        context: Context,
+        onboardingStore: OnboardingStore
     ): PromptTypeDecider {
-        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context)
+        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore)
     }
 
     @Provides
@@ -80,13 +83,13 @@ class RatingModule {
         return PlayStoreAndroidUtils(context)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
         return database.appEnjoymentDao()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
         return AppEnjoymentDatabaseRepository(appEnjoymentDao)
