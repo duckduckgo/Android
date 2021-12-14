@@ -24,12 +24,13 @@ import com.duckduckgo.app.remotemessage.store.ALL_MIGRATIONS
 import com.duckduckgo.app.remotemessage.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingDatabase
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -38,7 +39,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class RemoteMessagingModuleBindingModule {
 
     @Multibinds
@@ -49,10 +50,11 @@ abstract class RemoteMessagingModuleBindingModule {
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class DomainModule {
+
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigDownloader(
         remoteConfig: RemoteMessagingService,
         remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
@@ -62,11 +64,11 @@ class DomainModule {
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class NetworkModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val retrofit = Retrofit.Builder()
@@ -79,23 +81,24 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesMatchingAttributePluginPoint(customConfigs: Set<@JvmSuppressWildcards MatchingAttributePlugin>): PluginPoint<MatchingAttributePlugin> {
         return MatchingAttributePluginPoint(customConfigs)
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesMessagePluginPoint(customConfigs: Set<@JvmSuppressWildcards MessagePlugin>): PluginPoint<MessagePlugin> {
         return MessagePluginPoint(customConfigs)
     }
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class DataSourceModule {
-    @Singleton
+
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigProcessor(
         messagePluginPoint: PluginPoint<MessagePlugin>,
         matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>,
@@ -108,14 +111,14 @@ class DataSourceModule {
         )
     }
 
-    @Singleton
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
         return LocalRemoteMessagingConfigRepository(database)
     }
 
-    @Singleton
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingDatabase(context: Context): RemoteMessagingDatabase {
         return Room.databaseBuilder(context, RemoteMessagingDatabase::class.java, "remote_messaging.db")
             .enableMultiInstanceInvalidation()

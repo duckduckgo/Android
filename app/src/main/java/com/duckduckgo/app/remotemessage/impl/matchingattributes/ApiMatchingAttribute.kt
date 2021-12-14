@@ -17,148 +17,148 @@
 package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
 import com.duckduckgo.app.remotemessage.impl.MatchingAttributePlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class LocaleAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "locale"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Locale>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ApiMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "os_api"
+    private val featureName = "osApi"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Api>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class WebViewMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "webview"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.WebView>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FlavorMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "flavor"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Flavor>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppIdMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "app_id"
+    private val featureName = "appId"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.AppId>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppVersionMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "app_version"
+    private val featureName = "appVersion"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.AppVersion>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AtbMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "atb"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Atb>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppAtbMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "app_atb"
+    private val featureName = "appAtb"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.AppAtb>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SearchAtbMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "search_atb"
+    private val featureName = "searchAtb"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.SearchAtb>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ExpVariantMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "exp_variant"
+    private val featureName = "expVariant"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.ExpVariant>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class InstalledGPlayMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "installed_gplay"
+    private val featureName = "installedGPlay"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.InstalledGPlay>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DefaultBrowserMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "default_browser"
+    private val featureName = "defaultBrowser"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.DefaultBrowser>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class EmailEnabledMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "email_enabled"
+    private val featureName = "emailEnabled"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.EmailEnabled>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class WidgetAddedMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "widget_added"
+    private val featureName = "widgetAdded"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.WidgetAdded>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SearchCountMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "search_count"
+    private val featureName = "searchCount"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.SearchCount>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BookmarksMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "bookmarks"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Bookmarks>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FavoritesMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
     private val featureName = "favorites"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.Favorites>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppThemeMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "app_theme"
+    private val featureName = "appTheme"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.AppTheme>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DaysSinceInstalledMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "days_since_installed"
+    private val featureName = "daysSinceInstalled"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.DaysSinceInstalled>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DaysUsedSinceMatchingAttribute @Inject constructor() : MatchingAttributePlugin {
-    private val featureName = "days_used_since"
+    private val featureName = "daysUsedSince"
 
     override fun parse(key: String, json: String) = parse<MatchingAttribute.DaysUsedSince>(key, json, featureName)
 }

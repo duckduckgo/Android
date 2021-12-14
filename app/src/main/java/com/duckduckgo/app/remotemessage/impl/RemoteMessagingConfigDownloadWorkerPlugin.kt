@@ -20,11 +20,11 @@ import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.remotemessage.RemoteMessagingConfigDownloadWorker
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class RemoteMessagingConfigDownloadWorkerPlugin @Inject constructor(
     private val downloader: RemoteMessagingConfigDownloader,
     private val dispatcherProvider: DispatcherProvider

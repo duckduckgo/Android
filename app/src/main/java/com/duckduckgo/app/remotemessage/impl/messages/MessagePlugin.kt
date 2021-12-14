@@ -18,36 +18,36 @@ package com.duckduckgo.app.remotemessage.impl.messages
 
 import com.duckduckgo.app.remotemessage.impl.ActionJson
 import com.duckduckgo.app.remotemessage.impl.MessagePlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.*
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SmallMessage @Inject constructor() : MessagePlugin {
     private val featureName = "small"
 
     override fun parse(key: String, json: String) = parse<Content.Small>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class MediumMessage @Inject constructor() : MessagePlugin {
     private val featureName = "medium"
 
     override fun parse(key: String, json: String) = parse<Content.Medium>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BigSingleActionMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "big_1"
+    private val featureName = "big_single_action"
 
     override fun parse(key: String, json: String) = parse<Content.BigSingleAction>(key, json, featureName)
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BigTwoActionsMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "big_2"
+    private val featureName = "big_two_action"
 
     override fun parse(key: String, json: String) = parse<Content.BigTwoActions>(key, json, featureName)
 }

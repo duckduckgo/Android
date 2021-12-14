@@ -23,7 +23,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.remotemessage.impl.RemoteMessagingConfigDownloader
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -46,7 +46,7 @@ class RemoteMessagingConfigDownloadWorker(context: Context, workerParameters: Wo
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleObserver {
