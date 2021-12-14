@@ -36,7 +36,9 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     private val pixel: Pixel
 ) : AppTrackingProtectionWaitlistDataStore {
 
-    private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
+    private val encryptedPreferences: SharedPreferences? by lazy {
+        encryptedPreferences()
+    }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
