@@ -280,6 +280,7 @@
     <string name="atp_TrackingSignalOsBuildNumber">OS Build Number</string>
     <string name="atp_TrackingSignalPlatform">Device Platform</string>
     <string name="atp_TrackingSignalDeviceBrand">Device Brand</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Device Language</string>
     <string name="atp_TrackingSignalDeviceModel">Device Model</string>
     <string name="atp_TrackingSignalCPUData">CPU Data</string>
     <string name="atp_TrackingSignalScreenResolution">Screen Resolution</string>
@@ -305,6 +306,7 @@
     <string name="atp_TrackingSignalMagnetometerData">Magnetometer Data</string>
     <string name="atp_TrackingSignalAvailableInternalStorage">Available Internal Storage</string>
     <string name="atp_TrackingSignalAvailableExternalStorage">Available External Storage</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Device Total Memory</string>
     <string name="atp_TrackingSignalAvailableDeviceMemory">Available Device Memory</string>
     <string name="atp_TrackingSignalScreenMargins">Screen Margins</string>
     <string name="atp_TrackingSignalScreenDensity">Screen Density</string>

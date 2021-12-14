@@ -56,7 +56,7 @@ constructor(
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
         val lastTrackerBlockedAgo =
-            if (sourceData.isNotEmpty()) {
+            if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
                     LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
                 )
@@ -64,7 +64,7 @@ constructor(
                 ""
             }
 
-        val trackerCompany = trackerData.sortedBy { it.trackerEntity.score }.groupBy { it.tracker.trackerCompanyId }
+        val trackerCompany = trackerData.sortedByDescending { it.trackerEntity.score }.groupBy { it.tracker.trackerCompanyId }
 
         trackerCompany.forEach { data ->
             val trackerCompanyName = data.value[0].tracker.company

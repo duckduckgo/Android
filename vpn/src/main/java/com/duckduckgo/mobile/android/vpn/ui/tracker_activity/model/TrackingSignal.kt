@@ -19,22 +19,26 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.mobile.android.vpn.R
+import timber.log.Timber
 
 enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayName: Int, @DrawableRes val signalIcon: Int) {
     AAID("AAID", R.string.atp_TrackingSignalAAID, R.drawable.ic_signal_advertising_id),
-    DEVICE_ID("device_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
+    UNIQUE_IDENTIFIER("unique_identifier", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     FB_PERSISTENT_ID("fb_persistent_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     UUID("uuid", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     DEVICE_FINGERPRINTING_ID("device_fingerprint_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     SET_COOKIE("set_cookie", R.string.atp_TrackingSignalCookies, R.drawable.ic_signal_cookie),
     GET_COOKIE("get_cookie", R.string.atp_TrackingSignalCookies, R.drawable.ic_signal_cookie),
+    COOKIES("cookies", R.string.atp_TrackingSignalCookies, R.drawable.ic_signal_cookie),
     OS_VERSION("os_version", R.string.atp_TrackingSignalOsVersion, R.drawable.ic_signal_os),
     DEVICE_SDK_DATA("device_sdk_data", R.string.atp_TrackingSignalOsVersion, R.drawable.ic_signal_os),
     OS_BUILD_VERSION("platform", R.string.atp_TrackingSignalOsBuildNumber, R.drawable.ic_signal_os),
     PLATFORM("os_version", R.string.atp_TrackingSignalOsVersion, R.drawable.ic_signal_os),
     DEVICE_MAKE("device_make", R.string.atp_TrackingSignalDeviceBrand, R.drawable.ic_signal_device),
+    DEVICE_LANGUAGE("device_language", R.string.atp_TrackingSignalDeviceLanguage, R.drawable.ic_signal_device),
     DEVICE_MODEL("device_model", R.string.atp_TrackingSignalDeviceModel, R.drawable.ic_signal_device),
     DEVICE_HARDWARE_NAME("device_hardware_name", R.string.atp_TrackingSignalDeviceModel, R.drawable.ic_signal_device),
+    CPU_DATA("cpu_data", R.string.atp_TrackingSignalCPUData, R.drawable.ic_signal_device),
     DEVICE_CPU_TYPE("device_cpu_type", R.string.atp_TrackingSignalCPUData, R.drawable.ic_signal_device),
     DEVICE_CPU_STATUS("device_resolution", R.string.atp_TrackingSignalCPUData, R.drawable.ic_signal_device),
     DEVICE_RESOLUTION("device_hardware_name", R.string.atp_TrackingSignalScreenResolution, R.drawable.ic_signal_device),
@@ -53,13 +57,14 @@ enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayNam
     DEVICE_BATTERY_LEVEL("device_battery_level", R.string.atp_TrackingSignalBatteryLevel, R.drawable.ic_signal_battery),
     DEVICE_CHARGING_STATUS("local_ip", R.string.atp_TrackingSignalChargingStatus, R.drawable.ic_signal_battery),
     SCREEN_BRIGHTNESS("device_brightness", R.string.atp_TrackingSignalBrightness, R.drawable.ic_signal_brightness),
-    DEVICE_HEADPHONES_STATUS("device_headphones_status", R.string.atp_TrackingSignalHeadphoneStatus, R.drawable.ic_signal_volume),
+    DEVICE_HEADPHONE_STATUS("device_headphone_status", R.string.atp_TrackingSignalHeadphoneStatus, R.drawable.ic_signal_volume),
     ACCELEROMETER_DATA("accelerometer_data", R.string.atp_TrackingSignalAccelerometerData, R.drawable.ic_signal_sensor),
     ROTATION_DATA("roration_data", R.string.atp_TrackingSignalRotationData, R.drawable.ic_signal_sensor),
     DEVICE_ORIENTATION("device_orientation", R.string.atp_TrackingSignalDeviceOrientation, R.drawable.ic_signal_device),
     DEVICE_MAGNOMETER("device_magnometer", R.string.atp_TrackingSignalMagnetometerData, R.drawable.ic_signal_sensor),
     DEVICE_FREE_STORAGE("device_free_storage", R.string.atp_TrackingSignalAvailableInternalStorage, R.drawable.ic_signal_storage),
     EXTERNAL_FREE_STORAGE("external_free_storage", R.string.atp_TrackingSignalAvailableExternalStorage, R.drawable.ic_signal_storage),
+    DEVICE_TOTAL_MEMORY("device_total_memory", R.string.atp_TrackingSignalDeviceTotalMemory, R.drawable.ic_signal_storage),
     DEVICE_FREE_MEMORY("device_free_memory", R.string.atp_TrackingSignalAvailableDeviceMemory, R.drawable.ic_signal_storage),
     DEVICE_SCREEN_MARGINS("device_screen_margins", R.string.atp_TrackingSignalScreenMargins, R.drawable.ic_signal_device),
     DEVICE_SCREEN_DENSITY("device_screen_density", R.string.atp_TrackingSignalScreenDensity, R.drawable.ic_signal_device),
@@ -82,7 +87,12 @@ enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayNam
 
     companion object {
         fun fromTag(signalTag: String): TrackingSignal {
-            return valueOf(signalTag.uppercase())
+            return try {
+                valueOf(signalTag.uppercase())
+            } catch (exception: Exception) {
+                Timber.d("Unknown TrackingSignal $signalTag")
+                UNIQUE_IDENTIFIER
+            }
         }
 
     }
