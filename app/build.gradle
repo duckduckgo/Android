@@ -140,6 +140,9 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
 
+    internalImplementation project(path: ':traces-api')
+    internalImplementation project(path: ':traces-impl')
+
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 
