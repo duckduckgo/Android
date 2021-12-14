@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Zaštita privatnosti e-pošte, na jednostavan način.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte programe za praćenje e-pošte i sakrijte svoju adresu<br/>bez promjene pružatelja usluga e-pošte. <a href=\"\"><b>Saznajte više</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte programe za praćenje e-pošte i sakrijte svoju adresu bez promjene pružatelja usluga e-pošte. <a href=\"\"><b>Saznajte više</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Na popisu ste!</string>

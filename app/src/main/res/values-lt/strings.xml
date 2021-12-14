@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą<br />nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
