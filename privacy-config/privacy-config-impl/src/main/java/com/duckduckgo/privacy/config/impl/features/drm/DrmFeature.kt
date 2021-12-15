@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.privacy.config.impl.features.drm
 
-import javax.inject.Scope
+import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 
-/**
- * In Dagger, an unscoped component cannot depend on a scoped component. As
- * [AppComponent] is a scoped component (`@Singleton`, we create a custom
- * scope to be used by all fragment components. Additionally, a component with a specific scope
- * cannot have a sub component with the same scope.
- */
-@MustBeDocumented
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ActivityScoped
+data class DrmFeature(
+    val state: String,
+    val exceptions: List<DrmExceptionEntity>
+)

@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
@@ -68,7 +68,7 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleObserver {
@@ -88,7 +88,7 @@ class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTrackerExclusionListUpdateWorkerPlugin @Inject constructor(
     private val appTrackerListDownloader: AppTrackerListDownloader,
     private val vpnDatabase: VpnDatabase

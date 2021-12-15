@@ -21,7 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
@@ -30,7 +30,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FlipperInitializer @Inject constructor(
     private val context: Context,
     private val flipperPluginPoint: PluginPoint<FlipperPlugin>

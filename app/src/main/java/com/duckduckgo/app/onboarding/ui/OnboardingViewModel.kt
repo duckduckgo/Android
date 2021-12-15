@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,7 +55,7 @@ class OnboardingViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class OnboardingViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val pageLayoutManager: Provider<OnboardingPageManager>,

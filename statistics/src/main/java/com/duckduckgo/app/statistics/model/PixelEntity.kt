@@ -47,7 +47,9 @@ class QueryParamsTypeConverter {
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
-        private val mapStringStringType = Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
-        val queryParamsAdapter: JsonAdapter<Map<String, String>> = moshi.adapter(mapStringStringType)
+        private val mapStringStringType =
+            Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+        val queryParamsAdapter: JsonAdapter<Map<String, String>> =
+            moshi.adapter(mapStringStringType)
     }
 }

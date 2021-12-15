@@ -34,8 +34,7 @@ import org.mockito.ArgumentMatchers.anyList
 
 class RealTrackerAllowlistRepositoryTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealTrackerAllowlistRepository
 
@@ -45,65 +44,60 @@ class RealTrackerAllowlistRepositoryTest {
     @Before
     fun before() {
         whenever(mockDatabase.trackerAllowlistDao()).thenReturn(mockTrackerAllowlistDao)
-        testee = RealTrackerAllowlistRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealTrackerAllowlistRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenHttpsDaoContainsExceptions()
 
-        testee = RealTrackerAllowlistRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealTrackerAllowlistRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(trackerAllowlistEntity, testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealTrackerAllowlistRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+    fun whenUpdateAllThenUpdateAllCalled() =
+        coroutineRule.runBlocking {
+            testee =
+                RealTrackerAllowlistRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        verify(mockTrackerAllowlistDao).updateAll(anyList())
-    }
+            verify(mockTrackerAllowlistDao).updateAll(anyList())
+        }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
-        givenHttpsDaoContainsExceptions()
-        testee = RealTrackerAllowlistRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-        assertEquals(1, testee.exceptions.size)
-        reset(mockTrackerAllowlistDao)
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+        coroutineRule.runBlocking {
+            givenHttpsDaoContainsExceptions()
+            testee =
+                RealTrackerAllowlistRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+            assertEquals(1, testee.exceptions.size)
+            reset(mockTrackerAllowlistDao)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        assertEquals(0, testee.exceptions.size)
-    }
+            assertEquals(0, testee.exceptions.size)
+        }
 
     private fun givenHttpsDaoContainsExceptions() {
         whenever(mockTrackerAllowlistDao.getAll()).thenReturn(listOf(trackerAllowlistEntity))
     }
 
     companion object {
-        val trackerAllowlistEntity = TrackerAllowlistEntity(
-            domain = "domain",
-            rules = listOf(
-                AllowlistRuleEntity(rule = "rule", domains = listOf("domain"), reason = "reason")
-            )
-        )
+        val trackerAllowlistEntity =
+            TrackerAllowlistEntity(
+                domain = "domain",
+                rules =
+                    listOf(
+                        AllowlistRuleEntity(
+                            rule = "rule", domains = listOf("domain"), reason = "reason")))
     }
 }

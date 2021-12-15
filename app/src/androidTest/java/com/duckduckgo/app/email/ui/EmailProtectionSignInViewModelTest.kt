@@ -40,6 +40,7 @@ import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.PRIV
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.SIGN_UP_URL
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -62,6 +63,7 @@ class EmailProtectionSignInViewModelTest {
 
     private val mockEmailManager: EmailManager = mock()
     private var mockEmailService: EmailService = mock()
+    private var mockPixel: Pixel = mock()
     private val waitlistBuilder: EmailWaitlistWorkRequestBuilder = EmailWaitlistWorkRequestBuilder()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -72,7 +74,7 @@ class EmailProtectionSignInViewModelTest {
     fun before() {
         whenever(mockEmailManager.waitlistState()).thenReturn(NotJoinedQueue)
         initializeWorkManager()
-        testee = EmailProtectionSignInViewModel(mockEmailManager, mockEmailService, workManager, waitlistBuilder)
+        testee = EmailProtectionSignInViewModel(mockEmailManager, mockEmailService, workManager, waitlistBuilder, mockPixel)
     }
 
     @Test
@@ -91,26 +93,26 @@ class EmailProtectionSignInViewModelTest {
     }
 
     @Test
-    fun whenHaveAnInviteCodeThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
+    fun whenHaveAnInviteCodeThenEmitCommandOpenUrlInBrowserTabWithCorrectUrl() = coroutineRule.runBlocking {
         val inviteCode = "abcde"
         whenever(mockEmailManager.getInviteCode()).thenReturn(inviteCode)
         val expectedURL = "$SIGN_UP_URL$inviteCode"
 
         testee.commands.test {
             testee.haveAnInviteCode()
-            assertEquals(OpenUrl(url = expectedURL), awaitItem())
+            assertEquals(OpenUrlInBrowserTab(url = expectedURL), awaitItem())
         }
     }
 
     @Test
-    fun whenGetStartedThenEmitCommandOpenUrlWithCorrectUrl() = coroutineRule.runBlocking {
+    fun whenGetStartedThenEmitCommandOpenUrlInBrowserTabWithCorrectUrl() = coroutineRule.runBlocking {
         val inviteCode = "abcde"
         whenever(mockEmailManager.getInviteCode()).thenReturn(inviteCode)
         val expectedURL = "$GET_STARTED_URL$inviteCode"
 
         testee.commands.test {
             testee.getStarted()
-            assertEquals(OpenUrl(url = expectedURL), awaitItem())
+            assertEquals(OpenUrlInBrowserTab(url = expectedURL), awaitItem())
         }
     }
 
@@ -194,7 +196,7 @@ class EmailProtectionSignInViewModelTest {
 
     @Test
     fun whenJoinTheWaitlistAndCallFailsThenEmitShowErrorMessageCommand() = coroutineRule.runBlocking {
-        testee = EmailProtectionSignInViewModel(mockEmailManager, TestEmailService(), workManager, waitlistBuilder)
+        testee = EmailProtectionSignInViewModel(mockEmailManager, TestEmailService(), workManager, waitlistBuilder, mockPixel)
 
         testee.commands.test {
             testee.joinTheWaitlist()

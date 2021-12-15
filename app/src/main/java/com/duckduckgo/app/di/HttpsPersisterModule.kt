@@ -18,13 +18,13 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.httpsupgrade.store.EmptyHttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class HttpsPersisterModule {
 
     @Provides

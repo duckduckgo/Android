@@ -16,37 +16,38 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageSingleChoiceFormActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface ReportBreakageSingleChoiceFormActivityComponent : AndroidInjector<ReportBreakageSingleChoiceFormActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ReportBreakageSingleChoiceFormActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface ReportBreakageSingleChoiceFormActivityComponentProvider {
     fun provideReportBreakageSingleChoiceFormActivityComponentProviderFactory(): ReportBreakageSingleChoiceFormActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class ReportBreakageSingleChoiceFormActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ReportBreakageSingleChoiceFormActivity::class)
-    abstract fun bindReportBreakageSingleChoiceFormActivityComponentFactory(factory: ReportBreakageSingleChoiceFormActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun ReportBreakageSingleChoiceFormActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -23,9 +23,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.duckduckgo.mobile.android.R
 
-/**
- * Fragment to display a list of subsystems that show the values of this app's theme.
- */
+/** Fragment to display a list of subsystems that show the values of this app's theme. */
 class TypographyFragment : Fragment() {
 
     override fun onCreateView(
@@ -35,5 +33,4 @@ class TypographyFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_components_typography, container, false)
     }
-
 }

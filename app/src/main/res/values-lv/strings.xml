@@ -610,7 +610,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-pasta konfidencialitāte, vienkāršota.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/> nemainot e-pasta pakalpojumu sniedzēju. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Tu esi sarakstā!</string>

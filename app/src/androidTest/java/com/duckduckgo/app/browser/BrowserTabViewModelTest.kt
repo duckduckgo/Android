@@ -363,7 +363,8 @@ class BrowserTabViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             variantManager = mockVariantManager,
-            userEventsStore = mockUserEventsStore
+            userEventsStore = mockUserEventsStore,
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)

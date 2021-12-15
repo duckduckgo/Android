@@ -23,6 +23,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -163,7 +164,8 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             variantManager = mockVariantManager,
-            userEventsStore = mockUserEventsStore
+            userEventsStore = mockUserEventsStore,
+            duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
         whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
@@ -547,6 +549,14 @@ class CtaViewModelTest {
     fun whenRefreshCtaInHomeTabDuringFavoriteOnboardingThenReturnNull() = runBlockingTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, favoritesOnboarding = true)
         assertTrue(value is BubbleCta.DaxFavoritesOnboardingCta)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileDaxOnboardingActiveAndBrowsingOnDuckDuckGoEmailUrlThenReturnNull() = runBlockingTest {
+        givenDaxOnboardingActive()
+        val site = site(url = "https://duckduckgo.com/email/")
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertNull(value)
     }
 
     @Test

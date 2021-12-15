@@ -27,7 +27,7 @@ import android.os.ResultReceiver
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
@@ -37,7 +37,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class DeviceShieldAlertNotificationBuilderModule {
 
     @Provides

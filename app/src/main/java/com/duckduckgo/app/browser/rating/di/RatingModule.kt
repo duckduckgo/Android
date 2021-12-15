@@ -29,17 +29,18 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class RatingModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     @IntoSet
     fun appEnjoymentManagerObserver(
@@ -51,12 +52,12 @@ class RatingModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
@@ -82,13 +83,13 @@ class RatingModule {
         return PlayStoreAndroidUtils(context)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
         return database.appEnjoymentDao()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
         return AppEnjoymentDatabaseRepository(appEnjoymentDao)

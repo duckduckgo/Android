@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -149,7 +149,7 @@ class DeviceShieldTrackerActivityViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PastWeekTrackerActivityViewModelFactory @Inject constructor(
     private val applicationContext: Provider<Context>,
     private val deviceShieldPixels: Provider<DeviceShieldPixels>,

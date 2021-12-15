@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
@@ -66,7 +66,7 @@ class ExceptionRulesDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,

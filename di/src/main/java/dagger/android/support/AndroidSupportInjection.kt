@@ -16,14 +16,14 @@
 
 package dagger.android.support
 
-import android.app.Application
 import androidx.fragment.app.Fragment
+import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 
 class AndroidSupportInjection {
     companion object {
         inline fun <reified T : Fragment> inject(instance: T) {
-            AndroidInjector.inject(instance.context?.applicationContext as Application, instance)
+            AndroidInjector.inject(AndroidInjection.findHasDaggerInjectorForFragment(instance), instance)
         }
     }
 }

@@ -18,15 +18,16 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class CoroutinesModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesDispatcherProvider(): DispatcherProvider {
         return DefaultDispatcherProvider()
     }

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +28,7 @@ interface AppInstallationReferrerParser {
 }
 
 @Suppress("SameParameterValue")
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
@@ -27,7 +27,7 @@ interface CohortCalculator {
     fun calculateCohortForDate(localDate: LocalDate): String
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class RealCohortCalculator @Inject constructor() : CohortCalculator {
 
     override fun calculateCohortForDate(localDate: LocalDate): String {

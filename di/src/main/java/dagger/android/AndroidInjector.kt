@@ -33,7 +33,7 @@ interface HasDaggerInjector {
      *  1. creating the dagger component
      *  2. inject the dependencies in the Android type (eg. Activity)
      */
-    fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*>
+    fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*>
 }
 
 interface AndroidInjector<T> {
@@ -61,13 +61,13 @@ interface AndroidInjector<T> {
          *  2. Use the factory to create the dagger component that relates to an Android type, eg. Activity
          *  3. Inject any dependency requested by the Android type
          */
-        inline fun <reified T> inject(application: Application, instance: T, mapKey: Class<*>? = null) {
-            if ((application is HasDaggerInjector)) {
-                (application.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T>)
+        inline fun <reified T> inject(injector: Any, instance: T, mapKey: Class<*>? = null) {
+            if ((injector is HasDaggerInjector)) {
+                (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T>)
                     .create(instance)
                     .inject(instance)
             } else {
-                throw RuntimeException("Application class does not extend ${HasDaggerInjector::class.simpleName}")
+                throw RuntimeException("${injector.javaClass.canonicalName} class does not extend ${HasDaggerInjector::class.simpleName}")
             }
         }
     }
@@ -87,7 +87,7 @@ class AndroidInjection {
         }
 
         inline fun <reified T : Fragment> inject(instance: T, bindingKey: Class<*>? = null) {
-            AndroidInjector.inject(instance.context?.applicationContext as Application, instance, bindingKey)
+            AndroidInjector.inject(findHasDaggerInjectorForFragment(instance), instance, bindingKey)
         }
 
         inline fun <reified T : Service> inject(instance: T, bindingKey: Class<*>? = null) {
@@ -96,6 +96,35 @@ class AndroidInjection {
 
         inline fun <reified T : BroadcastReceiver> inject(instance: T, context: Context, bindingKey: Class<*>? = null) {
             AndroidInjector.inject(context.applicationContext as Application, instance, bindingKey)
+        }
+
+        /**
+         * Injects the [fragment] if an associated [AndroidInjector] implementation is found, otherwise [IllegalArgumentException]
+         * is thrown.
+         *
+         * The algorithm is the following:
+         * * walks the parent fragment hierarchy until if finds one that implements [HasDaggerInjector], else
+         * * uses the [fragment]'s and returns it if it implements [HasDaggerInjector], else
+         * * uses the [Application] and returns it if it implements [HasDaggerInjector], else
+         * * throws [IllegalArgumentException]
+         */
+        fun findHasDaggerInjectorForFragment(fragment: Fragment): HasDaggerInjector {
+            var parentFragment: Fragment? = fragment
+            while (parentFragment?.parentFragment != null) {
+                parentFragment = parentFragment.parentFragment
+
+                if (parentFragment is HasDaggerInjector) {
+                    return parentFragment
+                }
+            }
+            val activity = fragment.activity
+            if (activity is HasDaggerInjector) {
+                return activity
+            }
+
+            activity?.application?.let { return it as HasDaggerInjector }
+
+            throw IllegalArgumentException("No injector found for ${fragment.javaClass.canonicalName}")
         }
     }
 }

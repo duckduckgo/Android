@@ -52,5 +52,4 @@ class AppUrl {
         const val SETTINGS = "/settings"
         const val PARAMS = "/params"
     }
-
 }

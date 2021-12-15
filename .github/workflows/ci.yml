@@ -13,7 +13,7 @@ on:
 
 jobs:
   unit_tests:
-    name: Spotless and unit tests
+    name: JVM CI checks
     runs-on: ubuntu-latest
 
     steps:
@@ -39,23 +39,23 @@ jobs:
       - name: Spotless
         run: ./gradlew spotlessCheck --stacktrace
 
-      - name: Unit Tests
-        run: ./gradlew app:testPlayDebugUnitTest vpn:testDebugUnitTest privacy-config-impl:testDebugUnitTest privacy-config-store:testDebugUnitTest --stacktrace
+      - name: JVM checks
+        run: ./gradlew jvm_checks
 
-      - name: Bundle the Unit Test report
+      - name: Bundle the JVM checks report
         if: always()
-        run: find . -type d -name 'reports' | zip -@ -r unit-test-report.zip
+        run: find . -type d -name 'reports' | zip -@ -r jvm-checks-report.zip
 
-      - name: Upload the Unit Test report
+      - name: Upload the JVM checks report
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: unit-test-report
-          path: unit-test-report.zip
+          name: jvm-checks-report
+          path: jvm-checks-report.zip
 
   android_tests:
     runs-on: macos-latest
-    name: Android tests
+    name: Android CI checks
     strategy:
       matrix:
         api-level: [22, 29]
@@ -110,7 +110,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Android Tests
+      - name: Android checks
         uses: reactiveCircus/android-emulator-runner@v2.19.1
         with:
           api-level: ${{ matrix.api-level }}
@@ -120,15 +120,15 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew vpn:connectedDebugAndroidTest vpn-store:connectedDebugAndroidTest --stacktrace
+          script: ./gradlew android_checks
 
-      - name: Bundle the Android Test report
+      - name: Bundle the Android CI checks report
         if: always()
-        run: find . -type d -name 'reports' | zip -@ -r android-test-report.zip
+        run: find . -type d -name 'reports' | zip -@ -r android-checks-report.zip
 
-      - name: Upload the Android Test report
+      - name: Upload the Android CI checks report
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: android-test-report
-          path: android-test-report.zip
+          name: android-checks-report
+          path: android-checks-report.zip

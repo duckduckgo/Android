@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.email
 
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -30,7 +29,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-interface EmailManager : LifecycleObserver {
+interface EmailManager {
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
@@ -55,8 +54,6 @@ class AppEmailManager(
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope
 ) : EmailManager {
-
-    private val nextAliasFlow = emailDataStore.nextAliasFlow()
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
@@ -154,7 +151,7 @@ class AppEmailManager(
     }
 
     private fun consumeAlias(): String? {
-        val alias = nextAliasFlow.value
+        val alias = emailDataStore.nextAlias
         emailDataStore.clearNextAlias()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             generateNewAlias()

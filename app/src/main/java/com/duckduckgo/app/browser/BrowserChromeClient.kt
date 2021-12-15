@@ -27,9 +27,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.drm.DrmRequestManager
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.privacy.config.api.Drm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 class BrowserChromeClient @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val drmRequestManager: DrmRequestManager,
+    private val drm: Drm,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : WebChromeClient() {
 
@@ -142,7 +142,7 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        val permissions = drmRequestManager.drmPermissionsForRequest(request)
+        val permissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
         if (permissions.isNotEmpty()) {
             request.grant(permissions)
         }

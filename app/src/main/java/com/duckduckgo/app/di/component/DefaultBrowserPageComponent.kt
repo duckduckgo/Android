@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = FragmentScope::class
 )
 interface DefaultBrowserPageComponent : AndroidInjector<DefaultBrowserPage> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DefaultBrowserPage>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface DefaultBrowserPageComponentProvider {
     fun provideDefaultBrowserPageComponentFactory(): DefaultBrowserPageComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class DefaultBrowserPageBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DefaultBrowserPage::class)
-    abstract fun bindDefaultBrowserPageComponentFactory(factory: DefaultBrowserPageComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DefaultBrowserPageComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

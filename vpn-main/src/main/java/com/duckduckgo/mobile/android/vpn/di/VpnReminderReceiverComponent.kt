@@ -16,37 +16,38 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(ReceiverScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = ReceiverScope::class
 )
 interface VpnReminderReceiverComponent : AndroidInjector<VpnReminderReceiver> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnReminderReceiver>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface VpnReminderReceiverComponentProvider {
     fun provideVpnReminderReceiverComponentFactory(): VpnReminderReceiverComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class VpnReminderReceiverBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnReminderReceiver::class)
-    abstract fun bindVpnReminderReceiverComponentFactory(factory: VpnReminderReceiverComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnReminderReceiverComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

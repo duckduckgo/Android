@@ -16,39 +16,39 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface FeedbackActivityComponent : AndroidInjector<FeedbackActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<FeedbackActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface FeedbackActivityComponentProvider {
     fun provideFeedbackActivityComponentFactory(): FeedbackActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class FeedbackActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(FeedbackActivity::class)
-    abstract fun bindFeedbackActivityComponentFactory(factory: FeedbackActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun FeedbackActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }
