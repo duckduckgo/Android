@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Ιδιωτικότητα email, απλοποιημένη.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας,<br/>χωρίς να αλλάξετε πάροχο email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Είστε στη λίστα!</string>

@@ -22,7 +22,7 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,13 +30,15 @@ import java.io.IOException
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
 ) : AppTrackingProtectionWaitlistDataStore {
 
-    private val encryptedPreferences: SharedPreferences? = encryptedPreferences()
+    private val encryptedPreferences: SharedPreferences? by lazy {
+        encryptedPreferences()
+    }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {

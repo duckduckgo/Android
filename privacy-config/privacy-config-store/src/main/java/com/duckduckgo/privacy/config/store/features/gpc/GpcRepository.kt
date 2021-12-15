@@ -21,9 +21,9 @@ import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toGpcException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface GpcRepository {
     fun updateAll(exceptions: List<GpcExceptionEntity>)
@@ -33,16 +33,18 @@ interface GpcRepository {
     val exceptions: CopyOnWriteArrayList<GpcException>
 }
 
-class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    GpcRepository {
+class RealGpcRepository(
+    private val gpcDataStore: GpcDataStore,
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : GpcRepository {
 
     private val gpcDao: GpcDao = database.gpcDao()
     override val exceptions = CopyOnWriteArrayList<GpcException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
     override fun updateAll(exceptions: List<GpcExceptionEntity>) {
@@ -62,8 +64,6 @@ class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: Pr
 
     private fun loadToMemory() {
         exceptions.clear()
-        gpcDao.getAll().map {
-            exceptions.add(it.toGpcException())
-        }
+        gpcDao.getAll().map { exceptions.add(it.toGpcException()) }
     }
 }

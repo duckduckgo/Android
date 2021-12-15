@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -70,7 +70,7 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TabSwitcherViewModelFactory @Inject constructor(
     private val tabRepository: Provider<TabRepository>,
     private val webViewSessionStorage: Provider<WebViewSessionStorage>

@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -95,7 +95,7 @@ class NotificationScheduler(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationSender: NotificationSender,
     private val clearDataNotification: ClearDataNotification
@@ -111,7 +111,7 @@ class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationSender: NotificationSender,
     private val privacyProtectionNotification: PrivacyProtectionNotification

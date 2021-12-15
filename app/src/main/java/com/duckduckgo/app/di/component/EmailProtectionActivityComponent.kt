@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface EmailProtectionActivityComponent : AndroidInjector<EmailProtectionActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailProtectionActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface EmailProtectionActivityComponentProvider {
     fun provideEmailProtectionActivityComponentFactory(): EmailProtectionActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class EmailProtectionActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionActivity::class)
-    abstract fun bindEmailProtectionActivityComponentFactory(factory: EmailProtectionActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

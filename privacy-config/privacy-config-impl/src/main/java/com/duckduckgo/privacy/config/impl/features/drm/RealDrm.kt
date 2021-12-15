@@ -20,17 +20,17 @@ import android.net.Uri
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Drm
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealDrm @Inject constructor(private val featureToggle: FeatureToggle, private val drmRepository: DrmRepository) : Drm {
 
     override fun getDrmPermissionsForRequest(url: String, resources: Array<String>): Array<String> {

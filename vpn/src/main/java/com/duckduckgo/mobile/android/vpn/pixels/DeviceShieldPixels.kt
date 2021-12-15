@@ -21,14 +21,14 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -253,10 +253,25 @@ interface DeviceShieldPixels {
     fun didChooseToDisableOneAppFromDialog()
 
     fun didChooseToCancelTrackingProtectionDialog()
+
+    /**
+     * Will fire when the waitlist dialog is showed to the user
+     */
+    fun didShowWaitlistDialog()
+
+    /**
+     * Will fire when the user presses "notify me" CTA in the waitlist dialog
+     */
+    fun didPressWaitlistDialogNotifyMe()
+
+    /**
+     * Will fire when the user presses dismisses the waitlist dialog
+     */
+    fun didPressWaitlistDialogDismiss()
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
@@ -510,6 +525,18 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didChooseToCancelTrackingProtectionDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didShowWaitlistDialog() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
+    }
+
+    override fun didPressWaitlistDialogNotifyMe() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
+    }
+
+    override fun didPressWaitlistDialogDismiss() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
     }
 
     private fun suddenKill() {

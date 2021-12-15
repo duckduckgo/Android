@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -29,15 +28,14 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import dagger.android.AndroidInjection
+import dagger.android.DaggerActivity
 import javax.inject.Inject
 
-abstract class DuckDuckGoActivity : AppCompatActivity() {
+abstract class DuckDuckGoActivity : DaggerActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var themingDataStore: ThemingDataStore
+    @Inject lateinit var themingDataStore: ThemingDataStore
 
     private var themeChangeReceiver: BroadcastReceiver? = null
 
@@ -47,8 +45,9 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
     }
 
     /**
-     * We need to conditionally defer the Dagger initialization in certain places.
-     * So if this method is called from an Activity with daggerInject=false, you'll probably need to call daggerInject() directly.
+     * We need to conditionally defer the Dagger initialization in certain places. So if this method
+     * is called from an Activity with daggerInject=false, you'll probably need to call
+     * daggerInject() directly.
      */
     fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
         if (daggerInject) daggerInject()
@@ -83,6 +82,7 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_back_24)
     }
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
-
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 }

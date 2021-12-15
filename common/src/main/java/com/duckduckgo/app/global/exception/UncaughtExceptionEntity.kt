@@ -33,8 +33,9 @@ data class UncaughtExceptionEntity(
     fun formattedTimestamp(): String = formatter.format(Date(timestamp))
 
     companion object {
-        val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
+        val formatter: SimpleDateFormat =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
     }
 }

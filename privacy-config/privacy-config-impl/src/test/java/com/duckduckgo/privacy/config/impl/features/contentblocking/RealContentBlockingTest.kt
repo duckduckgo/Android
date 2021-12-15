@@ -24,11 +24,11 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealContentBlockingTest {
@@ -43,7 +43,9 @@ class RealContentBlockingTest {
     fun before() {
         givenFeatureIsEnabled()
 
-        testee = RealContentBlocking(mockContentBlockingRepository, mockFeatureToggle, mockUnprotectedTemporary)
+        testee =
+            RealContentBlocking(
+                mockContentBlockingRepository, mockFeatureToggle, mockUnprotectedTemporary)
     }
 
     @Test
@@ -85,15 +87,24 @@ class RealContentBlockingTest {
     }
 
     private fun givenThereAreExceptions() {
-        val exceptions = CopyOnWriteArrayList<ContentBlockingException>().apply { add(ContentBlockingException("example.com", "my reason here")) }
+        val exceptions =
+            CopyOnWriteArrayList<ContentBlockingException>().apply {
+                add(ContentBlockingException("example.com", "my reason here"))
+            }
         whenever(mockContentBlockingRepository.exceptions).thenReturn(exceptions)
     }
 
     private fun givenFeatureIsEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(true)
+        whenever(
+                mockFeatureToggle.isFeatureEnabled(
+                    PrivacyFeatureName.ContentBlockingFeatureName(), true))
+            .thenReturn(true)
     }
 
     private fun givenFeatureIsDisabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)).thenReturn(false)
+        whenever(
+                mockFeatureToggle.isFeatureEnabled(
+                    PrivacyFeatureName.ContentBlockingFeatureName(), true))
+            .thenReturn(false)
     }
 }

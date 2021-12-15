@@ -20,9 +20,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.BuildConfig
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -30,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -47,10 +47,10 @@ import javax.inject.Inject
  * where `--es hago <M>` is optional and is the timestamp (hours ago) for the trackers
  */
 @ContributesMultibinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@VpnScope
+@SingleInstanceIn(VpnScope::class)
 class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,

@@ -30,15 +30,10 @@ import timber.log.Timber
 
 interface AtbInitializerListener {
 
-    /**
-     * This method will be called before initializing the ATB
-     */
+    /** This method will be called before initializing the ATB */
     suspend fun beforeAtbInit()
 
-    /**
-     * @return the timeout in milliseconds after which [beforeAtbInit]
-     * will be stopped
-     */
+    /** @return the timeout in milliseconds after which [beforeAtbInit] will be stopped */
     fun beforeAtbInitTimeoutMillis(): Long
 }
 
@@ -51,18 +46,14 @@ class AtbInitializer(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun initializeOnResume() {
-        appCoroutineScope.launch {
-            initialize()
-        }
+        appCoroutineScope.launch { initialize() }
     }
 
     @VisibleForTesting
     suspend fun initialize() {
         Timber.v("Initialize ATB")
         listeners.forEach {
-            withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) {
-                it.beforeAtbInit()
-            }
+            withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
         }
 
         initializeAtb()
@@ -75,5 +66,4 @@ class AtbInitializer(
             statisticsUpdater.initializeAtb()
         }
     }
-
 }

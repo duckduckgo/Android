@@ -33,7 +33,9 @@ interface StatisticsService {
     ): Observable<ResponseBody>
 
     @GET("/atb.js")
-    fun atb(@Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null): Observable<Atb>
+    fun atb(
+        @Query(ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
+    ): Observable<Atb>
 
     @GET("/atb.js")
     fun updateSearchAtb(

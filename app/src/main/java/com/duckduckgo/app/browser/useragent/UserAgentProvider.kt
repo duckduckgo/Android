@@ -22,13 +22,13 @@ import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import javax.inject.Named
 import javax.inject.Provider
-import javax.inject.Singleton
 
 /**
  * Example Default User Agent (From Chrome):
@@ -111,6 +111,7 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
         const val SPACE = " "
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
+        val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
         val sitesThatOmitApplication = listOf(
             "cvs.com",
@@ -138,13 +139,15 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
     data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 @Module
 class DefaultUserAgentModule {
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     @Named("defaultUserAgent")
     fun provideDefaultUserAgent(context: Context): String {
-        return WebSettings.getDefaultUserAgent(context)
+        return runCatching {
+            WebSettings.getDefaultUserAgent(context)
+        }.getOrDefault(UserAgentProvider.fallbackDefaultUA)
     }
 }

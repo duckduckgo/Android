@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface SystemSearchActivityComponent : AndroidInjector<SystemSearchActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<SystemSearchActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface SystemSearchActivityComponentProvider {
     fun provideSystemSearchActivityComponentFactory(): SystemSearchActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class SystemSearchActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(SystemSearchActivity::class)
-    abstract fun bindSystemSearchActivityComponentFactory(factory: SystemSearchActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun SystemSearchActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

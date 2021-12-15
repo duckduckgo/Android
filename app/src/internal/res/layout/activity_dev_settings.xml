@@ -54,6 +54,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
+        android:id="@+id/enableAppStartupTrace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:toggleTitle="@string/devStartupTracing"
+        app:toggleSubTitle="@string/devStartupTracingByline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/privacyTitle" />
+
+    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/nextTdsEnabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +71,7 @@
         app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/privacyTitle" />
+        app:layout_constraintTop_toBottomOf="@id/enableAppStartupTrace" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/privacyTest1"

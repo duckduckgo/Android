@@ -1,3 +1,6 @@
-./gradlew spotlessApply
-git add `git diff --name-only --cached`
-exit 0
+
+    #!/bin/bash
+    echo "Running spotless check"
+    ./gradlew spotlessApply
+    git add `git diff --name-only --cached`
+    exit 0

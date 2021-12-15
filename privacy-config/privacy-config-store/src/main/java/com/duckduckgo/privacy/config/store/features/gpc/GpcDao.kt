@@ -38,9 +38,7 @@ abstract class GpcDao {
     @Query("select * from gpc_exceptions where domain = :domain")
     abstract fun get(domain: String): GpcExceptionEntity
 
-    @Query("select * from gpc_exceptions")
-    abstract fun getAll(): List<GpcExceptionEntity>
+    @Query("select * from gpc_exceptions") abstract fun getAll(): List<GpcExceptionEntity>
 
-    @Query("delete from gpc_exceptions")
-    abstract fun deleteAll()
+    @Query("delete from gpc_exceptions") abstract fun deleteAll()
 }

@@ -600,7 +600,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailové soukromí, zjednodušené.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu,<br/>bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu, bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jste na seznamu!</string>

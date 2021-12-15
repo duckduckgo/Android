@@ -24,7 +24,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -55,7 +55,7 @@ class PrivacyPracticesViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyPracticesViewModelFactory @Inject constructor(
     private val tabRepository: Provider<TabRepository>
 ) : ViewModelFactoryPlugin {

@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Uproszczona prywatność poczty e-mail.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres<br/>bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jesteś na liście!</string>
