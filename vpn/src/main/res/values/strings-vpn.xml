@@ -271,6 +271,7 @@
     <string name="atp_CompanyDetailsTrackingMenuReport">Report an Issue With This App</string>
     <string name="atp_CompanyDetailsTrackingShowMore">Show %d more</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Apps may include trackers from other companies for things like analytics and marketing. If we didn\'t block them, these trackers could create even more detailed digital profiles on you. <annotation type="learn_more_link">Learn more.</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Show Less</string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Android Advertising ID</string>
