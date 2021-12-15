@@ -174,8 +174,10 @@
     <string name="atp_ReportBreakageChoiceNoLogging">The app doesn\’t require log in</string>
     <string name="atp_ReportBreakageChoiceHeadingText"><b>Were you logged in to the app when you noticed the issue?</b></string>
     <string name="atp_ReportBreakageFormInputHint">Describe what happened (optional)</string>
+    <string name="atp_ReportBreakageFormCheckboxText">By clicking “Submit” I agree that DuckDuckGo may use the information in this report for purposes of improving App Tracking Protection.
+    </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[In addition to the details entered into this form, the report will contain:<br/>&#8226; The app name<br/>&#8226; A list of trackers blocked in the current app<br/>&#8226; Whether whole device tracker blocking is enabled<br/>&#8226; Version information for DuckDuckGo\'s app and blocklist<br/>&#8226; Aggregate performance statistics about DuckDuckGo\'s app<br/>]]>
+        <![CDATA[In addition to the details entered into this form, your app issue report will contain:<br/>&#8226; The app package name<br/>&#8226; A list of trackers blocked in the app<br/>&#8226; Whether App Tracking Protection is enabled<br/>&#8226; Aggregate DuckDuckGo app diagnostics<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Report sent, thanks! Your feedback helps us improve App Tracking Protection for everyone.</string>
     <string name="atp_ThanksForTheFeedback">Thanks for the feedback!</string>

@@ -33,9 +33,7 @@ import com.google.android.material.snackbar.Snackbar
  * Based on https://github.com/ravidsrk/kotlinextensions.com
  */
 
-/**
- * Show the view  (visibility = View.VISIBLE)
- */
+/** Show the view (visibility = View.VISIBLE) */
 fun View.show(): View {
     if (visibility != View.VISIBLE) {
         visibility = View.VISIBLE
@@ -43,9 +41,7 @@ fun View.show(): View {
     return this
 }
 
-/**
- * Hide the view. (visibility = View.INVISIBLE)
- */
+/** Hide the view. (visibility = View.INVISIBLE) */
 fun View.hide(): View {
     if (visibility != View.INVISIBLE) {
         visibility = View.INVISIBLE
@@ -53,9 +49,7 @@ fun View.hide(): View {
     return this
 }
 
-/**
- * Remove the view (visibility = View.GONE)
- */
+/** Remove the view (visibility = View.GONE) */
 fun View.gone(): View {
     if (visibility != View.GONE) {
         visibility = View.GONE
@@ -63,9 +57,7 @@ fun View.gone(): View {
     return this
 }
 
-/**
- * Extension method to show a keyboard for View.
- */
+/** Extension method to show a keyboard for View. */
 fun View.showKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     this.requestFocus()
@@ -78,16 +70,19 @@ fun View.showKeyboard() {
  */
 fun View.hideKeyboard(): Boolean {
     try {
-        val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         return inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    } catch (ignored: RuntimeException) {
-    }
+    } catch (ignored: RuntimeException) {}
     return false
 }
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
+
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
 fun Float.toDp(): Float = (this / Resources.getSystem().displayMetrics.density)
+
 fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)
 
 fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
@@ -117,7 +112,10 @@ fun View.recursiveEnable(enabled: Boolean) {
     }
 }
 
-fun CompoundButton.quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
+fun CompoundButton.quietlySetIsChecked(
+    newCheckedState: Boolean,
+    changeListener: CompoundButton.OnCheckedChangeListener?
+) {
     setOnCheckedChangeListener(null)
     isChecked = newCheckedState
     setOnCheckedChangeListener(changeListener)

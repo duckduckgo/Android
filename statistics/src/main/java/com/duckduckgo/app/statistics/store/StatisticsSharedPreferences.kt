@@ -52,15 +52,11 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         set(value) = preferences.edit { putString(KEY_APP_RETENTION_ATB, value) }
 
     override fun saveAtb(atb: Atb) {
-        preferences.edit {
-            putString(KEY_ATB, atb.version)
-        }
+        preferences.edit { putString(KEY_ATB, atb.version) }
     }
 
     override fun clearAtb() {
-        preferences.edit {
-            putString(KEY_ATB, null)
-        }
+        preferences.edit { putString(KEY_ATB, null) }
     }
 
     private val preferences: SharedPreferences

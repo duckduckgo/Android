@@ -21,10 +21,11 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
     private val entityLookup: EntityLookup

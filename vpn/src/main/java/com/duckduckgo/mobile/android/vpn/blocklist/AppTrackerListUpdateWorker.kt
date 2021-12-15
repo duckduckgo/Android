@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
@@ -119,10 +119,10 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
-class AppTrackerListUpdateWorkerScheduler
-@Inject
-constructor(private val workManager: WorkManager) : LifecycleObserver {
+@ContributesMultibinding(AppScope::class)
+class AppTrackerListUpdateWorkerScheduler @Inject constructor(
+    private val workManager: WorkManager
+) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleBlocklistUpdateWork() {
@@ -142,7 +142,7 @@ constructor(private val workManager: WorkManager) : LifecycleObserver {
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTrackerListUpdateWorkerPlugin
 @Inject
 constructor(

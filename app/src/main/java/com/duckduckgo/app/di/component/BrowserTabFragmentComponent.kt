@@ -17,38 +17,38 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(FragmentScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = FragmentScope::class
 )
 interface BrowserTabFragmentComponent : AndroidInjector<BrowserTabFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<BrowserTabFragment>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface BrowserTabFragmentComponentProvider {
     fun provideBrowserTabFragmentComponentFactory(): BrowserTabFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class BrowserTabFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrowserTabFragment::class)
-    abstract fun bindBrowserTabFragmentComponentFactory(factory: BrowserTabFragmentComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun BrowserTabFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -23,19 +23,19 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class AccessibilityModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesAccessibilitySettingsDataStore(
         context: Context,
         dispatcherProvider: DispatcherProvider,
@@ -43,7 +43,7 @@ class AccessibilityModule {
     ): AccessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, dispatcherProvider, appCoroutineScope)
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun providesAccessibilityManager(
         accessibilitySettingsDataStore: AccessibilitySettingsDataStore
     ): AccessibilityManager = AppAccessibilityManager(accessibilitySettingsDataStore)

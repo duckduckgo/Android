@@ -18,22 +18,23 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesBinding(VpnObjectGraph::class)
-@VpnScope
+@ContributesBinding(VpnScope::class)
+@SingleInstanceIn(VpnScope::class)
 class RealVpnStateCollector @Inject constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
     private val dispatcherProvider: DispatcherProvider,
@@ -54,7 +55,7 @@ class RealVpnStateCollector @Inject constructor(
 }
 
 private class VpnStateCollectorPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+    private val plugins: DaggerSet<VpnStateCollectorPlugin>
 ) : PluginPoint<VpnStateCollectorPlugin> {
     override fun getPlugins(): Collection<VpnStateCollectorPlugin> {
         return plugins.sortedBy { it.collectorName }
@@ -62,20 +63,20 @@ private class VpnStateCollectorPluginPoint(
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class VpnStateCollectorProviderModule {
 
     @Multibinds
-    @VpnScope
-    abstract fun bindVpnStateCollectorEmptyPlugins(): Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+    @SingleInstanceIn(VpnScope::class)
+    abstract fun bindVpnStateCollectorEmptyPlugins(): DaggerSet<VpnStateCollectorPlugin>
 
     @Module
-    @ContributesTo(VpnObjectGraph::class)
+    @ContributesTo(VpnScope::class)
     class VpnStateCollectorProviderModuleExt {
         @Provides
-        @VpnScope
+        @SingleInstanceIn(VpnScope::class)
         fun bindVpnMemoryCollectorPluginPoint(
-            plugins: Set<@JvmSuppressWildcards VpnStateCollectorPlugin>
+            plugins: DaggerSet<VpnStateCollectorPlugin>
         ): PluginPoint<VpnStateCollectorPlugin> {
             return VpnStateCollectorPluginPoint(plugins)
         }

@@ -125,6 +125,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
     implementation project(path: ':common')
     implementation project(path: ':app-store')
@@ -138,6 +139,9 @@ dependencies {
     implementation project(path: ':feature-toggles-impl')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
+
+    internalImplementation project(path: ':traces-api')
+    internalImplementation project(path: ':traces-impl')
 
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
@@ -269,5 +273,13 @@ tasks.register('fastlaneVersionCode') {
 }
 
 tasks.register('checks') {
-    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest', 'connectedPlayDebugAndroidTest'
+    dependsOn 'jvm_checks', 'android_checks'
+}
+
+tasks.register('android_checks') {
+    dependsOn 'connectedPlayDebugAndroidTest'
+}
+
+tasks.register('jvm_checks') {
+    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
 }

@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class RealAtpCohortManager @Inject constructor(
     private val cohortStore: CohortStore,
     private val cohortCalculator: CohortCalculator,

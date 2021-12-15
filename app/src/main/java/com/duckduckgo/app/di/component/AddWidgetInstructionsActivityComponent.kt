@@ -16,38 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface AddWidgetInstructionsActivityComponent : AndroidInjector<AddWidgetInstructionsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<AddWidgetInstructionsActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface AddWidgetInstructionsActivityComponentProvider {
     fun provideAddWidgetInstructionsActivityComponentFactory(): AddWidgetInstructionsActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class AddWidgetInstructionsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(AddWidgetInstructionsActivity::class)
-    abstract fun bindAddWidgetInstructionsActivityComponentFactory(factory: AddWidgetInstructionsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun AddWidgetInstructionsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

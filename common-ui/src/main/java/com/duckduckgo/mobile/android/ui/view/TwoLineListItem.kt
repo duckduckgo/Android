@@ -32,51 +32,44 @@ class TwoLineListItem : LinearLayout {
     private val binding: ViewTwoLineItemBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(
-        context,
-        attrs,
-        R.style.Widget_DuckDuckGo_TwoLineListItem
-    )
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, R.style.Widget_DuckDuckGo_TwoLineListItem)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.TwoLineListItem)
         setTitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemTitle) ?: "")
         setSubtitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemSubtitle) ?: "")
-        setImageVisibility(attributes.getBoolean(R.styleable.TwoLineListItem_twoLineItemImageVisible, true))
+        setImageVisibility(
+            attributes.getBoolean(R.styleable.TwoLineListItem_twoLineItemImageVisible, true))
         setImageResource(
             attributes.getResourceId(
-                R.styleable.TwoLineListItem_twoLineItemDrawable,
-                R.drawable.ic_overflow
-            )
-        )
+                R.styleable.TwoLineListItem_twoLineItemDrawable, R.drawable.ic_overflow))
         attributes.recycle()
     }
 
-    /**
-     * Sets the item title
-     */
+    /** Sets the item title */
     fun setTitle(title: String) {
         binding.title.text = title
     }
 
-    /**
-     * Sets the item subtitle
-     */
+    /** Sets the item subtitle */
     fun setSubtitle(subtitle: String) {
         binding.subtitle.text = subtitle
     }
 
-    /**
-     * Sets the item image resource
-     */
+    /** Sets the item image resource */
     fun setImageResource(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.image.setImageDrawable(drawable)
     }
 
-    /**
-     * Sets the item title
-     */
+    /** Sets the item title */
     fun setImageVisibility(isVisible: Boolean) {
         if (isVisible) {
             binding.imageContainer.show()
@@ -85,23 +78,17 @@ class TwoLineListItem : LinearLayout {
         }
     }
 
-    /**
-     * Sets the item image content description
-     */
+    /** Sets the item image content description */
     fun setContentDescription(description: String) {
         binding.image.contentDescription = description
     }
 
-    /**
-     * Sets the item click listener
-     */
+    /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         binding.itemContainer.setOnClickListener { onClick() }
     }
 
-    /**
-     * Sets the item oveflow menu click listener
-     */
+    /** Sets the item oveflow menu click listener */
     fun setOverflowClickListener(onClick: (View) -> Unit) {
         binding.overflowMenu.setOnClickListener { onClick(binding.overflowMenu) }
     }

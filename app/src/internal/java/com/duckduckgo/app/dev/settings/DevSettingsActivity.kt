@@ -44,6 +44,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onNextTdsToggled(isChecked)
     }
 
+    private val startupTraceToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onStartupTraceToggled(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -69,6 +73,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                 }
             }.launchIn(lifecycleScope)
 
