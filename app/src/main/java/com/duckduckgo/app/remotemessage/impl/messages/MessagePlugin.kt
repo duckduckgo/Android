@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.remotemessage.impl.messages
 
-import com.duckduckgo.app.remotemessage.impl.ActionJson
+import com.duckduckgo.app.remotemessage.impl.JsonMessageAction
 import com.duckduckgo.app.remotemessage.impl.MessagePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -63,13 +63,13 @@ private inline fun <reified T : Content> parse(key: String, json: String, featur
 
 class ActionAdapter {
     @ToJson
-    fun toJson(action: Action): ActionJson {
+    fun toJson(action: Action): JsonMessageAction {
         Timber.i("RMF: toJson $action")
-        return ActionJson("", "")
+        return JsonMessageAction("", "")
     }
 
     @FromJson
-    fun fromJson(action: ActionJson): Action {
+    fun fromJson(action: JsonMessageAction): Action {
         Timber.i("RMF: fromJson $action")
         return when (action.type) {
             "url" -> Action.Url(value = action.value)

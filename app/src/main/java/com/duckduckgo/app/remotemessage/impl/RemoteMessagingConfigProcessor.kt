@@ -16,83 +16,33 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.parse
-import com.duckduckgo.app.remotemessage.impl.messages.Content
-import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
+import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
-import okhttp3.internal.toImmutableList
-import org.json.JSONObject
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 
 interface RemoteMessagingConfigProcessor {
-    suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig)
+    suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig
 }
 
 class RealRemoteMessagingConfigProcessor(
-    private val messagesPluginPoint: PluginPoint<MessagePlugin>,
-    private val matchingAttributesPluginPoint: PluginPoint<MatchingAttributePlugin>,
+    private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonParser,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository
 ) : RemoteMessagingConfigProcessor {
 
-    override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {
+    override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
         Timber.i("RMF: process ${jsonRemoteMessagingConfig.version}")
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
         // if (currentVersion != newVersion) {
         if (true) {
-            val messages = parseRemoteMessages(jsonRemoteMessagingConfig.messages)
-            Timber.i("RMF: messages parsed $messages")
-            val matchingRules = parseMatchingRules(jsonRemoteMessagingConfig.matchingRules)
+            val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
         } else {
             Timber.i("RMF: skip, same version")
         }
-    }
 
-    private fun parseRemoteMessages(jsonMessages: List<Message>) = jsonMessages.map { it.map() }
-
-    private fun parseMatchingRules(
-        jsonMatchingRules: List<MatchingRule>
-    ): Map<Int, List<MatchingAttribute?>> {
-        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
-        jsonMatchingRules.forEach {
-            Timber.i("RMF: MatchingRule ${it.id}")
-            matchingRules[it.id] = it.attributes.map { (key, jsonObject) ->
-                Timber.i("RMF: MatchingRule $key")
-                matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
-                    val rule = plugin.parse(key, jsonObject.toString())
-                    if (rule != null) return@map rule
-                }
-                return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
-            }.toImmutableList()
-        }
-        return matchingRules
-    }
-
-    private fun Message.map(): RemoteMessage? {
-        return runCatching {
-            RemoteMessage(
-                id = this.id,
-                messageType = this.messageType,
-                content = this.content?.mapToContent(this.messageType) ?: throw IllegalArgumentException(),
-                matchingRules = this.matchingRules.orEmpty(),
-                exclusionRules = this.exclusionRules.orEmpty()
-            )
-        }.onFailure {
-            Timber.i("RMF: error $it")
-        }.getOrNull()
-    }
-
-    private fun JSONObject.mapToContent(messageType: String): Content? {
-        messagesPluginPoint.getPlugins().forEach { plugin ->
-            val content = plugin.parse(messageType, this.toString())
-            if (content != null) return content
-        }
-        return null
+        return RemoteConfig(emptyList(), emptyMap())
     }
 }

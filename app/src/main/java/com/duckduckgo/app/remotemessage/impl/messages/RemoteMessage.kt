@@ -16,7 +16,13 @@
 
 package com.duckduckgo.app.remotemessage.impl.messages
 
-import com.duckduckgo.app.remotemessage.impl.ActionJson
+import com.duckduckgo.app.remotemessage.impl.JsonMessageAction
+import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
+
+data class RemoteConfig(
+    val messages: List<RemoteMessage>,
+    val rules: Map<Int, List<MatchingAttribute?>>
+)
 
 data class RemoteMessage(
     val id: String,
@@ -27,10 +33,10 @@ data class RemoteMessage(
 )
 
 sealed class Content {
-    data class Small(val title: String, val description: String) : Content()
-    data class Medium(val title: String, val description: String, val placeholder: String) : Content()
-    data class BigSingleAction(val title: String, val description: String, val placeholder: String, val button: String, val primaryAction: ActionJson) : Content()
-    data class BigTwoActions(val title: String, val description: String, val placeholder: String, val button: String, val primaryAction: ActionJson, val button2: String, val secondaryAction: ActionJson) : Content()
+    data class Small(val titleText: String, val descriptionText: String) : Content()
+    data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : Content()
+    data class BigSingleAction(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction) : Content()
+    data class BigTwoActions(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction, val secondaryActionText: String, val secondaryAction: JsonMessageAction) : Content()
 }
 
 sealed class Action {

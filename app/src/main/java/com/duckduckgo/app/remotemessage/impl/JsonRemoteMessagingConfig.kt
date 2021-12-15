@@ -20,11 +20,11 @@ import org.json.JSONObject
 
 data class JsonRemoteMessagingConfig(
     val version: Long,
-    val messages: List<Message>,
-    val matchingRules: List<MatchingRule>
+    val messages: List<JsonRemoteMessage>,
+    val matchingRules: List<JsonMatchingRule>
 )
 
-data class Message(
+data class JsonRemoteMessage(
     val id: String,
     val messageType: String,
     val content: JSONObject?,
@@ -32,12 +32,12 @@ data class Message(
     val matchingRules: List<Int>?
 )
 
-data class MatchingRule(
+data class JsonMatchingRule(
     val id: Int,
     val attributes: Map<String, JSONObject?>
 )
 
-data class ActionJson(
+data class JsonMessageAction(
     val type: String,
     val value: String
 )
