@@ -97,6 +97,7 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
         var showMore: TextView = view.findViewById(R.id.tracking_company_show_more)
         var topSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_top_signals)
         var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
+        var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
 
         fun bind(trackerInfo: AppTPCompanyTrackersViewModel.CompanyTrackingDetails) {
             val badge = badgeIcon(view.context, trackerInfo.companyName)
@@ -145,7 +146,13 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
                 if (!bottomSignalsLayout.isVisible) {
                     bottomSignalsLayout.show()
                     showMore.gone()
+                    showLess.show()
                 }
+            }
+            showLess.setOnClickListener {
+                bottomSignalsLayout.gone()
+                showMore.show()
+                showLess.gone()
             }
         }
 
