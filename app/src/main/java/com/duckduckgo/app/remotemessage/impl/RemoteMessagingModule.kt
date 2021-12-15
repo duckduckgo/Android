@@ -100,14 +100,24 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigProcessor(
-        messagePluginPoint: PluginPoint<MessagePlugin>,
-        matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>,
+        remoteMessagingConfigJsonParser: RemoteMessagingConfigJsonParser,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
-            messagePluginPoint,
-            matchingAttributePluginPoint,
+            remoteMessagingConfigJsonParser,
             remoteMessagingConfigRepository
+        )
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagingConfigJsonParser(
+        messagePluginPoint: PluginPoint<MessagePlugin>,
+        matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>
+    ): RemoteMessagingConfigJsonParser {
+        return RemoteMessagingConfigJsonParser(
+            messagePluginPoint,
+            matchingAttributePluginPoint
         )
     }
 

@@ -16,11 +16,6 @@
 
 package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
-sealed class MatchingAttributeName(val key: String) {
-    object Api : MatchingAttributeName("os_api")
-    object InstalledGPlay : MatchingAttributeName("installed_gplay")
-}
-
 sealed class MatchingAttribute(val fallback: Boolean? = null) {
     data class Locale(override val value: List<String>) : MatchingAttribute(), StringArrayMatchingAttribute
     data class Api(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute

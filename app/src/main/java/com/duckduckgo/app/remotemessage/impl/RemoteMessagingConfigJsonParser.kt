@@ -29,7 +29,8 @@ class RemoteMessagingConfigJsonParser(
     private val messagesPluginPoint: PluginPoint<MessagePlugin>,
     private val matchingAttributesPluginPoint: PluginPoint<MatchingAttributePlugin>
 ) {
-    suspend fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
+
+    fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
         val messages = parseRemoteMessages(jsonRemoteMessagingConfig.messages)
         Timber.i("RMF: messages parsed $messages")
         val matchingRules = parseMatchingRules(jsonRemoteMessagingConfig.matchingRules)
@@ -39,25 +40,7 @@ class RemoteMessagingConfigJsonParser(
         )
     }
 
-    private fun parseRemoteMessages(jsonRemoteMessages: List<JsonRemoteMessage>) = jsonRemoteMessages.map { it.map() }.filterNotNull()
-
-    private fun parseMatchingRules(
-        jsonMatchingRules: List<JsonMatchingRule>
-    ): Map<Int, List<MatchingAttribute?>> {
-        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
-        jsonMatchingRules.forEach {
-            Timber.i("RMF: MatchingRule ${it.id}")
-            matchingRules[it.id] = it.attributes.map { (key, jsonObject) ->
-                Timber.i("RMF: MatchingRule $key")
-                matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
-                    val rule = plugin.parse(key, jsonObject.toString())
-                    if (rule != null) return@map rule
-                }
-                return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
-            }.toList()
-        }
-        return matchingRules
-    }
+    private fun parseRemoteMessages(jsonRemoteMessages: List<JsonRemoteMessage>) = jsonRemoteMessages.mapNotNull { it.map() }
 
     private fun JsonRemoteMessage.map(): RemoteMessage? {
         return runCatching {
@@ -79,5 +62,23 @@ class RemoteMessagingConfigJsonParser(
             if (content != null) return content
         }
         return null
+    }
+
+    private fun parseMatchingRules(
+        jsonMatchingRules: List<JsonMatchingRule>
+    ): Map<Int, List<MatchingAttribute?>> {
+        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
+        jsonMatchingRules.forEach {
+            Timber.i("RMF: MatchingRule ${it.id}")
+            matchingRules[it.id] = it.attributes.map { (key, jsonObject) ->
+                Timber.i("RMF: MatchingRule $key")
+                matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
+                    val rule = plugin.parse(key, jsonObject.toString())
+                    if (rule != null) return@map rule
+                }
+                return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
+            }.toList()
+        }
+        return matchingRules
     }
 }

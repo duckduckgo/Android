@@ -117,6 +117,27 @@ class RemoteMessagingConfigJsonParserTest {
         assertEquals(3, config.rules.size)
     }
 
+    @Test
+    fun whenJsonHasUnknownItemsThenMessageNotParsed() = coroutineRule.runBlocking {
+        val jsonString = FileUtilities.loadText("json/remote_messaging_config_unsupported_items.json")
+        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
+        val result = jsonAdapter.fromJson(jsonString)!!
+
+        val testee = RemoteMessagingConfigJsonParser(
+            messagesPluginPoint = getMessagePluginPoint(),
+            matchingAttributesPluginPoint = getMatchingAttributePluginPoint()
+        )
+
+        val config = testee.map(result)
+
+        assertEquals(0, config.messages.size)
+        assertEquals(1, config.rules.size)
+
+        val defaultBrowser = MatchingAttribute.DefaultBrowser(value = true)
+        assertEquals(defaultBrowser, config.rules[0])
+    }
+
     private fun getMessagePluginPoint(): PluginPoint<MessagePlugin> {
         return MessagePluginPoint(setOf(SmallMessage(), MediumMessage(), BigSingleActionMessage(), BigTwoActionsMessage()))
     }

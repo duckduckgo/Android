@@ -60,21 +60,3 @@ private inline fun <reified T : Content> parse(key: String, json: String, featur
     }
     return null
 }
-
-class ActionAdapter {
-    @ToJson
-    fun toJson(action: Action): JsonMessageAction {
-        Timber.i("RMF: toJson $action")
-        return JsonMessageAction("", "")
-    }
-
-    @FromJson
-    fun fromJson(action: JsonMessageAction): Action {
-        Timber.i("RMF: fromJson $action")
-        return when (action.type) {
-            "url" -> Action.Url(value = action.value)
-            "playstore" -> Action.PlayStore(value = action.value)
-            else -> throw JsonDataException("unknown suit: ${action.type}")
-        }
-    }
-}
