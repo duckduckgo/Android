@@ -22,8 +22,6 @@ import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -39,11 +37,7 @@ import javax.inject.Provider
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(
-    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
-    private val device: DeviceInfo,
-    private val pixel: Pixel
-) {
+class UserAgentProvider constructor(@Named("defaultUserAgent") private val defaultUserAgent: Provider<String>, private val device: DeviceInfo) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
     private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
@@ -89,7 +83,7 @@ class UserAgentProvider constructor(
     }
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
-        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent()) ?: return null
+        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
         var result = matches.groupValues.last()
         if (forDesktop) {
             result = result.replace(" Mobile", "")
@@ -102,18 +96,8 @@ class UserAgentProvider constructor(
     }
 
     private fun getSafariComponentFromUserAgent(): String? {
-        val matches = AgentRegex.safari.find(defaultUserAgent()) ?: return null
+        val matches = AgentRegex.safari.find(defaultUserAgent.get()) ?: return null
         return matches.groupValues.last()
-    }
-
-    private fun defaultUserAgent(): String = runCatching {
-        defaultUserAgent.get()
-    }.let { result ->
-        if (result.isFailure) {
-            pixel.fire(AppPixelName.WEBVIEW_DEFAULT_USER_AGENT_CRASH)
-            return fallbackDefaultUA
-        }
-        return@let result.getOrDefault(fallbackDefaultUA)
     }
 
     private object AgentRegex {
@@ -162,6 +146,8 @@ class DefaultUserAgentModule {
     @Provides
     @Named("defaultUserAgent")
     fun provideDefaultUserAgent(context: Context): String {
-        return WebSettings.getDefaultUserAgent(context)
+        return runCatching {
+            WebSettings.getDefaultUserAgent(context)
+        }.getOrDefault(UserAgentProvider.fallbackDefaultUA)
     }
 }
