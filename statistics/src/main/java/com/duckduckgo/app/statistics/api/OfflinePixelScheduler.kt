@@ -22,13 +22,13 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class OfflinePixelScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleObserver {
@@ -77,7 +77,7 @@ class OfflinePixelScheduler @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class OfflinePixelWorkerInjectorPlugin @Inject constructor(
     private val offlinePixelSender: OfflinePixelSender
 ) : WorkerInjectorPlugin {

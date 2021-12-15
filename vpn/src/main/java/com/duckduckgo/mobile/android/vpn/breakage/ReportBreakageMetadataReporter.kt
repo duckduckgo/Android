@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.breakage
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -27,7 +27,7 @@ interface ReportBreakageMetadataReporter {
     suspend fun getVpnStateMetadata(appPackageId: String? = null): String
 }
 
-@ContributesBinding(VpnObjectGraph::class)
+@ContributesBinding(VpnScope::class)
 class RealReportBreakageMetadataReporter @Inject constructor(
     private val vpnStateCollector: VpnStateCollector,
     private val dispatcherProvider: DispatcherProvider,

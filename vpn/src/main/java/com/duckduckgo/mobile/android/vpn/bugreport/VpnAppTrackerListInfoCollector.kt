@@ -16,14 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnObjectGraph::class)
+@ContributesMultibinding(VpnScope::class)
 class VpnAppTrackerListInfoCollector @Inject constructor(
     private val vpnDatabase: VpnDatabase,
 ) : VpnStateCollectorPlugin {

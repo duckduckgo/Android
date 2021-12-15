@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
@@ -28,7 +28,7 @@ import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class GpcPlugin @Inject constructor(
     private val gpcRepository: GpcRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository

@@ -616,7 +616,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte si e‑mailové trackery<br/>bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte si e‑mailové trackery bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>

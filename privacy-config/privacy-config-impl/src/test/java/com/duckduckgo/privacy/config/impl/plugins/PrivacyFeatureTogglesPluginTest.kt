@@ -30,8 +30,7 @@ import org.junit.Test
 
 class PrivacyFeatureTogglesPluginTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
     lateinit var testee: PrivacyFeatureTogglesPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
@@ -42,54 +41,61 @@ class PrivacyFeatureTogglesPluginTest {
     }
 
     @Test
-    fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() = coroutineRule.runBlocking {
-        assertNull(testee.isEnabled(NonPrivacyFeature(), true))
-    }
+    fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() =
+        coroutineRule.runBlocking { assertNull(testee.isEnabled(NonPrivacyFeature(), true)) }
 
     @Test
-    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnTrueWhenEnabled() = coroutineRule.runBlocking {
-        givenPrivacyFeatureIsEnabled()
+    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnTrueWhenEnabled() =
+        coroutineRule.runBlocking {
+            givenPrivacyFeatureIsEnabled()
 
-        val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
 
-        assertTrue(isEnabled!!)
-    }
-
-    @Test
-    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnFalseWhenDisabled() = coroutineRule.runBlocking {
-        givenPrivacyFeatureIsDisabled()
-
-        val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
-
-        assertFalse(isEnabled!!)
-    }
+            assertTrue(isEnabled!!)
+        }
 
     @Test
-    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnDefaultValueIfFeatureDoesNotExist() = coroutineRule.runBlocking {
-        val defaultValue = true
-        givenPrivacyFeatureReturnsDefaultValue(defaultValue)
+    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnFalseWhenDisabled() =
+        coroutineRule.runBlocking {
+            givenPrivacyFeatureIsDisabled()
 
-        val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), defaultValue)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
 
-        assertEquals(defaultValue, isEnabled)
-    }
+            assertFalse(isEnabled!!)
+        }
+
+    @Test
+    fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnDefaultValueIfFeatureDoesNotExist() =
+        coroutineRule.runBlocking {
+            val defaultValue = true
+            givenPrivacyFeatureReturnsDefaultValue(defaultValue)
+
+            val isEnabled =
+                testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), defaultValue)
+
+            assertEquals(defaultValue, isEnabled)
+        }
 
     private fun givenPrivacyFeatureIsEnabled() {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, true)).thenReturn(
-            true
-        )
+        whenever(
+                mockFeatureTogglesRepository.get(
+                    PrivacyFeatureName.ContentBlockingFeatureName().value, true))
+            .thenReturn(true)
     }
 
     private fun givenPrivacyFeatureIsDisabled() {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, true)).thenReturn(
-            false
-        )
+        whenever(
+                mockFeatureTogglesRepository.get(
+                    PrivacyFeatureName.ContentBlockingFeatureName().value, true))
+            .thenReturn(false)
     }
 
     private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
-        whenever(mockFeatureTogglesRepository.get(PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue)).thenReturn(defaultValue)
+        whenever(
+                mockFeatureTogglesRepository.get(
+                    PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue))
+            .thenReturn(defaultValue)
     }
 
     data class NonPrivacyFeature(override val value: String = "test") : FeatureName
-
 }

@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi<br/>vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>

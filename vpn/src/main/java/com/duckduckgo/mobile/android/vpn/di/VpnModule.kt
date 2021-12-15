@@ -20,7 +20,7 @@ import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
@@ -32,16 +32,17 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import java.nio.channels.Selector
 import javax.inject.Named
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 class VpnModule {
 
     @Provides
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @TargetApi(29)
     @Named("DetectOriginatingAppPackageModern")
     fun providesOriginatingAppResolverModern(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppPackageIdentifier {
@@ -49,7 +50,7 @@ class VpnModule {
     }
 
     @Provides
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Named("DetectOriginatingAppPackageLegacy")
     fun providesOriginatingAppResolverLegacy(
         packageManager: PackageManager,
@@ -59,14 +60,14 @@ class VpnModule {
         return DetectOriginatingAppPackageLegacy(packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
     }
 
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Provides
     fun providesProcNetFileConnectionMatcher(): NetworkFileConnectionMatcher {
         return ProcNetFileConnectionMatcher()
     }
 
+    @SingleInstanceIn(VpnScope::class)
     @Provides
-    @VpnScope
     fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = AppNameResolver(packageManager)
 
     @Provides
@@ -91,7 +92,7 @@ class VpnModule {
         return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor)
     }
 
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Provides
     fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
         return if (BuildConfig.DEBUG) {
@@ -101,7 +102,7 @@ class VpnModule {
         }
     }
 
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Provides
     fun providesVpnTrackerDetector(
         hostnameExtractor: HostnameExtractor,
@@ -115,13 +116,13 @@ class VpnModule {
         return DomainBasedTrackerDetector(hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase, requestInterceptors)
     }
 
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Provides
     fun providesContentTypeExtractor(tlsMessageDetector: TlsMessageDetector): ContentTypeExtractor {
         return TlsContentTypeExtractor(tlsMessageDetector)
     }
 
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     @Provides
     @TcpNetworkSelector
     fun provideTcpNetworkSelector(): Selector {

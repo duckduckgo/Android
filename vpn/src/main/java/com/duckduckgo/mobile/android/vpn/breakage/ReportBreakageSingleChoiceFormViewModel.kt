@@ -20,7 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
@@ -76,7 +76,7 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ReportBreakageSingleChoiceFormViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {

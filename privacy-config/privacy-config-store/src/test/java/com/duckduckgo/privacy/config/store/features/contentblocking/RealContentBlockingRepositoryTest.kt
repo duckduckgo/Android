@@ -34,8 +34,7 @@ import org.mockito.ArgumentMatchers.anyList
 
 class RealContentBlockingRepositoryTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealContentBlockingRepository
 
@@ -51,37 +50,47 @@ class RealContentBlockingRepositoryTest {
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenContentBlockingDaoContainsExceptions()
 
-        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        testee =
+            RealContentBlockingRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
-        assertEquals(contentBlockingException.toContentBlockingException(), testee.exceptions.first())
+        assertEquals(
+            contentBlockingException.toContentBlockingException(), testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+    fun whenUpdateAllThenUpdateAllCalled() =
+        coroutineRule.runBlocking {
+            testee =
+                RealContentBlockingRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        verify(mockContentBlockingDao).updateAll(anyList())
-    }
+            verify(mockContentBlockingDao).updateAll(anyList())
+        }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
-        givenContentBlockingDaoContainsExceptions()
-        testee = RealContentBlockingRepository(mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
-        assertEquals(1, testee.exceptions.size)
-        reset(mockContentBlockingDao)
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+        coroutineRule.runBlocking {
+            givenContentBlockingDaoContainsExceptions()
+            testee =
+                RealContentBlockingRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+            assertEquals(1, testee.exceptions.size)
+            reset(mockContentBlockingDao)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        assertEquals(0, testee.exceptions.size)
-    }
+            assertEquals(0, testee.exceptions.size)
+        }
 
     private fun givenContentBlockingDaoContainsExceptions() {
         whenever(mockContentBlockingDao.getAll()).thenReturn(listOf(contentBlockingException))
     }
 
     companion object {
-        val contentBlockingException = ContentBlockingExceptionEntity("example.com", "my reason here")
+        val contentBlockingException =
+            ContentBlockingExceptionEntity("example.com", "my reason here")
     }
 }

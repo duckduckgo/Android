@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.ui.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import javax.inject.Inject
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(private val context: Context) :
     ThemingDataStore {
@@ -51,18 +51,20 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
             private const val THEME_SYSTEM_DEFAULT = "SYSTEM_DEFAULT"
         }
 
-        fun prefValue(theme: DuckDuckGoTheme) = when (theme) {
-            DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
-            DuckDuckGoTheme.LIGHT -> THEME_LIGHT
-            DuckDuckGoTheme.DARK -> THEME_DARK
-        }
+        fun prefValue(theme: DuckDuckGoTheme) =
+            when (theme) {
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> THEME_SYSTEM_DEFAULT
+                DuckDuckGoTheme.LIGHT -> THEME_LIGHT
+                DuckDuckGoTheme.DARK -> THEME_DARK
+            }
 
-        fun themeFrom(value: String?, defValue: DuckDuckGoTheme) = when (value) {
-            THEME_LIGHT -> DuckDuckGoTheme.LIGHT
-            THEME_DARK -> DuckDuckGoTheme.DARK
-            THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
-            else -> defValue
-        }
+        fun themeFrom(value: String?, defValue: DuckDuckGoTheme) =
+            when (value) {
+                THEME_LIGHT -> DuckDuckGoTheme.LIGHT
+                THEME_DARK -> DuckDuckGoTheme.DARK
+                THEME_SYSTEM_DEFAULT -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                else -> defValue
+            }
     }
 
     companion object {

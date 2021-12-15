@@ -25,6 +25,7 @@ import android.os.Handler
 import android.os.Message
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
@@ -50,7 +51,6 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -73,7 +73,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+// open class so that we can test BrowserApplicationStateInfo
+open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -121,6 +122,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
     private var openMessageInNewTabJob: Job? = null
+
+    @VisibleForTesting
+    var destroyedByBackPress: Boolean = false
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -420,6 +424,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     override fun onBackPressed() {
         if (currentTab?.onBackPressed() != true) {
+            // signal user press back button to exit the app so that BrowserApplicationStateInfo
+            // can call the right callback
+            destroyedByBackPress = true
             super.onBackPressed()
         }
     }

@@ -17,10 +17,11 @@
 package com.duckduckgo.app.usage.search
 
 import androidx.room.*
-import javax.inject.Singleton
+import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
 
 @Dao
-@Singleton
+@SingleInstanceIn(AppScope::class)
 abstract class SearchCountDao {
 
     @Query("SELECT count FROM search_count LIMIT 1")

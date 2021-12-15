@@ -32,8 +32,7 @@ import org.junit.Test
 
 class PrivacyConfigDownloadWorkerTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: PrivacyConfigDownloadWorker
     private val mockPrivacyConfigDownloader: PrivacyConfigDownloader = mock()
@@ -46,30 +45,32 @@ class PrivacyConfigDownloadWorkerTest {
     }
 
     @Test
-    fun whenDoWorkIfDownloadReturnsTrueThenReturnSuccess() = coroutineRule.runBlocking {
+    fun whenDoWorkIfDownloadReturnsTrueThenReturnSuccess() =
+        coroutineRule.runBlocking {
+            whenever(mockPrivacyConfigDownloader.download()).thenReturn(true)
 
-        whenever(mockPrivacyConfigDownloader.download()).thenReturn(true)
+            val worker =
+                TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()
 
-        val worker = TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()
+            worker.privacyConfigDownloader = mockPrivacyConfigDownloader
+            worker.dispatcherProvider = coroutineRule.testDispatcherProvider
 
-        worker.privacyConfigDownloader = mockPrivacyConfigDownloader
-        worker.dispatcherProvider = coroutineRule.testDispatcherProvider
-
-        val result = worker.doWork()
-        assertThat(result, `is`(ListenableWorker.Result.success()))
-    }
+            val result = worker.doWork()
+            assertThat(result, `is`(ListenableWorker.Result.success()))
+        }
 
     @Test
-    fun whenDoWorkIfDownloadReturnsFalseThenReturnRetry() = coroutineRule.runBlocking {
+    fun whenDoWorkIfDownloadReturnsFalseThenReturnRetry() =
+        coroutineRule.runBlocking {
+            whenever(mockPrivacyConfigDownloader.download()).thenReturn(false)
 
-        whenever(mockPrivacyConfigDownloader.download()).thenReturn(false)
+            val worker =
+                TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()
 
-        val worker = TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()
+            worker.privacyConfigDownloader = mockPrivacyConfigDownloader
+            worker.dispatcherProvider = coroutineRule.testDispatcherProvider
 
-        worker.privacyConfigDownloader = mockPrivacyConfigDownloader
-        worker.dispatcherProvider = coroutineRule.testDispatcherProvider
-
-        val result = worker.doWork()
-        assertThat(result, `is`(ListenableWorker.Result.retry()))
-    }
+            val result = worker.doWork()
+            assertThat(result, `is`(ListenableWorker.Result.retry()))
+        }
 }

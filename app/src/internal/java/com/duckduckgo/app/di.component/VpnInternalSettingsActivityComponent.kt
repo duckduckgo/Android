@@ -16,39 +16,40 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
-
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.vpn.internal.feature.VpnInternalSettingsActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
-import dagger.Binds
-import dagger.Module
-import dagger.Subcomponent
+import dagger.*
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@WrongScope(
+    comment = "To use the right scope we first need to enable dagger component nesting",
+    correctScope = ActivityScope::class,
+)
+@SingleInstanceIn(VpnScope::class)
 @MergeSubcomponent(
-    scope = VpnObjectGraph::class
+    scope = VpnScope::class
 )
 interface VpnInternalSettingsActivityComponent : AndroidInjector<VpnInternalSettingsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnInternalSettingsActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface VpnInternalSettingsActivityComponentProvider {
     fun provideVpnInternalSettingsActivityComponentFactory(): VpnInternalSettingsActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class VpnInternalSettingsActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(VpnInternalSettingsActivity::class)
-    abstract fun bindVpnInternalSettingsActivityComponentFactory(factory: VpnInternalSettingsActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun VpnInternalSettingsActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

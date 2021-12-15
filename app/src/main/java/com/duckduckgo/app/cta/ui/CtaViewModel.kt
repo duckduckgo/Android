@@ -19,6 +19,7 @@ package com.duckduckgo.app.cta.ui
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -44,6 +45,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -52,10 +54,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 import kotlin.coroutines.CoroutineContext
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
@@ -69,7 +71,8 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val variantManager: VariantManager,
-    private val userEventsStore: UserEventsStore
+    private val userEventsStore: UserEventsStore,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -325,6 +328,11 @@ class CtaViewModel @Inject constructor(
         }
 
         nonNullSite.let {
+
+            if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
+                return null
+            }
+
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->

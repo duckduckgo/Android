@@ -588,7 +588,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-posta gizliliğinin basitleştirilmiş hâli.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı<br/>değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Listedesiniz!</string>

@@ -34,6 +34,3 @@ dependencies {
     implementation Kotlin.stdlib.jdk7
 }
 
-tasks.register('checks') {
-    dependsOn 'spotlessCheck'
-}

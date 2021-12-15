@@ -16,38 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
-import com.duckduckgo.di.scopes.ActivityObjectGraph
-import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.app.WidgetThemeConfiguration
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface WidgetThemeConfigurationComponent : AndroidInjector<WidgetThemeConfiguration> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<WidgetThemeConfiguration>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface WidgetThemeConfigurationComponentProvider {
     fun provideWidgetThemeConfigurationComponentFactory(): WidgetThemeConfigurationComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class WidgetThemeConfigurationBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WidgetThemeConfiguration::class)
-    abstract fun bindWidgetThemeConfigurationComponentFactory(factory: WidgetThemeConfigurationComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WidgetThemeConfigurationComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

@@ -27,9 +27,7 @@ abstract class PrivacyConfigDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(privacyConfig: PrivacyConfig)
 
-    @Query("select * from privacy_config LIMIT 1")
-    abstract fun get(): PrivacyConfig?
+    @Query("select * from privacy_config LIMIT 1") abstract fun get(): PrivacyConfig?
 
-    @Query("delete from privacy_config")
-    abstract fun delete()
+    @Query("delete from privacy_config") abstract fun delete()
 }

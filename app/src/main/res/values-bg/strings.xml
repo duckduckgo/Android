@@ -588,7 +588,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Поверителност на имейла с две думи.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Вече сте в списъка!</string>

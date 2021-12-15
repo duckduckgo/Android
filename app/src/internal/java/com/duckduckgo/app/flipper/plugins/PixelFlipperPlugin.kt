@@ -17,7 +17,7 @@
 package com.duckduckgo.app.flipper.plugins
 
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.core.FlipperConnection
 import com.facebook.flipper.core.FlipperObject
 import com.facebook.flipper.core.FlipperPlugin
@@ -30,9 +30,9 @@ import okhttp3.Response
 import org.threeten.bp.LocalTime
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class PixelFlipperPlugin @Inject constructor() : FlipperPlugin, Interceptor, PixelInterceptorPlugin {
 
     private var connection: FlipperConnection? = null
@@ -87,7 +87,7 @@ class PixelFlipperPlugin @Inject constructor() : FlipperPlugin, Interceptor, Pix
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class PixelFlipperPluginModule {
     @Binds
     @IntoSet

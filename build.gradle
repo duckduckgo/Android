@@ -1,24 +1,26 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
 
-    ext.spotless = "5.14.0"
-    ext.anvil_version = "2.3.3"
-
-    ext.gradle_plugin = "7.0.3"
-
-    ext.min_sdk = 21
-    ext.target_sdk = 30
-    ext.compile_sdk = 31
-    ext.tools_build_version = "30.0.3"
+    ext {
+        kotlin_version = '1.5.10'
+        spotless = "5.14.0"
+        anvil_version = "2.3.3"
+        gradle_plugin = "7.0.3"
+        min_sdk = 21
+        target_sdk = 30
+        compile_sdk = 31
+    }
 
     repositories {
         google()
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_plugin"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

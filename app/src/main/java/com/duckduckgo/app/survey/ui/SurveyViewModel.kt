@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -114,7 +114,7 @@ class SurveyViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SurveyViewModelFactory @Inject constructor(
     private val surveyDao: Provider<SurveyDao>,
     private val statisticsStore: Provider<StatisticsDataStore>,
