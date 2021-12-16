@@ -16,12 +16,16 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendDelayedFin
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendFin
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendReset
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
@@ -31,7 +35,10 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.*
+import xyz.hexene.localvpn.Packet.TCPHeader.ACK
+import xyz.hexene.localvpn.Packet.TCPHeader.PSH
+import xyz.hexene.localvpn.Packet.TCPHeader.RST
+import xyz.hexene.localvpn.Packet.TCPHeader.SYN
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_RECEIVED
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_SENT
@@ -49,7 +56,8 @@ class TcpNetworkToDevice(
     private val tcpSocketWriter: TcpSocketWriter,
     private val packetPersister: PacketPersister,
     private val tcbCloser: TCBCloser,
-    private val vpnCoroutineScope: CoroutineScope
+    private val vpnCoroutineScope: CoroutineScope,
+    private val healthMetricCounter: HealthMetricCounter
 ) {
 
     /**
@@ -58,7 +66,6 @@ class TcpNetworkToDevice(
      */
     @Suppress("BlockingMethodInNonBlockingContext")
     fun networkToDeviceProcessing() {
-        val startTime = System.nanoTime()
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {
@@ -73,15 +80,11 @@ class TcpNetworkToDevice(
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
-                    Timber.v("Got next network-to-device packet [isReadable] after %dms wait", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime))
                     processRead(key)
                 } else if (key.isValid && key.isConnectable) {
-                    Timber.v("Got next network-to-device packet [isConnectable] after %dms wait", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime))
                     processConnect(key)
                 } else if (key.isValid && key.isWritable) {
-                    val tcb = key.attachment() as TCB
-                    Timber.v("Now is the chance to write to the socket %s", tcb.ipAndPort)
-                    tcpSocketWriter.writeToSocket(tcb)
+                    processWrite(key)
                 }
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
@@ -90,7 +93,20 @@ class TcpNetworkToDevice(
         }
     }
 
+    private fun processWrite(key: SelectionKey) {
+        val tcb = key.attachment() as TCB
+        Timber.v("Now is the chance to write to the socket %s [isWritable]", tcb.ipAndPort)
+
+        try {
+            tcpSocketWriter.writeToSocket(tcb)
+        } catch (e: IOException) {
+            Timber.w(e, "Failed writing to socket %s", tcb.ipAndPort)
+            healthMetricCounter.onSocketChannelWriteError()
+        }
+    }
+
     private fun processRead(key: SelectionKey) {
+        Timber.v("Got next network-to-device packet [isReadable]")
         val receiveBuffer = ByteBufferPool.acquire()
         receiveBuffer.position(HEADER_SIZE)
 
@@ -113,6 +129,7 @@ class TcpNetworkToDevice(
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
+                healthMetricCounter.onSocketChannelReadError()
                 sendReset(packet, tcb)
                 return
             }
@@ -184,6 +201,7 @@ class TcpNetworkToDevice(
     }
 
     private fun processConnect(key: SelectionKey) {
+        Timber.v("Got next network-to-device packet [isConnectable]")
         val tcb = key.attachment() as TCB
         val packet = tcb.referencePacket
         runCatching {
@@ -219,6 +237,7 @@ class TcpNetworkToDevice(
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
 
             tcbCloser.closeConnection(tcb)
+            healthMetricCounter.onSocketChannelConnectError()
         }
     }
 

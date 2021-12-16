@@ -22,11 +22,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import android.os.Parcel
+import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -37,11 +43,18 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
-import java.util.concurrent.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
@@ -82,6 +95,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var tcpPacketProcessorFactory: TcpPacketProcessor.Factory
     private lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
+
+    @Inject
+    lateinit var tracerPacketRegister: TracerPacketRegister
+
+    @Inject
+    lateinit var healthMetricCounter: HealthMetricCounter
 
     inner class VpnServiceBinder : Binder() {
 
@@ -135,7 +154,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                stopVpn(VpnStopReason.SelfStop)
+                launch { stopVpn(VpnStopReason.SelfStop) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -150,13 +169,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         establishVpnInterface()
 
+        if (tunInterface == null) {
+            Timber.e("Failed to establish the TUN interface")
+            restartVpnService(applicationContext)
+            return@withContext
+        }
+
         tunInterface?.let { vpnInterface ->
             executorService?.shutdownNow()
             val processors = listOf(
                 tcpPacketProcessor,
                 udpPacketProcessor,
-                TunPacketReader(vpnInterface, queues),
-                TunPacketWriter(vpnInterface, queues)
+                TunPacketReader(vpnInterface, queues, healthMetricCounter),
+                TunPacketWriter(vpnInterface, queues, tracerPacketRegister, healthMetricCounter)
             )
             executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
                 processors.forEach { executorService.submit(it) }
@@ -239,8 +264,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun stopVpn(reason: VpnStopReason) {
-        Timber.i("VPN log: Stopping VPN")
+    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+        Timber.i("VPN log: Stopping VPN.")
 
         queues.clearAll()
         executorService?.shutdownNow()
@@ -276,7 +301,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        stopVpn(VpnStopReason.Revoked)
+        launch { stopVpn(VpnStopReason.Revoked) }
     }
 
     override fun onLowMemory() {
