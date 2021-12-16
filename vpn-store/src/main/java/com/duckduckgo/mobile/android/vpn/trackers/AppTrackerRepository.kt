@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.trackers
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerSystemAppsOverridesDao
 import kotlinx.coroutines.flow.Flow
 
 @WorkerThread
@@ -32,6 +33,8 @@ interface AppTrackerRepository {
 
     fun getManualAppExclusionListFlow(): Flow<List<AppTrackerManualExcludedApp>>
 
+    fun getSystemAppOverrideList(): List<AppTrackerSystemAppOverridePackage>
+
     fun manuallyExcludedApp(packageName: String)
 
     fun manuallyEnabledApp(packageName: String)
@@ -39,7 +42,10 @@ interface AppTrackerRepository {
     fun restoreDefaultProtectedList()
 }
 
-class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao) : AppTrackerRepository {
+class RealAppTrackerRepository(
+    private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
+    private val vpnSystemAppsOverrides: VpnAppTrackerSystemAppsOverridesDao
+) : AppTrackerRepository {
 
     override fun findTracker(hostname: String, packageName: String): AppTrackerType {
         val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname) ?: return AppTrackerType.NotTracker
@@ -70,6 +76,10 @@ class RealAppTrackerRepository(private val vpnAppTrackerBlockingDao: VpnAppTrack
 
     override fun getManualAppExclusionListFlow(): Flow<List<AppTrackerManualExcludedApp>> {
         return vpnAppTrackerBlockingDao.getManualAppExclusionListFlow()
+    }
+
+    override fun getSystemAppOverrideList(): List<AppTrackerSystemAppOverridePackage> {
+        return vpnSystemAppsOverrides.getSystemAppOverrides()
     }
 
     override fun manuallyExcludedApp(packageName: String) {
