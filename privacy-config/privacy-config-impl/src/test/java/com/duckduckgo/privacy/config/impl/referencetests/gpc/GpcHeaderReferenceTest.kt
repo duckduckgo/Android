@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.referencetests
+package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
 import android.content.Context
 import android.content.res.Resources
