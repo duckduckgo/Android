@@ -37,7 +37,7 @@ interface SpecialUrlDetector {
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
         class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String) : UrlType()
-        class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?) : UrlType()
+        class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?, val fallbackIntent: Intent? = null) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
     }
@@ -137,11 +137,19 @@ class SpecialUrlDetectorImpl(
         return try {
             val intent = Intent.parseUri(uriString, URI_NO_FLAG)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
-            UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl)
+            val fallbackIntent = buildFallbackIntent(fallbackUrl)
+            UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
             return UrlType.Unknown(uriString)
         }
+    }
+
+    private fun buildFallbackIntent(fallbackUrl: String?): Intent? {
+        if (determineType(fallbackUrl) is UrlType.NonHttpAppLink) {
+            return Intent.parseUri(fallbackUrl, URI_NO_FLAG)
+        }
+        return null
     }
 
     override fun determineType(uriString: String?): UrlType {
