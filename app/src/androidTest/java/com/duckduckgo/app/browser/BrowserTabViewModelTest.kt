@@ -53,6 +53,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
@@ -3661,6 +3662,57 @@ class BrowserTabViewModelTest {
 
         assertFalse(accessibilityViewState().refreshWebView)
         assertEquals(accessibilitySettingsDataStore.fontSize, accessibilityViewState().fontSize)
+    }
+
+    @Test
+    fun whenDownloadIsCalledThenDownloadRequestStartedPixelFired() {
+        val pendingFileDownload = buildPendingDownload(url = "http://www.example.com/download.pdf", contentDisposition = null, mimeType = null)
+
+        testee.download(pendingFileDownload)
+
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
+    }
+
+    @Test
+    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestSucceededPixelsFired() {
+        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
+        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
+            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFinishedDataUri(
+                file = File("image.jpg"),
+                mimeType = null
+            )
+        }
+
+        testee.download(pendingFileDownload)
+
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+    }
+
+    @Test
+    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestFailedPixelsFired() {
+        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
+        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
+            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFailed(
+                message = "message",
+                downloadFailReason = DownloadFailReason.ConnectionRefused
+            )
+        }
+
+        testee.download(pendingFileDownload)
+
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+    }
+
+    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+        return FileDownloader.PendingFileDownload(
+            url = url,
+            contentDisposition = contentDisposition,
+            mimeType = mimeType,
+            subfolder = "folder",
+            userAgent = "user_agent"
+        )
     }
 
     private fun givenUrlCanUseGpc() {
