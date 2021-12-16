@@ -1,0 +1,634 @@
+{
+  "featuresDisabled": {
+    "name": "All features are disabled",
+    "desc": "Those tests use config1_reference.json where all features are disabled",
+    "referenceConfig": "config1_reference.json",
+    "tests": [
+      {
+        "name": "smarter encryption should be disabled",
+        "featureName": "https",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension"
+        ]
+      },
+      {
+        "name": "tracker blocking should be disabled",
+        "featureName": "contentBlocking",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker allowlisting should be disabled",
+        "featureName": "trackerAllowlist",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "blocking of third party tracking cookies should be disabled",
+        "featureName": "trackingCookies3p",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser"
+        ]
+      },
+      {
+        "name": "reducing expiry of first party tracking cookies should be disabled",
+        "featureName": "trackingCookies1p",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "macos-browser",
+          "android-browser"
+        ]
+      },
+      {
+        "name": "click to load should be disabled",
+        "featureName": "clickToPlay",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for canvas should be disabled",
+        "featureName": "fingerprintingCanvas",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for audio should be disabled",
+        "featureName": "fingerprintingAudio",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for temporaryStorage should be disabled",
+        "featureName": "fingerprintingTemporaryStorage",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "referrer trimming should be disabled",
+        "featureName": "referrer",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for battery API should be disabled",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for screen size API should be disabled",
+        "featureName": "fingerprintingScreenSize",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for hardware should be disabled",
+        "featureName": "fingerprintingHardware",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "FLoC protection should be disabled",
+        "featureName": "floc",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Global Privacy Control should be disabled",
+        "featureName": "gpc",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension"
+        ]
+      },
+      {
+        "name": "email autofill should be disabled",
+        "featureName": "autofill",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "windows-browser",
+          "android-browser"
+        ]
+      }
+    ]
+  },
+  "featuresEnabled": {
+    "name": "All features are enabled",
+    "desc": "Those tests use config2_reference.json where all features are enabled",
+    "referenceConfig": "config2_reference.json",
+    "tests": [
+      {
+        "name": "smarter encryption should be enabled",
+        "featureName": "https",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension"
+        ]
+      },
+      {
+        "name": "tracker blocking should be enabled",
+        "featureName": "contentBlocking",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker allowlisting should be enabled",
+        "featureName": "trackerAllowlist",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "blocking of third party tracking cookies should be enabled",
+        "featureName": "trackingCookies3p",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser"
+        ]
+      },
+      {
+        "name": "reducing expiry of first party tracking cookies should be enabled",
+        "featureName": "trackingCookies1p",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser"
+        ]
+      },
+      {
+        "name": "click to load should be enabled",
+        "featureName": "clickToPlay",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for canvas should be enabled",
+        "featureName": "fingerprintingCanvas",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for audio should be enabled",
+        "featureName": "fingerprintingAudio",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for temporaryStorage should be enabled",
+        "featureName": "fingerprintingTemporaryStorage",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "referrer trimming should be enabled",
+        "featureName": "referrer",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for battery API should be enabled",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for screen size API should be enabled",
+        "featureName": "fingerprintingScreenSize",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "fingerprinting protection for hardware should be enabled",
+        "featureName": "fingerprintingHardware",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "FLoC protection should be enabled",
+        "featureName": "floc",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Global Privacy Control should be enabled",
+        "featureName": "gpc",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension"
+        ]
+      },
+      {
+        "name": "email autofill should be enabled",
+        "featureName": "autofill",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "windows-browser",
+          "android-browser"
+        ]
+      }
+    ]
+  },
+  "localExceptions": {
+    "name": "Per-feature exceptions should match correctly",
+    "desc": "Those tests use config2_reference.json where all features are enabled",
+    "referenceConfig": "config2_reference.json",
+    "tests": [
+      {
+        "name": "tracker blocking should be disabled due to a local exception",
+        "featureName": "contentBlocking",
+        "siteURL": "https://exception.com",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a local exception - subdomains should also match",
+        "featureName": "contentBlocking",
+        "siteURL": "https://sub.exception.com",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a local exception - full url",
+        "featureName": "contentBlocking",
+        "siteURL": "http://a.b.exception.com/some/path?query=value#thing",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - domain name in the path/query",
+        "featureName": "contentBlocking",
+        "siteURL": "https://nope.com/path/?site_url=exception.com",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - domain name is only a partial match",
+        "featureName": "contentBlocking",
+        "siteURL": "https://exception.com.pl/",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a local exception - exception domain with a subdomain",
+        "featureName": "contentBlocking",
+        "siteURL": "https://dont.block.co.uk",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - exception is more narrow (subdomain)",
+        "featureName": "contentBlocking",
+        "siteURL": "https://block.co.uk",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "globalExceptions": {
+    "name": "Global exceptions should match correctly",
+    "desc": "Those tests use config2_reference.json where all features are enabled",
+    "referenceConfig": "config2_reference.json",
+    "tests": [
+      {
+        "name": "tracker blocking should be disabled due to a global exception",
+        "featureName": "contentBlocking",
+        "siteURL": "https://global-exception.com",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a global exception - subdomains should also match",
+        "featureName": "contentBlocking",
+        "siteURL": "https://sub.global-exception.com",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a global exception - full url",
+        "featureName": "contentBlocking",
+        "siteURL": "http://a.b.global-exception.com/some/path?query=value#thing",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - domain name in the path/query",
+        "featureName": "contentBlocking",
+        "siteURL": "https://nope.com/path/?site_url=global-exception.com",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - domain name is only a partial match",
+        "featureName": "contentBlocking",
+        "siteURL": "https://global-exception.com.pl/",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should be disabled due to a global exception",
+        "featureName": "contentBlocking",
+        "siteURL": "https://dont.global-block.co.uk",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      },
+      {
+        "name": "tracker blocking should NOT be disabled - exception is more narrow (subdomain)",
+        "featureName": "contentBlocking",
+        "siteURL": "https://block.co.uk",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": []
+      }
+    ]
+  },
+  "aboutBlank": {
+    "name": "Some features are disabled in blank iframes",
+    "desc": "Those tests use config2_reference.json where all features are enabled",
+    "referenceConfig": "config2_reference.json",
+    "tests": [
+      {
+        "name": "Features should be enabled by default in blank iframes",
+        "featureName": "fingerprintingTemporaryStorage",
+        "siteURL": "https://example.org",
+        "frameURL": "about:blank",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Features should be disabled in blank iframes if specified by the feature",
+        "featureName": "fingerprintingCanvas",
+        "siteURL": "https://example.org",
+        "frameURL": "about:blank",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Features should NOT be disabled in iframes that are not blank",
+        "featureName": "fingerprintingCanvas",
+        "siteURL": "https://example.org",
+        "frameURL": "https://inner.com",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Features should be disabled in blank iframes if they match the blocklist",
+        "featureName": "fingerprintingAudio",
+        "siteURL": "https://blank-iframe.com",
+        "frameURL": "about:blank",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Features should NOT be disabled in blank iframes if they don't match the blocklist",
+        "featureName": "fingerprintingAudio",
+        "siteURL": "https://example.org",
+        "frameURL": "about:blank",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      }
+    ]
+  },
+  "script": {
+    "name": "Some protections are disabled for some scripts",
+    "desc": "Those tests use config2_reference.json where all features are enabled",
+    "referenceConfig": "config2_reference.json",
+    "tests": [
+      {
+        "name": "Feature should be disabled if script matches exception",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "scriptURL": "https://skip.third-party.com/script.js",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Feature should be disabled if script matches exception - subdomain should match",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "scriptURL": "https://also.skip.third-party.com/script.js",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Feature should NOT be disabled - domain name in the path/query",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "scriptURL": "https://tracker.com/script.js?fake=skip.third-party.com",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      },
+      {
+        "name": "Feature should NOT be disabled - exception is more narrow (subdomain)",
+        "featureName": "fingerprintingBattery",
+        "siteURL": "https://example.org",
+        "scriptURL": "https://third-party.com/script.js",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "android-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
+      }
+    ]
+  },
+  "missingFeature": {
+    "name": "Protections are expected to be disabled if they are missing from the config file.",
+    "desc": "Those tests use config3_reference.json where 'features' object is empty",
+    "referenceConfig": "config3_reference.json",
+    "tests": [
+      {
+        "name": "Feature should be disabled if it's not mentioned in the config file",
+        "featureName": "contentBlocking",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": []
+      }
+    ]
+  }
+}
