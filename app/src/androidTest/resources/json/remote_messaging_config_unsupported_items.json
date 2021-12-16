@@ -12,22 +12,26 @@
       "exclusionRules": [7, 8, 9]
     },
     {
-      "id": "c2d0a1f1-6157-434f-8145-38416037d339",
-      "messageType": "big_two_action",
+      "id": "8274589c-8aeb-4322-a737-3852911569e3",
+      "messageType": "big_single_action",
       "content": {
-        "titleText": "Here goes a title",
+        "titleText": "title",
         "descriptionText": "description",
         "placeholder": "WARNING",
         "primaryActionText": "Ok",
         "primaryAction": {
           "type": "unknown",
-          "value": "com.duckduckgo.mobile.android"
-        },
-        "secondaryActionText": "Cancel",
-        "secondaryAction": {
-          "type": "dismiss",
-          "value": ""
+          "value": "https://duckduckgo.com"
         }
+      }
+    },
+    {
+      "id": "c3549d64-b388-41d8-9649-33e6e2674e8e",
+      "messageType": "medium",
+      "content": {
+        "titleText": "Here goes a title",
+        "descriptionText": "description",
+        "placeholder": "UNKNOWN"
       }
     }
   ],

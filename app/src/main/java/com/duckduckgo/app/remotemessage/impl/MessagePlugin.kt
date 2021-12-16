@@ -20,7 +20,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.impl.messages.Content
 
 interface MessagePlugin {
-    fun parse(key: String, json: String): Content?
+    fun parse(key: String, json: String): JsonMessageContent?
 }
 
 class MessagePluginPoint(

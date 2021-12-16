@@ -59,7 +59,43 @@ class RemoteMessagingConfigJsonParser(
     private fun JSONObject.mapToContent(messageType: String): Content? {
         messagesPluginPoint.getPlugins().forEach { plugin ->
             val content = plugin.parse(messageType, this.toString())
-            if (content != null) return content
+            if (content != null) {
+               return when (content) {
+                    is JsonMessageContent.Small -> {
+                        Content.Small(
+                            titleText = content.titleText,
+                            descriptionText = content.descriptionText
+                        )
+                    }
+                    is JsonMessageContent.BigSingleAction -> {
+                        Content.BigSingleAction(
+                            titleText = content.titleText,
+                            descriptionText = content.descriptionText,
+                            placeholder = content.placeholder,
+                            primaryActionText = content.primaryActionText,
+                            primaryAction = content.primaryAction
+                        )
+                    }
+                    is JsonMessageContent.BigTwoActions -> {
+                        Content.BigTwoActions(
+                            titleText = content.titleText,
+                            descriptionText = content.descriptionText,
+                            placeholder = content.placeholder,
+                            primaryActionText = content.primaryActionText,
+                            primaryAction = content.primaryAction,
+                            secondaryActionText = content.secondaryActionText,
+                            secondaryAction = content.secondaryAction
+                        )
+                    }
+                    is JsonMessageContent.Medium -> {
+                        Content.Medium(
+                            titleText = content.titleText,
+                            descriptionText = content.descriptionText,
+                            placeholder = content.placeholder
+                        )
+                    }
+                }
+            }
         }
         return null
     }
@@ -70,13 +106,13 @@ class RemoteMessagingConfigJsonParser(
         val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
         jsonMatchingRules.forEach {
             Timber.i("RMF: MatchingRule ${it.id}")
-            matchingRules[it.id] = it.attributes.map { (key, jsonObject) ->
+            matchingRules[it.id] = it.attributes.mapNotNull { (key, jsonObject) ->
                 Timber.i("RMF: MatchingRule $key")
                 matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
                     val rule = plugin.parse(key, jsonObject.toString())
-                    if (rule != null) return@map rule
+                    if (rule != null) return@mapNotNull rule
                 }
-                return@map parse<MatchingAttribute.Unknown>(jsonObject.toString())
+                return@mapNotNull parse<MatchingAttribute.Unknown>(jsonObject.toString())
             }.toList()
         }
         return matchingRules

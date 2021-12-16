@@ -16,30 +16,30 @@
 
 package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
-sealed class MatchingAttribute(val fallback: Boolean? = null) {
-    data class Locale(override val value: List<String>) : MatchingAttribute(), StringArrayMatchingAttribute
-    data class Api(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class WebView(override val min: String, override val max: String) : MatchingAttribute(), RangeStringMatchingAttribute
-    data class Flavor(override val value: List<String>) : MatchingAttribute(), StringArrayMatchingAttribute
-    data class AppId(override val value: String) : MatchingAttribute(), StringMatchingAttribute
+sealed class MatchingAttribute {
+    data class Locale(override val value: List<String>, val fallback: Boolean? = null) : MatchingAttribute(), StringArrayMatchingAttribute
+    data class Api(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class WebView(override val min: String, override val max: String, val fallback: Boolean? = null) : MatchingAttribute(), RangeStringMatchingAttribute
+    data class Flavor(override val value: List<String>, val fallback: Boolean? = null) : MatchingAttribute(), StringArrayMatchingAttribute
+    data class AppId(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
 
-    data class AppVersion(override val min: String, override val max: String) : MatchingAttribute(), RangeStringMatchingAttribute
-    data class Atb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
-    data class AppAtb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
-    data class SearchAtb(override val value: String) : MatchingAttribute(), StringMatchingAttribute
-    data class ExpVariant(override val value: String) : MatchingAttribute(), StringMatchingAttribute
-    data class InstalledGPlay(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
+    data class AppVersion(override val min: String, override val max: String, val fallback: Boolean? = null) : MatchingAttribute(), RangeStringMatchingAttribute
+    data class Atb(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
+    data class AppAtb(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
+    data class SearchAtb(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
+    data class ExpVariant(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
+    data class InstalledGPlay(override val value: Boolean, val fallback: Boolean? = null) : MatchingAttribute(), BooleanMatchingAttribute
 
-    data class DefaultBrowser(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
-    data class EmailEnabled(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
-    data class WidgetAdded(override val value: Boolean) : MatchingAttribute(), BooleanMatchingAttribute
-    data class SearchCount(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class Bookmarks(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class Favorites(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class AppTheme(override val value: String) : MatchingAttribute(), StringMatchingAttribute
-    data class DaysSinceInstalled(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class DaysUsedSince(override val min: Int, override val max: Int) : MatchingAttribute(), RangeIntMatchingAttribute
-    class Unknown : MatchingAttribute()
+    data class DefaultBrowser(override val value: Boolean, val fallback: Boolean? = null) : MatchingAttribute(), BooleanMatchingAttribute
+    data class EmailEnabled(override val value: Boolean, val fallback: Boolean? = null) : MatchingAttribute(), BooleanMatchingAttribute
+    data class WidgetAdded(override val value: Boolean, val fallback: Boolean? = null) : MatchingAttribute(), BooleanMatchingAttribute
+    data class SearchCount(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class Bookmarks(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class Favorites(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class AppTheme(override val value: String, val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
+    data class DaysSinceInstalled(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class DaysUsedSince(override val min: Int, override val max: Int, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
+    data class Unknown(val fallback: Boolean? = null) : MatchingAttribute()
 }
 
 interface RangeIntMatchingAttribute {

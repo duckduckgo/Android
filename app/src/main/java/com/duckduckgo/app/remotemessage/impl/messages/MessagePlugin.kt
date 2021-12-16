@@ -17,6 +17,7 @@
 package com.duckduckgo.app.remotemessage.impl.messages
 
 import com.duckduckgo.app.remotemessage.impl.JsonMessageAction
+import com.duckduckgo.app.remotemessage.impl.JsonMessageContent
 import com.duckduckgo.app.remotemessage.impl.MessagePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -28,31 +29,31 @@ import javax.inject.Inject
 class SmallMessage @Inject constructor() : MessagePlugin {
     private val featureName = "small"
 
-    override fun parse(key: String, json: String) = parse<Content.Small>(key, json, featureName)
+    override fun parse(key: String, json: String) = parse<JsonMessageContent.Small>(key, json, featureName)
 }
 
 @ContributesMultibinding(AppScope::class)
 class MediumMessage @Inject constructor() : MessagePlugin {
     private val featureName = "medium"
 
-    override fun parse(key: String, json: String) = parse<Content.Medium>(key, json, featureName)
+    override fun parse(key: String, json: String) = parse<JsonMessageContent.Medium>(key, json, featureName)
 }
 
 @ContributesMultibinding(AppScope::class)
 class BigSingleActionMessage @Inject constructor() : MessagePlugin {
     private val featureName = "big_single_action"
 
-    override fun parse(key: String, json: String) = parse<Content.BigSingleAction>(key, json, featureName)
+    override fun parse(key: String, json: String) = parse<JsonMessageContent.BigSingleAction>(key, json, featureName)
 }
 
 @ContributesMultibinding(AppScope::class)
 class BigTwoActionsMessage @Inject constructor() : MessagePlugin {
     private val featureName = "big_two_action"
 
-    override fun parse(key: String, json: String) = parse<Content.BigTwoActions>(key, json, featureName)
+    override fun parse(key: String, json: String) = parse<JsonMessageContent.BigTwoActions>(key, json, featureName)
 }
 
-private inline fun <reified T : Content> parse(key: String, json: String, featureName: String): T? {
+private inline fun <reified T : JsonMessageContent> parse(key: String, json: String, featureName: String): T? {
     if (key == featureName) {
         val moshi = Moshi.Builder().build()
         val jsonAdapter: JsonAdapter<T> = moshi.adapter(T::class.java)

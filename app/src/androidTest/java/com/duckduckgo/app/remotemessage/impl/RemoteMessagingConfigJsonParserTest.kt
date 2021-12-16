@@ -20,6 +20,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.*
+import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.Unknown
 import com.duckduckgo.app.remotemessage.impl.messages.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -114,7 +115,20 @@ class RemoteMessagingConfigJsonParserTest {
         )
         assertEquals(bigTwoActions, config.messages[4])
 
+
         assertEquals(3, config.rules.size)
+
+        assertEquals(21, config.rules[5]?.size)
+        val localeMA = MatchingAttribute.Locale(listOf("en_US", "en_GB"), fallback = true)
+        assertEquals(localeMA, config.rules[5]?.first())
+
+        val locale2MA = MatchingAttribute.Locale(listOf("en_GB"), fallback = null)
+        assertEquals(locale2MA, config.rules[6]?.first())
+        assertEquals(1, config.rules[6]?.size)
+
+        val defaultBrowserMA = MatchingAttribute.DefaultBrowser(value = true, fallback = null)
+        assertEquals(defaultBrowserMA, config.rules[7]?.first())
+        assertEquals(1, config.rules[7]?.size)
     }
 
     @Test
@@ -131,11 +145,49 @@ class RemoteMessagingConfigJsonParserTest {
 
         val config = testee.map(result)
 
-        assertEquals(0, config.messages.size)
-        assertEquals(1, config.rules.size)
+        assertEquals(2, config.messages.size)
+        assertEquals(2, config.rules.size)
 
-        val defaultBrowser = MatchingAttribute.DefaultBrowser(value = true)
-        assertEquals(defaultBrowser, config.rules[0])
+        val unknown = Unknown(fallback = true)
+        assertEquals(unknown, config.rules[6]!![0])
+
+        val defaultBrowser = MatchingAttribute.DefaultBrowser(value = true, fallback = null)
+        assertEquals(defaultBrowser, config.rules[7]!![0])
+    }
+
+    @Test
+    fun whenJsonMalformedThenMessageNotParsed() = coroutineRule.runBlocking {
+        val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
+        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
+        val result = jsonAdapter.fromJson(jsonString)!!
+
+        val testee = RemoteMessagingConfigJsonParser(
+            messagesPluginPoint = getMessagePluginPoint(),
+            matchingAttributesPluginPoint = getMatchingAttributePluginPoint()
+        )
+
+        val config = testee.map(result)
+
+
+        assertEquals(1, config.messages.size)
+        val smallMessage = RemoteMessage(
+            id = "26780792-49fe-4e25-ae27-aa6a2e6f013b",
+            messageType = "small",
+            content = Content.Small(
+                titleText = "Here goes a title",
+                descriptionText = "description"
+            ),
+            matchingRules = listOf(5, 6),
+            exclusionRules = listOf(7, 8, 9)
+        )
+        assertEquals(smallMessage, config.messages[0])
+
+        assertEquals(1, config.rules.size)
+        assertEquals(3, config.rules[6]?.size)
+
+        val matchingAttr = listOf(Unknown(fallback = null), Unknown(fallback = true), Unknown(fallback = false))
+        assertEquals(matchingAttr, config.rules[6])
     }
 
     private fun getMessagePluginPoint(): PluginPoint<MessagePlugin> {

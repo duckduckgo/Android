@@ -17,6 +17,7 @@
 package com.duckduckgo.app.remotemessage.impl.messages
 
 import com.duckduckgo.app.remotemessage.impl.JsonMessageAction
+import com.duckduckgo.app.remotemessage.impl.JsonMessageContent
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
 
 data class RemoteConfig(
