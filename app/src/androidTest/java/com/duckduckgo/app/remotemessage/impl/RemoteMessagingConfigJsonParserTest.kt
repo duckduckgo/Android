@@ -20,7 +20,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.*
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.Unknown
+import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
 import com.duckduckgo.app.remotemessage.impl.messages.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -119,10 +119,10 @@ class RemoteMessagingConfigJsonParserTest {
         assertEquals(3, config.rules.size)
 
         assertEquals(21, config.rules[5]?.size)
-        val localeMA = MatchingAttribute.Locale(listOf("en_US", "en_GB"), fallback = true)
+        val localeMA = Locale(listOf("en_US", "en_GB"), fallback = true)
         assertEquals(localeMA, config.rules[5]?.first())
 
-        val locale2MA = MatchingAttribute.Locale(listOf("en_GB"), fallback = null)
+        val locale2MA = Locale(listOf("en_GB"), fallback = null)
         assertEquals(locale2MA, config.rules[6]?.first())
         assertEquals(1, config.rules[6]?.size)
 
@@ -186,7 +186,7 @@ class RemoteMessagingConfigJsonParserTest {
         assertEquals(1, config.rules.size)
         assertEquals(3, config.rules[6]?.size)
 
-        val matchingAttr = listOf(Unknown(fallback = null), Unknown(fallback = true), Unknown(fallback = false))
+        val matchingAttr = listOf(Locale(fallback = null), Api(fallback = true), WebView(fallback = false))
         assertEquals(matchingAttr, config.rules[6])
     }
 

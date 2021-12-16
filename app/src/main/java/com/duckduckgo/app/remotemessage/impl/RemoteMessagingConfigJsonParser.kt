@@ -104,14 +104,18 @@ class RemoteMessagingConfigJsonParser(
         jsonMatchingRules: List<JsonMatchingRule>
     ): Map<Int, List<MatchingAttribute?>> {
         val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
+
         jsonMatchingRules.forEach {
             Timber.i("RMF: MatchingRule ${it.id}")
+
             matchingRules[it.id] = it.attributes.mapNotNull { (key, jsonObject) ->
                 Timber.i("RMF: MatchingRule $key")
+
                 matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
                     val rule = plugin.parse(key, jsonObject.toString())
                     if (rule != null) return@mapNotNull rule
                 }
+
                 return@mapNotNull parse<MatchingAttribute.Unknown>(jsonObject.toString())
             }.toList()
         }

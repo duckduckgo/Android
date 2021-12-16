@@ -16,11 +16,15 @@
 
 package com.duckduckgo.app.remotemessage.impl.matchingattributes
 
+import com.duckduckgo.app.privacy.api.TermsOfServiceJson
+import com.duckduckgo.app.privacy.model.TermsOfService
 import com.duckduckgo.app.remotemessage.impl.MatchingAttributePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.Objects.nonNull
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -171,7 +175,8 @@ private inline fun <reified T : MatchingAttribute> parse(key: String, json: Stri
 }
 
 inline fun <reified T : MatchingAttribute> parse(json: String): T? {
-    val moshi = Moshi.Builder().build()
+    val moshi = Moshi.Builder()
+        .build()
     val jsonAdapter: JsonAdapter<T> = moshi.adapter(T::class.java)
     return jsonAdapter.fromJson(json)
 }
