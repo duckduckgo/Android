@@ -22,6 +22,19 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+}
+
 dependencies {
 
     implementation Kotlin.stdlib.jdk7
@@ -52,5 +65,5 @@ dependencies {
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation Testing.mockito.android
     androidTestImplementation Testing.mockito.kotlin
-
+    androidTestImplementation AndroidX.archCore.testing
 }

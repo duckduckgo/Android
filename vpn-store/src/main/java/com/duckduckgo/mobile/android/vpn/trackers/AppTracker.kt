@@ -54,6 +54,17 @@ data class AppTrackerExclusionListMetadata(
     val eTag: String?
 )
 
+@Entity(tableName = "vpn_app_tracker_system_app_override_list")
+data class AppTrackerSystemAppOverridePackage(
+    @PrimaryKey val packageId: String
+)
+
+@Entity(tableName = "vpn_app_tracker_system_app_override_list_metadata")
+data class AppTrackerSystemAppOverrideListMetadata(
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    val eTag: String?
+)
+
 @Entity(tableName = "vpn_app_tracker_exception_rules")
 data class AppTrackerExceptionRule(
     @PrimaryKey
@@ -125,6 +136,11 @@ data class AppTrackerBlocklist(
 
 /** JSON Model that represents the app exclusion list */
 data class JsonAppTrackerExclusionList(
+    val rules: List<String>
+)
+
+/** JSON Model that represents the system app overrides */
+data class JsonAppTrackerSystemAppOverrides(
     val rules: List<String>
 )
 

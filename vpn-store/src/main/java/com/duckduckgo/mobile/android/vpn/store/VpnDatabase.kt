@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.store
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.*
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
@@ -34,7 +35,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 18,
+    exportSchema = true, version = 19,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -53,6 +54,8 @@ import java.util.concurrent.Executors
         AppTrackerExceptionRuleMetadata::class,
         AppTrackerPackage::class,
         AppTrackerManualExcludedApp::class,
+        AppTrackerSystemAppOverridePackage::class,
+        AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class
     ]
 )
@@ -70,6 +73,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
+    abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
 
     companion object {
 
@@ -84,7 +88,8 @@ abstract class VpnDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): VpnDatabase {
             return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
                 .enableMultiInstanceInvalidation()
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigrationFrom(*IntRange(1, 17).toList().toIntArray())
+                .addMigrations(*ALL_MIGRATIONS.toTypedArray())
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
@@ -165,6 +170,17 @@ abstract class VpnDatabase : RoomDatabase() {
             return adapter.fromJson(json)?.rules.orEmpty()
         }
 
+        private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list` (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)")
+            }
+        }
+
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(
+                MIGRATION_18_TO_19,
+            )
     }
 }
 

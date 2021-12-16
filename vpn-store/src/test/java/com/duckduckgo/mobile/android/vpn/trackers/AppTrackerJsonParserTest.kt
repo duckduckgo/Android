@@ -25,14 +25,13 @@ import org.junit.Test
 class AppTrackerJsonParserTest {
 
     private val moshi = Moshi.Builder().build()
-    private val jsonAdapter: JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
 
     @Test
     fun whenJsonIsValidThenBlocklistIsParsed() {
         val json = loadText("full_app_trackers_blocklist_v2.json")
         val blocklist = AppTrackerJsonParser.parseAppTrackerJson(moshi, json)
 
-        Assert.assertEquals("1638913509906", blocklist.version)
+        Assert.assertEquals("1639624032609", blocklist.version)
         Assert.assertEquals(255, blocklist.trackers.count())
         Assert.assertEquals(376, blocklist.packages.count())
         Assert.assertEquals(127, blocklist.entities.count())
