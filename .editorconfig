@@ -1,60 +1,124 @@
-[{*.kt,*.kts}]
+
+# IntelliJ allows to export the code style in the .editorconfig format. These are the settings
+# from the most recent settings for SquareAndroid from here:
+#
+# https://github.com/square/java-code-styles
+#
+# Every time someone changes Square's code style we should update the config here, too. These
+# settings override the selected code style. This means nobody needs to import the code style
+# anymore and we can change settings for all developers here at once.
+#
+# Some keys were manually changed:
+#   * insert_final_newline (is false, changed to true, expected by KtLint)
+#   * ktlint_ignore_back_ticked_identifier (enabled, see comment below)
+#   * root (see comment below)
+
+# Tells tools to stop searching upwards.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
 indent_style = space
 insert_final_newline = true
 max_line_length = 150
-indent_size = 4
+tab_width = 4
 ij_continuation_indent_size = 4
+ij_formatter_off_tag = @formatter:off
+ij_formatter_on_tag = @formatter:on
+ij_formatter_tags_enabled = false
+ij_smart_tabs = false
+ij_wrap_on_typing = false
+
+# Back-ticked method names are allowed to exceed the line length. That's especially helpful for
+# test methods with descriptive names.
+ktlint_ignore_back_ticked_identifier = true
+
+[.editorconfig]
+ij_editorconfig_align_group_field_declarations = false
+ij_editorconfig_space_after_colon = false
+ij_editorconfig_space_after_comma = true
+ij_editorconfig_space_before_colon = false
+ij_editorconfig_space_before_comma = false
+ij_editorconfig_spaces_around_assignment_operators = true
+
+[*.json]
+indent_size = 2
+tab_width = 2
+ij_continuation_indent_size = 2
+
+[{*.ant,*.fxml,*.jhm,*.jnlp,*.jrxml,*.jspx,*.pom,*.rng,*.tagx,*.tld,*.wsdl,*.xml,*.xsd,*.xsl,*.xslt,*.xul}]
+ij_xml_align_attributes = false
+ij_xml_align_text = false
+ij_xml_attribute_wrap = normal
+ij_xml_block_comment_at_first_column = true
+ij_xml_keep_blank_lines = 2
+ij_xml_keep_indents_on_empty_lines = false
+ij_xml_keep_line_breaks = true
+ij_xml_keep_line_breaks_in_text = true
+ij_xml_keep_whitespaces = false
+ij_xml_keep_whitespaces_around_cdata = preserve
+ij_xml_keep_whitespaces_inside_cdata = false
+ij_xml_line_comment_at_first_column = true
+ij_xml_space_after_tag_name = false
+ij_xml_space_around_equals_in_attribute = false
+ij_xml_space_inside_empty_tag = false
+ij_xml_text_wrap = normal
+ij_xml_use_custom_settings = true
+
+[{*.kt,*.kts}]
 ij_kotlin_align_in_columns_case_branch = false
 ij_kotlin_align_multiline_binary_operation = false
 ij_kotlin_align_multiline_extends_list = false
 ij_kotlin_align_multiline_method_parentheses = false
-ij_kotlin_align_multiline_parameters = true
+ij_kotlin_align_multiline_parameters = false
 ij_kotlin_align_multiline_parameters_in_calls = false
-ij_kotlin_allow_trailing_comma = true
-ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_allow_trailing_comma = false
+ij_kotlin_allow_trailing_comma_on_call_site = false
 ij_kotlin_assignment_wrap = normal
 ij_kotlin_blank_lines_after_class_header = 0
 ij_kotlin_blank_lines_around_block_when_branches = 0
 ij_kotlin_blank_lines_before_declaration_with_comment_or_annotation_on_separate_line = 1
 ij_kotlin_block_comment_at_first_column = true
 ij_kotlin_call_parameters_new_line_after_left_paren = true
-ij_kotlin_call_parameters_right_paren_on_new_line = false
-ij_kotlin_call_parameters_wrap = on_every_item
+ij_kotlin_call_parameters_right_paren_on_new_line = true
+ij_kotlin_call_parameters_wrap = normal
 ij_kotlin_catch_on_new_line = false
 ij_kotlin_class_annotation_wrap = split_into_lines
 ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
 ij_kotlin_continuation_indent_for_chained_calls = true
-ij_kotlin_continuation_indent_for_expression_bodies = true
+ij_kotlin_continuation_indent_for_expression_bodies = false
 ij_kotlin_continuation_indent_in_argument_lists = true
-ij_kotlin_continuation_indent_in_elvis = false
-ij_kotlin_continuation_indent_in_if_conditions = false
+ij_kotlin_continuation_indent_in_elvis = true
+ij_kotlin_continuation_indent_in_if_conditions = true
 ij_kotlin_continuation_indent_in_parameter_lists = false
-ij_kotlin_continuation_indent_in_supertype_lists = false
+ij_kotlin_continuation_indent_in_supertype_lists = true
 ij_kotlin_else_on_new_line = false
-ij_kotlin_enum_constants_wrap = off
-ij_kotlin_extends_list_wrap = normal
-ij_kotlin_field_annotation_wrap = split_into_lines
+ij_kotlin_enum_constants_wrap = split_into_lines
+ij_kotlin_extends_list_wrap = on_every_item
+ij_kotlin_field_annotation_wrap = normal
 ij_kotlin_finally_on_new_line = false
-ij_kotlin_if_rparen_on_new_line = false
-ij_kotlin_import_nested_classes = false
+ij_kotlin_if_rparen_on_new_line = true
+ij_kotlin_import_nested_classes = true
+ij_kotlin_imports_layout = *, java.**, javax.**, kotlin.**, ^
 ij_kotlin_insert_whitespaces_in_simple_one_line_method = true
-ij_kotlin_keep_blank_lines_before_right_brace = 2
-ij_kotlin_keep_blank_lines_in_code = 2
-ij_kotlin_keep_blank_lines_in_declarations = 2
+ij_kotlin_keep_blank_lines_before_right_brace = 0
+ij_kotlin_keep_blank_lines_in_code = 1
+ij_kotlin_keep_blank_lines_in_declarations = 1
 ij_kotlin_keep_first_column_comment = true
 ij_kotlin_keep_indents_on_empty_lines = false
 ij_kotlin_keep_line_breaks = true
 ij_kotlin_lbrace_on_next_line = false
-ij_kotlin_line_comment_add_space = false
-ij_kotlin_line_comment_at_first_column = true
-ij_kotlin_method_annotation_wrap = split_into_lines
-ij_kotlin_method_call_chain_wrap = normal
+ij_kotlin_line_comment_add_space = true
+ij_kotlin_line_comment_at_first_column = false
+ij_kotlin_method_annotation_wrap = normal
+ij_kotlin_method_call_chain_wrap = on_every_item
 ij_kotlin_method_parameters_new_line_after_left_paren = true
 ij_kotlin_method_parameters_right_paren_on_new_line = true
-ij_kotlin_method_parameters_wrap = on_every_item
-ij_kotlin_name_count_to_use_star_import = 9999
-ij_kotlin_name_count_to_use_star_import_for_members = 9999
-ij_java_names_count_to_use_import_on_demand = 9999
+ij_kotlin_method_parameters_wrap = split_into_lines
+ij_kotlin_name_count_to_use_star_import = 999
+ij_kotlin_name_count_to_use_star_import_for_members = 999
 ij_kotlin_parameter_annotation_wrap = off
 ij_kotlin_space_after_comma = true
 ij_kotlin_space_after_extend_colon = true
