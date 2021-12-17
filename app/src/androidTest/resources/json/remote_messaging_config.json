@@ -172,8 +172,7 @@
           "fallback": true
         }
       }
-    },
-    {
+    },{
       "id": 6,
       "attributes": {
         "locale": {
@@ -181,6 +180,7 @@
         }
       }
     },
+    ,
     {
       "id": 7,
       "attributes": {

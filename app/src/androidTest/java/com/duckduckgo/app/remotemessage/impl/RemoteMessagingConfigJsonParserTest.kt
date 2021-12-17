@@ -57,8 +57,7 @@ class RemoteMessagingConfigJsonParserTest {
                 descriptionText = "description",
                 placeholder = "WARNING",
                 primaryActionText = "Ok",
-                primaryAction = JsonMessageAction(
-                    type = "url",
+                primaryAction = Action.Url(
                     value = "https://duckduckgo.com"
                 )
             ),
@@ -100,15 +99,11 @@ class RemoteMessagingConfigJsonParserTest {
                 descriptionText = "description",
                 placeholder = "WARNING",
                 primaryActionText = "Ok",
-                primaryAction = JsonMessageAction(
-                    type = "playstore",
+                primaryAction = Action.PlayStore(
                     value = "com.duckduckgo.mobile.android"
                 ),
                 secondaryActionText = "Cancel",
-                secondaryAction = JsonMessageAction(
-                    type = "dismiss",
-                    value = ""
-                ),
+                secondaryAction = Action.Dismiss,
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList()

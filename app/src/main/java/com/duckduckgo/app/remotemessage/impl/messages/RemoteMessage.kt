@@ -36,8 +36,8 @@ data class RemoteMessage(
 sealed class Content {
     data class Small(val titleText: String, val descriptionText: String) : Content()
     data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : Content()
-    data class BigSingleAction(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction) : Content()
-    data class BigTwoActions(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction, val secondaryActionText: String, val secondaryAction: JsonMessageAction) : Content()
+    data class BigSingleAction(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: Action) : Content()
+    data class BigTwoActions(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: Action, val secondaryActionText: String, val secondaryAction: Action) : Content()
 }
 
 sealed class Action {

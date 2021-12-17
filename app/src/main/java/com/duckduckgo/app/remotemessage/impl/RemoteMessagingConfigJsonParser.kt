@@ -19,6 +19,7 @@ package com.duckduckgo.app.remotemessage.impl
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.parse
+import com.duckduckgo.app.remotemessage.impl.messages.Action
 import com.duckduckgo.app.remotemessage.impl.messages.Content
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
@@ -73,7 +74,7 @@ class RemoteMessagingConfigJsonParser(
                             descriptionText = content.descriptionText,
                             placeholder = content.placeholder,
                             primaryActionText = content.primaryActionText,
-                            primaryAction = content.primaryAction
+                            primaryAction = content.primaryAction.toAction()
                         )
                     }
                     is JsonMessageContent.BigTwoActions -> {
@@ -82,9 +83,9 @@ class RemoteMessagingConfigJsonParser(
                             descriptionText = content.descriptionText,
                             placeholder = content.placeholder,
                             primaryActionText = content.primaryActionText,
-                            primaryAction = content.primaryAction,
+                            primaryAction = content.primaryAction.toAction(),
                             secondaryActionText = content.secondaryActionText,
-                            secondaryAction = content.secondaryAction
+                            secondaryAction = content.secondaryAction.toAction()
                         )
                     }
                     is JsonMessageContent.Medium -> {
@@ -120,5 +121,14 @@ class RemoteMessagingConfigJsonParser(
             }.toList()
         }
         return matchingRules
+    }
+}
+
+private fun JsonMessageAction.toAction(): Action {
+    return when(this.type) {
+        "url" -> Action.Url(this.value)
+        "dismiss" -> Action.Dismiss
+        "playstore" -> Action.PlayStore(this.value)
+        else -> throw IllegalArgumentException("Unknown Action Type")
     }
 }
