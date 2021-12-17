@@ -160,6 +160,15 @@
           "reason": "Exception should not alter feature's 'disabled' state"
         }
       ]
+    },
+    "eme": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
     }
   },
   "version": 1635943904459,

@@ -24,7 +24,6 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
-import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities.getJsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
@@ -62,13 +61,13 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    lateinit var testee: RealPrivacyConfigPersister
+    private lateinit var testee: RealContentBlocking
+    private lateinit var privacyConfigPersister: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
 
     private lateinit var db: PrivacyConfigDatabase
-    private lateinit var privacyRepository: PrivacyConfigRepository
-    private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
-    private lateinit var contentBlockingRepository: ContentBlockingRepository
+    private lateinit var referenceTestUtilities: ReferenceTestUtilities
 
     companion object {
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -87,16 +86,7 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
     @Before
     fun before() {
         prepareDb()
-        val plugins = listOf(ContentBlockingPlugin(contentBlockingRepository, mockTogglesRepository))
-        val pluginPoint = FakePrivacyFeaturePluginPoint(plugins)
-
-        testee = RealPrivacyConfigPersister(
-                pluginPoint,
-                mockTogglesRepository,
-                unprotectedTemporaryRepository,
-                privacyRepository,
-                db
-        )
+        loadPrivacyConfig()
     }
 
     @After
@@ -106,17 +96,15 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
-        testee.persistPrivacyConfig(getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+        givenFeatureToggleIsEnabled()
         when(testCase.featureName) {
             "contentBlocking" -> { testFeatureEnabledForContentBlocking() }
         }
     }
 
     private fun testFeatureEnabledForContentBlocking() {
-        val mockFeatureToggle: FeatureToggle = mock()
-        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
-        val test =  RealContentBlocking(contentBlockingRepository, mockFeatureToggle, mock())
-        val isFeatureEnabled = !test.isAnException(testCase.siteURL)
+        testee = RealContentBlocking(referenceTestUtilities.contentBlockingRepository, mockFeatureToggle, mock())
+        val isFeatureEnabled = !testee.isAnException(testCase.siteURL)
 
         assertEquals(testCase.expectFeatureEnabled, isFeatureEnabled)
     }
@@ -126,16 +114,22 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
-        privacyRepository = RealPrivacyConfigRepository(db)
-        contentBlockingRepository = RealContentBlockingRepository(db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
-        unprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
+    private fun loadPrivacyConfig() = coroutineRule.runBlocking {
+        referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
+        privacyConfigPersister = RealPrivacyConfigPersister(
+            referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+            mockTogglesRepository,
+            referenceTestUtilities.unprotectedTemporaryRepository,
+            referenceTestUtilities.privacyRepository,
+            db
+        )
+        privacyConfigPersister.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+    }
 
-    class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
-        override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-            return plugins
-        }
+    private fun givenFeatureToggleIsEnabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
     }
 
     data class TestCase(

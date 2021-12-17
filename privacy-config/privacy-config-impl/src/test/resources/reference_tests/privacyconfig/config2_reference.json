@@ -183,6 +183,15 @@
           "reason": "Feature should be disabled for given domain."
         }
       ]
+    },
+    "eme": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
     }
   },
   "version": 1635943904459,

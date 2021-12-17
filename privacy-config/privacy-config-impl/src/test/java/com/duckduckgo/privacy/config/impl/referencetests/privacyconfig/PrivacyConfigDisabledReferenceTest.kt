@@ -18,27 +18,19 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
-import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities.getJsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -57,10 +49,7 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
 
     private lateinit var db: PrivacyConfigDatabase
-    private lateinit var privacyRepository: PrivacyConfigRepository
-    private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
-    private val pluginPoint = FakePrivacyFeaturePluginPoint(mockTogglesRepository)
-
+    private lateinit var referenceTestUtilities: ReferenceTestUtilities
 
     companion object {
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -79,12 +68,13 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         prepareDb()
+        referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
 
         testee = RealPrivacyConfigPersister(
-                pluginPoint,
+                referenceTestUtilities.getPrivacyFeaturePluginPoint(),
                 mockTogglesRepository,
-                unprotectedTemporaryRepository,
-                privacyRepository,
+                referenceTestUtilities.unprotectedTemporaryRepository,
+                referenceTestUtilities.privacyRepository,
                 db
         )
     }
@@ -96,9 +86,9 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
-        testee.persistPrivacyConfig(getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+        testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
-        verify(mockTogglesRepository).insert(PrivacyFeatureToggles(testCase.featureName, testCase.expectFeatureEnabled))
+        verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(PrivacyFeatureToggles(testCase.featureName, testCase.expectFeatureEnabled))
     }
 
     private fun prepareDb() {
@@ -106,17 +96,6 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             Room.inMemoryDatabaseBuilder(mock(), PrivacyConfigDatabase::class.java)
                 .allowMainThreadQueries()
                 .build()
-        privacyRepository = RealPrivacyConfigRepository(db)
-        unprotectedTemporaryRepository =
-            RealUnprotectedTemporaryRepository(
-                db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
-    }
-
-
-    class FakePrivacyFeaturePluginPoint(private val mockTogglesRepository: PrivacyFeatureTogglesRepository): PluginPoint<PrivacyFeaturePlugin> {
-        override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-            return ReferenceTestUtilities.getPrivacyFeaturePlugins(mockTogglesRepository)
-        }
     }
 
     data class TestCase(

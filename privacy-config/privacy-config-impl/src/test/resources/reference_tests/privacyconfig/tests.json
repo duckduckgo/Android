@@ -179,6 +179,18 @@
           "windows-browser",
           "android-browser"
         ]
+      },
+      {
+        "name": "eme should be disabled",
+        "featureName": "eme",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": false,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "macos-browser",
+          "windows-browser"
+        ]
       }
     ]
   },
@@ -361,6 +373,18 @@
           "safari-extension",
           "windows-browser",
           "android-browser"
+        ]
+      },
+      {
+        "name": "eme should be enabled",
+        "featureName": "eme",
+        "siteURL": "https://example.org",
+        "expectFeatureEnabled": true,
+        "exceptPlatforms": [
+          "safari-extension",
+          "ios-browser",
+          "macos-browser",
+          "windows-browser"
         ]
       }
     ]
