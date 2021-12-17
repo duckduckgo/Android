@@ -18,11 +18,11 @@ package com.duckduckgo.app.usage.app
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
@@ -34,13 +34,14 @@ interface AppDaysUsedRepository {
     suspend fun getNumberOfDaysAppUsedSinceDate(date: Date): Long
 }
 
-class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) : AppDaysUsedRepository {
+class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) :
+    AppDaysUsedRepository {
 
-    private val singleThreadedDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val singleThreadedDispatcher =
+        Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    override suspend fun recordAppUsedToday() = withContext(singleThreadedDispatcher) {
-        appDaysUsedDao.insert(AppDaysUsedEntity())
-    }
+    override suspend fun recordAppUsedToday() =
+        withContext(singleThreadedDispatcher) { appDaysUsedDao.insert(AppDaysUsedEntity()) }
 
     override suspend fun getNumberOfDaysAppUsed(): Long {
         return withContext(singleThreadedDispatcher) {
@@ -56,6 +57,4 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
 }
 
 @Entity(tableName = "app_days_used")
-data class AppDaysUsedEntity(
-    @PrimaryKey val date: String = formatter.format((Date()))
-)
+data class AppDaysUsedEntity(@PrimaryKey val date: String = formatter.format((Date())))

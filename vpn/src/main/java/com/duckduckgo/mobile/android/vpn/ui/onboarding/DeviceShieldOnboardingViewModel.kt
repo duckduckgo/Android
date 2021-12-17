@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class DeviceShieldOnboardingViewModel(
     private val deviceShieldPixels: DeviceShieldPixels,
@@ -32,20 +32,20 @@ class DeviceShieldOnboardingViewModel(
 
     data class OnboardingPage(val imageHeader: Int, val title: Int, val text: Int)
 
-    val pages = listOf(
-        OnboardingPage(
-            R.raw.device_shield_tracker_count,
-            R.string.atp_OnboardingLastPageOneTitle, R.string.atp_OnboardingLatsPageOneSubtitle
-        ),
-        OnboardingPage(
-            R.raw.device_shield_tracking_apps,
-            R.string.atp_OnboardingLastPageTwoTitle, R.string.atp_OnboardingLastPageTwoSubTitle
-        ),
-        OnboardingPage(
-            R.drawable.device_shield_onboarding_page_three_header,
-            R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
-        )
-    )
+    val pages =
+        listOf(
+            OnboardingPage(
+                R.raw.device_shield_tracker_count,
+                R.string.atp_OnboardingLastPageOneTitle,
+                R.string.atp_OnboardingLatsPageOneSubtitle),
+            OnboardingPage(
+                R.raw.device_shield_tracking_apps,
+                R.string.atp_OnboardingLastPageTwoTitle,
+                R.string.atp_OnboardingLastPageTwoSubTitle),
+            OnboardingPage(
+                R.drawable.device_shield_onboarding_page_three_header,
+                R.string.atp_OnboardingLastPageThreeTitle,
+                R.string.atp_OnboardingLastPageThreeSubTitle))
 
     fun onStart() {
         deviceShieldOnboardingStore.onboardingDidShow()
@@ -59,18 +59,22 @@ class DeviceShieldOnboardingViewModel(
         Timber.i("App Tracking Protection, is now enabled")
         deviceShieldPixels.enableFromOnboarding()
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)
-class DeviceShieldOnboardingViewModelFactory @Inject constructor(
+class DeviceShieldOnboardingViewModelFactory
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (DeviceShieldOnboardingViewModel(deviceShieldPixels, deviceShieldOnboardingStore) as T)
+                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) ->
+                    (DeviceShieldOnboardingViewModel(
+                        deviceShieldPixels, deviceShieldOnboardingStore) as
+                        T)
                 else -> null
             }
         }

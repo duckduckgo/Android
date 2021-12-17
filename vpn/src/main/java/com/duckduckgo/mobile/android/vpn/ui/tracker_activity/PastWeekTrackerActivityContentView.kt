@@ -29,17 +29,24 @@ class PastWeekTrackerActivityContentView : FrameLayout {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)
-        text = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_android_text) ?: ""
+        val attributes =
+            context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)
+        text =
+            attributes.getString(R.styleable.PastWeekTrackerActivityContentView_android_text) ?: ""
         count = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_count) ?: ""
         footer = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_footer) ?: ""
         attributes.recycle()
     }
 
     private val root: View by lazy {
-        LayoutInflater.from(context).inflate(R.layout.view_device_shield_past_week_activity_content, this, true)
+        LayoutInflater.from(context)
+            .inflate(R.layout.view_device_shield_past_week_activity_content, this, true)
     }
 
     override fun onAttachedToWindow() {
@@ -48,14 +55,26 @@ class PastWeekTrackerActivityContentView : FrameLayout {
     }
 
     var count: String
-        get() { return root.content_text.text.toString() }
-        set(value) { root.content_text.text = value }
+        get() {
+            return root.content_text.text.toString()
+        }
+        set(value) {
+            root.content_text.text = value
+        }
 
     var text: String
-        get() { return root.content_title.text.toString() }
-        set(value) { root.content_title.text = value }
+        get() {
+            return root.content_title.text.toString()
+        }
+        set(value) {
+            root.content_title.text = value
+        }
 
     var footer: String
-        get() { return root.content_footer.text.toString() }
-        set(value) { root.content_footer.text = value }
+        get() {
+            return root.content_footer.text.toString()
+        }
+        set(value) {
+            root.content_footer.text = value
+        }
 }

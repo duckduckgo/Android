@@ -24,10 +24,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.content_autofill_tooltip.*
 
-class EmailAutofillTooltipFragment(
-    context: Context,
-    val address: String
-) : BottomSheetDialog(context, R.style.EmailTooltip) {
+class EmailAutofillTooltipFragment(context: Context, val address: String) :
+    BottomSheetDialog(context, R.style.EmailTooltip) {
 
     var useAddress: (() -> Unit) = {}
     var usePrivateAlias: (() -> Unit) = {}

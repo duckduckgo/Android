@@ -38,15 +38,16 @@ class DuckDuckGoRequestRewriter(
 ) : RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
-        val builder = Uri.Builder()
-            .authority(request.authority)
-            .scheme(request.scheme)
-            .path(request.path)
-            .fragment(request.fragment)
+        val builder =
+            Uri.Builder()
+                .authority(request.authority)
+                .scheme(request.scheme)
+                .path(request.path)
+                .fragment(request.fragment)
 
-        request.queryParameterNames
-            .filter { it != ParamKey.SOURCE && it != ParamKey.ATB }
-            .forEach { builder.appendQueryParameter(it, request.getQueryParameter(it)) }
+        request.queryParameterNames.filter { it != ParamKey.SOURCE && it != ParamKey.ATB }.forEach {
+            builder.appendQueryParameter(it, request.getQueryParameter(it))
+        }
 
         addCustomQueryParams(builder)
         val newUri = builder.build()
@@ -56,21 +57,25 @@ class DuckDuckGoRequestRewriter(
     }
 
     override fun shouldRewriteRequest(uri: Uri): Boolean {
-        return (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) || duckDuckGoUrlDetector.isDuckDuckGoStaticUrl(uri.toString())) &&
+        return (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) ||
+            duckDuckGoUrlDetector.isDuckDuckGoStaticUrl(uri.toString())) &&
             !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.ATB))
     }
 
     /**
-     * Applies cohort (atb) https://duck.co/help/privacy/atb and
-     * source (t) https://duck.co/help/privacy/t params to url
+     * Applies cohort (atb) https://duck.co/help/privacy/atb and source (t)
+     * https://duck.co/help/privacy/t params to url
      */
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
-            builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
+            builder.appendQueryParameter(
+                ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
         }
 
-        val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
+        val sourceValue =
+            if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION
+            else ParamValue.SOURCE
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)

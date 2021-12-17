@@ -34,13 +34,13 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class NotificationHandlerServiceTest {
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: NotificationHandlerService
     private lateinit var mockPixel: Pixel
 
-    private val appContext = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+    private val appContext =
+        InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     @Before
     fun before() {
@@ -51,13 +51,14 @@ class NotificationHandlerServiceTest {
         whenever(taskStackBuilder.addNextIntentWithParentStack(any())).thenReturn(taskStackBuilder)
         whenever(mockTaskStackBuilderFactory.createTaskBuilder()).thenReturn(taskStackBuilder)
 
-        testee = NotificationHandlerService().apply {
-            pixel = mockPixel
-            this.context = appContext
-            notificationManager = NotificationManagerCompat.from(context)
-            dispatcher = coroutinesTestRule.testDispatcherProvider
-            taskStackBuilderFactory = mockTaskStackBuilderFactory
-        }
+        testee =
+            NotificationHandlerService().apply {
+                pixel = mockPixel
+                this.context = appContext
+                notificationManager = NotificationManagerCompat.from(context)
+                dispatcher = coroutinesTestRule.testDispatcherProvider
+                taskStackBuilderFactory = mockTaskStackBuilderFactory
+            }
     }
 
     @Test

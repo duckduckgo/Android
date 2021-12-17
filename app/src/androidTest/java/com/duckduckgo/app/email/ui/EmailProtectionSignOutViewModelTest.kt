@@ -21,22 +21,21 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.ui.EmailProtectionSignOutViewModel.Command.*
 import com.duckduckgo.app.runBlocking
-import org.junit.Rule
 import com.nhaarman.mockitokotlin2.*
-import org.junit.Assert.*
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @FlowPreview
 @ExperimentalCoroutinesApi
 class EmailProtectionSignOutViewModelTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockEmailManager: EmailManager = mock()
     private lateinit var testee: EmailProtectionSignOutViewModel
@@ -47,12 +46,13 @@ class EmailProtectionSignOutViewModelTest {
     }
 
     @Test
-    fun whenOnSignOutButtonClickedThenEmitSignOutCommand() = coroutineRule.runBlocking {
-        testee.commands.test {
-            testee.onSignOutButtonClicked()
-            assertEquals(SignOut, awaitItem())
+    fun whenOnSignOutButtonClickedThenEmitSignOutCommand() =
+        coroutineRule.runBlocking {
+            testee.commands.test {
+                testee.onSignOutButtonClicked()
+                assertEquals(SignOut, awaitItem())
+            }
         }
-    }
 
     @Test
     fun whenOnEmailLogoutConfirmedThenCallSignOut() {

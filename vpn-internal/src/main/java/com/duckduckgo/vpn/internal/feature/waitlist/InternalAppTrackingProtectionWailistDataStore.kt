@@ -21,11 +21,9 @@ import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistD
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(
-    scope = AppScope::class,
-    priority = ContributesBinding.Priority.HIGHEST
-)
-class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
+@ContributesBinding(scope = AppScope::class, priority = ContributesBinding.Priority.HIGHEST)
+class InternalAppTrackingProtectionWailistDataStore @Inject constructor() :
+    AppTrackingProtectionWaitlistDataStore {
 
     override var inviteCode: String?
         get() = "internaltoken"
@@ -46,5 +44,4 @@ class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppT
     override fun canUseEncryption(): Boolean {
         return false
     }
-
 }

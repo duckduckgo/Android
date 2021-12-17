@@ -38,14 +38,18 @@ class RealCohortCalculatorTest {
     fun whenLocalDateNowThenReturnWeeklyCohort() {
         val date = LocalDate.now()
         val year = date.year
-        assertEquals("$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}", cohortCalculator.calculateCohortForDate(date))
+        assertEquals(
+            "$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}",
+            cohortCalculator.calculateCohortForDate(date))
     }
 
     @Test
     fun whenLocalDate4WeeksAgoThenReturnWeeklyCohort() {
         val date = LocalDate.now().minusWeeks(4)
         val year = date.year
-        assertEquals("$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}", cohortCalculator.calculateCohortForDate(date))
+        assertEquals(
+            "$year-week-${date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}",
+            cohortCalculator.calculateCohortForDate(date))
     }
 
     @Test
@@ -66,14 +70,18 @@ class RealCohortCalculatorTest {
     fun whenLocalDateMoreThan13WeeksAgoThenReturnQuarterCohort() {
         val date = LocalDate.now().minusWeeks(14)
         val year = date.year
-        assertEquals("$year-q${date.get(IsoFields.QUARTER_OF_YEAR)}", cohortCalculator.calculateCohortForDate(date))
+        assertEquals(
+            "$year-q${date.get(IsoFields.QUARTER_OF_YEAR)}",
+            cohortCalculator.calculateCohortForDate(date))
     }
 
     @Test
     fun whenLocalDate26WeeksAgoThenReturnQuarterCohort() {
         val date = LocalDate.now().minusWeeks(26)
         val year = date.year
-        assertEquals("$year-q${date.get(IsoFields.QUARTER_OF_YEAR)}", cohortCalculator.calculateCohortForDate(date))
+        assertEquals(
+            "$year-q${date.get(IsoFields.QUARTER_OF_YEAR)}",
+            cohortCalculator.calculateCohortForDate(date))
     }
 
     @Test

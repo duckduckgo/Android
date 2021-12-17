@@ -37,6 +37,5 @@ interface FireproofWebsiteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long
 
-    @Delete
-    fun delete(fireproofWebsiteEntity: FireproofWebsiteEntity): Int
+    @Delete fun delete(fireproofWebsiteEntity: FireproofWebsiteEntity): Int
 }

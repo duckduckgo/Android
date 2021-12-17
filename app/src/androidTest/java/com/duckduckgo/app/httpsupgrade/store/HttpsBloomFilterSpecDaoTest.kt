@@ -32,7 +32,11 @@ class HttpsBloomFilterSpecDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .build()
         dao = db.httpsBloomFilterSpecDao()
     }
 
@@ -48,14 +52,20 @@ class HttpsBloomFilterSpecDaoTest {
 
     @Test
     fun whenModelIsInsertedThenGetIsNotNull() {
-        dao.insert(HttpsBloomFilterSpec(errorRate = 0.1, bitCount = 1000, totalEntries = 55, sha256 = "abc"))
+        dao.insert(
+            HttpsBloomFilterSpec(
+                errorRate = 0.1, bitCount = 1000, totalEntries = 55, sha256 = "abc"))
         assertNotNull(dao.get())
     }
 
     @Test
     fun whenNewModelIsInsertedThenGetIsNotNullAndDetailsUpdates() {
-        dao.insert(HttpsBloomFilterSpec(bitCount = 1000, errorRate = 0.1, totalEntries = 55, sha256 = "abc"))
-        dao.insert(HttpsBloomFilterSpec(bitCount = 2000, errorRate = 0.2, totalEntries = 60, sha256 = "xyz"))
+        dao.insert(
+            HttpsBloomFilterSpec(
+                bitCount = 1000, errorRate = 0.1, totalEntries = 55, sha256 = "abc"))
+        dao.insert(
+            HttpsBloomFilterSpec(
+                bitCount = 2000, errorRate = 0.2, totalEntries = 60, sha256 = "xyz"))
 
         val specification = dao.get()
         assertNotNull(specification)
@@ -64,5 +74,4 @@ class HttpsBloomFilterSpecDaoTest {
         assertEquals(60, specification.totalEntries)
         assertEquals("xyz", specification.sha256)
     }
-
 }

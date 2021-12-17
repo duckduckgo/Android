@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface BrowserActivityComponent : AndroidInjector<BrowserActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<BrowserActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<BrowserActivity>
 }
 
 @ContributesTo(AppScope::class)

@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -35,11 +35,9 @@ import javax.inject.Inject
 
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var variantManager: VariantManager
+    @Inject lateinit var variantManager: VariantManager
 
     lateinit var adapter: FireproofWebsiteAdapter
 
@@ -73,30 +71,30 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
                     adapter.loginDetectionEnabled = it.loginDetectionEnabled
                     adapter.fireproofWebsites = it.fireproofWebsitesEntities
                 }
-            }
-        )
+            })
 
         viewModel.command.observe(
             this,
             Observer {
                 when (it) {
-                    is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
+                    is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite ->
+                        confirmDeleteWebsite(it.entity)
                 }
-            }
-        )
+            })
     }
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
-        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemovalConfirmation, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        val message =
+            HtmlCompat.fromHtml(
+                getString(R.string.fireproofWebsiteRemovalConfirmation, entity.website()),
+                HtmlCompat.FROM_HTML_MODE_LEGACY)
         viewModel.delete(entity)
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.onSnackBarUndoFireproof(entity)
-        }.show()
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.onSnackBarUndoFireproof(entity)
+            }
+            .show()
     }
 
     override fun onDestroy() {

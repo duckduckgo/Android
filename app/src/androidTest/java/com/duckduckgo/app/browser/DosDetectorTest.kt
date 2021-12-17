@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.browser.DosDetector.Companion.MAX_REQUESTS_COUNT
 import com.duckduckgo.app.browser.DosDetector.Companion.DOS_TIME_WINDOW_MS
+import com.duckduckgo.app.browser.DosDetector.Companion.MAX_REQUESTS_COUNT
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse

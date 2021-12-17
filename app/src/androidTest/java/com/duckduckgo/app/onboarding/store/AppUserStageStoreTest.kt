@@ -29,53 +29,57 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppUserStageStoreTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val userStageDao: UserStageDao = mock()
     private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenGetUserAppStageThenReturnCurrentStage() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.DAX_ONBOARDING)
+    fun whenGetUserAppStageThenReturnCurrentStage() =
+        coroutineRule.runBlocking {
+            givenCurrentStage(AppStage.DAX_ONBOARDING)
 
-        val userAppStage = testee.getUserAppStage()
+            val userAppStage = testee.getUserAppStage()
 
-        assertEquals(AppStage.DAX_ONBOARDING, userAppStage)
-    }
-
-    @Test
-    fun whenStageNewCompletedThenStageDaxOnboardingReturned() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.NEW)
-
-        val nextStage = testee.stageCompleted(AppStage.NEW)
-
-        assertEquals(AppStage.DAX_ONBOARDING, nextStage)
-    }
+            assertEquals(AppStage.DAX_ONBOARDING, userAppStage)
+        }
 
     @Test
-    fun whenStageDaxOnboardingCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.DAX_ONBOARDING)
+    fun whenStageNewCompletedThenStageDaxOnboardingReturned() =
+        coroutineRule.runBlocking {
+            givenCurrentStage(AppStage.NEW)
 
-        val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
+            val nextStage = testee.stageCompleted(AppStage.NEW)
 
-        assertEquals(AppStage.ESTABLISHED, nextStage)
-    }
-
-    @Test
-    fun whenStageEstablishedCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.ESTABLISHED)
-
-        val nextStage = testee.stageCompleted(AppStage.ESTABLISHED)
-
-        assertEquals(AppStage.ESTABLISHED, nextStage)
-    }
+            assertEquals(AppStage.DAX_ONBOARDING, nextStage)
+        }
 
     @Test
-    fun whenMoveToStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
-        testee.moveToStage(AppStage.DAX_ONBOARDING)
-        verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
-    }
+    fun whenStageDaxOnboardingCompletedThenStageEstablishedReturned() =
+        coroutineRule.runBlocking {
+            givenCurrentStage(AppStage.DAX_ONBOARDING)
+
+            val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
+
+            assertEquals(AppStage.ESTABLISHED, nextStage)
+        }
+
+    @Test
+    fun whenStageEstablishedCompletedThenStageEstablishedReturned() =
+        coroutineRule.runBlocking {
+            givenCurrentStage(AppStage.ESTABLISHED)
+
+            val nextStage = testee.stageCompleted(AppStage.ESTABLISHED)
+
+            assertEquals(AppStage.ESTABLISHED, nextStage)
+        }
+
+    @Test
+    fun whenMoveToStageThenUpdateUserStageInDao() =
+        coroutineRule.runBlocking {
+            testee.moveToStage(AppStage.DAX_ONBOARDING)
+            verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
+        }
 
     private suspend fun givenCurrentStage(appStage: AppStage) {
         whenever(userStageDao.currentUserAppStage()).thenReturn(UserStage(appStage = appStage))

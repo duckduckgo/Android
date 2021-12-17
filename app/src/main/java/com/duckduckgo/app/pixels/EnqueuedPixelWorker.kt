@@ -28,17 +28,16 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
+import timber.log.Timber
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = LifecycleObserver::class
-)
+@ContributesMultibinding(scope = AppScope::class, boundType = LifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
-class EnqueuedPixelWorker @Inject constructor(
+class EnqueuedPixelWorker
+@Inject
+constructor(
     private val workManager: WorkManager,
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
@@ -63,9 +62,11 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     private fun isLaunchByFireAction(): Boolean {
-        val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
+        val timeDifferenceMillis =
+            System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
         if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
-            Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
+            Timber.i(
+                "The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
             return true
         }
         return false
@@ -82,7 +83,8 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 
-    class RealEnqueuedPixelWorker(val context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
+    class RealEnqueuedPixelWorker(val context: Context, parameters: WorkerParameters) :
+        CoroutineWorker(context, parameters) {
         lateinit var pixel: Pixel
         lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -102,19 +104,22 @@ class EnqueuedPixelWorker @Inject constructor(
         private fun scheduleWorker(workManager: WorkManager) {
             Timber.v("Scheduling the EnqueuedPixelWorker")
 
-            val request = PeriodicWorkRequestBuilder<RealEnqueuedPixelWorker>(2, TimeUnit.HOURS)
-                .addTag(WORKER_SEND_ENQUEUED_PIXELS)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-                .build()
+            val request =
+                PeriodicWorkRequestBuilder<RealEnqueuedPixelWorker>(2, TimeUnit.HOURS)
+                    .addTag(WORKER_SEND_ENQUEUED_PIXELS)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                    .build()
 
-            workManager.enqueueUniquePeriodicWork(WORKER_SEND_ENQUEUED_PIXELS, ExistingPeriodicWorkPolicy.KEEP, request)
+            workManager.enqueueUniquePeriodicWork(
+                WORKER_SEND_ENQUEUED_PIXELS, ExistingPeriodicWorkPolicy.KEEP, request)
         }
     }
 }
 
-
 @ContributesMultibinding(AppScope::class)
-class EnqueuedPixelWorkerInjectorPlugin @Inject constructor(
+class EnqueuedPixelWorkerInjectorPlugin
+@Inject
+constructor(
     private val pixel: Provider<Pixel>,
     private val enqueuedPixelWorker: Provider<EnqueuedPixelWorker>
 ) : WorkerInjectorPlugin {

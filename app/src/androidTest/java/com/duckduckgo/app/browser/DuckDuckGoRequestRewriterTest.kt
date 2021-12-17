@@ -41,7 +41,12 @@ class DuckDuckGoRequestRewriterTest {
     fun before() {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
+        testee =
+            DuckDuckGoRequestRewriter(
+                DuckDuckGoUrlDetector(),
+                mockStatisticsStore,
+                mockVariantManager,
+                mockAppReferrerDataStore)
         builder = Uri.Builder()
     }
 
@@ -87,5 +92,4 @@ class DuckDuckGoRequestRewriterTest {
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
-
 }

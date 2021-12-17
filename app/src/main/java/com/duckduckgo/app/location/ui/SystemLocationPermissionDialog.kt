@@ -39,7 +39,8 @@ class SystemLocationPermissionDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
 
-        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
+        val binding =
+            ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
         val alertBuilder = AlertDialog.Builder(requireActivity()).setView(binding.root)
 
@@ -48,8 +49,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
         configureListeners(
             binding.allowLocationPermission,
             binding.denyLocationPermission,
-            binding.neverAllowLocationPermission
-        )
+            binding.neverAllowLocationPermission)
 
         return alertBuilder.create()
     }
@@ -65,7 +65,8 @@ class SystemLocationPermissionDialog : DialogFragment() {
     private fun populateSubtitle(view: TextView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!.websiteFromGeoLocationsApiOrigin()
-            val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
+            val subtitle =
+                getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
             view.text = subtitle
         }
     }

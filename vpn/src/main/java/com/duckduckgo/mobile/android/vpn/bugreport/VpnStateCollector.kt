@@ -28,14 +28,16 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesBinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
-class RealVpnStateCollector @Inject constructor(
+class RealVpnStateCollector
+@Inject
+constructor(
     private val vpnStateCollectors: PluginPoint<VpnStateCollectorPlugin>,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStateCollector {

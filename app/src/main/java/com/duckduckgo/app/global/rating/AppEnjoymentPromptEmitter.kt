@@ -25,5 +25,4 @@ interface AppEnjoymentPromptEmitter {
 class AppEnjoymentLiveDataEmitter : AppEnjoymentPromptEmitter {
 
     override val promptType: MutableLiveData<AppEnjoymentPromptOptions> = MutableLiveData()
-
 }

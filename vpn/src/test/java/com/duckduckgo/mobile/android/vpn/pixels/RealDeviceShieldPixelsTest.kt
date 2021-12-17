@@ -25,17 +25,18 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import java.util.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+    private val context =
+        InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
     private val deviceShieldPixels: DeviceShieldPixels = RealDeviceShieldPixels(context, pixel)
 
     @Before
@@ -86,7 +87,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromReminderNotification()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY.pixelName)
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY.pixelName)
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION)
         verifyNoMoreInteractions(pixel)
     }
@@ -119,8 +121,10 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.enableFromSummaryTrackerActivity()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel, times(2))
+            .fire(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -139,8 +143,10 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.didShowDailyNotification(0)
         deviceShieldPixels.didShowDailyNotification(1)
 
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.notificationVariant(0))
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.notificationVariant(1))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.notificationVariant(0))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.notificationVariant(1))
         verifyNoMoreInteractions(pixel)
     }
 
@@ -149,8 +155,10 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.didPressOnDailyNotification(0)
         deviceShieldPixels.didPressOnDailyNotification(1)
 
-        verify(pixel).fire(DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.notificationVariant(0))
-        verify(pixel).fire(DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.notificationVariant(1))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.notificationVariant(0))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.notificationVariant(1))
         verifyNoMoreInteractions(pixel)
     }
 
@@ -159,8 +167,10 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.didShowWeeklyNotification(0)
         deviceShieldPixels.didShowWeeklyNotification(1)
 
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.notificationVariant(0))
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.notificationVariant(1))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.notificationVariant(0))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.notificationVariant(1))
         verifyNoMoreInteractions(pixel)
     }
 
@@ -169,8 +179,10 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.didPressOnWeeklyNotification(0)
         deviceShieldPixels.didPressOnWeeklyNotification(1)
 
-        verify(pixel).fire(DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.notificationVariant(0))
-        verify(pixel).fire(DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.notificationVariant(1))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.notificationVariant(0))
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.notificationVariant(1))
         verifyNoMoreInteractions(pixel)
     }
 
@@ -242,7 +254,8 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.didShowDetailedTrackerActivity()
 
         verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_UNIQUE)
-        verify(pixel).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_DAILY.pixelName)
+        verify(pixel)
+            .fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY_DAILY.pixelName)
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.DID_SHOW_DETAILED_TRACKER_ACTIVITY)
         verifyNoMoreInteractions(pixel)
     }

@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
-interface EmailProtectionNotSupportedFragmentComponent : AndroidInjector<EmailProtectionNotSupportedFragment> {
+@MergeSubcomponent(scope = FragmentScope::class)
+interface EmailProtectionNotSupportedFragmentComponent :
+    AndroidInjector<EmailProtectionNotSupportedFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailProtectionNotSupportedFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface EmailProtectionNotSupportedFragmentComponentProvider {
-    fun provideEmailProtectionNotSupportedFragmentComponentFactory(): EmailProtectionNotSupportedFragmentComponent.Factory
+    fun provideEmailProtectionNotSupportedFragmentComponentFactory():
+        EmailProtectionNotSupportedFragmentComponent.Factory
 }
 
 @Module
@@ -49,5 +49,6 @@ abstract class EmailProtectionNotSupportedFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(EmailProtectionNotSupportedFragment::class)
-    abstract fun EmailProtectionNotSupportedFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun EmailProtectionNotSupportedFragmentComponent.Factory.bind():
+        AndroidInjector.Factory<*>
 }

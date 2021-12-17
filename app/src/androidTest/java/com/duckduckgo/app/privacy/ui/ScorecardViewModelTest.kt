@@ -35,24 +35,20 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class ScorecardViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val tabRepository: TabRepository = mock()
     private var userWhitelistDao: UserWhitelistDao = mock()
@@ -60,237 +56,230 @@ class ScorecardViewModelTest {
 
     private lateinit var testee: ScorecardViewModel
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    @get:Rule val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
-        testee = ScorecardViewModel(tabRepository, userWhitelistDao, contentBlocking, coroutineRule.testDispatcherProvider)
+        testee =
+            ScorecardViewModel(
+                tabRepository,
+                userWhitelistDao,
+                contentBlocking,
+                coroutineRule.testDispatcherProvider)
 
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+    fun whenNoDataThenDefaultValuesAreUsed() =
+        coroutineTestRule.runBlocking {
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
-        testee.scoreCard("1").test {
-            val viewState = awaitItem()
-            assertEquals("", viewState.domain)
-            assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
-            assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
-            assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
-            assertEquals(0, viewState.trackerCount)
-            assertEquals(0, viewState.majorNetworkCount)
-            assertTrue(viewState.allTrackersBlocked)
-            assertFalse(viewState.showIsMemberOfMajorNetwork)
-            assertFalse(viewState.showEnhancedGrade)
-            assertEquals(PrivacyPractices.Summary.UNKNOWN, viewState.practices)
-            assertFalse(viewState.isSiteInTempAllowedList)
+            testee.scoreCard("1").test {
+                val viewState = awaitItem()
+                assertEquals("", viewState.domain)
+                assertEquals(PrivacyGrade.UNKNOWN, viewState.beforeGrade)
+                assertEquals(PrivacyGrade.UNKNOWN, viewState.afterGrade)
+                assertEquals(HttpsStatus.SECURE, viewState.httpsStatus)
+                assertEquals(0, viewState.trackerCount)
+                assertEquals(0, viewState.majorNetworkCount)
+                assertTrue(viewState.allTrackersBlocked)
+                assertFalse(viewState.showIsMemberOfMajorNetwork)
+                assertFalse(viewState.showEnhancedGrade)
+                assertEquals(PrivacyPractices.Summary.UNKNOWN, viewState.practices)
+                assertFalse(viewState.isSiteInTempAllowedList)
+            }
         }
-    }
 
     @Test
-    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
 
-        testee.scoreCard("1").test {
-            val viewState = awaitItem()
-            assertEquals(PrivacyGrade.D, viewState.beforeGrade)
-            assertEquals(PrivacyGrade.B, viewState.afterGrade)
+            testee.scoreCard("1").test {
+                val viewState = awaitItem()
+                assertEquals(PrivacyGrade.D, viewState.beforeGrade)
+                assertEquals(PrivacyGrade.B, viewState.afterGrade)
+            }
         }
-    }
 
     @Test
-    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(https = HttpsStatus.MIXED))
+            siteData.postValue(site(https = HttpsStatus.MIXED))
 
-        testee.scoreCard("1").test {
-            assertEquals(HttpsStatus.MIXED, awaitItem().httpsStatus)
+            testee.scoreCard("1").test { assertEquals(HttpsStatus.MIXED, awaitItem().httpsStatus) }
         }
-    }
 
     @Test
-    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(trackerCount = 10))
+            siteData.postValue(site(trackerCount = 10))
 
-        testee.scoreCard("1").test {
-            assertEquals(10, awaitItem().trackerCount)
+            testee.scoreCard("1").test { assertEquals(10, awaitItem().trackerCount) }
         }
-    }
 
     @Test
-    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(majorNetworkCount = 10))
+            siteData.postValue(site(majorNetworkCount = 10))
 
-        testee.scoreCard("1").test {
-            assertEquals(10, awaitItem().majorNetworkCount)
+            testee.scoreCard("1").test { assertEquals(10, awaitItem().majorNetworkCount) }
         }
-    }
 
     @Test
-    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(allTrackersBlocked = false))
+            siteData.postValue(site(allTrackersBlocked = false))
 
-        testee.scoreCard("1").test {
-            assertEquals(false, awaitItem().allTrackersBlocked)
+            testee.scoreCard("1").test { assertEquals(false, awaitItem().allTrackersBlocked) }
         }
-    }
 
     @Test
-    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(allTrackersBlocked = true))
+            siteData.postValue(site(allTrackersBlocked = true))
 
-        testee.scoreCard("1").test {
-            assertEquals(true, awaitItem().allTrackersBlocked)
+            testee.scoreCard("1").test { assertEquals(true, awaitItem().allTrackersBlocked) }
         }
-    }
 
     @Test
-    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        val privacyPractices = Practices(0, GOOD, listOf("good"), listOf())
-        siteData.postValue(site(privacyPractices = privacyPractices))
+            val privacyPractices = Practices(0, GOOD, listOf("good"), listOf())
+            siteData.postValue(site(privacyPractices = privacyPractices))
 
-        testee.scoreCard("1").test {
-            assertEquals(GOOD, awaitItem().practices)
+            testee.scoreCard("1").test { assertEquals(GOOD, awaitItem().practices) }
         }
-    }
 
     @Test
-    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = 10.0)))
+            siteData.postValue(
+                site(entity = TestEntity(name = "", displayName = "", prevalence = 10.0)))
 
-        testee.scoreCard("1").test {
-            assertTrue(awaitItem().showIsMemberOfMajorNetwork)
+            testee.scoreCard("1").test { assertTrue(awaitItem().showIsMemberOfMajorNetwork) }
         }
-    }
 
     @Test
-    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = 0.0)))
+            siteData.postValue(
+                site(entity = TestEntity(name = "", displayName = "", prevalence = 0.0)))
 
-        testee.scoreCard("1").test {
-            assertFalse(awaitItem().showIsMemberOfMajorNetwork)
+            testee.scoreCard("1").test { assertFalse(awaitItem().showIsMemberOfMajorNetwork) }
         }
-    }
 
     @Test
-    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(entity = null))
+            siteData.postValue(site(entity = null))
 
-        testee.scoreCard("1").test {
-            assertFalse(awaitItem().showIsMemberOfMajorNetwork)
+            testee.scoreCard("1").test { assertFalse(awaitItem().showIsMemberOfMajorNetwork) }
         }
-    }
 
     @Test
-    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.A))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.A))
 
-        testee.scoreCard("1").test {
-            assertTrue(awaitItem().showEnhancedGrade)
+            testee.scoreCard("1").test { assertTrue(awaitItem().showEnhancedGrade) }
         }
-    }
 
     @Test
-    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(allTrackersBlocked = true, trackerCount = 0))
+            siteData.postValue(site(allTrackersBlocked = true, trackerCount = 0))
 
-        testee.scoreCard("1").test {
-            assertFalse(awaitItem().showEnhancedGrade)
+            testee.scoreCard("1").test { assertFalse(awaitItem().showEnhancedGrade) }
         }
-    }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
-        whenever(contentBlocking.isAnException(any())).thenReturn(true)
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+            whenever(contentBlocking.isAnException(any())).thenReturn(true)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
 
-        testee.scoreCard("1").test {
-            assertTrue(awaitItem().isSiteInTempAllowedList)
+            testee.scoreCard("1").test { assertTrue(awaitItem().isSiteInTempAllowedList) }
         }
-    }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
-        whenever(userWhitelistDao.contains(any())).thenReturn(true)
-        whenever(contentBlocking.isAnException(any())).thenReturn(false)
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+            whenever(userWhitelistDao.contains(any())).thenReturn(true)
+            whenever(contentBlocking.isAnException(any())).thenReturn(false)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
 
-        testee.scoreCard("1").test {
-            assertFalse(awaitItem().privacyOn)
+            testee.scoreCard("1").test { assertFalse(awaitItem().privacyOn) }
         }
-    }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
-        whenever(userWhitelistDao.contains(any())).thenReturn(false)
-        whenever(contentBlocking.isAnException(any())).thenReturn(true)
+    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+            whenever(userWhitelistDao.contains(any())).thenReturn(false)
+            whenever(contentBlocking.isAnException(any())).thenReturn(true)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
 
-        testee.scoreCard("1").test {
-            assertFalse(awaitItem().privacyOn)
+            testee.scoreCard("1").test { assertFalse(awaitItem().privacyOn) }
         }
-    }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
-        whenever(userWhitelistDao.contains(any())).thenReturn(false)
-        whenever(contentBlocking.isAnException(any())).thenReturn(false)
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+            whenever(userWhitelistDao.contains(any())).thenReturn(false)
+            whenever(contentBlocking.isAnException(any())).thenReturn(false)
 
-        siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
+            siteData.postValue(site(grade = PrivacyGrade.D, improvedGrade = PrivacyGrade.B))
 
-        testee.scoreCard("1").test {
-            assertTrue(awaitItem().privacyOn)
+            testee.scoreCard("1").test { assertTrue(awaitItem().privacyOn) }
         }
-    }
 
     private fun site(
         https: HttpsStatus = HttpsStatus.SECURE,

@@ -35,7 +35,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
+class BrokenSiteViewModel(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender
+) : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -50,28 +53,34 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var indexSelected = -1
-    val categories: List<BrokenSiteCategory> = listOf(
-        ImagesCategory,
-        PaywallCategory,
-        CommentsCategory,
-        VideosCategory,
-        LinksCategory,
-        ContentCategory,
-        LoginCategory,
-        UnsupportedCategory,
-        OtherCategory
-    )
+    val categories: List<BrokenSiteCategory> =
+        listOf(
+            ImagesCategory,
+            PaywallCategory,
+            CommentsCategory,
+            VideosCategory,
+            LinksCategory,
+            ContentCategory,
+            LoginCategory,
+            UnsupportedCategory,
+            OtherCategory)
     private var blockedTrackers: String = ""
     private var surrogates: String = ""
     private var url: String = ""
     private var upgradedHttps: Boolean = false
-    private val viewValue: ViewState get() = viewState.value!!
+    private val viewValue: ViewState
+        get() = viewState.value!!
 
     init {
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(
+        url: String,
+        blockedTrackers: String,
+        surrogates: String,
+        upgradedHttps: Boolean
+    ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
@@ -87,11 +96,11 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     fun onCategoryAccepted() {
-        viewState.value = viewState.value?.copy(
-            indexSelected = indexSelected,
-            categorySelected = categories.elementAtOrNull(indexSelected),
-            submitAllowed = canSubmit()
-        )
+        viewState.value =
+            viewState.value?.copy(
+                indexSelected = indexSelected,
+                categorySelected = categories.elementAtOrNull(indexSelected),
+                submitAllowed = canSubmit())
     }
 
     fun onSubmitPressed(webViewVersion: String) {
@@ -100,8 +109,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl)
-            )
+                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
         }
         command.value = Command.ConfirmAndFinish
     }
@@ -117,8 +125,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
             webViewVersion = webViewVersion,
-            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE
-        )
+            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE)
     }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
@@ -131,14 +138,17 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 }
 
 @ContributesMultibinding(AppScope::class)
-class BrokenSiteViewModelFactory @Inject constructor(
+class BrokenSiteViewModelFactory
+@Inject
+constructor(
     private val pixel: Provider<Pixel>,
     private val brokenSiteSender: Provider<BrokenSiteSender>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
+                isAssignableFrom(BrokenSiteViewModel::class.java) ->
+                    (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get()) as T)
                 else -> null
             }
         }

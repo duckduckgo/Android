@@ -31,12 +31,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(QuickSettingsScope::class)
-@MergeSubcomponent(
-    scope = QuickSettingsScope::class
-)
+@MergeSubcomponent(scope = QuickSettingsScope::class)
 interface DeviceShieldTileServiceComponent : AndroidInjector<DeviceShieldTileService> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DeviceShieldTileService>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<DeviceShieldTileService>
 }
 
 @ContributesTo(AppScope::class)
@@ -49,8 +46,10 @@ interface DeviceShieldTileServiceComponentProvider {
 abstract class DeviceShieldTileServiceBindingModule {
     @Binds
     @IntoMap
-    // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
-    // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
+    // We don't use the DeviceShieldTileService::class as binding key because TileService (Android)
+    // class does not
+    // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but
+    // immediately crash
     // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
     @ClassKey(TileServiceBingingKey::class)
     abstract fun DeviceShieldTileServiceComponent.Factory.bind(): AndroidInjector.Factory<*>

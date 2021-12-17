@@ -30,13 +30,9 @@ import org.junit.Test
 
 class UncaughtExceptionRepositoryDbTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: UncaughtExceptionRepositoryDb
 
@@ -44,11 +40,17 @@ class UncaughtExceptionRepositoryDbTest {
     private var rootExceptionFinder = RootExceptionFinder()
     private var deviceInfo: DeviceInfo = mock()
 
-    private val entity = UncaughtExceptionEntity(exceptionSource = UncaughtExceptionSource.GLOBAL, message = "message", version = "version", timestamp = 1000)
+    private val entity =
+        UncaughtExceptionEntity(
+            exceptionSource = UncaughtExceptionSource.GLOBAL,
+            message = "message",
+            version = "version",
+            timestamp = 1000)
 
     @Before
     fun before() {
-        testee = UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo)
+        testee =
+            UncaughtExceptionRepositoryDb(uncaughtExceptionDao, rootExceptionFinder, deviceInfo)
         whenever(deviceInfo.appVersion).thenReturn("version")
         whenever(uncaughtExceptionDao.getLatestException()).thenReturn(entity)
     }
@@ -72,14 +74,40 @@ class UncaughtExceptionRepositoryDbTest {
 
     @Test
     fun whenIsDifferentExceptionThenReturnTrue() = runBlocking {
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(entity.copy(message = "different message", timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(entity.copy(version = "different version", timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
 
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    message = "different message",
+                    version = "different version",
+                    timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    message = "different message",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    version = "different version",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500)))
 
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    message = "different message",
+                    version = "different version",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500)))
     }
 }

@@ -27,8 +27,8 @@ import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
-import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -37,18 +37,19 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
 class StatisticsModule {
 
     @Provides
-    fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
+    fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService =
+        retrofit.create(StatisticsService::class.java)
 
     @Provides
     fun statisticsUpdater(
@@ -58,8 +59,10 @@ class StatisticsModule {
         plugins: DaggerSet<RefreshRetentionAtbPlugin>,
     ): StatisticsUpdater {
         return StatisticsRequester(
-            statisticsDataStore, statisticsService, variantManager, RefreshRetentionAtbPluginPoint(plugins)
-        )
+            statisticsDataStore,
+            statisticsService,
+            variantManager,
+            RefreshRetentionAtbPluginPoint(plugins))
     }
 
     @Provides
@@ -67,11 +70,7 @@ class StatisticsModule {
         return retrofit.create(PixelService::class.java)
     }
 
-    @Provides
-    fun pixel(
-        pixelSender: PixelSender
-    ): Pixel =
-        RxBasedPixel(pixelSender)
+    @Provides fun pixel(pixelSender: PixelSender): Pixel = RxBasedPixel(pixelSender)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -83,7 +82,13 @@ class StatisticsModule {
         pendingPixelDao: PendingPixelDao,
         statisticsLibraryConfig: StatisticsLibraryConfig
     ): PixelSender {
-        return RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo, statisticsLibraryConfig)
+        return RxPixelSender(
+            pixelService,
+            pendingPixelDao,
+            statisticsDataStore,
+            variantManager,
+            deviceInfo,
+            statisticsLibraryConfig)
     }
 
     @Provides
@@ -96,10 +101,10 @@ class StatisticsModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         pixelSender: PixelSender
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender)
+    ): OfflinePixelSender =
+        OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender)
 
-    @Provides
-    fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
+    @Provides fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
 
     @Provides
     @IntoSet

@@ -27,8 +27,6 @@ class FormatterModule {
     @Provides
     @Named("numberFormatterWithSeparator")
     fun providesNumberFormatter(): NumberFormat {
-        return NumberFormat.getInstance().also {
-            it.maximumFractionDigits = 1
-        }
+        return NumberFormat.getInstance().also { it.maximumFractionDigits = 1 }
     }
 }

@@ -40,7 +40,8 @@ class BlobConverterInjectorJsTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenConvertBlobIntoDataUriAndDownloadThenInjectJsCode() {
-        val jsToEvaluate = getJsToEvaluate().replace("%blobUrl%", blobUrl).replace("%contentType%", contentType)
+        val jsToEvaluate =
+            getJsToEvaluate().replace("%blobUrl%", blobUrl).replace("%contentType%", contentType)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
 
         testee.convertBlobIntoDataUriAndDownload(webView, blobUrl, contentType)
@@ -49,11 +50,13 @@ class BlobConverterInjectorJsTest {
     }
 
     private fun getJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(
-            R.raw.blob_converter
-        )
-            .bufferedReader()
-            .use { it.readText() }
+        val js =
+            InstrumentationRegistry.getInstrumentation()
+                .targetContext
+                .resources
+                .openRawResource(R.raw.blob_converter)
+                .bufferedReader()
+                .use { it.readText() }
         return "javascript:$js"
     }
 }

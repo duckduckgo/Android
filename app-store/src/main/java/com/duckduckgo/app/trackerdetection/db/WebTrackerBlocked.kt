@@ -30,7 +30,8 @@ data class WebTrackerBlocked(
 ) {
 
     companion object {
-        private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        private val FORMATTER_SECONDS: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
         fun timestamp(date: LocalDateTime = LocalDateTime.now()): String {
             return FORMATTER_SECONDS.format(date)

@@ -49,7 +49,8 @@ class InitialFeedbackFragmentViewModelFactory @Inject constructor() : ViewModelF
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> (InitialFeedbackFragmentViewModel() as T)
+                isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) ->
+                    (InitialFeedbackFragmentViewModel() as T)
                 else -> null
             }
         }

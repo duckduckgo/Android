@@ -31,15 +31,28 @@ import com.duckduckgo.app.feedback.ui.negative.displayText
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
-class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
+class SubReasonNegativeFeedbackFragment :
+    FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
 
     private lateinit var recyclerAdapter: SubReasonAdapter
 
     interface DisambiguationNegativeFeedbackListener {
-        fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons)
-        fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons)
-        fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: CustomizationSubReasons)
-        fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons)
+        fun userSelectedSubReasonMissingBrowserFeatures(
+            mainReason: MainReason,
+            subReason: MissingBrowserFeaturesSubReasons
+        )
+        fun userSelectedSubReasonSearchNotGoodEnough(
+            mainReason: MainReason,
+            subReason: SearchNotGoodEnoughSubReasons
+        )
+        fun userSelectedSubReasonNeedMoreCustomization(
+            mainReason: MainReason,
+            subReason: CustomizationSubReasons
+        )
+        fun userSelectedSubReasonAppIsSlowOrBuggy(
+            mainReason: MainReason,
+            subReason: PerformanceSubReasons
+        )
     }
 
     private val binding: ContentFeedbackNegativeDisambiguationSubReasonBinding by viewBinding()
@@ -52,32 +65,39 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        recyclerAdapter = SubReasonAdapter(object : (FeedbackTypeSubReasonDisplay) -> Unit {
-            override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
-                when (reason.subReason) {
-                    is MissingBrowserFeaturesSubReasons -> {
-                        listener?.userSelectedSubReasonMissingBrowserFeatures(mainReason, reason.subReason)
+        recyclerAdapter =
+            SubReasonAdapter(
+                object : (FeedbackTypeSubReasonDisplay) -> Unit {
+                    override fun invoke(reason: FeedbackTypeSubReasonDisplay) {
+                        when (reason.subReason) {
+                            is MissingBrowserFeaturesSubReasons -> {
+                                listener?.userSelectedSubReasonMissingBrowserFeatures(
+                                    mainReason, reason.subReason)
+                            }
+                            is SearchNotGoodEnoughSubReasons -> {
+                                listener?.userSelectedSubReasonSearchNotGoodEnough(
+                                    mainReason, reason.subReason)
+                            }
+                            is CustomizationSubReasons -> {
+                                listener?.userSelectedSubReasonNeedMoreCustomization(
+                                    mainReason, reason.subReason)
+                            }
+                            is PerformanceSubReasons -> {
+                                listener?.userSelectedSubReasonAppIsSlowOrBuggy(
+                                    mainReason, reason.subReason)
+                            }
+                        }
                     }
-                    is SearchNotGoodEnoughSubReasons -> {
-                        listener?.userSelectedSubReasonSearchNotGoodEnough(mainReason, reason.subReason)
-                    }
-                    is CustomizationSubReasons -> {
-                        listener?.userSelectedSubReasonNeedMoreCustomization(mainReason, reason.subReason)
-                    }
-                    is PerformanceSubReasons -> {
-                        listener?.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, reason.subReason)
-                    }
-                }
-            }
-        })
+                })
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)
             binding.recyclerView.adapter = recyclerAdapter
-            binding.recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
+            binding.recyclerView.addItemDecoration(
+                FeedbackItemDecoration(
+                    ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             arguments?.let { args ->
-
                 mainReason = args.getSerializable(MAIN_REASON_EXTRA) as MainReason
                 val display = mainReason.displayText()
 
@@ -91,7 +111,9 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
         }
     }
 
-    private fun getDisplayTextForReasonType(mainReason: MainReason): List<FeedbackTypeSubReasonDisplay> {
+    private fun getDisplayTextForReasonType(
+        mainReason: MainReason
+    ): List<FeedbackTypeSubReasonDisplay> {
         return when (mainReason) {
             MISSING_BROWSING_FEATURES -> browserFeatureSubReasons()
             SEARCH_NOT_GOOD_ENOUGH -> searchNotGoodEnoughSubReasons()
@@ -114,15 +136,11 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     }
 
     private fun moreCustomizationsSubReasons(): List<FeedbackTypeSubReasonDisplay> {
-        return CustomizationSubReasons.values().mapNotNull {
-            FeedbackTypeDisplay.subReasons[it]
-        }
+        return CustomizationSubReasons.values().mapNotNull { FeedbackTypeDisplay.subReasons[it] }
     }
 
     private fun appSlowOrBuggySubReasons(): List<FeedbackTypeSubReasonDisplay> {
-        return PerformanceSubReasons.values().mapNotNull {
-            FeedbackTypeDisplay.subReasons[it]
-        }
+        return PerformanceSubReasons.values().mapNotNull { FeedbackTypeDisplay.subReasons[it] }
     }
 
     override fun configureViewModelObservers() {}
@@ -133,9 +151,7 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
 
         fun instance(mainReason: MainReason): SubReasonNegativeFeedbackFragment {
             val fragment = SubReasonNegativeFeedbackFragment()
-            fragment.arguments = Bundle().also {
-                it.putSerializable(MAIN_REASON_EXTRA, mainReason)
-            }
+            fragment.arguments = Bundle().also { it.putSerializable(MAIN_REASON_EXTRA, mainReason) }
             return fragment
         }
     }

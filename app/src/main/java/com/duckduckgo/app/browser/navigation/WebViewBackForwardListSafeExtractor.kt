@@ -23,8 +23,8 @@ import timber.log.Timber
 /**
  * There is a bug in WebView whereby `webView.copyBackForwardList()` can internally throw a NPE
  *
- * This extension function can be used as a direct replacement of `copyBackForwardList()`
- * It will catch the NullPointerException and return `null` when it happens.
+ * This extension function can be used as a direct replacement of `copyBackForwardList()` It will
+ * catch the NullPointerException and return `null` when it happens.
  *
  * https://bugs.chromium.org/p/chromium/issues/detail?id=498796
  */

@@ -26,7 +26,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.vpn.R
 
-class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageSingleChoiceFormViewHolder>() {
+class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) :
+    RecyclerView.Adapter<ReportBreakageSingleChoiceFormViewHolder>() {
 
     private val choices: MutableList<Choice> = mutableListOf()
 
@@ -38,9 +39,13 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportBreakageSingleChoiceFormViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ReportBreakageSingleChoiceFormViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.view_report_breakage_text_single_choice_entry, parent, false)
+        val view =
+            inflater.inflate(R.layout.view_report_breakage_text_single_choice_entry, parent, false)
         return ReportBreakageSingleChoiceFormViewHolder(view)
     }
 
@@ -69,13 +74,13 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
         }
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].questionStringRes == newList[newItemPosition].questionStringRes
+            return oldList[oldItemPosition].questionStringRes ==
+                newList[newItemPosition].questionStringRes
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
-
     }
 
     interface Listener {
@@ -84,15 +89,16 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
 }
 
 class ReportBreakageSingleChoiceFormViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    fun bind(choice: Choice, position: Int, listener: ReportBreakageSingleChoiceFormAdapter.Listener) {
+    fun bind(
+        choice: Choice,
+        position: Int,
+        listener: ReportBreakageSingleChoiceFormAdapter.Listener
+    ) {
         with(itemView.findViewById<TextView>(R.id.single_choice_text)) {
             text = itemView.context.getString(choice.questionStringRes)
-            setOnClickListener {
-                listener.onChoiceSelected(choice, position)
-            }
+            setOnClickListener { listener.onChoiceSelected(choice, position) }
         }
-        itemView.findViewById<RadioButton>(R.id.single_choice_selector).quietlySetIsChecked(choice.isSelected) { _, _ ->
-            listener.onChoiceSelected(choice, position)
-        }
+        itemView.findViewById<RadioButton>(R.id.single_choice_selector).quietlySetIsChecked(
+                choice.isSelected) { _, _ -> listener.onChoiceSelected(choice, position) }
     }
 }

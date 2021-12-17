@@ -30,7 +30,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class ChangeIconViewModel @Inject constructor(
+class ChangeIconViewModel
+@Inject
+constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appIconModifier: IconModifier,
     private val pixel: Pixel
@@ -48,9 +50,7 @@ class ChangeIconViewModel @Inject constructor(
         }
     }
 
-    data class ViewState(
-        val appIcons: List<IconViewData>
-    )
+    data class ViewState(val appIcons: List<IconViewData>)
 
     sealed class Command {
         object IconChanged : Command()
@@ -80,7 +80,9 @@ class ChangeIconViewModel @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class ChangeIconViewModelFactory @Inject constructor(
+class ChangeIconViewModelFactory
+@Inject
+constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val appIconModifier: Provider<IconModifier>,
     private val pixel: Provider<Pixel>
@@ -88,7 +90,10 @@ class ChangeIconViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) ->
+                    (ChangeIconViewModel(
+                        settingsDataStore.get(), appIconModifier.get(), pixel.get()) as
+                        T)
                 else -> null
             }
         }

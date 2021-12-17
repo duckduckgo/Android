@@ -32,11 +32,11 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 @Module
 @ContributesTo(AppScope::class)
@@ -57,9 +57,7 @@ class DeviceShieldStatusReportingModule {
     }
 }
 
-class DeviceShieldStatusReporting(
-    private val workManager: WorkManager
-) : LifecycleObserver {
+class DeviceShieldStatusReporting(private val workManager: WorkManager) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleDeviceShieldStatusReporting() {
@@ -69,10 +67,14 @@ class DeviceShieldStatusReporting(
         PeriodicWorkRequestBuilder<DeviceShieldStatusReportingWorker>(12, TimeUnit.HOURS)
             .addTag(WORKER_STATUS_REPORTING_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build().run { workManager.enqueue(this) }
+            .build()
+            .run { workManager.enqueue(this) }
     }
 
-    class DeviceShieldStatusReportingWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class DeviceShieldStatusReportingWorker(
+        private val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 
@@ -88,20 +90,25 @@ class DeviceShieldStatusReporting(
             return Result.success()
         }
 
-        private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(Dispatchers.IO) {
-            val startTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
-                DatabaseDateFormatter.timestamp(this)
-            }
+        private suspend fun sendLastDayVpnEnableDisableCounts() =
+            withContext(Dispatchers.IO) {
+                val startTime =
+                    LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
+                        DatabaseDateFormatter.timestamp(this)
+                    }
 
-            val lastDayVpnStats = vpnServiceStateStatsDao.getServiceStateStatsSince(startTime)
-                .groupBy { it.day }[startTime.substringBefore("T")]
-                ?.groupBy { it.vpnServiceStateStats.state }
+                val lastDayVpnStats =
+                    vpnServiceStateStatsDao.getServiceStateStatsSince(startTime).groupBy { it.day }[
+                            startTime.substringBefore("T")]
+                        ?.groupBy { it.vpnServiceStateStats.state }
 
-            lastDayVpnStats?.let { stats ->
-                deviceShieldPixels.reportLastDayEnableCount(stats[VpnServiceState.ENABLED].orEmpty().size)
-                deviceShieldPixels.reportLastDayDisableCount(stats[VpnServiceState.DISABLED].orEmpty().size)
+                lastDayVpnStats?.let { stats ->
+                    deviceShieldPixels.reportLastDayEnableCount(
+                        stats[VpnServiceState.ENABLED].orEmpty().size)
+                    deviceShieldPixels.reportLastDayDisableCount(
+                        stats[VpnServiceState.DISABLED].orEmpty().size)
+                }
             }
-        }
     }
 
     companion object {

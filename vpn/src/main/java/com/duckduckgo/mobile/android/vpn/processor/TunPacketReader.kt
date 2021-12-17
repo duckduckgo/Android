@@ -18,14 +18,17 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 
-class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
+class TunPacketReader(
+    private val tunInterface: ParcelFileDescriptor,
+    private val queues: VpnQueues
+) : Runnable {
 
     private var running = false
     var bufferToNetwork = byteBuffer()
@@ -46,7 +49,6 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
                     Timber.w(e, "Failed while reading from the TUN")
                 }
             }
-
         } catch (e: InterruptedException) {
             Timber.w(e, "Thread interrupted")
             running = false

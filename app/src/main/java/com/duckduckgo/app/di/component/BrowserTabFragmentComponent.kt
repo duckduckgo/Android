@@ -18,7 +18,6 @@ package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -31,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface BrowserTabFragmentComponent : AndroidInjector<BrowserTabFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<BrowserTabFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<BrowserTabFragment>
 }
 
 @ContributesTo(AppScope::class)

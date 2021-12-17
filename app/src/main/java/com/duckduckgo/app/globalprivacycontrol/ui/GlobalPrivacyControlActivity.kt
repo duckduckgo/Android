@@ -42,11 +42,12 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val clickableSpan = object : ClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.onLearnMoreSelected()
+    private val clickableSpan =
+        object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                viewModel.onLearnMoreSelected()
+            }
         }
-    }
 
     private val globalPrivacyControlToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onUserToggleGlobalPrivacyControl(isChecked)
@@ -71,8 +72,7 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
                     clickableSpan,
                     gpcSpannableString.getSpanStart(it),
                     gpcSpannableString.getSpanEnd(it),
-                    gpcSpannableString.getSpanFlags(it)
-                )
+                    gpcSpannableString.getSpanFlags(it))
                 removeSpan(it)
             }
         }
@@ -83,7 +83,8 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.globalPrivacyControlToggle.setOnCheckedChangeListener(globalPrivacyControlToggleListener)
+        binding.globalPrivacyControlToggle.setOnCheckedChangeListener(
+            globalPrivacyControlToggleListener)
     }
 
     private fun observeViewModel() {
@@ -91,22 +92,23 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
             this,
             { viewState ->
                 viewState?.let {
-                    binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
-                    binding.globalPrivacyControlToggle.isEnabled = it.globalPrivacyControlFeatureEnabled
+                    binding.globalPrivacyControlToggle.quietlySetIsChecked(
+                        it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
+                    binding.globalPrivacyControlToggle.isEnabled =
+                        it.globalPrivacyControlFeatureEnabled
                 }
-            }
-        )
+            })
 
         viewModel.command.observe(
             this,
             { command ->
                 command?.let {
                     when (it) {
-                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)
+                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore ->
+                            openLearnMoreSite(it.url)
                     }
                 }
-            }
-        )
+            })
     }
 
     private fun openLearnMoreSite(url: String) {

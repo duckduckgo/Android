@@ -26,16 +26,18 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBookmarkFolderEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 
 class BookmarkFoldersAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val parentId: Long
-) : ListAdapter<BookmarkFoldersAdapter.BookmarkFoldersItemTypes, BookmarkFolderScreenViewHolders>(BookmarkFoldersDiffCallback()) {
+) :
+    ListAdapter<BookmarkFoldersAdapter.BookmarkFoldersItemTypes, BookmarkFolderScreenViewHolders>(
+        BookmarkFoldersDiffCallback()) {
 
     companion object {
         const val BOOKMARK_FOLDERS_SECTION_TITLE_TYPE = 0
@@ -52,7 +54,9 @@ class BookmarkFoldersAdapter(
             submitList(field)
         }
 
-    private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
+    private fun generateNewList(
+        value: List<BookmarkFoldersItemTypes>
+    ): List<BookmarkFoldersItemTypes> {
         return if (parentId == 0L) {
             listOf(Header) + value
         } else {
@@ -60,12 +64,16 @@ class BookmarkFoldersAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkFolderScreenViewHolders {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BookmarkFolderScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_FOLDER_TYPE -> {
                 val binding = ViewBookmarkFolderEntryBinding.inflate(inflater, parent, false)
-                BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(layoutInflater, binding, viewModel)
+                BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder(
+                    layoutInflater, binding, viewModel)
             }
             BOOKMARK_FOLDERS_SECTION_TITLE_TYPE -> {
                 val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
@@ -98,7 +106,8 @@ class BookmarkFoldersAdapter(
 
 sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : BookmarkFolderScreenViewHolders(binding.root) {
+    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) :
+        BookmarkFolderScreenViewHolders(binding.root) {
         fun bind() {
             binding.savedSiteSectionTitle.setText(R.string.bookmarksSectionTitle)
         }
@@ -113,10 +122,8 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
         private val context: Context = binding.root.context
 
         fun update(bookmarkFolder: BookmarkFolder) {
-            binding.overflowMenu.contentDescription = context.getString(
-                R.string.bookmarkOverflowContentDescription,
-                bookmarkFolder.name
-            )
+            binding.overflowMenu.contentDescription =
+                context.getString(R.string.bookmarkOverflowContentDescription, bookmarkFolder.name)
 
             binding.title.text = bookmarkFolder.name
 
@@ -125,7 +132,9 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
             if (totalItems == 0) {
                 binding.subtitle.text = context.getString(R.string.bookmarkFolderEmpty)
             } else {
-                binding.subtitle.text = context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems)
+                binding.subtitle.text =
+                    context.resources.getQuantityString(
+                        R.plurals.bookmarkFolderItems, totalItems, totalItems)
             }
 
             binding.icon.setImageResource(R.drawable.ic_folder)
@@ -134,17 +143,19 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
                 showOverFlowMenu(binding.overflowMenu, bookmarkFolder)
             }
 
-            binding.root.setOnClickListener {
-                viewModel.onBookmarkFolderSelected(bookmarkFolder)
-            }
+            binding.root.setOnClickListener { viewModel.onBookmarkFolderSelected(bookmarkFolder) }
         }
 
         private fun showOverFlowMenu(anchor: ImageView, bookmarkFolder: BookmarkFolder) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmarkFolder(bookmarkFolder) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmarkFolder(bookmarkFolder) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) {
+                    editBookmarkFolder(bookmarkFolder)
+                }
+                onMenuItemClicked(view.findViewById(R.id.delete)) {
+                    deleteBookmarkFolder(bookmarkFolder)
+                }
             }
             popupMenu.show(binding.root, anchor)
         }
@@ -159,12 +170,19 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
     }
 }
 
-class BookmarkFoldersDiffCallback : DiffUtil.ItemCallback<BookmarkFoldersAdapter.BookmarkFoldersItemTypes>() {
-    override fun areItemsTheSame(oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes, newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes): Boolean {
+class BookmarkFoldersDiffCallback :
+    DiffUtil.ItemCallback<BookmarkFoldersAdapter.BookmarkFoldersItemTypes>() {
+    override fun areItemsTheSame(
+        oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes, newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes): Boolean {
+    override fun areContentsTheSame(
+        oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 }

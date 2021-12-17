@@ -20,18 +20,24 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
-class HttpsDataPersister @Inject constructor(
+class HttpsDataPersister
+@Inject
+constructor(
     private val binaryDataStore: BinaryDataStore,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val httpsFalsePositivesDao: HttpsFalsePositivesDao,
     private val appDatabase: AppDatabase
 ) {
 
-    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray, falsePositives: List<HttpsFalsePositiveDomain>) {
+    fun persistBloomFilter(
+        specification: HttpsBloomFilterSpec,
+        bytes: ByteArray,
+        falsePositives: List<HttpsFalsePositiveDomain>
+    ) {
         appDatabase.runInTransaction {
             persistBloomFilter(specification, bytes)
             persistFalsePositives(falsePositives)
@@ -55,6 +61,8 @@ class HttpsDataPersister @Inject constructor(
     }
 
     fun isPersisted(specification: HttpsBloomFilterSpec): Boolean {
-        return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
+        return specification == httpsBloomSpecDao.get() &&
+            binaryDataStore.verifyCheckSum(
+                HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
     }
 }

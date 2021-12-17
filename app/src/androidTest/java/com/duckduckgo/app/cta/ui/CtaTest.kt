@@ -34,26 +34,22 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.concurrent.TimeUnit
 
 class CtaTest {
 
-    @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
+    @Mock private lateinit var mockOnboardingStore: OnboardingStore
 
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
+    @Mock private lateinit var mockAppInstallStore: AppInstallStore
 
-    @Mock
-    private lateinit var mockActivity: FragmentActivity
+    @Mock private lateinit var mockActivity: FragmentActivity
 
-    @Mock
-    private lateinit var mockResources: Resources
+    @Mock private lateinit var mockResources: Resources
 
     @Before
     fun before() {
@@ -66,19 +62,22 @@ class CtaTest {
 
     @Test
     fun whenCtaIsSurveyReturnEmptyOkParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        val testee =
+            HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
         assertTrue(testee.pixelOkParameters().isEmpty())
     }
 
     @Test
     fun whenCtaIsSurveyReturnEmptyCancelParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        val testee =
+            HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
         assertTrue(testee.pixelCancelParameters().isEmpty())
     }
 
     @Test
     fun whenCtaIsSurveyReturnEmptyShownParameters() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
+        val testee =
+            HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
@@ -165,7 +164,8 @@ class CtaTest {
     @Test
     fun whenAddCtaToHistoryOnDay3ThenReturnCorrectValue() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
 
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         val value = testee.addCtaToHistory("test")
@@ -175,7 +175,8 @@ class CtaTest {
     @Test
     fun whenAddCtaToHistoryOnDay4ThenReturn3AsDayValue() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(4))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(4))
 
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         val value = testee.addCtaToHistory("test")
@@ -186,7 +187,8 @@ class CtaTest {
     fun whenAddCtaToHistoryContainsHistoryThenConcatenateNewValue() {
         val ctaHistory = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(ctaHistory)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         val value = testee.addCtaToHistory("test")
@@ -199,7 +201,8 @@ class CtaTest {
     fun whenCtaIsBubbleTypeThenConcatenateJourneyStoredValueInPixel() {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
@@ -259,7 +262,8 @@ class CtaTest {
     fun whenCtaIsDialogTypeThenConcatenateJourneyStoredValueInPixel() {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         val testee = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
@@ -269,13 +273,15 @@ class CtaTest {
 
     @Test
     fun whenMoreThanTwoTrackersBlockedReturnFirstTwoWithMultipleString() {
-        val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Other", "Other", 9.0),
-            TestEntity("Amazon", "Amazon", 9.0)
-        )
+        val trackers =
+            listOf(
+                TestEntity("Facebook", "Facebook", 9.0),
+                TestEntity("Other", "Other", 9.0),
+                TestEntity("Amazon", "Amazon", 9.0))
 
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook, Other</b>withMultiple", value)
@@ -283,12 +289,12 @@ class CtaTest {
 
     @Test
     fun whenTwoTrackersBlockedReturnThemWithZeroString() {
-        val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Other", "Other", 9.0)
-        )
+        val trackers =
+            listOf(TestEntity("Facebook", "Facebook", 9.0), TestEntity("Other", "Other", 9.0))
 
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook, Other</b>withZero", value)
@@ -296,14 +302,30 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    "facebook.com",
+                    "facebook.com",
+                    blocked = true,
+                    entity = TestEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null),
+                TrackingEvent(
+                    "other.com",
+                    "other.com",
+                    blocked = true,
+                    entity = TestEntity("Other", "Other", 9.0),
+                    categories = null,
+                    surrogateId = null))
         val site = site(events = trackers)
 
         val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackingEntities(),
+                "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Other, Facebook</b>withZero", value)
@@ -311,14 +333,30 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null, surrogateId = null)
-        )
+        val trackers =
+            listOf(
+                TrackingEvent(
+                    "facebook.com",
+                    "facebook.com",
+                    blocked = true,
+                    entity = TestEntity("Facebook", "Facebook", 3.0),
+                    categories = null,
+                    surrogateId = null),
+                TrackingEvent(
+                    "other.com",
+                    "other.com",
+                    blocked = true,
+                    entity = TestEntity("Other", "", 9.0),
+                    categories = null,
+                    surrogateId = null))
         val site = site(events = trackers)
 
         val testee =
-            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore,
+                mockAppInstallStore,
+                site.orderedTrackingEntities(),
+                "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -326,13 +364,15 @@ class CtaTest {
 
     @Test
     fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithZeroString() {
-        val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Facebook", "Facebook", 9.0)
-        )
+        val trackers =
+            listOf(
+                TestEntity("Facebook", "Facebook", 9.0),
+                TestEntity("Facebook", "Facebook", 9.0),
+                TestEntity("Facebook", "Facebook", 9.0))
 
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(
+                mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -342,7 +382,8 @@ class CtaTest {
     fun whenTryClearDataCtaShownThenConcatenateJourneyStoredValueInPixel() {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         val testee = DaxFireDialogCta.TryClearDataCta(mockOnboardingStore, mockAppInstallStore)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 

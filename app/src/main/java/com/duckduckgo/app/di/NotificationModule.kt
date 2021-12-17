@@ -93,15 +93,15 @@ class NotificationModule {
         privacyProtectionNotification: PrivacyProtectionNotification
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
-            workManager,
-            clearDataNotification,
-            privacyProtectionNotification
-        )
+            workManager, clearDataNotification, privacyProtectionNotification)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesNotificationFactory(context: Context, manager: NotificationManagerCompat): NotificationFactory {
+    fun providesNotificationFactory(
+        context: Context,
+        manager: NotificationManagerCompat
+    ): NotificationFactory {
         return NotificationFactory(context, manager)
     }
 
@@ -125,5 +125,4 @@ class NotificationModule {
     ): AppTPWaitlistCodeNotification {
         return AppTPWaitlistCodeNotification(context, notificationDao, dataStore)
     }
-
 }

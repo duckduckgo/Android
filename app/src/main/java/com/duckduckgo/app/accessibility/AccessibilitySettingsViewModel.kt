@@ -22,16 +22,15 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
 
-class AccessibilitySettingsViewModel constructor(
-    private val accessibilitySettings: AccessibilitySettingsDataStore
-) : ViewModel() {
+class AccessibilitySettingsViewModel
+constructor(private val accessibilitySettings: AccessibilitySettingsDataStore) : ViewModel() {
 
     data class ViewState(
         val overrideSystemFontSize: Boolean = false,
@@ -46,12 +45,11 @@ class AccessibilitySettingsViewModel constructor(
     fun start() {
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
-                    appFontSize = accessibilitySettings.appFontSize,
-                    forceZoom = accessibilitySettings.forceZoom
-                )
-            )
+                currentViewState()
+                    .copy(
+                        overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
+                        appFontSize = accessibilitySettings.appFontSize,
+                        forceZoom = accessibilitySettings.forceZoom))
         }
     }
 
@@ -59,11 +57,7 @@ class AccessibilitySettingsViewModel constructor(
         Timber.v("AccessibilityActSettings: onForceZoomChanged $checked")
         accessibilitySettings.forceZoom = checked
         viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    forceZoom = accessibilitySettings.forceZoom
-                )
-            )
+            viewState.emit(currentViewState().copy(forceZoom = accessibilitySettings.forceZoom))
         }
     }
 
@@ -72,10 +66,8 @@ class AccessibilitySettingsViewModel constructor(
         accessibilitySettings.overrideSystemFontSize = checked
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize
-                )
-            )
+                currentViewState()
+                    .copy(overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize))
         }
     }
 
@@ -83,11 +75,7 @@ class AccessibilitySettingsViewModel constructor(
         Timber.v("AccessibilityActSettings: onFontSizeChanged $newValue")
         accessibilitySettings.appFontSize = newValue
         viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    appFontSize = accessibilitySettings.appFontSize
-                )
-            )
+            viewState.emit(currentViewState().copy(appFontSize = accessibilitySettings.appFontSize))
         }
     }
 
@@ -95,13 +83,16 @@ class AccessibilitySettingsViewModel constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class AccessibilitySettingsViewModelFactory @Inject constructor(
+class AccessibilitySettingsViewModelFactory
+@Inject
+constructor(
     private val accessibilitySettings: Provider<AccessibilitySettingsDataStore>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AccessibilitySettingsViewModel::class.java) -> (AccessibilitySettingsViewModel(accessibilitySettings.get()) as T)
+                isAssignableFrom(AccessibilitySettingsViewModel::class.java) ->
+                    (AccessibilitySettingsViewModel(accessibilitySettings.get()) as T)
                 else -> null
             }
         }

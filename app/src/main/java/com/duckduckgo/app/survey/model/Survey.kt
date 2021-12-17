@@ -21,9 +21,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.io.Serializable
 
-@Entity(
-    tableName = "survey"
-)
+@Entity(tableName = "survey")
 data class Survey(
     @PrimaryKey val surveyId: String,
     val url: String?,

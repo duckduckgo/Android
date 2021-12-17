@@ -26,13 +26,15 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
-class FavoritesObserver @Inject constructor(
+class FavoritesObserver
+@Inject
+constructor(
     private val context: Context,
     private val favoritesRepository: FavoritesRepository,
     private val appCoroutineScope: CoroutineScope
@@ -45,8 +47,10 @@ class FavoritesObserver @Inject constructor(
     fun notifyWidgets() {
         appCoroutineScope.launch {
             favoritesRepository.favorites().collect {
-                instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
-                instance.notifyAppWidgetViewDataChanged(instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
+                instance.notifyAppWidgetViewDataChanged(
+                    instance.getAppWidgetIds(componentName), R.id.favoritesGrid)
+                instance.notifyAppWidgetViewDataChanged(
+                    instance.getAppWidgetIds(componentName), R.id.emptyfavoritesGrid)
             }
         }
     }

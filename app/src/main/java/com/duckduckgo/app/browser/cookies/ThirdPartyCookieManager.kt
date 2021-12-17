@@ -64,7 +64,8 @@ class AppThirdPartyCookieManager(
     }
 
     private suspend fun deleteHost(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity) {
-        if (hostsThatAlwaysRequireThirdPartyCookies.contains(authCookieAllowedDomainEntity.domain)) return
+        if (hostsThatAlwaysRequireThirdPartyCookies.contains(authCookieAllowedDomainEntity.domain))
+            return
         authCookiesAllowedDomainsRepository.removeDomain(authCookieAllowedDomainEntity)
     }
 
@@ -73,9 +74,7 @@ class AppThirdPartyCookieManager(
         val accessType = uri.getQueryParameter(RESPONSE_TYPE)
         ssDomain?.let {
             if (accessType?.contains(CODE) == false) {
-                ssDomain.toUri().host?.let {
-                    authCookiesAllowedDomainsRepository.addDomain(it)
-                }
+                ssDomain.toUri().host?.let { authCookiesAllowedDomainsRepository.addDomain(it) }
             }
         }
     }
@@ -86,7 +85,8 @@ class AppThirdPartyCookieManager(
         } != null
     }
 
-    // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below values
+    // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below
+    // values
     companion object {
         private const val SS_DOMAIN = "ss_domain"
         private const val RESPONSE_TYPE = "response_type"

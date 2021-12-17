@@ -23,24 +23,24 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
 import com.duckduckgo.app.runBlocking
 import junit.framework.Assert.*
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class AccessibilitySettingsSharedPreferencesTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val testee = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+    private val testee =
+        AccessibilitySettingsSharedPreferences(
+            context, coroutineRule.testDispatcherProvider, TestCoroutineScope())
 
     @After
     fun after() {
@@ -105,36 +105,40 @@ class AccessibilitySettingsSharedPreferencesTest {
     }
 
     @Test
-    fun whenValuesChangedThenNewChangesEmitted() = coroutineRule.runBlocking {
-        var accessibilitySetting = AccessibilitySettings(false, 100f, false)
+    fun whenValuesChangedThenNewChangesEmitted() =
+        coroutineRule.runBlocking {
+            var accessibilitySetting = AccessibilitySettings(false, 100f, false)
 
-        testee.settingsFlow().test {
-            assertEquals(accessibilitySetting, awaitItem())
+            testee.settingsFlow().test {
+                assertEquals(accessibilitySetting, awaitItem())
 
-            testee.overrideSystemFontSize = true
-            accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = true)
-            assertEquals(accessibilitySetting, awaitItem())
+                testee.overrideSystemFontSize = true
+                accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = true)
+                assertEquals(accessibilitySetting, awaitItem())
 
-            testee.appFontSize = 150f
-            accessibilitySetting = accessibilitySetting.copy(fontSize = 140f)
-            assertEquals(accessibilitySetting, awaitItem())
+                testee.appFontSize = 150f
+                accessibilitySetting = accessibilitySetting.copy(fontSize = 140f)
+                assertEquals(accessibilitySetting, awaitItem())
 
-            testee.forceZoom = true
-            accessibilitySetting = accessibilitySetting.copy(forceZoom = true)
-            assertEquals(accessibilitySetting, awaitItem())
+                testee.forceZoom = true
+                accessibilitySetting = accessibilitySetting.copy(forceZoom = true)
+                assertEquals(accessibilitySetting, awaitItem())
 
-            testee.overrideSystemFontSize = false
-            accessibilitySetting = accessibilitySetting.copy(overrideSystemFontSize = false, fontSize = 100f)
-            assertEquals(accessibilitySetting, awaitItem())
+                testee.overrideSystemFontSize = false
+                accessibilitySetting =
+                    accessibilitySetting.copy(overrideSystemFontSize = false, fontSize = 100f)
+                assertEquals(accessibilitySetting, awaitItem())
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     private fun systemFontSize() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
 
     private fun clearSharedPrefs() {
-        val prefs = context.getSharedPreferences(AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+        val prefs =
+            context.getSharedPreferences(
+                AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
         prefs.edit().clear().commit()
     }
 }

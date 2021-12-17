@@ -30,30 +30,22 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
-import javax.inject.Inject
 
 interface CohortStore {
-    /**
-     * @return the stored cohort local date or [null] if never set
-     */
+    /** @return the stored cohort local date or [null] if never set */
     fun getCohortStoredLocalDate(): LocalDate?
 
-    /**
-     * Stores the cohort [LocalDate] passed as parameter
-     */
+    /** Stores the cohort [LocalDate] passed as parameter */
     fun setCohortLocalDate(localDate: LocalDate)
 }
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = CohortStore::class
-)
-class RealCohortStore @Inject constructor(
-    private val context: Context
-) : CohortStore, VpnServiceCallbacks {
+@ContributesBinding(scope = AppScope::class, boundType = CohortStore::class)
+class RealCohortStore @Inject constructor(private val context: Context) :
+    CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -62,9 +54,7 @@ class RealCohortStore @Inject constructor(
         get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
 
     override fun getCohortStoredLocalDate(): LocalDate? {
-        return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {
-            LocalDate.parse(it)
-        }
+        return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let { LocalDate.parse(it) }
     }
 
     override fun setCohortLocalDate(localDate: LocalDate) {
@@ -73,7 +63,9 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         // skip if already stored
-        getCohortStoredLocalDate()?.let { return }
+        getCohortStoredLocalDate()?.let {
+            return
+        }
 
         setCohortLocalDate(LocalDate.now())
     }

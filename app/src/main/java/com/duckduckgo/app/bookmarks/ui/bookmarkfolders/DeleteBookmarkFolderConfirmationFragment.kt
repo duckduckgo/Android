@@ -39,7 +39,10 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
         AlertDialog.Builder(requireContext())
             .setMessage(getMessageString())
             .setTitle(R.string.delete)
-            .setPositiveButton(R.string.delete) { _, _ -> listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder) }
+            .setPositiveButton(R.string.delete) { _, _ ->
+                listener?.onBookmarkFolderDeleted(
+                    arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder)
+            }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .create()
 
@@ -47,8 +50,19 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
         val bookmarkFolder = arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder
         val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
         val message = getString(R.string.bookmarkFolderDeleteDialogMessage)
-        val string = SpannableString(resources.getQuantityString(R.plurals.bookmarkFolderDeleteDialogMessage, totalItems, message, bookmarkFolder.name, totalItems))
-        string.setSpan(StyleSpan(Typeface.BOLD), message.length, message.length + bookmarkFolder.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val string =
+            SpannableString(
+                resources.getQuantityString(
+                    R.plurals.bookmarkFolderDeleteDialogMessage,
+                    totalItems,
+                    message,
+                    bookmarkFolder.name,
+                    totalItems))
+        string.setSpan(
+            StyleSpan(Typeface.BOLD),
+            message.length,
+            message.length + bookmarkFolder.name.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return string
     }
 

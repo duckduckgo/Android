@@ -19,10 +19,10 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.SpannedString
-import android.text.Annotation
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -55,9 +55,7 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
 
     private fun bindViews() {
         close = findViewById(R.id.onboarding_close)
-        close.setOnClickListener {
-            close()
-        }
+        close.setOnClickListener { close() }
         deviceShieldActivityCta = findViewById(R.id.onboarding_enabled_activity_cta)
         deviceShieldActivityCta.setOnClickListener {
             startActivity(DeviceShieldTrackerActivity.intent(this))
@@ -68,11 +66,12 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
         val fullText = getText(R.string.atp_EnabledSettings) as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                finish()
+        val clickableSpan =
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    finish()
+                }
             }
-        }
 
         annotations?.find { it.value == "settings_link" }?.let {
             spannableString.apply {
@@ -80,16 +79,14 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
                     clickableSpan,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue)
-                    ),
+                        ContextCompat.getColor(
+                            baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    0
-                )
+                    0)
             }
         }
         settingsCta.apply {
@@ -102,15 +99,26 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
 
     private fun launchKonfetti() {
 
-        val magenta = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.magenta, null)
-        val blue = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.accentBlue, null)
-        val purple = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.purple, null)
-        val green = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.green, null)
-        val yellow = ResourcesCompat.getColor(getResources(), com.duckduckgo.mobile.android.R.color.yellow, null)
+        val magenta =
+            ResourcesCompat.getColor(
+                getResources(), com.duckduckgo.mobile.android.R.color.magenta, null)
+        val blue =
+            ResourcesCompat.getColor(
+                getResources(), com.duckduckgo.mobile.android.R.color.accentBlue, null)
+        val purple =
+            ResourcesCompat.getColor(
+                getResources(), com.duckduckgo.mobile.android.R.color.purple, null)
+        val green =
+            ResourcesCompat.getColor(
+                getResources(), com.duckduckgo.mobile.android.R.color.green, null)
+        val yellow =
+            ResourcesCompat.getColor(
+                getResources(), com.duckduckgo.mobile.android.R.color.yellow, null)
 
         val displayWidth = resources.displayMetrics.widthPixels
 
-        viewKonfetti.build()
+        viewKonfetti
+            .build()
             .addColors(magenta, blue, purple, green, yellow)
             .setDirection(0.0, 359.0)
             .setSpeed(1f, 5f)

@@ -31,6 +31,10 @@ import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.moshi.Moshi
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -43,10 +47,6 @@ import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.util.concurrent.TimeUnit
 
 class StatisticsRequesterJsonTest {
 
@@ -58,24 +58,26 @@ class StatisticsRequesterJsonTest {
 
     private val server = MockWebServer()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
     @Before
     fun before() {
         configureStubNetworking()
 
-        statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+        statisticsStore =
+            StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
-                return listOf()
+        val plugins =
+            object : PluginPoint<RefreshRetentionAtbPlugin> {
+                override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+                    return listOf()
+                }
             }
-        }
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins)
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        testee =
+            StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins)
+        whenever(mockVariantManager.getVariant())
+            .thenReturn(Variant("ma", 100.0, filterBy = { true }))
     }
 
     @After
@@ -301,11 +303,14 @@ class StatisticsRequesterJsonTest {
     }
 
     /**
-     * Should there be an issue obtaining the request, this will avoid the tests stalling indefinitely.
+     * Should there be an issue obtaining the request, this will avoid the tests stalling
+     * indefinitely.
      *
-     * If it takes more than the specified time to obtain the request, it's probably a developer error in configuring the test.
+     * If it takes more than the specified time to obtain the request, it's probably a developer
+     * error in configuring the test.
      *
-     * However, it has been observed that the request could stall indefinitely when working with a device with Charles proxy configured.
+     * However, it has been observed that the request could stall indefinitely when working with a
+     * device with Charles proxy configured.
      */
     private fun takeRequestImmediately() = server.takeRequest(100, TimeUnit.MILLISECONDS)
 
@@ -315,18 +320,15 @@ class StatisticsRequesterJsonTest {
     }
 
     private fun queueResponseFromFile(filename: String, responseCode: Int = 200) {
-        val response = MockResponse()
-            .setBody(loadText("$JSON_DIR/$filename"))
-            .setResponseCode(responseCode)
+        val response =
+            MockResponse().setBody(loadText("$JSON_DIR/$filename")).setResponseCode(responseCode)
 
         queueResponse(response)
     }
 
     @Suppress("SameParameterValue")
     private fun queueResponseFromString(responseBody: String, responseCode: Int = 200) {
-        val response = MockResponse()
-            .setBody(responseBody)
-            .setResponseCode(responseCode)
+        val response = MockResponse().setBody(responseBody).setResponseCode(responseCode)
 
         queueResponse(response)
     }
@@ -340,16 +342,21 @@ class StatisticsRequesterJsonTest {
     private fun configureStubNetworking() {
         server.start()
 
-        val okHttpClient = OkHttpClient.Builder()
-            .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(InetAddress.getLocalHost(), server.port)))
-            .build()
+        val okHttpClient =
+            OkHttpClient.Builder()
+                .proxy(
+                    Proxy(
+                        Proxy.Type.HTTP,
+                        InetSocketAddress(InetAddress.getLocalHost(), server.port)))
+                .build()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(server.url("localhost/").toString())
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
-            .build()
+        val retrofit =
+            Retrofit.Builder()
+                .baseUrl(server.url("localhost/").toString())
+                .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
+                .build()
 
         statisticsService = retrofit.create(StatisticsService::class.java)
     }

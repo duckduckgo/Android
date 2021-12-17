@@ -17,14 +17,16 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.TlsMessageDetector.Companion.CONTENT_TYPE_APPLICATION
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface ContentTypeExtractor {
     fun isTlsApplicationData(bytes: ByteArray): TlsContentType
 }
 
-class TlsContentTypeExtractor @Inject constructor(private val tlsMessageDetector: TlsMessageDetector) : ContentTypeExtractor {
+class TlsContentTypeExtractor
+@Inject
+constructor(private val tlsMessageDetector: TlsMessageDetector) : ContentTypeExtractor {
 
     override fun isTlsApplicationData(bytes: ByteArray): TlsContentType {
 
@@ -38,11 +40,11 @@ class TlsContentTypeExtractor @Inject constructor(private val tlsMessageDetector
             Timber.w(t, "Failed to extract TLS content type")
             return TlsContentType.Undetermined
         }
-
     }
 
     private fun extractContentType(packet: ByteArray): TlsContentType {
-        return if (packet[0].toInt() == CONTENT_TYPE_APPLICATION) TlsContentType.TlsApplicationData else TlsContentType.NotApplicationData
+        return if (packet[0].toInt() == CONTENT_TYPE_APPLICATION) TlsContentType.TlsApplicationData
+        else TlsContentType.NotApplicationData
     }
 }
 

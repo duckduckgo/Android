@@ -28,18 +28,16 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class DeviceShieldActivityFeedFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var trackerFeedAdapter: TrackerFeedAdapter
+    @Inject lateinit var trackerFeedAdapter: TrackerFeedAdapter
 
     private val activityFeedViewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
 
@@ -47,30 +45,41 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     private var feedListener: DeviceShieldActivityFeedListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
-            layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+            layoutManager =
+                StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(
+                    this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
         }
 
         lifecycleScope.launch {
-            activityFeedViewModel.getMostRecentTrackers(
-                DeviceShieldActivityFeedViewModel.TimeWindow(
-                    config.timeWindow.toLong(),
-                    config.timeWindowUnits
-                ),
-                config.showTimeWindowHeadings
-            )
+            activityFeedViewModel
+                .getMostRecentTrackers(
+                    DeviceShieldActivityFeedViewModel.TimeWindow(
+                        config.timeWindow.toLong(), config.timeWindowUnits),
+                    config.showTimeWindowHeadings)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect { it ->
                     feedListener?.onTrackerListShowed(it.size)
-                    trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        startActivity(AppTPCompanyTrackersActivity.intent(requireContext(), trackerFeedData.trackingApp.packageId, trackerFeedData.trackingApp.appDisplayName, trackerFeedData.bucket))
+                    trackerFeedAdapter.updateData(
+                        if (config.unboundedRows()) it else it.take(config.maxRows)) {
+                        trackerFeedData ->
+                        startActivity(
+                            AppTPCompanyTrackersActivity.intent(
+                                requireContext(),
+                                trackerFeedData.trackingApp.packageId,
+                                trackerFeedData.trackingApp.appDisplayName,
+                                trackerFeedData.bucket))
                     }
                 }
         }
@@ -89,20 +98,20 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         feedListener = null
     }
 
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 
     companion object {
-        private val defaultConfig = ActivityFeedConfig(
-            maxRows = Int.MAX_VALUE,
-            timeWindow = 5,
-            timeWindowUnits = TimeUnit.DAYS,
-            showTimeWindowHeadings = true
-        )
+        private val defaultConfig =
+            ActivityFeedConfig(
+                maxRows = Int.MAX_VALUE,
+                timeWindow = 5,
+                timeWindowUnits = TimeUnit.DAYS,
+                showTimeWindowHeadings = true)
 
         fun newInstance(config: ActivityFeedConfig): DeviceShieldActivityFeedFragment {
-            return DeviceShieldActivityFeedFragment().apply {
-                this.config = config
-            }
+            return DeviceShieldActivityFeedFragment().apply { this.config = config }
         }
     }
 
@@ -118,5 +127,4 @@ class DeviceShieldActivityFeedFragment : Fragment() {
     interface DeviceShieldActivityFeedListener {
         fun onTrackerListShowed(totalTrackers: Int)
     }
-
 }

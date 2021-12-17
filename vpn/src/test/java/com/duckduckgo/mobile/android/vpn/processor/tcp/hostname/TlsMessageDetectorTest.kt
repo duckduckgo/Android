@@ -62,9 +62,14 @@ class TlsMessageDetectorTest {
     private fun emptyByteArray() = ByteArray(0)
     private fun invalidTslByteArray() = ByteArray(1).also { it[0] = 50 }
 
-    private fun cipherChangeByteArray() = ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_CHANGE_CIPHER_SPEC.toByte() }
-    private fun alertByteArray() = ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_ALERT.toByte() }
-    private fun handshakeByteArray() = ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_HANDSHAKE.toByte() }
-    private fun applicationByteArray() = ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_APPLICATION.toByte() }
-    private fun heartbeatByteArray() = ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_HEARTBEAT.toByte() }
+    private fun cipherChangeByteArray() =
+        ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_CHANGE_CIPHER_SPEC.toByte() }
+    private fun alertByteArray() =
+        ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_ALERT.toByte() }
+    private fun handshakeByteArray() =
+        ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_HANDSHAKE.toByte() }
+    private fun applicationByteArray() =
+        ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_APPLICATION.toByte() }
+    private fun heartbeatByteArray() =
+        ByteArray(1).also { it[0] = TlsMessageDetector.CONTENT_TYPE_HEARTBEAT.toByte() }
 }

@@ -24,38 +24,34 @@ import kotlinx.coroutines.flow.SharedFlow
 
 interface TabRepository {
 
-    /**
-     * @return the tabs that are NOT marked as deletable in the DB
-     */
+    /** @return the tabs that are NOT marked as deletable in the DB */
     val liveTabs: LiveData<List<TabEntity>>
 
     val flowTabs: Flow<List<TabEntity>>
 
     val childClosedTabs: SharedFlow<String>
 
-    /**
-     * @return the tabs that are marked as "deletable" in the DB
-     */
+    /** @return the tabs that are marked as "deletable" in the DB */
     val flowDeletableTabs: Flow<List<TabEntity>>
 
     val liveSelectedTab: LiveData<TabEntity>
 
-    /**
-     * @return tabId of new record
-     */
+    /** @return tabId of new record */
     suspend fun add(url: String? = null, skipHome: Boolean = false): String
 
     suspend fun addDefaultTab(): String
 
-    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, sourceTabId: String): String
+    suspend fun addFromSourceTab(
+        url: String? = null,
+        skipHome: Boolean = false,
+        sourceTabId: String
+    ): String
 
     suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
     suspend fun update(tabId: String, site: Site?)
 
-    /**
-     * @return record if it exists, otherwise a new one
-     */
+    /** @return record if it exists, otherwise a new one */
     fun retrieveSiteData(tabId: String): MutableLiveData<Site>
 
     suspend fun delete(tab: TabEntity)
@@ -64,9 +60,7 @@ interface TabRepository {
 
     suspend fun undoDeletable(tab: TabEntity)
 
-    /**
-     * Deletes from the DB all tabs that are marked as "deletable"
-     */
+    /** Deletes from the DB all tabs that are marked as "deletable" */
     suspend fun purgeDeletableTabs()
 
     suspend fun deleteTabAndSelectSource(tabId: String)

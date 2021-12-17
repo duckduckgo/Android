@@ -40,7 +40,9 @@ class FavoritesAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : ListAdapter<FavoritesAdapter.FavoriteItemTypes, FavoritesScreenViewHolders>(FavoritesDiffCallback()) {
+) :
+    ListAdapter<FavoritesAdapter.FavoriteItemTypes, FavoritesScreenViewHolders>(
+        FavoritesDiffCallback()) {
 
     companion object {
         const val FAVORITE_SECTION_TITLE_TYPE = 0
@@ -68,7 +70,8 @@ class FavoritesAdapter(
         return when (viewType) {
             FAVORITE_TYPE -> {
                 val binding = ViewSavedSiteEntryBinding.inflate(inflater, parent, false)
-                return FavoritesScreenViewHolders.FavoriteViewHolder(layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
+                return FavoritesScreenViewHolders.FavoriteViewHolder(
+                    layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
                 val binding = ViewSavedSiteSectionTitleBinding.inflate(inflater, parent, false)
@@ -117,13 +120,15 @@ class FavoritesAdapter(
 
 sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) : FavoritesScreenViewHolders(binding.root) {
+    class SectionTitle(private val binding: ViewSavedSiteSectionTitleBinding) :
+        FavoritesScreenViewHolders(binding.root) {
         fun bind() {
             binding.savedSiteSectionTitle.setText(R.string.favoritesSectionTitle)
         }
     }
 
-    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : FavoritesScreenViewHolders(binding.root) {
+    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) :
+        FavoritesScreenViewHolders(binding.root) {
         fun bind() {
             binding.savedSiteEmptyHint.setText(R.string.favoritesEmptyHint)
         }
@@ -145,28 +150,21 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             this.favorite = favorite
 
             listItem.setContentDescription(
-                context.getString(
-                    R.string.bookmarkOverflowContentDescription,
-                    favorite.title
-                )
-            )
+                context.getString(R.string.bookmarkOverflowContentDescription, favorite.title))
 
             listItem.setTitle(favorite.title)
             listItem.setSubtitle(parseDisplayUrl(favorite.url))
             loadFavicon(favorite.url)
 
-            listItem.setOverflowClickListener { anchor ->
-                showOverFlowMenu(anchor, favorite)
-            }
+            listItem.setOverflowClickListener { anchor -> showOverFlowMenu(anchor, favorite) }
 
-            listItem.setClickListener {
-                viewModel.onSelected(favorite)
-            }
+            listItem.setClickListener { viewModel.onSelected(favorite) }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = itemView.findViewById(R.id.image))
             }
         }
 

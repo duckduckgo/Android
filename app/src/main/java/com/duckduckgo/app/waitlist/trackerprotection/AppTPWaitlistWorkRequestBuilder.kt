@@ -42,9 +42,10 @@ interface AppTPWaitlistWorkRequestBuilder {
 class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistWorkRequestBuilder {
 
     override fun waitlistRequestWork(withBigDelay: Boolean): OneTimeWorkRequest {
-        val requestBuilder = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>()
-            .setConstraints(networkAvailable())
-            .addTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
+        val requestBuilder =
+            OneTimeWorkRequestBuilder<AppTPWaitlistWorker>()
+                .setConstraints(networkAvailable())
+                .addTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
 
         if (withBigDelay) {
             requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
@@ -55,28 +56,27 @@ class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistW
         return requestBuilder.build()
     }
 
-    private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    private fun networkAvailable() =
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }
 
-class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(context, workerParams) {
 
-    @Inject
-    lateinit var waitlistManager: TrackingProtectionWaitlistManager
+    @Inject lateinit var waitlistManager: TrackingProtectionWaitlistManager
 
-    @Inject
-    lateinit var notificationSender: NotificationSender
+    @Inject lateinit var notificationSender: NotificationSender
 
-    @Inject
-    lateinit var notification: AppTPWaitlistCodeNotification
+    @Inject lateinit var notification: AppTPWaitlistCodeNotification
 
-    @Inject
-    lateinit var workRequestBuilder: AppTPWaitlistWorkRequestBuilder
+    @Inject lateinit var workRequestBuilder: AppTPWaitlistWorkRequestBuilder
 
     override suspend fun doWork(): Result {
         when (waitlistManager.fetchInviteCode()) {
             FetchCodeResult.CodeExisted -> Result.success()
             FetchCodeResult.Code -> notificationSender.sendNotification(notification)
-            FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(workRequestBuilder.waitlistRequestWork())
+            FetchCodeResult.NoCode ->
+                WorkManager.getInstance(context).enqueue(workRequestBuilder.waitlistRequestWork())
         }
 
         return Result.success()
@@ -84,7 +84,9 @@ class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerPara
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
+class AppConfigurationWorkerInjectorPlugin
+@Inject
+constructor(
     private val waitlistManager: TrackingProtectionWaitlistManager,
     private val notificationSender: NotificationSender,
     private val notification: AppTPWaitlistCodeNotification,

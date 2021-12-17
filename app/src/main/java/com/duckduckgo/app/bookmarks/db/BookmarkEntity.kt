@@ -22,9 +22,9 @@ import androidx.room.PrimaryKey
 /**
  * If this is modified, please consider the following instructions carefully:
  *
- * Every time  we change BookmarkEntity we also need to check (and probably change)
- * @property com.duckduckgo.app.global.db.MigrationsProvider.BOOKMARKS_DB_ON_CREATE
- * which is located in AppDatabase.kt
+ * Every time we change BookmarkEntity we also need to check (and probably change)
+ * @property com.duckduckgo.app.global.db.MigrationsProvider.BOOKMARKS_DB_ON_CREATE which is located
+ * in AppDatabase.kt
  */
 @Entity(tableName = "bookmarks")
 data class BookmarkEntity(

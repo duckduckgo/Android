@@ -24,7 +24,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class DeviceShieldRetentionPixelSender @Inject constructor(
+class DeviceShieldRetentionPixelSender
+@Inject
+constructor(
     private val context: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : RefreshRetentionAtbPlugin {

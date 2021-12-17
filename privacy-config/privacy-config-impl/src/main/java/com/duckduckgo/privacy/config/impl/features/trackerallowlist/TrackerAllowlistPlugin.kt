@@ -19,17 +19,19 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class TrackerAllowlistPlugin @Inject constructor(
+class TrackerAllowlistPlugin
+@Inject
+constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {

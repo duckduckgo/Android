@@ -32,8 +32,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ShortcutReceiverTest {
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private val mockPixel: Pixel = mock()
     private lateinit var testee: ShortcutReceiver
@@ -41,7 +40,9 @@ class ShortcutReceiverTest {
     @Before
     fun before() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        testee = ShortcutReceiver(context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
+        testee =
+            ShortcutReceiver(
+                context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
     }
 
     @Test

@@ -37,7 +37,11 @@ import com.duckduckgo.mobile.android.ui.view.showKeyboard
 class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyleAttr: Int
+    ) : super(context, attrs, defStyleAttr)
 
     private var didSelectQueryFirstTime = false
 
@@ -86,19 +90,18 @@ class KeyboardAwareEditText : AppCompatEditText {
         }
     }
 
-    /**
-     * Overrides to paste clip data without rich text formatting.
-     */
-    override fun onTextContextMenuItem(id: Int): Boolean = when (id) {
-        android.R.id.paste ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
-            } else {
-                context.getClipboardManager().convertClipToPlainText()
-                super.onTextContextMenuItem(id)
-            }
-        else -> super.onTextContextMenuItem(id)
-    }
+    /** Overrides to paste clip data without rich text formatting. */
+    override fun onTextContextMenuItem(id: Int): Boolean =
+        when (id) {
+            android.R.id.paste ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
+                } else {
+                    context.getClipboardManager().convertClipToPlainText()
+                    super.onTextContextMenuItem(id)
+                }
+            else -> super.onTextContextMenuItem(id)
+        }
 
     private fun Context.getClipboardManager(): ClipboardManager =
         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

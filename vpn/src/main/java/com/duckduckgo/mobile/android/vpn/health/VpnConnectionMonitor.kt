@@ -24,42 +24,44 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.net.NetworkInterface
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
-class VpnConnectionMonitor @Inject constructor(
-    private val context: Context,
-    private val deviceShieldPixels: DeviceShieldPixels
-) : VpnServiceCallbacks {
+class VpnConnectionMonitor
+@Inject
+constructor(private val context: Context, private val deviceShieldPixels: DeviceShieldPixels) :
+    VpnServiceCallbacks {
 
     private var job: Job? = null
     private val isRunning = AtomicBoolean(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job?.cancel()
-        job = coroutineScope.launch {
-            isRunning.set(true)
-            Timber.v("TUN monitor: STARTED")
-            while (isRunning.get()) {
-                if (!isTunInterfaceUp()) {
-                    Timber.e("TUN monitor: interface seems to be down!...restarting VPN")
-                    deviceShieldPixels.vpnTunInterfaceIsDown()
-                    TrackerBlockingVpnService.restartVpnService(context)
+        job =
+            coroutineScope.launch {
+                isRunning.set(true)
+                Timber.v("TUN monitor: STARTED")
+                while (isRunning.get()) {
+                    if (!isTunInterfaceUp()) {
+                        Timber.e("TUN monitor: interface seems to be down!...restarting VPN")
+                        deviceShieldPixels.vpnTunInterfaceIsDown()
+                        TrackerBlockingVpnService.restartVpnService(context)
+                    }
+                    delay(TimeUnit.SECONDS.toMillis(10))
                 }
-                delay(TimeUnit.SECONDS.toMillis(10))
             }
-        }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         when (vpnStopReason) {
-            VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("TUN monitor: VPN stopped due to error or revoked")
+            VpnStopReason.Error, VpnStopReason.Revoked ->
+                Timber.v("TUN monitor: VPN stopped due to error or revoked")
             VpnStopReason.SelfStop -> {
                 Timber.v("TUN monitor: STOPPED")
                 job?.cancel()

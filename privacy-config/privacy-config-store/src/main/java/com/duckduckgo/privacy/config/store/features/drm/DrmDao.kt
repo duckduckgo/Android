@@ -35,9 +35,7 @@ abstract class DrmDao {
         insertAll(domains)
     }
 
-    @Query("select * from drm_exceptions")
-    abstract fun getAll(): List<DrmExceptionEntity>
+    @Query("select * from drm_exceptions") abstract fun getAll(): List<DrmExceptionEntity>
 
-    @Query("delete from drm_exceptions")
-    abstract fun deleteAll()
+    @Query("delete from drm_exceptions") abstract fun deleteAll()
 }

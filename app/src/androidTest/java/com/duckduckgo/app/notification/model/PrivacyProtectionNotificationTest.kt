@@ -44,14 +44,16 @@ class PrivacyProtectionNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(false)
-        assertTrue(testee.canShow())
-    }
+    fun whenNotificationNotSeenThenCanShowIsTrue() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(false)
+            assertTrue(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(true)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(true)
+            assertFalse(testee.canShow())
+        }
 }

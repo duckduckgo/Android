@@ -30,14 +30,16 @@ import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(AppScope::class)
-class TrackerDataLoader @Inject constructor(
+class TrackerDataLoader
+@Inject
+constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val trackerDetector: TrackerDetector,
     private val tdsTrackerDao: TdsTrackerDao,
@@ -69,7 +71,8 @@ class TrackerDataLoader @Inject constructor(
 
     private fun updateTdsFromFile() {
         Timber.d("Updating tds from file")
-        val json = context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
+        val json =
+            context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
         val adapter = moshi.adapter(TdsJson::class.java)
         persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
     }

@@ -29,14 +29,11 @@ class DefaultBrowserObserverTest {
 
     private lateinit var testee: DefaultBrowserObserver
 
-    @Mock
-    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+    @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
+    @Mock private lateinit var mockAppInstallStore: AppInstallStore
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    @Mock private lateinit var mockPixel: Pixel
 
     @Before
     fun setup() {
@@ -48,9 +45,8 @@ class DefaultBrowserObserverTest {
     fun whenDDGIsDefaultBrowserIfItWasNotBeforeThenFireSetPixel() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString()
-        )
+        val params =
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString())
 
         testee.onApplicationResumed()
 

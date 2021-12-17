@@ -39,8 +39,8 @@ class VpnAppModule {
     }
 
     /**
-     * TODO this class should also not be needed in the AppScope.
-     * It is needed because the DaggerWorkerFactory is not modular. Easy to fix tho
+     * TODO this class should also not be needed in the AppScope. It is needed because the
+     * DaggerWorkerFactory is not modular. Easy to fix tho
      */
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -50,10 +50,9 @@ class VpnAppModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAppTrackerLoader(
-        vpnDatabase: VpnDatabase
-    ): AppTrackerRepository {
-        return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
+    fun provideAppTrackerLoader(vpnDatabase: VpnDatabase): AppTrackerRepository {
+        return RealAppTrackerRepository(
+            vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
 
     @Provides
@@ -61,5 +60,4 @@ class VpnAppModule {
     fun providesResources(context: Context): Resources {
         return context.resources
     }
-
 }

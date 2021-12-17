@@ -60,7 +60,11 @@ data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
         return sb.toString()
     }
 
-    fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {
+    fun format(
+        alwaysShowHours: Boolean = true,
+        alwaysShowMinutes: Boolean = true,
+        alwaysShowSeconds: Boolean = true
+    ): String {
         val sb = StringBuilder()
 
         if (hours > 0 || alwaysShowHours) {

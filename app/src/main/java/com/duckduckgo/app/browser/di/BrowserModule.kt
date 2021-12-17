@@ -73,12 +73,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import javax.inject.Named
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import javax.inject.Named
-import dagger.SingleInstanceIn
-import javax.inject.Provider
 
 @Module
 class BrowserModule {
@@ -90,7 +90,8 @@ class BrowserModule {
         variantManager: VariantManager,
         appReferrerDataStore: AppReferrerDataStore
     ): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
+        return DuckDuckGoRequestRewriter(
+            urlDetector, statisticsStore, variantManager, appReferrerDataStore)
     }
 
     @Provides
@@ -128,8 +129,7 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             emailInjector,
-            accessibilityManager
-        )
+            accessibilityManager)
     }
 
     @Provides
@@ -166,7 +166,8 @@ class BrowserModule {
         fileDeleter: FileDeleter,
         webViewHttpAuthStore: WebViewHttpAuthStore
     ): WebDataManager =
-        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
+        WebViewDataManager(
+            context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
@@ -179,11 +180,15 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
+    fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector =
+        SpecialUrlDetectorImpl(packageManager)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun userAgentProvider(@Named("defaultUserAgent") defaultUserAgent: Provider<String>, deviceInfo: DeviceInfo): UserAgentProvider {
+    fun userAgentProvider(
+        @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
+        deviceInfo: DeviceInfo
+    ): UserAgentProvider {
         return UserAgentProvider(defaultUserAgent, deviceInfo)
     }
 
@@ -195,7 +200,14 @@ class BrowserModule {
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         gpc: Gpc,
         userAgentProvider: UserAgentProvider
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
+    ): RequestInterceptor =
+        WebViewRequestInterceptor(
+            resourceSurrogates,
+            trackerDetector,
+            httpsUpgrader,
+            privacyProtectionCountDao,
+            gpc,
+            userAgentProvider)
 
     @Provides
     fun cookieManager(
@@ -203,7 +215,8 @@ class BrowserModule {
         removeCookies: RemoveCookies,
         dispatcherProvider: DispatcherProvider
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
+        return WebViewCookieManager(
+            cookieManager, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
     }
 
     @Provides
@@ -222,7 +235,12 @@ class BrowserModule {
         exceptionPixel: ExceptionPixel,
         dispatcherProvider: DispatcherProvider
     ): SQLCookieRemover {
-        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, offlinePixelCountDataStore, exceptionPixel, dispatcherProvider)
+        return SQLCookieRemover(
+            webViewDatabaseLocator,
+            getCookieHostsToPreserve,
+            offlinePixelCountDataStore,
+            exceptionPixel,
+            dispatcherProvider)
     }
 
     @Provides
@@ -233,16 +251,15 @@ class BrowserModule {
     @Named("authDbLocator")
     fun authDatabaseLocator(context: Context): DatabaseLocator = AuthDatabaseLocator(context)
 
-    @Provides
-    fun databaseCleanerHelper(): DatabaseCleaner = DatabaseCleanerHelper()
+    @Provides fun databaseCleanerHelper(): DatabaseCleaner = DatabaseCleanerHelper()
 
     @Provides
-    fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
+    fun getCookieHostsToPreserve(
+        fireproofWebsiteDao: FireproofWebsiteDao
+    ): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
 
     @Provides
-    fun cookieManagerRemover(
-        cookieManager: CookieManager
-    ): CookieManagerRemover {
+    fun cookieManagerRemover(cookieManager: CookieManager): CookieManagerRemover {
         return CookieManagerRemover(cookieManager)
     }
 
@@ -260,13 +277,20 @@ class BrowserModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
+    fun webViewPreviewPersister(
+        context: Context,
+        fileDeleter: FileDeleter
+    ): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
+    fun faviconPersister(
+        context: Context,
+        fileDeleter: FileDeleter,
+        dispatcherProvider: DispatcherProvider
+    ): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
     }
 
@@ -294,10 +318,14 @@ class BrowserModule {
     }
 
     @Provides
-    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
+    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService =
+        retrofit.create(DownloadFileService::class.java)
 
     @Provides
-    fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
+    fun fileDownloader(
+        dataUriDownloader: DataUriDownloader,
+        networkFileDownloader: NetworkFileDownloader
+    ): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
     }
 
@@ -310,17 +338,28 @@ class BrowserModule {
         variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+        return BrowserTabFireproofDialogsEventHandler(
+            userEventsStore,
+            pixel,
+            fireproofWebsiteRepository,
+            appSettingsPreferencesStore,
+            variantManager,
+            dispatchers)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
+    fun thirdPartyCookieManager(
+        cookieManager: CookieManager,
+        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+    ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     @IntoSet
-    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
+    fun serviceWorkerLifecycleObserver(
+        serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver
+    ): LifecycleObserver = serviceWorkerLifecycleObserver
 }

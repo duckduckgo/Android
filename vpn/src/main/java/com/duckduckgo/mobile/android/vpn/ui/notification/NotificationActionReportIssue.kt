@@ -28,19 +28,18 @@ class NotificationActionReportIssue {
 
     companion object {
         fun reportIssueNotificationAction(context: Context): NotificationCompat.Action {
-            val launchIntent = ReportBreakageAppListActivity.intent(context).also {
-                it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            }
+            val launchIntent =
+                ReportBreakageAppListActivity.intent(context).also {
+                    it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
             return NotificationCompat.Action(
                 R.drawable.ic_baseline_feedback_24,
                 context.getString(R.string.atp_ReportIssue),
-                PendingIntent.getActivity(context, 0, launchIntent, pendingIntentFlags())
-            )
+                PendingIntent.getActivity(context, 0, launchIntent, pendingIntentFlags()))
         }
 
         private fun pendingIntentFlags(): Int {
             return if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
         }
     }
-
 }

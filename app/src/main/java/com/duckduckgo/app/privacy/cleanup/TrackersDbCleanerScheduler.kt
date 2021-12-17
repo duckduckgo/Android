@@ -37,10 +37,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 @Module
 @ContributesTo(AppScope::class)
@@ -48,9 +48,7 @@ class TrackersDbCleanerSchedulerModule {
 
     @Provides
     @IntoSet
-    fun provideDeviceShieldNotificationScheduler(
-        workManager: WorkManager
-    ): LifecycleObserver {
+    fun provideDeviceShieldNotificationScheduler(workManager: WorkManager): LifecycleObserver {
         return TrackersDbCleanerScheduler(workManager)
     }
 
@@ -84,11 +82,15 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Default
 
     override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Scheduling Trackers Blocked DB cleaner")
-        val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
-            .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
+        val dbCleanerWorkRequest =
+            PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
+                .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                .build()
+        workManager.enqueueUniquePeriodicWork(
+            WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            dbCleanerWorkRequest)
     }
 
     companion object {
@@ -96,7 +98,8 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Default
     }
 }
 
-class TrackersDbCleanerWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
+class TrackersDbCleanerWorker(context: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
     lateinit var appTrackersDao: VpnTrackerDao

@@ -51,21 +51,24 @@ class GlobalPrivacyControlViewModel(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
-        _viewState.value = ViewState(
-            globalPrivacyControlEnabled = gpc.isEnabled(),
-            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) == true
-        )
+        _viewState.value =
+            ViewState(
+                globalPrivacyControlEnabled = gpc.isEnabled(),
+                globalPrivacyControlFeatureEnabled =
+                    featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true) ==
+                        true)
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
     fun onUserToggleGlobalPrivacyControl(enabled: Boolean) {
-        val pixelName = if (enabled) {
-            gpc.enableGpc()
-            SETTINGS_DO_NOT_SELL_ON
-        } else {
-            gpc.disableGpc()
-            SETTINGS_DO_NOT_SELL_OFF
-        }
+        val pixelName =
+            if (enabled) {
+                gpc.enableGpc()
+                SETTINGS_DO_NOT_SELL_ON
+            } else {
+                gpc.disableGpc()
+                SETTINGS_DO_NOT_SELL_OFF
+            }
         pixel.fire(pixelName)
 
         _viewState.value = _viewState.value?.copy(globalPrivacyControlEnabled = enabled)
@@ -81,7 +84,9 @@ class GlobalPrivacyControlViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class GlobalPrivacyControlViewModelFactory @Inject constructor(
+class GlobalPrivacyControlViewModelFactory
+@Inject
+constructor(
     private val pixel: Provider<Pixel>,
     private val featureToggle: Provider<FeatureToggle>,
     private val gpc: Provider<Gpc>
@@ -89,7 +94,9 @@ class GlobalPrivacyControlViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), featureToggle.get(), gpc.get()) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) ->
+                    (GlobalPrivacyControlViewModel(pixel.get(), featureToggle.get(), gpc.get()) as
+                        T)
                 else -> null
             }
         }

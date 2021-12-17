@@ -34,7 +34,8 @@ class AppEnjoymentAppCreationObserver(
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppStart() {
         appCoroutineScope.launch(Dispatchers.Main) {
-            appEnjoymentPromptEmitter.promptType.value = promptTypeDecider.determineInitialPromptType()
+            appEnjoymentPromptEmitter.promptType.value =
+                promptTypeDecider.determineInitialPromptType()
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 
 @file:Suppress("unused")
+
 package com.duckduckgo.app.global.view
 
 import android.view.View
@@ -25,8 +26,8 @@ import java.util.NoSuchElementException
 fun View.childrenSequence(): Sequence<View> = ViewChildrenSequence(this)
 
 /**
- * Return the [Sequence] of all children of the received [View], recursively.
- * Note that the sequence is not thread-safe.
+ * Return the [Sequence] of all children of the received [View], recursively. Note that the sequence
+ * is not thread-safe.
  *
  * @return the [Sequence] of children.
  */

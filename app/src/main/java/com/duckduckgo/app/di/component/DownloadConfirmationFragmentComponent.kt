@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface DownloadConfirmationFragmentComponent : AndroidInjector<DownloadConfirmationFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DownloadConfirmationFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<DownloadConfirmationFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface DownloadConfirmationFragmentComponentProvider {
-    fun provideDownloadConfirmationFragmentComponentFactory(): DownloadConfirmationFragmentComponent.Factory
+    fun provideDownloadConfirmationFragmentComponentFactory():
+        DownloadConfirmationFragmentComponent.Factory
 }
 
 @Module

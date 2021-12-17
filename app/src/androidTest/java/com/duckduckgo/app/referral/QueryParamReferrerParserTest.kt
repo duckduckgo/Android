@@ -85,7 +85,9 @@ class QueryParamReferrerParserTest {
 
     @Test
     fun whenReferrerContainsBothEuAuctionAndCampaignReferrerDataThenEuActionReferrerFound() {
-        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
+        val result =
+            testee.parse(
+                "key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
         assertTrue(result is EuAuctionReferrerFound)
     }
 
@@ -101,7 +103,10 @@ class QueryParamReferrerParserTest {
         verifyCampaignReferrerFound("AB", result)
     }
 
-    private fun verifyCampaignReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {
+    private fun verifyCampaignReferrerFound(
+        expectedReferrer: String,
+        result: ParsedReferrerResult
+    ) {
         assertTrue(result is CampaignReferrerFound)
         val value = (result as CampaignReferrerFound).campaignSuffix
         assertEquals(expectedReferrer, value)
@@ -115,5 +120,4 @@ class QueryParamReferrerParserTest {
         private const val INSTALLATION_SOURCE_KEY = "utm_source"
         private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
     }
-
 }

@@ -19,17 +19,21 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.Found
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.NotFound
-import kotlinx.coroutines.ensureActive
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.ensureActive
+import timber.log.Timber
 
 interface NetworkFileConnectionMatcher {
-    suspend fun searchNetworkFile(file: File, pattern: Pattern, connectionInfo: ConnectionInfo): NetworkFileSearchResult
+    suspend fun searchNetworkFile(
+        file: File,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo
+    ): NetworkFileSearchResult
 
     fun matchesConnection(connectionInfo: ConnectionInfo, localPort: Int): Boolean {
         return connectionInfo.sourcePort == localPort
@@ -39,13 +43,22 @@ interface NetworkFileConnectionMatcher {
 class ProcNetFileConnectionMatcher : NetworkFileConnectionMatcher {
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun searchNetworkFile(file: File, pattern: Pattern, connectionInfo: ConnectionInfo): NetworkFileSearchResult {
+    override suspend fun searchNetworkFile(
+        file: File,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo
+    ): NetworkFileSearchResult {
         BufferedReader(FileReader(file)).use { reader ->
             return searchLineByLine(reader, pattern, connectionInfo, file)
         }
     }
 
-    private suspend fun searchLineByLine(reader: BufferedReader, pattern: Pattern, connectionInfo: ConnectionInfo, file: File): NetworkFileSearchResult {
+    private suspend fun searchLineByLine(
+        reader: BufferedReader,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo,
+        file: File
+    ): NetworkFileSearchResult {
         var matcher: Matcher
 
         reader.lineSequence().forEach { line ->

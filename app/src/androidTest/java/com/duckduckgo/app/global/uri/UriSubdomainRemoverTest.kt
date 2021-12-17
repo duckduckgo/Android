@@ -38,10 +38,10 @@ class UriSubdomainRemoverTest {
 
     @Test
     fun whenRemovingMultipleSubdomainCanKeepCalling() {
-        val converted = Uri.parse("https://a.b.c.d.example.com")
-            .removeSubdomain()!!
-            .toUri().removeSubdomain()!!
-            .toUri().removeSubdomain()
+        val converted =
+            Uri.parse("https://a.b.c.d.example.com").removeSubdomain()!!.toUri().removeSubdomain()!!
+                .toUri()
+                .removeSubdomain()
         assertEquals("https://d.example.com", converted)
     }
 

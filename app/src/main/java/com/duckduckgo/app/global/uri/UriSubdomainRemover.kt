@@ -31,9 +31,7 @@ fun Uri.removeSubdomain(): String? {
 }
 
 private fun removeFirstSubdomain(splitDomains: List<String>): String {
-    return splitDomains
-        .drop(1)
-        .joinToString(".")
+    return splitDomains.drop(1).joinToString(".")
 }
 
 private fun isValid(uri: String): Boolean {

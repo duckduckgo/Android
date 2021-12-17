@@ -20,18 +20,18 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageModern
 import com.nhaarman.mockitokotlin2.*
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.net.InetAddress
 import java.net.InetSocketAddress
-
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class DetectOriginatingAppPackageModernTest {
 
     private val connectivityManager: ConnectivityManager = mock()
     private val packageManager: PackageManager = mock()
     private val addressCaptor = argumentCaptor<InetSocketAddress>()
-    private val testee: DetectOriginatingAppPackageModern = DetectOriginatingAppPackageModern(connectivityManager, packageManager)
+    private val testee: DetectOriginatingAppPackageModern =
+        DetectOriginatingAppPackageModern(connectivityManager, packageManager)
 
     @Test
     fun whenResolvingPackageThenCorrectProtocolPassedToConnectivityManager() {
@@ -46,7 +46,8 @@ class DetectOriginatingAppPackageModernTest {
     @Test
     fun whenResolvingPackageThenCorrectDestinationAddressPassedToConnectivityManager() {
         val expectedAddress = anExternalIpAddress()
-        val connection = aConnectionInfo(destinationAddress = InetAddress.getByName(expectedAddress))
+        val connection =
+            aConnectionInfo(destinationAddress = InetAddress.getByName(expectedAddress))
 
         testee.resolvePackageId(connection)
         captureDestinationAddress()
@@ -57,7 +58,8 @@ class DetectOriginatingAppPackageModernTest {
     @Test
     fun whenResolvingPackageThenCorrectSourceAddressPassedToConnectivityManager() {
         val expectedAddress = anInternalIpAddress()
-        val connection = aConnectionInfo(destinationAddress = InetAddress.getByName(expectedAddress))
+        val connection =
+            aConnectionInfo(destinationAddress = InetAddress.getByName(expectedAddress))
 
         testee.resolvePackageId(connection)
         captureSourceAddress()
@@ -89,7 +91,8 @@ class DetectOriginatingAppPackageModernTest {
     fun whenGetConnectionOwnerUidThrowsThenReturnUnknown() {
         val connection = aConnectionInfo(sourcePort = 40123)
 
-        whenever(connectivityManager.getConnectionOwnerUid(any(), any(), any())).thenThrow(SecurityException())
+        whenever(connectivityManager.getConnectionOwnerUid(any(), any(), any()))
+            .thenThrow(SecurityException())
 
         val packateId = testee.resolvePackageId(connection)
         assertEquals("unknown", packateId)

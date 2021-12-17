@@ -28,9 +28,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.fadeTransitionConfig
 
 /**
- * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
+ * Activity which is responsible for killing the main process and restarting it. This Activity will
+ * automatically finish itself after a brief time.
  *
- * This Activity runs in a separate process so that it can seamlessly restart the main app process without much in the way of a jarring UX.
+ * This Activity runs in a separate process so that it can seamlessly restart the main app process
+ * without much in the way of a jarring UX.
  *
  * The correct way to invoke this Activity is through its `triggerRestart(context)` method.
  *
@@ -83,9 +85,11 @@ class FireActivity : AppCompatActivity() {
 
         fun appRestarting(context: Context): Boolean {
             val currentProcessId = Process.myPid()
-            val activityManager: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val activityManager: ActivityManager =
+                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             activityManager.runningAppProcesses?.forEach {
-                if (it.pid == currentProcessId && it.processName.endsWith(context.getString(R.string.fireProcessName))) {
+                if (it.pid == currentProcessId &&
+                    it.processName.endsWith(context.getString(R.string.fireProcessName))) {
                     return true
                 }
             }

@@ -23,8 +23,8 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
+import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsPillWithSubtitle : LinearLayout {
@@ -33,12 +33,18 @@ class SettingsPillWithSubtitle : LinearLayout {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsPillWithSubtitle)
         setTitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillTitle) ?: "")
         setSubtitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillSubtitle) ?: "")
-        setPill(attributes.getResourceId(R.styleable.SettingsPillWithSubtitle_pillDrawable, R.drawable.ic_beta_pill))
+        setPill(
+            attributes.getResourceId(
+                R.styleable.SettingsPillWithSubtitle_pillDrawable, R.drawable.ic_beta_pill))
         attributes.recycle()
     }
 
@@ -59,5 +65,4 @@ class SettingsPillWithSubtitle : LinearLayout {
         recursiveEnable(enabled)
         super.setEnabled(enabled)
     }
-
 }

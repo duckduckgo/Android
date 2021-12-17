@@ -26,30 +26,44 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.net.URI
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
+class RealTrackerAllowlist
+@Inject
+constructor(
+    private val trackerAllowlistRepository: TrackerAllowlistRepository,
+    private val featureToggle: FeatureToggle
+) : TrackerAllowlist {
 
     override fun isAnException(documentURL: String, url: String): Boolean {
-        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
-            trackerAllowlistRepository.exceptions
+        return if (featureToggle.isFeatureEnabled(
+            PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
+            trackerAllowlistRepository
+                .exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
                 .map { matches(url, documentURL, it) }
-                .firstOrNull() ?: false
+                .firstOrNull()
+                ?: false
         } else {
             false
         }
     }
 
-    private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
+    private fun matches(
+        url: String,
+        documentUrl: String,
+        trackerAllowlist: TrackerAllowlistEntity
+    ): Boolean {
         val cleanedUrl = removePortFromUrl(url.toUri())
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()
-            cleanedUrl.matches(regex) && (it.domains.contains("<all>") || it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
+            cleanedUrl.matches(regex) &&
+                (it.domains.contains("<all>") ||
+                    it.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) })
         }
     }
 

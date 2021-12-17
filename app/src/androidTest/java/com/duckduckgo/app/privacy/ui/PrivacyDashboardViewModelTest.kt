@@ -22,6 +22,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -34,7 +35,6 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,13 +47,9 @@ import org.junit.Test
 
 class PrivacyDashboardViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private var viewStateObserver: Observer<PrivacyDashboardViewModel.ViewState> = mock()
     private var mockUserWhitelistDao: UserWhitelistDao = mock()
@@ -68,7 +64,14 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        val model =
+            PrivacyDashboardViewModel(
+                mockUserWhitelistDao,
+                mockContentBlocking,
+                networkLeaderboardDao,
+                mockPixel,
+                TestCoroutineScope(),
+                coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -79,7 +82,8 @@ class PrivacyDashboardViewModelTest {
         whenever(sitesVisitedLiveData.value).thenReturn(0)
         whenever(networkLeaderboardLiveData.value).thenReturn(emptyList())
         whenever(networkLeaderboardDao.sitesVisited()).thenReturn(sitesVisitedLiveData)
-        whenever(networkLeaderboardDao.trackerNetworkLeaderboard()).thenReturn(networkLeaderboardLiveData)
+        whenever(networkLeaderboardDao.trackerNetworkLeaderboard())
+            .thenReturn(networkLeaderboardLiveData)
     }
 
     @After

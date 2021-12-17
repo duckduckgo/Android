@@ -29,22 +29,19 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 class TrackerNetworksViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    @get:Rule val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val tabRepository: TabRepository = mock()
 
@@ -56,82 +53,94 @@ class TrackerNetworksViewModelTest {
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+    fun whenNoDataThenDefaultValuesAreUsed() =
+        coroutineTestRule.runBlocking {
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
-        testee.trackers("1").test {
-            val viewState = awaitItem()
-            assertEquals("", viewState.domain)
-            assertEquals(true, viewState.allTrackersBlocked)
-            assertTrue(viewState.trackingEventsByNetwork.isEmpty())
+            testee.trackers("1").test {
+                val viewState = awaitItem()
+                assertEquals("", viewState.domain)
+                assertEquals(true, viewState.allTrackersBlocked)
+                assertTrue(viewState.trackingEventsByNetwork.isEmpty())
+            }
         }
-    }
 
     @Test
-    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(url = "http://example.com/path"))
+            siteData.postValue(site(url = "http://example.com/path"))
 
-        testee.trackers("1").test {
-            assertEquals("example.com", awaitItem().domain)
+            testee.trackers("1").test { assertEquals("example.com", awaitItem().domain) }
         }
-    }
 
     @Test
-    fun whenTrackersUpdatedWithNoTrackersThenViewModelListIsEmpty() = coroutineTestRule.runBlocking {
-        val input = listOf(TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null))
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenTrackersUpdatedWithNoTrackersThenViewModelListIsEmpty() =
+        coroutineTestRule.runBlocking {
+            val input =
+                listOf(
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null))
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(trackingEvents = input))
-        testee.trackers("1").test {
-            assertTrue(awaitItem().trackingEventsByNetwork.isNotEmpty())
-        }
+            siteData.postValue(site(trackingEvents = input))
+            testee.trackers("1").test {
+                assertTrue(awaitItem().trackingEventsByNetwork.isNotEmpty())
+            }
 
-        siteData.postValue(site(trackingEvents = emptyList()))
-        testee.trackers("1").test {
-            assertTrue(awaitItem().trackingEventsByNetwork.isEmpty())
+            siteData.postValue(site(trackingEvents = emptyList()))
+            testee.trackers("1").test { assertTrue(awaitItem().trackingEventsByNetwork.isEmpty()) }
         }
-    }
 
     @Test
-    fun whenTrackersUpdatedThenViewModelUpdatedWithDistinctEntitiesOrderedBy() = coroutineTestRule.runBlocking {
-        val input = listOf(
-            // Minor entity with 3 distinct trackers
-            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(2), null, Entity.MINOR_ENTITY_A, true, null),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(3), null, Entity.MINOR_ENTITY_A, true, null),
+    fun whenTrackersUpdatedThenViewModelUpdatedWithDistinctEntitiesOrderedBy() =
+        coroutineTestRule.runBlocking {
+            val input =
+                listOf(
+                    // Minor entity with 3 distinct trackers
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(2), null, Entity.MINOR_ENTITY_A, true, null),
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(3), null, Entity.MINOR_ENTITY_A, true, null),
 
-            // Minor entity with 1 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(4), null, Entity.MINOR_ENTITY_B, true, null),
+                    // Minor entity with 1 distinct tracker
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(4), null, Entity.MINOR_ENTITY_B, true, null),
 
-            // Major entity with 2 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
-            TrackingEvent(Url.DOCUMENT, Url.tracker(7), null, Entity.MAJOR_ENTITY_B, true, null),
+                    // Major entity with 2 distinct tracker
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(6), null, Entity.MAJOR_ENTITY_B, true, null),
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(7), null, Entity.MAJOR_ENTITY_B, true, null),
 
-            // Major entity with 1 distinct tracker
-            TrackingEvent(Url.DOCUMENT, Url.tracker(5), null, Entity.MAJOR_ENTITY_A, true, null)
-        )
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+                    // Major entity with 1 distinct tracker
+                    TrackingEvent(
+                        Url.DOCUMENT, Url.tracker(5), null, Entity.MAJOR_ENTITY_A, true, null))
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(trackingEvents = input))
-        testee.trackers("1").test {
-            val result = awaitItem().trackingEventsByNetwork
-            assertEquals(0, result.keys.indexOf(Entity.MAJOR_ENTITY_A))
-            assertEquals(1, result.keys.indexOf(Entity.MAJOR_ENTITY_B))
-            assertEquals(2, result.keys.indexOf(Entity.MINOR_ENTITY_A))
-            assertEquals(3, result.keys.indexOf(Entity.MINOR_ENTITY_B))
-            assertEquals(1, result[Entity.MAJOR_ENTITY_A]?.count())
-            assertEquals(2, result[Entity.MAJOR_ENTITY_B]?.count())
-            assertEquals(3, result[Entity.MINOR_ENTITY_A]?.count())
-            assertEquals(1, result[Entity.MINOR_ENTITY_B]?.count())
+            siteData.postValue(site(trackingEvents = input))
+            testee.trackers("1").test {
+                val result = awaitItem().trackingEventsByNetwork
+                assertEquals(0, result.keys.indexOf(Entity.MAJOR_ENTITY_A))
+                assertEquals(1, result.keys.indexOf(Entity.MAJOR_ENTITY_B))
+                assertEquals(2, result.keys.indexOf(Entity.MINOR_ENTITY_A))
+                assertEquals(3, result.keys.indexOf(Entity.MINOR_ENTITY_B))
+                assertEquals(1, result[Entity.MAJOR_ENTITY_A]?.count())
+                assertEquals(2, result[Entity.MAJOR_ENTITY_B]?.count())
+                assertEquals(3, result[Entity.MINOR_ENTITY_A]?.count())
+                assertEquals(1, result[Entity.MINOR_ENTITY_B]?.count())
+            }
         }
-    }
 
     private fun site(url: String = "", trackingEvents: List<TrackingEvent> = emptyList()): Site {
         val site: Site = mock()
@@ -154,5 +163,4 @@ class TrackerNetworksViewModelTest {
 
         fun tracker(number: Int): String = String.format(TRACKER, number)
     }
-
 }

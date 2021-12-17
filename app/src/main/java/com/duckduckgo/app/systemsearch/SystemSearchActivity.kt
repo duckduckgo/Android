@@ -47,31 +47,26 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var omnibarScrolling: OmnibarScrolling
+    @Inject lateinit var omnibarScrolling: OmnibarScrolling
 
-    @Inject
-    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+    @Inject lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+    @Inject lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -87,12 +82,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private val omnibarTextInput
         get() = binding.omnibarTextInput
 
-    private val textChangeWatcher = object : TextChangedWatcher() {
-        override fun afterTextChanged(editable: Editable) {
-            showOmnibar()
-            viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
+    private val textChangeWatcher =
+        object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                showOmnibar()
+                viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,19 +120,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         when {
             launchedFromAssist(intent) -> pixel.fire(AppPixelName.APP_ASSIST_LAUNCH)
             launchedFromWidget(intent) -> pixel.fire(AppPixelName.APP_WIDGET_LAUNCH)
-            launchedFromSearchWithFavsWidget(intent) -> pixel.fire(AppPixelName.APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH)
+            launchedFromSearchWithFavsWidget(intent) ->
+                pixel.fire(AppPixelName.APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH)
             launchedFromNotification(intent) -> pixel.fire(AppPixelName.APP_NOTIFICATION_LAUNCH)
-            launchedFromSystemSearchBox(intent) -> pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
+            launchedFromSystemSearchBox(intent) ->
+                pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
         }
     }
 
     private fun configureObservers() {
-        viewModel.onboardingViewState.observe(
-            this,
-            {
-                it?.let { renderOnboardingViewState(it) }
-            }
-        )
+        viewModel.onboardingViewState.observe(this, { it?.let { renderOnboardingViewState(it) } })
         viewModel.resultsViewState.observe(
             this,
             {
@@ -148,20 +141,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                         renderQuickAccessItems(it)
                     }
                 }
-            }
-        )
-        viewModel.command.observe(
-            this,
-            {
-                processCommand(it)
-            }
-        )
+            })
+        viewModel.command.observe(this, { processCommand(it) })
     }
 
     private fun configureOnboarding() {
-        systemSearchOnboarding.okButton.setOnClickListener {
-            viewModel.userDismissedOnboarding()
-        }
+        systemSearchOnboarding.okButton.setOnClickListener { viewModel.userDismissedOnboarding() }
         systemSearchOnboarding.toggleButton.setOnClickListener {
             viewModel.userTappedOnboardingToggle()
         }
@@ -169,62 +154,64 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureAutoComplete() {
         binding.autocompleteSuggestions.layoutManager = LinearLayoutManager(this)
-        autocompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
-            immediateSearchClickListener = {
-                viewModel.userSubmittedAutocompleteResult(it.phrase)
-            },
-            editableSearchClickListener = {
-                viewModel.onUserSelectedToEditQuery(it.phrase)
-            }
-        )
+        autocompleteSuggestionsAdapter =
+            BrowserAutoCompleteSuggestionsAdapter(
+                immediateSearchClickListener = {
+                    viewModel.userSubmittedAutocompleteResult(it.phrase)
+                },
+                editableSearchClickListener = { viewModel.onUserSelectedToEditQuery(it.phrase) })
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
     }
 
     private fun configureDeviceAppSuggestions() {
         binding.deviceAppSuggestions.layoutManager = LinearLayoutManager(this)
-        deviceAppSuggestionsAdapter = DeviceAppSuggestionsAdapter {
-            viewModel.userSelectedApp(it)
-        }
+        deviceAppSuggestionsAdapter = DeviceAppSuggestionsAdapter { viewModel.userSelectedApp(it) }
         binding.deviceAppSuggestions.adapter = deviceAppSuggestionsAdapter
     }
 
     private fun configureQuickAccessGrid() {
         val quickAccessRecyclerView = quickAccessItemsBinding.quickAccessRecyclerView
-        val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+        val numOfColumns =
+            gridViewColumnCalculator.calculateNumberOfColumns(
+                QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
-        quickAccessAdapter = FavoritesQuickAccessAdapter(
-            this, faviconManager,
-            { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
-            { viewModel.onQuickAccesItemClicked(it) },
-            { viewModel.onEditQuickAccessItemRequested(it) },
-            { viewModel.onDeleteQuickAccessItemRequested(it) }
-        )
-        itemTouchHelper = ItemTouchHelper(
-            QuickAccessDragTouchItemListener(
-                quickAccessAdapter,
-                object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-                        viewModel.onQuickAccessListChanged(listElements)
-                    }
-                }
-            )
-        )
+        quickAccessAdapter =
+            FavoritesQuickAccessAdapter(
+                this,
+                faviconManager,
+                { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
+                { viewModel.onQuickAccesItemClicked(it) },
+                { viewModel.onEditQuickAccessItemRequested(it) },
+                { viewModel.onDeleteQuickAccessItemRequested(it) })
+        itemTouchHelper =
+            ItemTouchHelper(
+                QuickAccessDragTouchItemListener(
+                    quickAccessAdapter,
+                    object : QuickAccessDragTouchItemListener.DragDropListener {
+                        override fun onListChanged(
+                            listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+                        ) {
+                            viewModel.onQuickAccessListChanged(listElements)
+                        }
+                    }))
 
         itemTouchHelper.attachToRecyclerView(quickAccessRecyclerView)
         quickAccessRecyclerView.adapter = quickAccessAdapter
-        val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
+        val sidePadding =
+            gridViewColumnCalculator.calculateSidePadding(
+                QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
         quickAccessRecyclerView.setPadding(sidePadding, 8.toPx(), sidePadding, 8.toPx())
     }
 
     private fun configureDaxButton() {
-        binding.logo.setOnClickListener {
-            viewModel.userTappedDax()
-        }
+        binding.logo.setOnClickListener { viewModel.userTappedDax() }
     }
 
     private fun configureOmnibar() {
-        binding.resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateScroll() }
+        binding.resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateScroll()
+        }
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
@@ -235,7 +222,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun updateScroll() {
         val results = binding.results
-        val scrollable = binding.resultsContent.height > (results.height - results.paddingTop - results.paddingBottom)
+        val scrollable =
+            binding.resultsContent.height >
+                (results.height - results.paddingTop - results.paddingBottom)
         if (scrollable) {
             omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
         } else {
@@ -247,13 +236,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureTextInput() {
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (actionId == EditorInfo.IME_ACTION_GO ||
+                    keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                     viewModel.userSubmittedQuery(omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }
                 false
-            }
-        )
+            })
 
         omnibarTextInput.removeTextChangedListener(textChangeWatcher)
         omnibarTextInput.addTextChangedListener(textChangeWatcher)
@@ -264,7 +253,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (viewState.visible) {
             systemSearchOnboarding.onboarding.visibility = View.VISIBLE
             binding.results.elevation = 0.0f
-            systemSearchOnboarding.checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
+            systemSearchOnboarding.checkmarks.visibility =
+                if (viewState.expanded) View.VISIBLE else View.GONE
             refreshOnboardingToggleText(viewState.expanded)
         } else {
             systemSearchOnboarding.onboarding.visibility = View.GONE
@@ -273,13 +263,18 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun refreshOnboardingToggleText(expanded: Boolean) {
-        val toggleText = if (expanded) R.string.systemSearchOnboardingButtonLess else R.string.systemSearchOnboardingButtonMore
+        val toggleText =
+            if (expanded) R.string.systemSearchOnboardingButtonLess
+            else R.string.systemSearchOnboardingButtonMore
         systemSearchOnboarding.toggleButton.text = getString(toggleText)
     }
 
-    private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
+    private fun renderResultsViewState(
+        viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
+    ) {
         binding.deviceLabel.isVisible = viewState.appResults.isNotEmpty()
-        autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
+        autocompleteSuggestionsAdapter.updateData(
+            viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
     }
 
@@ -327,14 +322,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+        val message =
+            getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.insertQuickAccessItem(savedSite)
+            }
+            .show()
     }
 
     private fun launchDuckDuckGo() {

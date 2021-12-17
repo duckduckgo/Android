@@ -35,6 +35,12 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetecto
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.channels.SelectionKey
+import java.nio.channels.SelectionKey.OP_READ
+import java.nio.channels.SelectionKey.OP_WRITE
+import java.nio.channels.Selector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,12 +49,6 @@ import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
-import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.SelectionKey.OP_READ
-import java.nio.channels.SelectionKey.OP_WRITE
-import java.nio.channels.Selector
 
 class TcpDeviceToNetwork(
     private val queues: VpnQueues,
@@ -68,8 +68,9 @@ class TcpDeviceToNetwork(
 ) {
 
     /**
-     * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
-     * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
+     * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel
+     * is created and the packet is written. Instructs the selector we'll be interested in OP_READ
+     * for receiving the response to the packet we write.
      */
     fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
@@ -82,7 +83,9 @@ class TcpDeviceToNetwork(
         packet.backingBuffer = null
 
         val responseBuffer = ByteBufferPool.acquire()
-        val connectionParams = TcpConnectionParams(destinationAddress.hostAddress, destinationPort, sourcePort, packet, responseBuffer)
+        val connectionParams =
+            TcpConnectionParams(
+                destinationAddress.hostAddress, destinationPort, sourcePort, packet, responseBuffer)
         val connectionKey = connectionParams.key()
 
         val totalPacketLength = payloadBuffer.limit()
@@ -92,47 +95,67 @@ class TcpDeviceToNetwork(
         val tcb = TCB.getTCB(connectionKey)
 
         if (tcb == null) {
-            processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
+            processPacketTcbNotInitialized(
+                connectionKey, packet, totalPacketLength, connectionParams)
         } else {
-            processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
+            processPacketTcbExists(
+                connectionKey,
+                tcb,
+                packet,
+                totalPacketLength,
+                connectionParams,
+                responseBuffer,
+                payloadBuffer)
         }
     }
 
-    private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
+    private fun processPacketTcbNotInitialized(
+        connectionKey: String,
+        packet: Packet,
+        totalPacketLength: Int,
+        connectionParams: TcpConnectionParams
+    ) {
         Timber.v(
             "New packet. %s. TCB not initialized. %s. Packet length: %d.  Data length: %d",
             connectionKey,
             TcpPacketProcessor.logPacketDetails(
-                packet,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
-            ),
+                packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
             totalPacketLength,
-            packet.tcpPayloadSize(true)
-        )
-        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
-            when (it) {
-                OpenConnection -> openConnection(connectionParams)
-                SendAck -> {
-                    synchronized(connectionParams.responseBuffer) {
-                        connectionParams.packet.updateTcpBuffer(
-                            connectionParams.responseBuffer, ACK.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
-                        )
-                        queues.networkToDevice.offer(connectionParams.responseBuffer)
+            packet.tcpPayloadSize(true))
+        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1)
+            .events
+            .forEach {
+                when (it) {
+                    OpenConnection -> openConnection(connectionParams)
+                    SendAck -> {
+                        synchronized(connectionParams.responseBuffer) {
+                            connectionParams.packet.updateTcpBuffer(
+                                connectionParams.responseBuffer,
+                                ACK.toByte(),
+                                0,
+                                connectionParams.packet.tcpHeader.sequenceNumber + 1,
+                                0)
+                            queues.networkToDevice.offer(connectionParams.responseBuffer)
+                        }
                     }
-                }
-                SendReset -> {
-                    synchronized(connectionParams.responseBuffer) {
-                        connectionParams.packet.updateTcpBuffer(
-                            connectionParams.responseBuffer, RST.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
-                        )
-                        queues.networkToDevice.offer(connectionParams.responseBuffer)
+                    SendReset -> {
+                        synchronized(connectionParams.responseBuffer) {
+                            connectionParams.packet.updateTcpBuffer(
+                                connectionParams.responseBuffer,
+                                RST.toByte(),
+                                0,
+                                connectionParams.packet.tcpHeader.sequenceNumber + 1,
+                                0)
+                            queues.networkToDevice.offer(connectionParams.responseBuffer)
+                        }
                     }
+                    else ->
+                        Timber.e(
+                            "No connection open and won't open one to %s. Dropping packet. (action=%s)",
+                            connectionKey,
+                            it)
                 }
-                else -> Timber.e("No connection open and won't open one to %s. Dropping packet. (action=%s)", connectionKey, it)
             }
-        }
-
     }
 
     private fun processPacketTcbExists(
@@ -146,31 +169,40 @@ class TcpDeviceToNetwork(
     ) {
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
-            connectionKey, tcb.tcbState,
+            connectionKey,
+            tcb.tcbState,
             TcpPacketProcessor.logPacketDetails(
-                packet,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
-            ),
-            totalPacketLength, packet.tcpPayloadSize(true)
-        )
+                packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
+            totalPacketLength,
+            packet.tcpPayloadSize(true))
 
         if (packet.tcpHeader.isACK) {
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
         }
 
         val action =
-            TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
+            TcpStateFlow.newPacket(
+                connectionKey,
+                tcb.tcbState,
+                packet.asPacketType(tcb.finSequenceNumberToClient),
+                tcb.sequenceNumberToClientInitial)
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
 
         action.events.forEach {
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
-                SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
-                SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
+                SendFin ->
+                    tcb.sendFinToClient(
+                        queues,
+                        packet,
+                        packet.tcpPayloadSize(true),
+                        triggeredByServerEndOfStream = false)
+                SendFinWithData ->
+                    tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
                 CloseConnection -> closeConnection(tcb, responseBuffer)
-                SendReset -> tcbCloser.sendResetPacket(tcb, queues, packet, packet.tcpPayloadSize(true))
+                SendReset ->
+                    tcbCloser.sendResetPacket(tcb, queues, packet, packet.tcpPayloadSize(true))
                 DelayedCloseConnection -> {
                     vpnCoroutineScope.launch {
                         delay(3_000)
@@ -178,9 +210,11 @@ class TcpDeviceToNetwork(
                     }
                 }
                 SendAck -> tcb.sendAck(queues, packet)
-                else -> Timber.e("Unknown event for how to process device-to-network packet: %s", action.events)
+                else ->
+                    Timber.e(
+                        "Unknown event for how to process device-to-network packet: %s",
+                        action.events)
             }
-
         }
     }
 
@@ -203,14 +237,15 @@ class TcpDeviceToNetwork(
                             (SYN or ACK).toByte(),
                             tcb.sequenceNumberToClient,
                             tcb.acknowledgementNumberToClient,
-                            0
-                        )
+                            0)
                         tcb.sequenceNumberToClient++
                         queues.networkToDevice.offer(params.responseBuffer)
                     }
                 }
                 WaitToConnect -> {
-                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
+                    Timber.v(
+                        "Not finished connecting yet to %s, will register for OP_CONNECT event",
+                        tcb.selectionKey)
                     selector.wakeup()
                     tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
                 }
@@ -219,15 +254,31 @@ class TcpDeviceToNetwork(
         }
     }
 
-    private fun isARetryForRecentlyBlockedTracker(requestingApp: OriginatingApp, hostName: String?, payloadSize: Int): Boolean {
+    private fun isARetryForRecentlyBlockedTracker(
+        requestingApp: OriginatingApp,
+        hostName: String?,
+        payloadSize: Int
+    ): Boolean {
         if (hostName == null) return false
-        val recentTrackerEvent = recentAppTrackerCache.getRecentTrackingAttempt(requestingApp.packageId, hostName, payloadSize) ?: return false
+        val recentTrackerEvent =
+            recentAppTrackerCache.getRecentTrackingAttempt(
+                requestingApp.packageId, hostName, payloadSize)
+                ?: return false
         val timeSinceTrackerRequested = System.currentTimeMillis() - recentTrackerEvent.timestamp
-        Timber.v("Tracker %s was last sent by %s %dms ago", hostName, requestingApp.packageId, timeSinceTrackerRequested)
+        Timber.v(
+            "Tracker %s was last sent by %s %dms ago",
+            hostName,
+            requestingApp.packageId,
+            timeSinceTrackerRequested)
         return true
     }
 
-    private fun processPacket(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
+    private fun processPacket(
+        tcb: TCB,
+        packet: Packet,
+        payloadBuffer: ByteBuffer,
+        connectionParams: TcpConnectionParams
+    ) {
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) {
@@ -238,8 +289,10 @@ class TcpDeviceToNetwork(
             val isLocalAddress = determineIfLocalIpAddress(packet)
             val requestingApp = determineRequestingApp(tcb, packet)
             val hostName = determineHostName(tcb, packet, payloadBuffer)
-            val requestType = determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
-            val isATrackerRetryRequest = isARetryForRecentlyBlockedTracker(requestingApp, hostName, payloadSize)
+            val requestType =
+                determineIfTracker(tcb, packet, requestingApp, payloadBuffer, isLocalAddress)
+            val isATrackerRetryRequest =
+                isARetryForRecentlyBlockedTracker(requestingApp, hostName, payloadSize)
             Timber.v(
                 "App %s attempting to send %d bytes to (%s). %s host=%s, localAddress=%s, retry=%s",
                 requestingApp,
@@ -248,17 +301,11 @@ class TcpDeviceToNetwork(
                 requestType,
                 hostName,
                 isLocalAddress,
-                isATrackerRetryRequest
-            )
+                isATrackerRetryRequest)
 
             if (requestType is RequestTrackerType.Tracker) {
                 processTrackingRequestPacket(
-                    isATrackerRetryRequest,
-                    tcb,
-                    requestingApp,
-                    packet,
-                    payloadSize
-                )
+                    isATrackerRetryRequest, tcb, requestingApp, packet, payloadSize)
                 return
             }
 
@@ -271,7 +318,8 @@ class TcpDeviceToNetwork(
 
             try {
                 val seqNumber = packet.tcpHeader.acknowledgementNumber
-                var ackNumber = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
+                var ackNumber =
+                    increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
                 if (packet.tcpHeader.isFIN || packet.tcpHeader.isRST || packet.tcpHeader.isSYN) {
                     ackNumber = increaseOrWraparound(ackNumber, 1)
                 }
@@ -280,40 +328,64 @@ class TcpDeviceToNetwork(
                 selector.wakeup()
                 tcb.channel.register(selector, OP_WRITE, tcb)
 
-                val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
+                val writeData =
+                    PendingWriteData(
+                        payloadBuffer,
+                        tcb.channel,
+                        payloadSize,
+                        tcb,
+                        connectionParams,
+                        ackNumber,
+                        seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
-                Timber.w(e, "Network write error for %s. Wrote %d; %d unwritten", tcb.ipAndPort, bytesWritten, bytesUnwritten)
+                Timber.w(
+                    e,
+                    "Network write error for %s. Wrote %d; %d unwritten",
+                    tcb.ipAndPort,
+                    bytesWritten,
+                    bytesUnwritten)
                 tcbCloser.sendResetPacket(tcb, queues, packet, bytesWritten)
                 return
             }
         }
     }
 
-    private fun processTrackingRequestPacket(isATrackerRetryRequest: Boolean, tcb: TCB, requestingApp: OriginatingApp, packet: Packet, payloadSize: Int) {
+    private fun processTrackingRequestPacket(
+        isATrackerRetryRequest: Boolean,
+        tcb: TCB,
+        requestingApp: OriginatingApp,
+        packet: Packet,
+        payloadSize: Int
+    ) {
         if (isATrackerRetryRequest) {
             tcb.enterGhostingMode()
             processPacketInGhostingMode(tcb)
         } else {
-            Timber.i("Blocking tracker request. [%s] ---> [%s] %s", tcb.requestingAppPackage, tcb.trackerHostName, tcb.ipAndPort)
+            Timber.i(
+                "Blocking tracker request. [%s] ---> [%s] %s",
+                tcb.requestingAppPackage,
+                tcb.trackerHostName,
+                tcb.ipAndPort)
 
-            recentAppTrackerCache.addTrackerForApp(requestingApp.packageId, tcb.hostName, tcb.ipAndPort, payloadSize)
+            recentAppTrackerCache.addTrackerForApp(
+                requestingApp.packageId, tcb.hostName, tcb.ipAndPort, payloadSize)
             tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
         }
     }
 
     private fun processPacketInGhostingMode(tcb: TCB) {
-        val ghostingDuration = (System.currentTimeMillis() - tcb.getGhostingStartTime()).coerceAtLeast(0)
+        val ghostingDuration =
+            (System.currentTimeMillis() - tcb.getGhostingStartTime()).coerceAtLeast(0)
 
         Timber.v(
             "Blocking tracker request (dropping packet). [%s] ---> [%s] %s. Ghosting for %sms",
             tcb.requestingAppPackage,
             tcb.trackerHostName,
             tcb.ipAndPort,
-            ghostingDuration
-        )
+            ghostingDuration)
     }
 
     private fun determineHostName(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String? {
@@ -331,12 +403,14 @@ class TcpDeviceToNetwork(
     ): RequestTrackerType {
         Timber.v("Determining if a tracker. Already determined? %s", tcb.trackerTypeDetermined)
         if (tcb.trackerTypeDetermined) {
-            return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
-                tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
-            )
+            return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName))
+            else
+                RequestTrackerType.NotTracker(
+                    tcb.hostName ?: packet.ip4Header.destinationAddress.hostName)
         }
 
-        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress, requestingApp)
+        return trackerDetector.determinePacketType(
+            tcb, packet, payloadBuffer, isLocalAddress, requestingApp)
     }
 
     private fun determineIfLocalIpAddress(packet: Packet): Boolean {
@@ -345,7 +419,9 @@ class TcpDeviceToNetwork(
 
     private fun determineRequestingApp(tcb: TCB, packet: Packet): OriginatingApp {
         if (tcb.requestingAppDetermined) {
-            return OriginatingApp(tcb.requestingAppPackage ?: "unknown package", tcb.requestingAppName ?: "unknown app")
+            return OriginatingApp(
+                tcb.requestingAppPackage ?: "unknown package",
+                tcb.requestingAppName ?: "unknown app")
         }
 
         val packageId = originatingAppPackageResolver.resolvePackageId(packet.connectionInfo())

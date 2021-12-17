@@ -22,13 +22,11 @@ import org.threeten.bp.format.DateTimeFormatter
 class DatabaseDateFormatter {
 
     companion object {
-        private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        private val FORMATTER_SECONDS: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
         fun bucketByHour(date: LocalDateTime = LocalDateTime.now()): String {
-            val byHour = date
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0)
+            val byHour = date.withMinute(0).withSecond(0).withNano(0)
             return FORMATTER_SECONDS.format(byHour)
         }
 

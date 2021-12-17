@@ -24,9 +24,7 @@ class TreeNode<T>(val value: T) {
 
     fun forEachVisit(visitBefore: Visitor<T>, visitAfter: Visitor<T>) {
         visitBefore(this)
-        children.forEach {
-            it.forEachVisit(visitBefore, visitAfter)
-        }
+        children.forEach { it.forEachVisit(visitBefore, visitAfter) }
         visitAfter(this)
     }
 }

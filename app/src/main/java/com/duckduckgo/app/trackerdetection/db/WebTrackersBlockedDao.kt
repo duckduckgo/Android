@@ -25,13 +25,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WebTrackersBlockedDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: WebTrackerBlocked)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(tracker: WebTrackerBlocked)
 
     @Query("DELETE FROM web_trackers_blocked WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
-    @Query("SELECT * FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
+    @Query(
+        "SELECT * FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<WebTrackerBlocked>>
-
 }

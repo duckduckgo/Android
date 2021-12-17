@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface PrivacyDashboardActivityComponent : AndroidInjector<PrivacyDashboardActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<PrivacyDashboardActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<PrivacyDashboardActivity>
 }
 
 @ContributesTo(AppScope::class)

@@ -28,11 +28,17 @@ class MainReasonAdapter(private val itemClickListener: (FeedbackTypeMainReasonDi
     ListAdapter<FeedbackTypeMainReasonDisplay, MainReasonAdapter.ViewHolder>(DiffCallback()) {
 
     class DiffCallback : DiffUtil.ItemCallback<FeedbackTypeMainReasonDisplay>() {
-        override fun areItemsTheSame(oldItem: FeedbackTypeMainReasonDisplay, newItem: FeedbackTypeMainReasonDisplay): Boolean {
+        override fun areItemsTheSame(
+            oldItem: FeedbackTypeMainReasonDisplay,
+            newItem: FeedbackTypeMainReasonDisplay
+        ): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: FeedbackTypeMainReasonDisplay, newItem: FeedbackTypeMainReasonDisplay): Boolean {
+        override fun areContentsTheSame(
+            oldItem: FeedbackTypeMainReasonDisplay,
+            newItem: FeedbackTypeMainReasonDisplay
+        ): Boolean {
             return oldItem == newItem
         }
     }
@@ -47,12 +53,15 @@ class MainReasonAdapter(private val itemClickListener: (FeedbackTypeMainReasonDi
         holder.bind(getItem(position), itemClickListener)
     }
 
-    data class ViewHolder(val binding: ItemFeedbackReasonBinding) : RecyclerView.ViewHolder(binding.root) {
+    data class ViewHolder(val binding: ItemFeedbackReasonBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(reason: FeedbackTypeMainReasonDisplay, clickListener: (FeedbackTypeMainReasonDisplay) -> Unit) {
+        fun bind(
+            reason: FeedbackTypeMainReasonDisplay,
+            clickListener: (FeedbackTypeMainReasonDisplay) -> Unit
+        ) {
             binding.reason.text = binding.root.context.getString(reason.listDisplayResId)
             binding.root.setOnClickListener { clickListener(reason) }
         }
     }
-
 }

@@ -43,17 +43,11 @@ import org.junit.Test
 @Suppress("RemoveExplicitTypeArguments")
 class FeedbackViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: FeedbackViewModel
 
@@ -70,7 +64,12 @@ class FeedbackViewModelTest {
     @Before
     @UiThreadTest
     fun setup() {
-        testee = FeedbackViewModel(playStoreUtils, feedbackSubmitter, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        testee =
+            FeedbackViewModel(
+                playStoreUtils,
+                feedbackSubmitter,
+                TestCoroutineScope(),
+                coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -126,52 +125,61 @@ class FeedbackViewModelTest {
     }
 
     @Test
-    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenSubmitted() = runBlocking<Unit> {
-        testee.userGavePositiveFeedbackNoDetails()
+    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenSubmitted() =
+        runBlocking<Unit> {
+            testee.userGavePositiveFeedbackNoDetails()
 
-        verify(feedbackSubmitter).sendPositiveFeedback(null)
-    }
-
-    @Test
-    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
-        testee.userGavePositiveFeedbackNoDetails()
-
-        val command = captureCommand() as Command.Exit
-        assertTrue(command.feedbackSubmitted)
-    }
+            verify(feedbackSubmitter).sendPositiveFeedback(null)
+        }
 
     @Test
-    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        testee.userProvidedPositiveOpenEndedFeedback("foo")
+    fun whenUserChoosesNotToProvideFurtherDetailsForPositiveFeedbackThenExitCommandIssued() =
+        runBlocking<Unit> {
+            testee.userGavePositiveFeedbackNoDetails()
 
-        verify(feedbackSubmitter).sendPositiveFeedback("foo")
-    }
-
-    @Test
-    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenExitCommandIssued() = runBlocking<Unit> {
-        testee.userProvidedPositiveOpenEndedFeedback("foo")
-
-        val command = captureCommand() as Command.Exit
-        assertTrue(command.feedbackSubmitted)
-    }
+            val command = captureCommand() as Command.Exit
+            assertTrue(command.feedbackSubmitted)
+        }
 
     @Test
-    fun whenUserProvidesNegativeFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
-        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
-    }
+    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenFeedbackSubmitted() =
+        runBlocking<Unit> {
+            testee.userProvidedPositiveOpenEndedFeedback("foo")
+
+            verify(feedbackSubmitter).sendPositiveFeedback("foo")
+        }
 
     @Test
-    fun whenUserProvidesNegativeFeedbackNoSubReasonThenFeedbackSubmitted() = runBlocking<Unit> {
-        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "foo")
-        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "foo")
-    }
+    fun whenUserProvidesFurtherDetailsForPositiveFeedbackThenExitCommandIssued() =
+        runBlocking<Unit> {
+            testee.userProvidedPositiveOpenEndedFeedback("foo")
+
+            val command = captureCommand() as Command.Exit
+            assertTrue(command.feedbackSubmitted)
+        }
 
     @Test
-    fun whenUserProvidesNegativeFeedbackEmptyOpenEndedFeedbackThenFeedbackSubmitted() = runBlocking<Unit> {
-        testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "")
-        verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "")
-    }
+    fun whenUserProvidesNegativeFeedbackThenFeedbackSubmitted() =
+        runBlocking<Unit> {
+            testee.userProvidedNegativeOpenEndedFeedback(
+                MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
+            verify(feedbackSubmitter)
+                .sendNegativeFeedback(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT, "foo")
+        }
+
+    @Test
+    fun whenUserProvidesNegativeFeedbackNoSubReasonThenFeedbackSubmitted() =
+        runBlocking<Unit> {
+            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "foo")
+            verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "foo")
+        }
+
+    @Test
+    fun whenUserProvidesNegativeFeedbackEmptyOpenEndedFeedbackThenFeedbackSubmitted() =
+        runBlocking<Unit> {
+            testee.userProvidedNegativeOpenEndedFeedback(MISSING_BROWSING_FEATURES, null, "")
+            verify(feedbackSubmitter).sendNegativeFeedback(MISSING_BROWSING_FEATURES, null, "")
+        }
 
     @Test
     @UiThreadTest
@@ -249,7 +257,8 @@ class FeedbackViewModelTest {
     @Test
     @UiThreadTest
     fun whenUserSelectsSubNegativeReasonThenFragmentStateIsOpenEndedFeedback() {
-        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        testee.userSelectedSubReasonMissingBrowserFeatures(
+            MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         assertTrue(updateViewCommand is NegativeOpenEndedFeedback)
         verifyForwardsNavigation(updateViewCommand)
     }
@@ -267,7 +276,8 @@ class FeedbackViewModelTest {
     @UiThreadTest
     fun whenUserNavigatesBackFromOpenEndedFeedbackAndSubReasonIsValidStepThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
-        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        testee.userSelectedSubReasonMissingBrowserFeatures(
+            MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         testee.onBackPressed()
         assertTrue(updateViewCommand is NegativeFeedbackSubReason)
         verifyBackwardsNavigation(updateViewCommand)
@@ -286,7 +296,8 @@ class FeedbackViewModelTest {
     @UiThreadTest
     fun whenUserNavigatesBackFromOpenEndedFeedbackThenFragmentStateIsSubReasonSelection() {
         testee.userSelectedNegativeFeedbackMainReason(MISSING_BROWSING_FEATURES)
-        testee.userSelectedSubReasonMissingBrowserFeatures(MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
+        testee.userSelectedSubReasonMissingBrowserFeatures(
+            MISSING_BROWSING_FEATURES, TAB_MANAGEMENT)
         testee.onBackPressed()
         assertTrue(updateViewCommand is NegativeFeedbackSubReason)
         verifyBackwardsNavigation(updateViewCommand)

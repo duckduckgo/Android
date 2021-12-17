@@ -21,10 +21,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
+import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)

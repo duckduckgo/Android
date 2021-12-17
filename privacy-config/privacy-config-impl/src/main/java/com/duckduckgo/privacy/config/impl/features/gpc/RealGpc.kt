@@ -26,14 +26,22 @@ import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository, private val unprotectedTemporary: UnprotectedTemporary) : Gpc {
+class RealGpc
+@Inject
+constructor(
+    context: Context,
+    private val featureToggle: FeatureToggle,
+    val gpcRepository: GpcRepository,
+    private val unprotectedTemporary: UnprotectedTemporary
+) : Gpc {
 
-    private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
+    private val gpcJsFunctions: String =
+        context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
 
     override fun getGpcJs(): String {
         return gpcJsFunctions
@@ -91,11 +99,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         const val GPC_HEADER = "sec-gpc"
         const val GPC_HEADER_VALUE = "1"
 
-        private val headerConsumers = listOf(
-            "nytimes.com",
-            "globalprivacycontrol.org",
-            "global-privacy-control.glitch.me"
-        )
+        private val headerConsumers =
+            listOf("nytimes.com", "globalprivacycontrol.org", "global-privacy-control.glitch.me")
     }
-
 }

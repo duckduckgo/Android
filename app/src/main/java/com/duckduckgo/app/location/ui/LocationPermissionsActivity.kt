@@ -17,30 +17,30 @@
 package com.duckduckgo.app.location.ui
 
 import android.Manifest
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityLocationPermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
-class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
+class LocationPermissionsActivity :
+    DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
     private val binding: ActivityLocationPermissionsBinding by viewBinding()
     lateinit var adapter: LocationPermissionsAdapter
@@ -72,53 +72,60 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
                 viewState?.let {
                     if (!it.systemLocationPermissionGranted) {
                         binding.recycler.gone()
-                        binding.locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
+                        binding.locationPermissionsNoSystemPermission.text =
+                            getString(R.string.preciseLocationNoSystemPermission).html(this)
                         binding.locationPermissionsNoSystemPermission.show()
                     } else {
                         binding.recycler.show()
                         binding.locationPermissionsNoSystemPermission.gone()
-                        adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
+                        adapter.updatePermissions(
+                            it.locationPermissionEnabled, it.locationPermissionEntities)
                     }
                 }
-            }
-        )
+            })
 
         viewModel.command.observe(
             this,
             Observer {
                 when (it) {
-                    is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
-                    is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
+                    is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission ->
+                        confirmDeleteWebsite(it.entity)
+                    is LocationPermissionsViewModel.Command.EditLocationPermissions ->
+                        editSiteLocationPermission(it.entity)
                 }
-            }
-        )
+            })
     }
 
     private fun loadSystemPermission() {
         viewModel.loadLocationPermissions(
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED)
     }
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: LocationPermissionEntity) {
-        val message = getString(R.string.preciseLocationDeleteConfirmMessage, entity.domain.websiteFromGeoLocationsApiOrigin()).html(this)
+        val message =
+            getString(
+                    R.string.preciseLocationDeleteConfirmMessage,
+                    entity.domain.websiteFromGeoLocationsApiOrigin())
+                .html(this)
         val title = getString(R.string.dialogConfirmTitle)
-        deleteDialog = AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.delete(entity) }
-            .setNegativeButton(android.R.string.no) { _, _ -> }
-            .create()
+        deleteDialog =
+            AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.delete(entity) }
+                .setNegativeButton(android.R.string.no) { _, _ -> }
+                .create()
         deleteDialog?.show()
     }
 
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
-        val dialog = SiteLocationPermissionDialog.instance(origin = entity.domain, isEditingPermission = true, tabId = "")
-        dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
+        val dialog =
+            SiteLocationPermissionDialog.instance(
+                origin = entity.domain, isEditingPermission = true, tabId = "")
+        dialog.show(
+            supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
     override fun onDestroy() {
@@ -126,7 +133,10 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
         super.onDestroy()
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         viewModel.onSiteLocationPermissionSelected(domain, permission)
     }
 
@@ -134,6 +144,5 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
         fun intent(context: Context): Intent {
             return Intent(context, LocationPermissionsActivity::class.java)
         }
-
     }
 }

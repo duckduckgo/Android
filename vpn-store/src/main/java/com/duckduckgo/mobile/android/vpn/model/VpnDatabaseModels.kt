@@ -24,10 +24,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
-@Entity(
-    tableName = "vpn_tracker",
-    indices = [Index(value = ["timestamp"])]
-)
+@Entity(tableName = "vpn_tracker", indices = [Index(value = ["timestamp"])])
 data class VpnTracker(
     @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
@@ -38,16 +35,10 @@ data class VpnTracker(
     val timestamp: String = DatabaseDateFormatter.timestamp()
 )
 
-data class BucketizedVpnTracker(
-    val bucket: String,
-    @Embedded val vpnTracker: VpnTracker
-)
+data class BucketizedVpnTracker(val bucket: String, @Embedded val vpnTracker: VpnTracker)
 
 @Entity(tableName = "vpn_state")
-data class VpnState(
-    @PrimaryKey val id: Long = 1,
-    val uuid: String
-)
+data class VpnState(@PrimaryKey val id: Long = 1, val uuid: String)
 
 @Entity(tableName = "vpn_data_stats")
 data class VpnDataStats(
@@ -59,13 +50,12 @@ data class VpnDataStats(
 )
 
 @Entity(tableName = "vpn_running_stats")
-data class VpnRunningStats(
-    @PrimaryKey val id: String,
-    val timeRunningMillis: Long
-)
+data class VpnRunningStats(@PrimaryKey val id: String, val timeRunningMillis: Long)
 
 enum class VpnServiceState {
-    ENABLED, DISABLED, INVALID
+    ENABLED,
+    DISABLED,
+    INVALID
 }
 
 @Entity(tableName = "vpn_service_state_stats")
@@ -81,10 +71,7 @@ data class BucketizedVpnServiceStateStats(
 )
 
 @Entity(tableName = "vpn_preferences")
-data class VpnPreferences(
-    @PrimaryKey val preference: String,
-    val value: Boolean
-)
+data class VpnPreferences(@PrimaryKey val preference: String, val value: Boolean)
 
 data class TrackingApp(val packageId: String, val appDisplayName: String) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"

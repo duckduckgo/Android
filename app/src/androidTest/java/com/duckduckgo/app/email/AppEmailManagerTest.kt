@@ -18,9 +18,9 @@ package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
+import com.duckduckgo.app.email.AppEmailManager.WaitlistState.*
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailInviteCodeResponse
 import com.duckduckgo.app.email.api.EmailService
@@ -45,11 +45,9 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppEmailManagerTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
@@ -57,41 +55,50 @@ class AppEmailManagerTest {
 
     @Before
     fun setup() {
-        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        testee =
+            AppEmailManager(
+                mockEmailService,
+                mockEmailDataStore,
+                coroutineRule.testDispatcherProvider,
+                TestCoroutineScope())
     }
 
     @Test
-    fun whenFetchAliasFromServiceThenStoreAliasAddingDuckDomain() = coroutineRule.runBlocking {
-        mockEmailDataStore.emailToken = "token"
-        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias("test"))
-        testee.getAlias()
+    fun whenFetchAliasFromServiceThenStoreAliasAddingDuckDomain() =
+        coroutineRule.runBlocking {
+            mockEmailDataStore.emailToken = "token"
+            whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias("test"))
+            testee.getAlias()
 
-        assertEquals("test$DUCK_EMAIL_DOMAIN", mockEmailDataStore.nextAlias)
-    }
-
-    @Test
-    fun whenFetchAliasFromServiceAndTokenDoesNotExistThenDoNothing() = coroutineRule.runBlocking {
-        mockEmailDataStore.emailToken = null
-        testee.getAlias()
-
-        verify(mockEmailService, never()).newAlias(any())
-    }
+            assertEquals("test$DUCK_EMAIL_DOMAIN", mockEmailDataStore.nextAlias)
+        }
 
     @Test
-    fun whenFetchAliasFromServiceAndAddressIsBlankThenStoreNull() = coroutineRule.runBlocking {
-        mockEmailDataStore.emailToken = "token"
-        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
-        testee.getAlias()
+    fun whenFetchAliasFromServiceAndTokenDoesNotExistThenDoNothing() =
+        coroutineRule.runBlocking {
+            mockEmailDataStore.emailToken = null
+            testee.getAlias()
 
-        assertNull(mockEmailDataStore.nextAlias)
-    }
+            verify(mockEmailService, never()).newAlias(any())
+        }
 
     @Test
-    fun whenGetAliasThenReturnNextAlias() = coroutineRule.runBlocking {
-        givenNextAliasExists()
+    fun whenFetchAliasFromServiceAndAddressIsBlankThenStoreNull() =
+        coroutineRule.runBlocking {
+            mockEmailDataStore.emailToken = "token"
+            whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+            testee.getAlias()
 
-        assertEquals("alias", testee.getAlias())
-    }
+            assertNull(mockEmailDataStore.nextAlias)
+        }
+
+    @Test
+    fun whenGetAliasThenReturnNextAlias() =
+        coroutineRule.runBlocking {
+            givenNextAliasExists()
+
+            assertEquals("alias", testee.getAlias())
+        }
 
     @Test
     fun whenGetAliasIfNextAliasDoesNotExistThenReturnNull() {
@@ -130,14 +137,15 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenStoreCredentialsThenGenerateNewAlias() = coroutineRule.runBlocking {
-        mockEmailDataStore.emailToken = "token"
-        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+    fun whenStoreCredentialsThenGenerateNewAlias() =
+        coroutineRule.runBlocking {
+            mockEmailDataStore.emailToken = "token"
+            whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
 
-        testee.storeCredentials("token", "username", "cohort")
+            testee.storeCredentials("token", "username", "cohort")
 
-        verify(mockEmailService).newAlias(any())
-    }
+            verify(mockEmailService).newAlias(any())
+        }
 
     @Test
     fun whenStoreCredentialsThenCredentialsAreStoredInDataStore() {
@@ -149,18 +157,20 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenStoreCredentialsIfCredentialsWereCorrectlyStoredThenIsSignedInChannelSendsTrue() = coroutineRule.runBlocking {
-        testee.storeCredentials("token", "username", "cohort")
+    fun whenStoreCredentialsIfCredentialsWereCorrectlyStoredThenIsSignedInChannelSendsTrue() =
+        coroutineRule.runBlocking {
+            testee.storeCredentials("token", "username", "cohort")
 
-        assertTrue(testee.signedInFlow().first())
-    }
+            assertTrue(testee.signedInFlow().first())
+        }
 
     @Test
-    fun whenStoreCredentialsIfCredentialsAreBlankThenIsSignedInChannelSendsFalse() = coroutineRule.runBlocking {
-        testee.storeCredentials("", "", "cohort")
+    fun whenStoreCredentialsIfCredentialsAreBlankThenIsSignedInChannelSendsFalse() =
+        coroutineRule.runBlocking {
+            testee.storeCredentials("", "", "cohort")
 
-        assertFalse(testee.signedInFlow().first())
-    }
+            assertFalse(testee.signedInFlow().first())
+        }
 
     @Test
     fun whenSignedOutThenClearEmailDataAndAliasIsNull() {
@@ -174,11 +184,12 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenSignedOutThenIsSignedInChannelSendsFalse() = coroutineRule.runBlocking {
-        testee.signOut()
+    fun whenSignedOutThenIsSignedInChannelSendsFalse() =
+        coroutineRule.runBlocking {
+            testee.signOut()
 
-        assertFalse(testee.signedInFlow().first())
-    }
+            assertFalse(testee.signedInFlow().first())
+        }
 
     @Test
     fun whenGetEmailAddressThenDuckEmailDomainIsAppended() {
@@ -267,63 +278,80 @@ class AppEmailManagerTest {
     }
 
     @Test
-    fun whenFetchInviteCodeIfCodeAlreadyExistsThenReturnCodeExisted() = coroutineRule.runBlocking {
-        mockEmailDataStore.inviteCode = "inviteCode"
+    fun whenFetchInviteCodeIfCodeAlreadyExistsThenReturnCodeExisted() =
+        coroutineRule.runBlocking {
+            mockEmailDataStore.inviteCode = "inviteCode"
 
-        assertEquals(AppEmailManager.FetchCodeResult.CodeExisted, testee.fetchInviteCode())
-    }
-
-    @Test
-    fun whenFetchInviteCodeIfTimestampIsSmallerThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
-        givenUserIsInWaitlist()
-        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(12345))
-
-        testee.fetchInviteCode()
-
-        verify(mockEmailService).getCode("token")
-    }
+            assertEquals(AppEmailManager.FetchCodeResult.CodeExisted, testee.fetchInviteCode())
+        }
 
     @Test
-    fun whenFetchInviteCodeIfTimestampIsEqualsThanQueueTimestampThenCallGetCode() = coroutineRule.runBlocking {
-        givenUserIsInWaitlist()
-        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
+    fun whenFetchInviteCodeIfTimestampIsSmallerThanQueueTimestampThenCallGetCode() =
+        coroutineRule.runBlocking {
+            givenUserIsInWaitlist()
+            whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(12345))
 
-        testee.fetchInviteCode()
+            testee.fetchInviteCode()
 
-        verify(mockEmailService).getCode("token")
-    }
-
-    @Test
-    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeAvailableThenReturnCode() = coroutineRule.runBlocking {
-        givenUserIsTopOfTheQueue()
-        whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse("code"))
-
-        assertEquals(AppEmailManager.FetchCodeResult.Code, testee.fetchInviteCode())
-    }
+            verify(mockEmailService).getCode("token")
+        }
 
     @Test
-    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
-        givenUserIsTopOfTheQueue()
-        whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse(""))
+    fun whenFetchInviteCodeIfTimestampIsEqualsThanQueueTimestampThenCallGetCode() =
+        coroutineRule.runBlocking {
+            givenUserIsInWaitlist()
+            whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
 
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
-    }
+            testee.fetchInviteCode()
 
-    @Test
-    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeServiceNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
-        testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
-        givenUserIsTopOfTheQueue()
-
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
-    }
+            verify(mockEmailService).getCode("token")
+        }
 
     @Test
-    fun whenFetchInviteCodeIfUserInTheQueueAndStatusServiceNotAvailableThenReturnNoCode() = coroutineRule.runBlocking {
-        testee = AppEmailManager(TestEmailService(), mockEmailDataStore, coroutineRule.testDispatcherProvider, TestCoroutineScope())
-        givenUserIsInWaitlist()
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeAvailableThenReturnCode() =
+        coroutineRule.runBlocking {
+            givenUserIsTopOfTheQueue()
+            whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse("code"))
 
-        assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
-    }
+            assertEquals(AppEmailManager.FetchCodeResult.Code, testee.fetchInviteCode())
+        }
+
+    @Test
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeNotAvailableThenReturnNoCode() =
+        coroutineRule.runBlocking {
+            givenUserIsTopOfTheQueue()
+            whenever(mockEmailService.getCode(any())).thenReturn(EmailInviteCodeResponse(""))
+
+            assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        }
+
+    @Test
+    fun whenFetchInviteCodeIfUserIsTopOfQueueAndCodeServiceNotAvailableThenReturnNoCode() =
+        coroutineRule.runBlocking {
+            testee =
+                AppEmailManager(
+                    TestEmailService(),
+                    mockEmailDataStore,
+                    coroutineRule.testDispatcherProvider,
+                    TestCoroutineScope())
+            givenUserIsTopOfTheQueue()
+
+            assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        }
+
+    @Test
+    fun whenFetchInviteCodeIfUserInTheQueueAndStatusServiceNotAvailableThenReturnNoCode() =
+        coroutineRule.runBlocking {
+            testee =
+                AppEmailManager(
+                    TestEmailService(),
+                    mockEmailDataStore,
+                    coroutineRule.testDispatcherProvider,
+                    TestCoroutineScope())
+            givenUserIsInWaitlist()
+
+            assertEquals(AppEmailManager.FetchCodeResult.NoCode, testee.fetchInviteCode())
+        }
 
     @Test
     fun whenNotifyOnJoinedWaitlistThenSendNotificationSetToTrue() {
@@ -383,13 +411,14 @@ class AppEmailManagerTest {
         mockEmailDataStore.waitlistToken = "token"
     }
 
-    private fun givenUserIsTopOfTheQueue() = coroutineRule.runBlocking {
-        givenUserIsInWaitlist()
-        whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
-    }
+    private fun givenUserIsTopOfTheQueue() =
+        coroutineRule.runBlocking {
+            givenUserIsInWaitlist()
+            whenever(mockEmailService.waitlistStatus()).thenReturn(WaitlistStatusResponse(1234))
+        }
 
     private fun givenNextAliasExists() {
-//        cachedAlias.set("alias")
+        //        cachedAlias.set("alias")
         mockEmailDataStore.nextAlias = "alias"
     }
 
@@ -418,5 +447,4 @@ class FakeEmailDataStore : EmailDataStore {
 
     var canUseEncryption: Boolean = false
     override fun canUseEncryption(): Boolean = canUseEncryption
-
 }

@@ -26,11 +26,11 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
+import java.io.InputStream
+import java.security.cert.X509Certificate
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
 import timber.log.Timber
-import java.io.InputStream
-import java.security.cert.X509Certificate
 
 @GlideModule
 class GlobalGlideModule : AppGlideModule() {
@@ -42,22 +42,25 @@ class GlobalGlideModule : AppGlideModule() {
                 val isrgRootX1 = IsrgRootX1(context)
                 val isrgRootX2 = IsrgRootX2(context)
 
-                val handshakeCertificates = HandshakeCertificates.Builder()
-                    .addTrustedCertificate(isrgRootX1.certificate() as X509Certificate)
-                    .addTrustedCertificate(isrgRootX2.certificate() as X509Certificate)
-                    .addPlatformTrustedCertificates()
-                    .build()
+                val handshakeCertificates =
+                    HandshakeCertificates.Builder()
+                        .addTrustedCertificate(isrgRootX1.certificate() as X509Certificate)
+                        .addTrustedCertificate(isrgRootX2.certificate() as X509Certificate)
+                        .addPlatformTrustedCertificates()
+                        .build()
 
-                val okHttpClient = OkHttpClient.Builder()
-                    .sslSocketFactory(handshakeCertificates.sslSocketFactory(), handshakeCertificates.trustManager)
-                    .build()
+                val okHttpClient =
+                    OkHttpClient.Builder()
+                        .sslSocketFactory(
+                            handshakeCertificates.sslSocketFactory(),
+                            handshakeCertificates.trustManager)
+                        .build()
 
                 // use our custom okHttp instead of default HTTPUrlConnection
                 registry.replace(
                     GlideUrl::class.java,
                     InputStream::class.java,
-                    OkHttpUrlLoader.Factory(okHttpClient)
-                )
+                    OkHttpUrlLoader.Factory(okHttpClient))
             } catch (t: Throwable) {
                 Timber.d("Error registering GlideModule for GlideUrl: $t")
                 super.registerComponents(context, glide, registry)

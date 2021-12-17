@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,26 +29,28 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerBlocklist(tracker: List<AppTracker>)
 
-    @Query("SELECT * FROM vpn_app_tracker_blocking_list WHERE :subdomain LIKE '%' || hostname LIMIT 1")
+    @Query(
+        "SELECT * FROM vpn_app_tracker_blocking_list WHERE :subdomain LIKE '%' || hostname LIMIT 1")
     fun getTrackerBySubdomain(subdomain: String): AppTracker?
 
     @Query("SELECT * from vpn_app_tracker_blocking_list_metadata ORDER BY id DESC LIMIT 1")
     fun getTrackerBlocklistMetadata(): AppTrackerMetadata?
 
-    @Insert
-    fun setTrackerBlocklistMetadata(appTrackerMetadata: AppTrackerMetadata)
+    @Insert fun setTrackerBlocklistMetadata(appTrackerMetadata: AppTrackerMetadata)
 
-    @Query("DELETE from vpn_app_tracker_blocking_list")
-    fun deleteTrackerBlockList()
+    @Query("DELETE from vpn_app_tracker_blocking_list") fun deleteTrackerBlockList()
 
-    @Query("DELETE FROM vpn_app_tracker_blocking_app_packages")
-    fun deleteAppPackages()
+    @Query("DELETE FROM vpn_app_tracker_blocking_app_packages") fun deleteAppPackages()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAppPackages(appPackages: List<AppTrackerPackage>)
 
     @Transaction
-    fun updateTrackerBlocklist(blocklist: List<AppTracker>, appPackages: List<AppTrackerPackage>, metadata: AppTrackerMetadata) {
+    fun updateTrackerBlocklist(
+        blocklist: List<AppTracker>,
+        appPackages: List<AppTrackerPackage>,
+        metadata: AppTrackerMetadata
+    ) {
         setTrackerBlocklistMetadata(metadata)
 
         deleteTrackerBlockList()
@@ -76,11 +78,13 @@ interface VpnAppTrackerBlockingDao {
     @Query("SELECT * from vpn_app_tracker_exclusion_list_metadata ORDER BY id DESC LIMIT 1")
     fun getExclusionListMetadata(): AppTrackerExclusionListMetadata?
 
-    @Query("DELETE from vpn_app_tracker_exclusion_list")
-    fun deleteExclusionList()
+    @Query("DELETE from vpn_app_tracker_exclusion_list") fun deleteExclusionList()
 
     @Transaction
-    fun updateExclusionList(exclusionList: List<AppTrackerExcludedPackage>, metadata: AppTrackerExclusionListMetadata) {
+    fun updateExclusionList(
+        exclusionList: List<AppTrackerExcludedPackage>,
+        metadata: AppTrackerExclusionListMetadata
+    ) {
         setExclusionListMetadata(metadata)
         deleteExclusionList()
         insertExclusionList(exclusionList)
@@ -99,16 +103,20 @@ interface VpnAppTrackerBlockingDao {
     fun getTrackerExceptionRulesFlow(): Flow<List<AppTrackerExceptionRule>>
 
     @Insert
-    fun setTrackerExceptionRulesMetadata(appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata)
+    fun setTrackerExceptionRulesMetadata(
+        appTrackerExceptionRuleMetadata: AppTrackerExceptionRuleMetadata
+    )
 
     @Query("SELECT * from vpn_app_tracker_exception_rules_metadata ORDER BY id DESC LIMIT 1")
     fun getTrackerExceptionRulesMetadata(): AppTrackerExceptionRuleMetadata?
 
-    @Query("DELETE from vpn_app_tracker_exception_rules")
-    fun deleteTrackerExceptionRules()
+    @Query("DELETE from vpn_app_tracker_exception_rules") fun deleteTrackerExceptionRules()
 
     @Transaction
-    fun updateTrackerExceptionRules(exceptionRules: List<AppTrackerExceptionRule>, metadata: AppTrackerExceptionRuleMetadata) {
+    fun updateTrackerExceptionRules(
+        exceptionRules: List<AppTrackerExceptionRule>,
+        metadata: AppTrackerExceptionRuleMetadata
+    ) {
         setTrackerExceptionRulesMetadata(metadata)
         deleteTrackerExceptionRules()
         insertTrackerExceptionRules(exceptionRules)
@@ -123,7 +131,5 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoManualAppExclusionList(excludedApp: AppTrackerManualExcludedApp)
 
-    @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
-    fun deleteManualAppExclusionList()
-
+    @Query("DELETE from vpn_app_tracker_manual_exclusion_list") fun deleteManualAppExclusionList()
 }

@@ -41,27 +41,23 @@ import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 
 @ExperimentalCoroutinesApi
 class LocationPermissionsViewModelTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
 
@@ -69,9 +65,11 @@ class LocationPermissionsViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private val commandCaptor = ArgumentCaptor.forClass(LocationPermissionsViewModel.Command::class.java)
+    private val commandCaptor =
+        ArgumentCaptor.forClass(LocationPermissionsViewModel.Command::class.java)
 
-    private val viewStateCaptor = ArgumentCaptor.forClass(LocationPermissionsViewModel.ViewState::class.java)
+    private val viewStateCaptor =
+        ArgumentCaptor.forClass(LocationPermissionsViewModel.ViewState::class.java)
 
     private val mockCommandObserver: Observer<LocationPermissionsViewModel.Command> = mock()
 
@@ -89,17 +87,23 @@ class LocationPermissionsViewModelTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         locationPermissionsDao = db.locationPermissionsDao()
-        viewModel = LocationPermissionsViewModel(
-            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
-            mockGeoLocationPermissions,
-            coroutineRule.testDispatcherProvider,
-            settingsDataStore,
-            mockPixel
-        )
+        viewModel =
+            LocationPermissionsViewModel(
+                LocationPermissionsRepository(
+                    locationPermissionsDao,
+                    lazyFaviconManager,
+                    coroutineRule.testDispatcherProvider),
+                mockGeoLocationPermissions,
+                coroutineRule.testDispatcherProvider,
+                settingsDataStore,
+                mockPixel)
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
     }
@@ -113,7 +117,8 @@ class LocationPermissionsViewModelTest {
 
     @Test
     fun whenSystemLocationPermissionsAreEnabledAndViewModelIsLoadedThenInitialisedWithProperViewState() {
-        val defaultViewState = LocationPermissionsViewModel.ViewState(false, false, true, emptyList())
+        val defaultViewState =
+            LocationPermissionsViewModel.ViewState(false, false, true, emptyList())
 
         viewModel.loadLocationPermissions(true)
 
@@ -123,7 +128,8 @@ class LocationPermissionsViewModelTest {
 
     @Test
     fun whenSystemLocationPermissionsAreDisabledAndViewModelIsLoadedThenInitialisedWithProperViewState() {
-        val defaultViewState = LocationPermissionsViewModel.ViewState(false, false, false, emptyList())
+        val defaultViewState =
+            LocationPermissionsViewModel.ViewState(false, false, false, emptyList())
 
         viewModel.loadLocationPermissions(false)
 
@@ -143,7 +149,8 @@ class LocationPermissionsViewModelTest {
 
     @Test
     fun whenUserDeletesLocationPermissionThenConfirmDeleteCommandIssued() {
-        val locationPermissionEntity = LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
+        val locationPermissionEntity =
+            LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
         viewModel.onDeleteRequested(locationPermissionEntity)
 
         assertCommandIssued<LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission> {
@@ -152,33 +159,39 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserDeletesLocationPermissionThenViewStateIsUpdated() = coroutineRule.runBlocking {
-        givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
+    fun whenUserDeletesLocationPermissionThenViewStateIsUpdated() =
+        coroutineRule.runBlocking {
+            givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
 
-        viewModel.loadLocationPermissions(true)
+            viewModel.loadLocationPermissions(true)
 
-        val locationPermissionEntity = LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
-        viewModel.delete(locationPermissionEntity)
+            val locationPermissionEntity =
+                LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
+            viewModel.delete(locationPermissionEntity)
 
-        Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.isEmpty())
-    }
+            Mockito.verify(mockViewStateObserver, atLeastOnce())
+                .onChanged(viewStateCaptor.capture())
+            assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.isEmpty())
+        }
 
     @Test
-    fun whenUserDeletesLocationPermissionThenGeoLocationPermissionDeletesDomain() = coroutineRule.runBlocking {
-        val domain = "domain.com"
-        givenLocationPermission(LocationPermissionType.ALLOW_ONCE, domain)
+    fun whenUserDeletesLocationPermissionThenGeoLocationPermissionDeletesDomain() =
+        coroutineRule.runBlocking {
+            val domain = "domain.com"
+            givenLocationPermission(LocationPermissionType.ALLOW_ONCE, domain)
 
-        val locationPermissionEntity = LocationPermissionEntity(domain, LocationPermissionType.ALLOW_ONCE)
-        viewModel.delete(locationPermissionEntity)
+            val locationPermissionEntity =
+                LocationPermissionEntity(domain, LocationPermissionType.ALLOW_ONCE)
+            viewModel.delete(locationPermissionEntity)
 
-        assertNull(locationPermissionsDao.getPermission(domain))
-        Mockito.verify(mockGeoLocationPermissions).clear(domain)
-    }
+            assertNull(locationPermissionsDao.getPermission(domain))
+            Mockito.verify(mockGeoLocationPermissions).clear(domain)
+        }
 
     @Test
     fun whenUseEditsLocationPermissionThenEditCommandIssued() {
-        val locationPermissionEntity = LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
+        val locationPermissionEntity =
+            LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
         viewModel.onEditRequested(locationPermissionEntity)
 
         assertCommandIssued<LocationPermissionsViewModel.Command.EditLocationPermissions> {
@@ -187,13 +200,15 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesLocationPermissionsThenViewStateUpdated() = coroutineRule.runBlocking {
-        viewModel.loadLocationPermissions(true)
-        viewModel.onLocationPermissionToggled(true)
+    fun whenUserTogglesLocationPermissionsThenViewStateUpdated() =
+        coroutineRule.runBlocking {
+            viewModel.loadLocationPermissions(true)
+            viewModel.onLocationPermissionToggled(true)
 
-        Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.locationPermissionEnabled)
-    }
+            Mockito.verify(mockViewStateObserver, atLeastOnce())
+                .onChanged(viewStateCaptor.capture())
+            assertTrue(viewStateCaptor.value.locationPermissionEnabled)
+        }
 
     @Test
     fun whenUserTogglesLocationPermissionThenUpdateSettingsDataStore() {
@@ -203,82 +218,101 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserDisablesLocationPermissionThenAllPermissionsAreCleared() = coroutineRule.runBlocking {
-        viewModel.onLocationPermissionToggled(false)
+    fun whenUserDisablesLocationPermissionThenAllPermissionsAreCleared() =
+        coroutineRule.runBlocking {
+            viewModel.onLocationPermissionToggled(false)
 
-        Mockito.verify(mockGeoLocationPermissions).clearAll()
-    }
-
-    @Test
-    fun whenUserEnablesLocationPermissionThenPermissionsAreNotModified() = coroutineRule.runBlocking {
-        viewModel.onLocationPermissionToggled(true)
-
-        Mockito.verifyNoMoreInteractions(mockGeoLocationPermissions)
-    }
+            Mockito.verify(mockGeoLocationPermissions).clearAll()
+        }
 
     @Test
-    fun whenUserEditsLocationPermissionThenViewStateIsUpdated() = coroutineRule.runBlocking {
-        givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
+    fun whenUserEnablesLocationPermissionThenPermissionsAreNotModified() =
+        coroutineRule.runBlocking {
+            viewModel.onLocationPermissionToggled(true)
 
-        viewModel.loadLocationPermissions(true)
-
-        viewModel.onSiteLocationPermissionSelected("domain.com", LocationPermissionType.DENY_ALWAYS)
-
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
-        Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
-
-        val newPermission = viewStateCaptor.lastValue.locationPermissionEntities[0].permission
-        assertTrue(newPermission == LocationPermissionType.DENY_ALWAYS)
-    }
+            Mockito.verifyNoMoreInteractions(mockGeoLocationPermissions)
+        }
 
     @Test
-    fun whenAllowAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
+    fun whenUserEditsLocationPermissionThenViewStateIsUpdated() =
+        coroutineRule.runBlocking {
+            givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
 
-        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+            viewModel.loadLocationPermissions(true)
 
-        verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
-        verify(mockGeoLocationPermissions).allow(domain)
-        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
-    }
+            viewModel.onSiteLocationPermissionSelected(
+                "domain.com", LocationPermissionType.DENY_ALWAYS)
 
-    @Test
-    fun whenAllowOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = coroutineRule.runBlocking {
-        val domain = "example.com"
-        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+            verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+            Mockito.verify(mockViewStateObserver, atLeastOnce())
+                .onChanged(viewStateCaptor.capture())
+            assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
 
-        verify(mockGeoLocationPermissions).clear(domain)
-
-        assertNull(locationPermissionsDao.getPermission(domain))
-    }
+            val newPermission = viewStateCaptor.lastValue.locationPermissionEntities[0].permission
+            assertTrue(newPermission == LocationPermissionType.DENY_ALWAYS)
+        }
 
     @Test
-    fun whenDenyOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = coroutineRule.runBlocking {
-        val domain = "example.com"
-        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+    fun whenAllowAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() =
+        coroutineRule.runBlocking {
+            val domain = "example.com"
 
-        verify(mockGeoLocationPermissions).clear(domain)
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
 
-        assertNull(locationPermissionsDao.getPermission(domain))
-    }
+            verify(mockPixel).fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+            verify(mockGeoLocationPermissions).allow(domain)
+            assertEquals(
+                locationPermissionsDao.getPermission(domain)!!.permission,
+                LocationPermissionType.ALLOW_ALWAYS)
+        }
 
     @Test
-    fun whenDenyAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
-        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+    fun whenAllowOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() =
+        coroutineRule.runBlocking {
+            val domain = "example.com"
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
 
-        verify(mockGeoLocationPermissions).clear(domain)
-        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
-    }
+            verify(mockGeoLocationPermissions).clear(domain)
 
-    private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {
+            assertNull(locationPermissionsDao.getPermission(domain))
+        }
+
+    @Test
+    fun whenDenyOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() =
+        coroutineRule.runBlocking {
+            val domain = "example.com"
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+
+            verify(mockGeoLocationPermissions).clear(domain)
+
+            assertNull(locationPermissionsDao.getPermission(domain))
+        }
+
+    @Test
+    fun whenDenyAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() =
+        coroutineRule.runBlocking {
+            val domain = "example.com"
+            viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+
+            verify(mockGeoLocationPermissions).clear(domain)
+            assertEquals(
+                locationPermissionsDao.getPermission(domain)!!.permission,
+                LocationPermissionType.DENY_ALWAYS)
+        }
+
+    private fun givenLocationPermission(
+        permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE,
+        vararg domain: String
+    ) {
         domain.forEach {
-            locationPermissionsDao.insert(LocationPermissionEntity(domain = it, permission = permission))
+            locationPermissionsDao.insert(
+                LocationPermissionEntity(domain = it, permission = permission))
         }
     }
 
-    private inline fun <reified T : LocationPermissionsViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
+    private inline fun <reified T : LocationPermissionsViewModel.Command> assertCommandIssued(
+        instanceAssertions: T.() -> Unit = {}
+    ) {
         Mockito.verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
         Assert.assertNotNull(issuedCommand)

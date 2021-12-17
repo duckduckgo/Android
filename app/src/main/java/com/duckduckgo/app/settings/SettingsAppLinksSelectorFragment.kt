@@ -34,30 +34,33 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: AppLinkSettingType =
-            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AppLinkSettingType? ?: AppLinkSettingType.ASK_EVERYTIME
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AppLinkSettingType?
+                ?: AppLinkSettingType.ASK_EVERYTIME
 
-        val rootView =
-            View.inflate(activity, R.layout.settings_app_links_selector_fragment, null)
+        val rootView = View.inflate(activity, R.layout.settings_app_links_selector_fragment, null)
 
         updateCurrentSelection(currentOption, rootView.findViewById(R.id.appLinksSelectorGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.settingsTitleAppLinksDialog)
-            .setPositiveButton(R.string.dialogSave) { _, _ ->
-                dialog?.let {
-                    val radioGroup = it.findViewById(R.id.appLinksSelectorGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.appLinksSelectorAskEveryTime -> AppLinkSettingType.ASK_EVERYTIME
-                        R.id.appLinksSelectorAlways -> AppLinkSettingType.ALWAYS
-                        R.id.appLinksSelectorNever -> AppLinkSettingType.NEVER
-                        else -> AppLinkSettingType.ASK_EVERYTIME
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setTitle(R.string.settingsTitleAppLinksDialog)
+                .setPositiveButton(R.string.dialogSave) { _, _ ->
+                    dialog?.let {
+                        val radioGroup = it.findViewById(R.id.appLinksSelectorGroup) as RadioGroup
+                        val selectedOption =
+                            when (radioGroup.checkedRadioButtonId) {
+                                R.id.appLinksSelectorAskEveryTime ->
+                                    AppLinkSettingType.ASK_EVERYTIME
+                                R.id.appLinksSelectorAlways -> AppLinkSettingType.ALWAYS
+                                R.id.appLinksSelectorNever -> AppLinkSettingType.NEVER
+                                else -> AppLinkSettingType.ASK_EVERYTIME
+                            }
+                        val listener = activity as Listener?
+                        listener?.onAppLinkSettingSelected(selectedOption)
                     }
-                    val listener = activity as Listener?
-                    listener?.onAppLinkSettingSelected(selectedOption)
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -83,9 +86,8 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
         fun create(appLinkSettingType: AppLinkSettingType?): SettingsAppLinksSelectorFragment {
             val fragment = SettingsAppLinksSelectorFragment()
 
-            fragment.arguments = Bundle().also {
-                it.putSerializable(DEFAULT_OPTION_EXTRA, appLinkSettingType)
-            }
+            fragment.arguments =
+                Bundle().also { it.putSerializable(DEFAULT_OPTION_EXTRA, appLinkSettingType) }
             return fragment
         }
     }

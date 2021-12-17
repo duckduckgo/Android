@@ -36,16 +36,17 @@ import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.firstOrNull
-import org.threeten.bp.LocalDateTime
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.NetworkInterface
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
+import org.threeten.bp.LocalDateTime
 
-class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnostics), CoroutineScope by MainScope() {
+class VpnDiagnosticsActivity :
+    AppCompatActivity(R.layout.activity_vpn_diagnostics), CoroutineScope by MainScope() {
 
     private lateinit var networkAddresses: TextView
     private lateinit var meteredConnectionText: TextView
@@ -58,11 +59,9 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
 
     private lateinit var connectivityManager: ConnectivityManager
 
-    @Inject
-    lateinit var repository: AppTrackerBlockingStatsRepository
+    @Inject lateinit var repository: AppTrackerBlockingStatsRepository
 
-    @Inject
-    lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
+    @Inject lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
 
     private var timerUpdateJob: Job? = null
 
@@ -91,16 +90,19 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
 
             withContext(Dispatchers.Main) {
                 networkAddresses.text = addresses
-                meteredConnectionText.text = getString(R.string.atp_MeteredConnection, networkInfo.metered.toString())
-                vpnActiveText.text = getString(R.string.atp_ConnectionStatus, networkInfo.vpn.toString())
-                networkAvailable.text = getString(R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString())
+                meteredConnectionText.text =
+                    getString(R.string.atp_MeteredConnection, networkInfo.metered.toString())
+                vpnActiveText.text =
+                    getString(R.string.atp_ConnectionStatus, networkInfo.vpn.toString())
+                networkAvailable.text =
+                    getString(
+                        R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString())
                 runningTime.text = runningTimeFormatted
                 appTrackersTextView.text = "App $appTrackersBlockedFormatted"
                 webTrackersTextView.text = "Web $webTrackersBlockedFormatted"
                 dnsServersText.text = getString(R.string.atp_DnsServers, dnsInfo)
             }
         }
-
     }
 
     private fun retrieveHistoricalCrashInfo(): AppExitHistory {
@@ -108,33 +110,37 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
             return AppExitHistory()
         }
 
-        val exitReasons = applicationContext.historicalExitReasonsByProcessName("com.duckduckgo.mobile.android.vpn:vpn", 10)
+        val exitReasons =
+            applicationContext.historicalExitReasonsByProcessName(
+                "com.duckduckgo.mobile.android.vpn:vpn", 10)
         return AppExitHistory(exitReasons)
     }
 
     private fun retrieveRestartsHistoryInfo(): AppExitHistory {
         return runBlocking {
-            val restarts = withContext(Dispatchers.IO) {
-                repository.getVpnRestartHistory()
-                    .sortedByDescending { it.timestamp }
-                    .map {
+            val restarts =
+                withContext(Dispatchers.IO) {
+                    repository.getVpnRestartHistory().sortedByDescending { it.timestamp }.map {
                         """
                         Restarted on ${it.formattedTimestamp}
                         App exit reason - ${it.reason}
                         """.trimIndent()
                     }
-            }
+                }
 
             AppExitHistory(restarts)
         }
     }
 
     private suspend fun retrieveRunningTimeInfo() =
-        generateTimeRunningMessage(repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L)
+        generateTimeRunningMessage(
+            repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L)
 
-    private suspend fun retrieveAppTrackersBlockedInfo() = (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
+    private suspend fun retrieveAppTrackersBlockedInfo() =
+        (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
 
-    private suspend fun retrieveWebTrackersBlockedInfo() = (webTrackersBlockedRepository.get({ noStartDate() }).firstOrNull() ?: emptyList()).size
+    private suspend fun retrieveWebTrackersBlockedInfo() =
+        (webTrackersBlockedRepository.get({ noStartDate() }).firstOrNull() ?: emptyList()).size
 
     private fun noStartDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
@@ -144,7 +150,8 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         return if (networkInfo.networks.isEmpty()) {
             "no addresses"
         } else {
-            networkInfo.networks.joinToString("\n\n", transform = { "${it.type.type}:\n${it.address}" })
+            networkInfo.networks.joinToString(
+                "\n\n", transform = { "${it.type.type}:\n${it.address}" })
         }
     }
 
@@ -152,7 +159,8 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         return if (timeRunningMillis == 0L) {
             getString(R.string.vpnNotRunYet)
         } else {
-            return getString(R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
+            return getString(
+                R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
         }
     }
 
@@ -170,14 +178,16 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         val vpn = isVpnEnabled()
         val connectedToInternet = isConnectedToInternet()
 
-        return NetworkInfo(networks, metered = metered, vpn = vpn, connectedToInternet = connectedToInternet)
+        return NetworkInfo(
+            networks, metered = metered, vpn = vpn, connectedToInternet = connectedToInternet)
     }
 
     private fun retrieveDnsInfo(): String {
         val dnsServerAddresses = mutableListOf<String>()
 
         runCatching {
-            connectivityManager.allNetworks
+            connectivityManager
+                .allNetworks
                 .filter { it.isConnected() }
                 .mapNotNull { connectivityManager.getLinkProperties(it) }
                 .map { it.dnsServers }
@@ -185,13 +195,18 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                 .forEach { dnsServerAddresses.add(it.hostAddress) }
         }
 
-        return if (dnsServerAddresses.isEmpty()) return "none" else dnsServerAddresses.joinToString(", ") { it }
+        return if (dnsServerAddresses.isEmpty()) return "none"
+        else dnsServerAddresses.joinToString(", ") { it }
     }
 
     private fun android.net.Network.isConnected(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            connectivityManager.getNetworkCapabilities(this)?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
-                connectivityManager.getNetworkCapabilities(this)?.hasCapability(NET_CAPABILITY_VALIDATED) == true
+            connectivityManager
+                .getNetworkCapabilities(this)
+                ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
+                connectivityManager
+                    .getNetworkCapabilities(this)
+                    ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
         } else {
             isConnectedLegacy(this)
         }
@@ -213,8 +228,9 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
     @RequiresApi(Build.VERSION_CODES.M)
     private fun isConnectedToInternetMarshmallowAndNewer(): Boolean {
 
-        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            ?: return false
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+                ?: return false
 
         return capabilities.hasCapability(NET_CAPABILITY_VALIDATED)
     }
@@ -230,7 +246,10 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         for (networkInterface in NetworkInterface.getNetworkInterfaces()) {
             for (networkAddress in networkInterface.inetAddresses) {
                 if (!networkAddress.isLoopbackAddress) {
-                    networks.add(Network(address = networkAddress.hostAddress, type = addressType(address = networkAddress)))
+                    networks.add(
+                        Network(
+                            address = networkAddress.hostAddress,
+                            type = addressType(address = networkAddress)))
                 }
             }
         }
@@ -254,12 +273,13 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
         super.onStart()
 
         timerUpdateJob?.cancel()
-        timerUpdateJob = lifecycleScope.launch {
-            while (isActive) {
-                updateNetworkStatus()
-                delay(1_000)
+        timerUpdateJob =
+            lifecycleScope.launch {
+                while (isActive) {
+                    updateNetworkStatus()
+                    delay(1_000)
+                }
             }
-        }
     }
 
     override fun onStop() {
@@ -297,11 +317,12 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                     .setMessage(history.toString())
                     .setPositiveButton("OK") { _, _ -> }
                     .setNeutralButton("Share") { _, _ ->
-                        val intent = Intent(Intent.ACTION_SEND).also {
-                            it.type = "text/plain"
-                            it.putExtra(Intent.EXTRA_TEXT, history.toString())
-                            it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
-                        }
+                        val intent =
+                            Intent(Intent.ACTION_SEND).also {
+                                it.type = "text/plain"
+                                it.putExtra(Intent.EXTRA_TEXT, history.toString())
+                                it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
+                            }
                         startActivity(Intent.createChooser(intent, "Share"))
                     }
                     .show()
@@ -315,16 +336,15 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                     .setMessage(restarts.toString())
                     .setPositiveButton("OK") { _, _ -> }
                     .setNegativeButton("Clean") { _, _ ->
-                        runBlocking(Dispatchers.IO) {
-                            repository.deleteVpnRestartHistory()
-                        }
+                        runBlocking(Dispatchers.IO) { repository.deleteVpnRestartHistory() }
                     }
                     .setNeutralButton("Share") { _, _ ->
-                        val intent = Intent(Intent.ACTION_SEND).also {
-                            it.type = "text/plain"
-                            it.putExtra(Intent.EXTRA_TEXT, restarts.toString())
-                            it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
-                        }
+                        val intent =
+                            Intent(Intent.ACTION_SEND).also {
+                                it.type = "text/plain"
+                                it.putExtra(Intent.EXTRA_TEXT, restarts.toString())
+                                it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
+                            }
                         startActivity(Intent.createChooser(intent, "Share"))
                     }
                     .show()
@@ -341,9 +361,7 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
     }
 }
 
-data class AppExitHistory(
-    val history: List<String> = emptyList()
-) {
+data class AppExitHistory(val history: List<String> = emptyList()) {
     override fun toString(): String {
         return if (history.isEmpty()) {
             "No exit history available"
@@ -360,10 +378,7 @@ data class NetworkInfo(
     val connectedToInternet: Boolean
 )
 
-data class Network(
-    val address: String,
-    val type: NetworkType
-)
+data class Network(val address: String, val type: NetworkType)
 
 val networkTypeV4 = NetworkType("IPv4")
 val networkTypeV6 = NetworkType("IPv6")

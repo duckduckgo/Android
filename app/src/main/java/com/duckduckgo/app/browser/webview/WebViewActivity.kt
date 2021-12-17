@@ -31,11 +31,9 @@ import javax.inject.Inject
 
 class WebViewActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var userAgentProvider: UserAgentProvider
+    @Inject lateinit var userAgentProvider: UserAgentProvider
 
-    @Inject
-    lateinit var webViewClient: BrowserWebViewClient
+    @Inject lateinit var webViewClient: BrowserWebViewClient
 
     private val binding: ActivityEmailWebviewBinding by viewBinding()
 
@@ -70,9 +68,7 @@ class WebViewActivity : DuckDuckGoActivity() {
             }
         }
 
-        url?.let {
-            binding.simpleWebview.loadUrl(it)
-        }
+        url?.let { binding.simpleWebview.loadUrl(it) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

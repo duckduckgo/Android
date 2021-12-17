@@ -30,10 +30,6 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.channels.CancelledKeyException
@@ -42,8 +38,14 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 
-class UdpPacketProcessor @AssistedInject constructor(
+class UdpPacketProcessor
+@AssistedInject
+constructor(
     private val queues: VpnQueues,
     @Assisted private val networkChannelCreator: NetworkChannelCreator,
     private val packetPersister: PacketPersister,
@@ -66,13 +68,18 @@ class UdpPacketProcessor @AssistedInject constructor(
         Timber.i("Starting ${this::class.simpleName}")
 
         if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
+            pollJobDeviceToNetwork =
+                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+                    pollForDeviceToNetworkWork()
+                }
         }
 
         if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
+            pollJobNetworkToDevice =
+                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+                    pollForNetworkToDeviceWork()
+                }
         }
-
     }
 
     fun stop() {
@@ -121,8 +128,9 @@ class UdpPacketProcessor @AssistedInject constructor(
     }
 
     /**
-     * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
-     * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
+     * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel
+     * is created and the packet is written. Instructs the selector we'll be interested in OP_READ
+     * for receiving the response to the packet we write.
      */
     private fun deviceToNetworkProcessing() {
         val packet = queues.udpDeviceToNetwork.take() ?: return
@@ -155,7 +163,8 @@ class UdpPacketProcessor @AssistedInject constructor(
         try {
             val payloadBuffer = packet.backingBuffer ?: return
 
-            Timber.d("App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
+            Timber.d(
+                "App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
 
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
@@ -188,8 +197,9 @@ class UdpPacketProcessor @AssistedInject constructor(
     }
 
     /**
-     * Reads data from the network when the selector tells us it has a readable key.
-     * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
+     * Reads data from the network when the selector tells us it has a readable key. When data is
+     * read, we add it to the network-to-device queue, which will result in the packet being written
+     * back to the TUN.
      */
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun networkToDeviceProcessing() {
@@ -205,28 +215,31 @@ class UdpPacketProcessor @AssistedInject constructor(
         while (iterator.hasNext()) {
             val key = iterator.next()
 
-            kotlin.runCatching {
-                if (key.isValid && key.isReadable) {
-                    iterator.remove()
+            kotlin
+                .runCatching {
+                    if (key.isValid && key.isReadable) {
+                        iterator.remove()
 
-                    Timber.v("Got next network-to-device packet [isReadable] after ${SystemClock.uptimeMillis() - startTime}ms wait")
+                        Timber.v(
+                            "Got next network-to-device packet [isReadable] after ${SystemClock.uptimeMillis() - startTime}ms wait")
 
-                    val receiveBuffer = ByteBufferPool.acquire()
-                    receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
+                        val receiveBuffer = ByteBufferPool.acquire()
+                        receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
 
-                    val inputChannel = (key.channel() as DatagramChannel)
-                    val readBytes = inputChannel.read(receiveBuffer)
-                    packetPersister.persistDataReceived(readBytes, PACKET_TYPE_UDP)
-                    val referencePacket = key.attachment() as Packet
-                    referencePacket.updateUdpBuffer(receiveBuffer, readBytes)
-                    receiveBuffer.position(HEADER_SIZE + readBytes)
+                        val inputChannel = (key.channel() as DatagramChannel)
+                        val readBytes = inputChannel.read(receiveBuffer)
+                        packetPersister.persistDataReceived(readBytes, PACKET_TYPE_UDP)
+                        val referencePacket = key.attachment() as Packet
+                        referencePacket.updateUdpBuffer(receiveBuffer, readBytes)
+                        receiveBuffer.position(HEADER_SIZE + readBytes)
 
-                    queues.networkToDevice.offer(receiveBuffer)
+                        queues.networkToDevice.offer(receiveBuffer)
+                    }
                 }
-            }.onFailure {
-                Timber.w(it, "Failure processing selected key for selector")
-                key.cancel()
-            }
+                .onFailure {
+                    Timber.w(it, "Failure processing selected key for selector")
+                    key.cancel()
+                }
         }
     }
 
@@ -234,10 +247,12 @@ class UdpPacketProcessor @AssistedInject constructor(
         return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
 
-    data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
+    data class ChannelDetails(
+        val datagramChannel: DatagramChannel,
+        val originatingApp: OriginatingApp
+    )
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE
     }
-
 }

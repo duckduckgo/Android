@@ -28,9 +28,9 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
-import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -38,33 +38,45 @@ import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_email_protection_sign_in) {
+class EmailProtectionSignInFragment :
+    EmailProtectionFragment(R.layout.fragment_email_protection_sign_in) {
 
     private val viewModel by bindViewModel<EmailProtectionSignInViewModel>()
 
     private val binding: FragmentEmailProtectionSignInBinding by viewBinding()
 
-    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            showNotificationDialog()
+    private val getNotificationSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                showNotificationDialog()
+            }
         }
-    }
 
-    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readBlogPost()
+    private val readBlogSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                viewModel.readBlogPost()
+            }
         }
-    }
 
-    private val privacyGuaranteeSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readPrivacyGuarantees()
+    private val privacyGuaranteeSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                viewModel.readPrivacyGuarantees()
+            }
         }
-    }
 
     override fun configureViewModelObservers() {
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
+        viewModel
+            .viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { executeCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     override fun configureUi() {
@@ -92,15 +104,18 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     private fun renderErrorMessage() {
         binding.waitListButton.isEnabled = true
-        Toast.makeText(context, R.string.emailProtectionErrorJoiningWaitlist, Toast.LENGTH_LONG).show()
+        Toast.makeText(context, R.string.emailProtectionErrorJoiningWaitlist, Toast.LENGTH_LONG)
+            .show()
     }
 
     private fun executeCommand(command: EmailProtectionSignInViewModel.Command) {
         when (command) {
             is EmailProtectionSignInViewModel.Command.OpenUrl -> openWebsite(command.url)
-            is EmailProtectionSignInViewModel.Command.OpenUrlInBrowserTab -> openBrowserTab(command.url)
+            is EmailProtectionSignInViewModel.Command.OpenUrlInBrowserTab ->
+                openBrowserTab(command.url)
             is EmailProtectionSignInViewModel.Command.ShowErrorMessage -> renderErrorMessage()
-            is EmailProtectionSignInViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
+            is EmailProtectionSignInViewModel.Command.ShowNotificationDialog ->
+                showNotificationDialog()
         }
     }
 
@@ -121,7 +136,10 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         binding.getStartedButton.show()
         binding.duckAddressButton.show()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleInBeta)
-        setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionInBeta, listOf(readBlogSpan))
+        setClickableSpan(
+            binding.emailPrivacyDescription,
+            R.string.emailProtectionDescriptionInBeta,
+            listOf(readBlogSpan))
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
@@ -132,9 +150,15 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         binding.duckAddressButton.show()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoined)
         if (notify) {
-            setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithNotification, listOf(readBlogSpan))
+            setClickableSpan(
+                binding.emailPrivacyDescription,
+                R.string.emailProtectionDescriptionJoinedWithNotification,
+                listOf(readBlogSpan))
         } else {
-            setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithoutNotification, listOf(getNotificationSpan, readBlogSpan))
+            setClickableSpan(
+                binding.emailPrivacyDescription,
+                R.string.emailProtectionDescriptionJoinedWithoutNotification,
+                listOf(getNotificationSpan, readBlogSpan))
         }
     }
 
@@ -146,14 +170,24 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         binding.duckAddressButton.show()
         binding.waitListButton.isEnabled = true
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoin)
-        setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, listOf(readBlogSpan))
+        setClickableSpan(
+            binding.emailPrivacyDescription,
+            R.string.emailProtectionDescriptionJoin,
+            listOf(readBlogSpan))
     }
 
     private fun configureClickableLink() {
-        setClickableSpan(binding.footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan))
+        setClickableSpan(
+            binding.footerDescription,
+            R.string.emailProtectionFooterDescription,
+            listOf(privacyGuaranteeSpan))
     }
 
-    private fun setClickableSpan(view: MaterialTextView, stringId: Int, span: List<NonUnderlinedClickableSpan>) {
+    private fun setClickableSpan(
+        view: MaterialTextView,
+        stringId: Int,
+        span: List<NonUnderlinedClickableSpan>
+    ) {
         context?.let {
             val htmlString = getString(stringId).html(it)
             val spannableString = SpannableStringBuilder(htmlString)
@@ -164,8 +198,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
                         span[index],
                         spannableString.getSpanStart(urlSpan),
                         spannableString.getSpanEnd(urlSpan),
-                        spannableString.getSpanFlags(urlSpan)
-                    )
+                        spannableString.getSpanFlags(urlSpan))
                     removeSpan(urlSpan)
                 }
             }
@@ -184,9 +217,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     }
 
     private fun openWebsite(url: String) {
-        context?.let {
-            startActivity(EmailWebViewActivity.intent(it, url))
-        }
+        context?.let { startActivity(EmailWebViewActivity.intent(it, url)) }
     }
 
     companion object {

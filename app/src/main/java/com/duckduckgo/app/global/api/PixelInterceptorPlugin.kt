@@ -23,12 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
+import dagger.multibindings.Multibinds
 
-private class PixelInterceptorPluginPoint(
-    private val plugins: DaggerSet<PixelInterceptorPlugin>
-) : PluginPoint<PixelInterceptorPlugin> {
+private class PixelInterceptorPluginPoint(private val plugins: DaggerSet<PixelInterceptorPlugin>) :
+    PluginPoint<PixelInterceptorPlugin> {
     override fun getPlugins(): Collection<PixelInterceptorPlugin> {
         return plugins.sortedBy { it.javaClass.simpleName }
     }
@@ -37,8 +36,7 @@ private class PixelInterceptorPluginPoint(
 @Module
 @ContributesTo(AppScope::class)
 abstract class PixelInterceptorPluginModule {
-    @Multibinds
-    abstract fun bindEmptyPixelInterceptorPlugins(): DaggerSet<PixelInterceptorPlugin>
+    @Multibinds abstract fun bindEmptyPixelInterceptorPlugins(): DaggerSet<PixelInterceptorPlugin>
 
     @Module
     @ContributesTo(AppScope::class)

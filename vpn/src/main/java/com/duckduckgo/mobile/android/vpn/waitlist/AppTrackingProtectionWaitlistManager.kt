@@ -23,10 +23,10 @@ import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitl
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
-import javax.inject.Inject
 
 interface TrackingProtectionWaitlistManager {
     fun waitlistState(): WaitlistState
@@ -39,7 +39,9 @@ interface TrackingProtectionWaitlistManager {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class AppTrackingProtectionWaitlistManager @Inject constructor(
+class AppTrackingProtectionWaitlistManager
+@Inject
+constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
     private val dispatcherProvider: DispatcherProvider
@@ -94,24 +96,28 @@ class AppTrackingProtectionWaitlistManager @Inject constructor(
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {
         return withContext(dispatcherProvider.io()) {
-
-            val result = try {
-                service.redeemCode(inviteCode)
-                storeInviteCode(inviteCode)
-                RedeemCodeResult.Redeemed
-            } catch (e: HttpException) {
-                parseRedeemCodeError(e)
-            } catch (e: Exception) {
-                Timber.d(e.toString())
-                RedeemCodeResult.Failure
-            }
+            val result =
+                try {
+                    service.redeemCode(inviteCode)
+                    storeInviteCode(inviteCode)
+                    RedeemCodeResult.Redeemed
+                } catch (e: HttpException) {
+                    parseRedeemCodeError(e)
+                } catch (e: Exception) {
+                    Timber.d(e.toString())
+                    RedeemCodeResult.Failure
+                }
             return@withContext result
         }
     }
 
     private fun parseRedeemCodeError(e: HttpException): RedeemCodeResult {
         return try {
-            val error = Moshi.Builder().build().adapter(AppTPRedeemCodeError::class.java).fromJson(e.response()?.errorBody()?.string().orEmpty())
+            val error =
+                Moshi.Builder()
+                    .build()
+                    .adapter(AppTPRedeemCodeError::class.java)
+                    .fromJson(e.response()?.errorBody()?.string().orEmpty())
             when (error?.error) {
                 AppTPRedeemCodeError.INVALID -> RedeemCodeResult.InvalidCode
                 AppTPRedeemCodeError.ALREADY_REDEEMED -> RedeemCodeResult.AlreadyRedeemed

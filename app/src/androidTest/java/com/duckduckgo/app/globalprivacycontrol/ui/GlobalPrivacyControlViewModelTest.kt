@@ -37,17 +37,17 @@ import org.mockito.ArgumentCaptor
 
 class GlobalPrivacyControlViewModelTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
     private val mockPixel: Pixel = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockGpc: Gpc = mock()
-    private val commandCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.Command::class.java)
-    private val viewStateCaptor = ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.ViewState::class.java)
+    private val commandCaptor =
+        ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.Command::class.java)
+    private val viewStateCaptor =
+        ArgumentCaptor.forClass(GlobalPrivacyControlViewModel.ViewState::class.java)
     private val mockCommandObserver: Observer<GlobalPrivacyControlViewModel.Command> = mock()
     private val mockViewStateObserver: Observer<GlobalPrivacyControlViewModel.ViewState> = mock()
     lateinit var testee: GlobalPrivacyControlViewModel
@@ -83,7 +83,8 @@ class GlobalPrivacyControlViewModelTest {
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is GlobalPrivacyControlViewModel.Command.OpenLearnMore)
-        val url = (commandCaptor.lastValue as GlobalPrivacyControlViewModel.Command.OpenLearnMore).url
+        val url =
+            (commandCaptor.lastValue as GlobalPrivacyControlViewModel.Command.OpenLearnMore).url
         assertEquals(LEARN_MORE_URL, url)
     }
 

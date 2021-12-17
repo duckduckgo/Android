@@ -33,21 +33,23 @@ import javax.inject.Inject
 interface AutoComplete {
     fun autoComplete(query: String): Observable<AutoCompleteResult>
 
-    data class AutoCompleteResult(
-        val query: String,
-        val suggestions: List<AutoCompleteSuggestion>
-    )
+    data class AutoCompleteResult(val query: String, val suggestions: List<AutoCompleteSuggestion>)
 
     sealed class AutoCompleteSuggestion(open val phrase: String) {
         data class AutoCompleteSearchSuggestion(override val phrase: String, val isUrl: Boolean) :
             AutoCompleteSuggestion(phrase)
 
-        data class AutoCompleteBookmarkSuggestion(override val phrase: String, val title: String, val url: String) :
-            AutoCompleteSuggestion(phrase)
+        data class AutoCompleteBookmarkSuggestion(
+            override val phrase: String,
+            val title: String,
+            val url: String
+        ) : AutoCompleteSuggestion(phrase)
     }
 }
 
-class AutoCompleteApi @Inject constructor(
+class AutoCompleteApi
+@Inject
+constructor(
     private val autoCompleteService: AutoCompleteService,
     private val bookmarksDao: BookmarksDao,
     private val favoritesRepository: FavoritesRepository
@@ -59,41 +61,43 @@ class AutoCompleteApi @Inject constructor(
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
         }
 
-        val savedSitesObservable = getAutoCompleteBookmarkResults(query)
-            .zipWith(
-                getAutoCompleteFavoritesResults(query),
-                { bookmarks, favorites ->
-                    (favorites + bookmarks).take(2)
-                }
-            )
+        val savedSitesObservable =
+            getAutoCompleteBookmarkResults(query)
+                .zipWith(
+                    getAutoCompleteFavoritesResults(query),
+                    { bookmarks, favorites -> (favorites + bookmarks).take(2) })
 
         return savedSitesObservable.zipWith(
             getAutoCompleteSearchResults(query),
             { bookmarksResults, searchResults ->
                 AutoCompleteResult(
                     query = query,
-                    suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase }
-                )
-            }
-        )
+                    suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase })
+            })
     }
 
     private fun getAutoCompleteSearchResults(query: String) =
-        autoCompleteService.autoComplete(query)
+        autoCompleteService
+            .autoComplete(query)
             .flatMapIterable { it }
             .map {
-                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
+                AutoCompleteSearchSuggestion(
+                    phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
             }
             .toList()
             .onErrorReturn { emptyList() }
             .toObservable()
 
     private fun getAutoCompleteBookmarkResults(query: String) =
-        bookmarksDao.bookmarksObservable()
+        bookmarksDao
+            .bookmarksObservable()
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
             .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title.orEmpty(), url = it.url)
+                AutoCompleteBookmarkSuggestion(
+                    phrase = it.url.toUri().toStringDropScheme(),
+                    title = it.title.orEmpty(),
+                    url = it.url)
             }
             .distinctUntilChanged()
             .take(2)
@@ -102,11 +106,15 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteFavoritesResults(query: String) =
-        favoritesRepository.favoritesObservable()
+        favoritesRepository
+            .favoritesObservable()
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
             .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title.orEmpty(), url = it.url)
+                AutoCompleteBookmarkSuggestion(
+                    phrase = it.url.toUri().toStringDropScheme(),
+                    title = it.title.orEmpty(),
+                    url = it.url)
             }
             .distinctUntilChanged()
             .take(2)
@@ -115,7 +123,8 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun rankBookmarks(query: String, bookmarks: List<BookmarkEntity>): List<SavedSite> {
-        return bookmarks.asSequence()
+        return bookmarks
+            .asSequence()
             .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
             .sortByRank(query)
     }
@@ -152,8 +161,7 @@ class AutoCompleteApi @Inject constructor(
             tokens.forEach { token ->
                 if (!savedSite.title.startsWith(token, ignoreCase = true) &&
                     !savedSite.title.contains(" $token", ignoreCase = true) &&
-                    domain?.startsWith(token, ignoreCase = true) == false
-                ) {
+                    domain?.startsWith(token, ignoreCase = true) == false) {
                     return rankedBookmark
                 }
             }
@@ -165,8 +173,10 @@ class AutoCompleteApi @Inject constructor(
             } else if (savedSite.title.startsWith(tokens.first(), ignoreCase = true)) {
                 rankedBookmark.score += 50
             }
-
-        } else if (savedSite.url.redactSchemeAndWwwSubDomain().startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
+        } else if (savedSite
+            .url
+            .redactSchemeAndWwwSubDomain()
+            .startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
             rankedBookmark.score += 300
         }
 
@@ -177,10 +187,7 @@ class AutoCompleteApi @Inject constructor(
         return this.toUri().toStringDropScheme().removePrefix("www.")
     }
 
-    private data class RankedBookmark(
-        val savedSite: SavedSite,
-        var score: Int = BOOKMARK_SCORE
-    )
+    private data class RankedBookmark(val savedSite: SavedSite, var score: Int = BOOKMARK_SCORE)
 
     companion object {
         private const val BOOKMARK_SCORE = -1

@@ -49,10 +49,7 @@ class RuleTypeConverter {
 }
 
 @Entity(tableName = "drm_exceptions")
-data class DrmExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String
-)
+data class DrmExceptionEntity(@PrimaryKey val domain: String, val reason: String)
 
 fun DrmExceptionEntity.toDrmException(): DrmException {
     return DrmException(domain = this.domain, reason = this.reason)

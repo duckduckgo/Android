@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.nhaarman.mockitokotlin2.mock
+import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import java.util.*
 
 class RecentAppTrackerCacheTest {
 
@@ -101,7 +101,8 @@ class RecentAppTrackerCacheTest {
     @Test
     fun whenTrackingEventsForAppAndTrackerDomainThenTrackerReturned() {
         testee.addTrackerForApp(anAppPackage, aTracker, aTcbId, PAYLOAD_SIZE_10)
-        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
+        val trackerAttempt =
+            testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
         assertEquals(anAppPackage, trackerAttempt.appPackage)
         assertEquals(aTracker, trackerAttempt.trackerDomain)
     }
@@ -121,7 +122,8 @@ class RecentAppTrackerCacheTest {
         // different tracker - should not be returned
         testee.addTrackerForApp(anAppPackage, "tracker2", aTcbId, PAYLOAD_SIZE_10, timestamp = 400)
 
-        val trackerAttempt = testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
+        val trackerAttempt =
+            testee.getRecentTrackingAttempt(anAppPackage, aTracker, PAYLOAD_SIZE_10)!!
         assertEquals(300, trackerAttempt.timestamp)
     }
 

@@ -18,7 +18,4 @@ package com.duckduckgo.privacy.config.impl.features.drm
 
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 
-data class DrmFeature(
-    val state: String,
-    val exceptions: List<DrmExceptionEntity>
-)
+data class DrmFeature(val state: String, val exceptions: List<DrmExceptionEntity>)

@@ -23,7 +23,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class IsrgRootX2Test {
-    private val expectedCertificate = """
+    private val expectedCertificate =
+        """
         -----BEGIN CERTIFICATE-----
         MIICGzCCAaGgAwIBAgIQQdKd0XLq7qeAwSxs6S+HUjAKBggqhkjOPQQDAzBPMQsw
         CQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJuZXQgU2VjdXJpdHkgUmVzZWFyY2gg
@@ -38,9 +39,12 @@ class IsrgRootX2Test {
         tL4ndQavEi51mI38AjEAi/V3bNTIZargCyzuFJ0nN6T5U6VR5CmD1/iQMVtCnwr1
         /q4AaOeMSQ+2b1tbFfLn
         -----END CERTIFICATE-----
-    """.trimIndent().parsePemCertificate()
+    """
+            .trimIndent()
+            .parsePemCertificate()
 
-    private val certificatePlugin = IsrgRootX2(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
+    private val certificatePlugin =
+        IsrgRootX2(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
 
     @Test
     fun whenIsrgRootX1TypeThenReturnRoot() {

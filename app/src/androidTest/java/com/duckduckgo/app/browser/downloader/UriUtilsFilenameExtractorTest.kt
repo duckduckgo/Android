@@ -36,7 +36,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -49,7 +50,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -62,7 +64,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -75,7 +78,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -89,7 +93,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -102,7 +107,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -115,7 +121,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -128,7 +135,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition = "Content-Disposition: attachment; filename=fromDisposition.jpg"
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -141,7 +149,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -155,7 +164,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
@@ -168,7 +178,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -182,7 +193,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -196,7 +208,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
@@ -211,7 +224,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
@@ -226,7 +240,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType = "image/jpeg"
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -240,7 +255,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition = "Content-Disposition: attachment; filename=fromDisposition.jpg"
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -254,7 +270,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
@@ -268,7 +285,8 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
 
-        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        val extractionResult =
+            testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Guess)
 
         extractionResult as FilenameExtractor.FilenameExtractionResult.Guess
@@ -287,14 +305,16 @@ class UriUtilsFilenameExtractorTest {
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
-    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+    private fun buildPendingDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = "aFolder",
-            userAgent = "aUserAgent"
-        )
+            userAgent = "aUserAgent")
     }
-
 }

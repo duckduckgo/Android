@@ -33,16 +33,16 @@ class NetworkLeaderboardDaoTest {
     private lateinit var db: AppDatabase
     private lateinit var dao: NetworkLeaderboardDao
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun before() {
-        db = Room
-            .inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
 
         dao = db.networkLeaderboardDao()
     }
@@ -69,7 +69,8 @@ class NetworkLeaderboardDaoTest {
         dao.incrementNetworkCount("Network3")
         dao.incrementNetworkCount("Network3")
 
-        val data: List<NetworkLeaderboardEntry> = dao.trackerNetworkLeaderboard().blockingObserve()!!
+        val data: List<NetworkLeaderboardEntry> =
+            dao.trackerNetworkLeaderboard().blockingObserve()!!
         assertEquals(NetworkLeaderboardEntry("Network2", 3), data[0])
         assertEquals(NetworkLeaderboardEntry("Network3", 2), data[1])
         assertEquals(NetworkLeaderboardEntry("Network1", 1), data[2])

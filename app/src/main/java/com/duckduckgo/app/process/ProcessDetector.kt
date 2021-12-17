@@ -44,7 +44,10 @@ class ProcessDetector {
         }
 
         val am = context.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
-        return am?.runningAppProcesses?.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
+        return am?.runningAppProcesses
+            ?.firstOrNull { it.pid == Process.myPid() }
+            ?.processName
+            .orEmpty()
     }
 
     sealed class DuckDuckGoProcess(open val processName: String) {
@@ -53,8 +56,10 @@ class ProcessDetector {
             return "${this::class.java.simpleName} ($processName)"
         }
 
-        data class BrowserProcess(override val processName: String) : DuckDuckGoProcess(processName)
+        data class BrowserProcess(override val processName: String) :
+            DuckDuckGoProcess(processName)
         data class VpnProcess(override val processName: String) : DuckDuckGoProcess(processName)
-        data class UnknownProcess(override val processName: String) : DuckDuckGoProcess(processName)
+        data class UnknownProcess(override val processName: String) :
+            DuckDuckGoProcess(processName)
     }
 }

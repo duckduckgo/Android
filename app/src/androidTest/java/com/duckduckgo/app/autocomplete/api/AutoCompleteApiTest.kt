@@ -32,14 +32,11 @@ import org.mockito.MockitoAnnotations
 
 class AutoCompleteApiTest {
 
-    @Mock
-    private lateinit var mockAutoCompleteService: AutoCompleteService
+    @Mock private lateinit var mockAutoCompleteService: AutoCompleteService
 
-    @Mock
-    private lateinit var mockBookmarksDao: BookmarksDao
+    @Mock private lateinit var mockBookmarksDao: BookmarksDao
 
-    @Mock
-    private lateinit var mockFavoritesRepository: FavoritesRepository
+    @Mock private lateinit var mockFavoritesRepository: FavoritesRepository
 
     private lateinit var testee: AutoCompleteApi
 
@@ -59,8 +56,10 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenReturnBookmarkSuggestionsThenPhraseIsURLBaseHost() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("title").test()
@@ -71,9 +70,12 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenAutoCompleteDoesNotMatchAnySavedSiteReturnEmptySavedSiteList() {
-        whenever(mockAutoCompleteService.autoComplete("wrong")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
-        whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(listOf(favorite(title = "title"))))
+        whenever(mockAutoCompleteService.autoComplete("wrong"))
+            .thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
+        whenever(mockFavoritesRepository.favoritesObservable())
+            .thenReturn(Single.just(listOf(favorite(title = "title"))))
 
         val result = testee.autoComplete("wrong").test()
         val value = result.values()[0] as AutoCompleteResult
@@ -83,17 +85,16 @@ class AutoCompleteApiTest {
 
     @Test
     fun whenAutoCompleteReturnsMultipleBookmarkHitsThenLimitToMaxOfTwo() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title", "https://example.com", 0),
-                    BookmarkEntity(0, "title", "https://foo.com", 0),
-                    BookmarkEntity(0, "title", "https://bar.com", 0),
-                    BookmarkEntity(0, "title", "https://baz.com", 0)
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title", "https://example.com", 0),
+                        BookmarkEntity(0, "title", "https://foo.com", 0),
+                        BookmarkEntity(0, "title", "https://bar.com", 0),
+                        BookmarkEntity(0, "title", "https://baz.com", 0))))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("title").test()
@@ -101,136 +102,131 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "example.com", "title", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com", "title", "https://foo.com"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenAutoCompleteReturnsMultipleSavedSitesHitsThenLimitToMaxOfTwoFavoritesFirst() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title", "https://example.com", 0),
-                    BookmarkEntity(0, "title", "https://foo.com", 0),
-                    BookmarkEntity(0, "title", "https://bar.com", 0),
-                    BookmarkEntity(0, "title", "https://baz.com", 0)
-                )
-            )
-        )
-        whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    favorite(title = "title", url = "https://favexample.com"),
-                    favorite(title = "title", url = "https://favfoo.com"),
-                    favorite(title = "title", url = "https://favbar.com"),
-                    favorite(title = "title", url = "https://favbaz.com")
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title", "https://example.com", 0),
+                        BookmarkEntity(0, "title", "https://foo.com", 0),
+                        BookmarkEntity(0, "title", "https://bar.com", 0),
+                        BookmarkEntity(0, "title", "https://baz.com", 0))))
+        whenever(mockFavoritesRepository.favoritesObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        favorite(title = "title", url = "https://favexample.com"),
+                        favorite(title = "title", url = "https://favfoo.com"),
+                        favorite(title = "title", url = "https://favbar.com"),
+                        favorite(title = "title", url = "https://favbaz.com"))))
 
         val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "favexample.com", "title", "https://favexample.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "favfoo.com", "title", "https://favfoo.com"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenAutoCompleteReturnsDuplicatedItemsThenDedup() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("example.com", false),
-                    AutoCompleteServiceRawResult("foo.com", true),
-                    AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true)
-                )
-            )
-        )
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title example", "https://example.com", 0),
-                    BookmarkEntity(0, "title foo", "https://foo.com/path/to/foo", 0),
-                    BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0)
-                )
-            )
-        )
-        whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    favorite(title = "title example", url = "https://example.com"),
-                    favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
-                    favorite(title = "title foo", url = "https://foo.com"),
-                    favorite(title = "title bar", url = "https://bar.com")
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(
+                Observable.just(
+                    listOf(
+                        AutoCompleteServiceRawResult("example.com", false),
+                        AutoCompleteServiceRawResult("foo.com", true),
+                        AutoCompleteServiceRawResult("bar.com", true),
+                        AutoCompleteServiceRawResult("baz.com", true))))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title example", "https://example.com", 0),
+                        BookmarkEntity(0, "title foo", "https://foo.com/path/to/foo", 0),
+                        BookmarkEntity(0, "title foo", "https://foo.com", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0))))
+        whenever(mockFavoritesRepository.favoritesObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        favorite(title = "title example", url = "https://example.com"),
+                        favorite(title = "title foo", url = "https://foo.com/path/to/foo"),
+                        favorite(title = "title foo", url = "https://foo.com"),
+                        favorite(title = "title bar", url = "https://bar.com"))))
 
         val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com/path/to/foo", "title foo", "https://foo.com/path/to/foo"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "foo.com", true),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
-            ),
-            value.suggestions
-        )
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "example.com", "title example", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com/path/to/foo", "title foo", "https://foo.com/path/to/foo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "foo.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "bar.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "baz.com", true)),
+            value.suggestions)
     }
 
     @Test
     fun whenReturnOneBookmarkAndOneFavoriteSuggestionsThenShowBothFavoriteFirst() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
-        whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(listOf(Favorite(0, "title", "https://favexample.com", 1))))
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com", 0))))
+        whenever(mockFavoritesRepository.favoritesObservable())
+            .thenReturn(Single.just(listOf(Favorite(0, "title", "https://favexample.com", 1))))
 
         val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com")
-            ),
-            value.suggestions
-        )
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "favexample.com", "title", "https://favexample.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "example.com", "title", "https://example.com")),
+            value.suggestions)
     }
 
     @Test
     fun whenAutoCompleteReturnsDuplicatedItemsThenDedupConsideringQueryParams() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
-            Observable.just(
-                listOf(
-                    AutoCompleteServiceRawResult("example.com", false),
-                    AutoCompleteServiceRawResult("foo.com", true),
-                    AutoCompleteServiceRawResult("bar.com", true),
-                    AutoCompleteServiceRawResult("baz.com", true)
-                )
-            )
-        )
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title foo", "https://foo.com?key=value", 0),
-                    BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0)
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(
+                Observable.just(
+                    listOf(
+                        AutoCompleteServiceRawResult("example.com", false),
+                        AutoCompleteServiceRawResult("foo.com", true),
+                        AutoCompleteServiceRawResult("bar.com", true),
+                        AutoCompleteServiceRawResult("baz.com", true))))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title foo", "https://foo.com?key=value", 0),
+                        BookmarkEntity(0, "title foo", "https://foo.com", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0))))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("title").test()
@@ -238,29 +234,32 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "example.com", false),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
-            ),
-            value.suggestions
-        )
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "example.com", false),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "bar.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(
+                    phrase = "baz.com", true)),
+            value.suggestions)
     }
 
     @Test
     fun whenBookmarkTitleStartsWithQueryThenScoresHigher() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "the title example", "https://example.com", 0),
-                    BookmarkEntity(0, "the title foo", "https://foo.com/path/to/foo", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
-                    BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("title"))
+            .thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "the title example", "https://example.com", 0),
+                        BookmarkEntity(0, "the title foo", "https://foo.com/path/to/foo", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                        BookmarkEntity(0, "the title foo", "https://foo.com", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("title").test()
@@ -268,26 +267,26 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "the title example", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "bar.com", "title bar", "https://bar.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "example.com", "the title example", "https://example.com"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryAndBookmarkDomainStartsWithItThenScoreHigher() {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title example", "https://example.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
-                    BookmarkEntity(0, "title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title baz", "https://baz.com", 0),
-                )
-            )
-        )
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title example", "https://example.com", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                        BookmarkEntity(0, "title foo", "https://foo.com", 0),
+                        BookmarkEntity(0, "title baz", "https://baz.com", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("foo").test()
@@ -295,24 +294,23 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com", "title foo", "https://foo.com"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryAndBookmarkReturnsDuplicatedItemsThenDedup() {
         whenever(mockAutoCompleteService.autoComplete("cnn")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
-                    BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
-                    BookmarkEntity(0, "CNN international - world", "https://cnn.com/world", 0),
-                )
-            )
-        )
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
+                        BookmarkEntity(0, "CNN international", "https://cnn.com", 0),
+                        BookmarkEntity(0, "CNN international - world", "https://cnn.com/world", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("cnn").test()
@@ -320,24 +318,26 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com", "CNN international", "https://cnn.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com/world", "CNN international - world", "https://cnn.com/world"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "cnn.com", "CNN international", "https://cnn.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "cnn.com/world", "CNN international - world", "https://cnn.com/world"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryEndsWithSlashThenIgnoreItWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com/")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/"))
+            .thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
+                        BookmarkEntity(
+                            0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("reddit.com/").test()
@@ -345,24 +345,28 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com", "Reddit", "https://reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryEndsWithMultipleSlashThenIgnoreThemWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com///")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("reddit.com///"))
+            .thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
+                        BookmarkEntity(
+                            0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("reddit.com///").test()
@@ -370,24 +374,28 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com", "Reddit", "https://reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryContainsMultipleSlashThenIgnoreThemWhileMatching() {
-        whenever(mockAutoCompleteService.autoComplete("reddit.com/r//")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
-                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/r//"))
+            .thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "Reddit", "https://reddit.com", 0),
+                        BookmarkEntity(
+                            0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("reddit.com/r//").test()
@@ -395,23 +403,25 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenSingleTokenQueryDomainContainsWwwThenResultMathUrl() {
-        whenever(mockAutoCompleteService.autoComplete("reddit")).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "Reddit", "https://www.reddit.com", 0),
-                    BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo", 0),
-                )
-            )
-        )
+        whenever(mockAutoCompleteService.autoComplete("reddit"))
+            .thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "Reddit", "https://www.reddit.com", 0),
+                        BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete("reddit").test()
@@ -419,27 +429,29 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com", "Reddit", "https://www.reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com/r/duckduckgo", "duckduckgo", "https://www.reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "www.reddit.com", "Reddit", "https://www.reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "www.reddit.com/r/duckduckgo",
+                    "duckduckgo",
+                    "https://www.reddit.com/r/duckduckgo"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     @Test
     fun whenMultipleTokenQueryAndNoTokenMatchThenReturnEmpty() {
         val query = "example title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title example", "https://example.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
-                    BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title baz", "https://baz.com", 0),
-                )
-            )
-        )
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title example", "https://example.com", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                        BookmarkEntity(0, "the title foo", "https://foo.com", 0),
+                        BookmarkEntity(0, "title baz", "https://baz.com", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete(query).test()
@@ -452,16 +464,15 @@ class AutoCompleteApiTest {
     fun whenMultipleTokenQueryAndMultipleMatchesThenReturnCorrectScore() {
         val query = "title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
-        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
-            Single.just(
-                listOf(
-                    BookmarkEntity(0, "title example", "https://example.com", 0),
-                    BookmarkEntity(0, "title bar", "https://bar.com", 0),
-                    BookmarkEntity(0, "the title foo", "https://foo.com", 0),
-                    BookmarkEntity(0, "title foo baz", "https://baz.com", 0),
-                )
-            )
-        )
+        whenever(mockBookmarksDao.bookmarksObservable())
+            .thenReturn(
+                Single.just(
+                    listOf(
+                        BookmarkEntity(0, "title example", "https://example.com", 0),
+                        BookmarkEntity(0, "title bar", "https://bar.com", 0),
+                        BookmarkEntity(0, "the title foo", "https://foo.com", 0),
+                        BookmarkEntity(0, "title foo baz", "https://baz.com", 0),
+                    )))
         whenever(mockFavoritesRepository.favoritesObservable()).thenReturn(Single.just(emptyList()))
 
         val result = testee.autoComplete(query).test()
@@ -469,11 +480,12 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "baz.com", "title foo baz", "https://baz.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com", "the title foo", "https://foo.com"),
             ),
-            value.suggestions
-        )
+            value.suggestions)
     }
 
     private fun favorite(

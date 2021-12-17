@@ -21,20 +21,21 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 class GetCookieHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
     operator fun invoke(): List<String> {
         val fireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
-        return fireproofWebsites.flatMap { entity ->
-            val acceptedHosts = mutableSetOf<String>()
-            val host = entity.domain
-            acceptedHosts.add(host)
-            host.split(".")
-                .foldRight(
-                    "",
-                    { next, acc ->
-                        val acceptedHost = ".$next$acc"
-                        acceptedHosts.add(acceptedHost)
-                        acceptedHost
-                    }
-                )
-            acceptedHosts
-        }.distinct()
+        return fireproofWebsites
+            .flatMap { entity ->
+                val acceptedHosts = mutableSetOf<String>()
+                val host = entity.domain
+                acceptedHosts.add(host)
+                host.split(".")
+                    .foldRight(
+                        "",
+                        { next, acc ->
+                            val acceptedHost = ".$next$acc"
+                            acceptedHosts.add(acceptedHost)
+                            acceptedHost
+                        })
+                acceptedHosts
+            }
+            .distinct()
     }
 }

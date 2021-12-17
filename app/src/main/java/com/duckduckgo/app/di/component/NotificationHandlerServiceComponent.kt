@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface NotificationHandlerServiceComponent : AndroidInjector<NotificationHandlerService> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<NotificationHandlerService>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<NotificationHandlerService>
 }
 
 @ContributesTo(AppScope::class)
 interface NotificationHandlerServiceComponentProvider {
-    fun provideNotificationHandlerServiceComponentFactory(): NotificationHandlerServiceComponent.Factory
+    fun provideNotificationHandlerServiceComponentFactory():
+        NotificationHandlerServiceComponent.Factory
 }
 
 @Module

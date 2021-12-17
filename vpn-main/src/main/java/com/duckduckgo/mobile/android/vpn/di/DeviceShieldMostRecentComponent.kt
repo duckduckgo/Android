@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldMostRecentActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
-interface DeviceShieldMostRecentActivityComponent : AndroidInjector<DeviceShieldMostRecentActivity> {
+@MergeSubcomponent(scope = ActivityScope::class)
+interface DeviceShieldMostRecentActivityComponent :
+    AndroidInjector<DeviceShieldMostRecentActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldMostRecentActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface DeviceShieldMostRecentActivityComponentProvider {
-    fun provideDeviceShieldMostRecentActivityComponentFactory(): DeviceShieldMostRecentActivityComponent.Factory
+    fun provideDeviceShieldMostRecentActivityComponentFactory():
+        DeviceShieldMostRecentActivityComponent.Factory
 }
 
 @Module

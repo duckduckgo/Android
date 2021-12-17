@@ -52,12 +52,9 @@ class EmailEncryptedSharedPreferences(
             return EncryptedSharedPreferences.create(
                 context,
                 FILENAME,
-                MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build(),
+                MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
         } catch (e: IOException) {
             pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
         } catch (e: GeneralSecurityException) {
@@ -70,8 +67,7 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_EMAIL_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_EMAIL_TOKEN)
-                else putString(KEY_EMAIL_TOKEN, value)
+                if (value == null) remove(KEY_EMAIL_TOKEN) else putString(KEY_EMAIL_TOKEN, value)
             }
         }
 
@@ -79,8 +75,7 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_NEXT_ALIAS, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_NEXT_ALIAS)
-                else putString(KEY_NEXT_ALIAS, value)
+                if (value == null) remove(KEY_NEXT_ALIAS) else putString(KEY_NEXT_ALIAS, value)
             }
         }
 
@@ -96,9 +91,7 @@ class EmailEncryptedSharedPreferences(
     override var waitlistTimestamp: Int
         get() = encryptedPreferences?.getInt(KEY_WAITLIST_TIMESTAMP, -1) ?: -1
         set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                putInt(KEY_WAITLIST_TIMESTAMP, value)
-            }
+            encryptedPreferences?.edit(commit = true) { putInt(KEY_WAITLIST_TIMESTAMP, value) }
         }
 
     override var waitlistToken: String?
@@ -114,25 +107,21 @@ class EmailEncryptedSharedPreferences(
         get() = encryptedPreferences?.getString(KEY_INVITE_CODE, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_INVITE_CODE)
-                else putString(KEY_INVITE_CODE, value)
+                if (value == null) remove(KEY_INVITE_CODE) else putString(KEY_INVITE_CODE, value)
             }
         }
 
     override var sendNotification: Boolean
         get() = encryptedPreferences?.getBoolean(KEY_SEND_NOTIFICATION, false) ?: false
         set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                putBoolean(KEY_SEND_NOTIFICATION, value)
-            }
+            encryptedPreferences?.edit(commit = true) { putBoolean(KEY_SEND_NOTIFICATION, value) }
         }
 
     override var cohort: String?
         get() = encryptedPreferences?.getString(KEY_COHORT, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_COHORT)
-                else putString(KEY_COHORT, value)
+                if (value == null) remove(KEY_COHORT) else putString(KEY_COHORT, value)
             }
         }
 

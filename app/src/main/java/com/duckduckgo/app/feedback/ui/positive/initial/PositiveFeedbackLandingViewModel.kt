@@ -53,7 +53,8 @@ class PositiveFeedbackLandingViewModelFactory @Inject constructor() : ViewModelF
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> (PositiveFeedbackLandingViewModel() as T)
+                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) ->
+                    (PositiveFeedbackLandingViewModel() as T)
                 else -> null
             }
         }

@@ -45,13 +45,18 @@ class RestoreDefaultProtectionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_restore_defaults, null)
+        val rootView =
+            layoutInflater.inflate(R.layout.dialog_tracking_protection_restore_defaults, null)
 
-        val restoreCTA = rootView.findViewById<Button>(R.id.trackingProtectionRestoreDefaultsRestore)
+        val restoreCTA =
+            rootView.findViewById<Button>(R.id.trackingProtectionRestoreDefaultsRestore)
         val cancelCTA = rootView.findViewById<Button>(R.id.trackingProtectionRestoreDefaultsCancel)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
-            .setView(rootView)
+        val alertDialog =
+            MaterialAlertDialogBuilder(
+                    requireActivity(),
+                    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
+                .setView(rootView)
 
         isCancelable = false
 
@@ -60,17 +65,12 @@ class RestoreDefaultProtectionDialog : DialogFragment() {
         return alertDialog.create()
     }
 
-    private fun configureListeners(
-        restoreCTA: Button,
-        cancelCTA: Button
-    ) {
+    private fun configureListeners(restoreCTA: Button, cancelCTA: Button) {
         restoreCTA.setOnClickListener {
             dismiss()
             listener.onDefaultProtectionRestored()
         }
-        cancelCTA.setOnClickListener {
-            dismiss()
-        }
+        cancelCTA.setOnClickListener { dismiss() }
     }
 
     companion object {

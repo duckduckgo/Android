@@ -30,9 +30,7 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface EmailProtectionSignInFragmentComponent : AndroidInjector<EmailProtectionSignInFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<EmailProtectionSignInFragment>
@@ -40,7 +38,8 @@ interface EmailProtectionSignInFragmentComponent : AndroidInjector<EmailProtecti
 
 @ContributesTo(AppScope::class)
 interface EmailProtectionSignInFragmentComponentProvider {
-    fun provideEmailProtectionSignInFragmentComponentFactory(): EmailProtectionSignInFragmentComponent.Factory
+    fun provideEmailProtectionSignInFragmentComponentFactory():
+        EmailProtectionSignInFragmentComponent.Factory
 }
 
 @Module

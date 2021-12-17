@@ -34,13 +34,18 @@ interface OriginatingAppPackageIdentifier {
     fun resolvePackageId(connectionInfo: ConnectionInfo): String
 }
 
-class OriginatingAppPackageIdentifierStrategy @Inject constructor(
+class OriginatingAppPackageIdentifierStrategy
+@Inject
+constructor(
     @Named("DetectOriginatingAppPackageModern") private val modern: OriginatingAppPackageIdentifier,
     @Named("DetectOriginatingAppPackageLegacy") private val legacy: OriginatingAppPackageIdentifier
 ) {
 
     @SuppressLint("NewApi")
-    fun resolvePackageId(connectionInfo: ConnectionInfo, sdkVersion: Int = Build.VERSION.SDK_INT): String {
+    fun resolvePackageId(
+        connectionInfo: ConnectionInfo,
+        sdkVersion: Int = Build.VERSION.SDK_INT
+    ): String {
 
         return if (sdkVersion >= Build.VERSION_CODES.Q) {
             modern.resolvePackageId(connectionInfo)

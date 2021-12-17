@@ -31,11 +31,11 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Provider
 
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
@@ -72,10 +72,8 @@ class WhitelistViewModel(
     }
 
     private fun onUserWhitelistChanged(entries: List<UserWhitelistedDomain>) {
-        viewState.value = viewState.value?.copy(
-            showWhitelist = entries.isNotEmpty(),
-            whitelist = entries
-        )
+        viewState.value =
+            viewState.value?.copy(showWhitelist = entries.isNotEmpty(), whitelist = entries)
     }
 
     fun onAddRequested() {
@@ -87,9 +85,7 @@ class WhitelistViewModel(
             command.value = ShowWhitelistFormatError
             return
         }
-        appCoroutineScope.launch(dispatchers.io()) {
-            addEntryToDatabase(entry)
-        }
+        appCoroutineScope.launch(dispatchers.io()) { addEntryToDatabase(entry) }
     }
 
     fun onEditRequested(entry: UserWhitelistedDomain) {
@@ -112,9 +108,7 @@ class WhitelistViewModel(
     }
 
     fun onEntryDeleted(entry: UserWhitelistedDomain) {
-        appCoroutineScope.launch(dispatchers.io()) {
-            deleteEntryFromDatabase(entry)
-        }
+        appCoroutineScope.launch(dispatchers.io()) { deleteEntryFromDatabase(entry) }
     }
 
     private suspend fun addEntryToDatabase(entry: UserWhitelistedDomain) {
@@ -127,14 +121,17 @@ class WhitelistViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class WhitelistViewModelFactory @Inject constructor(
+class WhitelistViewModelFactory
+@Inject
+constructor(
     private val dao: Provider<UserWhitelistDao>,
     private val appCoroutineScope: Provider<CoroutineScope>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get(), appCoroutineScope.get()) as T)
+                isAssignableFrom(WhitelistViewModel::class.java) ->
+                    (WhitelistViewModel(dao.get(), appCoroutineScope.get()) as T)
                 else -> null
             }
         }

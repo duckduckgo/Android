@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface WelcomePageComponent : AndroidInjector<WelcomePage> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<WelcomePage>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<WelcomePage>
 }
 
 @ContributesTo(AppScope::class)

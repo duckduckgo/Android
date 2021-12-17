@@ -29,14 +29,14 @@ import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class SQLCookieRemoverTest {
 
@@ -87,9 +87,7 @@ class SQLCookieRemoverTest {
 
     @Test
     fun whenDatabasePathNotFoundThenPixelFired() = runBlocking {
-        val mockDatabaseLocator = mock<DatabaseLocator> {
-            on { getDatabasePath() } doReturn ""
-        }
+        val mockDatabaseLocator = mock<DatabaseLocator> { on { getDatabasePath() } doReturn "" }
         val sqlCookieRemover = givenSQLCookieRemover(databaseLocator = mockDatabaseLocator)
 
         sqlCookieRemover.removeCookies()
@@ -99,9 +97,8 @@ class SQLCookieRemoverTest {
 
     @Test
     fun whenUnableToOpenDatabaseThenPixelFiredAndSaveOfflineCount() = runBlocking {
-        val mockDatabaseLocator = mock<DatabaseLocator> {
-            on { getDatabasePath() } doReturn "fakePath"
-        }
+        val mockDatabaseLocator =
+            mock<DatabaseLocator> { on { getDatabasePath() } doReturn "fakePath" }
         val sqlCookieRemover = givenSQLCookieRemover(databaseLocator = mockDatabaseLocator)
 
         sqlCookieRemover.removeCookies()
@@ -139,7 +136,6 @@ class SQLCookieRemoverTest {
             cookieHostsToPreserve,
             offlinePixelCountDataStore,
             exceptionPixel,
-            dispatcherProvider
-        )
+            dispatcherProvider)
     }
 }

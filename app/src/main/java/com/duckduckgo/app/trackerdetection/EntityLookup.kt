@@ -25,22 +25,20 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface EntityLookup {
-    @WorkerThread
-    fun entityForUrl(url: String): Entity?
+    @WorkerThread fun entityForUrl(url: String): Entity?
 
-    @WorkerThread
-    fun entityForName(name: String): Entity?
+    @WorkerThread fun entityForName(name: String): Entity?
 }
 
 @SingleInstanceIn(AppScope::class)
-class TdsEntityLookup @Inject constructor(
-    private val entityDao: TdsEntityDao,
-    private val domainEntityDao: TdsDomainEntityDao
-) : EntityLookup {
+class TdsEntityLookup
+@Inject
+constructor(private val entityDao: TdsEntityDao, private val domainEntityDao: TdsDomainEntityDao) :
+    EntityLookup {
 
     var entities: List<TdsEntity> = emptyList()
 

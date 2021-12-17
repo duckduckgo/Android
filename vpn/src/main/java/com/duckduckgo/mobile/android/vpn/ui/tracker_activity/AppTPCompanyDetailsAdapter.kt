@@ -27,11 +27,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.vpn.R
+import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
 
-class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder>() {
+class AppTPCompanyDetailsAdapter() :
+    RecyclerView.Adapter<AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder>() {
 
     private val items = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()
 
@@ -49,9 +50,10 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
     suspend fun updateData(data: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>) {
         val newData = data
         val oldData = items
-        val diffResult = withContext(Dispatchers.IO) {
-            DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
-        }
+        val diffResult =
+            withContext(Dispatchers.IO) {
+                DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
+            }
 
         items.clear().also { items.addAll(newData) }
 
@@ -61,8 +63,7 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
     private class DiffCallback(
         private val old: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>,
         private val new: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>
-    ) :
-        DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = old.size
 
         override fun getNewListSize() = new.size
@@ -97,26 +98,33 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
-                )
+                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY))
             } else {
                 badgeImage.setImageResource(badge)
             }
 
             companyName.text = trackerInfo.companyDisplayName
-            trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, trackerInfo.trackingAttempts, trackerInfo.trackingAttempts)
-
+            trackingAttempts.text =
+                view.context.resources.getQuantityString(
+                    R.plurals.atp_CompanyDetailsTrackingAttempts,
+                    trackerInfo.trackingAttempts,
+                    trackerInfo.trackingAttempts)
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
-            val drawable = "$prefix$networkName"
-                .replace(" ", "_")
-                .replace(".", "")
-                .replace(",", "")
-                .toLowerCase(Locale.ROOT)
-            val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
+            val drawable =
+                "$prefix$networkName"
+                    .replace(" ", "_")
+                    .replace(".", "")
+                    .replace(",", "")
+                    .toLowerCase(Locale.ROOT)
+            val resource =
+                context.resources.getIdentifier(drawable, "drawable", context.packageName)
             return if (resource != 0) resource else null
         }
     }
-
 }

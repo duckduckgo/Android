@@ -56,7 +56,10 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
     ) {
         val searchSuggestionViewHolder = holder as SearchSuggestionViewHolder
-        searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
+        searchSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSearchSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener)
     }
 }
 
@@ -75,7 +78,10 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
     ) {
         val bookmarkSuggestionViewHolder = holder as BookmarkSuggestionViewHolder
-        bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
+        bookmarkSuggestionViewHolder.bind(
+            suggestion as AutoCompleteBookmarkSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener)
     }
 }
 
@@ -83,7 +89,8 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return EmptySuggestionViewHolder(ItemAutocompleteNoSuggestionsBinding.inflate(inflater, parent, false))
+        return EmptySuggestionViewHolder(
+            ItemAutocompleteNoSuggestionsBinding.inflate(inflater, parent, false))
     }
 
     override fun onBindViewHolder(
@@ -98,36 +105,41 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
 sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) :
+        AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteSearchSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
-        ) = with(binding) {
-            phrase.text = item.phrase
+        ) =
+            with(binding) {
+                phrase.text = item.phrase
 
-            val phraseOrUrlImage = if (item.isUrl) R.drawable.ic_globe_24dp else R.drawable.ic_loupe_24dp
-            phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
+                val phraseOrUrlImage =
+                    if (item.isUrl) R.drawable.ic_globe_24dp else R.drawable.ic_loupe_24dp
+                phraseOrUrlIndicator.setImageResource(phraseOrUrlImage)
 
-            editQueryImage.setOnClickListener { editableSearchClickListener(item) }
-            root.setOnClickListener { immediateSearchListener(item) }
-        }
+                editQueryImage.setOnClickListener { editableSearchClickListener(item) }
+                root.setOnClickListener { immediateSearchListener(item) }
+            }
     }
 
-    class BookmarkSuggestionViewHolder(val binding: ItemAutocompleteBookmarkSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+    class BookmarkSuggestionViewHolder(val binding: ItemAutocompleteBookmarkSuggestionBinding) :
+        AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteBookmarkSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
-        ) = with(binding) {
+        ) =
+            with(binding) {
+                title.text = item.title
+                url.text = item.url
 
-            title.text = item.title
-            url.text = item.url
-
-            goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
-            root.setOnClickListener { immediateSearchListener(item) }
-        }
+                goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
+                root.setOnClickListener { immediateSearchListener(item) }
+            }
     }
 
-    class EmptySuggestionViewHolder(binding: ItemAutocompleteNoSuggestionsBinding) : AutoCompleteViewHolder(binding.root)
+    class EmptySuggestionViewHolder(binding: ItemAutocompleteNoSuggestionsBinding) :
+        AutoCompleteViewHolder(binding.root)
 }

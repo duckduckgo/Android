@@ -61,16 +61,17 @@ interface Site {
     fun calculateGrades(): SiteGrades
 
     data class SiteGrades(val grade: PrivacyGrade, val improvedGrade: PrivacyGrade)
-
 }
 
-fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
-    .mapNotNull { it.entity }
-    .filter { it.displayName.isNotBlank() }
-    .sortedByDescending { it.prevalence }
+fun Site.orderedTrackingEntities(): List<Entity> =
+    trackingEvents
+        .mapNotNull { it.entity }
+        .filter { it.displayName.isNotBlank() }
+        .sortedByDescending { it.prevalence }
 
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }
 
-val Site.domain get() = uri?.domain()
+val Site.domain
+    get() = uri?.domain()

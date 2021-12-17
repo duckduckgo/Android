@@ -38,6 +38,9 @@ interface EmailService {
 }
 
 data class EmailAlias(val address: String)
+
 data class WaitlistResponse(val token: String?, val timestamp: Int?)
+
 data class WaitlistStatusResponse(val timestamp: Int)
+
 data class EmailInviteCodeResponse(val code: String)

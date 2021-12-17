@@ -28,25 +28,26 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageTextSingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private val binding: ActivityReportBreakageTextSingleChoiceBinding by viewBinding()
     private val viewModel: ReportBreakageSingleChoiceFormViewModel by bindViewModel()
 
-    private val adapter = ReportBreakageSingleChoiceFormAdapter(object : ReportBreakageSingleChoiceFormAdapter.Listener {
-        override fun onChoiceSelected(choice: Choice, position: Int) {
-            viewModel.onChoiceSelected(choice)
-        }
-    })
+    private val adapter =
+        ReportBreakageSingleChoiceFormAdapter(
+            object : ReportBreakageSingleChoiceFormAdapter.Listener {
+                override fun onChoiceSelected(choice: Choice, position: Int) {
+                    viewModel.onChoiceSelected(choice)
+                }
+            })
 
     private val toolbar
         get() = binding.includeToolbar.defaultToolbar
@@ -70,20 +71,22 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     }
 
     fun setupViews() {
-        binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.appBreakageFormDisclaimer.text =
+            HtmlCompat.fromHtml(
+                getString(R.string.atp_ReportBreakageFormDisclaimerText),
+                HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.reportBreakageChoicesRecycler.adapter = adapter
-        binding.ctaNextFormSubmit.setOnClickListener {
-            viewModel.onSubmitChoices()
-        }
+        binding.ctaNextFormSubmit.setOnClickListener { viewModel.onSubmitChoices() }
     }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.getChoices()
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { renderViewState(it) }
+            viewModel.getChoices().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                renderViewState(it)
+            }
         }
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
@@ -91,14 +94,20 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: ReportBreakageSingleChoiceFormView.Command) {
         when (command) {
-            is ReportBreakageSingleChoiceFormView.Command.SubmitChoice -> submitChoice(command.selectedChoice)
+            is ReportBreakageSingleChoiceFormView.Command.SubmitChoice ->
+                submitChoice(command.selectedChoice)
         }
     }
 
     private fun submitChoice(choice: Choice) {
-        val intent = Intent().apply {
-            IssueReport(appName = brokenApp?.appName, appPackageId = brokenApp?.appPackageId, loginInfo = getString(choice.questionStringRes)).addToIntent(this)
-        }
+        val intent =
+            Intent().apply {
+                IssueReport(
+                        appName = brokenApp?.appName,
+                        appPackageId = brokenApp?.appPackageId,
+                        loginInfo = getString(choice.questionStringRes))
+                    .addToIntent(this)
+            }
         setResult(RESULT_OK, intent)
         finish()
     }

@@ -33,18 +33,15 @@ class WorkSchedulerTest {
 
     @Before
     fun before() {
-        testee = AndroidWorkScheduler(
-            TestCoroutineScope(),
-            notificationScheduler,
-            jobCleaner
-        )
+        testee = AndroidWorkScheduler(TestCoroutineScope(), notificationScheduler, jobCleaner)
     }
 
     @Test
-    fun schedulesNextNotificationAndCleansDeprecatedJobs() = runBlocking<Unit> {
-        testee.scheduleWork()
+    fun schedulesNextNotificationAndCleansDeprecatedJobs() =
+        runBlocking<Unit> {
+            testee.scheduleWork()
 
-        verify(notificationScheduler).scheduleNextNotification()
-        verify(jobCleaner).cleanDeprecatedJobs()
-    }
+            verify(notificationScheduler).scheduleNextNotification()
+            verify(jobCleaner).cleanDeprecatedJobs()
+        }
 }

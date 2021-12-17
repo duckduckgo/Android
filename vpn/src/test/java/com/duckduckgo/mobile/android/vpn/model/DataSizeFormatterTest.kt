@@ -16,12 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.model
 
-import org.junit.Assert.*
-
-import org.junit.Before
-import org.junit.Test
 import java.text.NumberFormat
 import java.util.*
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
 
 class DataSizeFormatterTest {
 
@@ -29,7 +28,9 @@ class DataSizeFormatterTest {
 
     @Before
     fun setup() {
-        testee = DataSizeFormatter(NumberFormat.getNumberInstance(Locale.US).also { it.maximumFractionDigits = 1 })
+        testee =
+            DataSizeFormatter(
+                NumberFormat.getNumberInstance(Locale.US).also { it.maximumFractionDigits = 1 })
     }
 
     @Test

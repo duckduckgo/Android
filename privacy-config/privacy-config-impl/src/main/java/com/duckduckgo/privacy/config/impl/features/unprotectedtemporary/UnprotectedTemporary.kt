@@ -20,8 +20,8 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface UnprotectedTemporary {
     fun isAnException(url: String): Boolean
@@ -29,13 +29,18 @@ interface UnprotectedTemporary {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
+class RealUnprotectedTemporary
+@Inject
+constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) :
+    UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return unprotectedTemporaryRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+        return unprotectedTemporaryRepository.exceptions.any {
+            UriString.sameOrSubdomain(url, it.domain)
+        }
     }
 }

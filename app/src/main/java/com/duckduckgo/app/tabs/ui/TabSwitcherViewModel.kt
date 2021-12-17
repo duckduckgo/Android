@@ -30,12 +30,14 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
+class TabSwitcherViewModel(
+    private val tabRepository: TabRepository,
+    private val webViewSessionStorage: WebViewSessionStorage
+) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
-    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
-        context = viewModelScope.coroutineContext
-    )
+    var deletableTabs: LiveData<List<TabEntity>> =
+        tabRepository.flowDeletableTabs.asLiveData(context = viewModelScope.coroutineContext)
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
@@ -71,14 +73,17 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
 }
 
 @ContributesMultibinding(AppScope::class)
-class TabSwitcherViewModelFactory @Inject constructor(
+class TabSwitcherViewModelFactory
+@Inject
+constructor(
     private val tabRepository: Provider<TabRepository>,
     private val webViewSessionStorage: Provider<WebViewSessionStorage>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
+                isAssignableFrom(TabSwitcherViewModel::class.java) ->
+                    TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
                 else -> null
             }
         }

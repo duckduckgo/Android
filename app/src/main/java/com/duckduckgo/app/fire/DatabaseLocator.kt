@@ -25,16 +25,16 @@ abstract class DatabaseLocator(private val context: Context) {
 
     open fun getDatabasePath(): String {
         val dataDir = context.applicationInfo.dataDir
-        val detectedPath = knownLocations.find { knownPath ->
-            val file = File(dataDir, knownPath)
-            file.exists()
-        }
+        val detectedPath =
+            knownLocations.find { knownPath ->
+                val file = File(dataDir, knownPath)
+                file.exists()
+            }
 
         return detectedPath
             .takeUnless { it.isNullOrEmpty() }
-            ?.let { nonEmptyPath ->
-                "$dataDir$nonEmptyPath"
-            }.orEmpty()
+            ?.let { nonEmptyPath -> "$dataDir$nonEmptyPath" }
+            .orEmpty()
     }
 }
 

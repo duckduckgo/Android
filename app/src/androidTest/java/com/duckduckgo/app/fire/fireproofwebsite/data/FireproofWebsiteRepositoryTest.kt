@@ -38,13 +38,9 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class FireproofWebsiteRepositoryTest {
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
@@ -54,11 +50,16 @@ class FireproofWebsiteRepositoryTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        fireproofWebsiteRepository = FireproofWebsiteRepository(db.fireproofWebsiteDao(), coroutineRule.testDispatcherProvider, lazyFaviconManager)
+        fireproofWebsiteRepository =
+            FireproofWebsiteRepository(
+                db.fireproofWebsiteDao(), coroutineRule.testDispatcherProvider, lazyFaviconManager)
     }
 
     @After
@@ -67,72 +68,83 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() = coroutineRule.runBlocking {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("")
-        assertNull(fireproofWebsiteEntity)
-    }
+    fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() =
+        coroutineRule.runBlocking {
+            val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("")
+            assertNull(fireproofWebsiteEntity)
+        }
 
     @Test
-    fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() = coroutineRule.runBlocking {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("aa1111")
-        assertNull(fireproofWebsiteEntity)
-    }
+    fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() =
+        coroutineRule.runBlocking {
+            val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("aa1111")
+            assertNull(fireproofWebsiteEntity)
+        }
 
     @Test
-    fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() = coroutineRule.runBlocking {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("https://aa1111.com")
-        assertNull(fireproofWebsiteEntity)
-    }
+    fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() =
+        coroutineRule.runBlocking {
+            val fireproofWebsiteEntity =
+                fireproofWebsiteRepository.fireproofWebsite("https://aa1111.com")
+            assertNull(fireproofWebsiteEntity)
+        }
 
     @Test
-    fun whenFireproofWebsiteIsValidThenEntityCreated() = coroutineRule.runBlocking {
-        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("example.com")
-        assertEquals(FireproofWebsiteEntity("example.com"), fireproofWebsiteEntity)
-    }
+    fun whenFireproofWebsiteIsValidThenEntityCreated() =
+        coroutineRule.runBlocking {
+            val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("example.com")
+            assertEquals(FireproofWebsiteEntity("example.com"), fireproofWebsiteEntity)
+        }
 
     @Test
-    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("example.com", "example2.com")
-        val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()!!
-        assertEquals(fireproofWebsiteEntities.size, 2)
-    }
+    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("example.com", "example2.com")
+            val fireproofWebsiteEntities =
+                fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()!!
+            assertEquals(fireproofWebsiteEntities.size, 2)
+        }
 
     @Test
-    fun whenRemoveFireproofWebsiteThenItemRemovedFromDatabase() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("example.com", "example2.com")
+    fun whenRemoveFireproofWebsiteThenItemRemovedFromDatabase() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("example.com", "example2.com")
 
-        fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
+            fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
 
-        val fireproofWebsiteEntities = fireproofWebsiteDao.fireproofWebsitesSync()
-        assertEquals(fireproofWebsiteEntities.size, 1)
-    }
-
-    @Test
-    fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("example.com")
-
-        fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
-
-        verify(mockFaviconManager).deletePersistedFavicon("example.com")
-    }
+            val fireproofWebsiteEntities = fireproofWebsiteDao.fireproofWebsitesSync()
+            assertEquals(fireproofWebsiteEntities.size, 1)
+        }
 
     @Test
-    fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("example.com")
+    fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("example.com")
 
-        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("test.com")
+            fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
 
-        assertEquals(0, count)
-    }
+            verify(mockFaviconManager).deletePersistedFavicon("example.com")
+        }
 
     @Test
-    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("example.com")
+    fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("example.com")
 
-        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")
+            val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("test.com")
 
-        assertEquals(1, count)
-    }
+            assertEquals(0, count)
+        }
+
+    @Test
+    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("example.com")
+
+            val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")
+
+            assertEquals(1, count)
+        }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
         fireproofWebsitesDomain.forEach {

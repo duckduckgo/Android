@@ -30,8 +30,7 @@ import org.junit.Test
 
 class EmailJavascriptInterfaceTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule val coroutineRule = CoroutineTestRule()
 
     private val mockEmailManager: EmailManager = mock()
     private val mockWebView: WebView = mock()
@@ -40,7 +39,12 @@ class EmailJavascriptInterfaceTest {
 
     @Before
     fun setup() {
-        testee = EmailJavascriptInterface(mockEmailManager, mockWebView, DuckDuckGoUrlDetector(), coroutineRule.testDispatcherProvider) { counter++ }
+        testee =
+            EmailJavascriptInterface(
+                mockEmailManager,
+                mockWebView,
+                DuckDuckGoUrlDetector(),
+                coroutineRule.testDispatcherProvider) { counter++ }
     }
 
     @Test

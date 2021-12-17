@@ -51,8 +51,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: WebView
@@ -79,24 +78,24 @@ class BrowserWebViewClientTest {
     @Before
     fun setup() {
         webView = TestWebView(context)
-        testee = BrowserWebViewClient(
-            webViewHttpAuthStore,
-            trustedCertificateStore,
-            requestRewriter,
-            specialUrlDetector,
-            requestInterceptor,
-            offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
-            cookieManager,
-            loginDetector,
-            dosDetector,
-            gpc,
-            thirdPartyCookieManager,
-            TestCoroutineScope(),
-            coroutinesTestRule.testDispatcherProvider,
-            emailInjector,
-            accessibilitySettings
-        )
+        testee =
+            BrowserWebViewClient(
+                webViewHttpAuthStore,
+                trustedCertificateStore,
+                requestRewriter,
+                specialUrlDetector,
+                requestInterceptor,
+                offlinePixelCountDataStore,
+                uncaughtExceptionRepository,
+                cookieManager,
+                loginDetector,
+                dosDetector,
+                gpc,
+                thirdPartyCookieManager,
+                TestCoroutineScope(),
+                coroutinesTestRule.testDispatcherProvider,
+                emailInjector,
+                accessibilitySettings)
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
     }
@@ -126,44 +125,50 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
-    }
+    fun whenOnPageStartedCalledThenEventSentToLoginDetector() =
+        coroutinesTestRule.runBlocking {
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+            verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
+        }
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() = coroutinesTestRule.runBlocking {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
+    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() =
+        coroutinesTestRule.runBlocking {
+            whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
 
-        testee.onPageStarted(webView, null, null)
-        verify(gpc, never()).getGpcJs()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() = coroutinesTestRule.runBlocking {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
-
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(gpc).getGpcJs()
-    }
+            testee.onPageStarted(webView, null, null)
+            verify(gpc, never()).getGpcJs()
+        }
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() = coroutinesTestRule.runBlocking {
-        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
+    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() =
+        coroutinesTestRule.runBlocking {
+            whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
 
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(gpc, never()).getGpcJs()
-    }
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+            verify(gpc).getGpcJs()
+        }
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = coroutinesTestRule.runBlocking {
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(thirdPartyCookieManager).processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
-    }
+    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() =
+        coroutinesTestRule.runBlocking {
+            whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
+
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+            verify(gpc, never()).getGpcJs()
+        }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() =
+        coroutinesTestRule.runBlocking {
+            testee.onPageStarted(webView, EXAMPLE_URL, null)
+            verify(thirdPartyCookieManager)
+                .processUriForThirdPartyCookies(webView, EXAMPLE_URL.toUri())
+        }
 
     @UiThreadTest
     @Test
@@ -176,29 +181,34 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
-        val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
+        val authenticationRequest =
+            BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
         testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
-        val exception = RuntimeException()
-        val mockHandler = mock<HttpAuthHandler>()
-        val mockWebView = mock<WebView>()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onReceivedHttpAuthRequest(mockWebView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST)
-    }
+    fun whenOnReceivedHttpAuthRequestThrowsExceptionThenRecordException() =
+        coroutinesTestRule.runBlocking {
+            val exception = RuntimeException()
+            val mockHandler = mock<HttpAuthHandler>()
+            val mockWebView = mock<WebView>()
+            whenever(mockWebView.url).thenThrow(exception)
+            testee.onReceivedHttpAuthRequest(mockWebView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
+            verify(uncaughtExceptionRepository)
+                .recordUncaughtException(exception, UncaughtExceptionSource.ON_HTTP_AUTH_REQUEST)
+        }
 
     @UiThreadTest
     @Test
-    fun whenShouldInterceptRequestThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
-        val webResourceRequest = mock<WebResourceRequest>()
-        testee.shouldInterceptRequest(webView, webResourceRequest)
-        verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
-    }
+    fun whenShouldInterceptRequestThenEventSentToLoginDetector() =
+        coroutinesTestRule.runBlocking {
+            val webResourceRequest = mock<WebResourceRequest>()
+            testee.shouldInterceptRequest(webView, webResourceRequest)
+            verify(loginDetector)
+                .onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+        }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -250,13 +260,15 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
-        val exception = RuntimeException()
-        val mockWebView: WebView = mock()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onPageFinished(mockWebView, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
-    }
+    fun whenOnPageFinishedThrowsExceptionThenRecordException() =
+        coroutinesTestRule.runBlocking {
+            val exception = RuntimeException()
+            val mockWebView: WebView = mock()
+            whenever(mockWebView.url).thenThrow(exception)
+            testee.onPageFinished(mockWebView, null)
+            verify(uncaughtExceptionRepository)
+                .recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_FINISHED)
+        }
 
     @UiThreadTest
     @Test
@@ -274,123 +286,147 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenOnPageStartedThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
-        val exception = RuntimeException()
-        val mockWebView: WebView = mock()
-        whenever(mockWebView.url).thenThrow(exception)
-        testee.onPageStarted(mockWebView, null, null)
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_STARTED)
-    }
-
-    @Test
-    fun whenShouldOverrideThrowsExceptionThenRecordException() = coroutinesTestRule.runBlocking {
-        val exception = RuntimeException()
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
-        testee.shouldOverrideUrlLoading(webView, "")
-        verify(uncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
-    }
-
-    @Test
-    fun whenAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            whenever(listener.handleAppLink(any(), any())).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleAppLink(urlType, isForMainFrame = true)
+    fun whenOnPageStartedThrowsExceptionThenRecordException() =
+        coroutinesTestRule.runBlocking {
+            val exception = RuntimeException()
+            val mockWebView: WebView = mock()
+            whenever(mockWebView.url).thenThrow(exception)
+            testee.onPageStarted(mockWebView, null, null)
+            verify(uncaughtExceptionRepository)
+                .recordUncaughtException(exception, UncaughtExceptionSource.ON_PAGE_STARTED)
         }
-    }
 
     @Test
-    fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            whenever(listener.handleAppLink(any(), any())).thenReturn(false)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleAppLink(urlType, isForMainFrame = true)
+    fun whenShouldOverrideThrowsExceptionThenRecordException() =
+        coroutinesTestRule.runBlocking {
+            val exception = RuntimeException()
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenThrow(exception)
+            testee.shouldOverrideUrlLoading(webView, "")
+            verify(uncaughtExceptionRepository)
+                .recordUncaughtException(exception, UncaughtExceptionSource.SHOULD_OVERRIDE_REQUEST)
         }
-    }
 
     @Test
-    fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
-            testee.webViewClientListener = null
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener, never()).handleAppLink(any(), any())
+    fun whenAppLinkDetectedAndIsHandledThenReturnTrue() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(webResourceRequest.isRedirect).thenReturn(false)
+                whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+                whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+                assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener).handleAppLink(urlType, isForMainFrame = true)
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleNonHttpAppLink(urlType)
+    fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(webResourceRequest.isRedirect).thenReturn(false)
+                whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+                whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+                assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener).handleAppLink(urlType, isForMainFrame = true)
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsHandledOnApiLessThan24ThenReturnTrue() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener).handleNonHttpAppLink(urlType)
+    fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                whenever(specialUrlDetector.determineType(any<Uri>()))
+                    .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
+                testee.webViewClientListener = null
+                assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener, never()).handleAppLink(any(), any())
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleNonHttpAppLink(urlType)
+    fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val urlType =
+                    SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(webResourceRequest.isRedirect).thenReturn(false)
+                whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+                assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener).handleNonHttpAppLink(urlType)
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener).handleNonHttpAppLink(urlType)
+    fun whenNonHttpAppLinkDetectedAndIsHandledOnApiLessThan24ThenReturnTrue() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                val urlType =
+                    SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+                assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+                verify(listener).handleNonHttpAppLink(urlType)
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL))
-            testee.webViewClientListener = null
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener, never()).handleNonHttpAppLink(any())
+    fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val urlType =
+                    SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(webResourceRequest.isRedirect).thenReturn(false)
+                whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
+                assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener).handleNonHttpAppLink(urlType)
+            }
         }
-    }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() = coroutinesTestRule.runBlocking {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL))
-            testee.webViewClientListener = null
-            assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener, never()).handleNonHttpAppLink(any())
+    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                val urlType =
+                    SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+                whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(urlType)
+                whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
+                assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+                verify(listener).handleNonHttpAppLink(urlType)
+            }
         }
-    }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                whenever(specialUrlDetector.determineType(any<Uri>()))
+                    .thenReturn(
+                        SpecialUrlDetector.UrlType.NonHttpAppLink(
+                            EXAMPLE_URL, Intent(), EXAMPLE_URL))
+                testee.webViewClientListener = null
+                assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+                verify(listener, never()).handleNonHttpAppLink(any())
+            }
+        }
+
+    @Test
+    fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() =
+        coroutinesTestRule.runBlocking {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                whenever(specialUrlDetector.determineType(any<Uri>()))
+                    .thenReturn(
+                        SpecialUrlDetector.UrlType.NonHttpAppLink(
+                            EXAMPLE_URL, Intent(), EXAMPLE_URL))
+                testee.webViewClientListener = null
+                assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
+                verify(listener, never()).handleNonHttpAppLink(any())
+            }
+        }
 
     private class TestWebView(context: Context) : WebView(context)
 

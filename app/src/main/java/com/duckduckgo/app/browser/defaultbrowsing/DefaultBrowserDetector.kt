@@ -32,9 +32,7 @@ interface DefaultBrowserDetector {
     fun hasDefaultBrowser(): Boolean
 }
 
-class AndroidDefaultBrowserDetector(
-    private val context: Context
-) : DefaultBrowserDetector {
+class AndroidDefaultBrowserDetector(private val context: Context) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
@@ -51,7 +49,8 @@ class AndroidDefaultBrowserDetector(
 
     private fun defaultBrowserPackage(): String {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
-        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        val resolutionInfo: ResolveInfo? =
+            context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
     }
 

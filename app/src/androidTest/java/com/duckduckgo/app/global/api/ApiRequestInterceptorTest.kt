@@ -32,20 +32,23 @@ class ApiRequestInterceptorTest {
 
     @Before
     fun before() {
-        userAgentProvider = UserAgentProvider(
-            { WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context) },
-            ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context)
-        )
+        userAgentProvider =
+            UserAgentProvider(
+                {
+                    WebSettings.getDefaultUserAgent(
+                        InstrumentationRegistry.getInstrumentation().context)
+                },
+                ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context))
 
-        testee = ApiRequestInterceptor(
-            InstrumentationRegistry.getInstrumentation().context,
-            userAgentProvider
-        )
+        testee =
+            ApiRequestInterceptor(
+                InstrumentationRegistry.getInstrumentation().context, userAgentProvider)
     }
 
     @Test
     fun whenAPIRequestIsMadeThenUserAgentIsAdded() {
-        val packageName = InstrumentationRegistry.getInstrumentation().context.applicationInfo.packageName
+        val packageName =
+            InstrumentationRegistry.getInstrumentation().context.applicationInfo.packageName
 
         val response = testee.intercept(FakeChain("http://example.com"))
 
@@ -60,7 +63,8 @@ class ApiRequestInterceptorTest {
 
         val response = testee.intercept(fakeChain)
         val header = response.request.header(Header.USER_AGENT)!!
-        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+        val regex =
+            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
         assertTrue(header.matches(regex))
     }
 }

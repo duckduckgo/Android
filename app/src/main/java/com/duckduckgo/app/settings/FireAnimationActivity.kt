@@ -43,37 +43,43 @@ class FireAnimationActivity : DuckDuckGoActivity() {
 
         if (fireAnimationSerializable == null) finish()
 
-        configureFireAnimationView(fireAnimationSerializable as FireAnimation, binding.fireAnimationView)
+        configureFireAnimationView(
+            fireAnimationSerializable as FireAnimation, binding.fireAnimationView)
 
         binding.fireAnimationView.show()
         binding.fireAnimationView.playAnimation()
     }
 
-    private fun configureFireAnimationView(fireAnimation: FireAnimation, fireAnimationView: LottieAnimationView) {
+    private fun configureFireAnimationView(
+        fireAnimation: FireAnimation,
+        fireAnimationView: LottieAnimationView
+    ) {
         fireAnimationView.setAnimation(fireAnimation.resId)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
-        fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {}
-            override fun onAnimationCancel(animation: Animator?) {}
-            override fun onAnimationStart(animation: Animator?) {}
-            override fun onAnimationEnd(animation: Animator?) {
-                finish()
-                overridePendingTransition(0, R.anim.tab_anim_fade_out)
-            }
-        })
+        fireAnimationView.addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(animation: Animator?) {}
+                override fun onAnimationCancel(animation: Animator?) {}
+                override fun onAnimationStart(animation: Animator?) {}
+                override fun onAnimationEnd(animation: Animator?) {
+                    finish()
+                    overridePendingTransition(0, R.anim.tab_anim_fade_out)
+                }
+            })
     }
 
-    private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
-        override fun onAnimationUpdate(animation: ValueAnimator?) {
-            binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
-            if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
-                binding.fireAnimationView.removeUpdateListener(this)
+    private val accelerateAnimatorUpdateListener =
+        object : ValueAnimator.AnimatorUpdateListener {
+            override fun onAnimationUpdate(animation: ValueAnimator?) {
+                binding.fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
+                if (binding.fireAnimationView.speed > ANIMATION_MAX_SPEED) {
+                    binding.fireAnimationView.removeUpdateListener(this)
+                }
             }
         }
-    }
 
     companion object {
         const val FIRE_ANIMATION_EXTRA = "FIRE_ANIMATION_EXTRA"

@@ -30,14 +30,20 @@ data class BrokenSite(
 )
 
 sealed class BrokenSiteCategory(@StringRes val category: Int, val key: String) {
-    object ImagesCategory : BrokenSiteCategory(R.string.brokenSiteCategoryImages, IMAGES_CATEGORY_KEY)
-    object PaywallCategory : BrokenSiteCategory(R.string.brokenSiteCategoryPaywall, PAYWALL_CATEGORY_KEY)
-    object CommentsCategory : BrokenSiteCategory(R.string.brokenSiteCategoryComments, COMMENTS_CATEGORY_KEY)
-    object VideosCategory : BrokenSiteCategory(R.string.brokenSiteCategoryVideos, VIDEOS_CATEGORY_KEY)
+    object ImagesCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryImages, IMAGES_CATEGORY_KEY)
+    object PaywallCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryPaywall, PAYWALL_CATEGORY_KEY)
+    object CommentsCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryComments, COMMENTS_CATEGORY_KEY)
+    object VideosCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryVideos, VIDEOS_CATEGORY_KEY)
     object LinksCategory : BrokenSiteCategory(R.string.brokenSiteCategoryLinks, LINKS_CATEGORY_KEY)
-    object ContentCategory : BrokenSiteCategory(R.string.brokenSiteCategoryContent, CONTENT_CATEGORY_KEY)
+    object ContentCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryContent, CONTENT_CATEGORY_KEY)
     object LoginCategory : BrokenSiteCategory(R.string.brokenSiteCategoryLogin, LOGIN_CATEGORY_KEY)
-    object UnsupportedCategory : BrokenSiteCategory(R.string.brokenSiteCategoryUnsupported, UNSUPPORTED_CATEGORY_KEY)
+    object UnsupportedCategory :
+        BrokenSiteCategory(R.string.brokenSiteCategoryUnsupported, UNSUPPORTED_CATEGORY_KEY)
     object OtherCategory : BrokenSiteCategory(R.string.brokenSiteCategoryOther, OTHER_CATEGORY_KEY)
 
     companion object {

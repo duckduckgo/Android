@@ -20,8 +20,8 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
 class AppVersionCollector @Inject constructor() : VpnStateCollectorPlugin {
@@ -29,8 +29,6 @@ class AppVersionCollector @Inject constructor() : VpnStateCollectorPlugin {
         get() = "appInfo"
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
-        return JSONObject().apply {
-            put("appVersion", BuildConfig.VERSION_NAME)
-        }
+        return JSONObject().apply { put("appVersion", BuildConfig.VERSION_NAME) }
     }
 }

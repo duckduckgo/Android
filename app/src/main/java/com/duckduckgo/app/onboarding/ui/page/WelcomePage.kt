@@ -36,19 +36,18 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 class WelcomePage : OnboardingPageFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: WelcomePageViewModelFactory
+    @Inject lateinit var viewModelFactory: WelcomePageViewModelFactory
 
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
@@ -82,9 +81,7 @@ class WelcomePage : OnboardingPageFragment() {
         super.onStart()
 
         lifecycleScope.launch {
-            events.asFlow()
-                .flatMapLatest { welcomePageViewModel.reduce(it) }
-                .collect(::render)
+            events.asFlow().flatMapLatest { welcomePageViewModel.reduce(it) }.collect(::render)
         }
     }
 
@@ -93,8 +90,10 @@ class WelcomePage : OnboardingPageFragment() {
             welcomePageViewModel.screenContent.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect {
                     when (it) {
-                        is WelcomePageViewModel.ViewState.NewOrReturningUsersState -> renderNewOrReturningUsers()
-                        is WelcomePageViewModel.ViewState.DefaultOnboardingState -> renterDefaultOnboarding()
+                        is WelcomePageViewModel.ViewState.NewOrReturningUsersState ->
+                            renderNewOrReturningUsers()
+                        is WelcomePageViewModel.ViewState.DefaultOnboardingState ->
+                            renterDefaultOnboarding()
                     }
                 }
         }
@@ -128,9 +127,7 @@ class WelcomePage : OnboardingPageFragment() {
     }
 
     private fun event(event: WelcomePageView.Event) {
-        lifecycleScope.launch {
-            events.send(event)
-        }
+        lifecycleScope.launch { events.send(event) }
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
@@ -197,20 +194,22 @@ class WelcomePage : OnboardingPageFragment() {
     }
 
     private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
-        welcomeAnimation = ViewCompat.animate(welcomeContent as View)
-            .alpha(MIN_ALPHA)
-            .setDuration(ANIMATION_DURATION)
-            .setStartDelay(startDelay)
-            .withEndAction {
-                typingAnimation = ViewCompat.animate(daxCtaContainer)
-                    .alpha(MAX_ALPHA)
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction {
-                        welcomeAnimationFinished = true
-                        dialogTextCta.startTypingAnimation(ctaText)
-                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-                    }
-            }
+        welcomeAnimation =
+            ViewCompat.animate(welcomeContent as View)
+                .alpha(MIN_ALPHA)
+                .setDuration(ANIMATION_DURATION)
+                .setStartDelay(startDelay)
+                .withEndAction {
+                    typingAnimation =
+                        ViewCompat.animate(daxCtaContainer)
+                            .alpha(MAX_ALPHA)
+                            .setDuration(ANIMATION_DURATION)
+                            .withEndAction {
+                                welcomeAnimationFinished = true
+                                dialogTextCta.startTypingAnimation(ctaText)
+                                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
+                            }
+                }
     }
 
     private fun finishTypingAnimation() {

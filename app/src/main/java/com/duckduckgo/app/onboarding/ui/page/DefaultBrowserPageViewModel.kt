@@ -72,9 +72,7 @@ class DefaultBrowserPageViewModel(
     }
 
     fun loadUI() {
-        nextViewState()?.let {
-            refreshViewStateIfTypeChanged(it)
-        }
+        nextViewState()?.let { refreshViewStateIfTypeChanged(it) }
     }
 
     fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
@@ -95,9 +93,8 @@ class DefaultBrowserPageViewModel(
             command.value = Command.OpenDialog()
             viewState.value = currentState.copy(showInstructionsCard = true)
         }
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered
-        )
+        val params =
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered)
         pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
@@ -108,15 +105,18 @@ class DefaultBrowserPageViewModel(
                 reduceToNewState(origin, navigateToBrowser)
             }
             is Origin.DialogDismissed -> {
-                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
+                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(
+                    originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
                 reduceToNewState(origin)
             }
             is Origin.ExternalBrowser -> {
-                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
+                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(
+                    originValue = Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
                 reduceToNewState(origin)
             }
             is Origin.Settings -> {
-                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
+                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(
+                    originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
                 reduceToNewState(origin)
             }
         }
@@ -140,7 +140,8 @@ class DefaultBrowserPageViewModel(
                 ViewState.DefaultBrowserSettingsUI
             }
             else -> {
-                ViewState.DefaultBrowserDialogUI(showInstructionsCard = origin is Origin.InternalBrowser)
+                ViewState.DefaultBrowserDialogUI(
+                    showInstructionsCard = origin is Origin.InternalBrowser)
             }
         }
     }
@@ -148,14 +149,16 @@ class DefaultBrowserPageViewModel(
     private fun handleOriginInternalBrowser(): Boolean {
         var navigateToBrowser = false
         if (defaultBrowserDetector.isDefaultBrowser()) {
-            fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
+            fireDefaultBrowserPixelAndResetTimesPressedJustOnce(
+                originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
         } else {
             if (timesPressedJustOnce < MAX_DIALOG_ATTEMPTS) {
                 timesPressedJustOnce++
                 command.value = Command.OpenDialog()
                 pixel.fire(AppPixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
             } else {
-                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
+                fireDefaultBrowserPixelAndResetTimesPressedJustOnce(
+                    originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
                 navigateToBrowser = true
             }
         }
@@ -166,27 +169,26 @@ class DefaultBrowserPageViewModel(
         timesPressedJustOnce = 0
         if (defaultBrowserDetector.isDefaultBrowser()) {
             installStore.defaultBrowser = true
-            val params = mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
-            )
+            val params =
+                mapOf(
+                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
+                    Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue)
             pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
         } else {
             installStore.defaultBrowser = false
-            val params = mapOf(
-                Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
-            )
+            val params = mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue)
             pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
         }
     }
 
     private fun currentViewState(): ViewState = viewState.value!!
 
-    private fun newViewState(): ViewState = when {
-        defaultBrowserDetector.isDefaultBrowser() -> ViewState.ContinueToBrowser
-        defaultBrowserDetector.hasDefaultBrowser() -> ViewState.DefaultBrowserSettingsUI
-        else -> ViewState.DefaultBrowserDialogUI()
-    }
+    private fun newViewState(): ViewState =
+        when {
+            defaultBrowserDetector.isDefaultBrowser() -> ViewState.ContinueToBrowser
+            defaultBrowserDetector.hasDefaultBrowser() -> ViewState.DefaultBrowserSettingsUI
+            else -> ViewState.DefaultBrowserDialogUI()
+        }
 
     private fun refreshViewStateIfTypeChanged(createViewState: ViewState) {
         if (createViewState.javaClass != currentViewState().javaClass) {
@@ -201,7 +203,9 @@ class DefaultBrowserPageViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class DefaultBrowserPageViewModelFactory @Inject constructor(
+class DefaultBrowserPageViewModelFactory
+@Inject
+constructor(
     private val defaultBrowserDetector: Provider<DefaultBrowserDetector>,
     private val pixel: Provider<Pixel>,
     private val installStore: Provider<AppInstallStore>
@@ -209,7 +213,10 @@ class DefaultBrowserPageViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector.get(), pixel.get(), installStore.get()) as T)
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) ->
+                    (DefaultBrowserPageViewModel(
+                        defaultBrowserDetector.get(), pixel.get(), installStore.get()) as
+                        T)
                 else -> null
             }
         }

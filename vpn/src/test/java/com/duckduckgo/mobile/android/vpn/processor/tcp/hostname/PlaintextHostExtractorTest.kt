@@ -26,7 +26,8 @@ class PlaintextHostExtractorTest {
 
     @Test
     fun whenHostAvailableThenHostExtractedSuccessfully() {
-        val requestHostAvailable = """
+        val requestHostAvailable =
+            """
             GET / HTTP/1.1
             Host: example.com
             Connection: Keep-Alive
@@ -38,7 +39,8 @@ class PlaintextHostExtractorTest {
 
     @Test
     fun whenHostAvailableInUnexpectedOrderThenHostExtractedSuccessfully() {
-        val requestHostAvailableOutOfOrder = """
+        val requestHostAvailableOutOfOrder =
+            """
             GET / HTTP/1.1
             Connection: Keep-Alive
             Accept-Encoding: gzip
@@ -50,7 +52,8 @@ class PlaintextHostExtractorTest {
 
     @Test
     fun whenHostMissingThenNulReturned() {
-        val requestHostAvailableOutOfOrder = """
+        val requestHostAvailableOutOfOrder =
+            """
             GET / HTTP/1.1
             Connection: Keep-Alive
             Accept-Encoding: gzip

@@ -30,9 +30,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.launch
 
 class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
@@ -55,13 +55,13 @@ class FireproofWebsitesViewModel(
     val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
+    private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> =
+        fireproofWebsiteRepository.getFireproofWebsites()
+    private val fireproofWebsitesObserver =
+        Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
 
     init {
-        _viewState.value = ViewState(
-            loginDetectionEnabled = settingsDataStore.appLoginDetection
-        )
+        _viewState.value = ViewState(loginDetectionEnabled = settingsDataStore.appLoginDetection)
         fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
 
@@ -71,9 +71,7 @@ class FireproofWebsitesViewModel(
     }
 
     private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
-        _viewState.value = _viewState.value?.copy(
-            fireproofWebsitesEntities = entities
-        )
+        _viewState.value = _viewState.value?.copy(fireproofWebsitesEntities = entities)
     }
 
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {
@@ -96,7 +94,8 @@ class FireproofWebsitesViewModel(
 
     fun onUserToggleLoginDetection(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val pixelName = if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
+            val pixelName =
+                if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
             pixel.fire(pixelName)
 
             if (enabled) {
@@ -109,7 +108,9 @@ class FireproofWebsitesViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class FireproofWebsitesViewModelFactory @Inject constructor(
+class FireproofWebsitesViewModelFactory
+@Inject
+constructor(
     private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>,
     private val pixel: Provider<Pixel>,
@@ -119,7 +120,14 @@ class FireproofWebsitesViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository.get(), dispatcherProvider.get(), pixel.get(), settingsDataStore.get(), userEventsStore.get()) as T)
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) ->
+                    (FireproofWebsitesViewModel(
+                        fireproofWebsiteRepository.get(),
+                        dispatcherProvider.get(),
+                        pixel.get(),
+                        settingsDataStore.get(),
+                        userEventsStore.get()) as
+                        T)
                 else -> null
             }
         }

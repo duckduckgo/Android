@@ -24,8 +24,8 @@ import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
 import android.view.View
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
@@ -34,22 +34,28 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
+class EmailProtectionSignOutFragment() :
+    EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
 
     private val viewModel by bindViewModel<EmailProtectionSignOutViewModel>()
 
     private val binding: FragmentEmailProtectionSignOutBinding by viewBinding()
 
-    private val contactUsSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:support@duck.com")
-            openExternalApp(intent)
+    private val contactUsSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                val intent = Intent(Intent.ACTION_SENDTO)
+                intent.data = Uri.parse("mailto:support@duck.com")
+                openExternalApp(intent)
+            }
         }
-    }
 
     override fun configureViewModelObservers() {
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { executeCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     override fun configureUi() {
@@ -77,8 +83,7 @@ class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragme
                         contactUsSpan,
                         spannableString.getSpanStart(urlSpan),
                         spannableString.getSpanEnd(urlSpan),
-                        spannableString.getSpanFlags(urlSpan)
-                    )
+                        spannableString.getSpanFlags(urlSpan))
                     removeSpan(urlSpan)
                 }
             }
@@ -113,9 +118,7 @@ class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragme
 
         fun instance(emailAddress: String): EmailProtectionSignOutFragment {
             val fragment = EmailProtectionSignOutFragment()
-            fragment.arguments = Bundle().also {
-                it.putString(EMAIL_ADDRESS_EXTRA, emailAddress)
-            }
+            fragment.arguments = Bundle().also { it.putString(EMAIL_ADDRESS_EXTRA, emailAddress) }
             return fragment
         }
     }

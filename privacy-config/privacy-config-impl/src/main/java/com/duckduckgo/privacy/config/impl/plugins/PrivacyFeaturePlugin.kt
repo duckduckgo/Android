@@ -25,9 +25,8 @@ interface PrivacyFeaturePlugin {
     val featureName: PrivacyFeatureName
 }
 
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
+class PrivacyFeaturePluginPoint(private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>) :
+    PluginPoint<PrivacyFeaturePlugin> {
     override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
         return privacyFeatures
     }

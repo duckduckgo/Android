@@ -32,15 +32,20 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     private var terms: List<Pair<Int, String>> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PracticeViewHolder {
-        val binding = ItemPrivacyPracticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemPrivacyPracticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PracticeViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PracticeViewHolder, position: Int) {
         val term = terms[position]
-        val descriptionResource = if (term.first == GOOD) R.string.practicesIconContentGood else R.string.practicesIconContentBad
-        holder.binding.icon.contentDescription = holder.binding.icon.context.getText(descriptionResource)
-        holder.binding.icon.setImageResource(if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
+        val descriptionResource =
+            if (term.first == GOOD) R.string.practicesIconContentGood
+            else R.string.practicesIconContentBad
+        holder.binding.icon.contentDescription =
+            holder.binding.icon.context.getText(descriptionResource)
+        holder.binding.icon.setImageResource(
+            if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
         holder.binding.description.text = term.second.capitalize()
     }
 
@@ -53,8 +58,6 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
         notifyDataSetChanged()
     }
 
-    class PracticeViewHolder(
-        val binding: ItemPrivacyPracticeBinding
-    ) : RecyclerView.ViewHolder(binding.root)
-
+    class PracticeViewHolder(val binding: ItemPrivacyPracticeBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

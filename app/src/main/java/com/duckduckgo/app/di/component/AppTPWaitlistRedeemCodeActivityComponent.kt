@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
-interface AppTPWaitlistRedeemCodeActivityComponent : AndroidInjector<AppTPWaitlistRedeemCodeActivity> {
+@MergeSubcomponent(scope = ActivityScope::class)
+interface AppTPWaitlistRedeemCodeActivityComponent :
+    AndroidInjector<AppTPWaitlistRedeemCodeActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<AppTPWaitlistRedeemCodeActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface AppTPWaitlistRedeemCodeActivityComponentProvider {
-    fun provideAppTPWaitlistRedeemCodeActivityComponentFactory(): AppTPWaitlistRedeemCodeActivityComponent.Factory
+    fun provideAppTPWaitlistRedeemCodeActivityComponentFactory():
+        AppTPWaitlistRedeemCodeActivityComponent.Factory
 }
 
 @Module

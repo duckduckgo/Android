@@ -48,7 +48,8 @@ class AddWidgetInstructionsViewModelFactory @Inject constructor() : ViewModelFac
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> (AddWidgetInstructionsViewModel() as T)
+                isAssignableFrom(AddWidgetInstructionsViewModel::class.java) ->
+                    (AddWidgetInstructionsViewModel() as T)
                 else -> null
             }
         }

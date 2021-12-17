@@ -33,9 +33,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 import java.nio.channels.Selector
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(VpnScope::class)
@@ -45,7 +45,10 @@ class VpnModule {
     @SingleInstanceIn(VpnScope::class)
     @TargetApi(29)
     @Named("DetectOriginatingAppPackageModern")
-    fun providesOriginatingAppResolverModern(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppPackageIdentifier {
+    fun providesOriginatingAppResolverModern(
+        connectivityManager: ConnectivityManager,
+        packageManager: PackageManager
+    ): OriginatingAppPackageIdentifier {
         return DetectOriginatingAppPackageModern(connectivityManager, packageManager)
     }
 
@@ -57,7 +60,8 @@ class VpnModule {
         networkFileConnectionMatcher: NetworkFileConnectionMatcher,
         @VpnCoroutineScope vpnCoroutineScope: CoroutineScope
     ): OriginatingAppPackageIdentifier {
-        return DetectOriginatingAppPackageLegacy(packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
+        return DetectOriginatingAppPackageLegacy(
+            packageManager, networkFileConnectionMatcher, vpnCoroutineScope)
     }
 
     @SingleInstanceIn(VpnScope::class)
@@ -68,7 +72,8 @@ class VpnModule {
 
     @SingleInstanceIn(VpnScope::class)
     @Provides
-    fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver = AppNameResolver(packageManager)
+    fun providesAppNameResolver(packageManager: PackageManager): AppNameResolver =
+        AppNameResolver(packageManager)
 
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {
@@ -79,7 +84,9 @@ class VpnModule {
     fun provideNameHeaderExtractor(): HostnameHeaderExtractor = PlaintextHostHeaderExtractor()
 
     @Provides
-    fun provideEncryptedRequestHostExtractor(tlsMessageDetector: TlsMessageDetector): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor(tlsMessageDetector)
+    fun provideEncryptedRequestHostExtractor(
+        tlsMessageDetector: TlsMessageDetector
+    ): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor(tlsMessageDetector)
 
     @Provides
     fun providePayloadBytesExtractor(): PayloadBytesExtractor = ConcretePayloadBytesExtractor()
@@ -113,7 +120,14 @@ class VpnModule {
         tlsContentTypeExtractor: ContentTypeExtractor,
         requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
     ): VpnTrackerDetector {
-        return DomainBasedTrackerDetector(hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase, requestInterceptors)
+        return DomainBasedTrackerDetector(
+            hostnameExtractor,
+            appTrackerRepository,
+            appTrackerRecorder,
+            payloadBytesExtractor,
+            tlsContentTypeExtractor,
+            vpnDatabase,
+            requestInterceptors)
     }
 
     @SingleInstanceIn(VpnScope::class)

@@ -35,45 +35,50 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
+        val currentOption: FireAnimation =
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
 
-        val rootView = View.inflate(activity, R.layout.settings_fire_animation_selector_fragment, null)
+        val rootView =
+            View.inflate(activity, R.layout.settings_fire_animation_selector_fragment, null)
 
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.fireAnimationSelectorGroup))
 
         val radioGroup = rootView.findViewById(R.id.fireAnimationSelectorGroup) as RadioGroup
 
         radioGroup.setOnCheckedChangeListener { group, _ ->
-            val fireAnimation = when (group.checkedRadioButtonId) {
-                R.id.fireAnimationFire -> HeroFire
-                R.id.fireAnimationWater -> HeroWater
-                R.id.fireAnimationAbstract -> HeroAbstract
-                R.id.fireAnimationDisabled -> None
-                else -> HeroFire
-            }
+            val fireAnimation =
+                when (group.checkedRadioButtonId) {
+                    R.id.fireAnimationFire -> HeroFire
+                    R.id.fireAnimationWater -> HeroWater
+                    R.id.fireAnimationAbstract -> HeroAbstract
+                    R.id.fireAnimationDisabled -> None
+                    else -> HeroFire
+                }
 
             if (fireAnimation != None) {
                 startActivity(FireAnimationActivity.intent(requireContext(), fireAnimation))
             }
         }
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.settingsSelectFireAnimationDialog)
-            .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave) { _, _ ->
-                dialog?.let {
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.fireAnimationFire -> HeroFire
-                        R.id.fireAnimationWater -> HeroWater
-                        R.id.fireAnimationAbstract -> HeroAbstract
-                        R.id.fireAnimationDisabled -> None
-                        else -> HeroFire
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setTitle(R.string.settingsSelectFireAnimationDialog)
+                .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave) { _, _ ->
+                    dialog?.let {
+                        val selectedOption =
+                            when (radioGroup.checkedRadioButtonId) {
+                                R.id.fireAnimationFire -> HeroFire
+                                R.id.fireAnimationWater -> HeroWater
+                                R.id.fireAnimationAbstract -> HeroAbstract
+                                R.id.fireAnimationDisabled -> None
+                                else -> HeroFire
+                            }
+                        val listener = activity as Listener?
+                        listener?.onFireAnimationSelected(selectedOption)
                     }
-                    val listener = activity as Listener?
-                    listener?.onFireAnimationSelected(selectedOption)
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -100,9 +105,8 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
         fun create(selectedFireAnimation: FireAnimation?): SettingsFireAnimationSelectorFragment {
             val fragment = SettingsFireAnimationSelectorFragment()
 
-            fragment.arguments = Bundle().also {
-                it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation)
-            }
+            fragment.arguments =
+                Bundle().also { it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation) }
             return fragment
         }
     }

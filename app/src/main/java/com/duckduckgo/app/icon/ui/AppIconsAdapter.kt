@@ -21,13 +21,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.databinding.ItemAppIconBinding
 
-class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) -> Unit) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
+class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) -> Unit) :
+    RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
 
     private var iconViewData: MutableList<ChangeIconViewModel.IconViewData> = mutableListOf()
 
-    class IconViewHolder(
-        val binding: ItemAppIconBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    class IconViewHolder(val binding: ItemAppIconBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun getItemCount() = iconViewData.size
 

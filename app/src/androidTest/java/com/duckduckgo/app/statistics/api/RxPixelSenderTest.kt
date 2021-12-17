@@ -22,16 +22,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
-import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
+import java.util.concurrent.TimeoutException
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -39,29 +40,20 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import java.util.concurrent.TimeoutException
 
 class RxPixelSenderTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
-    @Mock
-    val api: PixelService = mock()
+    @Mock val api: PixelService = mock()
 
-    @Mock
-    val mockStatisticsDataStore: StatisticsDataStore = mock()
+    @Mock val mockStatisticsDataStore: StatisticsDataStore = mock()
 
-    @Mock
-    val mockVariantManager: VariantManager = mock()
+    @Mock val mockVariantManager: VariantManager = mock()
 
-    @Mock
-    val mockDeviceInfo: DeviceInfo = mock()
+    @Mock val mockDeviceInfo: DeviceInfo = mock()
 
     private lateinit var db: AppDatabase
     private lateinit var pendingPixelDao: PendingPixelDao
@@ -69,17 +61,24 @@ class RxPixelSenderTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         pendingPixelDao = db.pixelDao()
 
-        testee = RxPixelSender(
-            api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo,
-            object : StatisticsLibraryConfig {
-                override fun shouldFirePixelsAsDev() = true
-            }
-        )
+        testee =
+            RxPixelSender(
+                api,
+                pendingPixelDao,
+                mockStatisticsDataStore,
+                mockVariantManager,
+                mockDeviceInfo,
+                object : StatisticsLibraryConfig {
+                    override fun shouldFirePixelsAsDev() = true
+                })
     }
 
     @After
@@ -128,7 +127,8 @@ class RxPixelSenderTest {
         givenAppVersion("1.0.0")
 
         val params = mapOf("param1" to "value1", "param2" to "value2")
-        val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
+        val expectedParams =
+            mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
         testee.sendPixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap())
 
         verify(api).fire("mp", "phone", "atbvariant", expectedParams, emptyMap())
@@ -167,10 +167,8 @@ class RxPixelSenderTest {
                 pixelName = "mp",
                 atb = "atbvariant",
                 additionalQueryParams = params + mapOf("appVersion" to "1.0.0"),
-                encodedQueryParams = emptyMap()
-            ),
-            pixels.first()
-        )
+                encodedQueryParams = emptyMap()),
+            pixels.first())
     }
 
     @Test
@@ -189,40 +187,42 @@ class RxPixelSenderTest {
                 pixelName = "mp",
                 atb = "atbvariant",
                 additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-                encodedQueryParams = emptyMap()
-            ),
-            pixels.first()
-        )
+                encodedQueryParams = emptyMap()),
+            pixels.first())
     }
 
     @Test
     fun whenAppForegroundedThenPixelSent() {
         givenPixelApiSucceeds()
-        val pixelEntity = PixelEntity(
-            pixelName = "mp",
-            atb = "atbvariant",
-            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
-        )
+        val pixelEntity =
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap())
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
 
-        verify(api).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
-        )
+        verify(api)
+            .fire(
+                pixelEntity.pixelName,
+                "phone",
+                pixelEntity.atb,
+                pixelEntity.additionalQueryParams,
+                pixelEntity.encodedQueryParams)
     }
 
     @Test
     fun whenAppForegroundedAndPixelSentThenPixelRemoved() {
         givenPixelApiSucceeds()
-        val pixelEntity = PixelEntity(
-            pixelName = "mp",
-            atb = "atbvariant",
-            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
-        )
+        val pixelEntity =
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap())
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
@@ -235,12 +235,12 @@ class RxPixelSenderTest {
     @Test
     fun whenAppForegroundedAndSendPixelFailsThenPixelNotRemoved() {
         givenPixelApiFails()
-        val pixelEntity = PixelEntity(
-            pixelName = "mp",
-            atb = "atbvariant",
-            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
-        )
+        val pixelEntity =
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap())
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
@@ -254,20 +254,24 @@ class RxPixelSenderTest {
     @Test
     fun whenAppForegroundedWithMultiplePixelsEnqueuedThenSendAllPixels() {
         givenPixelApiSucceeds()
-        val pixelEntity = PixelEntity(
-            pixelName = "mp",
-            atb = "atbvariant",
-            additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-            encodedQueryParams = emptyMap()
-        )
+        val pixelEntity =
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap())
         pendingPixelDao.insert(pixelEntity, times = 5)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
 
-        verify(api, times(5)).fire(
-            pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
-        )
+        verify(api, times(5))
+            .fire(
+                pixelEntity.pixelName,
+                "phone",
+                pixelEntity.atb,
+                pixelEntity.additionalQueryParams,
+                pixelEntity.encodedQueryParams)
     }
 
     private fun assertPixelEntity(expectedEntity: PixelEntity, pixelEntity: PixelEntity) {
@@ -283,7 +287,8 @@ class RxPixelSenderTest {
     }
 
     private fun givenApiSendPixelSucceeds() {
-        whenever(api.fire(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete())
+        whenever(api.fire(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Completable.complete())
     }
 
     private fun givenVariant(variant: Variant) {
@@ -299,11 +304,13 @@ class RxPixelSenderTest {
     }
 
     private fun givenPixelApiSucceeds() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.complete())
+        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any()))
+            .thenReturn(Completable.complete())
     }
 
     private fun givenPixelApiFails() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any()))
+            .thenReturn(Completable.error(TimeoutException()))
     }
 
     private fun PendingPixelDao.insert(pixel: PixelEntity, times: Int) {

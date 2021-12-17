@@ -19,9 +19,9 @@ package com.duckduckgo.app.privacy.ui
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import java.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
 
 class TrackerNetworksAdapterTest {
 
@@ -54,8 +54,8 @@ class TrackerNetworksAdapterTest {
         val minorNetworkList = arrayListOf(trackingEvent, trackingEvent)
         val majorNetworkList = arrayListOf(trackingEvent, trackingEvent)
         return mapOf(
-            TestEntity("A", "A", 0.0) to minorNetworkList,
-            TestEntity("B", "B", 0.0) to majorNetworkList
-        ).toSortedMap(compareBy { it.displayName })
+                TestEntity("A", "A", 0.0) to minorNetworkList,
+                TestEntity("B", "B", 0.0) to majorNetworkList)
+            .toSortedMap(compareBy { it.displayName })
     }
 }

@@ -40,33 +40,28 @@ class InfoPanel : FrameLayout {
     private val binding: ViewInfoPanelBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(
-        context,
-        attrs,
-        R.style.Widget_DuckDuckGo_InfoPanel
-    )
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, R.style.Widget_DuckDuckGo_InfoPanel)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.InfoPanel)
         setText(attributes.getString(R.styleable.InfoPanel_panelText) ?: "")
         setImageResource(
             attributes.getResourceId(
-                R.styleable.InfoPanel_panelDrawable,
-                R.drawable.ic_link_color_24
-            )
-        )
+                R.styleable.InfoPanel_panelDrawable, R.drawable.ic_link_color_24))
         setBackgroundResource(
             attributes.getResourceId(
-                R.styleable.InfoPanel_panelBackground,
-                R.drawable.background_blue_tooltip
-            )
-        )
+                R.styleable.InfoPanel_panelBackground, R.drawable.background_blue_tooltip))
         attributes.recycle()
     }
 
-    /**
-     * Sets the panel text
-     */
+    /** Sets the panel text */
     fun setText(text: String) {
         binding.infoPanelText.text = text
     }
@@ -75,11 +70,12 @@ class InfoPanel : FrameLayout {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                onClick()
+        val clickableSpan =
+            object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    onClick()
+                }
             }
-        }
 
         annotations?.find { it.value == annotation }?.let {
             spannableString.apply {
@@ -87,33 +83,25 @@ class InfoPanel : FrameLayout {
                     clickableSpan,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(
                     UnderlineSpan(),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(
-                    ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.almostBlackDark)
-                    ),
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.almostBlackDark)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
         binding.infoPanelText.text = spannableString
     }
 
-    /**
-     * Sets the panel image resource
-     */
+    /** Sets the panel image resource */
     fun setImageResource(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.infoPanelImage.setImageDrawable(drawable)
     }
-
 }

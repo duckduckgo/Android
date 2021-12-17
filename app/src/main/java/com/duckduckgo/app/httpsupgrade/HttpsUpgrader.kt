@@ -33,32 +33,29 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 import kotlin.concurrent.thread
+import timber.log.Timber
 
 interface HttpsUpgrader {
 
-    @WorkerThread
-    fun shouldUpgrade(uri: Uri): Boolean
+    @WorkerThread fun shouldUpgrade(uri: Uri): Boolean
 
     fun upgrade(uri: Uri): Uri {
         return uri.toHttps
     }
 
-    @WorkerThread
-    fun reloadData()
+    @WorkerThread fun reloadData()
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = HttpsUpgrader::class
-)
-class HttpsUpgraderImpl @Inject constructor(
+@ContributesBinding(scope = AppScope::class, boundType = HttpsUpgrader::class)
+class HttpsUpgraderImpl
+@Inject
+constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val userAllowListDao: UserWhitelistDao,

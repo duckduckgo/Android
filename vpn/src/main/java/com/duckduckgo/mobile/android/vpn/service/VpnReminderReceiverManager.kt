@@ -25,15 +25,17 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
 import dummy.ui.VpnPreferences
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface VpnReminderReceiverManager {
     fun showReminderNotificationIfVpnDisabled(context: Context)
 }
 
 @ContributesBinding(AppScope::class)
-class AndroidVpnReminderReceiverManager @Inject constructor(
+class AndroidVpnReminderReceiverManager
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
@@ -44,28 +46,32 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
             Timber.v("Vpn is already running, nothing to show")
         } else {
             Timber.v("Vpn is not running, showing reminder notification")
-            val notification = if (wasReminderNotificationShown(context)) {
-                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
-            } else {
-                notificationWasShown(context)
-                deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
-            }
+            val notification =
+                if (wasReminderNotificationShown(context)) {
+                    deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
+                } else {
+                    notificationWasShown(context)
+                    deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+                }
 
             deviceShieldPixels.didShowReminderNotification()
-            notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+            notificationManager.notify(
+                TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
         }
     }
 
     private fun wasReminderNotificationShown(context: Context): Boolean {
-        return prefs(context).getBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
+        return prefs(context)
+            .getBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
     }
 
     private fun notificationWasShown(context: Context) {
-        prefs(context).edit { putBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
+        prefs(context).edit {
+            putBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true)
+        }
     }
 
     private fun prefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
     }
-
 }

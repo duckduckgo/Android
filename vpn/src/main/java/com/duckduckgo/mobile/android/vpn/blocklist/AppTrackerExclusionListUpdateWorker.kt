@@ -28,13 +28,14 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: WorkerParameters) :
+    CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
 
@@ -45,7 +46,8 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 
             val success = Result.success()
             if (exclusionListResult != success) {
-                Timber.w("Failed downloading exclution or system app override lists, scheduling a retry")
+                Timber.w(
+                    "Failed downloading exclution or system app override lists, scheduling a retry")
                 return@withContext Result.retry()
             }
 
@@ -60,7 +62,8 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 
         when (sysAppsOverrides.etag) {
             is ETag.ValidETag -> {
-                val currentEtag = vpnDatabase.vpnSystemAppsOverridesDao().getSystemAppOverridesMetadata()?.eTag
+                val currentEtag =
+                    vpnDatabase.vpnSystemAppsOverridesDao().getSystemAppOverridesMetadata()?.eTag
                 val updatedEtag = sysAppsOverrides.etag.value
 
                 if (updatedEtag == currentEtag) {
@@ -68,9 +71,13 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
                     return Result.success()
                 }
 
-                Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
-                vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
-                        sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag))
+                Timber.d(
+                    "Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
+                vpnDatabase
+                    .vpnSystemAppsOverridesDao()
+                    .upsertSystemAppOverrides(
+                        sysAppsOverrides.overridePackages,
+                        AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag))
 
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
 
@@ -89,7 +96,8 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 
         when (exclusionList.etag) {
             is ETag.ValidETag -> {
-                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag
+                val currentEtag =
+                    vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag
                 val updatedEtag = exclusionList.etag.value
 
                 if (updatedEtag == currentEtag) {
@@ -97,8 +105,13 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
                     return Result.success()
                 }
 
-                Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
+                Timber.d(
+                    "Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
+                vpnDatabase
+                    .vpnAppTrackerBlockingDao()
+                    .updateExclusionList(
+                        exclusionList.excludedPackages,
+                        AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
 
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
 
@@ -113,27 +126,34 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
-) : LifecycleObserver {
+class AppTrackerExclusionListUpdateWorkerScheduler
+@Inject
+constructor(private val workManager: WorkManager) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleBlocklistUpdateWork() {
         Timber.v("Scheduling tracker exclusion list update worker")
-        val workerRequest = PeriodicWorkRequestBuilder<AppTrackerExclusionListUpdateWorker>(6, TimeUnit.HOURS)
-            .addTag(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
+        val workerRequest =
+            PeriodicWorkRequestBuilder<AppTrackerExclusionListUpdateWorker>(6, TimeUnit.HOURS)
+                .addTag(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                .build()
+        workManager.enqueueUniquePeriodicWork(
+            APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG,
+            ExistingPeriodicWorkPolicy.REPLACE,
+            workerRequest)
     }
 
     companion object {
-        private const val APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG = "APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG"
+        private const val APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG =
+            "APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG"
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppTrackerExclusionListUpdateWorkerPlugin @Inject constructor(
+class AppTrackerExclusionListUpdateWorkerPlugin
+@Inject
+constructor(
     private val appTrackerListDownloader: AppTrackerListDownloader,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {

@@ -30,28 +30,27 @@ import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows sending fake trackers, to do so, in the command line:
  *
  * $ adb shell am broadcast -a track --es times <N> --es hago <M>
  *
- * where `--es times <N>` is optional and is the number of trackers to be sent
- * where `--es hago <M>` is optional and is the timestamp (hours ago) for the trackers
+ * where `--es times <N>` is optional and is the number of trackers to be sent where `--es hago <M>`
+ * is optional and is the timestamp (hours ago) for the trackers
  */
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
-)
+@ContributesMultibinding(scope = VpnScope::class, boundType = VpnServiceCallbacks::class)
 @SingleInstanceIn(VpnScope::class)
-class SendTrackerDebugReceiver @Inject constructor(
+class SendTrackerDebugReceiver
+@Inject
+constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
@@ -79,7 +78,11 @@ class SendTrackerDebugReceiver @Inject constructor(
 
             val insertionList = mutableListOf<VpnTracker>()
             for (i in 0 until times) {
-                insertionList.add(dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo))))
+                insertionList.add(
+                    dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(
+                        timestamp =
+                            DatabaseDateFormatter.timestamp(
+                                LocalDateTime.now().minusHours(hoursAgo))))
             }
             vpnDatabase.vpnTrackerDao().insert(insertionList)
         }
@@ -104,75 +107,48 @@ class SendTrackerDebugReceiver @Inject constructor(
     }
 }
 
-private val dummyTrackers = listOf(
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "www.facebook.com",
-        company = "Facebook, Inc.",
-        companyDisplayName = "Facebook",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "api.segment.io",
-        company = "Segment.io",
-        companyDisplayName = "Segment",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "crashlyticsreports-pa.googleapis.com",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "crashlyticsreports-pa.googleapis.com",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "lion.package.id",
-            appDisplayName = "LION"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "api.segment.io",
-        company = "Segment.io",
-        companyDisplayName = "Segment",
-        trackingApp = TrackingApp(
-            packageId = "lion.package.id",
-            appDisplayName = "LION"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "crashlyticsreports-pa.googleapis.com",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "puppy.package.id",
-            appDisplayName = "PUPPY"
-        )
-    ),
-    VpnTracker(
-        trackerCompanyId = 0,
-        domain = "api.segment.io",
-        company = "Segment.io",
-        companyDisplayName = "Segment",
-        trackingApp = TrackingApp(
-            packageId = "puppy.package.id",
-            appDisplayName = "PUPPY"
-        )
-    ),
-)
+private val dummyTrackers =
+    listOf(
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "www.facebook.com",
+            company = "Facebook, Inc.",
+            companyDisplayName = "Facebook",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "api.segment.io",
+            company = "Segment.io",
+            companyDisplayName = "Segment",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "crashlyticsreports-pa.googleapis.com",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "crashlyticsreports-pa.googleapis.com",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp = TrackingApp(packageId = "lion.package.id", appDisplayName = "LION")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "api.segment.io",
+            company = "Segment.io",
+            companyDisplayName = "Segment",
+            trackingApp = TrackingApp(packageId = "lion.package.id", appDisplayName = "LION")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "crashlyticsreports-pa.googleapis.com",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp = TrackingApp(packageId = "puppy.package.id", appDisplayName = "PUPPY")),
+        VpnTracker(
+            trackerCompanyId = 0,
+            domain = "api.segment.io",
+            company = "Segment.io",
+            companyDisplayName = "Segment",
+            trackingApp = TrackingApp(packageId = "puppy.package.id", appDisplayName = "PUPPY")),
+    )

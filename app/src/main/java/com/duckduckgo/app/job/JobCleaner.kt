@@ -21,18 +21,20 @@ import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWork
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedWorkerTags
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface JobCleaner {
     fun cleanDeprecatedJobs()
 
     companion object {
-        private const val STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous"
+        private const val STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG =
+            "com.duckduckgo.notification.schedule.continuous"
         private const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
         private const val FAVORITES_ONBOARDING_WORK_TAG = "FavoritesOnboardingWorker"
 
-        fun allDeprecatedNotificationWorkTags() = listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG, USE_OUR_APP_WORK_REQUEST_TAG)
+        fun allDeprecatedNotificationWorkTags() =
+            listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG, USE_OUR_APP_WORK_REQUEST_TAG)
         fun allDeprecatedWorkerTags() = listOf(FAVORITES_ONBOARDING_WORK_TAG)
     }
 }

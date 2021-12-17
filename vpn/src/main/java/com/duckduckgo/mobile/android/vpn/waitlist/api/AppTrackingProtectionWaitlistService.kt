@@ -35,13 +35,13 @@ interface AppTrackingProtectionWaitlistService {
 }
 
 data class WaitlistResponse(val token: String?, val timestamp: Int?)
+
 data class WaitlistStatusResponse(val timestamp: Int)
+
 data class AppTPInviteCodeResponse(val code: String)
-data class AppTPRedeemCodeResponse(
-    val product: String,
-    val status: String,
-    val error: String
-)
+
+data class AppTPRedeemCodeResponse(val product: String, val status: String, val error: String)
+
 data class AppTPRedeemCodeError(val error: String) {
     companion object {
         const val INVALID = "invalid_invite_code"

@@ -45,7 +45,10 @@ class AppTPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }
+        viewModel
+            .viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
             .launchIn(lifecycleScope)
 
         setContentView(binding.root)
@@ -64,7 +67,8 @@ class AppTPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
             binding.redeemButton.isEnabled = !inputText.isNullOrEmpty()
         }
         binding.redeemCode.editText?.setOnEditorActionListener { textView, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (actionId == EditorInfo.IME_ACTION_GO ||
+                keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                 if (binding.redeemButton.isEnabled) {
                     val code = binding.redeemCode.editText?.text.toString()
                     textView.hideKeyboard()

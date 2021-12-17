@@ -26,17 +26,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import timber.log.Timber
 
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
-)
+@ContributesMultibinding(scope = VpnScope::class, boundType = VpnServiceCallbacks::class)
 @SingleInstanceIn(VpnScope::class)
-class VpnServiceHeartbeatImpl @Inject constructor(
+class VpnServiceHeartbeatImpl
+@Inject
+constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider
@@ -44,10 +43,11 @@ class VpnServiceHeartbeatImpl @Inject constructor(
 
     private var job = ConflatedJob()
 
-    private suspend fun storeHeartbeat(type: String) = withContext(dispatcherProvider.io()) {
-        Timber.v("(${Process.myPid()}) - Sending heartbeat $type")
-        vpnDatabase.vpnHeartBeatDao().insertType(type)
-    }
+    private suspend fun storeHeartbeat(type: String) =
+        withContext(dispatcherProvider.io()) {
+            Timber.v("(${Process.myPid()}) - Sending heartbeat $type")
+            vpnDatabase.vpnHeartBeatDao().insertType(type)
+        }
 
     companion object {
         private const val HEART_BEAT_PERIOD_MINUTES: Long = 7
@@ -55,21 +55,25 @@ class VpnServiceHeartbeatImpl @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.v("onVpnStarted called")
-        job += coroutineScope.launch {
-            while (true) {
-                storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
-                delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))
+        job +=
+            coroutineScope.launch {
+                while (true) {
+                    storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
+                    delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))
+                }
             }
-        }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
-            VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
+            VpnStopReason.Error, VpnStopReason.Revoked ->
+                Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
             VpnStopReason.SelfStop -> {
                 Timber.v("HB monitor: self stopped $vpnStopReason")
-                coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
+                coroutineScope.launch {
+                    storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED)
+                }
             }
         }
         job.cancel()

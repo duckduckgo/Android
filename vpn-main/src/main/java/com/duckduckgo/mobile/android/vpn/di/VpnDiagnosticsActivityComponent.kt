@@ -30,12 +30,9 @@ import dagger.multibindings.IntoMap
 import dummy.ui.VpnDiagnosticsActivity
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
 }
 
 @ContributesTo(AppScope::class)

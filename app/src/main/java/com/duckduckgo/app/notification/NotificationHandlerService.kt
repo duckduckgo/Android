@@ -41,28 +41,22 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var context: Context
+    @Inject lateinit var context: Context
 
-    @Inject
-    lateinit var notificationManager: NotificationManagerCompat
+    @Inject lateinit var notificationManager: NotificationManagerCompat
 
-    @Inject
-    lateinit var notificationScheduler: AndroidNotificationScheduler
+    @Inject lateinit var notificationScheduler: AndroidNotificationScheduler
 
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
+    @Inject lateinit var dispatcher: DispatcherProvider
 
-    @Inject
-    lateinit var taskStackBuilderFactory: TaskStackBuilderFactory
+    @Inject lateinit var taskStackBuilderFactory: TaskStackBuilderFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -93,7 +87,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onEmailWaitlistCodeReceived(pixelSuffix: String) {
         Timber.i("Email waitlist code received launched!")
         val intent = EmailProtectionActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -102,7 +97,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onAppTPWaitlistCodeReceived(pixelSuffix: String) {
         Timber.i("App Tracking Protection waitlist code received launched!")
         val intent = AppTPWaitlistActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -111,7 +107,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onWebsiteNotification(intent: Intent, pixelSuffix: String) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(newIntent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -119,7 +116,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onCustomizeIconLaunched(pixelSuffix: String) {
         val intent = ChangeIconActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -127,7 +125,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onAppLaunched(pixelSuffix: String) {
         val intent = BrowserActivity.intent(context, newSearch = true)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -136,7 +135,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onClearDataLaunched(pixelSuffix: String) {
         Timber.i("Clear Data Launched!")
         val intent = SettingsActivity.intent(context)
-        taskStackBuilderFactory.createTaskBuilder()
+        taskStackBuilderFactory
+            .createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -170,7 +170,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
         const val NOTIFICATION_AUTO_CANCEL = "NOTIFICATION_AUTO_CANCEL"
 
-        fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+        fun pendingNotificationHandlerIntent(
+            context: Context,
+            eventType: String,
+            specification: NotificationSpec
+        ): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
             intent.putExtras(specification.bundle)

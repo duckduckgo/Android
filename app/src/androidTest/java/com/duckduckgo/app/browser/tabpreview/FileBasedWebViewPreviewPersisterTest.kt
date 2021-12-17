@@ -24,12 +24,12 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.io.File
 
 class FileBasedWebViewPreviewPersisterTest {
 
@@ -68,31 +68,37 @@ class FileBasedWebViewPreviewPersisterTest {
     }
 
     @Test
-    fun whenDeleteAllCalledThenEntireTabPreviewDirectoryDeleted() = runBlocking<Unit> {
-        testee.deleteAll()
-        val captor = argumentCaptor<File>()
-        verify(mockFileDeleter).deleteDirectory(captor.capture())
-        verifyTabPreviewDirectoryUse(captor.firstValue.absolutePath)
-    }
+    fun whenDeleteAllCalledThenEntireTabPreviewDirectoryDeleted() =
+        runBlocking<Unit> {
+            testee.deleteAll()
+            val captor = argumentCaptor<File>()
+            verify(mockFileDeleter).deleteDirectory(captor.capture())
+            verifyTabPreviewDirectoryUse(captor.firstValue.absolutePath)
+        }
 
     @Test
-    fun whenDeletingOnlyPreviewForATabThenTabDirectoryRemoved() = runBlocking<Unit> {
-        val tabId = "ABC-123"
-        testee.deletePreviewsForTab(tabId, currentPreviewImage = null)
-        verify(mockFileDeleter).deleteDirectory(any())
-    }
+    fun whenDeletingOnlyPreviewForATabThenTabDirectoryRemoved() =
+        runBlocking<Unit> {
+            val tabId = "ABC-123"
+            testee.deletePreviewsForTab(tabId, currentPreviewImage = null)
+            verify(mockFileDeleter).deleteDirectory(any())
+        }
 
     @Test
-    fun whenDeletingOldPreviewForATabButANewOneExistsThenOnlySinglePreviewImageDeleted() = runBlocking<Unit> {
-        val tabId = "ABC-123"
-        val newTabPreviewFilename = "new.jpg"
-        val captor = argumentCaptor<List<String>>()
-        testee.deletePreviewsForTab(tabId, newTabPreviewFilename)
-        verify(mockFileDeleter).deleteContents(any(), captor.capture())
-        verifyExistingPreviewExcludedFromDeletion(captor.firstValue, newTabPreviewFilename)
-    }
+    fun whenDeletingOldPreviewForATabButANewOneExistsThenOnlySinglePreviewImageDeleted() =
+        runBlocking<Unit> {
+            val tabId = "ABC-123"
+            val newTabPreviewFilename = "new.jpg"
+            val captor = argumentCaptor<List<String>>()
+            testee.deletePreviewsForTab(tabId, newTabPreviewFilename)
+            verify(mockFileDeleter).deleteContents(any(), captor.capture())
+            verifyExistingPreviewExcludedFromDeletion(captor.firstValue, newTabPreviewFilename)
+        }
 
-    private fun verifyExistingPreviewExcludedFromDeletion(exclusionList: List<String>, newTabPreviewFilename: String) {
+    private fun verifyExistingPreviewExcludedFromDeletion(
+        exclusionList: List<String>,
+        newTabPreviewFilename: String
+    ) {
         assertEquals(1, exclusionList.size)
         assertTrue(exclusionList.contains(newTabPreviewFilename))
     }

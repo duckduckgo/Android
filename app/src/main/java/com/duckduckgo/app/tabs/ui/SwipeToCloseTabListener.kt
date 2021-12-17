@@ -27,8 +27,7 @@ class SwipeToCloseTabListener(
     private val tabSwitcherAdapter: TabSwitcherAdapter,
     private val numberGridColumns: Int,
     private val tabSwipedListener: OnTabSwipedListener
-) :
-    ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
     interface OnTabSwipedListener {
         fun onSwiped(tab: TabEntity)
@@ -55,8 +54,11 @@ class SwipeToCloseTabListener(
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         return false
     }
-
 }

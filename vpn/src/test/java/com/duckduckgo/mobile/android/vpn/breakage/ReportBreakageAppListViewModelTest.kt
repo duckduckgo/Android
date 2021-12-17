@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -32,17 +33,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class ReportBreakageAppListViewModelTest {
 
     private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
-    private val protectedAppsChannel = Channel<List<TrackingProtectionAppInfo>>(1, BufferOverflow.DROP_LATEST)
+    private val protectedAppsChannel =
+        Channel<List<TrackingProtectionAppInfo>>(1, BufferOverflow.DROP_LATEST)
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var viewModel: ReportBreakageAppListViewModel
 
@@ -53,130 +53,154 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenOnSubmitBreakageAndNoSelectedItemThenEmitNoCommand() = coroutineRule.runBlocking {
-        viewModel.commands().test {
-            viewModel.onSubmitBreakage()
+    fun whenOnSubmitBreakageAndNoSelectedItemThenEmitNoCommand() =
+        coroutineRule.runBlocking {
+            viewModel.commands().test {
+                viewModel.onSubmitBreakage()
 
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
+                expectNoEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenOnSubmitBreakageAndAppSelectedThenEmitLaunchBreakageFormCommand() = coroutineRule.runBlocking {
-        viewModel.commands().test {
-            val expectedItem = InstalledApp(packageName = "com.android.ddg", name = "ddg", isSelected = true)
-            viewModel.onAppSelected(expectedItem)
-            viewModel.onSubmitBreakage()
+    fun whenOnSubmitBreakageAndAppSelectedThenEmitLaunchBreakageFormCommand() =
+        coroutineRule.runBlocking {
+            viewModel.commands().test {
+                val expectedItem =
+                    InstalledApp(packageName = "com.android.ddg", name = "ddg", isSelected = true)
+                viewModel.onAppSelected(expectedItem)
+                viewModel.onSubmitBreakage()
 
-            assertEquals(ReportBreakageAppListView.Command.LaunchBreakageForm(expectedItem), awaitItem())
-            cancelAndConsumeRemainingEvents()
+                assertEquals(
+                    ReportBreakageAppListView.Command.LaunchBreakageForm(expectedItem), awaitItem())
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() = coroutineRule.runBlocking {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
-        viewModel.getInstalledApps().test {
-            expectNoEvents()
+    fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() =
+        coroutineRule.runBlocking {
+            whenever(trackingProtectionAppsRepository.getProtectedApps())
+                .thenReturn(protectedAppsChannel.receiveAsFlow())
+            viewModel.getInstalledApps().test { expectNoEvents() }
         }
-    }
 
     @Test
-    fun whenGetInstalledAppsThenEmitState() = coroutineRule.runBlocking {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
-        viewModel.getInstalledApps().test {
-            protectedAppsChannel.send(listOf(appWithoutIssues))
-            assertEquals(
-                ReportBreakageAppListView.State(listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)), false),
-                awaitItem()
-            )
+    fun whenGetInstalledAppsThenEmitState() =
+        coroutineRule.runBlocking {
+            whenever(trackingProtectionAppsRepository.getProtectedApps())
+                .thenReturn(protectedAppsChannel.receiveAsFlow())
+            viewModel.getInstalledApps().test {
+                protectedAppsChannel.send(listOf(appWithoutIssues))
+                assertEquals(
+                    ReportBreakageAppListView.State(
+                        listOf(
+                            InstalledApp(
+                                packageName = appWithoutIssues.packageName,
+                                name = appWithoutIssues.name)),
+                        false),
+                    awaitItem())
+            }
         }
-    }
 
     @Test
-    fun whenGetInstalledAppsAndSelectedAppThenEmitState() = coroutineRule.runBlocking {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
-        viewModel.getInstalledApps().test {
-            viewModel.onAppSelected(InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name))
-            protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
-            val expected = listOf(
-                InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name, isSelected = true),
-            )
-            assertEquals(
-                ReportBreakageAppListView.State(expected, true),
-                awaitItem()
-            )
+    fun whenGetInstalledAppsAndSelectedAppThenEmitState() =
+        coroutineRule.runBlocking {
+            whenever(trackingProtectionAppsRepository.getProtectedApps())
+                .thenReturn(protectedAppsChannel.receiveAsFlow())
+            viewModel.getInstalledApps().test {
+                viewModel.onAppSelected(
+                    InstalledApp(
+                        packageName = appWithIssues.packageName, name = appWithIssues.name))
+                protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
+                val expected =
+                    listOf(
+                        InstalledApp(
+                            packageName = appWithoutIssues.packageName,
+                            name = appWithoutIssues.name),
+                        InstalledApp(
+                            packageName = appWithIssues.packageName,
+                            name = appWithIssues.name,
+                            isSelected = true),
+                    )
+                assertEquals(ReportBreakageAppListView.State(expected, true), awaitItem())
+            }
         }
-    }
 
     @Test
-    fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() = coroutineRule.runBlocking {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
-        viewModel.getInstalledApps().test {
-            viewModel.onAppSelected(InstalledApp(packageName = "unknown.package.name", name = appWithIssues.name))
-            protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
-            val expected = listOf(
-                InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name),
-                InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name),
-            )
-            assertEquals(
-                ReportBreakageAppListView.State(expected, false),
-                awaitItem()
-            )
+    fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() =
+        coroutineRule.runBlocking {
+            whenever(trackingProtectionAppsRepository.getProtectedApps())
+                .thenReturn(protectedAppsChannel.receiveAsFlow())
+            viewModel.getInstalledApps().test {
+                viewModel.onAppSelected(
+                    InstalledApp(packageName = "unknown.package.name", name = appWithIssues.name))
+                protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
+                val expected =
+                    listOf(
+                        InstalledApp(
+                            packageName = appWithoutIssues.packageName,
+                            name = appWithoutIssues.name),
+                        InstalledApp(
+                            packageName = appWithIssues.packageName, name = appWithIssues.name),
+                    )
+                assertEquals(ReportBreakageAppListView.State(expected, false), awaitItem())
+            }
         }
-    }
 
     @Test
-    fun whenOnBreakageSubmittedNoExtraInfoThenEmitSendBreakageInfoCommand() = coroutineRule.runBlocking {
-        viewModel.commands().test {
-            val selectedApp = InstalledApp("com.package.com", name = "AppName")
-            viewModel.onAppSelected(selectedApp)
-            viewModel.onBreakageSubmitted(IssueReport())
+    fun whenOnBreakageSubmittedNoExtraInfoThenEmitSendBreakageInfoCommand() =
+        coroutineRule.runBlocking {
+            viewModel.commands().test {
+                val selectedApp = InstalledApp("com.package.com", name = "AppName")
+                viewModel.onAppSelected(selectedApp)
+                viewModel.onBreakageSubmitted(IssueReport())
 
-            val expectedCommand = ReportBreakageAppListView.Command.SendBreakageInfo(
-                IssueReport(appPackageId = selectedApp.packageName)
-            )
+                val expectedCommand =
+                    ReportBreakageAppListView.Command.SendBreakageInfo(
+                        IssueReport(appPackageId = selectedApp.packageName))
 
-            assertEquals(expectedCommand, awaitItem())
-            cancelAndConsumeRemainingEvents()
+                assertEquals(expectedCommand, awaitItem())
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenOnBreakageSubmittedWithExtraInfoThenEmitSendBreakageInfoCommand() = coroutineRule.runBlocking {
-        viewModel.commands().test {
-            val selectedApp = InstalledApp("com.package.com", name = "AppName")
-            viewModel.onAppSelected(selectedApp)
-            viewModel.onBreakageSubmitted(IssueReport(description = "description"))
+    fun whenOnBreakageSubmittedWithExtraInfoThenEmitSendBreakageInfoCommand() =
+        coroutineRule.runBlocking {
+            viewModel.commands().test {
+                val selectedApp = InstalledApp("com.package.com", name = "AppName")
+                viewModel.onAppSelected(selectedApp)
+                viewModel.onBreakageSubmitted(IssueReport(description = "description"))
 
-            val expectedCommand = ReportBreakageAppListView.Command.SendBreakageInfo(
-                IssueReport(description = "description", appPackageId = selectedApp.packageName)
-            )
+                val expectedCommand =
+                    ReportBreakageAppListView.Command.SendBreakageInfo(
+                        IssueReport(
+                            description = "description", appPackageId = selectedApp.packageName))
 
-            assertEquals(expectedCommand, awaitItem())
-            cancelAndConsumeRemainingEvents()
+                assertEquals(expectedCommand, awaitItem())
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
-    private val appWithoutIssues = TrackingProtectionAppInfo(
-        packageName = "com.package.name",
-        name = "App",
-        type = "None",
-        category = AppCategory.Undefined,
-        isExcluded = false,
-        knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModifed = false
-    )
+    private val appWithoutIssues =
+        TrackingProtectionAppInfo(
+            packageName = "com.package.name",
+            name = "App",
+            type = "None",
+            category = AppCategory.Undefined,
+            isExcluded = false,
+            knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
+            userModifed = false)
 
-    private val appWithIssues = TrackingProtectionAppInfo(
-        packageName = "com.issues.package.name",
-        name = "App",
-        type = "None",
-        category = AppCategory.Undefined,
-        isExcluded = false,
-        knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-        userModifed = false
-    )
+    private val appWithIssues =
+        TrackingProtectionAppInfo(
+            packageName = "com.issues.package.name",
+            name = "App",
+            type = "None",
+            category = AppCategory.Undefined,
+            isExcluded = false,
+            knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+            userModifed = false)
 }

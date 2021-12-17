@@ -27,11 +27,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.DeleteBookmarkFolderConfirmationFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
@@ -52,8 +52,7 @@ import javax.inject.Inject
 
 class BookmarksActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
     lateinit var bookmarksAdapter: BookmarksAdapter
     lateinit var favoritesAdapter: FavoritesAdapter
@@ -92,8 +91,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         intent.extras?.getString(KEY_BOOKMARK_FOLDER_NAME)
             ?: getString(R.string.bookmarksActivityTitle)
 
-    private fun getParentFolderId() = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID)
-        ?: ROOT_FOLDER_ID
+    private fun getParentFolderId() =
+        intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: ROOT_FOLDER_ID
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -123,11 +122,14 @@ class BookmarksActivity : DuckDuckGoActivity() {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
             favoritesAdapter = FavoritesAdapter(layoutInflater, viewModel, this, faviconManager)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
-            contentBookmarksBinding.recycler.adapter = ConcatAdapter(favoritesAdapter, DividerAdapter(), bookmarkFoldersAdapter, bookmarksAdapter)
+            contentBookmarksBinding.recycler.adapter =
+                ConcatAdapter(
+                    favoritesAdapter, DividerAdapter(), bookmarkFoldersAdapter, bookmarksAdapter)
         } else {
             bookmarksAdapter = BookmarksAdapter(layoutInflater, viewModel, this, faviconManager)
             bookmarkFoldersAdapter = BookmarkFoldersAdapter(layoutInflater, viewModel, parentId)
-            contentBookmarksBinding.recycler.adapter = ConcatAdapter(bookmarkFoldersAdapter, bookmarksAdapter)
+            contentBookmarksBinding.recycler.adapter =
+                ConcatAdapter(bookmarkFoldersAdapter, bookmarksAdapter)
         }
         contentBookmarksBinding.recycler.itemAnimator = null
     }
@@ -138,31 +140,41 @@ class BookmarksActivity : DuckDuckGoActivity() {
             { viewState ->
                 viewState?.let { state ->
                     if (parentId == ROOT_FOLDER_ID) {
-                        favoritesAdapter.favoriteItems = state.favorites.map { FavoritesAdapter.FavoriteItem(it) }
+                        favoritesAdapter.favoriteItems =
+                            state.favorites.map { FavoritesAdapter.FavoriteItem(it) }
                     }
-                    bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                    bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+                    bookmarksAdapter.setItems(
+                        state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) },
+                        state.bookmarkFolders.isEmpty())
+                    bookmarkFoldersAdapter.bookmarkFolderItems =
+                        state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
                     setSearchMenuItemVisibility()
                 }
-            }
-        )
+            })
 
         viewModel.command.observe(
             this,
             {
                 when (it) {
-                    is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
+                    is BookmarksViewModel.Command.ConfirmDeleteSavedSite ->
+                        confirmDeleteSavedSite(it.savedSite)
                     is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
-                    is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
-                    is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
-                    is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
-                    is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
+                    is BookmarksViewModel.Command.ShowEditSavedSite ->
+                        showEditSavedSiteDialog(it.savedSite)
+                    is BookmarksViewModel.Command.ImportedSavedSites ->
+                        showImportedSavedSites(it.importSavedSitesResult)
+                    is BookmarksViewModel.Command.ExportedSavedSites ->
+                        showExportedSavedSites(it.exportSavedSitesResult)
+                    is BookmarksViewModel.Command.OpenBookmarkFolder ->
+                        openBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.ShowEditBookmarkFolder ->
+                        editBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.DeleteBookmarkFolder ->
+                        deleteBookmarkFolder(it.bookmarkFolder)
+                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder ->
+                        confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
                 }
-            }
-        )
+            })
     }
 
     private fun showImportedSavedSites(result: ImportSavedSitesResult) {
@@ -195,11 +207,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun showMessage(message: String) {
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG
-        ).show()
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -210,24 +218,19 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.bookmark_import -> {
-                val intent = Intent()
-                    .setType("text/html")
-                    .setAction(Intent.ACTION_GET_CONTENT)
+                val intent = Intent().setType("text/html").setAction(Intent.ACTION_GET_CONTENT)
 
                 startActivityForResult(
-                    Intent.createChooser(
-                        intent,
-                        getString(R.string.importBookmarksFileTitle)
-                    ),
-                    IMPORT_BOOKMARKS_REQUEST_CODE
-                )
+                    Intent.createChooser(intent, getString(R.string.importBookmarksFileTitle)),
+                    IMPORT_BOOKMARKS_REQUEST_CODE)
             }
             R.id.bookmark_export -> {
-                val intent = Intent()
-                    .setType("text/html")
-                    .setAction(Intent.ACTION_CREATE_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
+                val intent =
+                    Intent()
+                        .setType("text/html")
+                        .setAction(Intent.ACTION_CREATE_DOCUMENT)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
 
                 startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
             }
@@ -258,18 +261,21 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     viewModel.fetchBookmarksAndFolders(getParentFolderId())
                     return true
                 }
-            }
-        )
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter))
+            })
+        searchView.setOnQueryTextListener(
+            BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter))
         return super.onPrepareOptionsMenu(menu)
     }
 
     private fun setSearchMenuItemVisibility() {
-        searchMenuItem?.isVisible = viewModel.viewState.value?.enableSearch == true || getParentFolderId() != ROOT_FOLDER_ID
+        searchMenuItem?.isVisible =
+            viewModel.viewState.value?.enableSearch == true || getParentFolderId() != ROOT_FOLDER_ID
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
-        val dialog = EditSavedSiteDialogFragment.instance(savedSite, getParentFolderId(), getParentFolderName())
+        val dialog =
+            EditSavedSiteDialogFragment.instance(
+                savedSite, getParentFolderId(), getParentFolderName())
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
@@ -280,25 +286,24 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insert(savedSite)
-        }.show()
+        val message =
+            getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.fireproofWebsiteSnackbarAction) { viewModel.insert(savedSite) }
+            .show()
     }
 
-    private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder, folderBranch: BookmarkFolderBranch) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
-        Snackbar.make(
-            binding.root,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertDeletedFolderBranch(folderBranch)
-        }.show()
+    private fun confirmDeleteBookmarkFolder(
+        bookmarkFolder: BookmarkFolder,
+        folderBranch: BookmarkFolderBranch
+    ) {
+        val message =
+            getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.insertDeletedFolderBranch(folderBranch)
+            }
+            .show()
     }
 
     private fun openBookmarkFolder(bookmarkFolder: BookmarkFolder) {
@@ -308,7 +313,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
         val parentId = getParentFolderId()
         val parentFolderName = getParentFolderName()
-        val dialog = EditBookmarkFolderDialogFragment.instance(parentId, parentFolderName, bookmarkFolder)
+        val dialog =
+            EditBookmarkFolderDialogFragment.instance(parentId, parentFolderName, bookmarkFolder)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
@@ -353,8 +359,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             get() = "bookmarks_ddg_${formattedTimestamp()}.html"
 
         private fun formattedTimestamp(): String = formatter.format(Date())
-        private val formatter: SimpleDateFormat = SimpleDateFormat("yyyyMMdd", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
+        private val formatter: SimpleDateFormat =
+            SimpleDateFormat("yyyyMMdd", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }
     }
 }

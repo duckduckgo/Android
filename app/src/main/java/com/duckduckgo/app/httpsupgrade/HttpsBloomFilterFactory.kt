@@ -20,19 +20,21 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
 @ContributesBinding(AppScope::class)
-class HttpsBloomFilterFactoryImpl @Inject constructor(
+class HttpsBloomFilterFactoryImpl
+@Inject
+constructor(
     private val dao: HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,
     private val httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,
@@ -49,7 +51,9 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(
 
         val specification = dao.get()
         val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
-        if (dataPath == null || specification == null || !httpsDataPersister.isPersisted(specification)) {
+        if (dataPath == null ||
+            specification == null ||
+            !httpsDataPersister.isPersisted(specification)) {
             Timber.d("Https update data not available")
             return null
         }

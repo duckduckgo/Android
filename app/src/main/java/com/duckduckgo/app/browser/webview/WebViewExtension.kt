@@ -30,14 +30,11 @@ fun WebSettings.enableLightMode() {
 @SuppressLint("RequiresFeature")
 fun WebSettings.enableDarkMode() {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) &&
-        WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)
-    ) {
+        WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
         // requires WebView v76
         WebSettingsCompat.setForceDark(this, WebSettingsCompat.FORCE_DARK_ON)
         // requires WebView v83
         WebSettingsCompat.setForceDarkStrategy(
-            this,
-            WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
-        )
+            this, WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY)
     }
 }

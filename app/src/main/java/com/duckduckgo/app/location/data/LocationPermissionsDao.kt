@@ -26,8 +26,7 @@ import androidx.room.Query
 @Dao
 interface LocationPermissionsDao {
 
-    @Query("select * from locationPermissions")
-    fun allPermissions(): List<LocationPermissionEntity>
+    @Query("select * from locationPermissions") fun allPermissions(): List<LocationPermissionEntity>
 
     @Query("select * from locationPermissions")
     fun allPermissionsEntities(): LiveData<List<LocationPermissionEntity>>
@@ -41,7 +40,5 @@ interface LocationPermissionsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(locationPermissionEntity: LocationPermissionEntity): Long
 
-    @Delete
-    fun delete(locationPermissionEntity: LocationPermissionEntity): Int
-
+    @Delete fun delete(locationPermissionEntity: LocationPermissionEntity): Int
 }

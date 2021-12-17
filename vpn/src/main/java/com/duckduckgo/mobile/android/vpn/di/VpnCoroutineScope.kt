@@ -18,10 +18,5 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import javax.inject.Scope
 
-/**
- * Identifies a coroutine scope type that is scope to the VPN lifecycle
- */
-@Scope
-@MustBeDocumented
-@Retention(AnnotationRetention.RUNTIME)
-annotation class VpnCoroutineScope
+/** Identifies a coroutine scope type that is scope to the VPN lifecycle */
+@Scope @MustBeDocumented @Retention(AnnotationRetention.RUNTIME) annotation class VpnCoroutineScope

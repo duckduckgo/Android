@@ -22,17 +22,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
-import dagger.SingleInstanceIn
 
 interface ApiInterceptorPlugin {
     fun getInterceptor(): Interceptor
 }
 
-private class ApiInterceptorPluginPoint(
-    private val plugins: DaggerSet<ApiInterceptorPlugin>
-) : PluginPoint<ApiInterceptorPlugin> {
+private class ApiInterceptorPluginPoint(private val plugins: DaggerSet<ApiInterceptorPlugin>) :
+    PluginPoint<ApiInterceptorPlugin> {
     override fun getPlugins(): Collection<ApiInterceptorPlugin> {
         return plugins
     }
@@ -41,8 +40,7 @@ private class ApiInterceptorPluginPoint(
 @Module
 @ContributesTo(AppScope::class)
 abstract class ApiInterceptorPluginModule {
-    @Multibinds
-    abstract fun bindEmptyApiInterceptorPlugins(): DaggerSet<ApiInterceptorPlugin>
+    @Multibinds abstract fun bindEmptyApiInterceptorPlugins(): DaggerSet<ApiInterceptorPlugin>
 
     @Module
     @ContributesTo(AppScope::class)

@@ -65,18 +65,47 @@ class BrokenSiteDataTest {
     @Test
     fun whenSiteHasBlockedTrackersThenBlockedTrackersExist() {
         val site = buildSite(SITE_URL)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false, null)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false, null)
+        val event =
+            TrackingEvent(
+                "http://www.example.com",
+                "http://www.tracker.com/tracker.js",
+                emptyList(),
+                null,
+                false,
+                null)
+        val anotherEvent =
+            TrackingEvent(
+                "http://www.example.com/test",
+                "http://www.anothertracker.com/tracker.js",
+                emptyList(),
+                null,
+                false,
+                null)
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
-        assertEquals("www.tracker.com,www.anothertracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
+        assertEquals(
+            "www.tracker.com,www.anothertracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
     }
 
     @Test
     fun whenSiteHasSameHostBlockedTrackersThenOnlyUniqueTrackersIncludedInData() {
         val site = buildSite(SITE_URL)
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false, null)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false, null)
+        val event =
+            TrackingEvent(
+                "http://www.example.com",
+                "http://www.tracker.com/tracker.js",
+                emptyList(),
+                null,
+                false,
+                null)
+        val anotherEvent =
+            TrackingEvent(
+                "http://www.example.com/test",
+                "http://www.tracker.com/tracker2.js",
+                emptyList(),
+                null,
+                false,
+                null)
         site.trackerDetected(event)
         site.trackerDetected(anotherEvent)
         assertEquals("www.tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
@@ -92,7 +121,8 @@ class BrokenSiteDataTest {
     @Test
     fun whenSiteHasSurrogatesThenSurrogatesExist() {
         val surrogate = SurrogateResponse("test.js", true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse("test.js", true, "anothersurrogate.com/test.js", "", "")
+        val anotherSurrogate =
+            SurrogateResponse("test.js", true, "anothersurrogate.com/test.js", "", "")
         val site = buildSite(SITE_URL)
         site.surrogateDetected(surrogate)
         site.surrogateDetected(anotherSurrogate)

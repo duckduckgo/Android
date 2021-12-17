@@ -28,8 +28,7 @@ import javax.inject.Inject
 
 abstract class FeedbackFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId) {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -45,5 +44,7 @@ abstract class FeedbackFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
     open fun configureViewModelObservers() {}
     open fun configureListeners() {}
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 }

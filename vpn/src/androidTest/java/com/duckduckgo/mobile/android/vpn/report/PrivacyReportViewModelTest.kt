@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.mock
 import dummy.ui.VpnPreferences
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -42,15 +43,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
-import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
 class PrivacyReportViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var vpnPreferences: VpnPreferences
@@ -70,7 +68,9 @@ class PrivacyReportViewModelTest {
 
         repository = AppTrackerBlockingStatsRepository(db)
 
-        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit {
+            clear()
+        }
         vpnPreferences = VpnPreferences(context)
 
         testee = PrivacyReportViewModel(repository, deviceShieldPixels, onboardingStore, context)
@@ -78,9 +78,12 @@ class PrivacyReportViewModelTest {
 
     private fun prepareDb() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         vpnTrackerDao = db.vpnTrackerDao()
     }
 
@@ -91,7 +94,6 @@ class PrivacyReportViewModelTest {
 
     @Test
     fun whenTrackersBlockedThenReportHasTrackers() = runBlocking {
-
         trackerFound("dax.com")
         trackerFound("dax.com")
         trackerFound("dax.com")
@@ -105,7 +107,6 @@ class PrivacyReportViewModelTest {
 
     @Test
     fun whenTrackersBlockedOutsideTimeWindowThenReturnEmpty() = runBlocking {
-
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")
@@ -136,7 +137,14 @@ class PrivacyReportViewModelTest {
         timestamp: String = DatabaseDateFormatter.bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", companyDisplayName = "", trackingApp = defaultTrackingApp)
+        val tracker =
+            VpnTracker(
+                trackerCompanyId = trackerCompanyId,
+                domain = domain,
+                timestamp = timestamp,
+                company = "",
+                companyDisplayName = "",
+                trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 

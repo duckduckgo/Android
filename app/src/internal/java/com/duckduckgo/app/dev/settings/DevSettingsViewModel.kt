@@ -23,15 +23,17 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
 
-class DevSettingsViewModel @Inject constructor(
+class DevSettingsViewModel
+@Inject
+constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
 ) : ViewModel() {
@@ -52,11 +54,10 @@ class DevSettingsViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
-                    startupTraceEnabled = startupTraces.isTraceEnabled
-                )
-            )
+                currentViewState()
+                    .copy(
+                        nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
+                        startupTraceEnabled = startupTraces.isTraceEnabled))
         }
     }
 
@@ -98,13 +99,17 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     companion object {
-        private const val PRIVACY_TEST_URL_1 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html"
-        private const val PRIVACY_TEST_URL_2 = "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-fetch.html"
+        private const val PRIVACY_TEST_URL_1 =
+            "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html"
+        private const val PRIVACY_TEST_URL_2 =
+            "https://privacy-test-pages.glitch.me/tracker-reporting/1major-via-fetch.html"
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class SettingsViewModelFactory @Inject constructor(
+class SettingsViewModelFactory
+@Inject
+constructor(
     private val devSettingsDataStore: Provider<DevSettingsDataStore>,
     private val startupTraces: Provider<StartupTraces>,
 ) : ViewModelFactoryPlugin {

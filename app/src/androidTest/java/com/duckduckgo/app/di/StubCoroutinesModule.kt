@@ -25,10 +25,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(
-    scope = AppScope::class,
-    replaces = [CoroutinesModule::class]
-)
+@ContributesTo(scope = AppScope::class, replaces = [CoroutinesModule::class])
 class StubCoroutinesModule {
 
     @Provides

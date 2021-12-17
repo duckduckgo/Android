@@ -39,7 +39,9 @@ class FileChooserIntentBuilderTest {
     @Test
     fun whenIntentBuiltThenReadUriPermissionFlagSet() {
         val output = testee.intent(emptyArray())
-        assertTrue("Intent.FLAG_GRANT_READ_URI_PERMISSION flag not set on intent", output.hasFlagSet(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+        assertTrue(
+            "Intent.FLAG_GRANT_READ_URI_PERMISSION flag not set on intent",
+            output.hasFlagSet(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 
     @Test
@@ -133,11 +135,12 @@ class FileChooserIntentBuilderTest {
     }
 
     /**
-     * Helper function to build an `Intent` which contains one or more of `data` and `clipData` values.
+     * Helper function to build an `Intent` which contains one or more of `data` and `clipData`
+     * values.
      *
-     * This is a bit messy but the Intent APIs are messy themselves; at least this contains the mess to this one helper function
+     * This is a bit messy but the Intent APIs are messy themselves; at least this contains the mess
+     * to this one helper function
      */
-
     private fun buildIntent(data: String? = null, clipData: List<String>? = null): Intent {
         return Intent().also {
             if (data != null) {

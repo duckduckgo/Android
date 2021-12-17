@@ -25,7 +25,10 @@ class AppNameResolver(private val packageManager: PackageManager) {
     fun getAppNameForPackageId(packageId: String): OriginatingApp {
         val stripped = packageId.substringBefore(":")
         return try {
-            val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(stripped, PackageManager.GET_META_DATA)) as String
+            val appName =
+                packageManager.getApplicationLabel(
+                    packageManager.getApplicationInfo(stripped, PackageManager.GET_META_DATA)) as
+                    String
             OriginatingApp(packageId, appName)
         } catch (e: PackageManager.NameNotFoundException) {
             Timber.e("Failed to find app name for: $stripped. ${e.message}")
@@ -41,8 +44,8 @@ class AppNameResolver(private val packageManager: PackageManager) {
         }
 
         fun isUnknown(): Boolean {
-            return OriginatingAppPackageIdentifierStrategy.UNKNOWN.equals(appName, ignoreCase = true)
+            return OriginatingAppPackageIdentifierStrategy.UNKNOWN.equals(
+                appName, ignoreCase = true)
         }
     }
-
 }

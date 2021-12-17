@@ -30,12 +30,14 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.privacy.config.api.Drm
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-class BrowserChromeClient @Inject constructor(
+class BrowserChromeClient
+@Inject
+constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val drm: Drm,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
@@ -55,7 +57,6 @@ class BrowserChromeClient @Inject constructor(
 
             customView = view
             webViewClientListener?.goFullScreen(view)
-
         } catch (e: Throwable) {
             appCoroutineScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
@@ -81,7 +82,8 @@ class BrowserChromeClient @Inject constructor(
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
+            webViewClientListener?.navigationStateChanged(
+                WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
             appCoroutineScope.launch {
@@ -117,7 +119,11 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
+    override fun onShowFileChooser(
+        webView: WebView,
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserParams
+    ): Boolean {
         return try {
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
             true
@@ -133,7 +139,12 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+    override fun onCreateWindow(
+        view: WebView?,
+        isDialog: Boolean,
+        isUserGesture: Boolean,
+        resultMsg: Message?
+    ): Boolean {
         if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
             webViewClientListener?.openMessageInNewTab(resultMsg)
             return true
@@ -142,7 +153,8 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        val permissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
+        val permissions =
+            drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
         if (permissions.isNotEmpty()) {
             request.grant(permissions)
         }
@@ -152,8 +164,10 @@ class BrowserChromeClient @Inject constructor(
         webViewClientListener?.closeCurrentTab()
     }
 
-    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+    override fun onGeolocationPermissionsShowPrompt(
+        origin: String,
+        callback: GeolocationPermissions.Callback
+    ) {
         webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
-
 }

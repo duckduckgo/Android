@@ -192,7 +192,8 @@ class UriExtensionTest {
 
     @Test
     fun whenGettingAbsoluteStringThenDoNotReturnQueryParameters() {
-        val absoluteString = Uri.parse("https://example.com/test?q=example/#1/anotherrandomcode").absoluteString
+        val absoluteString =
+            Uri.parse("https://example.com/test?q=example/#1/anotherrandomcode").absoluteString
         assertEquals("https://example.com/test", absoluteString)
     }
 
@@ -243,13 +244,21 @@ class UriExtensionTest {
 
     @Test
     fun whenUriHasResourceNameAndPathThenDropSchemeReturnResourceNameAndPath() {
-        assertEquals("www.foo.com/path/to/foo", "https://www.foo.com/path/to/foo".toUri().toStringDropScheme())
-        assertEquals("www.foo.com/path/to/foo", "http://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+        assertEquals(
+            "www.foo.com/path/to/foo",
+            "https://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+        assertEquals(
+            "www.foo.com/path/to/foo",
+            "http://www.foo.com/path/to/foo".toUri().toStringDropScheme())
     }
 
     @Test
     fun whenUriHasResourceNamePathAndParamsThenDropSchemeReturnResourceNamePathAndParams() {
-        assertEquals("www.foo.com/path/to/foo?key=value", "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
-        assertEquals("www.foo.com/path/to/foo?key=value", "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+        assertEquals(
+            "www.foo.com/path/to/foo?key=value",
+            "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+        assertEquals(
+            "www.foo.com/path/to/foo?key=value",
+            "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
     }
 }

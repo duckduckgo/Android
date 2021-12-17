@@ -26,13 +26,13 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.pixels.AppPixelName.SURVEY_SURVEY_DISMISSED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
@@ -40,8 +40,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private val viewModel: SurveyViewModel by bindViewModel()
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
     private val binding: ActivityUserSurveyBinding by viewBinding()
 
@@ -74,18 +73,11 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        binding.dismissButton.setOnClickListener {
-            onSurveyDismissed()
-        }
+        binding.dismissButton.setOnClickListener { onSurveyDismissed() }
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                it?.let { command -> processCommand(command) }
-            }
-        )
+        viewModel.command.observe(this, Observer { it?.let { command -> processCommand(command) } })
     }
 
     private fun processCommand(command: Command) {
@@ -160,27 +152,40 @@ class SurveyActivity : DuckDuckGoActivity() {
             viewModel.onSurveyLoaded()
         }
 
-        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        override fun shouldInterceptRequest(
+            view: WebView,
+            request: WebResourceRequest
+        ): WebResourceResponse? {
             if (request.url.host == "duckduckgo.com") {
-                runOnUiThread {
-                    viewModel.onSurveyCompleted()
-                }
+                runOnUiThread { viewModel.onSurveyCompleted() }
             }
             return null
         }
 
         @Suppress("OverridingDeprecatedMember")
-        override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+        override fun onReceivedError(
+            view: WebView,
+            errorCode: Int,
+            description: String,
+            failingUrl: String
+        ) {
             viewModel.onSurveyFailedToLoad()
         }
 
-        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        override fun onReceivedError(
+            view: WebView,
+            request: WebResourceRequest,
+            error: WebResourceError
+        ) {
             if (request.isForMainFrame) {
                 viewModel.onSurveyFailedToLoad()
             }
         }
 
-        override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        override fun onRenderProcessGone(
+            view: WebView?,
+            detail: RenderProcessGoneDetail?
+        ): Boolean {
             viewModel.onSurveyFailedToLoad()
             return true
         }

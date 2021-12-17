@@ -24,14 +24,14 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.flowOn
 
 interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
@@ -52,7 +52,9 @@ interface TrackingProtectionAppsRepository {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealTrackingProtectionAppsRepository @Inject constructor(
+class RealTrackingProtectionAppsRepository
+@Inject
+constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider
@@ -61,8 +63,11 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
     override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
-        return appTrackerRepository.getAppExclusionListFlow()
-            .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
+        return appTrackerRepository
+            .getAppExclusionListFlow()
+            .combine(appTrackerRepository.getManualAppExclusionListFlow()) {
+                ddgExclusionList,
+                manualList ->
                 Timber.d("getProtectedApps flow")
                 installedApps
                     .map {
@@ -74,40 +79,46 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModifed = isUserModified(it.packageName, manualList)
-                        )
+                            userModifed = isUserModified(it.packageName, manualList))
                     }
                     .sortedBy { it.name.lowercase() }
                     .toList()
-            }.onStart {
-                refreshInstalledApps()
-            }.flowOn(dispatcherProvider.io())
+            }
+            .onStart { refreshInstalledApps() }
+            .flowOn(dispatcherProvider.io())
     }
 
     private fun refreshInstalledApps() {
         Timber.d("Excluded Apps: refreshInstalledApps")
-        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-            .asSequence()
-            .filterNot { shouldNotBeShown(it) }
+        installedApps =
+            packageManager
+                .getInstalledApplications(PackageManager.GET_META_DATA)
+                .asSequence()
+                .filterNot { shouldNotBeShown(it) }
     }
 
-    override suspend fun getExclusionAppsList(): List<String> = withContext(dispatcherProvider.io()) {
-        val exclusionList = appTrackerRepository.getAppExclusionList()
-        val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
-        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-            .asSequence()
-            .filter { shouldBeExcluded(it, exclusionList, manualExclusionList) }
-            .sortedBy { it.name }
-            .map { it.packageName }
-            .toList()
-    }
+    override suspend fun getExclusionAppsList(): List<String> =
+        withContext(dispatcherProvider.io()) {
+            val exclusionList = appTrackerRepository.getAppExclusionList()
+            val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
+            return@withContext packageManager
+                .getInstalledApplications(PackageManager.GET_META_DATA)
+                .asSequence()
+                .filter { shouldBeExcluded(it, exclusionList, manualExclusionList) }
+                .sortedBy { it.name }
+                .map { it.packageName }
+                .toList()
+        }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverriden(appInfo)
     }
 
     private fun isSystemAppAndNotOverriden(appInfo: ApplicationInfo): Boolean {
-        return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
+        return if (appTrackerRepository
+            .getSystemAppOverrideList()
+            .map { it.packageId }
+            .contains(appInfo.packageName)) {
             false
         } else {
             appInfo.isSystemApp()
@@ -178,60 +189,58 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     override suspend fun restoreDefaultProtectedList() {
-        withContext(dispatcherProvider.io()) {
-            appTrackerRepository.restoreDefaultProtectedList()
-        }
+        withContext(dispatcherProvider.io()) { appTrackerRepository.restoreDefaultProtectedList() }
     }
 
     companion object {
-        private val BROWSERS = listOf(
-            "com.duckduckgo.mobile.android",
-            "com.duckduckgo.mobile.android.debug",
-            "com.duckduckgo.mobile.android.vpn",
-            "com.duckduckgo.mobile.android.vpn.debug",
-            "com.android.chrome",
-            "org.mozilla.firefox",
-            "com.opera.browser",
-            "com.microsoft.emmx",
-            "com.brave.browser",
-            "com.UCMobile.intl",
-            "com.android.browser",
-            "com.sec.android.app.sbrowser",
-            "info.guardianproject.orfo",
-            "org.torproject.torbrowser_alpha",
-            "mobi.mgeek.TunnyBrowser",
-            "com.linkbubble.playstore",
-            "org.adblockplus.browser",
-            "arun.com.chromer",
-            "com.flynx",
-            "com.ghostery.android.ghostery",
-            "com.cliqz.browser",
-            "com.opera.mini.native",
-            "com.uc.browser.en",
-            "com.chrome.beta",
-            "org.mozilla.firefox_beta",
-            "com.opera.browser.beta",
-            "com.opera.mini.native.beta",
-            "com.sec.android.app.sbrowser.beta",
-            "org.mozilla.fennec_fdroid",
-            "org.mozilla.rocket",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "org.mozilla.fennec_aurora",
-            "org.mozilla.fennec",
-            "com.google.android.apps.chrome",
-            "org.chromium.chrome",
-            "com.microsoft.bing",
-            "com.yahoo.mobile.client.android.search",
-            "com.google.android.apps.searchlite",
-            "com.baidu.searchbox",
-            "ru.yandex.searchplugin",
-            "com.ecosia.android",
-            "com.qwant.liberty",
-            "com.qwantjunior.mobile",
-            "com.nhn.android.search",
-            "cz.seznam.sbrowser",
-            "com.coccoc.trinhduyet"
-        )
+        private val BROWSERS =
+            listOf(
+                "com.duckduckgo.mobile.android",
+                "com.duckduckgo.mobile.android.debug",
+                "com.duckduckgo.mobile.android.vpn",
+                "com.duckduckgo.mobile.android.vpn.debug",
+                "com.android.chrome",
+                "org.mozilla.firefox",
+                "com.opera.browser",
+                "com.microsoft.emmx",
+                "com.brave.browser",
+                "com.UCMobile.intl",
+                "com.android.browser",
+                "com.sec.android.app.sbrowser",
+                "info.guardianproject.orfo",
+                "org.torproject.torbrowser_alpha",
+                "mobi.mgeek.TunnyBrowser",
+                "com.linkbubble.playstore",
+                "org.adblockplus.browser",
+                "arun.com.chromer",
+                "com.flynx",
+                "com.ghostery.android.ghostery",
+                "com.cliqz.browser",
+                "com.opera.mini.native",
+                "com.uc.browser.en",
+                "com.chrome.beta",
+                "org.mozilla.firefox_beta",
+                "com.opera.browser.beta",
+                "com.opera.mini.native.beta",
+                "com.sec.android.app.sbrowser.beta",
+                "org.mozilla.fennec_fdroid",
+                "org.mozilla.rocket",
+                "com.chrome.dev",
+                "com.chrome.canary",
+                "org.mozilla.fennec_aurora",
+                "org.mozilla.fennec",
+                "com.google.android.apps.chrome",
+                "org.chromium.chrome",
+                "com.microsoft.bing",
+                "com.yahoo.mobile.client.android.search",
+                "com.google.android.apps.searchlite",
+                "com.baidu.searchbox",
+                "ru.yandex.searchplugin",
+                "com.ecosia.android",
+                "com.qwant.liberty",
+                "com.qwantjunior.mobile",
+                "com.nhn.android.search",
+                "cz.seznam.sbrowser",
+                "com.coccoc.trinhduyet")
     }
 }

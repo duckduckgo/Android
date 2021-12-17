@@ -36,13 +36,15 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
     }
 
     /**
-     * This RemoteViewsFactory will not render any item. It's used by is used for convenience to simplify executing background operations to show/hide empty widget CTA.
-     * If this RemoteViewsFactory count is 0, SearchAndFavoritesWidget R.id.emptyfavoritesGrid will show the configured EmptyView.
+     * This RemoteViewsFactory will not render any item. It's used by is used for convenience to
+     * simplify executing background operations to show/hide empty widget CTA. If this
+     * RemoteViewsFactory count is 0, SearchAndFavoritesWidget R.id.emptyfavoritesGrid will show the
+     * configured EmptyView.
      */
-    class EmptyFavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
+    class EmptyFavoritesWidgetItemFactory(val context: Context, intent: Intent) :
+        RemoteViewsFactory {
 
-        @Inject
-        lateinit var favoritesDataRepository: FavoritesRepository
+        @Inject lateinit var favoritesDataRepository: FavoritesRepository
 
         private var count = 0
 
@@ -54,8 +56,7 @@ class EmptyFavoritesWidgetService : RemoteViewsService() {
             count = if (favoritesDataRepository.userHasFavorites()) 1 else 0
         }
 
-        override fun onDestroy() {
-        }
+        override fun onDestroy() {}
 
         override fun getCount(): Int {
             return count

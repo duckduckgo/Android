@@ -106,7 +106,8 @@ class SiteMonitorTest {
     @Test
     fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOne() {
         val testee = SiteMonitor(document, null)
-        testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true, null))
+        testee.trackerDetected(
+            TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true, null))
         assertEquals(1, testee.majorNetworkCount)
     }
 

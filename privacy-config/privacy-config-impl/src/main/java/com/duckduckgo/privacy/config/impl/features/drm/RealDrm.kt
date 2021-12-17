@@ -31,7 +31,10 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealDrm @Inject constructor(private val featureToggle: FeatureToggle, private val drmRepository: DrmRepository) : Drm {
+class RealDrm
+@Inject
+constructor(private val featureToggle: FeatureToggle, private val drmRepository: DrmRepository) :
+    Drm {
 
     override fun getDrmPermissionsForRequest(url: String, resources: Array<String>): Array<String> {
         val perms = mutableSetOf<String>()
@@ -44,7 +47,9 @@ class RealDrm @Inject constructor(private val featureToggle: FeatureToggle, priv
     }
 
     private fun shouldEnableDrmForUri(uri: Uri): Boolean {
-        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName(), defaultValue = true) ?: false
+        val isFeatureEnabled =
+            featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName(), defaultValue = true)
+                ?: false
         return isFeatureEnabled && domainsThatAllowDrm(uri.baseHost)
     }
 

@@ -37,8 +37,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppTrackingProtectionWaitlistCodeFetcherTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockNotification: SchedulableNotification = mock()
     private val mockNotificationSender: NotificationSender = mock()
@@ -49,31 +48,34 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
 
     @Before
     fun before() {
-        testee = AppTrackingProtectionWaitlistCodeFetcher(
-            workManager,
-            waitlistManager,
-            mockNotification,
-            mockNotificationSender,
-            coroutineRule.testDispatcherProvider,
-            TestCoroutineScope()
-        )
+        testee =
+            AppTrackingProtectionWaitlistCodeFetcher(
+                workManager,
+                waitlistManager,
+                mockNotification,
+                mockNotificationSender,
+                coroutineRule.testDispatcherProvider,
+                TestCoroutineScope())
     }
 
     @Test
-    fun whenFetchingInviteCodeAndCodeAlreadyExistedThenWorkIsCancelled() = coroutineRule.runBlocking {
-        whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.CodeExisted)
-        whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
-        testee.fetchInviteCode()
-        verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
-    }
+    fun whenFetchingInviteCodeAndCodeAlreadyExistedThenWorkIsCancelled() =
+        coroutineRule.runBlocking {
+            whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.CodeExisted)
+            whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG))
+                .thenReturn(mock())
+            testee.fetchInviteCode()
+            verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
+        }
 
     @Test
-    fun whenCodeIsFetchedThenWorkIsCancelledAndNotificationIsSent() = coroutineRule.runBlocking {
-        whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.Code)
-        testee.fetchInviteCode()
-        whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
-        verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
-        verify(mockNotificationSender).sendNotification(any())
-    }
-
+    fun whenCodeIsFetchedThenWorkIsCancelledAndNotificationIsSent() =
+        coroutineRule.runBlocking {
+            whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.Code)
+            testee.fetchInviteCode()
+            whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG))
+                .thenReturn(mock())
+            verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
+            verify(mockNotificationSender).sendNotification(any())
+        }
 }

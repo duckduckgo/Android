@@ -23,11 +23,9 @@ import com.duckduckgo.app.survey.model.Survey
 @Dao
 abstract class SurveyDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(survey: Survey)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun insert(survey: Survey)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun update(survey: Survey)
+    @Update(onConflict = OnConflictStrategy.REPLACE) abstract fun update(survey: Survey)
 
     @Query("select count(1) > 0 from survey where surveyId = :surveyId")
     abstract fun exists(surveyId: String): Boolean

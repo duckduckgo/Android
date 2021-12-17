@@ -29,10 +29,10 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.runBlocking
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
@@ -51,14 +51,11 @@ import org.mockito.Mockito.verify
 @Suppress("EXPERIMENTAL_API_USAGE")
 class SystemSearchViewModelTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockUserStageStore: UserStageStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
@@ -75,13 +72,24 @@ class SystemSearchViewModelTest {
 
     @Before
     fun setup() {
-        whenever(mockAutoComplete.autoComplete(QUERY)).thenReturn(Observable.just(autocompleteQueryResult))
-        whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
+        whenever(mockAutoComplete.autoComplete(QUERY))
+            .thenReturn(Observable.just(autocompleteQueryResult))
+        whenever(mockAutoComplete.autoComplete(BLANK_QUERY))
+            .thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
+        testee =
+            SystemSearchViewModel(
+                mockUserStageStore,
+                mockAutoComplete,
+                mockDeviceAppLookup,
+                mockPixel,
+                mockFavoritesRepository,
+                mockFaviconManager,
+                mockSettingsStore,
+                coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -111,15 +119,24 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() = coroutineRule.runBlocking {
-        (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
-        testee =
-            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
-        testee.resetViewState()
-        testee.userUpdatedQuery("test")
+    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() =
+        coroutineRule.runBlocking {
+            (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
+            testee =
+                SystemSearchViewModel(
+                    givenEmptyUserStageStore(),
+                    mockAutoComplete,
+                    mockDeviceAppLookup,
+                    mockPixel,
+                    mockFavoritesRepository,
+                    mockFaviconManager,
+                    mockSettingsStore,
+                    coroutineRule.testDispatcherProvider)
+            testee.resetViewState()
+            testee.userUpdatedQuery("test")
 
-        // no crash
-    }
+            // no crash
+        }
 
     @Test
     fun whenOnboardingShownThenPixelSent() = runBlockingTest {
@@ -129,7 +146,8 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpandedAndPixelSent() = runBlockingTest {
+    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpandedAndPixelSent() =
+        runBlockingTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle()
 
@@ -139,7 +157,8 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpandedAndPixelSent() = runBlockingTest {
+    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpandedAndPixelSent() =
+        runBlockingTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle() // first press to expand
         testee.userTappedOnboardingToggle() // second press to minimize
@@ -150,7 +169,8 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsDismissedThenViewHiddenPixelSentAndOnboardingStoreNotified() = runBlockingTest {
+    fun whenOnboardingIsDismissedThenViewHiddenPixelSentAndOnboardingStoreNotified() =
+        runBlockingTest {
         whenOnboardingShowing()
         testee.userDismissedOnboarding()
 
@@ -161,60 +181,69 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserUpdatesQueryThenViewStateUpdated() = coroutineRule.runBlocking {
-        testee.userUpdatedQuery(QUERY)
+    fun whenUserUpdatesQueryThenViewStateUpdated() =
+        coroutineRule.runBlocking {
+            testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
-    }
-
-    @Test
-    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = coroutineRule.runBlocking {
-        testee.userUpdatedQuery(QUERY)
-        testee.userUpdatedQuery("$QUERY ")
-
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
-    }
+            val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
 
     @Test
-    fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = coroutineRule.runBlocking {
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.userUpdatedQuery(QUERY)
+    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() =
+        coroutineRule.runBlocking {
+            testee.userUpdatedQuery(QUERY)
+            testee.userUpdatedQuery("$QUERY ")
 
-        val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
-        assertNotNull(newViewState)
-        assertEquals(appQueryResult, newViewState.appResults)
-        assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
-    }
-
-    @Test
-    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = coroutineRule.runBlocking {
-        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.userUpdatedQuery(QUERY)
-
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
-    }
+            val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
 
     @Test
-    fun whenUserClearsQueryThenViewStateReset() = coroutineRule.runBlocking {
-        testee.userUpdatedQuery(QUERY)
-        testee.userRequestedClear()
+    fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() =
+        coroutineRule.runBlocking {
+            doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+            testee.userUpdatedQuery(QUERY)
 
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
-    }
+            val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
+            assertNotNull(newViewState)
+            assertEquals(appQueryResult, newViewState.appResults)
+            assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
+        }
 
     @Test
-    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = coroutineRule.runBlocking {
-        testee.userUpdatedQuery(QUERY)
-        testee.userUpdatedQuery(BLANK_QUERY)
+    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() =
+        coroutineRule.runBlocking {
+            doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+            testee.userUpdatedQuery(QUERY)
 
-        assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
-    }
+            assertTrue(
+                testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+        }
+
+    @Test
+    fun whenUserClearsQueryThenViewStateReset() =
+        coroutineRule.runBlocking {
+            testee.userUpdatedQuery(QUERY)
+            testee.userRequestedClear()
+
+            assertTrue(
+                testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+        }
+
+    @Test
+    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() =
+        coroutineRule.runBlocking {
+            testee.userUpdatedQuery(QUERY)
+            testee.userUpdatedQuery(BLANK_QUERY)
+
+            assertTrue(
+                testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
+        }
 
     @Test
     fun whenUserSubmitsQueryThenBrowserLaunchedWithQueryAndPixelSent() {
@@ -240,10 +269,11 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenOnboardingCompleted() = coroutineRule.runBlocking {
-        testee.userSubmittedQuery(QUERY)
-        verify(mockUserStageStore).stageCompleted(AppStage.NEW)
-    }
+    fun whenUserSubmitsQueryThenOnboardingCompleted() =
+        coroutineRule.runBlocking {
+            testee.userSubmittedQuery(QUERY)
+            verify(mockUserStageStore).stageCompleted(AppStage.NEW)
+        }
 
     @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
@@ -270,23 +300,25 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserTapsDaxThenOnboardingCompleted() = coroutineRule.runBlocking {
-        testee.userTappedDax()
-        verify(mockUserStageStore).stageCompleted(AppStage.NEW)
-    }
+    fun whenUserTapsDaxThenOnboardingCompleted() =
+        coroutineRule.runBlocking {
+            testee.userTappedDax()
+            verify(mockUserStageStore).stageCompleted(AppStage.NEW)
+        }
 
     @Test
-    fun whenViewModelCreatedThenAppsRefreshed() = coroutineRule.runBlocking {
-        verify(mockDeviceAppLookup).refreshAppList()
-    }
+    fun whenViewModelCreatedThenAppsRefreshed() =
+        coroutineRule.runBlocking { verify(mockDeviceAppLookup).refreshAppList() }
 
     @Test
-    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = coroutineRule.runBlocking {
-        testee.appNotFound(deviceApp)
-        verify(mockDeviceAppLookup, times(2)).refreshAppList()
-        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
-    }
+    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() =
+        coroutineRule.runBlocking {
+            testee.appNotFound(deviceApp)
+            verify(mockDeviceAppLookup, times(2)).refreshAppList()
+            verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            assertEquals(
+                Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
+        }
 
     @Test
     fun whenUserSelectedToUpdateQueryThenEditQueryCommandSent() {
@@ -332,7 +364,8 @@ class SystemSearchViewModelTest {
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
+        assertEquals(
+            Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
     }
 
     @Test
@@ -345,13 +378,14 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = coroutineRule.runBlocking {
-        val savedSite = Favorite(1, "title", "http://example.com", 0)
+    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() =
+        coroutineRule.runBlocking {
+            val savedSite = Favorite(1, "title", "http://example.com", 0)
 
-        testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
+            testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
 
-        verify(mockFavoritesRepository).delete(savedSite)
-    }
+            verify(mockFavoritesRepository).delete(savedSite)
+        }
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
@@ -376,9 +410,19 @@ class SystemSearchViewModelTest {
     fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf(listOf(savedSite)))
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
+        testee =
+            SystemSearchViewModel(
+                mockUserStageStore,
+                mockAutoComplete,
+                mockDeviceAppLookup,
+                mockPixel,
+                mockFavoritesRepository,
+                mockFaviconManager,
+                mockSettingsStore,
+                coroutineRule.testDispatcherProvider)
 
-        val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
+        val viewState =
+            testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
         assertEquals(1, viewState.favorites.size)
         assertEquals(savedSite, viewState.favorites.first().favorite)
     }
@@ -389,10 +433,11 @@ class SystemSearchViewModelTest {
     }
 
     private fun givenEmptyUserStageStore(): UserStageStore {
-        val emptyUserStageDao = object : UserStageDao {
-            override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
-            override fun insert(userStage: UserStage) {}
-        }
+        val emptyUserStageDao =
+            object : UserStageDao {
+                override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
+                override fun insert(userStage: UserStage) {}
+            }
         return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider)
     }
 
@@ -401,7 +446,8 @@ class SystemSearchViewModelTest {
         const val BLANK_QUERY = ""
         const val AUTOCOMPLETE_RESULT = "autocomplete result"
         val deviceApp = DeviceApp("", "", Intent())
-        val autocompleteQueryResult = AutoCompleteResult(QUERY, listOf(AutoCompleteSearchSuggestion(QUERY, false)))
+        val autocompleteQueryResult =
+            AutoCompleteResult(QUERY, listOf(AutoCompleteSearchSuggestion(QUERY, false)))
         val autocompleteBlankResult = AutoCompleteResult(BLANK_QUERY, emptyList())
         val appQueryResult = listOf(deviceApp)
         val appBlankResult = emptyList<DeviceApp>()

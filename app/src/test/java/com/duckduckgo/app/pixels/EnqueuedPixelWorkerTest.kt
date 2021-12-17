@@ -44,11 +44,11 @@ class EnqueuedPixelWorkerTest {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(2)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
 
-        verify(workManager).enqueueUniquePeriodicWork(
-            eq("com.duckduckgo.pixels.enqueued.worker"),
-            eq(ExistingPeriodicWorkPolicy.KEEP),
-            any()
-        )
+        verify(workManager)
+            .enqueueUniquePeriodicWork(
+                eq("com.duckduckgo.pixels.enqueued.worker"),
+                eq(ExistingPeriodicWorkPolicy.KEEP),
+                any())
     }
 
     @Test
@@ -62,7 +62,8 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionThenDoNotSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(unsentForgetAllPixelStore.lastClearTimestamp)
+            .thenReturn(System.currentTimeMillis())
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
@@ -83,7 +84,8 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(unsentForgetAllPixelStore.lastClearTimestamp)
+            .thenReturn(System.currentTimeMillis())
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)

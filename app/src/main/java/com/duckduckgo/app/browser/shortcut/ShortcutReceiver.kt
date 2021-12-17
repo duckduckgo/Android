@@ -34,17 +34,16 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = LifecycleObserver::class
-)
+@ContributesMultibinding(scope = AppScope::class, boundType = LifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
-class ShortcutReceiver @Inject constructor(
+class ShortcutReceiver
+@Inject
+constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
@@ -64,13 +63,13 @@ class ShortcutReceiver @Inject constructor(
 
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {
-                Toast.makeText(it, it.getString(R.string.shortcutAddedText, title), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                        it, it.getString(R.string.shortcutAddedText, title), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
-        appCoroutineScope.launch(dispatcher.io()) {
-            pixel.fire(AppPixelName.SHORTCUT_ADDED)
-        }
+        appCoroutineScope.launch(dispatcher.io()) { pixel.fire(AppPixelName.SHORTCUT_ADDED) }
     }
 
     companion object {

@@ -31,7 +31,9 @@ class OfflinePixelSharedPreferencesTest {
 
     @Before
     fun setup() {
-        context.getSharedPreferences(OfflinePixelCountSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        context.getSharedPreferences(
+                OfflinePixelCountSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+            .edit { clear() }
         testee = OfflinePixelCountSharedPreferences(context)
     }
 

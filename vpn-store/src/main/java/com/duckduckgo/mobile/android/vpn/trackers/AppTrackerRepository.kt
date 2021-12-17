@@ -48,7 +48,9 @@ class RealAppTrackerRepository(
 ) : AppTrackerRepository {
 
     override fun findTracker(hostname: String, packageName: String): AppTrackerType {
-        val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname) ?: return AppTrackerType.NotTracker
+        val tracker =
+            vpnAppTrackerBlockingDao.getTrackerBySubdomain(hostname)
+                ?: return AppTrackerType.NotTracker
         val entityName = vpnAppTrackerBlockingDao.getEntityByAppPackageId(packageName)
         if (firstPartyTracker(tracker, entityName)) {
             return AppTrackerType.FirstParty(tracker)
@@ -83,15 +85,16 @@ class RealAppTrackerRepository(
     }
 
     override fun manuallyExcludedApp(packageName: String) {
-        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(AppTrackerManualExcludedApp(packageName, false))
+        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(
+            AppTrackerManualExcludedApp(packageName, false))
     }
 
     override fun manuallyEnabledApp(packageName: String) {
-        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(AppTrackerManualExcludedApp(packageName, true))
+        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(
+            AppTrackerManualExcludedApp(packageName, true))
     }
 
     override fun restoreDefaultProtectedList() {
         vpnAppTrackerBlockingDao.deleteManualAppExclusionList()
     }
-
 }

@@ -43,15 +43,11 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class GeoLocationPermissionsTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var locationPermissionsDao: LocationPermissionsDao
 
@@ -66,18 +62,25 @@ class GeoLocationPermissionsTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         locationPermissionsDao = db.locationPermissionsDao()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
 
-        geoLocationPermissions = GeoLocationPermissionsManager(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
-            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
-            coroutineRule.testDispatcherProvider
-        )
+        geoLocationPermissions =
+            GeoLocationPermissionsManager(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                LocationPermissionsRepository(
+                    locationPermissionsDao,
+                    lazyFaviconManager,
+                    coroutineRule.testDispatcherProvider),
+                FireproofWebsiteRepository(
+                    fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+                coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -86,70 +89,74 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedThenOnlyNonFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("anotherdomain.com")
-        givenLocationPermissionsDomain("https://domain.com")
+    fun whenClearingAllPermissionsButFireproofedThenOnlyNonFireproofedSitesAreDeleted() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("anotherdomain.com")
+            givenLocationPermissionsDomain("https://domain.com")
 
-        val oldFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
-        assertEquals(oldFireproofWebsites.size, 1)
+            val oldFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
+            assertEquals(oldFireproofWebsites.size, 1)
 
-        val oldLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(oldLocationPermissions.size, 1)
+            val oldLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(oldLocationPermissions.size, 1)
 
-        geoLocationPermissions.clearAllButFireproofed()
+            geoLocationPermissions.clearAllButFireproofed()
 
-        val newFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
-        assertEquals(newFireproofWebsites.size, 1)
+            val newFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
+            assertEquals(newFireproofWebsites.size, 1)
 
-        val newLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(newLocationPermissions.size, 0)
-    }
-
-    @Test
-    fun whenClearingAllPermissionsButFireproofedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() = coroutineRule.runBlocking {
-        givenLocationPermissionsDomain("https://domain.com")
-
-        val oldLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(oldLocationPermissions.size, 1)
-
-        geoLocationPermissions.clearAllButFireproofed()
-
-        val newLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(newLocationPermissions.size, 0)
-    }
+            val newLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(newLocationPermissions.size, 0)
+        }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedAndSiteIsFireproofedThenNothingIsDeleted() = coroutineRule.runBlocking {
-        givenFireproofWebsiteDomain("domain.com")
-        givenLocationPermissionsDomain("https://domain.com")
+    fun whenClearingAllPermissionsButFireproofedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() =
+        coroutineRule.runBlocking {
+            givenLocationPermissionsDomain("https://domain.com")
 
-        val oldFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
-        assertEquals(oldFireproofWebsites.size, 1)
+            val oldLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(oldLocationPermissions.size, 1)
 
-        val oldLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(oldLocationPermissions.size, 1)
+            geoLocationPermissions.clearAllButFireproofed()
 
-        geoLocationPermissions.clearAllButFireproofed()
-
-        val newFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
-        assertEquals(newFireproofWebsites.size, 1)
-
-        val newLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(newLocationPermissions.size, 1)
-    }
+            val newLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(newLocationPermissions.size, 0)
+        }
 
     @Test
-    fun whenClearingAllPermissionsThenAllPermissionsAreDeleted() = coroutineRule.runBlocking {
-        givenLocationPermissionsDomain("https://domain.com")
+    fun whenClearingAllPermissionsButFireproofedAndSiteIsFireproofedThenNothingIsDeleted() =
+        coroutineRule.runBlocking {
+            givenFireproofWebsiteDomain("domain.com")
+            givenLocationPermissionsDomain("https://domain.com")
 
-        val oldLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(oldLocationPermissions.size, 1)
+            val oldFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
+            assertEquals(oldFireproofWebsites.size, 1)
 
-        geoLocationPermissions.clearAll()
+            val oldLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(oldLocationPermissions.size, 1)
 
-        val newLocationPermissions = locationPermissionsDao.allPermissions()
-        assertEquals(newLocationPermissions.size, 0)
-    }
+            geoLocationPermissions.clearAllButFireproofed()
+
+            val newFireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
+            assertEquals(newFireproofWebsites.size, 1)
+
+            val newLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(newLocationPermissions.size, 1)
+        }
+
+    @Test
+    fun whenClearingAllPermissionsThenAllPermissionsAreDeleted() =
+        coroutineRule.runBlocking {
+            givenLocationPermissionsDomain("https://domain.com")
+
+            val oldLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(oldLocationPermissions.size, 1)
+
+            geoLocationPermissions.clearAll()
+
+            val newLocationPermissions = locationPermissionsDao.allPermissions()
+            assertEquals(newLocationPermissions.size, 0)
+        }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
         fireproofWebsitesDomain.forEach {
@@ -157,7 +164,11 @@ class GeoLocationPermissionsTest {
         }
     }
 
-    private fun givenLocationPermissionsDomain(domain: String, permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS) {
-        locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
+    private fun givenLocationPermissionsDomain(
+        domain: String,
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+    ) {
+        locationPermissionsDao.insert(
+            LocationPermissionEntity(domain = domain, permission = permissionType))
     }
 }

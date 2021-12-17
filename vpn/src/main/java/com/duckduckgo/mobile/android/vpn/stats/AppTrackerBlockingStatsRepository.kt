@@ -24,11 +24,11 @@ import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnDatabase) {
 
@@ -42,8 +42,12 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         return stateDao.get().distinctUntilChanged()
     }
 
-    fun getVpnTrackers(startTime: () -> String, endTime: String = noEndDate()): Flow<List<VpnTracker>> {
-        return trackerDao.getTrackersBetween(startTime(), endTime)
+    fun getVpnTrackers(
+        startTime: () -> String,
+        endTime: String = noEndDate()
+    ): Flow<List<VpnTracker>> {
+        return trackerDao
+            .getTrackersBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
@@ -51,50 +55,53 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     }
 
     @WorkerThread
-    fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTracker> {
-        return trackerDao.getTrackersBetweenSync(startTime(), endTime)
-            .filter { tracker -> tracker.timestamp >= startTime() }
+    fun getVpnTrackersSync(
+        startTime: () -> String,
+        endTime: String = noEndDate()
+    ): List<VpnTracker> {
+        return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker ->
+            tracker.timestamp >= startTime()
+        }
     }
 
     @WorkerThread
     fun getMostRecentVpnTrackers(startTime: () -> String): Flow<List<BucketizedVpnTracker>> {
-        return trackerDao.getPagedTrackersSince(startTime())
-            .conflate()
-            .distinctUntilChanged()
+        return trackerDao.getPagedTrackersSince(startTime()).conflate().distinctUntilChanged()
     }
 
     @WorkerThread
     fun getTrackersForAppFromDate(date: String, packageName: String): Flow<List<VpnTracker>> {
-        return trackerDao.getTrackersForAppFromDate(date, packageName)
+        return trackerDao
+            .getTrackersForAppFromDate(date, packageName)
             .conflate()
             .distinctUntilChanged()
     }
 
     fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {
-        return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
+        return runningTimeDao
+            .getRunningStatsBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
             .map { list -> list.filter { it.id >= startTime() } }
-            .transform { runningTimes ->
-                emit(runningTimes.sumOf { it.timeRunningMillis })
-            }
+            .transform { runningTimes -> emit(runningTimes.sumOf { it.timeRunningMillis }) }
             .flowOn(Dispatchers.Default)
     }
 
     fun getVpnDataStats(startTime: () -> String, endTime: String = noEndDate()): Flow<DataStats> {
-        return statsDao.getDataStatsBetween(startTime(), endTime)
+        return statsDao
+            .getDataStatsBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
             .map { list -> list.filter { it.id >= startTime() } }
-            .transform {
-                emit(calculateDataTotals(it))
-            }.flowOn(Dispatchers.Default)
+            .transform { emit(calculateDataTotals(it)) }
+            .flowOn(Dispatchers.Default)
     }
 
     @WorkerThread
     fun getVpnRestartHistory(): List<VpnPhoenixEntity> {
-        return phoenixDao.restarts()
-            .filter { it.timestamp >= System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1) }
+        return phoenixDao.restarts().filter {
+            it.timestamp >= System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1)
+        }
     }
 
     @WorkerThread
@@ -103,15 +110,23 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     }
 
     @WorkerThread
-    fun getBlockedTrackersCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
-        return trackerDao.getTrackersCountBetween(startTime(), endTime)
+    fun getBlockedTrackersCountBetween(
+        startTime: () -> String,
+        endTime: String = noEndDate()
+    ): Flow<Int> {
+        return trackerDao
+            .getTrackersCountBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
     }
 
     @WorkerThread
-    fun getTrackingAppsCountBetween(startTime: () -> String, endTime: String = noEndDate()): Flow<Int> {
-        return trackerDao.getTrackingAppsCountBetween(startTime(), endTime)
+    fun getTrackingAppsCountBetween(
+        startTime: () -> String,
+        endTime: String = noEndDate()
+    ): Flow<Int> {
+        return trackerDao
+            .getTrackingAppsCountBetween(startTime(), endTime)
             .conflate()
             .distinctUntilChanged()
     }
@@ -132,8 +147,7 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
 
         return DataStats(
             sent = DataTransfer(dataSent, packetsSent),
-            received = DataTransfer(dataReceived, packetsReceived)
-        )
+            received = DataTransfer(dataReceived, packetsReceived))
     }
 
     fun noStartDate(): String {
@@ -144,6 +158,9 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
 
-    data class DataStats(val sent: DataTransfer = DataTransfer(), val received: DataTransfer = DataTransfer())
+    data class DataStats(
+        val sent: DataTransfer = DataTransfer(),
+        val received: DataTransfer = DataTransfer()
+    )
     data class DataTransfer(val dataSize: Long = 0, val numberPackets: Long = 0)
 }

@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnRunningStatsDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(stat: VpnRunningStats): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(stat: VpnRunningStats): Long
 
-    @Query("UPDATE vpn_running_stats SET timeRunningMillis = timeRunningMillis + :timeRunningMillis WHERE id =:id")
+    @Query(
+        "UPDATE vpn_running_stats SET timeRunningMillis = timeRunningMillis + :timeRunningMillis WHERE id =:id")
     fun updateTimeRunning(timeRunningMillis: Long, id: String)
 
     @Transaction
@@ -41,7 +41,10 @@ interface VpnRunningStatsDao {
     }
 
     @Query("SELECT * FROM vpn_running_stats WHERE id >= :startTime AND id < :endTime")
-    fun getRunningStatsBetween(startTime: String = bucket(), endTime: String): Flow<List<VpnRunningStats>>
+    fun getRunningStatsBetween(
+        startTime: String = bucket(),
+        endTime: String
+    ): Flow<List<VpnRunningStats>>
 
     private fun bucket() = DatabaseDateFormatter.bucketByHour()
 }

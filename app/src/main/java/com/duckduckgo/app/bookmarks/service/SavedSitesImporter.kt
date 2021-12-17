@@ -48,15 +48,18 @@ class RealSavedSitesImporter(
 
     override suspend fun import(uri: Uri): ImportSavedSitesResult {
         return try {
-            val savedSites = contentResolver.openInputStream(uri).use { stream ->
-                val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
-                savedSitesParser.parseHtml(document, bookmarksRepository)
-            }
+            val savedSites =
+                contentResolver.openInputStream(uri).use { stream ->
+                    val document = Jsoup.parse(stream, Charsets.UTF_8.name(), BASE_URI)
+                    savedSitesParser.parseHtml(document, bookmarksRepository)
+                }
 
             savedSites.forEach {
                 when (it) {
                     is SavedSite.Favorite -> favoritesRepository.insert(it)
-                    is SavedSite.Bookmark -> bookmarksDao.insert(BookmarkEntity(title = it.title, url = it.url, parentId = it.parentId))
+                    is SavedSite.Bookmark ->
+                        bookmarksDao.insert(
+                            BookmarkEntity(title = it.title, url = it.url, parentId = it.parentId))
                 }
             }
             ImportSavedSitesResult.Success(savedSites)

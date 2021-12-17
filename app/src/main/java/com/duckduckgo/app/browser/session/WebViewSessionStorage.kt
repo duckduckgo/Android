@@ -31,20 +31,27 @@ interface WebViewSessionStorage {
 
 class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
-    private val cache = object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
+    private val cache =
+        object : LruCache<String, Bundle>(CACHE_SIZE_BYTES) {
 
-        /**
-         * Size (in bytes) of a single entry in the cache for the given key.
-         * We specify the max cache size in bytes, so we need to calculate an approximate size of the cache entry in bytes.
-         */
-        override fun sizeOf(key: String, bundle: Bundle) = bundle.sizeInBytes()
+            /**
+             * Size (in bytes) of a single entry in the cache for the given key. We specify the max
+             * cache size in bytes, so we need to calculate an approximate size of the cache entry
+             * in bytes.
+             */
+            override fun sizeOf(key: String, bundle: Bundle) = bundle.sizeInBytes()
 
-        override fun entryRemoved(evicted: Boolean, key: String?, oldValue: Bundle?, newValue: Bundle?) {
-            if (evicted) {
-                Timber.v("Evicted $key from WebView session storage")
+            override fun entryRemoved(
+                evicted: Boolean,
+                key: String?,
+                oldValue: Bundle?,
+                newValue: Bundle?
+            ) {
+                if (evicted) {
+                    Timber.v("Evicted $key from WebView session storage")
+                }
             }
         }
-    }
 
     override fun saveSession(webView: WebView?, tabId: String) {
         if (webView == null) {
@@ -66,9 +73,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     }
 
     private fun createWebViewBundle(webView: WebView): Bundle {
-        return Bundle().also {
-            webView.saveState(it)
-        }
+        return Bundle().also { webView.saveState(it) }
     }
 
     override fun restoreSession(webView: WebView?, tabId: String): Boolean {
@@ -86,9 +91,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         }
 
         val webViewBundle = bundle.getBundle(CACHE_KEY_WEBVIEW)
-        webViewBundle?.let {
-            webView.restoreState(it)
-        }
+        webViewBundle?.let { webView.restoreState(it) }
         webView.scrollY = bundle.getInt(CACHE_KEY_SCROLL_POSITION)
         cache.remove(tabId)
 
@@ -109,7 +112,8 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     }
 
     private fun logCacheSize() {
-        Timber.v("Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes")
+        Timber.v(
+            "Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes")
     }
 
     private fun Bundle.sizeInBytes(): Int {
@@ -127,7 +131,5 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
         private const val CACHE_KEY_WEBVIEW = "webview"
         private const val CACHE_KEY_SCROLL_POSITION = "scroll-position"
-
     }
-
 }

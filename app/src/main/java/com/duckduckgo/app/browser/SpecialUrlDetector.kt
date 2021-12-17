@@ -24,8 +24,8 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
-import timber.log.Timber
 import java.net.URISyntaxException
+import timber.log.Timber
 
 interface SpecialUrlDetector {
     fun determineType(uri: Uri): UrlType
@@ -36,16 +36,23 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String) : UrlType()
-        class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?, val fallbackIntent: Intent? = null) : UrlType()
+        class AppLink(
+            val appIntent: Intent? = null,
+            val excludedComponents: List<ComponentName>? = null,
+            val uriString: String
+        ) : UrlType()
+        class NonHttpAppLink(
+            val uriString: String,
+            val intent: Intent,
+            val fallbackUrl: String?,
+            val fallbackIntent: Intent? = null
+        ) : UrlType()
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
     }
 }
 
-class SpecialUrlDetectorImpl(
-    private val packageManager: PackageManager
-) : SpecialUrlDetector {
+class SpecialUrlDetectorImpl(private val packageManager: PackageManager) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
         val uriString = uri.toString()
@@ -64,16 +71,20 @@ class SpecialUrlDetectorImpl(
         }
     }
 
-    private fun buildTelephone(uriString: String): UrlType = UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:").truncate(PHONE_MAX_LENGTH))
+    private fun buildTelephone(uriString: String): UrlType =
+        UrlType.Telephone(uriString.removePrefix("$TEL_SCHEME:").truncate(PHONE_MAX_LENGTH))
 
     private fun buildTelephonePrompt(uriString: String): UrlType =
         UrlType.Telephone(uriString.removePrefix("$TELPROMPT_SCHEME:").truncate(PHONE_MAX_LENGTH))
 
-    private fun buildEmail(uriString: String): UrlType = UrlType.Email(uriString.truncate(EMAIL_MAX_LENGTH))
+    private fun buildEmail(uriString: String): UrlType =
+        UrlType.Email(uriString.truncate(EMAIL_MAX_LENGTH))
 
-    private fun buildSms(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:").truncate(SMS_MAX_LENGTH))
+    private fun buildSms(uriString: String): UrlType =
+        UrlType.Sms(uriString.removePrefix("$SMS_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
+    private fun buildSmsTo(uriString: String): UrlType =
+        UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     private fun checkForAppLink(uriString: String): UrlType {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -87,7 +98,8 @@ class SpecialUrlDetectorImpl(
                         return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
                     }
                     val excludedComponents = getExcludedComponents(activities)
-                    return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
+                    return UrlType.AppLink(
+                        excludedComponents = excludedComponents, uriString = uriString)
                 }
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
@@ -100,7 +112,8 @@ class SpecialUrlDetectorImpl(
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
         val browsableIntent = Intent.parseUri(uriString, URI_NO_FLAG)
         browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
-        return packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
+        return packageManager.queryIntentActivities(
+            browsableIntent, PackageManager.GET_RESOLVED_FILTER)
     }
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {
@@ -111,14 +124,18 @@ class SpecialUrlDetectorImpl(
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(nonBrowserActivity: ResolveInfo, uriString: String): Intent {
         val intent = Intent.parseUri(uriString, URI_NO_FLAG)
-        intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
+        intent.component =
+            ComponentName(
+                nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
         return intent
     }
 
     private fun getExcludedComponents(activities: List<ResolveInfo>): List<ComponentName> {
-        return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && isBrowserFilter(resolveInfo.filter)
-        }.map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
+        return activities
+            .filter { resolveInfo ->
+                resolveInfo.filter != null && isBrowserFilter(resolveInfo.filter)
+            }
+            .map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
     }
 
     private fun isBrowserFilter(filter: IntentFilter) =
@@ -138,7 +155,11 @@ class SpecialUrlDetectorImpl(
             val intent = Intent.parseUri(uriString, URI_NO_FLAG)
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
             val fallbackIntent = buildFallbackIntent(fallbackUrl)
-            UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
+            UrlType.NonHttpAppLink(
+                uriString = uriString,
+                intent = intent,
+                fallbackUrl = fallbackUrl,
+                fallbackIntent = fallbackIntent)
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
             return UrlType.Unknown(uriString)
@@ -158,7 +179,8 @@ class SpecialUrlDetectorImpl(
         return determineType(Uri.parse(uriString))
     }
 
-    private fun String.truncate(maxLength: Int): String = if (this.length > maxLength) this.substring(0, maxLength) else this
+    private fun String.truncate(maxLength: Int): String =
+        if (this.length > maxLength) this.substring(0, maxLength) else this
 
     companion object {
         private const val TEL_SCHEME = "tel"

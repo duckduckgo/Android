@@ -38,10 +38,16 @@ class WelcomePageModule {
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
         onboardingStore: OnboardingStore,
         variantManager: VariantManager
-    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog, onboardingStore, variantManager)
+    ) =
+        WelcomePageViewModelFactory(
+            appInstallStore,
+            context,
+            pixel,
+            defaultRoleBrowserDialog,
+            onboardingStore,
+            variantManager)
 
     @Provides
-    fun defaultRoleBrowserDialog(
-        appInstallStore: AppInstallStore
-    ): DefaultRoleBrowserDialog = RealDefaultRoleBrowserDialog(appInstallStore)
+    fun defaultRoleBrowserDialog(appInstallStore: AppInstallStore): DefaultRoleBrowserDialog =
+        RealDefaultRoleBrowserDialog(appInstallStore)
 }

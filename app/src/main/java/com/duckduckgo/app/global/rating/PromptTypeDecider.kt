@@ -42,9 +42,9 @@ class InitialPromptTypeDecider(
 
     override suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions {
         return withContext(Dispatchers.IO) {
-
             if (onboardingStore.userMarkedAsReturningUser) {
-                Timber.i("Users marked as returning should not see any app enjoyment prompts as per experiment definition")
+                Timber.i(
+                    "Users marked as returning should not see any app enjoyment prompts as per experiment definition")
                 return@withContext ShowNothing
             }
 
@@ -80,7 +80,8 @@ class InitialPromptTypeDecider(
             Timber.i("DuckDuckGo was not installed from Play Store")
 
             return if (BuildConfig.DEBUG) {
-                Timber.i("Running in DEBUG mode so will allow this; would normally enforce this check")
+                Timber.i(
+                    "Running in DEBUG mode so will allow this; would normally enforce this check")
                 true
             } else {
                 Timber.i("Cannot show app enjoyment prompts")
@@ -95,7 +96,9 @@ class InitialPromptTypeDecider(
         val numberSearchesMade = searchCountDao.getSearchesMade()
         val enoughMade = numberSearchesMade >= MINIMUM_SEARCHES_THRESHOLD
 
-        Timber.i("Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s", if (enoughMade) "yes" else "no")
+        Timber.i(
+            "Searches made: $numberSearchesMade. Enough searches made to show app enjoyment prompt: %s",
+            if (enoughMade) "yes" else "no")
         return enoughMade
     }
 }

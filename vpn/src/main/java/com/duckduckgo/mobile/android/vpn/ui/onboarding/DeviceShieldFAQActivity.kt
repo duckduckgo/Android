@@ -26,8 +26,7 @@ import javax.inject.Inject
 
 class DeviceShieldFAQActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +51,5 @@ class DeviceShieldFAQActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, DeviceShieldFAQActivity::class.java)
         }
-
     }
-
 }

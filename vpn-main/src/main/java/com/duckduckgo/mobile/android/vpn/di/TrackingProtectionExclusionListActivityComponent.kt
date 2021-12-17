@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
-interface TrackingProtectionExclusionListActivityComponent : AndroidInjector<TrackingProtectionExclusionListActivity> {
+@MergeSubcomponent(scope = ActivityScope::class)
+interface TrackingProtectionExclusionListActivityComponent :
+    AndroidInjector<TrackingProtectionExclusionListActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<TrackingProtectionExclusionListActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface TrackingProtectionExclusionListActivityComponentProvider {
-    fun provideTrackingProtectionExclusionListActivityComponentFactory(): TrackingProtectionExclusionListActivityComponent.Factory
+    fun provideTrackingProtectionExclusionListActivityComponentFactory():
+        TrackingProtectionExclusionListActivityComponent.Factory
 }
 
 @Module
@@ -49,5 +49,6 @@ abstract class TrackingProtectionExclusionListActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(TrackingProtectionExclusionListActivity::class)
-    abstract fun TrackingProtectionExclusionListActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun TrackingProtectionExclusionListActivityComponent.Factory.bind():
+        AndroidInjector.Factory<*>
 }

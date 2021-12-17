@@ -27,8 +27,8 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig)
@@ -37,7 +37,9 @@ interface PrivacyConfigPersister {
 @WorkerThread
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealPrivacyConfigPersister @Inject constructor(
+class RealPrivacyConfigPersister
+@Inject
+constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
@@ -53,7 +55,9 @@ class RealPrivacyConfigPersister @Inject constructor(
         if (newVersion > previousVersion) {
             database.runInTransaction {
                 privacyFeatureTogglesRepository.deleteAll()
-                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
+                privacyConfigRepository.insert(
+                    PrivacyConfig(
+                        version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme))
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
@@ -65,5 +69,4 @@ class RealPrivacyConfigPersister @Inject constructor(
             }
         }
     }
-
 }

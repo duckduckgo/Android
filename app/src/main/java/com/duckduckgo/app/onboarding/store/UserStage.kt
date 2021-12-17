@@ -23,15 +23,12 @@ import androidx.room.TypeConverter
 const val USER_STAGE_TABLE_NAME = "userStage"
 
 @Entity(tableName = USER_STAGE_TABLE_NAME)
-data class UserStage(
-    @PrimaryKey val key: Int = 1,
-    val appStage: AppStage
-)
+data class UserStage(@PrimaryKey val key: Int = 1, val appStage: AppStage)
 
 enum class AppStage {
     NEW,
     DAX_ONBOARDING,
-    ESTABLISHED;
+    ESTABLISHED
 }
 
 class StageTypeConverter {

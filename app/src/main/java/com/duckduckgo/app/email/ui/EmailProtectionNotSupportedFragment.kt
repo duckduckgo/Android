@@ -18,7 +18,8 @@ package com.duckduckgo.app.email.ui
 
 import com.duckduckgo.app.browser.R
 
-class EmailProtectionNotSupportedFragment : EmailProtectionFragment(R.layout.fragment_email_protection_not_supported) {
+class EmailProtectionNotSupportedFragment :
+    EmailProtectionFragment(R.layout.fragment_email_protection_not_supported) {
     companion object {
         fun instance(): EmailProtectionNotSupportedFragment {
             return EmailProtectionNotSupportedFragment()

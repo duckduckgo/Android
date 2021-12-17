@@ -19,9 +19,8 @@ package com.duckduckgo.app.statistics.config
 import com.duckduckgo.app.statistics.BuildConfig
 
 /**
- * If you want to configure the statistics library, have your app extend this listener
- * and implement the different methods.
- * The library will check through the application context.
+ * If you want to configure the statistics library, have your app extend this listener and implement
+ * the different methods. The library will check through the application context.
  */
 interface StatisticsLibraryConfig {
     fun shouldFirePixelsAsDev(): Boolean

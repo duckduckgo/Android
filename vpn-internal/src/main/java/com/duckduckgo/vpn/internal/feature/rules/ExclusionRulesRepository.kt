@@ -19,52 +19,58 @@ package com.duckduckgo.vpn.internal.feature.rules
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
-class ExclusionRulesRepository @Inject constructor(
-    private val dispatcherProvider: DispatcherProvider,
-    vpnDatabase: VpnDatabase
-) {
+class ExclusionRulesRepository
+@Inject
+constructor(private val dispatcherProvider: DispatcherProvider, vpnDatabase: VpnDatabase) {
     private val blockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
 
-    suspend fun upsertRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
-        val rule = blockingDao.getRuleByTrackerDomain(domain)
-        if (rule != null) {
-            val updatedRule = rule.copy(
-                rule = rule.rule,
-                packageNames = rule.packageNames.toMutableSet().apply { add(appPackageName) }.toList()
-            )
-            blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
-        } else {
-            blockingDao.insertTrackerExceptionRules(
-                listOf(AppTrackerExceptionRule(rule = domain, packageNames = listOf(appPackageName)))
-            )
+    suspend fun upsertRule(appPackageName: String, domain: String) =
+        withContext(dispatcherProvider.io()) {
+            val rule = blockingDao.getRuleByTrackerDomain(domain)
+            if (rule != null) {
+                val updatedRule =
+                    rule.copy(
+                        rule = rule.rule,
+                        packageNames =
+                            rule.packageNames.toMutableSet().apply { add(appPackageName) }.toList())
+                blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
+            } else {
+                blockingDao.insertTrackerExceptionRules(
+                    listOf(
+                        AppTrackerExceptionRule(
+                            rule = domain, packageNames = listOf(appPackageName))))
+            }
         }
-    }
 
-    suspend fun removeRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
-        val rule = blockingDao.getRuleByTrackerDomain(domain)
-        rule?.let {
-            val updatedRule = it.copy(
-                rule = it.rule,
-                packageNames = it.packageNames.toMutableSet().apply { remove(appPackageName) }.toList()
-            )
-            Timber.v("aitorr rule $it / $updatedRule")
-            blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
+    suspend fun removeRule(appPackageName: String, domain: String) =
+        withContext(dispatcherProvider.io()) {
+            val rule = blockingDao.getRuleByTrackerDomain(domain)
+            rule?.let {
+                val updatedRule =
+                    it.copy(
+                        rule = it.rule,
+                        packageNames =
+                            it.packageNames
+                                .toMutableSet()
+                                .apply { remove(appPackageName) }
+                                .toList())
+                Timber.v("aitorr rule $it / $updatedRule")
+                blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
+            }
         }
-    }
 
-    suspend fun getAllTrackerRules(): List<AppTrackerExceptionRule> = withContext(dispatcherProvider.io()) {
-        return@withContext blockingDao.getTrackerExceptionRules()
-    }
+    suspend fun getAllTrackerRules(): List<AppTrackerExceptionRule> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext blockingDao.getTrackerExceptionRules()
+        }
 
-    suspend fun deleteAllTrackerRules() = withContext(dispatcherProvider.io()) {
-        blockingDao.deleteTrackerExceptionRules()
-    }
+    suspend fun deleteAllTrackerRules() =
+        withContext(dispatcherProvider.io()) { blockingDao.deleteTrackerExceptionRules() }
 
-    suspend fun insertTrackerRules(rules: List<AppTrackerExceptionRule>) = withContext(dispatcherProvider.io()) {
-        blockingDao.insertTrackerExceptionRules(rules)
-    }
+    suspend fun insertTrackerRules(rules: List<AppTrackerExceptionRule>) =
+        withContext(dispatcherProvider.io()) { blockingDao.insertTrackerExceptionRules(rules) }
 }

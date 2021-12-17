@@ -84,7 +84,8 @@ class MigrationLifecycleObserverTest {
         }
     }
 
-    internal class FakeMigrationPlugin(override val version: Int = CURRENT_VERSION) : MigrationPlugin {
+    internal class FakeMigrationPlugin(override val version: Int = CURRENT_VERSION) :
+        MigrationPlugin {
         var count = 0
 
         override fun run() {

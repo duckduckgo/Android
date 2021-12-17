@@ -32,11 +32,11 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Provider
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
@@ -90,12 +90,8 @@ class SurveyViewModel(
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
         viewModelScope.launch() {
-            withContext(dispatchers.io() + NonCancellable) {
-                surveyDao.update(survey)
-            }
-            withContext(dispatchers.main()) {
-                command.value = Command.Close
-            }
+            withContext(dispatchers.io() + NonCancellable) { surveyDao.update(survey) }
+            withContext(dispatchers.main()) { command.value = Command.Close }
         }
     }
 
@@ -115,7 +111,9 @@ class SurveyViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class SurveyViewModelFactory @Inject constructor(
+class SurveyViewModelFactory
+@Inject
+constructor(
     private val surveyDao: Provider<SurveyDao>,
     private val statisticsStore: Provider<StatisticsDataStore>,
     private val appInstallStore: Provider<AppInstallStore>
@@ -123,7 +121,10 @@ class SurveyViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao.get(), statisticsStore.get(), appInstallStore.get()) as T)
+                isAssignableFrom(SurveyViewModel::class.java) ->
+                    (SurveyViewModel(
+                        surveyDao.get(), statisticsStore.get(), appInstallStore.get()) as
+                        T)
                 else -> null
             }
         }

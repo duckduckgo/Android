@@ -46,7 +46,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     abstract fun configureUI()
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
-    protected val binding get() = _binding!!
+    protected val binding
+        get() = _binding!!
 
     private var initialTitle: String? = null
     private var titleState = ValidationState.UNCHANGED
@@ -54,12 +55,13 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private var initialParentFolderId: Long? = null
     private var folderChanged = false
 
-    var launcher = registerForActivityResult(StartActivityForResult()) { result ->
-        result.data?.let { data ->
-            storeFolderIdFromIntent(data)
-            populateFolderNameFromIntent(data)
+    var launcher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            result.data?.let { data ->
+                storeFolderIdFromIntent(data)
+                populateFolderNameFromIntent(data)
+            }
         }
-    }
 
     private fun populateFolderNameFromIntent(data: Intent) {
         data.getStringExtra(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
@@ -79,7 +81,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
@@ -88,7 +94,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureToolbar(binding.savedSiteAppBar.toolbar)
         configureUI()
         initialTitle = binding.titleInput.text.toString()
-        initialParentFolderId = arguments?.getLong(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
+        initialParentFolderId =
+            arguments?.getLong(EditBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID)
         addTextWatchers()
         showKeyboard(binding.titleInput)
         return binding.root
@@ -111,8 +118,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                     }
                 }
                 false
-            }
-        )
+            })
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -133,9 +139,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private fun configureUpNavigation(toolbar: Toolbar) {
         toolbar.setNavigationIcon(R.drawable.ic_back_24)
-        toolbar.setNavigationOnClickListener {
-            dismiss()
-        }
+        toolbar.setNavigationOnClickListener { dismiss() }
     }
 
     private fun configureClickListeners() {
@@ -143,7 +147,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
             context?.let { context ->
                 arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
                     if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
-                        launcher.launch(BookmarkFoldersActivity.intent(context, it, arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder))
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder))
                     } else {
                         launcher.launch(BookmarkFoldersActivity.intent(context, it))
                     }
@@ -170,28 +178,34 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         configureUpNavigation(toolbar)
     }
 
-    protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
+    protected fun setConfirmationVisibility(
+        inputState: ValidationState = ValidationState.UNCHANGED
+    ) {
         binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
-            (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
-            (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
+            (inputState == ValidationState.CHANGED ||
+                titleState == ValidationState.CHANGED ||
+                folderChanged) &&
+                (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
 
-    private val titleTextWatcher = object : TextChangedWatcher() {
-        override fun afterTextChanged(editable: Editable) {
-            titleState = when {
-                editable.toString().isBlank() -> {
-                    ValidationState.INVALID
-                }
-                editable.toString() != initialTitle -> {
-                    ValidationState.CHANGED
-                }
-                else -> {
-                    ValidationState.UNCHANGED
-                }
+    private val titleTextWatcher =
+        object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                titleState =
+                    when {
+                        editable.toString().isBlank() -> {
+                            ValidationState.INVALID
+                        }
+                        editable.toString() != initialTitle -> {
+                            ValidationState.CHANGED
+                        }
+                        else -> {
+                            ValidationState.UNCHANGED
+                        }
+                    }
+                setConfirmationVisibility()
             }
-            setConfirmationVisibility()
         }
-    }
 }
 
 enum class ValidationState {

@@ -22,6 +22,5 @@ import retrofit2.http.GET
 
 interface ResourceSurrogateListService {
 
-    @GET("https://staticcdn.duckduckgo.com/surrogates.txt")
-    fun surrogates(): Call<ResponseBody>
+    @GET("https://staticcdn.duckduckgo.com/surrogates.txt") fun surrogates(): Call<ResponseBody>
 }

@@ -30,9 +30,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
-import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
+import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -51,28 +51,38 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            showNotificationDialog()
+    private val getNotificationSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                showNotificationDialog()
+            }
         }
-    }
 
-    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.learnMore()
+    private val readBlogSpan =
+        object : NonUnderlinedClickableSpan() {
+            override fun onClick(widget: View) {
+                viewModel.learnMore()
+            }
         }
-    }
 
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        viewModel.onCodeRedeemed(result.resultCode)
-    }
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result: ActivityResult ->
+            viewModel.onCodeRedeemed(result.resultCode)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }
+        viewModel
+            .viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
             .launchIn(lifecycleScope)
-        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
+        viewModel
+            .commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
         setContentView(binding.root)
@@ -117,9 +127,8 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.inviteCodeButton.gone()
         binding.footerInviteCodeButton.gone()
         binding.footerDescription.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
-            viewModel.learnMore()
-        }
+        binding.appTPDescription.addClickableLink(
+            "beta_link", getText(R.string.atp_WaitlistInBetaDescription)) { viewModel.learnMore() }
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
@@ -133,13 +142,12 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         if (notify) {
             binding.appTPDescription.addClickableSpan(
                 getText(R.string.atp_WaitlistJoinedWithNotification),
-                listOf(Pair("beta_link", readBlogSpan))
-            )
+                listOf(Pair("beta_link", readBlogSpan)))
         } else {
             binding.appTPDescription.addClickableSpan(
                 getText(R.string.atp_WaitlistJoinedWithoutNotification),
-                listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan))
-            )
+                listOf(
+                    Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan)))
         }
     }
 
@@ -149,9 +157,8 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.getStartedButton.gone()
         binding.inviteCodeButton.show()
         binding.footerInviteCodeButton.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
-            viewModel.learnMore()
-        }
+        binding.appTPDescription.addClickableLink(
+            "beta_link", getText(R.string.atp_WaitlistDescription)) { viewModel.learnMore() }
     }
 
     private fun renderCodeRedeemed() {
@@ -162,9 +169,8 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.inviteCodeButton.gone()
         binding.footerInviteCodeButton.gone()
         binding.footerDescription.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
-            viewModel.learnMore()
-        }
+        binding.appTPDescription.addClickableLink(
+            "beta_link", getText(R.string.atp_WaitlistInBetaDescription)) { viewModel.learnMore() }
     }
 
     private fun renderErrorMessage() {
@@ -174,11 +180,12 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun showNotificationDialog() {
         supportFragmentManager.let {
-            val dialog = WaitlistNotificationDialog.create().apply {
-                onNotifyClicked = { viewModel.onNotifyMeClicked() }
-                onNoThanksClicked = { viewModel.onNoThanksClicked() }
-                onDialogDismissed = { viewModel.onDialogDismissed() }
-            }
+            val dialog =
+                WaitlistNotificationDialog.create().apply {
+                    onNotifyClicked = { viewModel.onNotifyMeClicked() }
+                    onNoThanksClicked = { viewModel.onNoThanksClicked() }
+                    onDialogDismissed = { viewModel.onDialogDismissed() }
+                }
             dialog.show(it, EmailProtectionSignInFragment.NOTIFICATION_DIALOG_TAG)
         }
     }
@@ -193,7 +200,11 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun openWebsite() {
-        startActivity(WebViewActivity.intent(this, getString(R.string.atp_WaitlistBetaBlogPost), getString(R.string.atp_WaitlistActivityTitle)))
+        startActivity(
+            WebViewActivity.intent(
+                this,
+                getString(R.string.atp_WaitlistBetaBlogPost),
+                getString(R.string.atp_WaitlistActivityTitle)))
     }
 
     companion object {

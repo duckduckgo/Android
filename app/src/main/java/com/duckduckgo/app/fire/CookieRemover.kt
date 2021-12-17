@@ -24,11 +24,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface CookieRemover {
     suspend fun removeCookies(): Boolean
@@ -71,10 +71,12 @@ class SQLCookieRemover(
 
     private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
         return try {
-            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
+            SQLiteDatabase.openDatabase(
+                databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
             offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
-            exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
+            exceptionPixel.sendExceptionPixel(
+                AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
     }
@@ -91,7 +93,8 @@ class SQLCookieRemover(
             } catch (exception: Exception) {
                 Timber.e(exception)
                 offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
-                exceptionPixel.sendExceptionPixel(AppPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
+                exceptionPixel.sendExceptionPixel(
+                    AppPixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()
             }
@@ -111,8 +114,7 @@ class SQLCookieRemover(
                 } else {
                     "$acc AND host_key NOT LIKE ?"
                 }
-            }
-        )
+            })
     }
 
     companion object {

@@ -17,9 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.dev.settings.DevSettingsActivity
-import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -31,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface DevSettingsActivityComponent : AndroidInjector<DevSettingsActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DevSettingsActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<DevSettingsActivity>
 }
 
 @ContributesTo(AppScope::class)

@@ -29,7 +29,8 @@ class VpnPreferences @Inject constructor(private val applicationContext: Context
         prefs().edit { putBoolean(PREFS_KEY_DEBUG_LOGGING, enabled) }
     }
 
-    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, BuildConfig.DEBUG)
+    fun getDebugLoggingPreference(): Boolean =
+        prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, BuildConfig.DEBUG)
 
     fun useCustomDnsServer(dnsServer: Boolean) {
         prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
@@ -43,8 +44,7 @@ class VpnPreferences @Inject constructor(private val applicationContext: Context
 
     companion object {
 
-        @VisibleForTesting
-        const val PREFS_FILENAME = "VpnDummySettings"
+        @VisibleForTesting const val PREFS_FILENAME = "VpnDummySettings"
 
         private const val PREFS_KEY_DEBUG_LOGGING = "PREFS_KEY_DEBUG_LOGGING"
         private const val PREFS_KEY_DNS_SERVER = "PREFS_KEY_DNS_SERVER"

@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
-interface ShareOpenEndedFeedbackFragmentComponent : AndroidInjector<ShareOpenEndedFeedbackFragment> {
+@MergeSubcomponent(scope = FragmentScope::class)
+interface ShareOpenEndedFeedbackFragmentComponent :
+    AndroidInjector<ShareOpenEndedFeedbackFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ShareOpenEndedFeedbackFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface ShareOpenEndedFeedbackFragmentComponentProvider {
-    fun provideShareOpenEndedFeedbackFragmentComponentFactory(): ShareOpenEndedFeedbackFragmentComponent.Factory
+    fun provideShareOpenEndedFeedbackFragmentComponentFactory():
+        ShareOpenEndedFeedbackFragmentComponent.Factory
 }
 
 @Module

@@ -27,9 +27,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,16 +68,21 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState()
+        viewModel
+            .viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState ->
                 viewState.let {
-                    binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
-                    binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
+                    binding.nextTdsEnabled.quietlySetIsChecked(
+                        it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.enableAppStartupTrace.quietlySetIsChecked(
+                        it.startupTraceEnabled, startupTraceToggleListener)
                 }
-            }.launchIn(lifecycleScope)
+            }
+            .launchIn(lifecycleScope)
 
-        viewModel.commands()
+        viewModel
+            .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
@@ -97,7 +102,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun sendTdsIntent() {
-        Toast.makeText(this, getString(R.string.devSettingsScreenTdsWait), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.devSettingsScreenTdsWait), Toast.LENGTH_SHORT)
+            .show()
         val intent = Intent()
         intent.action = DOWNLOAD_TDS_INTENT_ACTION
         sendBroadcast(intent)

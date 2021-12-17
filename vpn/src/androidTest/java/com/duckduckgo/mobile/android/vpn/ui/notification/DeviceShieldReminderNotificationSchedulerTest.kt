@@ -32,17 +32,15 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.*
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class DeviceShieldReminderNotificationSchedulerTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -56,7 +54,9 @@ class DeviceShieldReminderNotificationSchedulerTest {
     fun before() {
         initializeWorkManager()
         notificationManager = NotificationManagerCompat.from(context)
-        testee = DeviceShieldReminderNotificationScheduler(context, workManager, notificationManager, notificationBuilder)
+        testee =
+            DeviceShieldReminderNotificationScheduler(
+                context, workManager, notificationManager, notificationBuilder)
     }
 
     @After
@@ -66,11 +66,12 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     // https://developer.android.com/topic/libraries/architecture/workmanager/how-to/integration-testing
     private fun initializeWorkManager() {
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .setWorkerFactory(testWorkerFactory())
-            .build()
+        val config =
+            Configuration.Builder()
+                .setMinimumLoggingLevel(Log.DEBUG)
+                .setExecutor(SynchronousExecutor())
+                .setWorkerFactory(testWorkerFactory())
+                .build()
 
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
         workManager = WorkManager.getInstance(context)
@@ -158,29 +159,38 @@ class DeviceShieldReminderNotificationSchedulerTest {
     }
 
     private fun configureMockNotification() {
-        whenever(notificationBuilder.buildReminderNotification(any(), any())).thenReturn(
-            NotificationCompat.Builder(context, "")
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .build()
-        )
+        whenever(notificationBuilder.buildReminderNotification(any(), any()))
+            .thenReturn(
+                NotificationCompat.Builder(context, "")
+                    .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+                    .build())
     }
 
     private fun enqueueDailyReminderNotificationWorker() {
         val requestBuilder = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
-        val request = requestBuilder
-            .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
-            .setInitialDelay(24, TimeUnit.HOURS)
-            .build()
-        workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
+        val request =
+            requestBuilder
+                .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+                .setInitialDelay(24, TimeUnit.HOURS)
+                .build()
+        workManager.enqueueUniqueWork(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG,
+            ExistingWorkPolicy.KEEP,
+            request)
     }
 
     private fun enqueueUndesiredReminderNotificationWorker() {
-        val requestBuilder = PeriodicWorkRequestBuilder<VpnReminderNotificationWorker>(5, TimeUnit.HOURS)
-        val request = requestBuilder
-            .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
-            .setInitialDelay(5, TimeUnit.HOURS)
-            .build()
-        workManager.enqueueUniquePeriodicWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
+        val requestBuilder =
+            PeriodicWorkRequestBuilder<VpnReminderNotificationWorker>(5, TimeUnit.HOURS)
+        val request =
+            requestBuilder
+                .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+                .setInitialDelay(5, TimeUnit.HOURS)
+                .build()
+        workManager.enqueueUniquePeriodicWork(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request)
     }
 
     private fun assertWorkersAreNotEnqueued(tag: String) {
@@ -202,7 +212,11 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     private fun testWorkerFactory(): WorkerFactory {
         return object : WorkerFactory() {
-            override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+            override fun createWorker(
+                appContext: Context,
+                workerClassName: String,
+                workerParameters: WorkerParameters
+            ): ListenableWorker? {
                 return VpnReminderNotificationWorker(appContext, workerParameters).also {
                     it.vpnReminderReceiverManager = mockVpnReminderReceiverManager
                 }
@@ -211,8 +225,6 @@ class DeviceShieldReminderNotificationSchedulerTest {
     }
 
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {
-        return workManager
-            .getWorkInfosByTag(tag)
-            .get()
+        return workManager.getWorkInfosByTag(tag).get()
     }
 }

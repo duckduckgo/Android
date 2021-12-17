@@ -19,6 +19,8 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +28,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.*
 
 interface EmailManager {
     fun signedInFlow(): StateFlow<Boolean>
@@ -61,7 +61,8 @@ class AppEmailManager(
     override fun getAlias(): String? = consumeAlias()
 
     override fun isSignedIn(): Boolean {
-        return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
+        return !emailDataStore.emailToken.isNullOrBlank() &&
+            !emailDataStore.emailUsername.isNullOrBlank()
     }
 
     override fun storeCredentials(token: String, username: String, cohort: String) {
@@ -82,9 +83,7 @@ class AppEmailManager(
     }
 
     override fun getEmailAddress(): String? {
-        return emailDataStore.emailUsername?.let {
-            "$it$DUCK_EMAIL_DOMAIN"
-        }
+        return emailDataStore.emailUsername?.let { "$it$DUCK_EMAIL_DOMAIN" }
     }
 
     override fun waitlistState(): WaitlistState {
@@ -98,8 +97,12 @@ class AppEmailManager(
     }
 
     override fun joinWaitlist(timestamp: Int, token: String) {
-        if (emailDataStore.waitlistTimestamp == -1) { emailDataStore.waitlistTimestamp = timestamp }
-        if (emailDataStore.waitlistToken == null) { emailDataStore.waitlistToken = token }
+        if (emailDataStore.waitlistTimestamp == -1) {
+            emailDataStore.waitlistTimestamp = timestamp
+        }
+        if (emailDataStore.waitlistToken == null) {
+            emailDataStore.waitlistToken = token
+        }
     }
 
     override fun getInviteCode(): String {
@@ -143,9 +146,10 @@ class AppEmailManager(
     override fun getLastUsedDate(): String = emailDataStore.lastUsedDate.orEmpty()
 
     override fun setNewLastUsedDate() {
-        val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("US/Eastern")
-        }
+        val formatter: SimpleDateFormat =
+            SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("US/Eastern")
+            }
         val date = formatter.format(Date())
         emailDataStore.lastUsedDate = date
     }
@@ -153,9 +157,7 @@ class AppEmailManager(
     private fun consumeAlias(): String? {
         val alias = emailDataStore.nextAlias
         emailDataStore.clearNextAlias()
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            generateNewAlias()
-        }
+        appCoroutineScope.launch(dispatcherProvider.io()) { generateNewAlias() }
         return alias
     }
 
@@ -165,17 +167,16 @@ class AppEmailManager(
 
     private suspend fun fetchAliasFromService() {
         emailDataStore.emailToken?.let { token ->
-            runCatching {
-                emailService.newAlias("Bearer $token")
-            }.onSuccess { alias ->
-                emailDataStore.nextAlias = if (alias.address.isBlank()) {
-                    null
-                } else {
-                    "${alias.address}$DUCK_EMAIL_DOMAIN"
+            runCatching { emailService.newAlias("Bearer $token") }
+                .onSuccess { alias ->
+                    emailDataStore.nextAlias =
+                        if (alias.address.isBlank()) {
+                            null
+                        } else {
+                            "${alias.address}$DUCK_EMAIL_DOMAIN"
+                        }
                 }
-            }.onFailure {
-                Timber.w(it, "Failed to fetch alias")
-            }
+                .onFailure { Timber.w(it, "Failed to fetch alias") }
         }
     }
 

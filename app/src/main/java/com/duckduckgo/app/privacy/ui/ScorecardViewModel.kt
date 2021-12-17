@@ -33,12 +33,14 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 
-class ScorecardViewModel @Inject constructor(
+class ScorecardViewModel
+@Inject
+constructor(
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
@@ -60,16 +62,25 @@ class ScorecardViewModel @Inject constructor(
         val isSiteInTempAllowedList: Boolean = false
     )
 
-    fun scoreCard(tabId: String): StateFlow<ViewState> = flow {
-        tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
-            val domain = site.domain ?: ""
-            val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
-            val isSiteAContentBlockingException = withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
-            emit(updatedState(site, domain, isWhitelisted, isSiteAContentBlockingException))
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    fun scoreCard(tabId: String): StateFlow<ViewState> =
+        flow {
+                tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
+                    val domain = site.domain ?: ""
+                    val isWhitelisted =
+                        withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+                    val isSiteAContentBlockingException =
+                        withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
+                    emit(updatedState(site, domain, isWhitelisted, isSiteAContentBlockingException))
+                }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
-    private fun updatedState(site: Site, domain: String, isWhitelisted: Boolean, isSiteAContentBlockingException: Boolean): ViewState {
+    private fun updatedState(
+        site: Site,
+        domain: String,
+        isWhitelisted: Boolean,
+        isSiteAContentBlockingException: Boolean
+    ): ViewState {
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade
@@ -86,15 +97,14 @@ class ScorecardViewModel @Inject constructor(
             privacyOn = !isWhitelisted && !isSiteAContentBlockingException,
             showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
             showEnhancedGrade = grade != improvedGrade,
-            isSiteInTempAllowedList = isSiteAContentBlockingException
-        )
+            isSiteInTempAllowedList = isSiteAContentBlockingException)
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class ScorecardViewModelFactory @Inject constructor(
-    private val viewModel: Provider<ScorecardViewModel>
-) : ViewModelFactoryPlugin {
+class ScorecardViewModelFactory
+@Inject
+constructor(private val viewModel: Provider<ScorecardViewModel>) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

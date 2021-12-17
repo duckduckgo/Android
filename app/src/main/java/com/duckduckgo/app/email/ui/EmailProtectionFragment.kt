@@ -27,10 +27,10 @@ import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-abstract class EmailProtectionFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId) {
+abstract class EmailProtectionFragment(@LayoutRes contentLayoutId: Int = 0) :
+    Fragment(contentLayoutId) {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -50,5 +50,7 @@ abstract class EmailProtectionFragment(@LayoutRes contentLayoutId: Int = 0) : Fr
     open fun configureViewModelObservers() {}
     open fun configureUi() {}
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 }

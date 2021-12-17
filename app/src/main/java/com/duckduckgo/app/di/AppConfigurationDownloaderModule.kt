@@ -40,7 +40,6 @@ open class AppConfigurationDownloaderModule {
             trackerDataDownloader,
             httpsUpgradeDataDownloader,
             resourceSurrogateDownloader,
-            surveyDownloader
-        )
+            surveyDownloader)
     }
 }

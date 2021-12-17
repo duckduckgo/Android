@@ -19,30 +19,24 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import xyz.hexene.localvpn.Packet
+import dagger.SingleInstanceIn
 import java.nio.ByteBuffer
 import java.util.concurrent.BlockingDeque
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 import kotlin.math.min
+import xyz.hexene.localvpn.Packet
 
 interface VpnQueuesTimeLogger {
-    /**
-     * This method effectively returns the time since last buffer delivered to VPN
-     */
+    /** This method effectively returns the time since last buffer delivered to VPN */
     fun millisSinceLastDeviceToNetworkWrite(): Long
 
-    /**
-     * This method effectively returns the time since last buffer written back to TUN
-     */
+    /** This method effectively returns the time since last buffer written back to TUN */
     fun millisSinceLastNetworkToDeviceWrite(): Long
 
-    /**
-     * This method effectively returns the time since last buffer was processed
-     */
+    /** This method effectively returns the time since last buffer was processed */
     fun millisSinceLastBufferRead(): Long
 }
 
@@ -59,8 +53,7 @@ class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     override fun millisSinceLastDeviceToNetworkWrite(): Long {
         return min(
             (tcpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer(),
-            (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer()
-        )
+            (udpDeviceToNetwork as LoggingLinkedBlockingDeque).millisSinceLastOffer())
     }
 
     override fun millisSinceLastNetworkToDeviceWrite(): Long {

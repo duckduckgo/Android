@@ -35,8 +35,7 @@ import org.mockito.Mockito
 
 class ChangeIconViewModelTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var mockCommandObserver: Observer<ChangeIconViewModel.Command> = mock()
     private var mockSettingsDataStore: SettingsDataStore = mock()
@@ -70,7 +69,9 @@ class ChangeIconViewModelTest {
 
         val viewState = testee.viewState.value!!
         assertTrue(viewState.appIcons.isNotEmpty())
-        assertTrue(viewState.appIcons.find { it.selected }!!.appIcon.componentName == selectedIcon.componentName)
+        assertTrue(
+            viewState.appIcons.find { it.selected }!!.appIcon.componentName ==
+                selectedIcon.componentName)
     }
 
     @Test
@@ -79,7 +80,8 @@ class ChangeIconViewModelTest {
         val selectedIconViewData = ChangeIconViewModel.IconViewData(selectedIcon, true)
         testee.onIconSelected(selectedIconViewData)
 
-        verify(mockCommandObserver).onChanged(Mockito.any(ChangeIconViewModel.Command.ShowConfirmationDialog::class.java))
+        verify(mockCommandObserver)
+            .onChanged(Mockito.any(ChangeIconViewModel.Command.ShowConfirmationDialog::class.java))
     }
 
     @Test
@@ -94,7 +96,7 @@ class ChangeIconViewModelTest {
 
         verify(mockAppIconModifier).changeIcon(previousIcon, selectedIcon)
         verify(mockSettingsDataStore).appIcon = selectedIcon
-        verify(mockCommandObserver).onChanged(Mockito.any(ChangeIconViewModel.Command.IconChanged::class.java))
+        verify(mockCommandObserver)
+            .onChanged(Mockito.any(ChangeIconViewModel.Command.IconChanged::class.java))
     }
-
 }

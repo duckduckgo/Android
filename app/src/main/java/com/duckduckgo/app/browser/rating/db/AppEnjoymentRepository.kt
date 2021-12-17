@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser.rating.db
 
 import com.duckduckgo.app.global.rating.PromptCount
+import java.util.*
+import java.util.concurrent.Executors
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import java.util.concurrent.Executors
 
 interface AppEnjoymentRepository {
 
@@ -36,32 +36,44 @@ interface AppEnjoymentRepository {
     suspend fun dateUserDismissedFirstPrompt(): Date?
 }
 
-class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDao) : AppEnjoymentRepository {
-    private val singleThreadedDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDao) :
+    AppEnjoymentRepository {
+    private val singleThreadedDispatcher =
+        Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    override suspend fun onUserSelectedToRateApp(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_PROVIDED_RATING, promptCount))
-    }
+    override suspend fun onUserSelectedToRateApp(promptCount: PromptCount) =
+        withContext(singleThreadedDispatcher) {
+            appEnjoymentDao.insertEvent(
+                AppEnjoymentEntity(AppEnjoymentEventType.USER_PROVIDED_RATING, promptCount))
+        }
 
-    override suspend fun onUserDeclinedToRateApp(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_RATING, promptCount))
-    }
+    override suspend fun onUserDeclinedToRateApp(promptCount: PromptCount) =
+        withContext(singleThreadedDispatcher) {
+            appEnjoymentDao.insertEvent(
+                AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_RATING, promptCount))
+        }
 
-    override suspend fun onUserSelectedToGiveFeedback(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_PROVIDED_FEEDBACK, promptCount))
-    }
+    override suspend fun onUserSelectedToGiveFeedback(promptCount: PromptCount) =
+        withContext(singleThreadedDispatcher) {
+            appEnjoymentDao.insertEvent(
+                AppEnjoymentEntity(AppEnjoymentEventType.USER_PROVIDED_FEEDBACK, promptCount))
+        }
 
-    override suspend fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_FEEDBACK, promptCount))
-    }
+    override suspend fun onUserDeclinedToGiveFeedback(promptCount: PromptCount) =
+        withContext(singleThreadedDispatcher) {
+            appEnjoymentDao.insertEvent(
+                AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_FEEDBACK, promptCount))
+        }
 
-    override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) = withContext(singleThreadedDispatcher) {
-        appEnjoymentDao.insertEvent(AppEnjoymentEntity(AppEnjoymentEventType.USER_DECLINED_TO_SAY_WHETHER_ENJOYING, promptCount))
-    }
+    override suspend fun onUserDeclinedToSayIfEnjoyingApp(promptCount: PromptCount) =
+        withContext(singleThreadedDispatcher) {
+            appEnjoymentDao.insertEvent(
+                AppEnjoymentEntity(
+                    AppEnjoymentEventType.USER_DECLINED_TO_SAY_WHETHER_ENJOYING, promptCount))
+        }
 
     override suspend fun canUserBeShownFirstPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
-
             if (appEnjoymentDao.hasUserProvidedRating()) {
                 Timber.d("User has given a rating previously")
                 return@withContext false
@@ -75,7 +87,8 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
             val promptCount = PromptCount.first().value
 
             if (appEnjoymentDao.hasUserDeclinedRating(promptCount)) {
-                Timber.d("User has declined to give rating previously for prompt number $promptCount")
+                Timber.d(
+                    "User has declined to give rating previously for prompt number $promptCount")
                 return@withContext false
             }
 
@@ -85,7 +98,8 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
             }
 
             if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(promptCount)) {
-                Timber.d("User has declined to say whether enjoying or not for prompt number $promptCount")
+                Timber.d(
+                    "User has declined to say whether enjoying or not for prompt number $promptCount")
                 return@withContext false
             }
 
@@ -96,7 +110,6 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
 
     override suspend fun canUserBeShownSecondPrompt(): Boolean {
         return withContext(singleThreadedDispatcher) {
-
             if (appEnjoymentDao.hasUserProvidedRating()) {
                 Timber.d("User has given a rating previously")
                 return@withContext false
@@ -120,11 +133,13 @@ class AppEnjoymentDatabaseRepository(private val appEnjoymentDao: AppEnjoymentDa
             }
 
             if (appEnjoymentDao.hasUserDeclinedToSayWhetherEnjoying(secondPrompt)) {
-                Timber.d("User has already declined to say whether enjoying the app or not previously")
+                Timber.d(
+                    "User has already declined to say whether enjoying the app or not previously")
                 return@withContext false
             }
 
-            Timber.d("User has not recently provided a rating or feedback; they can be shown another prompt")
+            Timber.d(
+                "User has not recently provided a rating or feedback; they can be shown another prompt")
             return@withContext true
         }
     }

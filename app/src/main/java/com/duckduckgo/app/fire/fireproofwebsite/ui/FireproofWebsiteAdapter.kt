@@ -60,7 +60,8 @@ class FireproofWebsiteAdapter(
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
+    private val sortedHeaderElements =
+        listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -76,7 +77,8 @@ class FireproofWebsiteAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
-                val binding = ViewFireproofWebsiteDescriptionBinding.inflate(inflater, parent, false)
+                val binding =
+                    ViewFireproofWebsiteDescriptionBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofInfoViewHolder(binding, variantManager)
             }
             TOGGLE_TYPE -> {
@@ -84,12 +86,9 @@ class FireproofWebsiteAdapter(
                 FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(
                     binding,
                     CompoundButton.OnCheckedChangeListener { _, isChecked ->
-                        viewModel.onUserToggleLoginDetection(
-                            isChecked
-                        )
+                        viewModel.onUserToggleLoginDetection(isChecked)
                     },
-                    variantManager
-                )
+                    variantManager)
             }
             DIVIDER_TYPE -> {
                 val binding = ViewListItemDividerBinding.inflate(inflater, parent, false)
@@ -97,18 +96,14 @@ class FireproofWebsiteAdapter(
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewFireproofTitleBinding.inflate(inflater, parent, false)
-                binding.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                binding.fireproofWebsiteSectionTitle.setText(
+                    R.string.fireproofWebsiteItemsSectionTitle)
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             FIREPROOF_WEBSITE_TYPE -> {
                 val binding = ViewListSingleItemEntryBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(
-                    inflater,
-                    binding,
-                    viewModel,
-                    lifecycleOwner,
-                    faviconManager
-                )
+                    inflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewFireproofWebsiteEmptyHintBinding.inflate(inflater, parent, false)
@@ -131,13 +126,8 @@ class FireproofWebsiteAdapter(
             is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
                 holder.bind(loginDetectionEnabled)
             }
-            is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(
-                fireproofWebsites[
-                    getWebsiteItemPosition(
-                        position
-                    )
-                ]
-            )
+            is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder ->
+                holder.bind(fireproofWebsites[getWebsiteItemPosition(position)])
             is FireproofWebSiteViewHolder.FireproofInfoViewHolder -> holder.bind()
         }
     }
@@ -146,11 +136,12 @@ class FireproofWebsiteAdapter(
         return getItemsSize() + itemsOnTopOfList()
     }
 
-    private fun getItemsSize() = if (fireproofWebsites.isEmpty()) {
-        EMPTY_HINT_ITEM_SIZE
-    } else {
-        fireproofWebsites.size
-    }
+    private fun getItemsSize() =
+        if (fireproofWebsites.isEmpty()) {
+            EMPTY_HINT_ITEM_SIZE
+        } else {
+            fireproofWebsites.size
+        }
 
     private fun itemsOnTopOfList() = sortedHeaderElements.size
 
@@ -171,12 +162,12 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         private val binding: ViewFireproofWebsiteToggleBinding,
         private val listener: CompoundButton.OnCheckedChangeListener,
         private val variantManager: VariantManager
-    ) :
-        FireproofWebSiteViewHolder(binding.root) {
+    ) : FireproofWebSiteViewHolder(binding.root) {
         fun bind(loginDetectionEnabled: Boolean) {
 
             if (variantManager.isFireproofExperimentEnabled()) {
-                binding.fireproofWebsiteToggle.text = binding.root.context.getString(R.string.daxFireproofSettingsToggle)
+                binding.fireproofWebsiteToggle.text =
+                    binding.root.context.getString(R.string.daxFireproofSettingsToggle)
             }
 
             binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
@@ -189,12 +180,14 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
     ) : FireproofWebSiteViewHolder(binding.root) {
         fun bind() {
             if (variantManager.isFireproofExperimentEnabled()) {
-                binding.fireproofWebsiteDescription.text = binding.root.context.getString(R.string.daxFireproofSettingsInfo)
+                binding.fireproofWebsiteDescription.text =
+                    binding.root.context.getString(R.string.daxFireproofSettingsInfo)
             }
         }
     }
 
-    class FireproofWebsiteSimpleViewViewHolder(binding: ViewBinding) : FireproofWebSiteViewHolder(binding.root)
+    class FireproofWebsiteSimpleViewViewHolder(binding: ViewBinding) :
+        FireproofWebSiteViewHolder(binding.root)
 
     class FireproofWebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
@@ -211,21 +204,19 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             val listItem = binding.root
             this.entity = entity
 
-            listItem.contentDescription = context.getString(
-                R.string.fireproofWebsiteOverflowContentDescription,
-                entity.website()
-            )
+            listItem.contentDescription =
+                context.getString(
+                    R.string.fireproofWebsiteOverflowContentDescription, entity.website())
 
             listItem.setTitle(entity.website())
             loadFavicon(entity.domain)
-            listItem.setOverflowClickListener { anchor ->
-                showOverFlowMenu(anchor, entity)
-            }
+            listItem.setOverflowClickListener { anchor -> showOverFlowMenu(anchor, entity) }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
@@ -236,7 +227,6 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             }
             popupMenu.show(binding.root, anchor)
-
         }
 
         private fun deleteEntity(entity: FireproofWebsiteEntity) {

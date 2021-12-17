@@ -29,10 +29,10 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.quietlySetValue
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
+import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import java.text.NumberFormat
 
 class AccessibilityActivity : DuckDuckGoActivity() {
 
@@ -42,17 +42,18 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val systemFontSizeChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onSystemFontSizeChanged(isChecked)
-    }
+    private val systemFontSizeChangeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onSystemFontSizeChanged(isChecked)
+        }
 
-    private val forceZoomChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.onForceZoomChanged(isChecked)
-    }
+    private val forceZoomChangeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onForceZoomChanged(isChecked)
+        }
 
-    private val fontSizeChangeListener = Slider.OnChangeListener { _, newValue, _ ->
-        viewModel.onFontSizeChanged(newValue)
-    }
+    private val fontSizeChangeListener =
+        Slider.OnChangeListener { _, newValue, _ -> viewModel.onFontSizeChanged(newValue) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,14 +68,18 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState()
+        viewModel
+            .viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 Timber.i("AccessibilityActSettings: newViewState $viewState")
                 renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
-                binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
-                binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
-            }.launchIn(lifecycleScope)
+                binding.appFontSizeToggle.quietlySetIsChecked(
+                    viewState.overrideSystemFontSize, systemFontSizeChangeListener)
+                binding.forceZoomToggle.quietlySetIsChecked(
+                    viewState.forceZoom, forceZoomChangeListener)
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun renderFontSize(fontSize: Float, overrideSystemFontSize: Boolean) {

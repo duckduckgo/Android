@@ -31,11 +31,11 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
-    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
-        EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
-        SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
-        BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
-    )
+    private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> =
+        mapOf(
+            EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
+            SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
+            BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory())
 
     private var phrase = ""
     private var suggestions: List<AutoCompleteSuggestion> = emptyList()
@@ -55,12 +55,13 @@ class BrowserAutoCompleteSuggestionsAdapter(
         if (holder is EmptySuggestionViewHolder) {
             // nothing required
         } else {
-            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
-                holder,
-                suggestions[position],
-                immediateSearchClickListener,
-                editableSearchClickListener
-            )
+            viewHolderFactoryMap
+                .getValue(getItemViewType(position))
+                .onBindViewHolder(
+                    holder,
+                    suggestions[position],
+                    immediateSearchClickListener,
+                    editableSearchClickListener)
         }
     }
 

@@ -28,14 +28,14 @@ import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistMana
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Provider
 
 class AppTPWaitlistViewModel(
     private val waitlistManager: TrackingProtectionWaitlistManager,
@@ -49,7 +49,8 @@ class AppTPWaitlistViewModel(
         MutableStateFlow(ViewState(waitlistManager.waitlistState()))
     val viewState: StateFlow<ViewState> = viewStateFlow
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val commandChannel =
+        Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
@@ -63,32 +64,26 @@ class AppTPWaitlistViewModel(
     data class ViewState(val waitlist: WaitlistState)
 
     fun getStarted() {
-        viewModelScope.launch {
-            commandChannel.send(Command.ShowOnboarding)
-        }
+        viewModelScope.launch { commandChannel.send(Command.ShowOnboarding) }
     }
 
     fun haveAnInviteCode() {
-        viewModelScope.launch {
-            commandChannel.send(Command.EnterInviteCode)
-        }
+        viewModelScope.launch { commandChannel.send(Command.EnterInviteCode) }
     }
 
     fun joinTheWaitlist() {
         viewModelScope.launch {
-            runCatching {
-                waitlistService.joinWaitlist()
-            }.onSuccess {
-                val timestamp = it.timestamp
-                val token = it.token
-                if (timestamp != null && !token.isNullOrBlank()) {
-                    joinedWaitlist(timestamp, token)
-                } else {
-                    commandChannel.send(Command.ShowErrorMessage)
+            runCatching { waitlistService.joinWaitlist() }
+                .onSuccess {
+                    val timestamp = it.timestamp
+                    val token = it.token
+                    if (timestamp != null && !token.isNullOrBlank()) {
+                        joinedWaitlist(timestamp, token)
+                    } else {
+                        commandChannel.send(Command.ShowErrorMessage)
+                    }
                 }
-            }.onFailure {
-                commandChannel.send(Command.ShowErrorMessage)
-            }
+                .onFailure { commandChannel.send(Command.ShowErrorMessage) }
         }
     }
 
@@ -102,16 +97,12 @@ class AppTPWaitlistViewModel(
     }
 
     fun learnMore() {
-        viewModelScope.launch {
-            commandChannel.send(Command.LaunchBetaInstructions)
-        }
+        viewModelScope.launch { commandChannel.send(Command.LaunchBetaInstructions) }
     }
 
     fun onNotifyMeClicked() {
         deviceShieldPixels.didPressWaitlistDialogNotifyMe()
-        viewModelScope.launch {
-            waitlistManager.notifyOnJoinedWaitlist()
-        }
+        viewModelScope.launch { waitlistManager.notifyOnJoinedWaitlist() }
     }
 
     fun onNoThanksClicked() {
@@ -119,22 +110,20 @@ class AppTPWaitlistViewModel(
     }
 
     fun onDialogDismissed() {
-        viewModelScope.launch {
-            viewStateFlow.emit(ViewState(waitlistManager.waitlistState()))
-        }
+        viewModelScope.launch { viewStateFlow.emit(ViewState(waitlistManager.waitlistState())) }
     }
 
     fun onCodeRedeemed(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
-            viewModelScope.launch {
-                viewStateFlow.emit(ViewState(WaitlistState.CodeRedeemed))
-            }
+            viewModelScope.launch { viewStateFlow.emit(ViewState(WaitlistState.CodeRedeemed)) }
         }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppTPWaitlistViewModelFactory @Inject constructor(
+class AppTPWaitlistViewModelFactory
+@Inject
+constructor(
     private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
     private val waitlistService: Provider<AppTrackingProtectionWaitlistService>,
     private val workManager: Provider<WorkManager>,
@@ -144,15 +133,15 @@ class AppTPWaitlistViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AppTPWaitlistViewModel::class.java) -> (
-                    AppTPWaitlistViewModel(
+                isAssignableFrom(AppTPWaitlistViewModel::class.java) ->
+                    (AppTPWaitlistViewModel(
                         waitlistManager.get(),
                         waitlistService.get(),
                         workManager.get(),
                         workRequestBuilder.get(),
                         deviceShieldPixels.get(),
-                    ) as T
-                    )
+                    ) as
+                        T)
                 else -> null
             }
         }

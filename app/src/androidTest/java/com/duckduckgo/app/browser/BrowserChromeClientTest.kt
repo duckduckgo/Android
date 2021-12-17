@@ -102,7 +102,8 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.goFullScreen(any())).thenThrow(exception)
         testee.onShowCustomView(fakeView, null)
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_CUSTOM_VIEW)
+        verify(mockUncaughtExceptionRepository)
+            .recordUncaughtException(exception, UncaughtExceptionSource.SHOW_CUSTOM_VIEW)
     }
 
     @Test
@@ -116,7 +117,8 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.exitFullScreen()).thenThrow(exception)
         testee.onHideCustomView()
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.HIDE_CUSTOM_VIEW)
+        verify(mockUncaughtExceptionRepository)
+            .recordUncaughtException(exception, UncaughtExceptionSource.HIDE_CUSTOM_VIEW)
     }
 
     @UiThreadTest
@@ -139,7 +141,8 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
         testee.onProgressChanged(webView, 10)
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.ON_PROGRESS_CHANGED)
+        verify(mockUncaughtExceptionRepository)
+            .recordUncaughtException(exception, UncaughtExceptionSource.ON_PROGRESS_CHANGED)
     }
 
     @UiThreadTest
@@ -176,13 +179,15 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.titleReceived(anyString())).thenThrow(exception)
         testee.onReceivedTitle(webView, "")
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.RECEIVED_PAGE_TITLE)
+        verify(mockUncaughtExceptionRepository)
+            .recordUncaughtException(exception, UncaughtExceptionSource.RECEIVED_PAGE_TITLE)
     }
 
     @Test
     fun whenOnShowFileChooserCalledThenShowFileChooser() {
         assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
-        verify(mockWebViewClientListener).showFileChooser(mockFilePathCallback, mockFileChooserParams)
+        verify(mockWebViewClientListener)
+            .showFileChooser(mockFilePathCallback, mockFileChooserParams)
     }
 
     @Test
@@ -190,7 +195,8 @@ class BrowserChromeClientTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.showFileChooser(any(), any())).thenThrow(exception)
         assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
+        verify(mockUncaughtExceptionRepository)
+            .recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
         verify(mockFilePathCallback).onReceiveValue(null)
     }
 
@@ -220,10 +226,11 @@ class BrowserChromeClientTest {
         verify(mockPermission, never()).grant(any())
     }
 
-    private val mockMsg = Message().apply {
-        target = mock()
-        obj = mock<WebView.WebViewTransport>()
-    }
+    private val mockMsg =
+        Message().apply {
+            target = mock()
+            obj = mock<WebView.WebViewTransport>()
+        }
 
     private class TestWebView(context: Context) : WebView(context) {
         override fun getUrl(): String {

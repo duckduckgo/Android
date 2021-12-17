@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface InitialFeedbackFragmentComponent : AndroidInjector<InitialFeedbackFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<InitialFeedbackFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<InitialFeedbackFragment>
 }
 
 @ContributesTo(AppScope::class)

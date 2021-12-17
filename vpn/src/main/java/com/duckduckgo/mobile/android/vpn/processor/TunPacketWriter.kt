@@ -18,13 +18,16 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 
-class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
+class TunPacketWriter(
+    private val tunInterface: ParcelFileDescriptor,
+    private val queues: VpnQueues
+) : Runnable {
 
     private var running = false
 
@@ -33,7 +36,8 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
 
         running = true
 
-        // writing back data to the TUN; this means packet from the network flowing back to apps on the device
+        // writing back data to the TUN; this means packet from the network flowing back to apps on
+        // the device
         val vpnOutput = FileOutputStream(tunInterface.fileDescriptor).channel
 
         vpnOutput.use { vpnOutput ->

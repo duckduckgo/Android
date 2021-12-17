@@ -39,7 +39,9 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : ListAdapter<BookmarksAdapter.BookmarksItemTypes, BookmarkScreenViewHolders>(BookmarksDiffCallback()) {
+) :
+    ListAdapter<BookmarksAdapter.BookmarksItemTypes, BookmarkScreenViewHolders>(
+        BookmarksDiffCallback()) {
 
     companion object {
         const val EMPTY_STATE_TYPE = 0
@@ -55,7 +57,10 @@ class BookmarksAdapter(
         submitList(generatedList)
     }
 
-    private fun generateNewList(value: List<BookmarksItemTypes>, showEmptyHint: Boolean): List<BookmarksItemTypes> {
+    private fun generateNewList(
+        value: List<BookmarksItemTypes>,
+        showEmptyHint: Boolean
+    ): List<BookmarksItemTypes> {
         if (!showEmptyHint) {
             return value
         }
@@ -67,7 +72,8 @@ class BookmarksAdapter(
         return when (viewType) {
             BOOKMARK_TYPE -> {
                 val binding = ViewSavedSiteEntryBinding.inflate(inflater, parent, false)
-                return BookmarkScreenViewHolders.BookmarksViewHolder(layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
+                return BookmarkScreenViewHolders.BookmarksViewHolder(
+                    layoutInflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
@@ -98,7 +104,8 @@ class BookmarksAdapter(
 
 sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : BookmarkScreenViewHolders(binding.root) {
+    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) :
+        BookmarkScreenViewHolders(binding.root) {
         fun bind() {
             binding.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
         }
@@ -118,27 +125,20 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             val twoListItem = binding.root
 
             twoListItem.setContentDescription(
-                context.getString(
-                    R.string.bookmarkOverflowContentDescription,
-                    bookmark.title
-                )
-            )
+                context.getString(R.string.bookmarkOverflowContentDescription, bookmark.title))
             twoListItem.setTitle(bookmark.title)
             twoListItem.setSubtitle(parseDisplayUrl(bookmark.url))
             loadFavicon(bookmark.url)
 
-            twoListItem.setOverflowClickListener { anchor ->
-                showOverFlowMenu(anchor, bookmark)
-            }
+            twoListItem.setOverflowClickListener { anchor -> showOverFlowMenu(anchor, bookmark) }
 
-            twoListItem.setClickListener {
-                viewModel.onSelected(bookmark)
-            }
+            twoListItem.setClickListener { viewModel.onSelected(bookmark) }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = itemView.findViewById(R.id.image))
             }
         }
 

@@ -21,8 +21,8 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Process
 import androidx.annotation.RequiresApi
-import timber.log.Timber
 import java.net.InetSocketAddress
+import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class DetectOriginatingAppPackageModern(
@@ -31,16 +31,22 @@ class DetectOriginatingAppPackageModern(
 ) : OriginatingAppPackageIdentifier {
 
     override fun resolvePackageId(connectionInfo: ConnectionInfo): String {
-        val destination = InetSocketAddress(connectionInfo.destinationAddress, connectionInfo.destinationPort)
+        val destination =
+            InetSocketAddress(connectionInfo.destinationAddress, connectionInfo.destinationPort)
         val source = InetSocketAddress(connectionInfo.sourceAddress, connectionInfo.sourcePort)
         val connectionOwnerUid: Int = getConnectionOwnerUid(connectionInfo, source, destination)
         return getPackageIdForUid(connectionOwnerUid)
     }
 
-    private fun getConnectionOwnerUid(connectionInfo: ConnectionInfo, source: InetSocketAddress, destination: InetSocketAddress): Int {
+    private fun getConnectionOwnerUid(
+        connectionInfo: ConnectionInfo,
+        source: InetSocketAddress,
+        destination: InetSocketAddress
+    ): Int {
         return try {
-            connectivityManager.getConnectionOwnerUid(connectionInfo.protocolNumber, source, destination)
-        } catch (t:Throwable) {
+            connectivityManager.getConnectionOwnerUid(
+                connectionInfo.protocolNumber, source, destination)
+        } catch (t: Throwable) {
             Timber.e(t, "Error getting connection owner UID")
             Process.INVALID_UID
         }
@@ -54,10 +60,9 @@ class DetectOriginatingAppPackageModern(
         }
 
         if (packages.size > 1) {
-            val sb = StringBuilder(String.format("Found %d packages for uid:%d", packages.size, uid))
-            packages.forEach {
-                sb.append(String.format("\npackage: %s", it))
-            }
+            val sb =
+                StringBuilder(String.format("Found %d packages for uid:%d", packages.size, uid))
+            packages.forEach { sb.append(String.format("\npackage: %s", it)) }
             Timber.d(sb.toString())
         }
 

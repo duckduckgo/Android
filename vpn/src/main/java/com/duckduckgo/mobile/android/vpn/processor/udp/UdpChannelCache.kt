@@ -24,12 +24,18 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @SingleInstanceIn(VpnScope::class)
-class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
-    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: UdpPacketProcessor.ChannelDetails?, newValue: UdpPacketProcessor.ChannelDetails?) {
+class UdpChannelCache @Inject constructor() :
+    LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
+    override fun entryRemoved(
+        evicted: Boolean,
+        key: String?,
+        oldValue: UdpPacketProcessor.ChannelDetails?,
+        newValue: UdpPacketProcessor.ChannelDetails?
+    ) {
         Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
         if (evicted) {
             oldValue?.datagramChannel?.close()
@@ -48,5 +54,7 @@ class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcesso
 abstract class UdpChannelCacheModule {
     @Binds
     @IntoSet
-    abstract fun bindUdpChannelCacheMemoryCollector(udpChannelCache: UdpChannelCache): VpnMemoryCollectorPlugin
+    abstract fun bindUdpChannelCacheMemoryCollector(
+        udpChannelCache: UdpChannelCache
+    ): VpnMemoryCollectorPlugin
 }

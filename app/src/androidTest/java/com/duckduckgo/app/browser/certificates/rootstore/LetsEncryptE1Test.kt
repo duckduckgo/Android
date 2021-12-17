@@ -23,7 +23,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class LetsEncryptE1Test {
-    private val expectedCertificate = """
+    private val expectedCertificate =
+        """
         -----BEGIN CERTIFICATE-----
         MIICxjCCAk2gAwIBAgIRALO93/inhFu86QOgQTWzSkUwCgYIKoZIzj0EAwMwTzEL
         MAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2VhcmNo
@@ -41,9 +42,12 @@ class LetsEncryptE1Test {
         Dbo/AwCd89eYhNlXLr3pD5xcSAQh8suzYHKOl9YST8pE9kLJ03uGqQIwWrGxtO3q
         YJkgsTgDyj2gJrjubi1K9sZmHzOa25JK1fUpE8ZwYii6I4zPPS/Lgul/
         -----END CERTIFICATE-----
-    """.trimIndent().parsePemCertificate()
+    """
+            .trimIndent()
+            .parsePemCertificate()
 
-    private val certificatePlugin = LetsEncryptE1(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
+    private val certificatePlugin =
+        LetsEncryptE1(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
 
     @Test
     fun whenGetTypeThenReturnIntermediate() {

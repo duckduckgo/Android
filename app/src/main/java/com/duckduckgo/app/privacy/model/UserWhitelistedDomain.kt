@@ -20,6 +20,4 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "user_whitelist")
-data class UserWhitelistedDomain(
-    @PrimaryKey val domain: String
-)
+data class UserWhitelistedDomain(@PrimaryKey val domain: String)

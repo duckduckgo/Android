@@ -23,9 +23,9 @@ import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Single
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
 
@@ -37,21 +37,23 @@ class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
             .build()
     }
 
-    private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    private fun networkAvailable() =
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     companion object {
         const val APP_CONFIG_SYNC_WORK_TAG = "AppConfigurationWorker"
     }
 }
 
-class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
+    RxWorker(context, workerParams) {
 
-    @Inject
-    lateinit var appConfigurationDownloader: ConfigurationDownloader
+    @Inject lateinit var appConfigurationDownloader: ConfigurationDownloader
 
     override fun createWork(): Single<Result> {
         Timber.i("Running app config sync")
-        return appConfigurationDownloader.downloadTask()
+        return appConfigurationDownloader
+            .downloadTask()
             .toSingle {
                 Timber.i("App configuration sync was successful")
                 Result.success()
@@ -64,9 +66,9 @@ class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val configurationDownloader: ConfigurationDownloader
-) : WorkerInjectorPlugin {
+class AppConfigurationWorkerInjectorPlugin
+@Inject
+constructor(private val configurationDownloader: ConfigurationDownloader) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is AppConfigurationWorker) {

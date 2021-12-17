@@ -26,11 +26,13 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 
 abstract class OnboardingPageFragment : Fragment() {
 
-    @LayoutRes
-    abstract fun layoutResource(): Int
+    @LayoutRes abstract fun layoutResource(): Int
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(layoutResource(), container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? = inflater.inflate(layoutResource(), container, false)
 
     fun onContinuePressed() {
         when (activity) {

@@ -29,19 +29,19 @@ import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to trigger appTP notifications, to do so, in the command line:
  *
  * $ adb shell am broadcast -a notify --es <weekly/daily> <N>
  *
- * where `--es weekly <N>` will trigger the N'th variant of the weekly notification
- * where `--es daily <N>` will trigger the N'th variant of the daily notification
+ * where `--es weekly <N>` will trigger the N'th variant of the weekly notification where `--es
+ * daily <N>` will trigger the N'th variant of the daily notification
  */
 class DeviceShieldNotificationsDebugReceiver(
     context: Context,
@@ -59,7 +59,9 @@ class DeviceShieldNotificationsDebugReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
+class DeviceShieldNotificationsDebugReceiverRegister
+@Inject
+constructor(
     private val context: Context,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
     private val notificationManagerCompat: NotificationManagerCompat,
@@ -83,32 +85,33 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
             val daily = kotlin.runCatching { intent.getStringExtra("daily")?.toInt() }.getOrNull()
 
             vpnCoroutineScope.launch(Dispatchers.IO) {
-                val notification = if (weekly != null) {
-                    Timber.v("Debug - Sending weekly notification $weekly")
-                    weeklyNotificationPressedHandler.notificationVariant = weekly
-                    val deviceShieldNotification =
-                        deviceShieldNotificationFactory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(weekly)
+                val notification =
+                    if (weekly != null) {
+                        Timber.v("Debug - Sending weekly notification $weekly")
+                        weeklyNotificationPressedHandler.notificationVariant = weekly
+                        val deviceShieldNotification =
+                            deviceShieldNotificationFactory.weeklyNotificationFactory
+                                .createWeeklyDeviceShieldNotification(weekly)
 
-                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
-                        context,
-                        deviceShieldNotification,
-                        weeklyNotificationPressedHandler
-                    )
-                } else if (daily != null) {
-                    Timber.v("Debug - Sending daily notification $daily")
-                    dailyNotificationPressedHandler.notificationVariant = daily
-                    val deviceShieldNotification = deviceShieldNotificationFactory.dailyNotificationFactory.createDailyDeviceShieldNotification(daily)
+                        deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                            context, deviceShieldNotification, weeklyNotificationPressedHandler)
+                    } else if (daily != null) {
+                        Timber.v("Debug - Sending daily notification $daily")
+                        dailyNotificationPressedHandler.notificationVariant = daily
+                        val deviceShieldNotification =
+                            deviceShieldNotificationFactory.dailyNotificationFactory
+                                .createDailyDeviceShieldNotification(daily)
 
-                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
-                        context, deviceShieldNotification, dailyNotificationPressedHandler
-                    )
-                } else {
-                    Timber.v("Debug - invalid notification type")
-                    null
-                }
+                        deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                            context, deviceShieldNotification, dailyNotificationPressedHandler)
+                    } else {
+                        Timber.v("Debug - invalid notification type")
+                        null
+                    }
 
                 notification?.let {
-                    notificationManagerCompat.notify(DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
+                    notificationManagerCompat.notify(
+                        DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
                 }
             }
         }

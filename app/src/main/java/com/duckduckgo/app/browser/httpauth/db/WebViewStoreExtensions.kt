@@ -27,5 +27,4 @@ fun WebView.clearFormDataCompat() {
         val webViewDatabase = WebViewDatabase.getInstance(this.context)
         webViewDatabase.clearFormData()
     }
-
 }

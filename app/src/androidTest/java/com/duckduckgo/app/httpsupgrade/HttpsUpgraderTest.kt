@@ -44,14 +44,22 @@ class HttpsUpgraderTest {
     @Before
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName())).thenReturn(true)
-        testee = HttpsUpgraderImpl(mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()))
+            .thenReturn(true)
+        testee =
+            HttpsUpgraderImpl(
+                mockHttpsBloomFilterFactory,
+                mockBloomFalsePositiveListDao,
+                mockUserAllowlistDao,
+                mockFeatureToggle,
+                mockHttps)
         testee.reloadData()
     }
 
     @Test
     fun whenFeatureIsDisableTheShouldNotUpgrade() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()))
+            .thenReturn(false)
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
     }

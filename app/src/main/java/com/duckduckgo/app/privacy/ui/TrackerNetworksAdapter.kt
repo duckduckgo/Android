@@ -25,13 +25,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkElementBinding
 import com.duckduckgo.app.browser.databinding.ItemTrackerNetworkHeaderBinding
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.Theming
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,13 +47,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     data class Header(val networkName: String, val networkDisplayName: String) : ViewData
     data class Row(val tracker: TrackingEvent) : ViewData
 
-    class HeaderViewHolder(
-        val binding: ItemTrackerNetworkHeaderBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    class HeaderViewHolder(val binding: ItemTrackerNetworkHeaderBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
-    class RowViewHolder(
-        val binding: ItemTrackerNetworkElementBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    class RowViewHolder(val binding: ItemTrackerNetworkElementBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()
@@ -84,7 +82,8 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
         holder.binding.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
         viewElement.tracker.categories?.let { categories ->
-            holder.binding.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
+            holder.binding.category.text =
+                DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
         }
     }
 
@@ -93,20 +92,17 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             val context = binding.root.context
             val iconResource = networkRenderer.networkLogoIcon(context, viewElement.networkName)
             if (iconResource != null) {
-                val drawable = Theming.getThemedDrawable(
-                    context,
-                    iconResource,
-                    DuckDuckGoTheme.LIGHT
-                )
+                val drawable =
+                    Theming.getThemedDrawable(context, iconResource, DuckDuckGoTheme.LIGHT)
                 binding.icon.setImageDrawable(drawable)
                 binding.icon.show()
                 binding.unknownIcon.gone()
             } else {
-                val drawable = Theming.getThemedDrawable(
-                    context,
-                    R.drawable.other_tracker_privacy_dashboard_bg,
-                    DuckDuckGoTheme.LIGHT
-                )
+                val drawable =
+                    Theming.getThemedDrawable(
+                        context,
+                        R.drawable.other_tracker_privacy_dashboard_bg,
+                        DuckDuckGoTheme.LIGHT)
                 binding.unknownIcon.text = viewElement.networkDisplayName.take(1)
                 binding.unknownIcon.background = drawable
                 binding.unknownIcon.show()
@@ -143,7 +139,8 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return viewData
     }
 
-    class DiffCallback(private val old: List<ViewData>, private val new: List<ViewData>) : DiffUtil.Callback() {
+    class DiffCallback(private val old: List<ViewData>, private val new: List<ViewData>) :
+        DiffUtil.Callback() {
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return old[oldItemPosition] == new[newItemPosition]

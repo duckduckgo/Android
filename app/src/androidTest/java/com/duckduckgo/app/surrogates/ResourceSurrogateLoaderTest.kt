@@ -35,7 +35,8 @@ class ResourceSurrogateLoaderTest {
     @Before
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
-        dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
+        dataStore =
+            ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
         testee = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
     }
 
@@ -104,7 +105,8 @@ class ResourceSurrogateLoaderTest {
 
     @Test
     fun whenSurrogateFileIsHasSpaceInFinalFunctionBlock() {
-        val surrogates = initialiseFile("surrogates_valid_but_unexpected_extra_space_in_function_close")
+        val surrogates =
+            initialiseFile("surrogates_valid_but_unexpected_extra_space_in_function_close")
         assertEquals(6, surrogates.size)
     }
 
@@ -126,5 +128,4 @@ class ResourceSurrogateLoaderTest {
     private fun readFile(filename: String): ByteArray {
         return javaClass.classLoader!!.getResource("binary/surrogates/$filename").readBytes()
     }
-
 }

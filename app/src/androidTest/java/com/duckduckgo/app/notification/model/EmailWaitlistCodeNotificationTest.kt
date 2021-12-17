@@ -33,8 +33,7 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class EmailWaitlistCodeNotificationTest {
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    @get:Rule val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockNotificationsDao: NotificationDao = mock()
@@ -48,23 +47,26 @@ class EmailWaitlistCodeNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenAndSendNotificationIsTrueThenReturnTrue() = coroutineTestRule.runBlocking {
-        whenever(mockNotificationsDao.exists(any())).thenReturn(false)
-        whenever(mockEmailDataStore.sendNotification).thenReturn(true)
-        assertTrue(testee.canShow())
-    }
+    fun whenNotificationNotSeenAndSendNotificationIsTrueThenReturnTrue() =
+        coroutineTestRule.runBlocking {
+            whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+            whenever(mockEmailDataStore.sendNotification).thenReturn(true)
+            assertTrue(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationNotSeenAndSendNotificationIsFalseThenReturnFalse() = coroutineTestRule.runBlocking {
-        whenever(mockNotificationsDao.exists(any())).thenReturn(false)
-        whenever(mockEmailDataStore.sendNotification).thenReturn(false)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationNotSeenAndSendNotificationIsFalseThenReturnFalse() =
+        coroutineTestRule.runBlocking {
+            whenever(mockNotificationsDao.exists(any())).thenReturn(false)
+            whenever(mockEmailDataStore.sendNotification).thenReturn(false)
+            assertFalse(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationSeenThenReturnFalse() = coroutineTestRule.runBlocking {
-        whenever(mockNotificationsDao.exists(any())).thenReturn(true)
-        whenever(mockEmailDataStore.sendNotification).thenReturn(true)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationSeenThenReturnFalse() =
+        coroutineTestRule.runBlocking {
+            whenever(mockNotificationsDao.exists(any())).thenReturn(true)
+            whenever(mockEmailDataStore.sendNotification).thenReturn(true)
+            assertFalse(testee.canShow())
+        }
 }

@@ -17,9 +17,9 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
+import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -46,6 +46,8 @@ import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -57,8 +59,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
 
 class SettingsViewModel(
     private val appContext: Context,
@@ -84,7 +84,8 @@ class SettingsViewModel(
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
+        val automaticallyClearData: AutomaticallyClearData =
+            AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
@@ -133,41 +134,55 @@ class SettingsViewModel(
         val savedTheme = themingDataStore.theme
         val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
-        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
+        val automaticallyClearWhenEnabled =
+            isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    loading = false,
-                    theme = savedTheme,
-                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                    isAppDefaultBrowser = defaultBrowserAlready,
-                    showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                    version = obtainVersion(variant.key),
-                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-                    appIcon = settingsDataStore.appIcon,
-                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
-                )
-            )
+                currentViewState()
+                    .copy(
+                        loading = false,
+                        theme = savedTheme,
+                        autoCompleteSuggestionsEnabled =
+                            settingsDataStore.autoCompleteSuggestionsEnabled,
+                        isAppDefaultBrowser = defaultBrowserAlready,
+                        showDefaultBrowserSetting =
+                            defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
+                        version = obtainVersion(variant.key),
+                        automaticallyClearData =
+                            AutomaticallyClearData(
+                                automaticallyClearWhat,
+                                automaticallyClearWhen,
+                                automaticallyClearWhenEnabled),
+                        appIcon = settingsDataStore.appIcon,
+                        selectedFireAnimation = settingsDataStore.selectedFireAnimation,
+                        globalPrivacyControlEnabled =
+                            gpc.isEnabled() &&
+                                featureToggle.isFeatureEnabled(
+                                    PrivacyFeatureName.GpcFeatureName()) == true,
+                        appLinksSettingType =
+                            getAppLinksSettingsState(
+                                settingsDataStore.appLinksEnabled,
+                                settingsDataStore.showAppLinksPrompt),
+                        appTrackingProtectionEnabled =
+                            TrackerBlockingVpnService.isServiceRunning(appContext),
+                        appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()))
         }
     }
 
     // FIXME
     // We need to fix this. This logic as inside the start method but it messes with the unit tests
-    // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
+    // because when doing runningBlockingTest {} there is no delay and the tests crashes because
+    // this
     // becomes a while(true) without any delay
     fun startPollingAppTpEnableState() {
         viewModelScope.launch {
             while (isActive) {
                 val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
-                    viewState.value = currentViewState().copy(
-                        appTrackingProtectionEnabled = isDeviceShieldEnabled
-                    )
+                    viewState.value =
+                        currentViewState()
+                            .copy(appTrackingProtectionEnabled = isDeviceShieldEnabled)
                 }
                 delay(1_000)
             }
@@ -196,7 +211,9 @@ class SettingsViewModel(
     }
 
     fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
+        viewModelScope.launch {
+            command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation))
+        }
         pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
@@ -210,7 +227,9 @@ class SettingsViewModel(
     }
 
     fun userRequestedToChangeAppLinkSetting() {
-        viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
+        viewModelScope.launch {
+            command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType))
+        }
         pixel.fire(SETTINGS_APP_LINKS_PRESSED)
     }
 
@@ -223,11 +242,17 @@ class SettingsViewModel(
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
+        viewModelScope.launch {
+            command.send(
+                Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption))
+        }
     }
 
     fun onAutomaticallyClearWhenClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
+        viewModelScope.launch {
+            command.send(
+                Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption))
+        }
     }
 
     fun onGlobalPrivacyControlClicked() {
@@ -263,7 +288,9 @@ class SettingsViewModel(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled))
+        }
     }
 
     fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
@@ -287,12 +314,17 @@ class SettingsViewModel(
                     SETTINGS_APP_LINKS_NEVER_SELECTED
                 }
             }
-        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType))
+        }
 
         pixel.fire(pixelName)
     }
 
-    private fun getAppLinksSettingsState(appLinksEnabled: Boolean, showAppLinksPrompt: Boolean): AppLinkSettingType {
+    private fun getAppLinksSettingsState(
+        appLinksEnabled: Boolean,
+        showAppLinksPrompt: Boolean
+    ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
                 AppLinkSettingType.ASK_EVERYTIME
@@ -311,7 +343,8 @@ class SettingsViewModel(
 
     fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
         if (settingsDataStore.isCurrentlySelected(clearWhatNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
+            Timber.v(
+                "User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
             return
         }
 
@@ -321,48 +354,50 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        clearWhatOption = clearWhatNewSetting,
-                        clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting)
-                    )
-                )
-            )
+                currentViewState()
+                    .copy(
+                        automaticallyClearData =
+                            AutomaticallyClearData(
+                                clearWhatOption = clearWhatNewSetting,
+                                clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
+                                clearWhenOptionEnabled =
+                                    isAutomaticallyClearingDataWhenSettingEnabled(
+                                        clearWhatNewSetting))))
         }
     }
 
-    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
+    private fun isAutomaticallyClearingDataWhenSettingEnabled(
+        clearWhatOption: ClearWhatOption?
+    ): Boolean {
         return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
     }
 
     fun onAutomaticallyWhenOptionSelected(clearWhenNewSetting: ClearWhenOption) {
         if (settingsDataStore.isCurrentlySelected(clearWhenNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
+            Timber.v(
+                "User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
             return
         }
 
-        clearWhenNewSetting.pixelEvent()?.let {
-            pixel.fire(it)
-        }
+        clearWhenNewSetting.pixelEvent()?.let { pixel.fire(it) }
 
         settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting
-                    )
-                )
-            )
+                currentViewState()
+                    .copy(
+                        automaticallyClearData =
+                            AutomaticallyClearData(
+                                settingsDataStore.automaticallyClearWhatOption,
+                                clearWhenNewSetting)))
         }
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
         Timber.d("User toggled theme, theme to set: $selectedTheme")
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            Timber.d(
+                "User selected same theme they've already set: $selectedTheme; no need to do anything else")
             return
         }
         themingDataStore.theme = selectedTheme
@@ -382,7 +417,8 @@ class SettingsViewModel(
 
     fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
         if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
-            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
+            Timber.v(
+                "User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
             return
         }
         settingsDataStore.selectedFireAnimation = selectedFireAnimation
@@ -390,7 +426,9 @@ class SettingsViewModel(
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(selectedFireAnimation = selectedFireAnimation))
         }
-        pixel.fire(FIRE_ANIMATION_NEW_SELECTED, mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
+        pixel.fire(
+            FIRE_ANIMATION_NEW_SELECTED,
+            mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
     fun onManageWhitelistSelected() {
@@ -413,10 +451,14 @@ class SettingsViewModel(
     private fun ClearWhenOption.pixelEvent(): PixelName? {
         return when (this) {
             ClearWhenOption.APP_EXIT_ONLY -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-            ClearWhenOption.APP_EXIT_OR_5_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-            ClearWhenOption.APP_EXIT_OR_15_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
-            ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
-            ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
+            ClearWhenOption.APP_EXIT_OR_5_MINS ->
+                AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
+            ClearWhenOption.APP_EXIT_OR_15_MINS ->
+                AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
+            ClearWhenOption.APP_EXIT_OR_30_MINS ->
+                AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
+            ClearWhenOption.APP_EXIT_OR_60_MINS ->
+                AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
     }
@@ -429,7 +471,9 @@ enum class AppLinkSettingType {
 }
 
 @ContributesMultibinding(AppScope::class)
-class SettingsViewModelFactory @Inject constructor(
+class SettingsViewModelFactory
+@Inject
+constructor(
     private val context: Provider<Context>,
     private val themingDataStore: Provider<ThemingDataStore>,
     private val settingsDataStore: Provider<SettingsDataStore>,
@@ -445,8 +489,8 @@ class SettingsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (
-                    SettingsViewModel(
+                isAssignableFrom(SettingsViewModel::class.java) ->
+                    (SettingsViewModel(
                         context.get(),
                         themingDataStore.get(),
                         settingsDataStore.get(),
@@ -457,9 +501,8 @@ class SettingsViewModelFactory @Inject constructor(
                         deviceShieldOnboardingStore.get(),
                         gpc.get(),
                         featureToggle.get(),
-                        pixel.get()
-                    ) as T
-                    )
+                        pixel.get()) as
+                        T)
                 else -> null
             }
         }

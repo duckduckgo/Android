@@ -29,14 +29,16 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
-class VpnTrackerNotificationUpdates @Inject constructor(
+class VpnTrackerNotificationUpdates
+@Inject
+constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val repository: AppTrackerBlockingStatsRepository,
@@ -49,14 +51,14 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val newTrackerObserverJob = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        newTrackerObserverJob += coroutineScope.launch(dispatcherProvider.io()) {
-            repository.getVpnTrackers({ dateOfLastHour() })
-                .combine(notificationTickerChannel.asStateFlow()) { trackers, _ -> trackers }
-                .onStart { startNewTrackerNotificationRefreshTicker(this@launch) }
-                .collectLatest {
-                    updateNotificationForNewTrackerFound(it)
-                }
-        }
+        newTrackerObserverJob +=
+            coroutineScope.launch(dispatcherProvider.io()) {
+                repository
+                    .getVpnTrackers({ dateOfLastHour() })
+                    .combine(notificationTickerChannel.asStateFlow()) { trackers, _ -> trackers }
+                    .onStart { startNewTrackerNotificationRefreshTicker(this@launch) }
+                    .collectLatest { updateNotificationForNewTrackerFound(it) }
+            }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
@@ -66,21 +68,25 @@ class VpnTrackerNotificationUpdates @Inject constructor(
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTracker>) {
         if (trackersBlocked.isNotEmpty()) {
-            val deviceShieldNotification = deviceShieldNotificationFactory.createNotificationNewTrackerFound(trackersBlocked)
-            val notification = DeviceShieldEnabledNotificationBuilder
-                .buildTrackersBlockedNotification(context, deviceShieldNotification, ongoingNotificationPressedHandler)
-            notificationManager.notify(TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID, notification)
+            val deviceShieldNotification =
+                deviceShieldNotificationFactory.createNotificationNewTrackerFound(trackersBlocked)
+            val notification =
+                DeviceShieldEnabledNotificationBuilder.buildTrackersBlockedNotification(
+                    context, deviceShieldNotification, ongoingNotificationPressedHandler)
+            notificationManager.notify(
+                TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID, notification)
         }
     }
 
     private fun startNewTrackerNotificationRefreshTicker(coroutineScope: CoroutineScope) {
         // this ticker ensures the ongoing notification information is not stale if we haven't
         // blocked trackers for a while
-        notificationTickerJob += coroutineScope.launch {
-            while (isActive) {
-                notificationTickerChannel.emit(System.currentTimeMillis())
-                delay(TimeUnit.HOURS.toMillis(1))
+        notificationTickerJob +=
+            coroutineScope.launch {
+                while (isActive) {
+                    notificationTickerChannel.emit(System.currentTimeMillis())
+                    delay(TimeUnit.HOURS.toMillis(1))
+                }
             }
-        }
     }
 }

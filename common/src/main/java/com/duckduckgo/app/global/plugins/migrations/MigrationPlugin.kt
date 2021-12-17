@@ -19,8 +19,8 @@ package com.duckduckgo.app.global.plugins.migrations
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface MigrationPlugin {
     fun run()
@@ -28,9 +28,10 @@ interface MigrationPlugin {
 }
 
 @SingleInstanceIn(AppScope::class)
-class MigrationPluginPoint @Inject constructor(
-    private val injectorPlugins: DaggerSet<MigrationPlugin>
-) : PluginPoint<MigrationPlugin> {
+class MigrationPluginPoint
+@Inject
+constructor(private val injectorPlugins: DaggerSet<MigrationPlugin>) :
+    PluginPoint<MigrationPlugin> {
     override fun getPlugins(): Collection<MigrationPlugin> {
         return injectorPlugins
     }

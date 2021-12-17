@@ -26,188 +26,235 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeatur
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
 
-fun MainReason.displayText(): FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay? = FeedbackTypeDisplay.mainReasons[this]
+fun MainReason.displayText(): FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay? =
+    FeedbackTypeDisplay.mainReasons[this]
 
 class FeedbackTypeDisplay {
 
     data class FeedbackTypeMainReasonDisplay(
         val mainReason: MainReason,
-
-        @StringRes
-        val listDisplayResId: Int,
-
-        @StringRes
-        val titleDisplayResId: Int,
-
-        @StringRes
-        val subtitleDisplayResId: Int
+        @StringRes val listDisplayResId: Int,
+        @StringRes val titleDisplayResId: Int,
+        @StringRes val subtitleDisplayResId: Int
     )
 
     data class FeedbackTypeSubReasonDisplay(
         val subReason: SubReason,
-
-        @StringRes
-        val listDisplayResId: Int,
-
-        @StringRes
-        val subtitleDisplayResId: Int = listDisplayResId
+        @StringRes val listDisplayResId: Int,
+        @StringRes val subtitleDisplayResId: Int = listDisplayResId
     )
 
     companion object {
-        val mainReasons: Map<MainReason, FeedbackTypeMainReasonDisplay> = mutableMapOf<MainReason, FeedbackTypeMainReasonDisplay>().also {
+        val mainReasons: Map<MainReason, FeedbackTypeMainReasonDisplay> =
+            mutableMapOf<MainReason, FeedbackTypeMainReasonDisplay>().also {
+                MISSING_BROWSING_FEATURES.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            listDisplayResId = R.string.missingBrowserFeaturesTitleLong,
+                            titleDisplayResId = R.string.missingBrowserFeaturesTitleShort,
+                            subtitleDisplayResId = R.string.missingBrowserFeaturesSubtitle)
+                }
 
-            MISSING_BROWSING_FEATURES.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    listDisplayResId = R.string.missingBrowserFeaturesTitleLong,
-                    titleDisplayResId = R.string.missingBrowserFeaturesTitleShort,
-                    subtitleDisplayResId = R.string.missingBrowserFeaturesSubtitle
-                )
+                WEBSITES_NOT_LOADING.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            R.string.websiteNotLoadingTitleShort,
+                            R.string.websiteNotLoadingTitleLong,
+                            R.string.websiteNotLoadingSubtitle)
+                }
+
+                SEARCH_NOT_GOOD_ENOUGH.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            R.string.searchNotGoodEnoughTitleLong,
+                            R.string.searchNotGoodEnoughTitleShort,
+                            R.string.searchNotGoodEnoughSubtitle)
+                }
+
+                NOT_ENOUGH_CUSTOMIZATIONS.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            R.string.needMoreCustomizationTitleLong,
+                            R.string.needMoreCustomizationTitleShort,
+                            R.string.needMoreCustomizationSubtitle)
+                }
+
+                APP_IS_SLOW_OR_BUGGY.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            R.string.appIsSlowOrBuggyTitleLong,
+                            R.string.appIsSlowOrBuggyTitleShort,
+                            R.string.appIsSlowOrBuggySubtitle)
+                }
+
+                OTHER.also { type ->
+                    it[type] =
+                        FeedbackTypeMainReasonDisplay(
+                            type,
+                            R.string.otherMainReasonTitleLong,
+                            R.string.otherMainReasonTitleShort,
+                            R.string.tellUsHowToImprove)
+                }
             }
 
-            WEBSITES_NOT_LOADING.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    R.string.websiteNotLoadingTitleShort,
-                    R.string.websiteNotLoadingTitleLong,
-                    R.string.websiteNotLoadingSubtitle
-                )
-            }
+        val subReasons: Map<SubReason, FeedbackTypeSubReasonDisplay> =
+            mutableMapOf<SubReason, FeedbackTypeSubReasonDisplay>().also {
+                NAVIGATION_ISSUES.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonNavigation)
+                }
 
-            SEARCH_NOT_GOOD_ENOUGH.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    R.string.searchNotGoodEnoughTitleLong,
-                    R.string.searchNotGoodEnoughTitleShort,
-                    R.string.searchNotGoodEnoughSubtitle
-                )
-            }
+                TAB_MANAGEMENT.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonTabManagement)
+                }
 
-            NOT_ENOUGH_CUSTOMIZATIONS.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    R.string.needMoreCustomizationTitleLong,
-                    R.string.needMoreCustomizationTitleShort,
-                    R.string.needMoreCustomizationSubtitle
-                )
-            }
+                AD_POPUP_BLOCKING.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonAdPopups)
+                }
 
-            APP_IS_SLOW_OR_BUGGY.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    R.string.appIsSlowOrBuggyTitleLong,
-                    R.string.appIsSlowOrBuggyTitleShort,
-                    R.string.appIsSlowOrBuggySubtitle
-                )
-            }
+                WATCHING_VIDEOS.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonVideos)
+                }
 
-            OTHER.also { type ->
-                it[type] = FeedbackTypeMainReasonDisplay(
-                    type,
-                    R.string.otherMainReasonTitleLong,
-                    R.string.otherMainReasonTitleShort,
-                    R.string.tellUsHowToImprove
-                )
-            }
-        }
+                INTERACTING_IMAGES.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonImages)
+                }
 
-        val subReasons: Map<SubReason, FeedbackTypeSubReasonDisplay> = mutableMapOf<SubReason, FeedbackTypeSubReasonDisplay>().also {
+                BOOKMARK_MANAGEMENT.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.missingBrowserFeatureSubReasonBookmarks)
+                }
 
-            NAVIGATION_ISSUES.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonNavigation)
-            }
+                MissingBrowserFeaturesSubReasons.OTHER.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type,
+                            R.string.missingBrowserFeatureSubReasonOther,
+                            R.string.tellUsHowToImprove)
+                }
 
-            TAB_MANAGEMENT.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonTabManagement)
-            }
+                PROGRAMMING_TECHNICAL_SEARCHES.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.searchNotGoodEnoughSubReasonTechnicalSearches)
+                }
 
-            AD_POPUP_BLOCKING.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonAdPopups)
-            }
+                LAYOUT_MORE_LIKE_GOOGLE.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.searchNotGoodEnoughSubReasonGoogleLayout)
+                }
 
-            WATCHING_VIDEOS.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonVideos)
-            }
+                FASTER_LOAD_TIME.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.searchNotGoodEnoughSubReasonFasterLoadTimes)
+                }
 
-            INTERACTING_IMAGES.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonImages)
-            }
+                BETTER_AUTOCOMPLETE.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.searchNotGoodEnoughSubReasonBetterAutocomplete)
+                }
 
-            BOOKMARK_MANAGEMENT.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonBookmarks)
-            }
+                SEARCHING_IN_SPECIFIC_LANGUAGE.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.searchNotGoodEnoughSubReasonSpecificLanguage)
+                }
 
-            MissingBrowserFeaturesSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.missingBrowserFeatureSubReasonOther, R.string.tellUsHowToImprove)
-            }
+                SearchNotGoodEnoughSubReasons.OTHER.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type,
+                            R.string.searchNotGoodEnoughSubReasonOther,
+                            R.string.tellUsHowToImprove)
+                }
 
-            PROGRAMMING_TECHNICAL_SEARCHES.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonTechnicalSearches)
-            }
+                HOME_SCREEN_CONFIGURATION.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonHomeScreenConfiguration)
+                }
 
-            LAYOUT_MORE_LIKE_GOOGLE.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonGoogleLayout)
-            }
+                TAB_DISPLAY.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonTabDisplay)
+                }
 
-            FASTER_LOAD_TIME.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonFasterLoadTimes)
-            }
+                HOW_APP_LOOKS.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonAppLooks)
+                }
 
-            BETTER_AUTOCOMPLETE.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonBetterAutocomplete)
-            }
+                WHICH_DATA_IS_CLEARED.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonWhichDataIsCleared)
+                }
 
-            SEARCHING_IN_SPECIFIC_LANGUAGE.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonSpecificLanguage)
-            }
+                WHEN_DATA_IS_CLEARED.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonWhenDataIsCleared)
+                }
 
-            SearchNotGoodEnoughSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.searchNotGoodEnoughSubReasonOther, R.string.tellUsHowToImprove)
-            }
+                BOOKMARK_DISPLAY.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.needMoreCustomizationSubReasonBookmarksDisplay)
+                }
 
-            HOME_SCREEN_CONFIGURATION.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonHomeScreenConfiguration)
-            }
+                CustomizationSubReasons.OTHER.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type,
+                            R.string.needMoreCustomizationSubReasonOther,
+                            R.string.tellUsHowToImprove)
+                }
 
-            TAB_DISPLAY.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonTabDisplay)
-            }
+                SLOW_WEB_PAGE_LOADS.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.appIsSlowOrBuggySubReasonSlowResults)
+                }
 
-            HOW_APP_LOOKS.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonAppLooks)
-            }
+                APP_CRASHES_OR_FREEZES.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.appIsSlowOrBuggySubReasonAppCrashesOrFreezes)
+                }
 
-            WHICH_DATA_IS_CLEARED.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhichDataIsCleared)
-            }
+                MEDIA_PLAYBACK_BUGS.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type, R.string.appIsSlowOrBuggySubReasonMediaPlayback)
+                }
 
-            WHEN_DATA_IS_CLEARED.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonWhenDataIsCleared)
+                PerformanceSubReasons.OTHER.also { type ->
+                    it[type] =
+                        FeedbackTypeSubReasonDisplay(
+                            type,
+                            R.string.appIsSlowOrBuggySubReasonOther,
+                            R.string.tellUsHowToImprove)
+                }
             }
-
-            BOOKMARK_DISPLAY.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonBookmarksDisplay)
-            }
-
-            CustomizationSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.needMoreCustomizationSubReasonOther, R.string.tellUsHowToImprove)
-            }
-
-            SLOW_WEB_PAGE_LOADS.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonSlowResults)
-            }
-
-            APP_CRASHES_OR_FREEZES.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonAppCrashesOrFreezes)
-            }
-
-            MEDIA_PLAYBACK_BUGS.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonMediaPlayback)
-            }
-
-            PerformanceSubReasons.OTHER.also { type ->
-                it[type] = FeedbackTypeSubReasonDisplay(type, R.string.appIsSlowOrBuggySubReasonOther, R.string.tellUsHowToImprove)
-            }
-        }
     }
 }

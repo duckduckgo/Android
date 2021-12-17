@@ -32,17 +32,17 @@ import dagger.multibindings.IntoMap
     correctScope = ActivityScope::class,
 )
 @SingleInstanceIn(VpnScope::class)
-@MergeSubcomponent(
-    scope = VpnScope::class
-)
-interface ReportBreakageTextFormActivityComponent : AndroidInjector<ReportBreakageTextFormActivity> {
+@MergeSubcomponent(scope = VpnScope::class)
+interface ReportBreakageTextFormActivityComponent :
+    AndroidInjector<ReportBreakageTextFormActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ReportBreakageTextFormActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface ReportBreakageTextFormActivityComponentProvider {
-    fun provideReportBreakageTextFormActivityComponentFactory(): ReportBreakageTextFormActivityComponent.Factory
+    fun provideReportBreakageTextFormActivityComponentFactory():
+        ReportBreakageTextFormActivityComponent.Factory
 }
 
 @Module

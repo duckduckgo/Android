@@ -34,7 +34,7 @@ data class TdsTracker(
 
 enum class Action {
     BLOCK,
-    IGNORE;
+    IGNORE
 }
 
 class Rule(
@@ -44,10 +44,7 @@ class Rule(
     val surrogate: String?
 )
 
-class RuleExceptions(
-    val domains: List<String>?,
-    val types: List<String>?
-)
+class RuleExceptions(val domains: List<String>?, val types: List<String>?)
 
 class ActionTypeConverter {
 
@@ -92,7 +89,8 @@ class Adapters {
     companion object {
         private val moshi = JsonModule().moshi()
         private val ruleListType = Types.newParameterizedType(List::class.java, Rule::class.java)
-        private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+        private val stringListType =
+            Types.newParameterizedType(List::class.java, String::class.java)
         val ruleListAdapter: JsonAdapter<List<Rule>> = moshi.adapter(ruleListType)
         val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
     }

@@ -29,72 +29,51 @@ class DaoModule {
     @Provides
     fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
 
-    @Provides
-    fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
+    @Provides fun providesTdsTrackDao(database: AppDatabase) = database.tdsTrackerDao()
 
-    @Provides
-    fun providesTdsEntityDao(database: AppDatabase) = database.tdsEntityDao()
+    @Provides fun providesTdsEntityDao(database: AppDatabase) = database.tdsEntityDao()
 
-    @Provides
-    fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
+    @Provides fun providesTdsDomainEntityDao(database: AppDatabase) = database.tdsDomainEntityDao()
 
-    @Provides
-    fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
+    @Provides fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()
 
-    @Provides
-    fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
+    @Provides fun providesBookmarksDao(database: AppDatabase) = database.bookmarksDao()
 
-    @Provides
-    fun providesFavoritesDao(database: AppDatabase) = database.favoritesDao()
+    @Provides fun providesFavoritesDao(database: AppDatabase) = database.favoritesDao()
 
-    @Provides
-    fun providesBookmarkFoldersDao(database: AppDatabase) = database.bookmarkFoldersDao()
+    @Provides fun providesBookmarkFoldersDao(database: AppDatabase) = database.bookmarkFoldersDao()
 
-    @Provides
-    fun providesTabsDao(database: AppDatabase) = database.tabsDao()
+    @Provides fun providesTabsDao(database: AppDatabase) = database.tabsDao()
 
-    @Provides
-    fun surveyDao(database: AppDatabase) = database.surveyDao()
+    @Provides fun surveyDao(database: AppDatabase) = database.surveyDao()
 
-    @Provides
-    fun dismissedCtaDao(database: AppDatabase) = database.dismissedCtaDao()
+    @Provides fun dismissedCtaDao(database: AppDatabase) = database.dismissedCtaDao()
 
-    @Provides
-    fun searchCountDao(database: AppDatabase) = database.searchCountDao()
+    @Provides fun searchCountDao(database: AppDatabase) = database.searchCountDao()
 
-    @Provides
-    fun appDaysUsedDao(database: AppDatabase) = database.appsDaysUsedDao()
+    @Provides fun appDaysUsedDao(database: AppDatabase) = database.appsDaysUsedDao()
 
-    @Provides
-    fun notification(database: AppDatabase) = database.notificationDao()
+    @Provides fun notification(database: AppDatabase) = database.notificationDao()
 
     @Provides
     fun privacyProtectionCounts(database: AppDatabase) = database.privacyProtectionCountsDao()
 
-    @Provides
-    fun uncaughtExceptionDao(database: AppDatabase) = database.uncaughtExceptionDao()
+    @Provides fun uncaughtExceptionDao(database: AppDatabase) = database.uncaughtExceptionDao()
 
-    @Provides
-    fun tdsDao(database: AppDatabase) = database.tdsDao()
+    @Provides fun tdsDao(database: AppDatabase) = database.tdsDao()
 
-    @Provides
-    fun userStageDao(database: AppDatabase) = database.userStageDao()
+    @Provides fun userStageDao(database: AppDatabase) = database.userStageDao()
 
-    @Provides
-    fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
+    @Provides fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
 
-    @Provides
-    fun userEventsDao(database: AppDatabase) = database.userEventsDao()
+    @Provides fun userEventsDao(database: AppDatabase) = database.userEventsDao()
 
-    @Provides
-    fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
+    @Provides fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
 
-    @Provides
-    fun webTrackersBlockedDao(database: AppDatabase) = database.webTrackersBlockedDao()
+    @Provides fun webTrackersBlockedDao(database: AppDatabase) = database.webTrackersBlockedDao()
 
-    @Provides
-    fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
+    @Provides fun allowedDomainsDao(database: AppDatabase) = database.authCookiesAllowedDomainsDao()
 }

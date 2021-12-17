@@ -23,15 +23,15 @@ class TrustedSites {
 
     companion object {
 
-        private val trusted = listOf(
-            AppUrl.Url.HOST,
-            "duckduckgo.com",
-            "donttrack.us",
-            "spreadprivacy.com",
-            "duckduckhack.com",
-            "privatebrowsingmyths.com",
-            "duck.co"
-        )
+        private val trusted =
+            listOf(
+                AppUrl.Url.HOST,
+                "duckduckgo.com",
+                "donttrack.us",
+                "spreadprivacy.com",
+                "duckduckhack.com",
+                "privatebrowsingmyths.com",
+                "duck.co")
 
         fun isTrusted(url: String): Boolean {
             return trusted.any { UriString.sameOrSubdomain(url, it) }

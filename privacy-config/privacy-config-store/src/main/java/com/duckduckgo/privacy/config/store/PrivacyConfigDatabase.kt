@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.store
 
 import androidx.room.Database
-
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
@@ -33,17 +32,17 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 4,
-    entities = [
-        TrackerAllowlistEntity::class,
-        UnprotectedTemporaryEntity::class,
-        HttpsExceptionEntity::class,
-        GpcExceptionEntity::class,
-        ContentBlockingExceptionEntity::class,
-        DrmExceptionEntity::class,
-        PrivacyConfig::class
-    ]
-)
+    exportSchema = true,
+    version = 4,
+    entities =
+        [
+            TrackerAllowlistEntity::class,
+            UnprotectedTemporaryEntity::class,
+            HttpsExceptionEntity::class,
+            GpcExceptionEntity::class,
+            ContentBlockingExceptionEntity::class,
+            DrmExceptionEntity::class,
+            PrivacyConfig::class])
 abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun trackerAllowlistDao(): TrackerAllowlistDao
     abstract fun unprotectedTemporaryDao(): UnprotectedTemporaryDao
@@ -54,11 +53,12 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun drmDao(): DrmDao
 }
 
-val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("DROP TABLE toggles")
-        database.execSQL("DELETE FROM privacy_config")
+val MIGRATION_2_3 =
+    object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE toggles")
+            database.execSQL("DELETE FROM privacy_config")
+        }
     }
-}
 
 val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3)

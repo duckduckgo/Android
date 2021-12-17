@@ -43,7 +43,9 @@ class TdsTrackerJsonTest {
         val json = loadText("json/tds_trackers.json")
         val trackers = jsonAdapter.fromJson(json)!!.jsonToTrackers()
         val tracker = trackers["1dmp.io"]
-        assertEquals(TdsTracker("1dmp.io", BLOCK, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
+        assertEquals(
+            TdsTracker("1dmp.io", BLOCK, "CleverDATA LLC", listOf("Advertising"), arrayListOf()),
+            tracker)
     }
 
     @Test

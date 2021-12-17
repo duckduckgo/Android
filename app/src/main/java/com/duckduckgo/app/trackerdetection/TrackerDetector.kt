@@ -23,14 +23,14 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
+import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import timber.log.Timber
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -39,7 +39,9 @@ interface TrackerDetector {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class TrackerDetectorImpl @Inject constructor(
+class TrackerDetectorImpl
+@Inject
+constructor(
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
@@ -64,23 +66,31 @@ class TrackerDetectorImpl @Inject constructor(
             return null
         }
 
-        val result = clients
-            .filter { it.name.type == Client.ClientType.BLOCKING }
-            .mapNotNull { it.matches(url, documentUrl) }
-            .firstOrNull { it.matches }
+        val result =
+            clients
+                .filter { it.name.type == Client.ClientType.BLOCKING }
+                .mapNotNull { it.matches(url, documentUrl) }
+                .firstOrNull { it.matches }
 
         if (result != null) {
-            val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
-            val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl) || isSiteAContentBlockingException(documentUrl)
+            val entity =
+                if (result.entityName != null) entityLookup.entityForName(result.entityName)
+                else null
+            val isDocumentInAllowedList =
+                userWhitelistDao.isDocumentWhitelisted(documentUrl) ||
+                    isSiteAContentBlockingException(documentUrl)
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
             val isBlocked = !isDocumentInAllowedList && !isInTrackerAllowList
 
             val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
+            webTrackersBlockedDao.insert(
+                WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
 
-            Timber.v("$documentUrl resource $url WAS identified as a tracker and isBlocked=$isBlocked")
+            Timber.v(
+                "$documentUrl resource $url WAS identified as a tracker and isBlocked=$isBlocked")
 
-            return TrackingEvent(documentUrl, url, result.categories, entity, isBlocked, result.surrogate)
+            return TrackingEvent(
+                documentUrl, url, result.categories, entity, isBlocked, result.surrogate)
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
@@ -92,7 +102,9 @@ class TrackerDetectorImpl @Inject constructor(
     }
 
     private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
-        sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
+        sameOrSubdomain(firstUrl, secondUrl) ||
+            sameOrSubdomain(secondUrl, firstUrl) ||
+            sameNetworkName(firstUrl, secondUrl)
 
     private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean {
         val firstNetwork = entityLookup.entityForUrl(firstUrl) ?: return false
@@ -101,7 +113,8 @@ class TrackerDetectorImpl @Inject constructor(
     }
 
     @VisibleForTesting
-    val clientCount get() = clients.count()
+    val clientCount
+        get() = clients.count()
 }
 
 private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {

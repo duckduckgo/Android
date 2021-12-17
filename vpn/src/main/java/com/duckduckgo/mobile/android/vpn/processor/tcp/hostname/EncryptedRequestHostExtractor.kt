@@ -16,15 +16,16 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
-import timber.log.Timber
 import kotlin.text.Charsets.US_ASCII
+import timber.log.Timber
 
 interface EncryptedRequestHostExtractor {
     fun extract(packet: ByteArray): String?
 }
 
 // based on https://www.ietf.org/rfc/rfc5246.txt
-class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: TlsMessageDetector) : EncryptedRequestHostExtractor {
+class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: TlsMessageDetector) :
+    EncryptedRequestHostExtractor {
 
     override fun extract(packet: ByteArray): String? {
 
@@ -38,7 +39,6 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
             Timber.w(t, "Failed to extract ClientHello domain")
             return null
         }
-
     }
 
     private fun extractHostFromClientHelloSniHeader(packet: ByteArray): String? {
@@ -79,24 +79,32 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
         return String(serverNameBytes, US_ASCII)
     }
 
-    private fun findServerNameIndicationHeaderStart(packet: ByteArray, extensionStartIndex: Int, extensionsLength: Int): Int {
+    private fun findServerNameIndicationHeaderStart(
+        packet: ByteArray,
+        extensionStartIndex: Int,
+        extensionsLength: Int
+    ): Int {
         var extensionBytesSearched = 0
         var index = extensionStartIndex
 
         while (extensionBytesSearched < extensionsLength && index < packet.size) {
-            val extensionType = addHigherLowerOrderBytes(HigherOrderByte(packet[index]), LowerOrderByte(packet[index + 1]))
+            val extensionType =
+                addHigherLowerOrderBytes(
+                    HigherOrderByte(packet[index]), LowerOrderByte(packet[index + 1]))
             index += 2
 
             if (extensionType == SERVER_NAME_EXTENSION_TYPE) {
                 return index
             } else {
-                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+                val extensionLength =
+                    HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
                 index += 2
 
                 // skip to next extension, if there is a next one
                 index += extensionLength
 
-                // record number of extension bytes searched, which is the current extension length + 4 (2 bytes for type, 2 bytes for length)
+                // record number of extension bytes searched, which is the current extension length
+                // + 4 (2 bytes for type, 2 bytes for length)
                 extensionBytesSearched += extensionLength + 4
             }
         }
@@ -113,14 +121,20 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
         val tlsVersionMajor = packet[1].toInt()
         val tlsVersionMinor = packet[2].toInt()
 
-        Timber.v("Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d", tlsVersionMajor, tlsVersionMinor, contentType, packet.size)
+        Timber.v(
+            "Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d",
+            tlsVersionMajor,
+            tlsVersionMinor,
+            contentType,
+            packet.size)
 
         if (packet.size < TLS_HEADER_SIZE) {
             return false
         }
 
         if (tlsVersionMajor < 0x03) {
-            Timber.v("TLS version wouldn't include a SNI header so no point in looking further for it")
+            Timber.v(
+                "TLS version wouldn't include a SNI header so no point in looking further for it")
             return false
         }
 
@@ -132,7 +146,10 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
         val handshakeLength = determineTlsHandshakeLength(packet)
 
         if (packet.size < handshakeLength + TLS_HEADER_SIZE) {
-            Timber.w("TLS packet size unexpected. Handshake size reported %d is greater than total packet size %d", handshakeLength, packet.size)
+            Timber.w(
+                "TLS packet size unexpected. Handshake size reported %d is greater than total packet size %d",
+                handshakeLength,
+                packet.size)
         }
 
         val handshakeMessageType = packet[TLS_HEADER_SIZE]
@@ -151,7 +168,10 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
     }
 
     // first byte must be multiplied by 256 (or shl 8), then added to second
-    private fun addHigherLowerOrderBytes(higherOrderByte: HigherOrderByte, lowerOrderByte: LowerOrderByte): Int {
+    private fun addHigherLowerOrderBytes(
+        higherOrderByte: HigherOrderByte,
+        lowerOrderByte: LowerOrderByte
+    ): Int {
         val higherInt = higherOrderByte.byte.toInt() shl 8 and 0xFF00
         val lowerInt = lowerOrderByte.byte.toInt() and 0x00FF
         return higherInt + lowerInt
@@ -170,7 +190,6 @@ inline class HigherOrderByte(val byte: Byte) {
     operator fun plus(lowerOrderByte: LowerOrderByte): Int {
         return (this.byte.toInt() shl 8 and 0xFF00) + (lowerOrderByte.byte.toInt() and 0x00FF)
     }
-
 }
 
 inline class LowerOrderByte(val byte: Byte)

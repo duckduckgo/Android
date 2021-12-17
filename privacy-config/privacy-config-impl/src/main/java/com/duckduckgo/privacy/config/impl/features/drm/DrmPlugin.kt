@@ -24,12 +24,14 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class DrmPlugin @Inject constructor(
+class DrmPlugin
+@Inject
+constructor(
     private val drmRepository: DrmRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
@@ -38,8 +40,7 @@ class DrmPlugin @Inject constructor(
         if (name == featureName.value) {
             val drmExceptions = mutableListOf<DrmExceptionEntity>()
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<DrmFeature> =
-                moshi.adapter(DrmFeature::class.java)
+            val jsonAdapter: JsonAdapter<DrmFeature> = moshi.adapter(DrmFeature::class.java)
 
             val drmFeature: DrmFeature? = jsonAdapter.fromJson(jsonString)
             drmFeature?.exceptions?.map {

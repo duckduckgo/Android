@@ -24,20 +24,18 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.junit.*
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class AppTPCompanyTrackersViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     private val repository = mock<AppTrackerBlockingStatsRepository>()
 
@@ -45,10 +43,8 @@ class AppTPCompanyTrackersViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = AppTPCompanyTrackersViewModel(
-            repository,
-            CoroutineTestRule().testDispatcherProvider
-        )
+        viewModel =
+            AppTPCompanyTrackersViewModel(repository, CoroutineTestRule().testDispatcherProvider)
     }
 
     @Ignore
@@ -59,7 +55,8 @@ class AppTPCompanyTrackersViewModelTest {
 
         val someTrackers = someTrackers()
 
-        whenever(repository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
+        whenever(repository.getTrackersForAppFromDate(packageName, date))
+            .thenReturn(getTrackersFlow(someTrackers))
         viewModel.getTrackersForAppFromDate(date, packageName).test {
             Assert.assertEquals(someTrackers, awaitItem())
         }
@@ -83,9 +80,6 @@ class AppTPCompanyTrackersViewModelTest {
                 timestamp = timestamp,
                 company = "",
                 companyDisplayName = "",
-                trackingApp = defaultTrackingApp
-            )
-        )
+                trackingApp = defaultTrackingApp))
     }
-
 }

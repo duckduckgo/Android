@@ -40,7 +40,12 @@ class AtbInitializerTest {
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
-        testee = AtbInitializer(TestCoroutineScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
+        testee =
+            AtbInitializer(
+                TestCoroutineScope(),
+                statisticsDataStore,
+                statisticsUpdater,
+                setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -50,8 +55,14 @@ class AtbInitializerTest {
     @Test
     fun whenReferrerInformationQuicklyAvailableThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
-        testee = AtbInitializer(TestCoroutineScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
+        appReferrerStateListener =
+            StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
+        testee =
+            AtbInitializer(
+                TestCoroutineScope(),
+                statisticsDataStore,
+                statisticsUpdater,
+                setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -61,8 +72,14 @@ class AtbInitializerTest {
     @Test
     fun whenReferrerInformationTimesOutThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
-        testee = AtbInitializer(TestCoroutineScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
+        appReferrerStateListener =
+            StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
+        testee =
+            AtbInitializer(
+                TestCoroutineScope(),
+                statisticsDataStore,
+                statisticsUpdater,
+                setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -72,7 +89,12 @@ class AtbInitializerTest {
     @Test
     fun whenAlreadyInitializedThenRefreshCalled() = runBlockingTest {
         configureAlreadyInitialized()
-        testee = AtbInitializer(TestCoroutineScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
+        testee =
+            AtbInitializer(
+                TestCoroutineScope(),
+                statisticsDataStore,
+                statisticsUpdater,
+                setOf(appReferrerStateListener))
 
         testee.initialize()
         verify(statisticsUpdater).refreshAppRetentionAtb()

@@ -43,12 +43,8 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        instructionsButtons.homeButton.setOnClickListener {
-            viewModel.onShowHomePressed()
-        }
-        instructionsButtons.closeButton.setOnClickListener {
-            viewModel.onClosePressed()
-        }
+        instructionsButtons.homeButton.setOnClickListener { viewModel.onShowHomePressed() }
+        instructionsButtons.closeButton.setOnClickListener { viewModel.onClosePressed() }
     }
 
     private fun configureCommandObserver() {
@@ -59,8 +55,7 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
                     ShowHome -> showHome()
                     Close -> close()
                 }
-            }
-        )
+            })
     }
 
     override fun onBackPressed() {

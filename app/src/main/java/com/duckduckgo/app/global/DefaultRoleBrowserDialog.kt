@@ -29,13 +29,10 @@ interface DefaultRoleBrowserDialog {
     fun dialogShown()
 }
 
-class RealDefaultRoleBrowserDialog(
-    private val appInstallStore: AppInstallStore
-) : DefaultRoleBrowserDialog {
+class RealDefaultRoleBrowserDialog(private val appInstallStore: AppInstallStore) :
+    DefaultRoleBrowserDialog {
 
-    /**
-     * @return an Intent to launch the role browser dialog
-     */
+    /** @return an Intent to launch the role browser dialog */
     override fun createIntent(context: Context): Intent? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = context.getSystemService(RoleManager::class.java) ?: return null
@@ -55,7 +52,8 @@ class RealDefaultRoleBrowserDialog(
     }
 
     override fun shouldShowDialog(): Boolean {
-        // The second and subsequent times the dialog is shown, the system allows the user to click on "don't show again"
+        // The second and subsequent times the dialog is shown, the system allows the user to click
+        // on "don't show again"
         // we will get the same result as if the dialog was just dismissed.
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
             appInstallStore.newDefaultBrowserDialogCount < DEFAULT_BROWSER_DIALOG_MAX_ATTEMPTS

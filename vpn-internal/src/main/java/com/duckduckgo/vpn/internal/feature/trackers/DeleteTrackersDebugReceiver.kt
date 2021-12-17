@@ -25,16 +25,15 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows deletion of previously seen trackers.
  *
  * $ adb shell am broadcast -a delete-trackers
- *
  */
 class DeleteTrackersDebugReceiver(
     context: Context,
@@ -51,7 +50,9 @@ class DeleteTrackersDebugReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class DeleteTrackersDebugReceiverRegister @Inject constructor(
+class DeleteTrackersDebugReceiverRegister
+@Inject
+constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -66,15 +67,14 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
 
         receiver?.unregister()
 
-        receiver = DeleteTrackersDebugReceiver(context) { _ ->
-            appCoroutineScope.launch {
-                vpnDatabase.vpnTrackerDao().deleteAllTrackers()
+        receiver =
+            DeleteTrackersDebugReceiver(context) { _ ->
+                appCoroutineScope.launch { vpnDatabase.vpnTrackerDao().deleteAllTrackers() }
             }
-        }.apply { register() }
+                .apply { register() }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         receiver?.unregister()
     }
-
 }

@@ -25,8 +25,7 @@ fun Packet.connectionInfo(): ConnectionInfo {
         destinationPort = extractDestinationPort(),
         sourceAddress = ip4Header.sourceAddress,
         sourcePort = extractSourcePort(),
-        protocolNumber = ip4Header.protocol.number
-    )
+        protocolNumber = ip4Header.protocol.number)
 }
 
 private fun Packet.extractSourcePort() =

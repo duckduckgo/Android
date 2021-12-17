@@ -28,16 +28,18 @@ import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import org.threeten.bp.LocalDateTime
+import timber.log.Timber
 
-class DeviceShieldActivityFeedViewModel @Inject constructor(
+class DeviceShieldActivityFeedViewModel
+@Inject
+constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val timeDiffFormatter: TimeDiffFormatter
@@ -49,31 +51,37 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private fun startTickerRefresher() {
         Timber.i("startTickerRefresher")
         tickerJob?.cancel()
-        tickerJob = viewModelScope.launch {
-            while (isActive) {
-                delay(TimeUnit.MINUTES.toMillis(1))
-                tickerChannel.emit(System.currentTimeMillis())
+        tickerJob =
+            viewModelScope.launch {
+                while (isActive) {
+                    delay(TimeUnit.MINUTES.toMillis(1))
+                    tickerChannel.emit(System.currentTimeMillis())
+                }
             }
-        }
     }
 
     suspend fun getMostRecentTrackers(
         timeWindow: TimeWindow,
         showHeadings: Boolean
-    ): Flow<List<TrackerFeedItem>> = withContext(dispatcherProvider.io()) {
-        return@withContext statsRepository.getMostRecentVpnTrackers { timeWindow.asString() }
-            .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
-            .map { aggregateDataPerApp(it, showHeadings) }
-            .flowOn(Dispatchers.Default)
-            .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
-            .onStart {
-                startTickerRefresher()
-                emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
-                delay(300)
-            }
-    }
+    ): Flow<List<TrackerFeedItem>> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext statsRepository
+                .getMostRecentVpnTrackers { timeWindow.asString() }
+                .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
+                .map { aggregateDataPerApp(it, showHeadings) }
+                .flowOn(Dispatchers.Default)
+                .map { it.ifEmpty { listOf(TrackerFeedItem.TrackerEmptyFeed) } }
+                .onStart {
+                    startTickerRefresher()
+                    emit(listOf(TrackerFeedItem.TrackerLoadingSkeleton))
+                    delay(300)
+                }
+        }
 
-    private suspend fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>, showHeadings: Boolean): List<TrackerFeedItem> {
+    private suspend fun aggregateDataPerApp(
+        trackerData: List<BucketizedVpnTracker>,
+        showHeadings: Boolean
+    ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
 
@@ -91,16 +99,20 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                 val trackerList = mutableListOf<TrackerInfo>()
                 perTrackerData.forEach { trackerBucket ->
                     val trackerCompanyName = trackerBucket.value.first().vpnTracker.company
-                    val trackerCompanyDisplayName = trackerBucket.value.first().vpnTracker.companyDisplayName
+                    val trackerCompanyDisplayName =
+                        trackerBucket.value.first().vpnTracker.companyDisplayName
                     val timestamp =
-                        trackerBucket.value.sortedByDescending { it.vpnTracker.timestamp }.first().vpnTracker.timestamp
+                        trackerBucket
+                            .value
+                            .sortedByDescending { it.vpnTracker.timestamp }
+                            .first()
+                            .vpnTracker
+                            .timestamp
                     trackerList.add(
                         TrackerInfo(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
-                            timestamp = timestamp
-                        )
-                    )
+                            timestamp = timestamp))
                     totalTrackerCount += trackerBucket.value.size
                 }
 
@@ -111,21 +123,21 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
                 sourceData.add(
                     TrackerFeedItem.TrackerFeedData(
-                        id = item.bucket.hashCode() + item.vpnTracker.trackingApp.packageId.hashCode(),
+                        id =
+                            item.bucket.hashCode() +
+                                item.vpnTracker.trackingApp.packageId.hashCode(),
                         bucket = item.bucket,
-                        trackingApp = TrackingApp(
-                            item.vpnTracker.trackingApp.packageId,
-                            item.vpnTracker.trackingApp.appDisplayName
-                        ),
+                        trackingApp =
+                            TrackingApp(
+                                item.vpnTracker.trackingApp.packageId,
+                                item.vpnTracker.trackingApp.appDisplayName),
                         trackersTotalCount = totalTrackerCount,
                         trackers = trackerList.sortedByDescending { it.timestamp },
                         timestamp = item.vpnTracker.timestamp,
-                        displayTimestamp = timeDiffFormatter.formatTimePassed(
-                            LocalDateTime.now(),
-                            LocalDateTime.parse(item.vpnTracker.timestamp)
-                        )
-                    )
-                )
+                        displayTimestamp =
+                            timeDiffFormatter.formatTimePassed(
+                                LocalDateTime.now(),
+                                LocalDateTime.parse(item.vpnTracker.timestamp))))
             }
         }
 
@@ -134,19 +146,23 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     data class TimeWindow(val value: Long, val unit: TimeUnit) {
         fun asString(): String {
-            return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
+            return DatabaseDateFormatter.timestamp(
+                LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
         }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class DeviceShieldActivityFeedViewModelFactory @Inject constructor(
+class DeviceShieldActivityFeedViewModelFactory
+@Inject
+constructor(
     private val deviceShieldActivityFeedViewModel: Provider<DeviceShieldActivityFeedViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DeviceShieldActivityFeedViewModel::class.java) -> (deviceShieldActivityFeedViewModel.get() as T)
+                isAssignableFrom(DeviceShieldActivityFeedViewModel::class.java) ->
+                    (deviceShieldActivityFeedViewModel.get() as T)
                 else -> null
             }
         }

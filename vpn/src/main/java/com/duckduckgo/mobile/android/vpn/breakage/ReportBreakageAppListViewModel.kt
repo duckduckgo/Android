@@ -22,16 +22,16 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Provider
 
-class ReportBreakageAppListViewModel constructor(
-    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository
-) : ViewModel() {
+class ReportBreakageAppListViewModel
+constructor(private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository) :
+    ViewModel() {
 
     private val selectedAppFlow = MutableStateFlow<InstalledApp?>(null)
 
@@ -39,48 +39,51 @@ class ReportBreakageAppListViewModel constructor(
     internal fun commands(): Flow<ReportBreakageAppListView.Command> = command.receiveAsFlow()
 
     internal suspend fun getInstalledApps(): Flow<ReportBreakageAppListView.State> {
-        return trackingProtectionAppsRepository.getProtectedApps()
+        return trackingProtectionAppsRepository
+            .getProtectedApps()
             .combine(selectedAppFlow.asStateFlow()) { apps, selectedApp ->
                 val installedApps = apps.map { InstalledApp(it.packageName, it.name) }
-                selectedApp?.let { appSelected ->
-                    installedApps.update(appSelected)
-                } ?: installedApps
+                selectedApp?.let { appSelected -> installedApps.update(appSelected) }
+                    ?: installedApps
             }
-            .map { ReportBreakageAppListView.State(installedApps = it, canSubmit = it.hasSelected()) }
+            .map {
+                ReportBreakageAppListView.State(installedApps = it, canSubmit = it.hasSelected())
+            }
     }
 
     internal fun onAppSelected(app: InstalledApp) {
-        viewModelScope.launch {
-            selectedAppFlow.emit(app.copy(isSelected = true))
-        }
+        viewModelScope.launch { selectedAppFlow.emit(app.copy(isSelected = true)) }
     }
 
     internal fun onSubmitBreakage() {
         viewModelScope.launch {
-            selectedAppFlow.value?.let { command.send(ReportBreakageAppListView.Command.LaunchBreakageForm(it)) }
+            selectedAppFlow.value?.let {
+                command.send(ReportBreakageAppListView.Command.LaunchBreakageForm(it))
+            }
         }
     }
     internal fun onBreakageSubmitted(issueReport: IssueReport) {
         viewModelScope.launch {
             selectedAppFlow.value?.let {
-                command.send(ReportBreakageAppListView.Command.SendBreakageInfo(issueReport.copy(appPackageId = it.packageName)))
+                command.send(
+                    ReportBreakageAppListView.Command.SendBreakageInfo(
+                        issueReport.copy(appPackageId = it.packageName)))
             }
         }
     }
 
     private fun List<InstalledApp>.update(newValue: InstalledApp): List<InstalledApp> {
-        return toMutableList().map {
-            if (it.packageName == newValue.packageName) newValue else it
-        }
+        return toMutableList().map { if (it.packageName == newValue.packageName) newValue else it }
     }
 
     private fun List<InstalledApp>.hasSelected() = find { it.isSelected } != null
 }
 
 @ContributesMultibinding(AppScope::class)
-class ReportBreakageAppListViewModelFactory @Inject constructor(
-    private val repository: Provider<TrackingProtectionAppsRepository>
-) : ViewModelFactoryPlugin {
+class ReportBreakageAppListViewModelFactory
+@Inject
+constructor(private val repository: Provider<TrackingProtectionAppsRepository>) :
+    ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

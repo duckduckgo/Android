@@ -44,9 +44,14 @@ class AppNotificationSender(
         }
 
         val specification = notification.buildSpecification()
-        val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-        val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
-        val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
+        val launchIntent =
+            NotificationHandlerService.pendingNotificationHandlerIntent(
+                context, notification.launchIntent, specification)
+        val cancelIntent =
+            NotificationHandlerService.pendingNotificationHandlerIntent(
+                context, notification.cancelIntent, specification)
+        val systemNotification =
+            factory.createNotification(specification, launchIntent, cancelIntent)
         notificationDao.insert(Notification(notification.id))
         manager.notify(specification.systemId, systemNotification)
         pixel.fire("${AppPixelName.NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")

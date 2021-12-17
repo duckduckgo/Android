@@ -35,13 +35,6 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.ACK
-import xyz.hexene.localvpn.Packet.TCPHeader.FIN
-import xyz.hexene.localvpn.TCB
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.CancelledKeyException
@@ -49,8 +42,17 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors.newSingleThreadExecutor
 import kotlin.math.pow
+import kotlinx.coroutines.*
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.Packet.TCPHeader.ACK
+import xyz.hexene.localvpn.Packet.TCPHeader.FIN
+import xyz.hexene.localvpn.TCB
 
-class TcpPacketProcessor @AssistedInject constructor(
+class TcpPacketProcessor
+@AssistedInject
+constructor(
     queues: VpnQueues,
     @Assisted networkChannelCreator: NetworkChannelCreator,
     trackerDetector: VpnTrackerDetector,
@@ -69,21 +71,24 @@ class TcpPacketProcessor @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun build(networkChannelCreator: NetworkChannelCreator, coroutineScope: CoroutineScope): TcpPacketProcessor
+        fun build(
+            networkChannelCreator: NetworkChannelCreator,
+            coroutineScope: CoroutineScope
+        ): TcpPacketProcessor
     }
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
     private var staleTcpConnectionCleanerJob: Job? = null
 
-    private val tcpNetworkToDevice = TcpNetworkToDevice(
-        queues = queues,
-        selector = selector,
-        tcpSocketWriter = tcpSocketWriter,
-        packetPersister = packetPersister,
-        tcbCloser = tcbCloser,
-        vpnCoroutineScope = vpnCoroutineScope
-    )
+    private val tcpNetworkToDevice =
+        TcpNetworkToDevice(
+            queues = queues,
+            selector = selector,
+            tcpSocketWriter = tcpSocketWriter,
+            packetPersister = packetPersister,
+            tcbCloser = tcbCloser,
+            vpnCoroutineScope = vpnCoroutineScope)
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
             queues = queues,
@@ -99,24 +104,31 @@ class TcpPacketProcessor @AssistedInject constructor(
             hostnameExtractor = hostnameExtractor,
             payloadBytesExtractor = payloadBytesExtractor,
             recentAppTrackerCache = recentAppTrackerCache,
-            vpnCoroutineScope = vpnCoroutineScope
-        )
+            vpnCoroutineScope = vpnCoroutineScope)
 
     override fun run() {
         Timber.i("Starting %s", this::class.simpleName)
 
         if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
+            pollJobDeviceToNetwork =
+                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
+                    pollForDeviceToNetworkWork()
+                }
         }
 
         if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
+            pollJobNetworkToDevice =
+                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
+                    pollForNetworkToDeviceWork()
+                }
         }
 
         if (staleTcpConnectionCleanerJob == null) {
-            staleTcpConnectionCleanerJob = vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) { periodicConnectionCleanup() }
+            staleTcpConnectionCleanerJob =
+                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
+                    periodicConnectionCleanup()
+                }
         }
-
     }
 
     private suspend fun periodicConnectionCleanup() {
@@ -178,7 +190,11 @@ class TcpPacketProcessor @AssistedInject constructor(
     )
 
     companion object {
-        fun logPacketDetails(packet: Packet, sequenceNumber: Long, acknowledgementNumber: Long): String {
+        fun logPacketDetails(
+            packet: Packet,
+            sequenceNumber: Long,
+            acknowledgementNumber: Long
+        ): String {
             with(packet.tcpHeader) {
                 return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
                 isRST.printFlag(
@@ -209,10 +225,14 @@ class TcpPacketProcessor @AssistedInject constructor(
             this.tcbState = newStatus
         }
 
-        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, payloadSize: Int, triggeredByServerEndOfStream: Boolean) {
+        fun TCB.sendFinToClient(
+            queues: VpnQueues,
+            packet: Packet,
+            payloadSize: Int,
+            triggeredByServerEndOfStream: Boolean
+        ) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
-
                 var responseAck = acknowledgementNumberToClient + payloadSize
                 val responseSeq = acknowledgementNumberToServer
 
@@ -220,7 +240,8 @@ class TcpPacketProcessor @AssistedInject constructor(
                     responseAck = increaseOrWraparound(responseAck, 1)
                 }
 
-                this.referencePacket.updateTcpBuffer(buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0)
+                this.referencePacket.updateTcpBuffer(
+                    buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0)
 
                 if (triggeredByServerEndOfStream) {
                     finSequenceNumberToClient = sequenceNumberToClient
@@ -232,10 +253,11 @@ class TcpPacketProcessor @AssistedInject constructor(
                 Timber.v(
                     "%s - Sending FIN/ACK, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
-                    responseSeq, responseAck,
-                    sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
-                )
-
+                    responseSeq,
+                    responseAck,
+                    sequenceNumberToClient,
+                    acknowledgementNumberToClient,
+                    payloadSize)
             }
 
             queues.networkToDevice.offerFirst(buffer)
@@ -252,16 +274,17 @@ class TcpPacketProcessor @AssistedInject constructor(
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
-                acknowledgementNumberToClient = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
+                acknowledgementNumberToClient =
+                    increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
                 sequenceNumberToClient = packet.tcpHeader.acknowledgementNumber
 
                 if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
-                    acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
+                    acknowledgementNumberToClient =
+                        increaseOrWraparound(acknowledgementNumberToClient, 1)
                     Timber.v(
                         "%s - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to %d",
                         ipAndPort,
-                        acknowledgementNumberToClient
-                    )
+                        acknowledgementNumberToClient)
                 }
 
                 Timber.i(
@@ -269,11 +292,15 @@ class TcpPacketProcessor @AssistedInject constructor(
                     ipAndPort,
                     payloadSize,
                     acknowledgementNumberToClient,
-                    sequenceNumberToClient
-                )
+                    sequenceNumberToClient)
 
                 val buffer = ByteBufferPool.acquire()
-                packet.updateTcpBuffer(buffer, (ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+                packet.updateTcpBuffer(
+                    buffer,
+                    (ACK).toByte(),
+                    sequenceNumberToClient,
+                    acknowledgementNumberToClient,
+                    0)
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
             }
@@ -303,5 +330,4 @@ class TcpPacketProcessor @AssistedInject constructor(
         private val MAX_SEQUENCE_NUMBER = (2.0.pow(32.0) - 1).toLong()
         private const val PERIODIC_STALE_CONNECTION_CLEANUP_PERIOD_MS = 30_000L
     }
-
 }

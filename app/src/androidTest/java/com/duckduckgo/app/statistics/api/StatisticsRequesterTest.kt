@@ -36,29 +36,32 @@ class StatisticsRequesterTest {
     private var mockResponseBody: ResponseBody = mock()
     private var mockVariantManager: VariantManager = mock()
 
-    private val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-        override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
-            return listOf()
+    private val plugins =
+        object : PluginPoint<RefreshRetentionAtbPlugin> {
+            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+                return listOf()
+            }
         }
-    }
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins)
+    private var testee: StatisticsRequester =
+        StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins)
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        whenever(mockVariantManager.getVariant())
+            .thenReturn(Variant("ma", 100.0, filterBy = { true }))
         whenever(mockService.atb(any())).thenReturn(Observable.just(ATB))
-        whenever(mockService.updateSearchAtb(any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.updateSearchAtb(any(), any(), any()))
+            .thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
     }
 
     @Test
     fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
-        whenever(mockService.updateSearchAtb(any(), any(), any())).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateSearchAtb(any(), any(), any()))
+            .thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshSearchRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
     }
@@ -66,7 +69,8 @@ class StatisticsRequesterTest {
     @Test
     fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
-        whenever(mockService.updateAppAtb(any(), any(), any())).thenReturn(Observable.just(UPDATE_ATB))
+        whenever(mockService.updateAppAtb(any(), any(), any()))
+            .thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshAppRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
     }

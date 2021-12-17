@@ -22,7 +22,11 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 
 class PredefinedGradeDataJsonConverter {
 
-    class GradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: Input, val url: String) {
+    class GradeTestCase(
+        val expected: Grade.Scores.ScoresAvailable,
+        val input: Input,
+        val url: String
+    ) {
 
         class Input(
             val https: Boolean,
@@ -35,7 +39,11 @@ class PredefinedGradeDataJsonConverter {
         class Tracker(val blocked: Boolean, val parentEntity: Entity)
     }
 
-    class JsonGradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: JsonInput, val url: String) {
+    class JsonGradeTestCase(
+        val expected: Grade.Scores.ScoresAvailable,
+        val input: JsonInput,
+        val url: String
+    ) {
 
         class JsonInput(
             val https: Boolean,
@@ -51,19 +59,17 @@ class PredefinedGradeDataJsonConverter {
 }
 
 fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.JsonInput.toInput(): Input {
-    val trackerList = trackers.map {
-        Tracker(it.blocked, entity(it.parentEntity, it.prevalence))
-    }
+    val trackerList = trackers.map { Tracker(it.blocked, entity(it.parentEntity, it.prevalence)) }
     return Input(
         https,
         httpsAutoUpgrade,
         entity(parentEntity, parentTrackerPrevalence),
         privacyScore,
-        trackerList.toTypedArray()
-    )
+        trackerList.toTypedArray())
 }
 
-fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.toGradeTestCase(): PredefinedGradeDataJsonConverter.GradeTestCase {
+fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.toGradeTestCase():
+    PredefinedGradeDataJsonConverter.GradeTestCase {
     return PredefinedGradeDataJsonConverter.GradeTestCase(expected, input.toInput(), url)
 }
 

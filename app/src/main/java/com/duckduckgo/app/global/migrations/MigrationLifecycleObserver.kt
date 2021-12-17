@@ -23,12 +23,14 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class MigrationLifecycleObserver @Inject constructor(
+class MigrationLifecycleObserver
+@Inject
+constructor(
     private val migrationPluginPoint: PluginPoint<MigrationPlugin>,
     private val migrationStore: MigrationStore
 ) : LifecycleObserver {
@@ -36,13 +38,11 @@ class MigrationLifecycleObserver @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun migrate() {
         val currentVersion = migrationStore.version
-        migrationPluginPoint.getPlugins()
+        migrationPluginPoint
+            .getPlugins()
             .sortedBy { it.version }
-            .filter {
-                currentVersion < it.version
-            }.forEach {
-                it.run()
-            }
+            .filter { currentVersion < it.version }
+            .forEach { it.run() }
 
         if (currentVersion < CURRENT_VERSION) {
             migrationStore.version = CURRENT_VERSION

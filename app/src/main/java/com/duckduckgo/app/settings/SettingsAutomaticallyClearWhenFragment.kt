@@ -25,9 +25,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
+import com.duckduckgo.mobile.android.ui.view.show
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
@@ -37,9 +37,11 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
+        val currentOption: ClearWhenOption =
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
 
-        val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
+        val rootView =
+            View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
 
         if (BuildConfig.DEBUG) {
             showDebugOnlyOption(rootView)
@@ -47,25 +49,27 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhenGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
-            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
-                dialog?.let {
-                    val radioGroup = it.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
-                        R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
-                        R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
-                        R.id.settingInactive60Mins -> APP_EXIT_OR_60_MINS
-                        R.id.settingInactive5Seconds -> APP_EXIT_OR_5_SECONDS
-                        else -> APP_EXIT_ONLY
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
+                .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
+                    dialog?.let {
+                        val radioGroup = it.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
+                        val selectedOption =
+                            when (radioGroup.checkedRadioButtonId) {
+                                R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
+                                R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
+                                R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
+                                R.id.settingInactive60Mins -> APP_EXIT_OR_60_MINS
+                                R.id.settingInactive5Seconds -> APP_EXIT_OR_5_SECONDS
+                                else -> APP_EXIT_ONLY
+                            }
+                        val listener = activity as Listener?
+                        listener?.onAutomaticallyClearWhenOptionSelected(selectedOption)
                     }
-                    val listener = activity as Listener?
-                    listener?.onAutomaticallyClearWhenOptionSelected(selectedOption)
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -99,12 +103,10 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         fun create(clearWhenSetting: ClearWhenOption?): SettingsAutomaticallyClearWhenFragment {
             val fragment = SettingsAutomaticallyClearWhenFragment()
 
-            fragment.arguments = Bundle().also {
-                it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhenSetting)
+            fragment.arguments =
+                Bundle().also { it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhenSetting) }
 
-            }
             return fragment
         }
     }
-
 }

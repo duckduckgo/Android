@@ -34,12 +34,8 @@ class GetCookieHostsToPreserveTest {
     @Test
     fun whenSubDomainFireproofWebsiteThenExpectedListReturned() {
         givenFireproofWebsitesStored(FireproofWebsiteEntity("mobile.twitter.com"))
-        val expectedList = listOf(
-            ".mobile.twitter.com",
-            "mobile.twitter.com",
-            ".twitter.com",
-            ".com"
-        )
+        val expectedList =
+            listOf(".mobile.twitter.com", "mobile.twitter.com", ".twitter.com", ".com")
 
         val hostsToPreserve = getHostsToPreserve()
 
@@ -60,13 +56,8 @@ class GetCookieHostsToPreserveTest {
     fun whenMultipleFireproofWebsiteWithSameTopLevelThenExpectedListReturned() {
         givenFireproofWebsitesStored(FireproofWebsiteEntity("twitter.com"))
         givenFireproofWebsitesStored(FireproofWebsiteEntity("example.com"))
-        val expectedList = listOf(
-            ".example.com",
-            "example.com",
-            "twitter.com",
-            ".twitter.com",
-            ".com"
-        )
+        val expectedList =
+            listOf(".example.com", "example.com", "twitter.com", ".twitter.com", ".com")
 
         val hostsToPreserve = getHostsToPreserve()
 

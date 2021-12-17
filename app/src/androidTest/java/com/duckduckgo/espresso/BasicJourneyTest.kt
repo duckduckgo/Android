@@ -32,14 +32,13 @@ import org.junit.runner.RunWith
 class BasicJourneyTest {
 
     /**
-     * Use [ActivityScenarioRule] to create and launch the activity under test before each test,
-     * and close it after each test. This is a replacement for
-     * [androidx.test.rule.ActivityTestRule].
+     * Use [ActivityScenarioRule] to create and launch the activity under test before each test, and
+     * close it after each test. This is a replacement for [androidx.test.rule.ActivityTestRule].
      */
-    @get:Rule
-    var activityScenarioRule = activityScenarioRule<BrowserActivity>()
+    @get:Rule var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
-    @Test @UserJourney
+    @Test
+    @UserJourney
     fun browser_openPopUp() {
         // since we use a fake toolbar, we want to wait until the real one is visible
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
@@ -50,5 +49,4 @@ class BasicJourneyTest {
         // check that the forward arrow is visible
         onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
     }
-
 }

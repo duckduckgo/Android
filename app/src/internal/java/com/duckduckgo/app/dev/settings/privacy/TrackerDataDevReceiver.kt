@@ -31,8 +31,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class TrackerDataDevReceiver(
     context: Context,
@@ -53,7 +53,9 @@ class TrackerDataDevReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class TrackerDataDevReceiverRegister @Inject constructor(
+class TrackerDataDevReceiverRegister
+@Inject
+constructor(
     private val context: Context,
     private val trackderDataDownloader: TrackerDataDownloader
 ) : LifecycleObserver {
@@ -69,12 +71,19 @@ class TrackerDataDevReceiverRegister @Inject constructor(
         Timber.i("Debug receiver TrackerDataDevReceiverRegister registered")
 
         TrackerDataDevReceiver(context) { _ ->
-            trackderDataDownloader.downloadTds()
+            trackderDataDownloader
+                .downloadTds()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { Toast.makeText(context, "Tds data downloaded", Toast.LENGTH_LONG).show() },
-                    { Toast.makeText(context, "Error while downloading Tds ${it.localizedMessage}", Toast.LENGTH_LONG).show() },
+                    {
+                        Toast.makeText(
+                                context,
+                                "Error while downloading Tds ${it.localizedMessage}",
+                                Toast.LENGTH_LONG)
+                            .show()
+                    },
                 )
         }
     }

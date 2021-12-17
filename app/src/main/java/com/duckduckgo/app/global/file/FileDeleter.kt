@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.global.file
 
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 interface FileDeleter {
 
@@ -26,18 +26,15 @@ interface FileDeleter {
      * Delete the contents of the given directory, but don't delete the directory itself
      *
      * Optionally: specify an exclusion list. Files with names exactly matching will not be deleted.
-     * Note, the exclusion list only applies to the top-level directory. All files in subdirectories will be deleted, regardless of exclusion list.
+     * Note, the exclusion list only applies to the top-level directory. All files in subdirectories
+     * will be deleted, regardless of exclusion list.
      */
     suspend fun deleteContents(parentDirectory: File, excludedFiles: List<String> = emptyList())
 
-    /**
-     * Delete the contents of the given directory, and deletes the directory itself.
-     */
+    /** Delete the contents of the given directory, and deletes the directory itself. */
     suspend fun deleteDirectory(directoryToDelete: File)
 
-    /**
-     * Delete a file(s) of the given directory, but don't delete the directory itself
-     */
+    /** Delete a file(s) of the given directory, but don't delete the directory itself */
     suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>)
 }
 
@@ -51,9 +48,7 @@ class AndroidFileDeleter : FileDeleter {
     }
 
     override suspend fun deleteDirectory(directoryToDelete: File) {
-        withContext(Dispatchers.IO) {
-            directoryToDelete.deleteRecursively()
-        }
+        withContext(Dispatchers.IO) { directoryToDelete.deleteRecursively() }
     }
 
     override suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>) {

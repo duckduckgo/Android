@@ -34,7 +34,8 @@ class NotificationRegistrarTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notifcationManagerCompat = NotificationManagerCompat.from(context)
-    private val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager =
+        context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
@@ -45,14 +46,14 @@ class NotificationRegistrarTest {
     @Before
     fun before() {
         whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
-        testee = NotificationRegistrar(
-            TestCoroutineScope(),
-            context,
-            notificationManager,
-            notifcationManagerCompat,
-            mockSettingsDataStore,
-            mockPixel
-        )
+        testee =
+            NotificationRegistrar(
+                TestCoroutineScope(),
+                context,
+                notificationManager,
+                notifcationManagerCompat,
+                mockSettingsDataStore,
+                mockPixel)
     }
 
     @Test

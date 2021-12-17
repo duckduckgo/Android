@@ -21,15 +21,17 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppP
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import java.net.InetAddress
 import org.junit.Test
 import xyz.hexene.localvpn.Packet
-import java.net.InetAddress
 
 class OriginatingAppPackageIdentifierStrategyTest {
 
     private val mockResolverModern: OriginatingAppPackageIdentifier = mock()
     private val mockResolverLegacy: OriginatingAppPackageIdentifier = mock()
-    private val testee = OriginatingAppPackageIdentifierStrategy(modern = mockResolverModern, legacy = mockResolverLegacy)
+    private val testee =
+        OriginatingAppPackageIdentifierStrategy(
+            modern = mockResolverModern, legacy = mockResolverLegacy)
 
     @Test
     fun whenLegacyDeviceThenLegacyResolverUsed() {
@@ -45,7 +47,8 @@ class OriginatingAppPackageIdentifierStrategyTest {
         verify(mockResolverModern).resolvePackageId(connectionInfo)
     }
 
-    private fun aConnectionInfo(): ConnectionInfo = ConnectionInfo(anAddress(), aPort(), anAddress(), aPort(), aProtocol())
+    private fun aConnectionInfo(): ConnectionInfo =
+        ConnectionInfo(anAddress(), aPort(), anAddress(), aPort(), aProtocol())
     private fun anAddress(): InetAddress = InetAddress.getByName("192.168.0.1")
     private fun aPort(): Int = 80
     private fun aProtocol(): Int = Packet.IP4Header.TransportProtocol.TCP.number

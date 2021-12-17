@@ -31,7 +31,8 @@ interface FireAnimationLoader : LifecycleObserver {
     fun preloadSelectedAnimation()
 }
 
-class LottieFireAnimationLoader constructor(
+class LottieFireAnimationLoader
+constructor(
     private val context: Context,
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,

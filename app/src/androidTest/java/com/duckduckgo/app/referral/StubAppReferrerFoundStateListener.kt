@@ -29,8 +29,7 @@ class StubAppReferrerFoundStateListener(
         return ParsedReferrerResult.CampaignReferrerFound(referrer)
     }
 
-    override fun initialiseReferralRetrieval() {
-    }
+    override fun initialiseReferralRetrieval() {}
 
     override suspend fun beforeAtbInit() {
         waitForReferrerCode()

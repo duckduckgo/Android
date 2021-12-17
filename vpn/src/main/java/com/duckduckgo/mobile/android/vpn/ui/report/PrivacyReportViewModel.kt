@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
@@ -46,13 +46,17 @@ class PrivacyReportViewModel(
     private val applicationContext: Context,
 ) : ViewModel(), LifecycleObserver {
 
-    private val vpnRunningState = MutableStateFlow(
-        PrivacyReportView.RunningState(isRunning = true, hasValueChanged = false)
-    )
+    private val vpnRunningState =
+        MutableStateFlow(PrivacyReportView.RunningState(isRunning = true, hasValueChanged = false))
 
-    val viewStateFlow = vpnRunningState.combine(getReport()) { runningState, trackersBlocked ->
-        PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
-    }
+    val viewStateFlow =
+        vpnRunningState.combine(getReport()) { runningState, trackersBlocked ->
+            PrivacyReportView.ViewState(
+                runningState.isRunning,
+                runningState.hasValueChanged,
+                trackersBlocked,
+                deviceShieldOnboarding.didShowOnboarding())
+        }
 
     fun pollDeviceShieldState() {
         viewModelScope.launch {
@@ -69,31 +73,45 @@ class PrivacyReportViewModel(
 
     @VisibleForTesting
     fun getReport(): Flow<PrivacyReportView.TrackersBlocked> {
-        return repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
-            if (trackers.isEmpty()) {
-                PrivacyReportView.TrackersBlocked("", 0, 0)
-            } else {
-                val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
-                val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
-                val latestApp = perApp.first().first.appDisplayName
+        return repository
+            .getVpnTrackers({ dateOfLastHour() })
+            .map { trackers ->
+                if (trackers.isEmpty()) {
+                    PrivacyReportView.TrackersBlocked("", 0, 0)
+                } else {
+                    val perApp =
+                        trackers.groupBy { it.trackingApp }.toList().sortedByDescending {
+                            it.second.size
+                        }
+                    val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
+                    val latestApp = perApp.first().first.appDisplayName
 
-                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
+                    PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.size)
+                }
             }
-
-        }.onStart {
-            pollDeviceShieldState()
-        }
+            .onStart { pollDeviceShieldState() }
     }
 
     object PrivacyReportView {
-        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked, val onboardingComplete: Boolean)
+        data class ViewState(
+            val isRunning: Boolean,
+            val hasValueChanged: Boolean,
+            val trackersBlocked: TrackersBlocked,
+            val onboardingComplete: Boolean
+        )
         data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
-        data class TrackersBlocked(val latestApp: String, val otherAppsSize: Int, val trackers: Int)
+        data class TrackersBlocked(
+            val latestApp: String,
+            val otherAppsSize: Int,
+            val trackers: Int
+        )
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class PrivacyReportViewModelFactory @Inject constructor(
+class PrivacyReportViewModelFactory
+@Inject
+constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
@@ -102,14 +120,13 @@ class PrivacyReportViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyReportViewModel::class.java) -> (
-                    PrivacyReportViewModel(
+                isAssignableFrom(PrivacyReportViewModel::class.java) ->
+                    (PrivacyReportViewModel(
                         appTrackerBlockingStatsRepository,
                         deviceShieldPixels,
                         deviceShieldOnboardingStore,
-                        context
-                    ) as T
-                    )
+                        context) as
+                        T)
                 else -> null
             }
         }

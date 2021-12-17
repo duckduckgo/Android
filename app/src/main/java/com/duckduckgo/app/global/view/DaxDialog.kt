@@ -108,7 +108,8 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
     override fun onStart() {
         super.onStart()
         dialog?.window?.attributes?.dimAmount = 0f
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -181,13 +182,16 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
         }
 
         context?.let {
-            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
+            val toolbarColor =
+                if (toolbarDimmed) getColor(it, R.color.dimmed)
+                else getColor(it, android.R.color.transparent)
             with(binding) {
                 toolbarDialogLayout.setBackgroundColor(toolbarColor)
                 hiddenText.text = daxText.html(it)
                 primaryCta.text = primaryButtonText
                 secondaryCta.text = secondaryButtonText
-                secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
+                secondaryCta.visibility =
+                    if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
                 dialogText.typingDelayInMs = typingDelayInMs
                 hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
             }
@@ -206,15 +210,16 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
             showHideButton: Boolean = true
         ): TypewriterDaxDialog {
             return TypewriterDaxDialog().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_DAX_TEXT, daxText)
-                    putString(ARG_PRIMARY_CTA_TEXT, primaryButtonText)
-                    putString(ARG_SECONDARY_CTA_TEXT, secondaryButtonText)
-                    putBoolean(ARG_TOOLBAR_DIMMED, toolbarDimmed)
-                    putBoolean(ARG_DISMISSIBLE, dismissible)
-                    putLong(ARG_TYPING_DELAY, typingDelayInMs)
-                    putBoolean(ARG_SHOW_HIDE_BUTTON, showHideButton)
-                }
+                arguments =
+                    Bundle().apply {
+                        putString(ARG_DAX_TEXT, daxText)
+                        putString(ARG_PRIMARY_CTA_TEXT, primaryButtonText)
+                        putString(ARG_SECONDARY_CTA_TEXT, secondaryButtonText)
+                        putBoolean(ARG_TOOLBAR_DIMMED, toolbarDimmed)
+                        putBoolean(ARG_DISMISSIBLE, dismissible)
+                        putLong(ARG_TYPING_DELAY, typingDelayInMs)
+                        putBoolean(ARG_SHOW_HIDE_BUTTON, showHideButton)
+                    }
             }
         }
 

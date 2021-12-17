@@ -22,17 +22,20 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class SiteFactory @Inject constructor(
+class SiteFactory
+@Inject
+constructor(
     private val privacyPractices: PrivacyPractices,
     private val entityLookup: EntityLookup
 ) {
 
     /**
-     * Builds a Site with minimal details; this is quick to build but won't contain the full details needed for all functionality
+     * Builds a Site with minimal details; this is quick to build but won't contain the full details
+     * needed for all functionality
      *
      * @see [loadFullSiteDetails] to ensure full privacy details are loaded
      */
@@ -50,7 +53,8 @@ class SiteFactory @Inject constructor(
     fun loadFullSiteDetails(site: Site) {
         val practices = privacyPractices.privacyPracticesFor(site.url)
         val memberNetwork = entityLookup.entityForUrl(site.url)
-        val siteDetails = SitePrivacyData(site.url, practices, memberNetwork, memberNetwork?.prevalence ?: 0.0)
+        val siteDetails =
+            SitePrivacyData(site.url, practices, memberNetwork, memberNetwork?.prevalence ?: 0.0)
         site.updatePrivacyData(siteDetails)
     }
 

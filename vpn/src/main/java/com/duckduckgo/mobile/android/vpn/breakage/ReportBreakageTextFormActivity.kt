@@ -27,16 +27,14 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageTextFormBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject
-    lateinit var metadataReporter: ReportBreakageMetadataReporter
+    @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
 
     private val binding: ActivityReportBreakageTextFormBinding by viewBinding()
 
@@ -45,28 +43,36 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
 
     private lateinit var brokenApp: BrokenApp
 
-    private val reportBreakageLoginInfo = registerForActivityResult(ReportBreakageContract()) { issueReport ->
-        if (!issueReport.isEmpty()) {
-            lifecycleScope.launch {
-                val issue = issueReport.copy(
-                    appName = brokenApp.appName,
-                    appPackageId = brokenApp.appPackageId,
-                    description = binding.appBreakageFormFeedbackInput.text.toString(),
-                    customMetadata = Base64.encodeToString(metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
-                )
-                deviceShieldPixels.sendAppBreakageReport(issue.toMap())
+    private val reportBreakageLoginInfo =
+        registerForActivityResult(ReportBreakageContract()) { issueReport ->
+            if (!issueReport.isEmpty()) {
+                lifecycleScope.launch {
+                    val issue =
+                        issueReport.copy(
+                            appName = brokenApp.appName,
+                            appPackageId = brokenApp.appPackageId,
+                            description = binding.appBreakageFormFeedbackInput.text.toString(),
+                            customMetadata =
+                                Base64.encodeToString(
+                                    metadataReporter
+                                        .getVpnStateMetadata(issueReport.appPackageId)
+                                        .toByteArray(),
+                                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE))
+                    deviceShieldPixels.sendAppBreakageReport(issue.toMap())
 
-                setResult(RESULT_OK, Intent().apply { issue.addToIntent(this) })
-                finish()
+                    setResult(RESULT_OK, Intent().apply { issue.addToIntent(this) })
+                    finish()
+                }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // The value should never be "unknown" we just do this because getParcelableExtra returns nullable
-        brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
+        // The value should never be "unknown" we just do this because getParcelableExtra returns
+        // nullable
+        brokenApp =
+            intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
 
         setContentView(binding.root)
         setupToolbar(toolbar)
@@ -79,9 +85,13 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     }
 
     fun setupViews() {
-        binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.appBreakageFormDisclaimer.text =
+            HtmlCompat.fromHtml(
+                getString(R.string.atp_ReportBreakageFormDisclaimerText),
+                HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.ctaNextFormText.setOnClickListener {
-            reportBreakageLoginInfo.launch(ReportBreakageScreen.LoginInformation(brokenApp.appName, brokenApp.appPackageId))
+            reportBreakageLoginInfo.launch(
+                ReportBreakageScreen.LoginInformation(brokenApp.appName, brokenApp.appPackageId))
         }
     }
 

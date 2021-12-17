@@ -32,9 +32,12 @@ class PrivacyProtectionCountDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         dao = db.privacyProtectionCountsDao()
     }
 
@@ -77,7 +80,8 @@ class PrivacyProtectionCountDaoTest {
 
     @Test
     fun whenCountsInitialisedToArbitraryValueThenThoseReturnedInCounts() {
-        dao.initialiseCounts(PrivacyProtectionCountsEntity(blockedTrackerCount = 5, upgradeCount = 3))
+        dao.initialiseCounts(
+            PrivacyProtectionCountsEntity(blockedTrackerCount = 5, upgradeCount = 3))
         assertEquals(5, dao.getTrackersBlockedCount())
         assertEquals(3, dao.getUpgradeCount())
     }

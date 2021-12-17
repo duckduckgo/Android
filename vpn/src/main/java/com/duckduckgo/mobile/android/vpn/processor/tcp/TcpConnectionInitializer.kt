@@ -19,14 +19,14 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import timber.log.Timber
-import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader
-import xyz.hexene.localvpn.TCB
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 import kotlin.random.Random
+import timber.log.Timber
+import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.Packet.TCPHeader
+import xyz.hexene.localvpn.TCB
 
 interface ConnectionInitializer {
     fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>?
@@ -42,11 +42,13 @@ interface ConnectionInitializer {
         fun key(): String {
             return "$destinationAddress:$destinationPort:$sourcePort"
         }
-
     }
 }
 
-class TcpConnectionInitializer(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : ConnectionInitializer {
+class TcpConnectionInitializer(
+    private val queues: VpnQueues,
+    private val networkChannelCreator: NetworkChannelCreator
+) : ConnectionInitializer {
 
     override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
         val key = params.key()
@@ -56,29 +58,38 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
 
         Timber.d("Initializing connection $key")
 
-        val pair = if (header.isSYN) {
-            val channel = networkChannelCreator.createSocketChannel()
-            val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
-            val sequenceToServer = header.sequenceNumber
-            val ackNumberToClient = header.sequenceNumber + 1
-            val ackNumberToServer = header.acknowledgementNumber
+        val pair =
+            if (header.isSYN) {
+                val channel = networkChannelCreator.createSocketChannel()
+                val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
+                val sequenceToServer = header.sequenceNumber
+                val ackNumberToClient = header.sequenceNumber + 1
+                val ackNumberToServer = header.acknowledgementNumber
 
-            val tcb = TCB(key, sequenceNumberToClient, sequenceToServer, ackNumberToClient, ackNumberToServer, channel, params.packet)
-            TCB.putTCB(params.key(), tcb)
-            channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
-            Pair(tcb, channel)
-        } else {
-            Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
-            params.packet.updateTcpBuffer(
-                params.responseBuffer,
-                TCPHeader.RST.toByte(),
-                0,
-                params.packet.tcpHeader.sequenceNumber + 1,
-                params.packet.tcpPayloadSize(true)
-            )
-            queues.networkToDevice.offer(params.responseBuffer)
-            null
-        }
+                val tcb =
+                    TCB(
+                        key,
+                        sequenceNumberToClient,
+                        sequenceToServer,
+                        ackNumberToClient,
+                        ackNumberToServer,
+                        channel,
+                        params.packet)
+                TCB.putTCB(params.key(), tcb)
+                channel.connect(
+                    InetSocketAddress(params.destinationAddress, params.destinationPort))
+                Pair(tcb, channel)
+            } else {
+                Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
+                params.packet.updateTcpBuffer(
+                    params.responseBuffer,
+                    TCPHeader.RST.toByte(),
+                    0,
+                    params.packet.tcpHeader.sequenceNumber + 1,
+                    params.packet.tcpPayloadSize(true))
+                queues.networkToDevice.offer(params.responseBuffer)
+                null
+            }
 
         return pair
     }

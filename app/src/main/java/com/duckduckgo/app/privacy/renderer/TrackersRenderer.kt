@@ -29,19 +29,26 @@ class TrackersRenderer {
         return context.resources.getQuantityString(resource, trackerCount, trackerCount)
     }
 
-    fun majorNetworksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
-        val resource = if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
+    fun majorNetworksText(
+        context: Context,
+        networkCount: Int,
+        allTrackersBlocked: Boolean
+    ): String {
+        val resource =
+            if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
         return context.resources.getQuantityString(resource, networkCount, networkCount)
     }
 
     @DrawableRes
     fun networksBanner(allTrackersBlocked: Boolean): Int {
-        return if (allTrackersBlocked) R.drawable.networks_banner_good else R.drawable.networks_banner_bad
+        return if (allTrackersBlocked) R.drawable.networks_banner_good
+        else R.drawable.networks_banner_bad
     }
 
     @DrawableRes
     fun networksIcon(allTrackersBlocked: Boolean): Int {
-        return if (allTrackersBlocked) R.drawable.networks_icon_good else R.drawable.networks_icon_bad
+        return if (allTrackersBlocked) R.drawable.networks_icon_good
+        else R.drawable.networks_icon_bad
     }
 
     @DrawableRes
@@ -55,11 +62,12 @@ class TrackersRenderer {
     }
 
     private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
-        val drawable = "$prefix$networkName"
-            .replace(" ", "_")
-            .replace(".", "")
-            .replace(",", "")
-            .toLowerCase(Locale.ROOT)
+        val drawable =
+            "$prefix$networkName"
+                .replace(" ", "_")
+                .replace(".", "")
+                .replace(",", "")
+                .toLowerCase(Locale.ROOT)
         val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
         return if (resource != 0) resource else null
     }
@@ -71,9 +79,9 @@ class TrackersRenderer {
     }
 
     @DrawableRes
-    fun successFailureIcon(count: Int): Int = when (count) {
-        0 -> R.drawable.icon_success
-        else -> R.drawable.icon_fail
-    }
-
+    fun successFailureIcon(count: Int): Int =
+        when (count) {
+            0 -> R.drawable.icon_success
+            else -> R.drawable.icon_fail
+        }
 }

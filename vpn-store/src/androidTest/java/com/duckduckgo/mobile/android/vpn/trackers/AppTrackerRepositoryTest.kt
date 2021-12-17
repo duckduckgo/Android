@@ -31,14 +31,15 @@ class AppTrackerRepositoryTest {
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        vpnDatabase = Room.inMemoryDatabaseBuilder(
-            context,
-            VpnDatabase::class.java
-        ).allowMainThreadQueries().build().apply {
-            VpnDatabase.prepopulateAppTrackerBlockingList(context, this)
-        }
+        vpnDatabase =
+            Room.inMemoryDatabaseBuilder(context, VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
+                .apply { VpnDatabase.prepopulateAppTrackerBlockingList(context, this) }
 
-        appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
+        appTrackerRepository =
+            RealAppTrackerRepository(
+                vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
 
     @Test

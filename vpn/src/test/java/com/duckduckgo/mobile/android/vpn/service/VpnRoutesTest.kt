@@ -18,9 +18,9 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import java.net.InetAddress
 import org.junit.Assert.*
 import org.junit.Test
-import java.net.InetAddress
 
 class VpnRoutesTest {
 
@@ -134,7 +134,9 @@ class VpnRoutesTest {
         assertEquals("0.1.3.0", "0.1.2.255".incrementIpAddress())
         assertEquals("255.255.255.255", "255.255.255.254".incrementIpAddress())
 
-        kotlin.runCatching { "255.255.255.255".incrementIpAddress() }.onSuccess { fail("This should fail the test but didn't") }
+        kotlin.runCatching { "255.255.255.255".incrementIpAddress() }.onSuccess {
+            fail("This should fail the test but didn't")
+        }
     }
 
     private fun assertNoRoutes(routes: List<Route>) {
@@ -142,11 +144,15 @@ class VpnRoutesTest {
     }
 
     private fun assertIpLesserOrEqualTo(ipAddress: String, compareTo: String) {
-        assertTrue("$ipAddress needs to be <= $compareTo", ipAddress.normalizeIpAddress() <= compareTo.normalizeIpAddress())
+        assertTrue(
+            "$ipAddress needs to be <= $compareTo",
+            ipAddress.normalizeIpAddress() <= compareTo.normalizeIpAddress())
     }
 
     private fun assertIpGreaterOrEqualTo(ipAddress: String, compareTo: String) {
-        assertTrue("$ipAddress needs to be >= $compareTo", ipAddress.normalizeIpAddress() >= compareTo.normalizeIpAddress())
+        assertTrue(
+            "$ipAddress needs to be >= $compareTo",
+            ipAddress.normalizeIpAddress() >= compareTo.normalizeIpAddress())
     }
 
     private fun findRoutes(lowest: String, highest: String): List<Route> {
@@ -160,13 +166,17 @@ class VpnRoutesTest {
             val highestFromCurrentRoute = it.first.highAddress
             val expectedNextIpAddress = highestFromCurrentRoute.incrementIpAddress()
             val lowestFromNextRoute = it.second.lowAddress
-            assertEquals("Gap found in routes: $expectedNextIpAddress", expectedNextIpAddress, lowestFromNextRoute)
+            assertEquals(
+                "Gap found in routes: $expectedNextIpAddress",
+                expectedNextIpAddress,
+                lowestFromNextRoute)
         }
     }
 
     private fun String.incrementIpAddress(): String {
         if (this == "255.255.255.255") {
-            throw IllegalArgumentException("Cannot increment IP address; already maxed out at 255.255.255.255")
+            throw IllegalArgumentException(
+                "Cannot increment IP address; already maxed out at 255.255.255.255")
         }
 
         val addressBytes = InetAddress.getByName(this).address
@@ -189,13 +199,11 @@ class VpnRoutesTest {
             split(".")[0].padStart(3, '0'),
             split(".")[1].padStart(3, '0'),
             split(".")[2].padStart(3, '0'),
-            split(".")[3].padStart(3, '0')
-        )
+            split(".")[3].padStart(3, '0'))
     }
 
     private fun Byte.canIncrement(): Boolean {
         val uByte = this.toInt() and 0xFF
         return uByte < 255
     }
-
 }

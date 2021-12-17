@@ -37,9 +37,9 @@ import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleInstanceIn
 
 @Module
 class EmailModule {
@@ -56,7 +56,11 @@ class EmailModule {
     }
 
     @Provides
-    fun providesEmailInjector(emailManager: EmailManager, duckDuckGoUrlDetector: DuckDuckGoUrlDetector, dispatcherProvider: DispatcherProvider): EmailInjector {
+    fun providesEmailInjector(
+        emailManager: EmailManager,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        dispatcherProvider: DispatcherProvider
+    ): EmailInjector {
         return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider)
     }
 
@@ -78,11 +82,19 @@ class EmailModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): EmailWaitlistCodeFetcher {
-        return AppEmailWaitlistCodeFetcher(workManager, emailManager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
+        return AppEmailWaitlistCodeFetcher(
+            workManager,
+            emailManager,
+            notification,
+            notificationSender,
+            dispatcherProvider,
+            appCoroutineScope)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     @IntoSet
-    fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
+    fun providesWaitlistCodeFetcherObserver(
+        emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher
+    ): LifecycleObserver = emailWaitlistCodeFetcher
 }

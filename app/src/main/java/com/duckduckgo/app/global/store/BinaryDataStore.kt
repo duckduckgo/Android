@@ -24,8 +24,7 @@ class BinaryDataStore @Inject constructor(private val context: Context) {
 
     fun hasData(name: String): Boolean = context.fileExists(name)
 
-    fun loadData(name: String): ByteArray =
-        context.openFileInput(name).use { it.readBytes() }
+    fun loadData(name: String): ByteArray = context.openFileInput(name).use { it.readBytes() }
 
     fun saveData(name: String, byteArray: ByteArray) {
         context.openFileOutput(name, Context.MODE_PRIVATE).use { it.write(byteArray) }

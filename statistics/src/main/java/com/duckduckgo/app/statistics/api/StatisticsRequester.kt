@@ -102,7 +102,9 @@ class StatisticsRequester(
                     Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
                     store.searchRetentionAtb = it.version
                     storeUpdateVersionIfPresent(it)
-                    plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
+                    plugins.getPlugins().forEach { plugin ->
+                        plugin.onSearchRetentionAtbRefreshed()
+                    }
                 },
                 { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") })
     }

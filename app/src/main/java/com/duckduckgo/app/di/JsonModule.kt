@@ -30,9 +30,10 @@ class JsonModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun moshi(): Moshi = Moshi.Builder()
-        .add(ActionJsonAdapter())
-        .add(HttpsFalsePositivesJsonAdapter())
-        .add(TermsOfServiceListAdapter())
-        .build()
+    fun moshi(): Moshi =
+        Moshi.Builder()
+            .add(ActionJsonAdapter())
+            .add(HttpsFalsePositivesJsonAdapter())
+            .add(TermsOfServiceListAdapter())
+            .build()
 }

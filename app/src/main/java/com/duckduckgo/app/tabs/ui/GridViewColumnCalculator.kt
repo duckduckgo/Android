@@ -18,7 +18,6 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import com.duckduckgo.mobile.android.ui.view.toDp
-import com.duckduckgo.mobile.android.ui.view.toDp
 import com.duckduckgo.mobile.android.ui.view.toPx
 import kotlin.math.min
 
@@ -32,8 +31,9 @@ class GridViewColumnCalculator(val context: Context) {
     }
 
     /**
-     * Given a numOfColumns and their width, calculate sides padding to center all items on the GridView.
-     * RecyclerView should have a match_parent width to avoid clipping items if drag-drop enabled.
+     * Given a numOfColumns and their width, calculate sides padding to center all items on the
+     * GridView. RecyclerView should have a match_parent width to avoid clipping items if drag-drop
+     * enabled.
      *
      * @return start/end padding in pixels
      */

@@ -22,11 +22,9 @@ import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 @Dao
 abstract class TdsMetadataDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(tdsMetadata: TdsMetadata)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun insert(tdsMetadata: TdsMetadata)
 
-    @Query("SELECT eTag FROM tdsMetadata limit 1")
-    abstract fun eTag(): String?
+    @Query("SELECT eTag FROM tdsMetadata limit 1") abstract fun eTag(): String?
 
     @Transaction
     open fun tdsDownloadSuccessful(tdsMetadata: TdsMetadata) {

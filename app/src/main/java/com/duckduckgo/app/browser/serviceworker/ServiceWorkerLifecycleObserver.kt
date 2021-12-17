@@ -24,12 +24,14 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.di.scopes.AppScope
-import timber.log.Timber
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import javax.inject.Inject
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
-class ServiceWorkerLifecycleObserver @Inject constructor(
+class ServiceWorkerLifecycleObserver
+@Inject
+constructor(
     private val requestInterceptor: RequestInterceptor,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : LifecycleObserver {
@@ -38,9 +40,9 @@ class ServiceWorkerLifecycleObserver @Inject constructor(
     fun setServiceWorkerClient() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
-                ServiceWorkerController.getInstance().setServiceWorkerClient(
-                    BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)
-                )
+                ServiceWorkerController.getInstance()
+                    .setServiceWorkerClient(
+                        BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository))
             } catch (e: Exception) {
                 Timber.w(e.localizedMessage)
             }

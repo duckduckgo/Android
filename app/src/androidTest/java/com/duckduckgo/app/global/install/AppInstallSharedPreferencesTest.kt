@@ -31,7 +31,8 @@ class AppInstallSharedPreferencesTest {
 
     @Before
     fun setup() {
-        context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+            .edit { clear() }
         testee = AppInstallSharedPreferences(context)
     }
 

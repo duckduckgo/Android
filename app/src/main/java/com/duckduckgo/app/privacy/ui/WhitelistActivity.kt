@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
@@ -38,8 +38,7 @@ import javax.inject.Inject
 
 class WhitelistActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
     private lateinit var adapter: WebsitesAdapter
 
@@ -81,18 +80,9 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState.observe(
-            this,
-            Observer { viewState ->
-                viewState?.let { renderViewState(it) }
-            }
-        )
+            this, Observer { viewState -> viewState?.let { renderViewState(it) } })
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.command.observe(this, Observer { processCommand(it) })
     }
 
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
@@ -113,15 +103,18 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun showAddDialog() {
         val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val addDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogAddTitle)
-            setView(dialogBinding.root)
-            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialogBinding.textInput.text.toString()
-                viewModel.onEntryAdded(UserWhitelistedDomain(newText))
-            }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
+        val addDialog =
+            AlertDialog.Builder(this)
+                .apply {
+                    setTitle(R.string.dialogAddTitle)
+                    setView(dialogBinding.root)
+                    setPositiveButton(R.string.dialogSaveAction) { _, _ ->
+                        val newText = dialogBinding.textInput.text.toString()
+                        viewModel.onEntryAdded(UserWhitelistedDomain(newText))
+                    }
+                    setNegativeButton(android.R.string.no) { _, _ -> }
+                }
+                .create()
 
         dialog?.dismiss()
         dialog = addDialog
@@ -130,15 +123,18 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     private fun showEditDialog(entry: UserWhitelistedDomain) {
         val dialogBinding = EditWhitelistBinding.inflate(layoutInflater)
-        val editDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogEditTitle)
-            setView(dialogBinding.root)
-            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
-                val newText = dialogBinding.textInput.text.toString()
-                viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
-            }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
+        val editDialog =
+            AlertDialog.Builder(this)
+                .apply {
+                    setTitle(R.string.dialogEditTitle)
+                    setView(dialogBinding.root)
+                    setPositiveButton(R.string.dialogSaveAction) { _, _ ->
+                        val newText = dialogBinding.textInput.text.toString()
+                        viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
+                    }
+                    setNegativeButton(android.R.string.no) { _, _ -> }
+                }
+                .create()
 
         dialog?.dismiss()
         dialog = editDialog
@@ -149,12 +145,19 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun showDeleteDialog(entry: UserWhitelistedDomain) {
-        val deleteDialog = AlertDialog.Builder(this).apply {
-            setTitle(R.string.dialogConfirmTitle)
-            setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this.context))
-            setPositiveButton(android.R.string.yes) { _, _ -> viewModel.onEntryDeleted(entry) }
-            setNegativeButton(android.R.string.no) { _, _ -> }
-        }.create()
+        val deleteDialog =
+            AlertDialog.Builder(this)
+                .apply {
+                    setTitle(R.string.dialogConfirmTitle)
+                    setMessage(
+                        getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain)
+                            .html(this.context))
+                    setPositiveButton(android.R.string.yes) { _, _ ->
+                        viewModel.onEntryDeleted(entry)
+                    }
+                    setNegativeButton(android.R.string.no) { _, _ -> }
+                }
+                .create()
 
         dialog?.dismiss()
         dialog = deleteDialog

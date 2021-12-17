@@ -23,23 +23,20 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 class VpnReminderReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject
-    lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
+    @Inject lateinit var notificationPressedHandler: ReminderNotificationPressedHandler
 
-    @Inject
-    lateinit var reminderManager: VpnReminderReceiverManager
+    @Inject lateinit var reminderManager: VpnReminderReceiverManager
 
     override fun onReceive(context: Context, intent: Intent) {
         AndroidInjection.inject(this, context)
@@ -50,15 +47,12 @@ class VpnReminderReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
             deviceShieldPixels.enableFromReminderNotification()
-            goAsync(pendingResult) {
-                TrackerBlockingVpnService.startService(context)
-            }
+            goAsync(pendingResult) { TrackerBlockingVpnService.startService(context) }
         } else {
             Timber.w("VpnReminderReceiver: unknown action")
             pendingResult?.finish()
         }
     }
-
 }
 
 fun goAsync(

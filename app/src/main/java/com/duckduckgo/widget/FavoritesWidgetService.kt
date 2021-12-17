@@ -32,8 +32,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.generateDefaultDrawable
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 class FavoritesWidgetService : RemoteViewsService() {
 
@@ -50,22 +50,20 @@ class FavoritesWidgetService : RemoteViewsService() {
 
         private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
-        @Inject
-        lateinit var favoritesDataRepository: FavoritesRepository
+        @Inject lateinit var favoritesDataRepository: FavoritesRepository
 
-        @Inject
-        lateinit var faviconManager: FaviconManager
+        @Inject lateinit var faviconManager: FaviconManager
 
-        @Inject
-        lateinit var widgetPrefs: WidgetPreferences
+        @Inject lateinit var widgetPrefs: WidgetPreferences
 
-        private val appWidgetId = intent.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        )
+        private val appWidgetId =
+            intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 
-        private val faviconItemSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon).toInt()
-        private val faviconItemCornerRadius = context.resources.getDimension(R.dimen.savedSiteGridItemCornerRadiusFavicon).toInt()
+        private val faviconItemSize =
+            context.resources.getDimension(R.dimen.savedSiteGridItemFavicon).toInt()
+        private val faviconItemCornerRadius =
+            context.resources.getDimension(R.dimen.savedSiteGridItemCornerRadiusFavicon).toInt()
 
         private val maxItems: Int
             get() {
@@ -80,19 +78,24 @@ class FavoritesWidgetService : RemoteViewsService() {
         }
 
         override fun onDataSetChanged() {
-            val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
-                val bitmap = runBlocking {
-                    faviconManager.loadFromDiskWithParams(url = it.url, cornerRadius = faviconItemCornerRadius, width = faviconItemSize, height = faviconItemSize)
-                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
+            val newList =
+                favoritesDataRepository.favoritesSync().take(maxItems).map {
+                    val bitmap = runBlocking {
+                        faviconManager.loadFromDiskWithParams(
+                            url = it.url,
+                            cornerRadius = faviconItemCornerRadius,
+                            width = faviconItemSize,
+                            height = faviconItemSize)
+                            ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty())
+                                .toBitmap(faviconItemSize, faviconItemSize)
+                    }
+                    WidgetFavorite(it.title, it.url, bitmap)
                 }
-                WidgetFavorite(it.title, it.url, bitmap)
-            }
             domains.clear()
             domains.addAll(newList)
         }
 
-        override fun onDestroy() {
-        }
+        override fun onDestroy() {}
 
         override fun getCount(): Int {
             return maxItems
@@ -117,7 +120,8 @@ class FavoritesWidgetService : RemoteViewsService() {
                 configureClickListener(remoteViews, item.url)
             } else {
                 remoteViews.setTextViewText(R.id.quickAccessTitle, "")
-                remoteViews.setImageViewResource(R.id.quickAccessFavicon, getEmptyBackgroundDrawable())
+                remoteViews.setImageViewResource(
+                    R.id.quickAccessFavicon, getEmptyBackgroundDrawable())
             }
 
             return remoteViews
@@ -135,7 +139,8 @@ class FavoritesWidgetService : RemoteViewsService() {
             return when (theme) {
                 WidgetTheme.LIGHT -> R.drawable.search_widget_favorite_favicon_light_background
                 WidgetTheme.DARK -> R.drawable.search_widget_favorite_favicon_dark_background
-                WidgetTheme.SYSTEM_DEFAULT -> R.drawable.search_widget_favorite_favicon_daynight_background
+                WidgetTheme.SYSTEM_DEFAULT ->
+                    R.drawable.search_widget_favorite_favicon_daynight_background
             }
         }
 

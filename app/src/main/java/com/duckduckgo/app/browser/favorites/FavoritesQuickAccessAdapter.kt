@@ -36,9 +36,9 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.math.absoluteValue
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -53,7 +53,8 @@ class FavoritesQuickAccessAdapter(
         const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
     }
 
-    data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
+    data class QuickAccessFavorite(val favorite: SavedSite.Favorite) :
+        FavoritesAdapter.FavoriteItemTypes
 
     class QuickAccessViewHolder(
         private val inflater: LayoutInflater,
@@ -75,20 +76,18 @@ class FavoritesQuickAccessAdapter(
             object Drag : ItemState()
         }
 
-        private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
-            binding.root,
-            PropertyValuesHolder.ofFloat("scaleX", 1.2f, 1f),
-            PropertyValuesHolder.ofFloat("scaleY", 1.2f, 1f)
-        ).apply {
-            duration = 150L
-        }
-        private val scaleUp = ObjectAnimator.ofPropertyValuesHolder(
-            binding.root,
-            PropertyValuesHolder.ofFloat("scaleX", 1f, 1.2f),
-            PropertyValuesHolder.ofFloat("scaleY", 1f, 1.2f)
-        ).apply {
-            duration = 150L
-        }
+        private val scaleDown =
+            ObjectAnimator.ofPropertyValuesHolder(
+                    binding.root,
+                    PropertyValuesHolder.ofFloat("scaleX", 1.2f, 1f),
+                    PropertyValuesHolder.ofFloat("scaleY", 1.2f, 1f))
+                .apply { duration = 150L }
+        private val scaleUp =
+            ObjectAnimator.ofPropertyValuesHolder(
+                    binding.root,
+                    PropertyValuesHolder.ofFloat("scaleX", 1f, 1.2f),
+                    PropertyValuesHolder.ofFloat("scaleY", 1f, 1.2f))
+                .apply { duration = 150L }
 
         fun bind(item: QuickAccessFavorite) {
             with(item.favorite) {
@@ -124,13 +123,9 @@ class FavoritesQuickAccessAdapter(
                     Timber.v("$key changed - Need an update for $item")
                 }
 
-                bundle[DIFF_KEY_TITLE]?.let {
-                    binding.quickAccessTitle.text = it as String
-                }
+                bundle[DIFF_KEY_TITLE]?.let { binding.quickAccessTitle.text = it as String }
 
-                bundle[DIFF_KEY_URL]?.let {
-                    loadFavicon(it as String)
-                }
+                bundle[DIFF_KEY_URL]?.let { loadFavicon(it as String) }
 
                 configureClickListeners(item)
             }
@@ -146,7 +141,11 @@ class FavoritesQuickAccessAdapter(
             binding.root.setOnClickListener { onItemSelected(item) }
         }
 
-        private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
+        private fun showOverFlowMenu(
+            layoutInflater: LayoutInflater,
+            anchor: View,
+            item: QuickAccessFavorite
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -178,7 +177,8 @@ class FavoritesQuickAccessAdapter(
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = binding.quickAccessFavicon)
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = binding.quickAccessFavicon)
             }
         }
 
@@ -198,14 +198,26 @@ class FavoritesQuickAccessAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ViewQuickAccessItemBinding.inflate(inflater, parent, false)
-        return QuickAccessViewHolder(inflater, binding, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
+        return QuickAccessViewHolder(
+            inflater,
+            binding,
+            lifecycleOwner,
+            faviconManager,
+            onMoveListener,
+            onItemSelected,
+            onEditClicked,
+            onDeleteClicked)
     }
 
     override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: QuickAccessViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
             return
@@ -215,11 +227,17 @@ class FavoritesQuickAccessAdapter(
 }
 
 class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite>() {
-    override fun areItemsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
+    override fun areItemsTheSame(
+        oldItem: QuickAccessFavorite,
+        newItem: QuickAccessFavorite
+    ): Boolean {
         return oldItem.favorite.id == newItem.favorite.id
     }
 
-    override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
+    override fun areContentsTheSame(
+        oldItem: QuickAccessFavorite,
+        newItem: QuickAccessFavorite
+    ): Boolean {
         return oldItem.favorite.title == newItem.favorite.title &&
             oldItem.favorite.url == newItem.favorite.url &&
             oldItem.favorite.position == newItem.favorite.position

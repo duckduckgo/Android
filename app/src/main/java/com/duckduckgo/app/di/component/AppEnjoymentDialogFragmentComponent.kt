@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface AppEnjoymentDialogFragmentComponent : AndroidInjector<AppEnjoymentDialogFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<AppEnjoymentDialogFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<AppEnjoymentDialogFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface AppEnjoymentDialogFragmentComponentProvider {
-    fun provideAppEnjoymentDialogFragmentComponentFactory(): AppEnjoymentDialogFragmentComponent.Factory
+    fun provideAppEnjoymentDialogFragmentComponentFactory():
+        AppEnjoymentDialogFragmentComponent.Factory
 }
 
 @Module

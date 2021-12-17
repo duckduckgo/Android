@@ -29,10 +29,10 @@ interface DeviceShieldOnboardingStore {
 }
 
 @ContributesBinding(AppScope::class)
-class DeviceShieldOnboardingImpl @Inject constructor(
-    context: Context
-) : DeviceShieldOnboardingStore {
-    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_PRIVATE)
+class DeviceShieldOnboardingImpl @Inject constructor(context: Context) :
+    DeviceShieldOnboardingStore {
+    private val preferences =
+        context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_PRIVATE)
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
@@ -47,7 +47,9 @@ class DeviceShieldOnboardingImpl @Inject constructor(
     }
 
     companion object {
-        private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
+        private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED =
+            "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS =
+            "com.duckduckgo.android.atp.onboarding.store"
     }
 }

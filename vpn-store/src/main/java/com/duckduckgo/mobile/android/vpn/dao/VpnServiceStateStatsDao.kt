@@ -23,10 +23,10 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 @Dao
 interface VpnServiceStateStatsDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(stat: VpnServiceStateStats)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(stat: VpnServiceStateStats)
 
-    @Query("SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")
+    @Query(
+        "SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")
     fun getServiceStateStatsSince(startTime: String): List<BucketizedVpnServiceStateStats>
 
     @Query("SELECT COUNT(*) FROM vpn_service_state_stats WHERE state is 'ENABLED'")

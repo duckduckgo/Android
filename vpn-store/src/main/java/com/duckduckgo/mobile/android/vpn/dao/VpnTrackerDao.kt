@@ -27,37 +27,40 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnTrackerDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: VpnTracker)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(tracker: VpnTracker)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: List<VpnTracker>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(tracker: List<VpnTracker>)
 
-    @Query("DELETE FROM vpn_tracker")
-    fun deleteAllTrackers()
+    @Query("DELETE FROM vpn_tracker") fun deleteAllTrackers()
 
     @Query("SELECT * FROM vpn_tracker ORDER BY trackerId DESC LIMIT 1")
     fun getLatestTracker(): Flow<VpnTracker?>
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
+    @Query(
+        "SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
+    @Query(
+        "SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
-    @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
+    @Query(
+        "SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackersCountBetween(startTime: String, endTime: String): Flow<Int>
 
-    @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
+    @Query(
+        "SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
     fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
 
-    @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
+    @Query(
+        "SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 
-    @Query("SELECT * FROM vpn_tracker WHERE timestamp LIKE :date || '%' AND packageId = :appPackage order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
+    @Query(
+        "SELECT * FROM vpn_tracker WHERE timestamp LIKE :date || '%' AND packageId = :appPackage order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getTrackersForAppFromDate(date: String, appPackage: String): Flow<List<VpnTracker>>
 
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")

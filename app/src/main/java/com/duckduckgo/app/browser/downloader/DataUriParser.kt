@@ -79,6 +79,5 @@ class DataUriParser @Inject constructor() {
             }
             return "$name.$fileType"
         }
-
     }
 }

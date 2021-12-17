@@ -24,9 +24,9 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.nhaarman.mockitokotlin2.*
+import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
-import java.io.BufferedReader
 
 class EmailInjectorJsTest {
 
@@ -108,9 +108,13 @@ class EmailInjectorJsTest {
     }
 
     private fun getAliasJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.inject_alias)
-            .bufferedReader()
-            .use { it.readText() }
+        val js =
+            InstrumentationRegistry.getInstrumentation()
+                .targetContext
+                .resources
+                .openRawResource(R.raw.inject_alias)
+                .bufferedReader()
+                .use { it.readText() }
         return "javascript:$js"
     }
 

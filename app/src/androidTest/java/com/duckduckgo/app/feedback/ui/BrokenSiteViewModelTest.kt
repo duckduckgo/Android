@@ -21,13 +21,9 @@ import org.mockito.MockitoAnnotations
 
 class BrokenSiteViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
     private val mockPixel: Pixel = mock()
 
@@ -104,15 +100,15 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
-        val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
-            siteUrl = url,
-            upgradeHttps = false,
-            blockedTrackers = "",
-            surrogates = "",
-            webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
-        )
+        val brokenSiteExpected =
+            BrokenSite(
+                category = testee.categories[0].key,
+                siteUrl = url,
+                upgradeHttps = false,
+                blockedTrackers = "",
+                surrogates = "",
+                webViewVersion = "webViewVersion",
+                siteType = BrokenSiteViewModel.DESKTOP_SITE)
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
@@ -126,15 +122,15 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
-        val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
-            siteUrl = nullUrl,
-            upgradeHttps = false,
-            blockedTrackers = "",
-            surrogates = "",
-            webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
-        )
+        val brokenSiteExpected =
+            BrokenSite(
+                category = testee.categories[0].key,
+                siteUrl = nullUrl,
+                upgradeHttps = false,
+                blockedTrackers = "",
+                surrogates = "",
+                webViewVersion = "webViewVersion",
+                siteType = BrokenSiteViewModel.DESKTOP_SITE)
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
         verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(brokenSiteExpected)
@@ -200,5 +196,4 @@ class BrokenSiteViewModelTest {
         private const val url = "http://example.com"
         private const val message = "Feedback message"
     }
-
 }

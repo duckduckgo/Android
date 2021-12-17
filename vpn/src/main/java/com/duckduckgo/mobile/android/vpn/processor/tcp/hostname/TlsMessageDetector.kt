@@ -29,7 +29,11 @@ class TlsMessageDetector @Inject constructor() {
 
     private fun isKnownTlsContentType(contentType: Int): Boolean {
         return when (contentType) {
-            CONTENT_TYPE_CHANGE_CIPHER_SPEC, CONTENT_TYPE_ALERT, CONTENT_TYPE_HANDSHAKE, CONTENT_TYPE_APPLICATION, CONTENT_TYPE_HEARTBEAT -> true
+            CONTENT_TYPE_CHANGE_CIPHER_SPEC,
+            CONTENT_TYPE_ALERT,
+            CONTENT_TYPE_HANDSHAKE,
+            CONTENT_TYPE_APPLICATION,
+            CONTENT_TYPE_HEARTBEAT -> true
             else -> false
         }
     }

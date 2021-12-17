@@ -29,5 +29,6 @@ fun SslCertificate.toX509Certificate(): X509Certificate {
     val bundle = SslCertificate.saveState(this)
     val bytes = bundle.getByteArray("x509-certificate")
     return CertificateFactory.getInstance(CertificateTypes.X509)
-        .generateCertificate(bytes?.inputStream()) as X509Certificate
+        .generateCertificate(bytes?.inputStream()) as
+        X509Certificate
 }

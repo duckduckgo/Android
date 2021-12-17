@@ -64,36 +64,36 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         when (savedSite) {
             is SavedSite.Bookmark -> {
-                val parentId = arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
+                val parentId =
+                    arguments?.getLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: 0
                 listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
-                )
+                    savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId))
             }
             is SavedSite.Favorite -> {
-                listener?.onSavedSiteEdited(
-                    savedSite.copy(title = updatedTitle, url = updatedUrl)
-                )
+                listener?.onSavedSiteEdited(savedSite.copy(title = updatedTitle, url = updatedUrl))
             }
         }
     }
 
-    private val urlTextWatcher = object : TextChangedWatcher() {
-        override fun afterTextChanged(editable: Editable) {
-            when {
-                editable.toString().isBlank() -> {
-                    setConfirmationVisibility(ValidationState.INVALID)
-                }
-                editable.toString() != getSavedSite().url -> {
-                    setConfirmationVisibility(ValidationState.CHANGED)
-                }
-                else -> {
-                    setConfirmationVisibility(ValidationState.UNCHANGED)
+    private val urlTextWatcher =
+        object : TextChangedWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                when {
+                    editable.toString().isBlank() -> {
+                        setConfirmationVisibility(ValidationState.INVALID)
+                    }
+                    editable.toString() != getSavedSite().url -> {
+                        setConfirmationVisibility(ValidationState.CHANGED)
+                    }
+                    else -> {
+                        setConfirmationVisibility(ValidationState.UNCHANGED)
+                    }
                 }
             }
         }
-    }
 
-    private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
+    private fun getSavedSite(): SavedSite =
+        requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
 
@@ -101,19 +101,25 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
         val args = requireArguments()
         if (!args.containsKey(KEY_SAVED_SITE)) {
-            throw IllegalArgumentException("Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
+            throw IllegalArgumentException(
+                "Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
     }
 
     companion object {
         const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(savedSite: SavedSite, parentFolderId: Long = 0, parentFolderName: String? = null): EditSavedSiteDialogFragment {
+        fun instance(
+            savedSite: SavedSite,
+            parentFolderId: Long = 0,
+            parentFolderName: String? = null
+        ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)
             bundle.putLong(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID, parentFolderId)
-            bundle.putString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME, parentFolderName)
+            bundle.putString(
+                AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME, parentFolderName)
             dialog.arguments = bundle
             return dialog
         }

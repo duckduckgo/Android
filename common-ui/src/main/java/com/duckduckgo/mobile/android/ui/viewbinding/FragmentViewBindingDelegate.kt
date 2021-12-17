@@ -36,8 +36,9 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 ) : ReadOnlyProperty<Fragment, T> {
 
     // LazyThreadSafetyMode.NONE because it will never be initialised from ore than one thread
-    private val nullifyBindingHandler by
-        lazy(LazyThreadSafetyMode.NONE) { Handler(Looper.getMainLooper()) }
+    private val nullifyBindingHandler by lazy(LazyThreadSafetyMode.NONE) {
+        Handler(Looper.getMainLooper())
+    }
     private var binding: T? = null
 
     private val bindMethod = bindingClass.getMethod("bind", View::class.java)

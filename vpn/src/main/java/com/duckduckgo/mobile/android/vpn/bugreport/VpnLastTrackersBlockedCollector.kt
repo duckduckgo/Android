@@ -25,13 +25,15 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.threeten.bp.LocalDateTime
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
-class VpnLastTrackersBlockedCollector @Inject constructor(
+class VpnLastTrackersBlockedCollector
+@Inject
+constructor(
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
     private val moshi: Moshi,
@@ -43,15 +45,20 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return withContext(dispatcherProvider.io()) {
             val result = mutableMapOf<String, List<String>>()
-            vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(dateOfLastDay(), noEndDate())
-                .filter { tracker -> appPackageId?.let { tracker.trackingApp.packageId == it } ?: true }
+            vpnDatabase
+                .vpnTrackerDao()
+                .getTrackersBetweenSync(dateOfLastDay(), noEndDate())
+                .filter { tracker ->
+                    appPackageId?.let { tracker.trackingApp.packageId == it } ?: true
+                }
                 .groupBy { it.trackingApp.packageId }
                 .mapValues { entry -> entry.value.map { it.domain } }
-                .onEach {
-                    result[it.key] = it.value.toSet().toList()
-                }
+                .onEach { result[it.key] = it.value.toSet().toList() }
 
-            val adapter = moshi.adapter<Map<String, List<String>>>(Types.newParameterizedType(Map::class.java, String::class.java, List::class.java, String::class.java))
+            val adapter =
+                moshi.adapter<Map<String, List<String>>>(
+                    Types.newParameterizedType(
+                        Map::class.java, String::class.java, List::class.java, String::class.java))
             return@withContext JSONObject(adapter.toJson(result))
         }
     }

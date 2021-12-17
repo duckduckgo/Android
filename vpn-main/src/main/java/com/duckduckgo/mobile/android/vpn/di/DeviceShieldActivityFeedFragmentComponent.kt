@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
-interface DeviceShieldActivityFeedFragmentComponent : AndroidInjector<DeviceShieldActivityFeedFragment> {
+@MergeSubcomponent(scope = FragmentScope::class)
+interface DeviceShieldActivityFeedFragmentComponent :
+    AndroidInjector<DeviceShieldActivityFeedFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldActivityFeedFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface DeviceShieldActivityFeedFragmentComponentProvider {
-    fun provideDeviceShieldActivityFeedFragmentComponentFactory(): DeviceShieldActivityFeedFragmentComponent.Factory
+    fun provideDeviceShieldActivityFeedFragmentComponentFactory():
+        DeviceShieldActivityFeedFragmentComponent.Factory
 }
 
 @Module
@@ -49,5 +49,6 @@ abstract class DeviceShieldActivityFeedFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldActivityFeedFragment::class)
-    abstract fun DeviceShieldActivityFeedFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldActivityFeedFragmentComponent.Factory.bind():
+        AndroidInjector.Factory<*>
 }

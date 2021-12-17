@@ -24,19 +24,14 @@ import dagger.Module
 import dagger.multibindings.Multibinds
 
 interface RefreshRetentionAtbPlugin {
-    /**
-     * Will be called right after we have refreshed the ATB retention on search
-     */
+    /** Will be called right after we have refreshed the ATB retention on search */
     fun onSearchRetentionAtbRefreshed()
-    /**
-     * Will be called right after we have refreshed the ATB retention on search
-     */
+    /** Will be called right after we have refreshed the ATB retention on search */
     fun onAppRetentionAtbRefreshed()
 }
 
-class RefreshRetentionAtbPluginPoint(
-    private val plugins: DaggerSet<RefreshRetentionAtbPlugin>
-) : PluginPoint<RefreshRetentionAtbPlugin> {
+class RefreshRetentionAtbPluginPoint(private val plugins: DaggerSet<RefreshRetentionAtbPlugin>) :
+    PluginPoint<RefreshRetentionAtbPlugin> {
     override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
         return plugins.sortedBy { it.javaClass.simpleName }
     }
@@ -45,6 +40,5 @@ class RefreshRetentionAtbPluginPoint(
 @Module
 @ContributesTo(AppScope::class)
 abstract class RefreshRetentionAtbPluginModule {
-    @Multibinds
-    abstract fun bindRefreshRetentionAtbPlugins(): DaggerSet<RefreshRetentionAtbPlugin>
+    @Multibinds abstract fun bindRefreshRetentionAtbPlugins(): DaggerSet<RefreshRetentionAtbPlugin>
 }

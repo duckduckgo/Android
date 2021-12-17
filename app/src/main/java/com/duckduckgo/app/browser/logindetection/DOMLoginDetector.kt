@@ -24,8 +24,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.global.getValidUrl
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface DOMLoginDetector {
     fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit)
@@ -34,7 +34,8 @@ interface DOMLoginDetector {
 
 sealed class WebNavigationEvent {
     data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
-    data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
+    data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) :
+        WebNavigationEvent()
 }
 
 class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) :
@@ -43,7 +44,8 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
     private val loginPathRegex = Regex("login|sign-in|signin|session")
 
     override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
-        webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
+        webView.addJavascriptInterface(
+            LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
@@ -74,12 +76,14 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     @UiThread
     private fun scanForPasswordFields(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
+        webView.evaluateJavascript(
+            "javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
     }
 
     @UiThread
     private fun injectLoginFormDetectionJS(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
+        webView.evaluateJavascript(
+            "javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
     }
 
     private class JavaScriptDetector {
@@ -88,14 +92,24 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
         private fun getFunctionsJS(context: Context): String {
             if (!this::functions.isInitialized) {
-                functions = context.resources.openRawResource(R.raw.login_form_detection_functions).bufferedReader().use { it.readText() }
+                functions =
+                    context
+                        .resources
+                        .openRawResource(R.raw.login_form_detection_functions)
+                        .bufferedReader()
+                        .use { it.readText() }
             }
             return functions
         }
 
         private fun getHandlersJS(context: Context): String {
             if (!this::handlers.isInitialized) {
-                handlers = context.resources.openRawResource(R.raw.login_form_detection_handlers).bufferedReader().use { it.readText() }
+                handlers =
+                    context
+                        .resources
+                        .openRawResource(R.raw.login_form_detection_handlers)
+                        .bufferedReader()
+                        .use { it.readText() }
             }
             return handlers
         }

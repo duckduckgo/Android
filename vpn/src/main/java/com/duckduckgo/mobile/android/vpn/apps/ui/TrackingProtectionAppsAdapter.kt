@@ -51,7 +51,10 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
         return excludedApps[position].packageName.hashCode().toLong()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackingProtectionAppViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): TrackingProtectionAppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_device_shield_excluded_app_entry, parent, false)
         return TrackingProtectionAppViewHolder(view)
@@ -73,8 +76,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     private class DiffCallback(
         private val oldList: List<TrackingProtectionAppInfo>,
         private val newList: List<TrackingProtectionAppInfo>
-    ) :
-        DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size
@@ -87,36 +89,52 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }
-
 }
 
 interface AppProtectionListener {
-    fun onAppProtectionChanged(excludedAppInfo: TrackingProtectionAppInfo, enabled: Boolean, position: Int)
+    fun onAppProtectionChanged(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        enabled: Boolean,
+        position: Int
+    )
 }
 
 class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(isListEnabled: Boolean, excludedAppInfo: TrackingProtectionAppInfo, position: Int, listener: AppProtectionListener) {
-        val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
+    fun bind(
+        isListEnabled: Boolean,
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int,
+        listener: AppProtectionListener
+    ) {
+        val appIcon =
+            itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
         itemView.deviceShieldAppEntryName.text =
-            String.format(itemView.context.resources.getString(R.string.atp_ExcludedAppEntry), excludedAppInfo.name)
+            String.format(
+                    itemView.context.resources.getString(R.string.atp_ExcludedAppEntry),
+                    excludedAppInfo.name)
                 .applyBoldSpanTo(listOf(excludedAppInfo.name!!))
 
         if (excludedAppInfo.isProblematic()) {
             if (excludedAppInfo.isExcluded) {
                 itemView.deviceShieldAppExclusionReason.text =
                     getAppExcludingReasonText(itemView.context, excludedAppInfo.knownProblem)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(getAppExcludingReasonIcon(excludedAppInfo.knownProblem))
+                itemView.deviceShieldAppExclusionReason.leftDrawable(
+                    getAppExcludingReasonIcon(excludedAppInfo.knownProblem))
                 itemView.deviceShieldAppExclusionReason.show()
             } else {
-                itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.text =
+                    itemView.context.getString(R.string.atp_ExcludedReasonManuallyEnabled)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(
+                    com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
             }
         } else {
             if (excludedAppInfo.isExcluded) {
-                itemView.deviceShieldAppExclusionReason.text = itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
-                itemView.deviceShieldAppExclusionReason.leftDrawable(com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
+                itemView.deviceShieldAppExclusionReason.text =
+                    itemView.context.getString(R.string.atp_ExcludedReasonManuallyDisabled)
+                itemView.deviceShieldAppExclusionReason.leftDrawable(
+                    com.duckduckgo.mobile.android.R.drawable.ic_link_blue_16)
                 itemView.deviceShieldAppExclusionReason.show()
             } else {
                 itemView.deviceShieldAppExclusionReason.gone()
@@ -124,34 +142,38 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
         }
 
         if (isListEnabled) {
-            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
+            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(
+                !excludedAppInfo.isExcluded) { _, enabled ->
                 listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
             }
         } else {
             itemView.deviceShieldAppEntryShieldEnabled.isClickable = false
-            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
+            itemView.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(
+                !excludedAppInfo.isExcluded, null)
         }
     }
 
     private fun getAppExcludingReasonText(context: Context, excludingReason: Int): String {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> context.getString(R.string.atp_ExcludedReasonKnownIssues)
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON ->
+                context.getString(R.string.atp_ExcludedReasonLoadsWebsites)
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
+                context.getString(R.string.atp_ExcludedReasonKnownIssues)
             else -> ""
         }
     }
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
+                com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON ->
+                com.duckduckgo.mobile.android.R.drawable.ic_alert_yellow_16
             else -> 0
         }
     }
 }
 
 fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
-    return runCatching {
-        getApplicationIcon(packageName)
-    }.getOrNull()
+    return runCatching { getApplicationIcon(packageName) }.getOrNull()
 }

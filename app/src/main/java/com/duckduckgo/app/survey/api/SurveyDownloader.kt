@@ -26,13 +26,15 @@ import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import io.reactivex.Completable
-import retrofit2.Response
-import timber.log.Timber
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
+import retrofit2.Response
+import timber.log.Timber
 
-class SurveyDownloader @Inject constructor(
+class SurveyDownloader
+@Inject
+constructor(
     private val service: SurveyService,
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
@@ -58,7 +60,6 @@ class SurveyDownloader @Inject constructor(
     fun download(): Completable {
 
         return Completable.fromAction {
-
             Timber.d("Downloading user survey data")
 
             val response = getSurveyResponse()
@@ -85,34 +86,41 @@ class SurveyDownloader @Inject constructor(
             surveyDao.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
 
-            val newSurvey = when {
-                surveyOption != null ->
-                    when {
-                        canSurveyBeScheduled(surveyOption) -> Survey(surveyGroup.id, calculateUrlWithParameters(surveyOption), surveyOption.installationDay, SCHEDULED)
-                        else -> null
-                    }
-                else -> Survey(surveyGroup.id, null, null, NOT_ALLOCATED)
-            }
+            val newSurvey =
+                when {
+                    surveyOption != null ->
+                        when {
+                            canSurveyBeScheduled(surveyOption) ->
+                                Survey(
+                                    surveyGroup.id,
+                                    calculateUrlWithParameters(surveyOption),
+                                    surveyOption.installationDay,
+                                    SCHEDULED)
+                            else -> null
+                        }
+                    else -> Survey(surveyGroup.id, null, null, NOT_ALLOCATED)
+                }
 
-            newSurvey?.let {
-                surveyDao.insert(newSurvey)
-            }
+            newSurvey?.let { surveyDao.insert(newSurvey) }
         }
     }
 
     private fun calculateUrlWithParameters(surveyOption: SurveyOption): String {
         val uri = surveyOption.url.toUri()
 
-        val builder = Uri.Builder()
-            .authority(uri.authority)
-            .scheme(uri.scheme)
-            .path(uri.path)
-            .fragment(uri.fragment)
+        val builder =
+            Uri.Builder()
+                .authority(uri.authority)
+                .scheme(uri.scheme)
+                .path(uri.path)
+                .fragment(uri.fragment)
 
         surveyOption.urlParameters?.map {
             when {
-                (SurveyUrlParameter.EmailCohortParam.parameter == it) -> builder.appendQueryParameter(it, emailManager.getCohort())
-                (SurveyUrlParameter.AtpCohortParam.parameter == it) -> builder.appendQueryParameter(it, atpCohortManager.getCohort())
+                (SurveyUrlParameter.EmailCohortParam.parameter == it) ->
+                    builder.appendQueryParameter(it, emailManager.getCohort())
+                (SurveyUrlParameter.AtpCohortParam.parameter == it) ->
+                    builder.appendQueryParameter(it, atpCohortManager.getCohort())
                 else -> {
                     // NO OP
                 }

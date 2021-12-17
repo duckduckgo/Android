@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ReceiverScope::class)
-@MergeSubcomponent(
-    scope = ReceiverScope::class
-)
+@MergeSubcomponent(scope = ReceiverScope::class)
 interface VpnReminderReceiverComponent : AndroidInjector<VpnReminderReceiver> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<VpnReminderReceiver>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<VpnReminderReceiver>
 }
 
 @ContributesTo(AppScope::class)

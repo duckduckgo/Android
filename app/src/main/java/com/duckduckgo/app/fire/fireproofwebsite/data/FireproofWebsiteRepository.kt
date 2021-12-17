@@ -22,10 +22,12 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
 import dagger.Lazy
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
-class FireproofWebsiteRepository @Inject constructor(
+class FireproofWebsiteRepository
+@Inject
+constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider,
     private val faviconManager: Lazy<FaviconManager>
@@ -34,9 +36,8 @@ class FireproofWebsiteRepository @Inject constructor(
         if (!UriString.isValidDomain(domain)) return null
 
         val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = domain)
-        val id = withContext(dispatchers.io()) {
-            fireproofWebsiteDao.insert(fireproofWebsiteEntity)
-        }
+        val id =
+            withContext(dispatchers.io()) { fireproofWebsiteDao.insert(fireproofWebsiteEntity) }
 
         return if (id >= 0) {
             fireproofWebsiteEntity
@@ -45,7 +46,8 @@ class FireproofWebsiteRepository @Inject constructor(
         }
     }
 
-    fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
+    fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> =
+        fireproofWebsiteDao.fireproofWebsitesEntities()
 
     fun isDomainFireproofed(domain: String): Boolean {
         val uri = Uri.parse(domain)

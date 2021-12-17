@@ -18,16 +18,18 @@ package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import io.reactivex.Completable
 import io.reactivex.Completable.fromAction
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
-class HttpsUpgradeDataDownloader @Inject constructor(
+class HttpsUpgradeDataDownloader
+@Inject
+constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val dataPersister: HttpsDataPersister,
@@ -36,21 +38,16 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
     fun download(): Completable {
 
-        val filter = service.httpsBloomFilterSpec()
-            .flatMapCompletable {
-                downloadBloomFilter(it)
-            }
+        val filter = service.httpsBloomFilterSpec().flatMapCompletable { downloadBloomFilter(it) }
         val falsePositives = downloadFalsePositives()
 
-        return Completable.mergeDelayError(listOf(filter, falsePositives))
-            .doOnComplete {
-                Timber.i("Https download task completed successfully")
-            }
+        return Completable.mergeDelayError(listOf(filter, falsePositives)).doOnComplete {
+            Timber.i("Https download task completed successfully")
+        }
     }
 
     private fun downloadBloomFilter(specification: HttpsBloomFilterSpec): Completable {
         return fromAction {
-
             Timber.d("Downloading https bloom filter binary")
 
             if (dataPersister.isPersisted(specification)) {
@@ -74,7 +71,6 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
         Timber.d("Downloading HTTPS false positives")
         return fromAction {
-
             val call = service.falsePositives()
             val response = call.execute()
 
@@ -91,6 +87,5 @@ class HttpsUpgradeDataDownloader @Inject constructor(
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
-
     }
 }

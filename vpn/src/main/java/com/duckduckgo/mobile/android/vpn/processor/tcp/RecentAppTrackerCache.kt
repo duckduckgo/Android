@@ -17,16 +17,23 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import androidx.annotation.VisibleForTesting
+import javax.inject.Inject
 import timber.log.Timber
 import xyz.hexene.localvpn.TCB
-import javax.inject.Inject
 
 class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser) {
 
     @VisibleForTesting
-    val recentTrackingAttempts = mutableMapOf<String, MutableMap<String, MutableList<RecentTrackerEvent>>>()
+    val recentTrackingAttempts =
+        mutableMapOf<String, MutableMap<String, MutableList<RecentTrackerEvent>>>()
 
-    fun addTrackerForApp(appPackage: String, trackerDomain: String?, tcbId: String, payloadSize: Int, timestamp: Long = System.currentTimeMillis()) {
+    fun addTrackerForApp(
+        appPackage: String,
+        trackerDomain: String?,
+        tcbId: String,
+        payloadSize: Int,
+        timestamp: Long = System.currentTimeMillis()
+    ) {
         if (trackerDomain == null) return
 
         synchronized(recentTrackingAttempts) {
@@ -35,7 +42,11 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         }
     }
 
-    fun getRecentTrackingAttempt(appPackage: String, hostName: String, payloadSize: Int): RecentTrackerEvent? {
+    fun getRecentTrackingAttempt(
+        appPackage: String,
+        hostName: String,
+        payloadSize: Int
+    ): RecentTrackerEvent? {
         synchronized(recentTrackingAttempts) {
             val trackers = recentTrackingAttempts[appPackage]
             if (trackers.isNullOrEmpty()) return null
@@ -54,19 +65,23 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
         timestamp: Long
     ) {
         val trackingEvents = getTrackerListForDomain(trackers, trackerDomain)
-        trackingEvents.add(RecentTrackerEvent(appPackage, trackerDomain, payloadSize, tcbId, timestamp))
+        trackingEvents.add(
+            RecentTrackerEvent(appPackage, trackerDomain, payloadSize, tcbId, timestamp))
     }
 
-    private fun getTrackerListForDomain(trackers: MutableMap<String, MutableList<RecentTrackerEvent>>, trackerDomain: String): MutableList<RecentTrackerEvent> {
+    private fun getTrackerListForDomain(
+        trackers: MutableMap<String, MutableList<RecentTrackerEvent>>,
+        trackerDomain: String
+    ): MutableList<RecentTrackerEvent> {
         val existingList = trackers[trackerDomain]
         if (existingList != null) return existingList
 
-        return mutableListOf<RecentTrackerEvent>().also {
-            trackers[trackerDomain] = it
-        }
+        return mutableListOf<RecentTrackerEvent>().also { trackers[trackerDomain] = it }
     }
 
-    private fun getTrackersForApp(appPackage: String): MutableMap<String, MutableList<RecentTrackerEvent>> {
+    private fun getTrackersForApp(
+        appPackage: String
+    ): MutableMap<String, MutableList<RecentTrackerEvent>> {
         val existingMap = recentTrackingAttempts[appPackage]
         if (existingMap != null) return existingMap
 
@@ -91,7 +106,9 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
             }
 
             if (connectionsToRemove.isNotEmpty()) {
-                Timber.v("Cleaning up stale connections from recent trackers. There are %d to remove", connectionsToRemove.size)
+                Timber.v(
+                    "Cleaning up stale connections from recent trackers. There are %d to remove",
+                    connectionsToRemove.size)
             }
 
             connectionsToRemove.forEach { connection ->

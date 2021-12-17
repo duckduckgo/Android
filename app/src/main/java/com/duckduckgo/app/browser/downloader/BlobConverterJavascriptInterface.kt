@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.downloader
 
 import android.webkit.JavascriptInterface
 
-class BlobConverterJavascriptInterface(private val onBlobConverted: (url: String, mimeType: String) -> Unit) {
+class BlobConverterJavascriptInterface(
+    private val onBlobConverted: (url: String, mimeType: String) -> Unit
+) {
 
     @JavascriptInterface
     fun convertBlobToDataUri(dataUrl: String, contentType: String) {

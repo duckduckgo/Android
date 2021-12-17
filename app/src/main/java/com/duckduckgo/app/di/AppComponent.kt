@@ -37,55 +37,56 @@ import com.duckduckgo.widget.SearchWidget
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
+import dagger.SingleInstanceIn
 import dagger.android.AndroidInjector
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
 @MergeComponent(
     scope = AppScope::class,
-    modules = [
-        ApplicationModule::class,
-        WorkerModule::class,
-        NetworkModule::class,
-        AppConfigurationDownloaderModule::class,
-        StoreModule::class,
-        DatabaseModule::class,
-        DaoModule::class,
-        JsonModule::class,
-        SystemComponentsModule::class,
-        BrowserModule::class,
-        BrowserAutoCompleteModule::class,
-        ResourceSurrogateModule::class,
-        NotificationModule::class,
-        OnboardingModule::class,
-        VariantModule::class,
-        FaviconModule::class,
-        PrivacyModule::class,
-        WidgetModule::class,
-        RatingModule::class,
-        AppUsageModule::class,
-        FileModule::class,
-        UncaughtExceptionModule::class,
-        CoroutinesModule::class,
-        CertificateTrustedStoreModule::class,
-        WelcomePageModule::class,
-        FormatterModule::class,
-        EmailModule::class,
-    ]
-)
+    modules =
+        [
+            ApplicationModule::class,
+            WorkerModule::class,
+            NetworkModule::class,
+            AppConfigurationDownloaderModule::class,
+            StoreModule::class,
+            DatabaseModule::class,
+            DaoModule::class,
+            JsonModule::class,
+            SystemComponentsModule::class,
+            BrowserModule::class,
+            BrowserAutoCompleteModule::class,
+            ResourceSurrogateModule::class,
+            NotificationModule::class,
+            OnboardingModule::class,
+            VariantModule::class,
+            FaviconModule::class,
+            PrivacyModule::class,
+            WidgetModule::class,
+            RatingModule::class,
+            AppUsageModule::class,
+            FileModule::class,
+            UncaughtExceptionModule::class,
+            CoroutinesModule::class,
+            CertificateTrustedStoreModule::class,
+            WelcomePageModule::class,
+            FormatterModule::class,
+            EmailModule::class,
+        ])
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     @Component.Builder
     interface Builder {
 
-        @BindsInstance
-        fun application(application: Application): Builder
+        @BindsInstance fun application(application: Application): Builder
 
         @BindsInstance
-        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
+        fun applicationCoroutineScope(
+            @AppCoroutineScope applicationCoroutineScope: CoroutineScope
+        ): Builder
 
         fun build(): AppComponent
     }
@@ -96,9 +97,10 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
     fun inject(favoritesWidgetItemFactory: FavoritesWidgetService.FavoritesWidgetItemFactory)
 
-    fun inject(emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetService.EmptyFavoritesWidgetItemFactory)
+    fun inject(
+        emptyFavoritesWidgetItemFactory: EmptyFavoritesWidgetService.EmptyFavoritesWidgetItemFactory
+    )
 
     // accessor to Retrofit instance for test only only for test
-    @Named("api")
-    fun retrofit(): Retrofit
+    @Named("api") fun retrofit(): Retrofit
 }

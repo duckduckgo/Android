@@ -29,13 +29,13 @@ import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.jakewharton.threetenabp.AndroidThreeTen
+import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
@@ -47,15 +47,18 @@ class DeviceShieldActivityFeedViewModelTest {
     @Before
     fun setup() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
 
-        viewModel = DeviceShieldActivityFeedViewModel(
-            AppTrackerBlockingStatsRepository(db),
-            CoroutineTestRule().testDispatcherProvider,
-            TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext)
-        )
+        viewModel =
+            DeviceShieldActivityFeedViewModel(
+                AppTrackerBlockingStatsRepository(db),
+                CoroutineTestRule().testDispatcherProvider,
+                TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext))
     }
 
     @Test
@@ -89,28 +92,35 @@ class DeviceShieldActivityFeedViewModelTest {
                         id = dummyTrackers[0].id(),
                         bucket = dummyTrackers[0].bucket(),
                         trackingApp = dummyTrackers[0].trackingApp,
-                        trackers = listOf(
-                            TrackerInfo(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName, TEST_TIMESTAMP),
-                            TrackerInfo(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName, TEST_TIMESTAMP)
-                        ),
+                        trackers =
+                            listOf(
+                                TrackerInfo(
+                                    dummyTrackers[0].company,
+                                    dummyTrackers[0].companyDisplayName,
+                                    TEST_TIMESTAMP),
+                                TrackerInfo(
+                                    dummyTrackers[1].company,
+                                    dummyTrackers[1].companyDisplayName,
+                                    TEST_TIMESTAMP)),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "just now",
-                        trackersTotalCount = 2
-                    ),
+                        trackersTotalCount = 2),
                     TrackerFeedItem.TrackerFeedData(
                         id = dummyTrackers[2].id(),
                         bucket = dummyTrackers[2].bucket(),
                         trackingApp = dummyTrackers[2].trackingApp,
-                        trackers = listOf(
-                            TrackerInfo(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName, TEST_TIMESTAMP),
-                        ),
+                        trackers =
+                            listOf(
+                                TrackerInfo(
+                                    dummyTrackers[2].company,
+                                    dummyTrackers[2].companyDisplayName,
+                                    TEST_TIMESTAMP),
+                            ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "just now",
-                        trackersTotalCount = 1
-                    ),
+                        trackersTotalCount = 1),
                 ),
-                awaitItem()
-            )
+                awaitItem())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
@@ -145,60 +155,43 @@ private fun VpnTracker.bucket(): String {
 private val TEST_TIMESTAMP = DatabaseDateFormatter.timestamp()
 private val TEST_TIMESTAMP_IN_THE_PAST = "2021-01-01T10:00:00"
 
-private val dummyTrackers = listOf(
-    VpnTracker(
-        timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
-        domain = "www.facebook.com",
-        company = "Facebook, Inc.",
-        companyDisplayName = "Facebook",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
-        domain = "api.segment.io",
-        company = "Segment.io",
-        companyDisplayName = "Segment",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
-        domain = "crashlyticsreports-pa.googleapis.com",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "lion.package.id",
-            appDisplayName = "LION"
-        )
-    ),
-    VpnTracker(
-        timestamp = TEST_TIMESTAMP_IN_THE_PAST,
-        trackerCompanyId = 0,
-        domain = "doubleclick.net",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "foo.package.id",
-            appDisplayName = "Foo"
-        )
-    ),
-    VpnTracker(
-        timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
-        domain = "doubleclick.net",
-        company = "Google LLC",
-        companyDisplayName = "Google",
-        trackingApp = TrackingApp(
-            packageId = "com.duckduckgo.mobile.android.vpn",
-            appDisplayName = "DuckDuckGo"
-        )
-    )
-)
+private val dummyTrackers =
+    listOf(
+        VpnTracker(
+            timestamp = TEST_TIMESTAMP,
+            trackerCompanyId = 0,
+            domain = "www.facebook.com",
+            company = "Facebook, Inc.",
+            companyDisplayName = "Facebook",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            timestamp = TEST_TIMESTAMP,
+            trackerCompanyId = 0,
+            domain = "api.segment.io",
+            company = "Segment.io",
+            companyDisplayName = "Segment",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            timestamp = TEST_TIMESTAMP,
+            trackerCompanyId = 0,
+            domain = "crashlyticsreports-pa.googleapis.com",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp = TrackingApp(packageId = "lion.package.id", appDisplayName = "LION")),
+        VpnTracker(
+            timestamp = TEST_TIMESTAMP_IN_THE_PAST,
+            trackerCompanyId = 0,
+            domain = "doubleclick.net",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp = TrackingApp(packageId = "foo.package.id", appDisplayName = "Foo")),
+        VpnTracker(
+            timestamp = TEST_TIMESTAMP,
+            trackerCompanyId = 0,
+            domain = "doubleclick.net",
+            company = "Google LLC",
+            companyDisplayName = "Google",
+            trackingApp =
+                TrackingApp(
+                    packageId = "com.duckduckgo.mobile.android.vpn",
+                    appDisplayName = "DuckDuckGo")))

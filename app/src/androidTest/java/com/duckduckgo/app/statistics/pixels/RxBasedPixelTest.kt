@@ -17,26 +17,23 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Completable
+import java.util.concurrent.TimeoutException
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import java.util.concurrent.TimeoutException
 
 class RxBasedPixelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
-    @Mock
-    val mockPixelSender = mock<PixelSender>()
+    @Mock val mockPixelSender = mock<PixelSender>()
 
     @Test
     fun whenPixelWithoutQueryParamsFiredThenPixelSentWithDefaultParams() {
@@ -101,11 +98,13 @@ class RxBasedPixelTest {
     }
 
     private fun givenEnqueuePixelSucceeds() {
-        whenever(mockPixelSender.enqueuePixel(any(), any(), any())).thenReturn(Completable.complete())
+        whenever(mockPixelSender.enqueuePixel(any(), any(), any()))
+            .thenReturn(Completable.complete())
     }
 
     private fun givenEnqueuePixelFails() {
-        whenever(mockPixelSender.enqueuePixel(any(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(mockPixelSender.enqueuePixel(any(), any(), any()))
+            .thenReturn(Completable.error(TimeoutException()))
     }
 
     private fun givenSendPixelSucceeds() {
@@ -113,6 +112,7 @@ class RxBasedPixelTest {
     }
 
     private fun givenSendPixelFails() {
-        whenever(mockPixelSender.sendPixel(any(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(mockPixelSender.sendPixel(any(), any(), any()))
+            .thenReturn(Completable.error(TimeoutException()))
     }
 }

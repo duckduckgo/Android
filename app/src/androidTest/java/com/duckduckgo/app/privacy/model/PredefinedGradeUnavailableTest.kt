@@ -40,7 +40,6 @@ class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
             } else {
                 grade.addEntityNotBlocked(tracker.parentEntity)
             }
-
         }
 
         Timber.d("testCase ${testCase.url}")
@@ -54,10 +53,9 @@ class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
         fun data(): Array<GradeTestCase> {
             val json = FileUtilities.loadText("privacy-grade/test/data/grade-cases.json")
             val moshi = Moshi.Builder().build()
-            val jsonAdapter = moshi.adapter<Array<JsonGradeTestCase>>(Array<JsonGradeTestCase>::class.java)
-            return jsonAdapter.fromJson(json)!!
-                .map { it.toGradeTestCase() }
-                .toTypedArray()
+            val jsonAdapter =
+                moshi.adapter<Array<JsonGradeTestCase>>(Array<JsonGradeTestCase>::class.java)
+            return jsonAdapter.fromJson(json)!!.map { it.toGradeTestCase() }.toTypedArray()
         }
     }
 }

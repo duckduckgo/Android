@@ -33,11 +33,9 @@ import javax.inject.Inject
 
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var widgetPrefs: WidgetPreferences
+    @Inject lateinit var widgetPrefs: WidgetPreferences
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -46,9 +44,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         val binding = ActivityWidgetConfigurationBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val extras = intent.extras
-        extras?.let {
-            appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        }
+        extras?.let { appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId) }
 
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -63,7 +59,8 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             binding.widgetConfigThemeSystem.isChecked = true
         } else {
             binding.widgetConfigThemeSystem.visibility = View.GONE
-            val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            val currentNightMode =
+                resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
                 binding.widgetConfigThemeDark.isChecked = true
             } else {
@@ -74,35 +71,41 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         binding.widgetConfigThemeRadioGroup.setOnCheckedChangeListener { _, radioId ->
             when (radioId) {
                 R.id.widgetConfigThemeSystem -> {
-                    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                    val currentNightMode =
+                        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                     if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
+                        binding.widgetConfigPreview.setImageResource(
+                            R.drawable.search_favorites_widget_dark_preview)
                     } else {
-                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
+                        binding.widgetConfigPreview.setImageResource(
+                            R.drawable.search_favorites_widget_preview)
                     }
                 }
                 R.id.widgetConfigThemeLight -> {
-                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_preview)
+                    binding.widgetConfigPreview.setImageResource(
+                        R.drawable.search_favorites_widget_preview)
                 }
                 R.id.widgetConfigThemeDark -> {
-                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
+                    binding.widgetConfigPreview.setImageResource(
+                        R.drawable.search_favorites_widget_dark_preview)
                 }
             }
         }
 
         binding.widgetConfigAddWidgetButton.setOnClickListener {
-            val selectedTheme = when (binding.widgetConfigThemeRadioGroup.checkedRadioButtonId) {
-                R.id.widgetConfigThemeLight -> {
-                    WidgetTheme.LIGHT
+            val selectedTheme =
+                when (binding.widgetConfigThemeRadioGroup.checkedRadioButtonId) {
+                    R.id.widgetConfigThemeLight -> {
+                        WidgetTheme.LIGHT
+                    }
+                    R.id.widgetConfigThemeDark -> {
+                        WidgetTheme.DARK
+                    }
+                    R.id.widgetConfigThemeSystem -> {
+                        WidgetTheme.SYSTEM_DEFAULT
+                    }
+                    else -> throw IllegalArgumentException("Unknown Radio button Id")
                 }
-                R.id.widgetConfigThemeDark -> {
-                    WidgetTheme.DARK
-                }
-                R.id.widgetConfigThemeSystem -> {
-                    WidgetTheme.SYSTEM_DEFAULT
-                }
-                else -> throw IllegalArgumentException("Unknown Radio button Id")
-            }
             storeAndSubmitConfiguration(appWidgetId, selectedTheme)
         }
 

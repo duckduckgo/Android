@@ -45,16 +45,19 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Provider
 
-data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
+data class SystemSearchResult(
+    val autocomplete: AutoCompleteResult,
+    val deviceApps: List<DeviceApp>
+)
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,
@@ -67,10 +70,7 @@ class SystemSearchViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
-    data class OnboardingViewState(
-        val visible: Boolean,
-        val expanded: Boolean = false
-    )
+    data class OnboardingViewState(val visible: Boolean, val expanded: Boolean = false)
 
     sealed class Suggestions {
         data class SystemSearchResultsViewState(
@@ -78,7 +78,9 @@ class SystemSearchViewModel(
             val appResults: List<DeviceApp> = emptyList()
         ) : Suggestions()
 
-        data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) : Suggestions()
+        data class QuickAccessItems(
+            val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+        ) : Suggestions()
     }
 
     sealed class Command {
@@ -100,7 +102,8 @@ class SystemSearchViewModel(
     private val resultsPublishSubject = PublishRelay.create<String>()
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsDisposable: Disposable? = null
-    private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
+    private var latestQuickAccessItems: Suggestions.QuickAccessItems =
+        Suggestions.QuickAccessItems(emptyList())
 
     private var appsJob: Job? = null
 
@@ -110,7 +113,9 @@ class SystemSearchViewModel(
         refreshAppList()
         viewModelScope.launch {
             favoritesRepository.favorites().collect { favorite ->
-                latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                latestQuickAccessItems =
+                    Suggestions.QuickAccessItems(
+                        favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
                 resultsViewState.postValue(latestQuickAccessItems)
             }
         }
@@ -121,9 +126,7 @@ class SystemSearchViewModel(
 
     fun resetViewState() {
         command.value = Command.ClearInputText
-        viewModelScope.launch {
-            resetOnboardingState()
-        }
+        viewModelScope.launch { resetOnboardingState() }
         resetResultsState()
     }
 
@@ -142,31 +145,31 @@ class SystemSearchViewModel(
     }
 
     private fun configureResults() {
-        resultsDisposable = resultsPublishSubject
-            .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
-            .switchMap { buildResultsObservable(query = it) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result ->
-                    updateResults(result)
-                },
-                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
-            )
+        resultsDisposable =
+            resultsPublishSubject
+                .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
+                .switchMap { buildResultsObservable(query = it) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { result -> updateResults(result) },
+                    { t: Throwable? -> Timber.w(t, "Failed to get search results") })
     }
 
     private fun buildResultsObservable(query: String): Observable<SystemSearchResult>? {
         return Observable.zip(
             autoComplete.autoComplete(query),
             Observable.just(deviceAppLookup.query(query)),
-            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> {
+                autocompleteResult: AutoCompleteResult,
+                appsResult: List<DeviceApp> ->
                 SystemSearchResult(autocompleteResult, appsResult)
-            }
-        )
+            })
     }
 
     fun userTappedOnboardingToggle() {
-        onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
+        onboardingViewState.value =
+            currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
         if (currentOnboardingState().expanded) {
             pixel.fire(INTERSTITIAL_ONBOARDING_MORE_PRESSED)
             command.value = Command.DismissKeyboard
@@ -208,22 +211,24 @@ class SystemSearchViewModel(
         val appResults = results.deviceApps
         val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
-        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
-        val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
+        val updatedSuggestions =
+            if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
+        val updatedApps =
+            if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
         resultsViewState.postValue(
             when (val currentResultsState = currentResultsState()) {
                 is Suggestions.SystemSearchResultsViewState -> {
                     currentResultsState.copy(
-                        autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                        appResults = updatedApps
-                    )
+                        autocompleteResults =
+                            AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+                        appResults = updatedApps)
                 }
-                is Suggestions.QuickAccessItems -> Suggestions.SystemSearchResultsViewState(
-                    autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
-                    appResults = updatedApps
-                )
-            }
-        )
+                is Suggestions.QuickAccessItems ->
+                    Suggestions.SystemSearchResultsViewState(
+                        autocompleteResults =
+                            AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
+                        appResults = updatedApps)
+            })
     }
 
     private fun inputCleared() {
@@ -275,9 +280,7 @@ class SystemSearchViewModel(
     }
 
     private fun refreshAppList() {
-        viewModelScope.launch(dispatchers.io()) {
-            deviceAppLookup.refreshAppList()
-        }
+        viewModelScope.launch(dispatchers.io()) { deviceAppLookup.refreshAppList() }
     }
 
     override fun onCleared() {
@@ -314,9 +317,7 @@ class SystemSearchViewModel(
     override fun onSavedSiteEdited(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    favoritesRepository.update(savedSite)
-                }
+                viewModelScope.launch(dispatchers.io()) { favoritesRepository.update(savedSite) }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to edit received")
         }
@@ -336,9 +337,7 @@ class SystemSearchViewModel(
     fun insertQuickAccessItem(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    favoritesRepository.insert(savedSite)
-                }
+                viewModelScope.launch(dispatchers.io()) { favoritesRepository.insert(savedSite) }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
         }
@@ -346,7 +345,9 @@ class SystemSearchViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class SystemSearchViewModelFactory @Inject constructor(
+class SystemSearchViewModelFactory
+@Inject
+constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val autoComplete: Provider<AutoCompleteApi>,
     private val deviceAppLookup: Provider<DeviceAppLookup>,
@@ -358,17 +359,16 @@ class SystemSearchViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (
-                    SystemSearchViewModel(
+                isAssignableFrom(SystemSearchViewModel::class.java) ->
+                    (SystemSearchViewModel(
                         userStageStore.get(),
                         autoComplete.get(),
                         deviceAppLookup.get(),
                         pixel.get(),
                         favoritesRepository.get(),
                         faviconManager.get(),
-                        appSettingsPreferencesStore.get()
-                    ) as T
-                    )
+                        appSettingsPreferencesStore.get()) as
+                        T)
                 else -> null
             }
         }

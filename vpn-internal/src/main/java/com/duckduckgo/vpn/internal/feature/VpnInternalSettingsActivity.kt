@@ -31,33 +31,36 @@ import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var vpnBugReporter: VpnBugReporter
+    @Inject lateinit var vpnBugReporter: VpnBugReporter
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
 
-    private val transparencyToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        if (toggleState) {
-            TransparencyModeDebugReceiver.turnOnIntent()
-        } else {
-            TransparencyModeDebugReceiver.turnOffIntent()
-        }.also { sendBroadcast(it) }
-    }
+    private val transparencyToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, toggleState ->
+            if (toggleState) {
+                    TransparencyModeDebugReceiver.turnOnIntent()
+                } else {
+                    TransparencyModeDebugReceiver.turnOffIntent()
+                }
+                .also { sendBroadcast(it) }
+        }
 
-    private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        if (toggleState) {
-            DebugLoggingReceiver.turnOnIntent()
-        } else {
-            DebugLoggingReceiver.turnOffIntent()
-        }.also { sendBroadcast(it) }
-    }
+    private val debugLoggingToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, toggleState ->
+            if (toggleState) {
+                    DebugLoggingReceiver.turnOnIntent()
+                } else {
+                    DebugLoggingReceiver.turnOffIntent()
+                }
+                .also { sendBroadcast(it) }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,7 +107,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                     putExtra(Intent.EXTRA_TEXT, report)
                     startActivity(Intent.createChooser(this, "Share AppTP bug report"))
                 }
-            }.show()
+            }
+            .show()
     }
 
     private fun setupAppTrackerExceptionRules() {
@@ -116,30 +120,35 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private fun setupTransparencyMode() {
 
         // we use the same receiver as it makes IPC much easier
-        transparencyModeDebugReceiver = TransparencyModeDebugReceiver(this) {
-            // avoid duplicating broadcast intent when toggle changes state
-            binding.transparencyModeToggle.setOnCheckedChangeListener(null)
-            if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
-                binding.transparencyModeToggle.isChecked = true
-            } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
-                binding.transparencyModeToggle.isChecked = false
+        transparencyModeDebugReceiver =
+            TransparencyModeDebugReceiver(this) {
+                // avoid duplicating broadcast intent when toggle changes state
+                binding.transparencyModeToggle.setOnCheckedChangeListener(null)
+                if (TransparencyModeDebugReceiver.isTurnOnIntent(it)) {
+                    binding.transparencyModeToggle.isChecked = true
+                } else if (TransparencyModeDebugReceiver.isTurnOffIntent(it)) {
+                    binding.transparencyModeToggle.isChecked = false
+                }
+                binding.transparencyModeToggle.setOnCheckedChangeListener(
+                    transparencyToggleListener)
             }
-            binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
-        }.apply { register() }
+                .apply { register() }
 
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
     }
 
     private fun setupDebugLogging() {
-        debugLoggingReceiver = DebugLoggingReceiver(this) { intent ->
-            binding.debugLoggingToggle.setOnCheckedChangeListener(null)
-            if (DebugLoggingReceiver.isLoggingOnIntent(intent)) {
-                binding.debugLoggingToggle.isChecked = true
-            } else if (DebugLoggingReceiver.isLoggingOffIntent(intent)) {
-                binding.debugLoggingToggle.isChecked = false
+        debugLoggingReceiver =
+            DebugLoggingReceiver(this) { intent ->
+                binding.debugLoggingToggle.setOnCheckedChangeListener(null)
+                if (DebugLoggingReceiver.isLoggingOnIntent(intent)) {
+                    binding.debugLoggingToggle.isChecked = true
+                } else if (DebugLoggingReceiver.isLoggingOffIntent(intent)) {
+                    binding.debugLoggingToggle.isChecked = false
+                }
+                binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
             }
-            binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
-        }.apply { register() }
+                .apply { register() }
 
         // initial state
         binding.debugLoggingToggle.isChecked = TimberExtensions.isLoggingEnabled()
