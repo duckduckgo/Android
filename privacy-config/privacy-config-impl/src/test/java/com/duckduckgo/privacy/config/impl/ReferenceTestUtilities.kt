@@ -63,10 +63,6 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
     var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestCoroutineScope(), dispatcherProvider)
     var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestCoroutineScope(), dispatcherProvider)
 
-    init {
-
-    }
-
     // Add your plugin to this list in order for it to be tested against some basic reference tests
     private fun getPrivacyFeaturePlugins(): List<PrivacyFeaturePlugin> {
         return listOf(
