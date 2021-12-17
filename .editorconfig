@@ -16,20 +16,20 @@
 # Tells tools to stop searching upwards.
 root = true
 
-[*]
+[{/submodules/**,*.cpp}]
 charset = utf-8
-end_of_line = lf
-indent_size = 4
-indent_style = space
-insert_final_newline = true
-max_line_length = 150
-tab_width = 4
-ij_continuation_indent_size = 4
-ij_formatter_off_tag = @formatter:off
-ij_formatter_on_tag = @formatter:on
-ij_formatter_tags_enabled = false
-ij_smart_tabs = false
-ij_wrap_on_typing = false
+end_of_line = unset
+indent_size = unset
+indent_style = unset
+insert_final_newline = unset
+max_line_length = unset
+tab_width = unset
+ij_continuation_indent_size = unset
+ij_formatter_off_tag = unset
+ij_formatter_on_tag = unset
+ij_formatter_tags_enabled = unset
+ij_smart_tabs = unset
+ij_wrap_on_typing = unset
 
 # Back-ticked method names are allowed to exceed the line length. That's especially helpful for
 # test methods with descriptive names.
