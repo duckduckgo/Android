@@ -546,7 +546,7 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
-        firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_USER_REPORT, healthMetrics)
+        firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
     }
 
     private fun suddenKill() {
