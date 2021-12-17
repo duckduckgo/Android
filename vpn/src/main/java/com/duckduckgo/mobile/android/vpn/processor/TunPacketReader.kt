@@ -20,6 +20,9 @@ import android.os.ParcelFileDescriptor
 import android.os.Process
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -27,14 +30,19 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-class TunPacketReader(
-    private val tunInterface: ParcelFileDescriptor,
+class TunPacketReader @AssistedInject constructor(
+    @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter
 ) : Runnable {
 
     private var running = false
     var bufferToNetwork = byteBuffer()
+
+    @AssistedFactory
+    interface Factory {
+        fun create(tunInterface: ParcelFileDescriptor): TunPacketReader
+    }
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY)

@@ -23,6 +23,9 @@ import com.duckduckgo.mobile.android.vpn.health.TracedState.REMOVED_FROM_NETWORK
 import com.duckduckgo.mobile.android.vpn.health.TracerEvent
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
@@ -30,14 +33,19 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-class TunPacketWriter(
-    private val tunInterface: ParcelFileDescriptor,
+class TunPacketWriter @AssistedInject constructor(
+    @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
     private val tracerPacketRegister: TracerPacketRegister,
     private val healthMetricCounter: HealthMetricCounter
 ) : Runnable {
 
     private var running = false
+
+    @AssistedFactory
+    interface Factory {
+        fun create(tunInterface: ParcelFileDescriptor): TunPacketWriter
+    }
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY)
