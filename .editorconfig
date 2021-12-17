@@ -1,4 +1,3 @@
-
 # IntelliJ allows to export the code style in the .editorconfig format. These are the settings
 # from the most recent settings for SquareAndroid from here:
 #
@@ -16,24 +15,25 @@
 # Tells tools to stop searching upwards.
 root = true
 
-[{/submodules/**,*.cpp}]
+[*]
 charset = utf-8
-end_of_line = unset
-indent_size = unset
-indent_style = unset
-insert_final_newline = unset
-max_line_length = unset
-tab_width = unset
-ij_continuation_indent_size = unset
-ij_formatter_off_tag = unset
-ij_formatter_on_tag = unset
-ij_formatter_tags_enabled = unset
-ij_smart_tabs = unset
-ij_wrap_on_typing = unset
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 150
+tab_width = 4
+ij_continuation_indent_size = 4
+ij_formatter_off_tag = @formatter:off
+ij_formatter_on_tag = @formatter:on
+ij_formatter_tags_enabled = false
+ij_smart_tabs = false
+ij_wrap_on_typing = false
+
 
 # Back-ticked method names are allowed to exceed the line length. That's especially helpful for
 # test methods with descriptive names.
-ktlint_ignore_back_ticked_identifier = true
+# ktlint_ignore_back_ticked_identifier = true
 
 [.editorconfig]
 ij_editorconfig_align_group_field_declarations = false
@@ -44,11 +44,11 @@ ij_editorconfig_space_before_comma = false
 ij_editorconfig_spaces_around_assignment_operators = true
 
 [*.json]
-indent_size = 2
-tab_width = 2
 ij_continuation_indent_size = 2
+tab_width = 2
+indent_size = 2
 
-[{*.ant,*.fxml,*.jhm,*.jnlp,*.jrxml,*.jspx,*.pom,*.rng,*.tagx,*.tld,*.wsdl,*.xml,*.xsd,*.xsl,*.xslt,*.xul}]
+[*.xml]
 ij_xml_align_attributes = false
 ij_xml_align_text = false
 ij_xml_attribute_wrap = normal
