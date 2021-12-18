@@ -22,29 +22,32 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.*
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.AndroidInjection
-import dummy.VpnViewModelFactory
 import dummy.ui.VpnControllerViewModel.AppTrackersBlocked
+import java.text.NumberFormat
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
-import java.text.NumberFormat
-import javax.inject.Inject
 
-class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
+class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var lastAppTrackerDomainTextView: TextView
     private lateinit var appTrackerCompaniesBlockedTodayTextView: TextView
@@ -64,16 +67,9 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var dataReceivedTextView: TextView
     private lateinit var uuidTextView: TextView
 
-    @Inject
-    lateinit var vpnDatabase: VpnDatabase
+    @Inject lateinit var vpnDatabase: VpnDatabase
 
-    @Inject
-    lateinit var viewModelFactory: VpnViewModelFactory
-
-    @Inject
-    lateinit var dataSizeFormatter: DataSizeFormatter
-
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    @Inject lateinit var dataSizeFormatter: DataSizeFormatter
 
     private val viewModel: VpnControllerViewModel by bindViewModel()
     private val packetsFormatter = NumberFormat.getInstance()
@@ -85,7 +81,8 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setContentView(R.layout.activity_vpn_controller)
+        setupToolbar(findViewById(R.id.toolbar))
 
         AndroidInjection.inject(this)
 
@@ -123,21 +120,20 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             renderLastWeekWebTrackerData(it)
         }
 
-        viewModel.getVpnState().observe(this) {
-            renderUuid(it?.uuid ?: "initializing")
-        }
+        viewModel.getVpnState().observe(this) { renderUuid(it?.uuid ?: "initializing") }
     }
 
     override fun onStart() {
         super.onStart()
 
         timerUpdateJob?.cancel()
-        timerUpdateJob = lifecycleScope.launch {
-            while (isActive) {
-                updateRelativeTimes()
-                delay(1_000)
+        timerUpdateJob =
+            lifecycleScope.launch {
+                while (isActive) {
+                    updateRelativeTimes()
+                    delay(1_000)
+                }
             }
-        }
     }
 
     override fun onStop() {
@@ -150,15 +146,19 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun setViewReferences() {
-        appTrackerCompaniesBlockedTodayTextView = findViewById(R.id.vpnAppTrackerCompaniesBlockedToday)
+        appTrackerCompaniesBlockedTodayTextView =
+            findViewById(R.id.vpnAppTrackerCompaniesBlockedToday)
         appTrackersBlockedTodayTextView = findViewById(R.id.vpnAppTrackersBlockedToday)
-        appTrackerCompaniesBlockedWeekTextView = findViewById(R.id.vpnAppTrackerCompaniesBlockedWeek)
+        appTrackerCompaniesBlockedWeekTextView =
+            findViewById(R.id.vpnAppTrackerCompaniesBlockedWeek)
         appTrackersBlockedWeekTextView = findViewById(R.id.vpnAppTrackersBlockedWeek)
         lastAppTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
 
-        webTrackerCompaniesBlockedTodayTextView = findViewById(R.id.vpnWebTrackerCompaniesBlockedToday)
+        webTrackerCompaniesBlockedTodayTextView =
+            findViewById(R.id.vpnWebTrackerCompaniesBlockedToday)
         webTrackersBlockedTodayTextView = findViewById(R.id.vpnWebTrackersBlockedToday)
-        webTrackerCompaniesBlockedWeekTextView = findViewById(R.id.vpnWebTrackersCompaniesBlockedWeek)
+        webTrackerCompaniesBlockedWeekTextView =
+            findViewById(R.id.vpnWebTrackersCompaniesBlockedWeek)
         webTrackersBlockedWeekTextView = findViewById(R.id.vpnWebTrackersBlockedWeek)
         lastWebTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
 
@@ -166,15 +166,21 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         dataSentTextView = findViewById(R.id.vpnSentStats)
         dataReceivedTextView = findViewById(R.id.vpnReceivedStats)
         uuidTextView = findViewById(R.id.vpnUUID)
-        appVersionText = findViewById<TextView>(R.id.appVersionText).also { it.text = packageManager.getPackageInfo(packageName, 0).versionName }
+        appVersionText =
+            findViewById<TextView>(R.id.appVersionText).also {
+                it.text = packageManager.getPackageInfo(packageName, 0).versionName
+            }
     }
 
     private fun configureUiHandlers() {
         uuidTextView.setOnClickListener {
-            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val manager: ClipboardManager =
+                getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
             manager.setPrimaryClip(clipData)
-            Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(
+                    uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -194,16 +200,16 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun renderDataStats(dataSent: DataTransfer, dataReceived: DataTransfer) {
-        dataSentTextView.text = getString(
-            R.string.vpnDataTransferred,
-            dataSizeFormatter.format(dataSent.dataSize),
-            packetsFormatter.format(dataSent.numberPackets)
-        )
-        dataReceivedTextView.text = getString(
-            R.string.vpnDataTransferred,
-            dataSizeFormatter.format(dataReceived.dataSize),
-            packetsFormatter.format(dataReceived.numberPackets)
-        )
+        dataSentTextView.text =
+            getString(
+                R.string.vpnDataTransferred,
+                dataSizeFormatter.format(dataSent.dataSize),
+                packetsFormatter.format(dataSent.numberPackets))
+        dataReceivedTextView.text =
+            getString(
+                R.string.vpnDataTransferred,
+                dataSizeFormatter.format(dataReceived.dataSize),
+                packetsFormatter.format(dataReceived.numberPackets))
     }
 
     private fun renderUuid(uuid: String) {
@@ -211,34 +217,45 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun renderTodayAppTrackerData(trackerData: AppTrackersBlocked) {
-        appTrackerCompaniesBlockedTodayTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
-        appTrackersBlockedTodayTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
+        appTrackerCompaniesBlockedTodayTextView.text =
+            generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
+        appTrackersBlockedTodayTextView.text =
+            generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
         lastAppTrackerBlocked = trackerData.trackerList.firstOrNull()
         updateRelativeTimes()
     }
 
     private fun renderLastWeekAppTrackerData(trackerData: AppTrackersBlocked) {
-        appTrackerCompaniesBlockedWeekTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
-        appTrackersBlockedWeekTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
+        appTrackerCompaniesBlockedWeekTextView.text =
+            generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
+        appTrackersBlockedWeekTextView.text =
+            generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 
     private fun renderTodayWebTrackerData(trackerData: VpnControllerViewModel.WebTrackersBlocked) {
-        webTrackerCompaniesBlockedTodayTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
-        webTrackersBlockedTodayTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
+        webTrackerCompaniesBlockedTodayTextView.text =
+            generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
+        webTrackersBlockedTodayTextView.text =
+            generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
         lastWebTrackerBlocked = trackerData.trackerList.firstOrNull()
         lastWebTrackerDomainTextView.text = generateLastWebTrackerBlocked(lastWebTrackerBlocked)
     }
 
-    private fun renderLastWeekWebTrackerData(trackerData: VpnControllerViewModel.WebTrackersBlocked) {
-        webTrackerCompaniesBlockedWeekTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
-        webTrackersBlockedWeekTextView.text = generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
+    private fun renderLastWeekWebTrackerData(
+        trackerData: VpnControllerViewModel.WebTrackersBlocked
+    ) {
+        webTrackerCompaniesBlockedWeekTextView.text =
+            generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
+        webTrackersBlockedWeekTextView.text =
+            generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 
     private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
         return if (timeRunningMillis == 0L) {
             getString(R.string.vpnNotRunYet)
         } else {
-            return getString(R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
+            return getString(
+                R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
         }
     }
 
@@ -260,14 +277,19 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.trackerUrl}\n(owned by ${lastTracker.trackerCompany})"
     }
 
-    private fun generateTrackerCompaniesBlocked(totalTrackerCompanies: Int, displayWeek: Boolean): String {
+    private fun generateTrackerCompaniesBlocked(
+        totalTrackerCompanies: Int,
+        displayWeek: Boolean
+    ): String {
         return if (totalTrackerCompanies == 0) {
             applicationContext.getString(R.string.vpnTrackerCompaniesNone)
         } else {
             return if (displayWeek) {
-                applicationContext.getString(R.string.vpnTrackerCompaniesBlockedThisWeek, totalTrackerCompanies)
+                applicationContext.getString(
+                    R.string.vpnTrackerCompaniesBlockedThisWeek, totalTrackerCompanies)
             } else {
-                applicationContext.getString(R.string.vpnTrackerCompaniesBlockedToday, totalTrackerCompanies)
+                applicationContext.getString(
+                    R.string.vpnTrackerCompaniesBlockedToday, totalTrackerCompanies)
             }
         }
     }
@@ -296,5 +318,32 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
         val FEEDBACK_URL = "https://form.asana.com?k=j2t0mHOc9nMVTDqg5OHPJw&d=137249556945".toUri()
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+@ContributesMultibinding(AppScope::class)
+class VpnControllerViewModelFactory
+@Inject
+constructor(
+    private val appTrackerBlockedRepository: AppTrackerBlockingStatsRepository,
+    private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val applicationContext: Context,
+    private val vpnPreferences: VpnPreferences
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(VpnControllerViewModel::class.java) -> {
+                    return VpnControllerViewModel(
+                        appTrackerBlockedRepository,
+                        webTrackersBlockedRepository,
+                        applicationContext,
+                        vpnPreferences) as
+                        T
+                }
+                else -> null
+            }
+        }
     }
 }

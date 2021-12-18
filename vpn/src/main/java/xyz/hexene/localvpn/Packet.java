@@ -38,6 +38,9 @@ public class Packet {
     public UDPHeader udpHeader;
     public ByteBuffer backingBuffer;
 
+    public boolean isTracer;
+    public String tracerId;
+
     private boolean isTCP;
     private boolean isUDP;
 
@@ -51,6 +54,15 @@ public class Packet {
             this.isUDP = true;
         }
         this.backingBuffer = buffer;
+    }
+
+    private Packet() {}
+
+    public static Packet TracerPacker(String tracerId) {
+        Packet packet = new Packet();
+        packet.isTracer = true;
+        packet.tracerId = tracerId;
+        return packet;
     }
 
     @Override
