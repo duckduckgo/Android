@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.Unknown
-import com.duckduckgo.app.remotemessage.impl.messages.*
+import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
 import timber.log.Timber
 
 class RemoteMessagingConfigJsonParser(
@@ -36,59 +34,4 @@ class RemoteMessagingConfigJsonParser(
             rules = matchingRules
         )
     }
-
-    private fun parseMatchingRules(
-        jsonMatchingRules: List<JsonMatchingRule>
-    ): Map<Int, List<MatchingAttribute?>> {
-        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
-
-        jsonMatchingRules.forEach {
-            Timber.i("RMF: MatchingRule ${it.id}")
-
-            matchingRules[it.id] = it.attributes.mapNotNull { (key, jsonMatchingAttribute) ->
-                Timber.i("RMF: MatchingRule $key")
-
-                return@mapNotNull kotlin.runCatching {
-                    when (key) {
-                        "locale" -> {
-                            MatchingAttribute.Locale(
-                                value = jsonMatchingAttribute.value as List<String>,
-                                fallback = jsonMatchingAttribute.fallback
-                            )
-                        }
-                        "defaultBrowser" -> {
-                            MatchingAttribute.DefaultBrowser(
-                                value = jsonMatchingAttribute.value as Boolean,
-                                fallback = jsonMatchingAttribute.fallback
-                            )
-                        }
-                        else -> Unknown(fallback = jsonMatchingAttribute.fallback)
-                    }
-                }.getOrDefault(Unknown(fallback = jsonMatchingAttribute.fallback))
-            }.toList()
-        }
-        return matchingRules
-    }
-
-    /*private fun parseMatchingRules(
-        jsonMatchingRules: List<JsonMatchingRule>
-    ): Map<Int, List<MatchingAttribute?>> {
-        val matchingRules = mutableMapOf<Int, List<MatchingAttribute?>>()
-
-        jsonMatchingRules.forEach {
-            Timber.i("RMF: MatchingRule ${it.id}")
-
-            matchingRules[it.id] = it.attributes.mapNotNull { (key, jsonObject) ->
-                Timber.i("RMF: MatchingRule $key")
-
-                matchingAttributesPluginPoint.getPlugins().forEach { plugin ->
-                    val rule = plugin.parse(key, jsonObject.toString())
-                    if (rule != null) return@mapNotNull rule
-                }
-
-                return@mapNotNull parse<MatchingAttribute.Unknown>(jsonObject.toString())
-            }.toList()
-        }
-        return matchingRules
-    }*/
 }

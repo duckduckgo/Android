@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
-import com.squareup.moshi.JsonClass
-import org.json.JSONObject
-
 data class JsonRemoteMessagingConfig(
     val version: Long,
     val messages: List<JsonRemoteMessage>,
@@ -32,13 +29,6 @@ data class JsonRemoteMessage(
     val exclusionRules: List<Int>?,
     val matchingRules: List<Int>?
 )
-
-sealed class JsonMessageContent {
-    data class Small(val titleText: String, val descriptionText: String) : JsonMessageContent()
-    data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : JsonMessageContent()
-    data class BigSingleAction(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction) : JsonMessageContent()
-    data class BigTwoActions(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction, val secondaryActionText: String, val secondaryAction: JsonMessageAction) : JsonMessageContent()
-}
 
 data class JsonContent(
     val titleText: String,

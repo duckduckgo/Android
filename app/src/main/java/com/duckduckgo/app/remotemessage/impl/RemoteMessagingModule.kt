@@ -19,7 +19,6 @@ package com.duckduckgo.app.remotemessage.impl
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.remotemessage.store.ALL_MIGRATIONS
 import com.duckduckgo.app.remotemessage.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
@@ -31,23 +30,10 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
-import javax.inject.Singleton
-
-@Module
-@ContributesTo(AppScope::class)
-abstract class RemoteMessagingModuleBindingModule {
-
-    @Multibinds
-    abstract fun provideMatchingAttributesPlugins(): Set<@JvmSuppressWildcards MatchingAttributePlugin>
-
-    @Multibinds
-    abstract fun provideMessagePlugins(): Set<@JvmSuppressWildcards MessagePlugin>
-}
 
 @Module
 @ContributesTo(AppScope::class)
@@ -78,18 +64,6 @@ class NetworkModule {
             .build()
 
         return retrofit.create(RemoteMessagingService::class.java)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesMatchingAttributePluginPoint(customConfigs: Set<@JvmSuppressWildcards MatchingAttributePlugin>): PluginPoint<MatchingAttributePlugin> {
-        return MatchingAttributePluginPoint(customConfigs)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesMessagePluginPoint(customConfigs: Set<@JvmSuppressWildcards MessagePlugin>): PluginPoint<MessagePlugin> {
-        return MessagePluginPoint(customConfigs)
     }
 }
 
