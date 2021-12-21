@@ -50,24 +50,26 @@ class FileDownloadBroadcastReceiver @Inject constructor(
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Timber.d("Download completed.")
 
-        val downloadManager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+        appCoroutineScope.launch(dispatcher.io()) {
+            Timber.d("Download completed.")
+            val downloadManager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
 
-        val query = DownloadManager.Query()
-        query.setFilterByStatus(DownloadManager.STATUS_FAILED or DownloadManager.STATUS_SUCCESSFUL)
+            val query = DownloadManager.Query()
+            query.setFilterByStatus(DownloadManager.STATUS_FAILED or DownloadManager.STATUS_SUCCESSFUL)
 
-        val cursor = downloadManager?.query(query) ?: return
-        if (cursor.moveToFirst()) {
-            val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-            when (cursor.getInt(index)) {
-                DownloadManager.STATUS_SUCCESSFUL -> appCoroutineScope.launch(dispatcher.io()) {
-                    Timber.d("Download completed with success.")
-                    pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-                }
-                DownloadManager.STATUS_FAILED -> appCoroutineScope.launch(dispatcher.io()) {
-                    Timber.d("Download completed, but failed.")
-                    pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+            val cursor = downloadManager?.query(query)
+            if (cursor?.moveToFirst() == true) {
+                val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                when (cursor.getInt(index)) {
+                    DownloadManager.STATUS_SUCCESSFUL -> {
+                        Timber.d("Download completed with success.")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+                    }
+                    DownloadManager.STATUS_FAILED -> {
+                        Timber.d("Download completed, but failed.")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+                    }
                 }
             }
         }
